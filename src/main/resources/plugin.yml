@@ -1,0 +1,11 @@
+name: DMGR
+version: 0.0.1
+main: com.dace.dmgr.DMGR
+prefix: DMGR
+database: false
+depend: [ CrackShot ]
+authors: [ DarkDace ]
+description: Core plugin of DMGR
+commands:
+  메뉴:
+    description: DMGR Command
