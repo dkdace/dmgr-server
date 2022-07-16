@@ -1,8 +1,8 @@
 package com.dace.dmgr.data.model;
 
-import com.dace.dmgr.data.Model;
+import com.dace.dmgr.data.YamlModel;
 
-public class GeneralConfig extends Model {
+public class GeneralConfig extends YamlModel {
     public static String resourcePackUrl;
     public static int chatCooldown;
 
@@ -12,7 +12,6 @@ public class GeneralConfig extends Model {
 
     public GeneralConfig() {
         super("GeneralConfig");
-        super.initConfig();
         resourcePackUrl = getConfigString("resourcePackUrl");
         chatCooldown = getConfigInt("chatCooldown");
     }

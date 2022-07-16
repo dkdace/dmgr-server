@@ -7,8 +7,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class MainMenuEvent extends MenuEvent {
-    public MainMenuEvent() {
+    private static final MainMenuEvent instance = new MainMenuEvent();
+
+    private MainMenuEvent() {
         super("메뉴");
+    }
+
+    public static MainMenuEvent getInstance() {
+        return instance;
     }
 
     @Override

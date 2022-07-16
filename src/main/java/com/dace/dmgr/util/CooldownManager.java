@@ -1,6 +1,6 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.data.Model;
+import com.dace.dmgr.data.YamlModel;
 
 import java.util.HashMap;
 
@@ -13,8 +13,8 @@ public class CooldownManager {
         cooldownList.put(id, time);
     }
 
-    public static void setCooldown(Model model, Enum id, long duration) {
-        String saveId = model.getKey() + id;
+    public static void setCooldown(YamlModel yamlModel, Enum id, long duration) {
+        String saveId = yamlModel.getKey() + id;
 
         long time = System.currentTimeMillis();
         time += duration * 50;
@@ -33,8 +33,8 @@ public class CooldownManager {
         return (time - System.currentTimeMillis()) / 50;
     }
 
-    public static long getCooldown(Model model, Enum id) {
-        String saveId = model.getKey() + id;
+    public static long getCooldown(YamlModel yamlModel, Enum id) {
+        String saveId = yamlModel.getKey() + id;
 
         Long time = cooldownList.get(saveId);
         if (time == null)
@@ -57,8 +57,8 @@ public class CooldownManager {
         }
     }
 
-    public static void addCooldown(Model model, Enum id, long duration) {
-        String saveId = model.getKey() + id;
+    public static void addCooldown(YamlModel yamlModel, Enum id, long duration) {
+        String saveId = yamlModel.getKey() + id;
 
         Long time = cooldownList.get(saveId);
         if (time == null)

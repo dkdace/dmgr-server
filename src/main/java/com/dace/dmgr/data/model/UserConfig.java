@@ -1,16 +1,15 @@
 package com.dace.dmgr.data.model;
 
-import com.dace.dmgr.data.Model;
+import com.dace.dmgr.data.YamlModel;
 import org.bukkit.entity.Player;
 
-public class UserConfig extends Model {
+public class UserConfig extends YamlModel {
     private String chatSound = "new.block.note_block.pling";
     private boolean koreanChat;
     private boolean nightVision;
 
     public UserConfig(Player player) {
         super("UserConfig", player.getUniqueId().toString());
-        super.initConfig();
         this.koreanChat = getConfigBoolean("koreanChat");
         this.chatSound = getConfigString("chatSound", this.chatSound);
         this.nightVision = getConfigBoolean("nightVision");

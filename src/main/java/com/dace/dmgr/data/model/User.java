@@ -1,10 +1,10 @@
 package com.dace.dmgr.data.model;
 
-import com.dace.dmgr.data.Model;
+import com.dace.dmgr.data.YamlModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-public class User extends Model {
+public class User extends YamlModel {
     public boolean resourcePack = false;
     public PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
     public Player player;
@@ -15,13 +15,8 @@ public class User extends Model {
     private int money;
     private int rank;
 
-    public enum Cooldown {
-        CHAT
-    }
-
     public User(Player player) {
         super("User", player.getUniqueId().toString());
-        super.initConfig();
         setName(player.getName());
         this.player = player;
         this.xp = getConfigInt("xp");
@@ -77,5 +72,9 @@ public class User extends Model {
     public void setRank(int rank) {
         this.rank = rank;
         setConfig("rank", this.rank);
+    }
+
+    public enum Cooldown {
+        CHAT
     }
 }

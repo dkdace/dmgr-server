@@ -2,7 +2,6 @@ package com.dace.dmgr.system;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.data.model.User;
-import com.dace.dmgr.gui.menu.MainMenu;
 import com.dace.dmgr.gui.menu.event.MainMenuEvent;
 import com.dace.dmgr.lobby.Chat;
 import com.dace.dmgr.lobby.ResourcePack;
@@ -78,7 +77,7 @@ public class EventListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         User user = userList.get(event.getWhoClicked().getUniqueId());
 
-        new MainMenuEvent().event(event, user);
+        MainMenuEvent.getInstance().event(event, user);
     }
 
     @EventHandler

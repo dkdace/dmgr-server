@@ -5,27 +5,29 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 
-public class Model {
-    private YamlConfiguration config;
+public class YamlModel {
     private final String key;
     private final String modelName;
+    private YamlConfiguration config;
     private File file;
 
-    protected Model(String modelName, String key) {
+    protected YamlModel(String modelName, String key) {
         this.modelName = modelName;
         this.key = key;
+        initConfig();
     }
 
-    protected Model(String modelName) {
+    protected YamlModel(String modelName) {
         this.modelName = modelName;
         this.key = "default";
+        initConfig();
     }
 
     public String getKey() {
         return key;
     }
 
-    protected void initConfig() {
+    private void initConfig() {
         file = new File(DMGR.getPlugin().getDataFolder(), modelName + ".yml");
         config = YamlConfiguration.loadConfiguration(file);
         try {
