@@ -1,18 +1,22 @@
 package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.data.model.User;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.dace.dmgr.system.EntityList.userList;
 
 public class ServerQuit {
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 
-    public static void event(PlayerQuitEvent event, User user) {
-        event.setQuitMessage(PREFIX + user.player.getName());
+    public static void event(PlayerQuitEvent event, Player player) {
+        userList.get(player.getUniqueId()).remove();
+
+        event.setQuitMessage(PREFIX + player.getName());
 
         new BukkitRunnable() {
             @Override

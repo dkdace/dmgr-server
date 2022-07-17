@@ -1,0 +1,112 @@
+package com.dace.dmgr.user;
+
+import com.dace.dmgr.util.YamlModel;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+
+import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.EntityList.userList;
+
+public class User extends YamlModel {
+    private final Player player;
+    private final UserConfig userConfig;
+    public boolean resourcePack = false;
+    public PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
+    private String name;
+    private int xp;
+    private int level;
+    private int money;
+    private int rank;
+
+    public User(Player player) {
+        super("User", player.getUniqueId().toString());
+        this.player = player;
+        this.name = player.getName();
+        this.userConfig = new UserConfig(player);
+        this.xp = loadValue("xp");
+        this.level = loadValue("level");
+        this.money = loadValue("money");
+        this.rank = loadValue("rank");
+        userList.put(player.getUniqueId(), this);
+        saveConfig();
+    }
+
+    private void saveConfig() {
+        saveValue("name", this.name);
+        saveValue("xp", this.xp);
+        saveValue("level", this.level);
+        saveValue("money", this.money);
+        saveValue("rank", this.rank);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public UserConfig getUserConfig() {
+        return userConfig;
+    }
+
+    public void remove() {
+        userList.remove(player.getUniqueId());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        saveValue("name", this.name);
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        if (xp < 0) xp = 0;
+        this.xp = xp;
+        saveValue("xp", this.xp);
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        if (level < 0) level = 0;
+        this.level = level;
+        saveValue("level", this.level);
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        if (money < 0) money = 0;
+        this.money = money;
+        saveValue("money", this.money);
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+        saveValue("rank", this.rank);
+    }
+
+    public void reset() {
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+        player.setHealth(20);
+        combatUserList.remove(player.getUniqueId());
+    }
+
+    public enum Cooldown {
+        CHAT, COMMAND
+    }
+}

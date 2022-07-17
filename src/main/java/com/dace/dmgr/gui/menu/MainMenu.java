@@ -1,18 +1,18 @@
 package com.dace.dmgr.gui.menu;
 
-import com.dace.dmgr.data.model.User;
 import com.dace.dmgr.gui.ItemGenerator;
 import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.gui.slot.ButtonSlot;
 import com.dace.dmgr.gui.slot.DisplaySlot;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class MainMenu extends Menu {
-    public MainMenu(User user) {
+    public MainMenu(Player player) {
         super(6, "§8메뉴");
         super.fill(ItemGenerator.getSlotItem(DisplaySlot.EMPTY));
 
-        super.getGui().setItem(4, ItemGenerator.getPlayerSkull(user.player, "§f§l[ null ] §f" + user.player.getName()));
+        super.getGui().setItem(4, ItemGenerator.getPlayerSkull(player, "§f§l[ null ] §f" + player.getName()));
         super.getGui().setItem(19,
                 ItemGenerator.getItem(Material.IRON_SWORD, "§e§l게임 시작", "§f전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다."));
         super.getGui().setItem(21, ItemGenerator.getItem(Material.LEATHER_BOOTS, "§e§l이동", "§f원하는 장소로 이동합니다."));

@@ -1,14 +1,11 @@
 package com.dace.dmgr.system;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.data.model.User;
 import com.dace.dmgr.gui.menu.event.MainMenuEvent;
 import com.dace.dmgr.lobby.Chat;
 import com.dace.dmgr.lobby.ResourcePack;
 import com.dace.dmgr.lobby.ServerJoin;
 import com.dace.dmgr.lobby.ServerQuit;
-import com.mewin.WGRegionEvents.events.RegionEnterEvent;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,46 +14,29 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerResourcePackStatusEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.server.TabCompleteEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
-
-import static com.dace.dmgr.system.EntityList.userList;
 
 public class EventListener implements Listener {
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        User user = new User(player);
-        userList.put(player.getUniqueId(), user);
-
-        ServerJoin.event(event, user);
+        ServerJoin.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        User user = userList.get(player.getUniqueId());
-        userList.remove(player.getUniqueId());
-
-        ServerQuit.event(event, user);
+        ServerQuit.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        User user = userList.get(event.getPlayer().getUniqueId());
-
-        Chat.event(event, user);
+        Chat.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerResourcepack(PlayerResourcePackStatusEvent event) {
-        User user = userList.get(event.getPlayer().getUniqueId());
-
-        ResourcePack.event(event, user);
+        ResourcePack.event(event, event.getPlayer());
     }
 
     @EventHandler
@@ -75,9 +55,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        User user = userList.get(event.getWhoClicked().getUniqueId());
-
-        MainMenuEvent.getInstance().event(event, user);
+        MainMenuEvent.getInstance().event(event, (Player) event.getWhoClicked());
     }
 
     @EventHandler
@@ -121,10 +99,16 @@ public class EventListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onRegionEnter(RegionEnterEvent event) {
-        Player player = event.getPlayer();
-        ProtectedRegion region = event.getRegion();
-        player.sendMessage("Hello player, " + region.getId());
+    @EventHandler()
+    public void onPlayerCommandEvent(PlayerCommandPreprocessEvent event) {
+        if (event.getMessage().equals("spawn"))
+            event.setCancelled(true);
     }
+
+//    @EventHandler
+//    public void onRegionEnter(RegionEnterEvent event) {
+//        Player player = event.getPlayer();
+//        ProtectedRegion region = event.getRegion();
+//        player.sendMessage("Hello player, " + region.getId());
+//    }
 }

@@ -7,5 +7,19 @@ depend: [ CrackShot ]
 authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:
+  스폰:
+    aliases:
+      - tmvhs
+      - spawn
+      - 로비
+      - fhql
+      - lobby
+      - 퇴장
+      - xhlwkd
+      - exit
+    description: DMGR Command
   메뉴:
+    description: DMGR Command
+  선택:
+    permission: admin
     description: DMGR Command

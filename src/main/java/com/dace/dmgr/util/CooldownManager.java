@@ -1,7 +1,5 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.data.YamlModel;
-
 import java.util.HashMap;
 
 public class CooldownManager {
@@ -15,10 +13,7 @@ public class CooldownManager {
 
     public static void setCooldown(YamlModel yamlModel, Enum id, long duration) {
         String saveId = yamlModel.getKey() + id;
-
-        long time = System.currentTimeMillis();
-        time += duration * 50;
-        cooldownList.put(saveId, time);
+        setCooldown(saveId, duration);
     }
 
     public static long getCooldown(String id) {
@@ -35,16 +30,7 @@ public class CooldownManager {
 
     public static long getCooldown(YamlModel yamlModel, Enum id) {
         String saveId = yamlModel.getKey() + id;
-
-        Long time = cooldownList.get(saveId);
-        if (time == null)
-            return 0;
-        else if (time - System.currentTimeMillis() <= 0) {
-            cooldownList.remove(saveId);
-            return 0;
-        }
-
-        return (time - System.currentTimeMillis()) / 50;
+        return getCooldown(saveId);
     }
 
     public static void addCooldown(String id, long duration) {
@@ -59,13 +45,6 @@ public class CooldownManager {
 
     public static void addCooldown(YamlModel yamlModel, Enum id, long duration) {
         String saveId = yamlModel.getKey() + id;
-
-        Long time = cooldownList.get(saveId);
-        if (time == null)
-            setCooldown(saveId, duration);
-        else {
-            time += duration * 50;
-            cooldownList.replace(saveId, time);
-        }
+        addCooldown(saveId, duration);
     }
 }

@@ -1,6 +1,6 @@
-package com.dace.dmgr.data.model;
+package com.dace.dmgr.user;
 
-import com.dace.dmgr.data.YamlModel;
+import com.dace.dmgr.util.YamlModel;
 import org.bukkit.entity.Player;
 
 public class UserConfig extends YamlModel {
@@ -10,9 +10,16 @@ public class UserConfig extends YamlModel {
 
     public UserConfig(Player player) {
         super("UserConfig", player.getUniqueId().toString());
-        this.koreanChat = getConfigBoolean("koreanChat");
-        this.chatSound = getConfigString("chatSound", this.chatSound);
-        this.nightVision = getConfigBoolean("nightVision");
+        this.koreanChat = loadValue("koreanChat");
+        this.chatSound = loadValue("chatSound", this.chatSound);
+        this.nightVision = loadValue("nightVision");
+        saveConfig();
+    }
+
+    private void saveConfig() {
+        saveValue("chatSound", this.chatSound);
+        saveValue("koreanChat", this.koreanChat);
+        saveValue("nightVision", this.nightVision);
     }
 
     public String getChatSound() {
@@ -21,7 +28,7 @@ public class UserConfig extends YamlModel {
 
     public void setChatSound(String chatSound) {
         this.chatSound = chatSound;
-        setConfig("chatSound", this.chatSound);
+        saveValue("chatSound", this.chatSound);
     }
 
     public boolean isKoreanChat() {
@@ -30,7 +37,7 @@ public class UserConfig extends YamlModel {
 
     public void setKoreanChat(boolean koreanChat) {
         this.koreanChat = koreanChat;
-        setConfig("koreanChat", this.koreanChat);
+        saveValue("koreanChat", this.koreanChat);
     }
 
     public boolean isNightVision() {
@@ -39,6 +46,6 @@ public class UserConfig extends YamlModel {
 
     public void setNightVision(boolean nightVision) {
         this.nightVision = nightVision;
-        setConfig("nightVision", this.nightVision);
+        saveValue("nightVision", this.nightVision);
     }
 }

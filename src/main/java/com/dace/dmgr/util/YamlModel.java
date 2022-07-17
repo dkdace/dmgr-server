@@ -1,9 +1,10 @@
-package com.dace.dmgr.data;
+package com.dace.dmgr.util;
 
 import com.dace.dmgr.DMGR;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.List;
 
 public class YamlModel {
     private final String key;
@@ -38,7 +39,7 @@ public class YamlModel {
         }
     }
 
-    protected void setConfig(String path, Object value) {
+    protected void saveValue(String path, Object value) {
         try {
             config.set(key + "." + path, value);
             config.save(file);
@@ -47,35 +48,19 @@ public class YamlModel {
         }
     }
 
-    protected int getConfigInt(String path) {
-        return config.getInt(key + "." + path, 0);
+    protected <T> T loadValue(String path) {
+        return (T) config.get(key + "." + path);
     }
 
-    protected int getConfigInt(String path, int def) {
-        return config.getInt(key + "." + path, def);
+    protected <T> T loadValue(String path, T def) {
+        return (T) config.get(key + "." + path, def);
     }
 
-    protected double getConfigDouble(String path) {
-        return config.getDouble(key + "." + path, 0.0);
+    protected <T> List<T> loadValues(String path) {
+        return (List<T>) config.getList(key + "." + path);
     }
 
-    protected double getConfigDouble(String path, double def) {
-        return config.getDouble(key + "." + path, def);
-    }
-
-    protected String getConfigString(String path) {
-        return config.getString(key + "." + path, "");
-    }
-
-    protected String getConfigString(String path, String def) {
-        return config.getString(key + "." + path, def);
-    }
-
-    protected boolean getConfigBoolean(String path) {
-        return config.getBoolean(key + "." + path, false);
-    }
-
-    protected boolean getConfigBoolean(String path, boolean def) {
-        return config.getBoolean(key + "." + path, def);
+    protected <T> List<T> loadValues(String path, List<T> def) {
+        return (List<T>) config.getList(key + "." + path, def);
     }
 }

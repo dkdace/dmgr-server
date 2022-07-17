@@ -1,7 +1,9 @@
 package com.dace.dmgr;
 
-import com.dace.dmgr.system.CommandManager;
 import com.dace.dmgr.system.EventListener;
+import com.dace.dmgr.system.command.LobbyCommand;
+import com.dace.dmgr.system.command.MainMenuCommand;
+import com.dace.dmgr.system.command.SelectCharCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -11,8 +13,6 @@ public class DMGR extends JavaPlugin {
     public final static String CHAT_PREFIX = "§b§l[ DMGR ] §f";
     public final static String CHAT_WARN_PREFIX = "§b§l[ DMGR ] §c";
     public static boolean debug = false;
-    private static String author;
-    private static String version;
 
     public static DMGR getPlugin() {
         return JavaPlugin.getPlugin(DMGR.class);
@@ -20,8 +20,6 @@ public class DMGR extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        author = getDescription().getAuthors().get(0);
-        version = getDescription().getVersion();
         writeLog("플러그인 활성화 완료");
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         registerCommand();
@@ -33,8 +31,9 @@ public class DMGR extends JavaPlugin {
     }
 
     private void registerCommand() {
-        CommandManager cm = new CommandManager();
-        getCommand("메뉴").setExecutor(cm);
+        getCommand("스폰").setExecutor(new LobbyCommand());
+        getCommand("메뉴").setExecutor(new MainMenuCommand());
+        getCommand("선택").setExecutor(new SelectCharCommand());
     }
 
     public void writeLog(String msg) {
