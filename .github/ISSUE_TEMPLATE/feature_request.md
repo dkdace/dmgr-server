@@ -10,7 +10,7 @@ assignees: ''
 ## ℹ Description
 추가할 기능에 대한 설명
 
-## ✅ Todo
+## ✅ Tasks
 - [ ] 할 일
 - [ ] 할 일
 - [ ] 할 일
