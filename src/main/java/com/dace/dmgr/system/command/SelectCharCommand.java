@@ -1,6 +1,6 @@
 package com.dace.dmgr.system.command;
 
-//import com.dace.dmgr.util.Admin;
+import com.dace.dmgr.util.Admin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,7 +11,7 @@ public class SelectCharCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-//        Admin.selectCharacter(player, args[0], args[1]);
+        Admin.selectCharacter(player, args[0], args[1]);
 
         return true;
     }
