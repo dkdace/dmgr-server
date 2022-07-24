@@ -1,4 +1,4 @@
-package com.dace.dmgr.system;
+package com.dace.dmgr.user;
 
 import com.dace.dmgr.user.User;
 import org.bukkit.entity.Player;

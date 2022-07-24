@@ -1,4 +1,4 @@
-package com.dace.dmgr.lobby;
+package com.dace.dmgr.event;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.user.User;

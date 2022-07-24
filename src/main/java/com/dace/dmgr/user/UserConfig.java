@@ -5,21 +5,21 @@ import org.bukkit.entity.Player;
 
 public class UserConfig extends YamlModel {
     private String chatSound = "new.block.note_block.pling";
-    private boolean koreanChat;
-    private boolean nightVision;
+    private boolean koreanChat = false;
+    private boolean nightVision = false;
 
     public UserConfig(Player player) {
         super("UserConfig", player.getUniqueId().toString());
-        this.koreanChat = loadValue("koreanChat");
-        this.chatSound = loadValue("chatSound", this.chatSound);
-        this.nightVision = loadValue("nightVision");
+        this.koreanChat = loadValue("koreanChat", koreanChat);
+        this.chatSound = loadValue("chatSound", chatSound);
+        this.nightVision = loadValue("nightVision", nightVision);
         saveConfig();
     }
 
     private void saveConfig() {
-        saveValue("chatSound", this.chatSound);
-        saveValue("koreanChat", this.koreanChat);
-        saveValue("nightVision", this.nightVision);
+        saveValue("chatSound", chatSound);
+        saveValue("koreanChat", koreanChat);
+        saveValue("nightVision", nightVision);
     }
 
     public String getChatSound() {

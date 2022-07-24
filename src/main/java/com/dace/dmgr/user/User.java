@@ -14,30 +14,30 @@ public class User extends YamlModel {
     public boolean resourcePack = false;
     public PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
     private String name;
-    private int xp;
-    private int level;
-    private int money;
-    private int rank;
+    private int xp = 0;
+    private int level = 0;
+    private int money = 0;
+    private int rank = 0;
 
     public User(Player player) {
         super("User", player.getUniqueId().toString());
         this.player = player;
         this.name = player.getName();
         this.userConfig = new UserConfig(player);
-        this.xp = loadValue("xp");
-        this.level = loadValue("level");
-        this.money = loadValue("money");
-        this.rank = loadValue("rank");
+        this.xp = loadValue("xp", xp);
+        this.level = loadValue("level", level);
+        this.money = loadValue("money", money);
+        this.rank = loadValue("rank", rank);
         userList.put(player.getUniqueId(), this);
         saveConfig();
     }
 
     private void saveConfig() {
-        saveValue("name", this.name);
-        saveValue("xp", this.xp);
-        saveValue("level", this.level);
-        saveValue("money", this.money);
-        saveValue("rank", this.rank);
+        saveValue("name", name);
+        saveValue("xp", xp);
+        saveValue("level", level);
+        saveValue("money", money);
+        saveValue("rank", rank);
     }
 
     public Player getPlayer() {

@@ -1,5 +1,6 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.system.EventListener;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MainMenuCommand;
@@ -23,6 +24,7 @@ public class DMGR extends JavaPlugin {
         writeLog("플러그인 활성화 완료");
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         registerCommand();
+        new GeneralConfig();
     }
 
     @Override
