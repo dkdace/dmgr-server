@@ -1,9 +1,8 @@
 package com.dace.dmgr.gui.slot;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
-public enum DisplaySlot {
+public enum DisplaySlot implements ISlotItem {
     EMPTY((short) 1),
     EMPTY_LEFT((short) 2),
     EMPTY_RIGHT((short) 3),
@@ -12,19 +11,19 @@ public enum DisplaySlot {
     DISABLED((short) 6),
     ENABLED((short) 7);
 
-    private final static Material material = Material.CARROT_STICK;
+    public final static Material MATERIAL = Material.CARROT_STICK;
     private final short damage;
 
     DisplaySlot(short damage) {
         this.damage = damage;
     }
 
-    public static boolean isDisplaySlot(ItemStack item) {
-        if (item.getType() == material)
-            return item.getDurability() <= 7;
-        return false;
+    @Override
+    public String getName() {
+        return "§f";
     }
 
+    @Override
     public short getDamage() {
         return damage;
     }
