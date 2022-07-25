@@ -1,6 +1,7 @@
 package com.dace.dmgr.event;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -14,7 +15,9 @@ public class ServerQuit {
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 
     public static void event(PlayerQuitEvent event, Player player) {
-        userList.get(player.getUniqueId()).remove();
+        User user = userList.get(player.getUniqueId());
+
+        user.reset();
 
         event.setQuitMessage(PREFIX + player.getName());
 

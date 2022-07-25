@@ -1,5 +1,6 @@
 package com.dace.dmgr.user;
 
+import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.YamlModel;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -101,9 +102,16 @@ public class User extends YamlModel {
     }
 
     public void reset() {
+        SkinManager.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
+        player.getInventory().clear();
+        player.setExp(0);
+        player.setLevel(0);
+        player.getActivePotionEffects().forEach((potionEffect ->
+                player.removePotionEffect(potionEffect.getType())));
         combatUserList.remove(player.getUniqueId());
+
     }
 
     public enum Cooldown {

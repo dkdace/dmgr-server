@@ -61,6 +61,11 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>codemc-releases</id>
+            <url>https://repo.codemc.org/repository/maven-releases/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -68,6 +73,13 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- SkinsRestorer API -->
+        <dependency>
+            <groupId>net.skinsrestorer</groupId>
+            <artifactId>skinsrestorer-api</artifactId>
+            <version>14.2.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
