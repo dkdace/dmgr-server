@@ -1,6 +1,5 @@
 package com.dace.dmgr.gui;
 
-import com.dace.dmgr.gui.slot.DisplaySlot;
 import com.dace.dmgr.gui.slot.ISlotItem;
 import com.shampaggon.crackshot.CSUtility;
 import org.bukkit.Material;
@@ -86,7 +85,7 @@ public class ItemGenerator {
     }
 
     public static ItemStack getSlotItem(ISlotItem slot) {
-        ItemStack item = ItemGenerator.getItem(DisplaySlot.MATERIAL, 1, slot.getDamage(), slot.getName());
+        ItemStack item = ItemGenerator.getItem(slot.getMaterial(), 1, slot.getDamage(), slot.getName());
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setUnbreakable(true);
         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);

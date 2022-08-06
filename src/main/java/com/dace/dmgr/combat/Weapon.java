@@ -11,6 +11,7 @@ public enum Weapon {
             "\n§7사격§f하여 §c⚔ 피해§f를 입힙니다." +
             "\n§f"));
 
+    private final static Material material = Material.DIAMOND_HOE;
     private final ItemStack itemStack;
     private final CSUtility csUtility = new CSUtility();
 
@@ -20,9 +21,5 @@ public enum Weapon {
 
     public ItemStack getItemStack() {
         return itemStack;
-    }
-
-    private static class Constants {
-        private final static Material material = Material.DIAMOND_HOE;
     }
 }

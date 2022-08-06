@@ -7,13 +7,18 @@ public enum CommunicationSlot implements ISlotItem {
     SHOW_ULT((short) 5, "§a궁극기 상태"),
     REQ_RALLY((short) 5, "§a집결 요청");
 
-    private final static Material material = Material.STAINED_GLASS_PANE;
+    public static final Material MATERIAL = Material.STAINED_GLASS_PANE;
     private final String name;
     private final short damage;
 
     CommunicationSlot(short damage, String name) {
         this.name = name;
         this.damage = damage;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return MATERIAL;
     }
 
     @Override

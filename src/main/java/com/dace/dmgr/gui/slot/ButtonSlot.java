@@ -1,7 +1,6 @@
 package com.dace.dmgr.gui.slot;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 public enum ButtonSlot implements ISlotItem {
     EXIT((short) 8, "§c나가기"),
@@ -10,13 +9,18 @@ public enum ButtonSlot implements ISlotItem {
     UP((short) 11, "§6위로"),
     DOWN((short) 12, "§6아래로");
 
-    public final static Material material = Material.CARROT_STICK;
+    public static final Material MATERIAL = Material.CARROT_STICK;
     private final String name;
     private final short damage;
 
     ButtonSlot(short damage, String name) {
         this.name = name;
         this.damage = damage;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return MATERIAL;
     }
 
     @Override

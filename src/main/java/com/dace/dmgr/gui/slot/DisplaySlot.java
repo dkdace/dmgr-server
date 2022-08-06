@@ -11,11 +11,16 @@ public enum DisplaySlot implements ISlotItem {
     DISABLED((short) 6),
     ENABLED((short) 7);
 
-    public final static Material MATERIAL = Material.CARROT_STICK;
+    public static final Material MATERIAL = Material.CARROT_STICK;
     private final short damage;
 
     DisplaySlot(short damage) {
         this.damage = damage;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return MATERIAL;
     }
 
     @Override

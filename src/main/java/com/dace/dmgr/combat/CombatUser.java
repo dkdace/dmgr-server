@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static com.dace.dmgr.system.EntityList.combatUserList;
 
-public class CombatUser {
+public class CombatUser implements CombatEntity {
     private final Map<String, Integer> shield = new HashMap<>();
     private final Player player;
     private Character character = null;
@@ -32,18 +32,22 @@ public class CombatUser {
         combatUserList.remove(player.getUniqueId());
     }
 
+    @Override
     public String getTeam() {
         return team;
     }
 
+    @Override
     public void setTeam(String team) {
         this.team = team;
     }
 
+    @Override
     public int getHealth() {
         return (int) (player.getHealth() * 50);
     }
 
+    @Override
     public void setHealth(int health) {
         double realHealth = health / 50.0;
         if (realHealth < 0) realHealth = 0;
@@ -51,10 +55,12 @@ public class CombatUser {
         player.setHealth(realHealth);
     }
 
+    @Override
     public int getMaxHealth() {
         return (int) (player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
     }
 
+    @Override
     public void setMaxHealth(int health) {
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
