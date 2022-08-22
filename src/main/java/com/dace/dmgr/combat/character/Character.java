@@ -4,20 +4,20 @@ import com.dace.dmgr.combat.Weapon;
 import org.bukkit.inventory.ItemStack;
 
 public class Character {
-    protected String name;
-    protected ItemStack weapon;
-    protected int health;
-    protected float speed;
-    protected float hitbox;
-    protected String skinName;
+    private final String name;
+    private final ItemStack weapon;
+    private final IStats stats;
+    private final String skinName;
 
-    public Character(String name, Weapon weapon, int health, float speed, float hitbox, String skinName) {
+    public Character(String name, Weapon weapon, IStats stats, String skinName) {
         this.name = name;
         this.weapon = weapon.getItemStack();
-        this.health = health;
-        this.speed = speed;
-        this.hitbox = hitbox;
+        this.stats = stats;
         this.skinName = skinName;
+    }
+
+    public IStats getStats() {
+        return stats;
     }
 
     public ItemStack getWeapon() {
@@ -26,18 +26,6 @@ public class Character {
 
     public String getName() {
         return name;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public float getHitbox() {
-        return hitbox;
     }
 
     public String getSkinName() {

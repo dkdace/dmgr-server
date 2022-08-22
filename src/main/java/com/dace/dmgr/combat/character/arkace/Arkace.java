@@ -1,16 +1,19 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.CombatUser;
-import com.dace.dmgr.combat.Weapon;
+import com.dace.dmgr.combat.*;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.GunCharacter;
 import com.dace.dmgr.combat.character.ICharacter;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.ICombatEntity;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 
 public class Arkace extends Character implements ICharacter, GunCharacter {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super("아케이스", Weapon.ARKACE, 1000, 1.0F, 1.0F, "DVArkace");
+        super("아케이스", Weapon.ARKACE, new ArkaceStats(), "DVArkace");
     }
 
     public static Arkace getInstance() {
@@ -19,7 +22,22 @@ public class Arkace extends Character implements ICharacter, GunCharacter {
 
     @Override
     public void useWeaponShoot(CombatUser combatUser) {
-        combatUser.getPlayer().sendMessage("test!");
+        new Bullet(combatUser, "평") {
+            @Override
+            public void trail(Location location) {
+                location.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
+            }
+
+            @Override
+            public void onHitBlock(Location location) {
+
+            }
+
+            @Override
+            public void onHitEntity(Location location, ICombatEntity target) {
+//                Combat.attack(combatUser, target, ArkaceStats.Normal.DAMAGE, "", false, false);
+            }
+        }.shoot(combatUser.getEntity().getEyeLocation(), combatUser.getEntity().getLocation().getDirection().multiply(0.25));
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.dace.dmgr.event;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.config.GeneralConfig;
+import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
@@ -18,11 +18,11 @@ public class Chat {
         event.setCancelled(true);
 
         if (!player.isOp()) {
-            if (CooldownManager.getCooldown(user, User.Cooldown.CHAT) > 0) {
+            if (CooldownManager.getCooldown(user, Cooldown.CHAT) > 0) {
                 player.sendMessage(DMGR.CHAT_WARN_PREFIX + "채팅을 천천히 하십시오.");
                 return;
             }
-            CooldownManager.setCooldown(user, User.Cooldown.CHAT, GeneralConfig.chatCooldown);
+            CooldownManager.setCooldown(user, Cooldown.CHAT);
         }
 
         Bukkit.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), event.getMessage()));

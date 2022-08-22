@@ -65,7 +65,10 @@
             <id>codemc-releases</id>
             <url>https://repo.codemc.org/repository/maven-releases/</url>
         </repository>
-
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -75,12 +78,16 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- SkinsRestorer API -->
         <dependency>
             <groupId>net.skinsrestorer</groupId>
             <artifactId>skinsrestorer-api</artifactId>
             <version>14.2.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.7.0</version>
         </dependency>
     </dependencies>
 </project>

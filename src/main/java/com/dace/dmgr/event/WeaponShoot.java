@@ -1,6 +1,6 @@
 package com.dace.dmgr.event;
 
-import com.dace.dmgr.combat.CombatUser;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
 import org.bukkit.entity.Player;
 

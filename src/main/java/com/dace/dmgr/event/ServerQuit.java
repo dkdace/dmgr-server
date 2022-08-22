@@ -29,6 +29,8 @@ public class ServerQuit {
                 playQuitSound();
             }
         }.runTaskLater(DMGR.getPlugin(), 1);
+
+        userList.remove(player.getUniqueId());
     }
 
     private static void playQuitSound() {

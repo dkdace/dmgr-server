@@ -11,6 +11,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -85,6 +88,21 @@ public class EventListener implements Listener {
         Player player = event.getPlayer();
 
         if (!player.isOp()) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        EntityDamage.event(event, event.getEntity());
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        EntityDeath.event(event, event.getEntity());
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        EntityDamageByEntity.event(event, event.getDamager(), event.getEntity());
     }
 
     @EventHandler
