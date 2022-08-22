@@ -24,10 +24,6 @@ public class YamlModel {
         initConfig();
     }
 
-    public String getKey() {
-        return key;
-    }
-
     private void initConfig() {
         file = new File(DMGR.getPlugin().getDataFolder(), modelName + ".yml");
         config = YamlConfiguration.loadConfiguration(file);

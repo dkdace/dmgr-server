@@ -2,18 +2,16 @@ package com.dace.dmgr.gui.slot;
 
 import org.bukkit.Material;
 
-public enum ButtonSlot implements ISlotItem {
-    EXIT((short) 8, "§c나가기"),
-    LEFT((short) 9, "§6이전"),
-    RIGHT((short) 10, "§6다음"),
-    UP((short) 11, "§6위로"),
-    DOWN((short) 12, "§6아래로");
+public enum CommunicationSlot implements ISlotItem {
+    REQ_HEAL((short) 5, "§a치료 요청"),
+    SHOW_ULT((short) 5, "§a궁극기 상태"),
+    REQ_RALLY((short) 5, "§a집결 요청");
 
-    public static final Material MATERIAL = Material.CARROT_STICK;
+    public static final Material MATERIAL = Material.STAINED_GLASS_PANE;
     private final String name;
     private final short damage;
 
-    ButtonSlot(short damage, String name) {
+    CommunicationSlot(short damage, String name) {
         this.name = name;
         this.damage = damage;
     }

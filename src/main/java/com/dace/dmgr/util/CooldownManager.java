@@ -11,9 +11,22 @@ public class CooldownManager {
         cooldownList.put(id, time);
     }
 
-    public static void setCooldown(YamlModel yamlModel, Enum id, long duration) {
-        String saveId = yamlModel.getKey() + id;
+    public static void setCooldown(HasCooldown object, Cooldown id, long duration) {
+        String saveId = object.getCooldownKey() + id;
         setCooldown(saveId, duration);
+    }
+
+    public static <T> void setCooldown(HasCooldown object, Cooldown id, T subId, long duration) {
+        String saveId = object.getCooldownKey() + id + subId;
+        setCooldown(saveId, duration);
+    }
+
+    public static void setCooldown(HasCooldown object, Cooldown id) {
+        setCooldown(object, id, id.getDefaultValue());
+    }
+
+    public static <T> void setCooldown(HasCooldown object, Cooldown id, T subId) {
+        setCooldown(object, id, subId, id.getDefaultValue());
     }
 
     public static long getCooldown(String id) {
@@ -28,8 +41,13 @@ public class CooldownManager {
         return (time - System.currentTimeMillis()) / 50;
     }
 
-    public static long getCooldown(YamlModel yamlModel, Enum id) {
-        String saveId = yamlModel.getKey() + id;
+    public static long getCooldown(HasCooldown object, Cooldown id) {
+        String saveId = object.getCooldownKey() + id;
+        return getCooldown(saveId);
+    }
+
+    public static <T> long getCooldown(HasCooldown object, Cooldown id, T subId) {
+        String saveId = object.getCooldownKey() + id + subId;
         return getCooldown(saveId);
     }
 
@@ -43,8 +61,13 @@ public class CooldownManager {
         }
     }
 
-    public static void addCooldown(YamlModel yamlModel, Enum id, long duration) {
-        String saveId = yamlModel.getKey() + id;
+    public static void addCooldown(HasCooldown object, Cooldown id, long duration) {
+        String saveId = object.getCooldownKey() + id;
+        addCooldown(saveId, duration);
+    }
+
+    public static <T> void addCooldown(HasCooldown object, Cooldown id, T subId, long duration) {
+        String saveId = object.getCooldownKey() + id + subId;
         addCooldown(saveId, duration);
     }
 }

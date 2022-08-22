@@ -1,5 +1,7 @@
 package com.dace.dmgr.user;
 
+import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.util.HasCooldown;
 import com.dace.dmgr.util.YamlModel;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -8,7 +10,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import static com.dace.dmgr.system.EntityList.combatUserList;
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class User extends YamlModel {
+public class User extends YamlModel implements HasCooldown {
     private final Player player;
     private final UserConfig userConfig;
     public boolean resourcePack = false;
@@ -46,10 +48,6 @@ public class User extends YamlModel {
 
     public UserConfig getUserConfig() {
         return userConfig;
-    }
-
-    public void remove() {
-        userList.remove(player.getUniqueId());
     }
 
     public String getName() {
@@ -101,12 +99,19 @@ public class User extends YamlModel {
     }
 
     public void reset() {
+        SkinManager.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
+        player.getInventory().clear();
+        player.setExp(0);
+        player.setLevel(0);
+        player.getActivePotionEffects().forEach((potionEffect ->
+                player.removePotionEffect(potionEffect.getType())));
         combatUserList.remove(player.getUniqueId());
     }
 
-    public enum Cooldown {
-        CHAT, COMMAND
+    @Override
+    public String getCooldownKey() {
+        return player.getUniqueId().toString();
     }
 }

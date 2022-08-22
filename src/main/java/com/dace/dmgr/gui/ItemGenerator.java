@@ -1,7 +1,7 @@
 package com.dace.dmgr.gui;
 
-import com.dace.dmgr.gui.slot.ButtonSlot;
-import com.dace.dmgr.gui.slot.DisplaySlot;
+import com.dace.dmgr.gui.slot.ISlotItem;
+import com.shampaggon.crackshot.CSUtility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ItemGenerator {
     public static final Material SLOT_MATERIAL = Material.CARROT_STICK;
+    public static final CSUtility csUtility = new CSUtility();
 
     public static ItemStack getItem(Material material, int amount, short damage, String name, String lore) {
         List<String> loreList = Arrays.asList(lore.split("\\n"));
@@ -71,28 +72,20 @@ public class ItemGenerator {
         return item;
     }
 
-    public static ItemStack getSlotItem(DisplaySlot type) {
-        ItemStack item = ItemGenerator.getItem(SLOT_MATERIAL, 1, type.getDamage(), "§f");
+    public static ItemStack getCSItem(String weaponName, String lore) {
+        List<String> loreList = Arrays.asList(lore.split("\\n"));
+        ItemStack item = csUtility.generateWeapon(weaponName);
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setUnbreakable(true);
         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+        itemMeta.setLore(loreList);
         item.setItemMeta(itemMeta);
 
         return item;
     }
 
-    public static ItemStack getSlotItem(ButtonSlot type) {
-        ItemStack item = ItemGenerator.getItem(SLOT_MATERIAL, 1, type.getDamage(), type.getName());
-        ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setUnbreakable(true);
-        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
-        item.setItemMeta(itemMeta);
-
-        return item;
-    }
-
-    public static ItemStack getSlotItem(ButtonSlot type, String name) {
-        ItemStack item = ItemGenerator.getItem(SLOT_MATERIAL, 1, type.getDamage(), name);
+    public static ItemStack getSlotItem(ISlotItem slot) {
+        ItemStack item = ItemGenerator.getItem(slot.getMaterial(), 1, slot.getDamage(), slot.getName());
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setUnbreakable(true);
         itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);

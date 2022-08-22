@@ -25,7 +25,7 @@ public abstract class MenuEvent {
     }
 
     private boolean isClickable(ItemStack item) {
-        return item.getType() != Material.AIR && !DisplaySlot.isDisplaySlot(item);
+        return item.getType() != Material.AIR && item.getType() != DisplaySlot.MATERIAL;
     }
 
     public void event(InventoryClickEvent event, Player player) {
