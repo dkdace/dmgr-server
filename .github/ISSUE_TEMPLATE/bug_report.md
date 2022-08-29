@@ -2,7 +2,7 @@
 name: Bug report
 about: 버그 발생에 대한 내용을 작성해주세요.
 title: ''
-labels: bug
+labels: ''
 assignees: ''
 
 ---
