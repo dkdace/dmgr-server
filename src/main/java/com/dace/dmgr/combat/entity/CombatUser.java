@@ -6,6 +6,8 @@ import com.dace.dmgr.gui.ItemGenerator;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.HasCooldown;
+import com.dace.dmgr.util.VectorUtil;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -93,6 +95,16 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
     public void onWeaponShoot() {
         if (character != null)
             ((GunCharacter) character).useWeaponShoot(this);
+    }
+
+    public Location getLeftHand() {
+        return entity.getEyeLocation().subtract(0, 0.2, 0)
+                .add(VectorUtil.getPitchAxis(entity.getLocation()).multiply(0.2));
+    }
+
+    public Location getRightHand() {
+        return entity.getEyeLocation().subtract(0, 0.2, 0)
+                .add(VectorUtil.getPitchAxis(entity.getLocation()).multiply(-0.2));
     }
 
     @Override
