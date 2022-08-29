@@ -117,7 +117,7 @@ public class EventListener implements Listener {
 
             if (!player.isOp()) {
                 if (event.getBuffer().split(" ").length == 1) {
-                    player.sendMessage(DMGR.CHAT_WARN_PREFIX + "금지된 행동입니다.");
+                    player.sendMessage(DMGR.PREFIX.CHAT_WARN + "금지된 행동입니다.");
                     event.setCancelled(true);
                 }
             }
