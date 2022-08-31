@@ -8,6 +8,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.user.Lobby;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
 import com.dace.dmgr.util.RegionUtil;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.dace.dmgr.system.EntityList.combatEntityList;
+import static com.dace.dmgr.system.EntityList.combatUserList;
 
 public class Combat {
     public static final float HITS_HITBOX = 0.15F;
@@ -163,12 +166,9 @@ public class Combat {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
 
-        if (victim instanceof CombatUser)
-            victim.setHealth(victim.getMaxHealth());
-        else
-            ((TemporalEntity<?>) victim).remove();
-
         if (victim instanceof CombatUser) {
+            victim.setHealth(victim.getMaxHealth());
+
             if (CooldownManager.getCooldown((CombatUser) victim, Cooldown.RESPAWN_TIME) == 0) {
                 Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageList();
                 Set<String> attackerNames = damageList.keySet().stream().map((CombatUser _attacker) ->
@@ -178,13 +178,13 @@ public class Combat {
                 damageList.forEach((CombatUser _attacker, Float damage) -> {
                     Player _attackerEntity = _attacker.getEntity();
 
-                    int score = (int) (damage * 100);
+                    int score = Math.round(damage * 100);
 
                     _attackerEntity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
                     if (score > 30) {
-                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치");
+                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
                     } else {
-                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 도움");
+                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
                     }
                     playKillSound(_attackerEntity);
                 });
@@ -194,18 +194,51 @@ public class Combat {
                             String.join(" ,", attackerNames) + " §4§l-> " + victimName);
 
                     damageList.clear();
+                    respawn(attacker, (CombatUser) victim);
                 }
             }
-
         } else {
             attackerEntity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
             playKillSound(attackerEntity);
+
+            ((TemporalEntity<?>) victim).remove();
         }
     }
 
-    public static void sendDamage(Entity entity) {
+    private static void respawn(CombatUser attacker, CombatUser victim) {
+        Player attackerEntity = attacker.getEntity();
+        Player victimEntity = victim.getEntity();
+
+        Location deadLocation = victimEntity.getLocation().add(0, 0.5, 0);
+        deadLocation.setPitch(90);
+
+        CooldownManager.setCooldown(victim, Cooldown.RESPAWN_TIME);
+        victimEntity.setGameMode(GameMode.SPECTATOR);
+        victimEntity.setVelocity(new Vector());
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                long cooldown = CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME);
+                if (combatUserList.get(victimEntity.getUniqueId()) == null || cooldown <= 0) cancel();
+
+                victimEntity.sendTitle("§c§l죽었습니다!",
+                        String.format("%.1f", (float) cooldown / 20) + "초 후 부활합니다.", 0, 20, 10);
+                victimEntity.teleport(deadLocation);
+
+                if (isCancelled()) {
+                    victim.setHealth(victim.getMaxHealth());
+                    victimEntity.teleport(Lobby.lobby);
+                    victimEntity.setGameMode(GameMode.SURVIVAL);
+                }
+            }
+        }.runTaskTimer(DMGR.getPlugin(), 0, 1);
+    }
+
+    private static void sendDamage(Entity entity) {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_STATUS);
+
         packet.getIntegers().writeSafely(0, entity.getEntityId());
         packet.getBytes().writeSafely(0, (byte) 2);
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
