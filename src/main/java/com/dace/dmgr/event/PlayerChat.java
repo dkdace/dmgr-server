@@ -11,7 +11,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class Chat {
+public class PlayerChat {
     public static void event(AsyncPlayerChatEvent event, Player player) {
         User user = userList.get(player.getUniqueId());
 

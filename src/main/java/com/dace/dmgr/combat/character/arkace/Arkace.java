@@ -4,7 +4,8 @@ import com.dace.dmgr.combat.Bullet;
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Weapon;
 import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.GunCharacter;
+import com.dace.dmgr.combat.character.HasCSWeapon;
+import com.dace.dmgr.combat.character.HasSprintEvent;
 import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
@@ -13,7 +14,7 @@ import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
-public class Arkace extends Character implements ICharacter, GunCharacter {
+public class Arkace extends Character implements ICharacter, HasCSWeapon, HasSprintEvent {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
@@ -40,6 +41,14 @@ public class Arkace extends Character implements ICharacter, GunCharacter {
                 Combat.attack(combatUser, target, ArkaceStats.Normal.DAMAGE, "", false, false);
             }
         }.shoot();
+    }
+
+    @Override
+    public void onSprintToggle(CombatUser combatUser, boolean sprint) {
+        if (sprint)
+            combatUser.addSpeedIncrement(ArkaceStats.Passive1.SPRINT_SPEED);
+        else
+            combatUser.addSpeedIncrement(-ArkaceStats.Passive1.SPRINT_SPEED);
     }
 
     @Override
@@ -71,5 +80,4 @@ public class Arkace extends Character implements ICharacter, GunCharacter {
     public void useSkill4(CombatUser combatUser) {
 
     }
-
 }

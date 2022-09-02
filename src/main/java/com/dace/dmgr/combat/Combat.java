@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.system.PacketListener;
 import com.dace.dmgr.user.Lobby;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
@@ -139,7 +139,7 @@ public class Combat {
                 else victim.setHealth(victim.getHealth() - damage);
             }
 
-            if (attacker != victim && victim instanceof CombatUser) {
+            if (victim instanceof CombatUser && attacker != victim) {
                 if (ult)
                     attacker.addUlt((float) damage / attacker.getCharacter().getStats().getUltimate().getCost());
 
@@ -148,11 +148,12 @@ public class Combat {
                 }
                 CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId());
 
+                float sumDamage = ((CombatUser) victim).getDamageList().getOrDefault(attacker, 0F);
                 if (killed)
-                    ((CombatUser) victim).getDamageList().put(attacker, (float) victim.getHealth() / victim.getMaxHealth());
+                    ((CombatUser) victim).getDamageList().put(attacker, sumDamage + (float) victim.getHealth() / victim.getMaxHealth());
                 else
-                    ((CombatUser) victim).getDamageList().put(attacker, (float) damage / victim.getMaxHealth());
-                if (((CombatUser) victim).getDamageList().get(attacker) > 1)
+                    ((CombatUser) victim).getDamageList().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
+                if (sumDamage > 1)
                     ((CombatUser) victim).getDamageList().put(attacker, 1F);
             }
 
@@ -223,7 +224,7 @@ public class Combat {
                 if (combatUserList.get(victimEntity.getUniqueId()) == null || cooldown <= 0) cancel();
 
                 victimEntity.sendTitle("§c§l죽었습니다!",
-                        String.format("%.1f", (float) cooldown / 20) + "초 후 부활합니다.", 0, 20, 10);
+                        String.format("%.1f", Math.ceil((float) cooldown / 20)) + "초 후 부활합니다.", 0, 20, 10);
                 victimEntity.teleport(deadLocation);
 
                 if (isCancelled()) {
@@ -236,7 +237,7 @@ public class Combat {
     }
 
     private static void sendDamage(Entity entity) {
-        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        ProtocolManager protocolManager = PacketListener.protocolManager;
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_STATUS);
 
         packet.getIntegers().writeSafely(0, entity.getEntityId());

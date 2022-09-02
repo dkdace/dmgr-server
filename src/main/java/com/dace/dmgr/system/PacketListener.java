@@ -9,7 +9,7 @@ import com.dace.dmgr.DMGR;
 import org.bukkit.entity.Player;
 
 public class PacketListener {
-    private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+    public static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
     public static void init() {
         PacketAdapter playServerUpdateHealth = new PacketAdapter(DMGR.getPlugin(), PacketType.Play.Server.UPDATE_HEALTH) {
@@ -17,7 +17,7 @@ public class PacketListener {
             public void onPacketSending(PacketEvent event) {
                 Player player = event.getPlayer();
 
-                if (player.getFoodLevel() != event.getPacket().getIntegers().readSafely(0))
+                if (player.getFoodLevel() == event.getPacket().getIntegers().readSafely(0))
                     event.setCancelled(true);
             }
         };

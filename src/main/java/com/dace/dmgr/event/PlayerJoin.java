@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class ServerJoin {
+public class PlayerJoin {
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
     private static final String TITLE = "§3Welcome to §b§lDMGR";
 
@@ -22,7 +22,7 @@ public class ServerJoin {
             @Override
             public void run() {
                 DMGR.getPlugin().getServer().broadcastMessage(PREFIX + "현재 인원수는 §3§l" + Bukkit.getOnlinePlayers().size() + "명§b입니다.");
-                ResourcePack.sendResourcePack(user);
+                PlayerResourcePack.sendResourcePack(user);
 
                 player.sendTitle(TITLE, "", 0, 100, 40);
                 playJoinSound();

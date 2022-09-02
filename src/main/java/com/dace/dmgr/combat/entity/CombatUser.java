@@ -1,7 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.GunCharacter;
+import com.dace.dmgr.combat.character.HasCSWeapon;
+import com.dace.dmgr.combat.character.HasSprintEvent;
 import com.dace.dmgr.gui.ItemGenerator;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
@@ -93,8 +94,13 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
     }
 
     public void onWeaponShoot() {
-        if (character != null)
-            ((GunCharacter) character).useWeaponShoot(this);
+        if (character != null && character instanceof HasCSWeapon)
+            ((HasCSWeapon) character).useWeaponShoot(this);
+    }
+
+    public void onSprintToggle(boolean sprint) {
+        if (character != null && character instanceof HasSprintEvent)
+            ((HasSprintEvent) character).onSprintToggle(this, sprint);
     }
 
     public Location getLeftHand() {
