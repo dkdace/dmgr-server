@@ -11,7 +11,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class Chat {
+public class PlayerChat {
     public static void event(AsyncPlayerChatEvent event, Player player) {
         User user = userList.get(player.getUniqueId());
 
@@ -19,7 +19,7 @@ public class Chat {
 
         if (!player.isOp()) {
             if (CooldownManager.getCooldown(user, Cooldown.CHAT) > 0) {
-                player.sendMessage(DMGR.CHAT_WARN_PREFIX + "채팅을 천천히 하십시오.");
+                player.sendMessage(DMGR.PREFIX.CHAT_WARN + "채팅을 천천히 하십시오.");
                 return;
             }
             CooldownManager.setCooldown(user, Cooldown.CHAT);

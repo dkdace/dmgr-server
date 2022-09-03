@@ -23,22 +23,22 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 public class EventListener implements Listener {
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent event) {
-        ServerJoin.event(event, event.getPlayer());
+        PlayerJoin.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
-        ServerQuit.event(event, event.getPlayer());
+        PlayerQuit.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        Chat.event(event, event.getPlayer());
+        PlayerChat.event(event, event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerResourcepack(PlayerResourcePackStatusEvent event) {
-        ResourcePack.event(event, event.getPlayer());
+        PlayerResourcePack.event(event, event.getPlayer());
     }
 
     @EventHandler
@@ -111,13 +111,18 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
+        PlayerToggleSprint.event(event, event.getPlayer());
+    }
+
+    @EventHandler
     public void onTabCompleteEvent(TabCompleteEvent event) {
         if (event.getSender() instanceof Player) {
             Player player = (Player) event.getSender();
 
             if (!player.isOp()) {
                 if (event.getBuffer().split(" ").length == 1) {
-                    player.sendMessage(DMGR.CHAT_WARN_PREFIX + "금지된 행동입니다.");
+                    player.sendMessage(DMGR.PREFIX.CHAT_WARN + "금지된 행동입니다.");
                     event.setCancelled(true);
                 }
             }

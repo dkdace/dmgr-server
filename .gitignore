@@ -246,5 +246,3 @@ fabric.properties
 *.iml
 out
 gen
-
-/src/main/java/com/dace/dmgr/database/DBConnection.java

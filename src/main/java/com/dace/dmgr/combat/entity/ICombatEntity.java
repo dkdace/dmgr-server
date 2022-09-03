@@ -20,4 +20,8 @@ public interface ICombatEntity {
     int getMaxHealth();
 
     void setMaxHealth(int health);
+
+    int getSpeedIncrement();
+
+    void addSpeedIncrement(int speedIncrement);
 }

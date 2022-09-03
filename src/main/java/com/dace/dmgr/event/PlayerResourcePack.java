@@ -9,7 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class ResourcePack {
+public class PlayerResourcePack {
     private static final String DENY_KICK_MESSAGE = "§3§l[ §b§lDMGR §3§l] §6리소스팩 적용을 활성화 해주세요!" +
             "\n§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용" +
             "\n" +

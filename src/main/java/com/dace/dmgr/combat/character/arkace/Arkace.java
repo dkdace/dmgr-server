@@ -1,15 +1,20 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.*;
+import com.dace.dmgr.combat.Bullet;
+import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.Weapon;
 import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.GunCharacter;
+import com.dace.dmgr.combat.character.HasCSWeapon;
+import com.dace.dmgr.combat.character.HasSprintEvent;
 import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
-public class Arkace extends Character implements ICharacter, GunCharacter {
+public class Arkace extends Character implements ICharacter, HasCSWeapon, HasSprintEvent {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
@@ -22,22 +27,28 @@ public class Arkace extends Character implements ICharacter, GunCharacter {
 
     @Override
     public void useWeaponShoot(CombatUser combatUser) {
-        new Bullet(combatUser, "평") {
+        SoundPlayer.play("random.gun2.scarlight_1", combatUser.getEntity(), 3F, 1F);
+        SoundPlayer.play("random.gun_reverb", combatUser.getEntity(), 5F, 1.2F);
+        new Bullet(combatUser, 7) {
             @Override
             public void trail(Location location) {
-                location.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
-            }
-
-            @Override
-            public void onHitBlock(Location location) {
-
+                Location trailLoc = location.add(VectorUtil.getPitchAxis(location).multiply(-0.2)).add(0, -0.2, 0);
+                location.getWorld().spawnParticle(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
             }
 
             @Override
             public void onHitEntity(Location location, ICombatEntity target) {
-//                Combat.attack(combatUser, target, ArkaceStats.Normal.DAMAGE, "", false, false);
+                Combat.attack(combatUser, target, ArkaceStats.Normal.DAMAGE, "", false, false);
             }
-        }.shoot(combatUser.getEntity().getEyeLocation(), combatUser.getEntity().getLocation().getDirection().multiply(0.25));
+        }.shoot();
+    }
+
+    @Override
+    public void onSprintToggle(CombatUser combatUser, boolean sprint) {
+        if (sprint)
+            combatUser.addSpeedIncrement(ArkaceStats.Passive1.SPRINT_SPEED);
+        else
+            combatUser.addSpeedIncrement(-ArkaceStats.Passive1.SPRINT_SPEED);
     }
 
     @Override
@@ -69,5 +80,4 @@ public class Arkace extends Character implements ICharacter, GunCharacter {
     public void useSkill4(CombatUser combatUser) {
 
     }
-
 }

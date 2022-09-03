@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class ServerQuit {
+public class PlayerQuit {
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 
     public static void event(PlayerQuitEvent event, Player player) {

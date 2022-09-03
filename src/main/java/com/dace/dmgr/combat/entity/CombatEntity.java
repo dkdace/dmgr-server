@@ -9,6 +9,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     protected final T entity;
     private String name;
     private String team = "";
+    private int speedIncrement = 0;
 
     protected CombatEntity(T entity, String name) {
         this.entity = entity;
@@ -63,5 +64,17 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     @Override
     public void setMaxHealth(int health) {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
+    }
+
+    @Override
+    public int getSpeedIncrement() {
+        return speedIncrement;
+    }
+
+    @Override
+    public void addSpeedIncrement(int speedIncrement) {
+        this.speedIncrement += speedIncrement;
+        if (this.speedIncrement < -100) this.speedIncrement = -100;
+        if (this.speedIncrement > 100) this.speedIncrement = 100;
     }
 }
