@@ -1,8 +1,8 @@
 ---
 name: Feature request
-about: 추가할 기능에 대한 내용을 작성해주세요.
+about: "[기본 Feature 템플릿] 추가/수정할 기능에 대한 내용을 작성해주세요."
 title: "[Feature]"
-labels: ''
+labels: "✅ Priority: Normal"
 assignees: ''
 
 ---

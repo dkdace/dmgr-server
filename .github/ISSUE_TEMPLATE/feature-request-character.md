@@ -2,7 +2,7 @@
 name: Feature request/Character
 about: 추가할 전투원에 대한 내용을 작성해주세요.
 title: "[Feature/Character]"
-labels: "➕⚔ Feature/Character"
+labels: "➕ Feature/Character, ✅ Priority: Normal"
 assignees: ''
 
 ---
