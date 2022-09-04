@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.HasCSWeapon;
 import com.dace.dmgr.combat.character.HasSprintEvent;
-import com.dace.dmgr.gui.ItemGenerator;
+import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.HasCooldown;
@@ -68,9 +68,9 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
             setMaxHealth(character.getStats().getHealth());
             setHealth(character.getStats().getHealth());
             entity.getInventory().setItem(4, character.getWeapon());
-            entity.getInventory().setItem(9, ItemGenerator.getSlotItem(CommunicationSlot.REQ_HEAL));
-            entity.getInventory().setItem(10, ItemGenerator.getSlotItem(CommunicationSlot.SHOW_ULT));
-            entity.getInventory().setItem(11, ItemGenerator.getSlotItem(CommunicationSlot.REQ_RALLY));
+            entity.getInventory().setItem(9, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_HEAL).build());
+            entity.getInventory().setItem(10, ItemBuilder.fromSlotItem(CommunicationSlot.SHOW_ULT).build());
+            entity.getInventory().setItem(11, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_RALLY).build());
             this.character = character;
         } catch (Exception e) {
             e.printStackTrace();

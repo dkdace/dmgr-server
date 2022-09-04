@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.gui.ItemGenerator;
+import com.dace.dmgr.gui.ItemBuilder;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,16 +22,16 @@ public class Dummy extends TemporalEntity<Zombie> {
         setTeam("DUMMY");
 
         List<ItemStack> equipment = new ArrayList<>();
-        equipment.add(ItemGenerator.getItem(Material.LEATHER_CHESTPLATE, ""));
-        equipment.add(ItemGenerator.getItem(Material.LEATHER_LEGGINGS, ""));
-        equipment.add(ItemGenerator.getItem(Material.LEATHER_BOOTS, ""));
+        equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());
+        equipment.add(new ItemBuilder(Material.LEATHER_LEGGINGS).build());
+        equipment.add(new ItemBuilder(Material.LEATHER_BOOTS).build());
         equipment.forEach((ItemStack itemStack) -> {
             LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
             leatherArmorMeta.setColor(Color.fromRGB(255, 255, 255));
             itemStack.setItemMeta(leatherArmorMeta);
         });
 
-        entity.getEquipment().setHelmet(ItemGenerator.getItem(Material.STAINED_GLASS, 1, (short) 15, ""));
+        entity.getEquipment().setHelmet(new ItemBuilder(Material.STAINED_GLASS).setDamage((short) 15).build());
         entity.getEquipment().setChestplate(equipment.get(0));
         entity.getEquipment().setLeggings(equipment.get(1));
         entity.getEquipment().setBoots(equipment.get(2));
