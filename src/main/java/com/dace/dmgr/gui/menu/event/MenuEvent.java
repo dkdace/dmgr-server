@@ -1,6 +1,5 @@
-package com.dace.dmgr.gui.menu;
+package com.dace.dmgr.gui.menu.event;
 
-import com.dace.dmgr.gui.slot.DisplaySlot;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,21 +19,21 @@ public abstract class MenuEvent {
         return ChatColor.stripColor(item.getItemMeta().getDisplayName());
     }
 
-    private String getMenuName(InventoryClickEvent event) {
+    private String getInventoryName(InventoryClickEvent event) {
         return ChatColor.stripColor(event.getClickedInventory().getName());
     }
 
     private boolean isClickable(ItemStack item) {
-        return item.getType() != Material.AIR && item.getType() != DisplaySlot.MATERIAL;
+        return item.getType() != Material.AIR && !getItemName(item).isEmpty();
     }
 
     public void event(InventoryClickEvent event, Player player) {
         if (event.getClickedInventory() != null) {
-            if (getMenuName(event).equals(menuName)) {
+            if (getInventoryName(event).equals(menuName)) {
                 event.setCancelled(true);
 
                 if (isClickable(event.getCurrentItem()))
-                    onClick(event, player, event.getCurrentItem(), getItemName(event.getCurrentItem()));
+                    onMenuClick(event, player, event.getCurrentItem(), getItemName(event.getCurrentItem()));
             }
         }
     }
@@ -43,5 +42,5 @@ public abstract class MenuEvent {
         SoundPlayer.play(Sound.UI_BUTTON_CLICK, player, 1F, 1F);
     }
 
-    protected abstract void onClick(InventoryClickEvent event, Player player, ItemStack clickItem, String clickItemName);
+    protected abstract void onMenuClick(InventoryClickEvent event, Player player, ItemStack clickItem, String clickItemName);
 }

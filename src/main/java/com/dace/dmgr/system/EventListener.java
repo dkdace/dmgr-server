@@ -2,7 +2,6 @@ package com.dace.dmgr.system;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.event.*;
-import com.dace.dmgr.gui.menu.event.MainMenuEvent;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -57,10 +56,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-
-        InventoryClick.event(event, player);
-        MainMenuEvent.getInstance().event(event, player);
+        InventoryClick.event(event, (Player) event.getWhoClicked());
     }
 
     @EventHandler
