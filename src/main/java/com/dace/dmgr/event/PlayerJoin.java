@@ -1,6 +1,7 @@
 package com.dace.dmgr.event;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.user.Lobby;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
@@ -16,7 +17,11 @@ public class PlayerJoin {
     public static void event(PlayerJoinEvent event, Player player) {
         User user = new User(player);
 
+        Lobby.lobbyTick(player);
         event.setJoinMessage(PREFIX + player.getName());
+
+        if (!user.getUserConfig().isKoreanChat())
+            player.performCommand("kakc chmod 0");
 
         new BukkitRunnable() {
             @Override

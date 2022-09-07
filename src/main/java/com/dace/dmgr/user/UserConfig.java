@@ -4,30 +4,30 @@ import com.dace.dmgr.util.YamlModel;
 import org.bukkit.entity.Player;
 
 public class UserConfig extends YamlModel {
-    private String chatSound = "new.block.note_block.pling";
+    private String chatSound = ChatSound.PLING.toString();
     private boolean koreanChat = false;
     private boolean nightVision = false;
 
     public UserConfig(Player player) {
         super("UserConfig", player.getUniqueId().toString());
         this.koreanChat = loadValue("koreanChat", koreanChat);
-        this.chatSound = loadValue("chatSound", chatSound);
         this.nightVision = loadValue("nightVision", nightVision);
+        this.chatSound = loadValue("chatSound", chatSound);
         saveConfig();
     }
 
     private void saveConfig() {
-        saveValue("chatSound", chatSound);
         saveValue("koreanChat", koreanChat);
         saveValue("nightVision", nightVision);
+        saveValue("chatSound", chatSound);
     }
 
-    public String getChatSound() {
-        return chatSound;
+    public ChatSound getChatSound() {
+        return ChatSound.valueOf(chatSound);
     }
 
-    public void setChatSound(String chatSound) {
-        this.chatSound = chatSound;
+    public void setChatSound(ChatSound chatSound) {
+        this.chatSound = chatSound.toString();
         saveValue("chatSound", this.chatSound);
     }
 
