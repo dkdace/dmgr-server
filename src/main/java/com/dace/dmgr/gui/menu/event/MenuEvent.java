@@ -1,5 +1,6 @@
 package com.dace.dmgr.gui.menu.event;
 
+import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -23,6 +23,11 @@ commands:
       - apsb
       - menu
     description: DMGR Command
+  설정:
+    aliases:
+      - tjfwjd
+      - option
+      - config
   선택:
     permission: admin
     description: DMGR Command

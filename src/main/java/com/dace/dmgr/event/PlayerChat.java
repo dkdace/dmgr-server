@@ -28,7 +28,7 @@ public class PlayerChat {
         Bukkit.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), event.getMessage()));
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             User user2 = userList.get(player2.getUniqueId());
-            SoundPlayer.play(user2.getUserConfig().getChatSound(), player2, 1000F, 1.414F);
+            SoundPlayer.play(user2.getUserConfig().getChatSound().getSound(), player2, 1000F, 1.414F);
         });
     }
 }

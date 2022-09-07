@@ -3,9 +3,7 @@ package com.dace.dmgr;
 import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.system.EventListener;
 import com.dace.dmgr.system.PacketListener;
-import com.dace.dmgr.system.command.LobbyCommand;
-import com.dace.dmgr.system.command.MainMenuCommand;
-import com.dace.dmgr.system.command.SelectCharCommand;
+import com.dace.dmgr.system.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DMGR extends JavaPlugin {
@@ -32,6 +30,7 @@ public class DMGR extends JavaPlugin {
     private void registerCommand() {
         getCommand("스폰").setExecutor(new LobbyCommand());
         getCommand("메뉴").setExecutor(new MainMenuCommand());
+        getCommand("설정").setExecutor(new OptionCommand());
         getCommand("선택").setExecutor(new SelectCharCommand());
     }
 

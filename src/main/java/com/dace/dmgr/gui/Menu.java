@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Menu {
@@ -38,12 +39,18 @@ public class Menu {
 
     protected void setToggleButton(int index, ItemStack itemStack, boolean isEnabled) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        List<String> lore = itemMeta.getLore();
+        String text;
         if (isEnabled)
-            lore.add("§a§l켜짐");
+            text = "§a§l켜짐";
         else
-            lore.add("§c§l꺼짐");
-        itemMeta.setLore(lore);
+            text = "§c§l꺼짐";
+
+        if (itemMeta.hasLore()) {
+            List<String> lore = itemMeta.getLore();
+            lore.add(text);
+            itemMeta.setLore(lore);
+        } else
+            itemMeta.setLore(Arrays.asList(text));
         itemStack.setItemMeta(itemMeta);
 
         gui.setItem(index, itemStack);
@@ -55,6 +62,23 @@ public class Menu {
             gui.setItem(displayIndex, ItemBuilder.fromSlotItem(DisplaySlot.ENABLED).build());
         else
             gui.setItem(displayIndex, ItemBuilder.fromSlotItem(DisplaySlot.DISABLED).build());
+    }
+
+    protected void setSelectButton(int index, ItemStack itemStack, boolean isSelected) {
+        if (isSelected) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            String text = "§a§l선택됨";
+
+            if (itemMeta.hasLore()) {
+                List<String> lore = itemMeta.getLore();
+                lore.add(text);
+                itemMeta.setLore(lore);
+            } else
+                itemMeta.setLore(Arrays.asList(text));
+            itemStack.setItemMeta(itemMeta);
+        }
+
+        gui.setItem(index, itemStack);
     }
 
     public void open(Player player) {

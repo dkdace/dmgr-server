@@ -1,6 +1,8 @@
 package com.dace.dmgr.gui;
 
 import com.dace.dmgr.gui.slot.ISlotItem;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.shampaggon.crackshot.CSUtility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,7 +11,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class ItemBuilder {
     public static final Material SLOT_MATERIAL = Material.CARROT_STICK;
@@ -39,6 +43,24 @@ public class ItemBuilder {
     public static ItemBuilder fromPlayerSkull(Player player) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
         ((SkullMeta) itemBuilder.getItemMeta()).setOwningPlayer(player);
+        return itemBuilder;
+    }
+
+    public static ItemBuilder fromSkullIcon(SkullIcon skullIcon) {
+        ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
+        SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
+
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+        gameProfile.getProperties().put("textures", new Property("textures", skullIcon.getUrl()));
+
+        try {
+            Field profileField = skullMeta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(skullMeta, gameProfile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return itemBuilder;
     }
 
