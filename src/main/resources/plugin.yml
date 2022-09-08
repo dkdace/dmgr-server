@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.dace.dmgr.DMGR
 prefix: DMGR
 database: false
-depend: [ CrackShot, WorldEdit, WorldGuard, ProtocolLib, SkinsRestorer ]
+depend: [ CrackShot, WorldEdit, WorldGuard, ProtocolLib, SkinsRestorer, Netherboard ]
 authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:
