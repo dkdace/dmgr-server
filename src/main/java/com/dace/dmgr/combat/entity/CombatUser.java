@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.HasCSWeapon;
 import com.dace.dmgr.combat.character.HasSprintEvent;
+import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
@@ -21,7 +21,7 @@ import static com.dace.dmgr.system.EntityList.combatUserList;
 public class CombatUser extends CombatEntity<Player> implements HasCooldown {
     private final Map<String, Integer> shield = new HashMap<>();
     private final Map<CombatUser, Float> damageList = new HashMap<>();
-    private Character character = null;
+    private ICharacter character = null;
 
     public CombatUser(Player entity) {
         super(entity, entity.getName());
@@ -57,17 +57,17 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
         setUlt(getUlt() + value);
     }
 
-    public Character getCharacter() {
+    public ICharacter getCharacter() {
         return character;
     }
 
-    public void setCharacter(Character character) {
+    public void setCharacter(ICharacter character) {
         try {
             reset();
             SkinManager.applySkin(entity, character.getSkinName());
             setMaxHealth(character.getStats().getHealth());
             setHealth(character.getStats().getHealth());
-            entity.getInventory().setItem(4, character.getWeapon());
+            entity.getInventory().setItem(4, character.getWeapon().getItemStack());
             entity.getInventory().setItem(9, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_HEAL).build());
             entity.getInventory().setItem(10, ItemBuilder.fromSlotItem(CommunicationSlot.SHOW_ULT).build());
             entity.getInventory().setItem(11, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_RALLY).build());
@@ -86,11 +86,13 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
     }
 
     public void onLeftClick() {
-
+        if (character != null)
+            character.useWeaponLeft(this);
     }
 
     public void onRightClick() {
-
+        if (character != null)
+            character.useWeaponRight(this);
     }
 
     public void onWeaponShoot() {
@@ -98,7 +100,20 @@ public class CombatUser extends CombatEntity<Player> implements HasCooldown {
             ((HasCSWeapon) character).useWeaponShoot(this);
     }
 
-    public void onSprintToggle(boolean sprint) {
+    public void onItemHeld(int slot) {
+        if (character != null) {
+            if (slot == 0)
+                character.useSkill1(this);
+            if (slot == 1)
+                character.useSkill2(this);
+            if (slot == 2)
+                character.useSkill3(this);
+            if (slot == 3)
+                character.useUltimate(this);
+        }
+    }
+
+    public void onToggleSprint(boolean sprint) {
         if (character != null && character instanceof HasSprintEvent)
             ((HasSprintEvent) character).onSprintToggle(this, sprint);
     }

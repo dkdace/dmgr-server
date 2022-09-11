@@ -16,7 +16,7 @@ public class StringUtil {
         int index = ((int) Math.floor(percent * length)) - 1;
         if (index < 0) index = 0;
 
-        bar.insert(index, "§8");
+        bar.insert(index, "§0");
         bar.insert(0, color.toString());
 
         return bar.toString();

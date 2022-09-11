@@ -65,7 +65,10 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder fromCSItem(String weaponName) {
-        return new ItemBuilder(csUtility.generateWeapon(weaponName)).addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
+        ItemStack weapon = csUtility.generateWeapon(weaponName);
+        ItemBuilder itemBuilder = new ItemBuilder(weapon).addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
+        itemBuilder.getItemMeta().setUnbreakable(true);
+        return itemBuilder;
     }
 
     public ItemMeta getItemMeta() {

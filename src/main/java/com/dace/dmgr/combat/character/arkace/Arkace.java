@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.HasCSWeapon;
 import com.dace.dmgr.combat.character.HasSprintEvent;
-import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.util.SoundPlayer;
@@ -14,7 +13,7 @@ import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
-public class Arkace extends Character implements ICharacter, HasCSWeapon, HasSprintEvent {
+public class Arkace extends Character implements HasCSWeapon, HasSprintEvent {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
@@ -53,31 +52,31 @@ public class Arkace extends Character implements ICharacter, HasCSWeapon, HasSpr
 
     @Override
     public void useWeaponLeft(CombatUser combatUser) {
-
+        combatUser.getEntity().sendMessage("left click");
     }
 
     @Override
     public void useWeaponRight(CombatUser combatUser) {
-
+        combatUser.getEntity().sendMessage("right click");
     }
 
     @Override
     public void useSkill1(CombatUser combatUser) {
-
+        combatUser.getEntity().sendMessage("skill 1");
     }
 
     @Override
     public void useSkill2(CombatUser combatUser) {
-
+        combatUser.getEntity().sendMessage("skill 2");
     }
 
     @Override
     public void useSkill3(CombatUser combatUser) {
-
+        combatUser.getEntity().sendMessage("skill 3");
     }
 
     @Override
-    public void useSkill4(CombatUser combatUser) {
-
+    public void useUltimate(CombatUser combatUser) {
+        combatUser.getEntity().sendMessage("ultimate");
     }
 }
