@@ -6,27 +6,30 @@ public class CooldownManager {
     private static final HashMap<String, Long> cooldownList = new HashMap<>();
 
     public static void setCooldown(String id, long duration) {
-        long time = System.currentTimeMillis();
-        time += duration * 50;
-        cooldownList.put(id, time);
+        if (duration == 0) cooldownList.remove(id);
+        else {
+            long time = System.currentTimeMillis();
+            time += duration * 50;
+            cooldownList.put(id, time);
+        }
     }
 
-    public static void setCooldown(HasCooldown object, Cooldown id, long duration) {
-        String saveId = object.getCooldownKey() + id;
+    public static void setCooldown(Object object, Cooldown id, long duration) {
+        String saveId = object.toString() + id;
         setCooldown(saveId, duration);
     }
 
-    public static <T> void setCooldown(HasCooldown object, Cooldown id, T subId, long duration) {
-        String saveId = object.getCooldownKey() + id + subId;
+    public static <T> void setCooldown(Object object, Cooldown id, T subId, long duration) {
+        String saveId = object.toString() + id + subId;
         setCooldown(saveId, duration);
     }
 
-    public static void setCooldown(HasCooldown object, Cooldown id) {
-        setCooldown(object, id, id.getDefaultValue());
+    public static void setCooldown(Object object, Cooldown id) {
+        setCooldown(object.toString(), id, id.getDefaultValue());
     }
 
-    public static <T> void setCooldown(HasCooldown object, Cooldown id, T subId) {
-        setCooldown(object, id, subId, id.getDefaultValue());
+    public static <T> void setCooldown(Object object, Cooldown id, T subId) {
+        setCooldown(object.toString(), id, subId, id.getDefaultValue());
     }
 
     public static long getCooldown(String id) {
@@ -41,13 +44,13 @@ public class CooldownManager {
         return (time - System.currentTimeMillis()) / 50;
     }
 
-    public static long getCooldown(HasCooldown object, Cooldown id) {
-        String saveId = object.getCooldownKey() + id;
+    public static long getCooldown(Object object, Cooldown id) {
+        String saveId = object.toString() + id;
         return getCooldown(saveId);
     }
 
-    public static <T> long getCooldown(HasCooldown object, Cooldown id, T subId) {
-        String saveId = object.getCooldownKey() + id + subId;
+    public static <T> long getCooldown(Object object, Cooldown id, T subId) {
+        String saveId = object.toString() + id + subId;
         return getCooldown(saveId);
     }
 
@@ -61,13 +64,13 @@ public class CooldownManager {
         }
     }
 
-    public static void addCooldown(HasCooldown object, Cooldown id, long duration) {
-        String saveId = object.getCooldownKey() + id;
+    public static void addCooldown(Object object, Cooldown id, long duration) {
+        String saveId = object.toString() + id;
         addCooldown(saveId, duration);
     }
 
-    public static <T> void addCooldown(HasCooldown object, Cooldown id, T subId, long duration) {
-        String saveId = object.getCooldownKey() + id + subId;
+    public static <T> void addCooldown(Object object, Cooldown id, T subId, long duration) {
+        String saveId = object.toString() + id + subId;
         addCooldown(saveId, duration);
     }
 }

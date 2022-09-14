@@ -11,6 +11,6 @@ public class PlayerToggleSprint {
         CombatUser combatUser = combatUserList.get(player.getUniqueId());
 
         if (combatUser != null)
-            combatUser.onSprintToggle(event.isSprinting());
+            combatUser.onToggleSprint(event.isSprinting());
     }
 }

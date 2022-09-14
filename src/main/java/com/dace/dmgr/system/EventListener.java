@@ -136,6 +136,16 @@ public class EventListener implements Listener {
         WeaponShoot.event(event, event.getPlayer());
     }
 
+    @EventHandler()
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        PlayerItemHeld.event(event, event.getPlayer());
+    }
+
+    @EventHandler()
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        PlayerInteract.event(event, event.getPlayer());
+    }
+
 //    @EventHandler
 //    public void onRegionEnter(RegionEnterEvent event) {
 //        Player player = event.getPlayer();

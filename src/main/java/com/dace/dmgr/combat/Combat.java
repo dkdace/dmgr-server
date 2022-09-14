@@ -64,7 +64,7 @@ public class Combat {
                         if (((Player) entity).isSneaking())
                             hitboxHeight -= 0.35;
 
-                        float statHitbox = ((CombatUser) entity).getCharacter().getStats().getHitbox();
+                        float statHitbox = ((CombatUser) entity).getCharacter().getCharacterStats().getHitbox();
                         hitboxWidth += statHitbox - 1.0;
                         hitboxHeight += statHitbox - 1.0;
                     } else if (entity.getType() == EntityType.IRON_GOLEM) {
@@ -141,7 +141,7 @@ public class Combat {
 
             if (victim instanceof CombatUser && attacker != victim) {
                 if (ult)
-                    attacker.addUlt((float) damage / attacker.getCharacter().getStats().getUltimate().getCost());
+                    attacker.addUlt((float) damage / attacker.getCharacter().getCharacterStats().getActive(4).getCost());
 
                 if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId()) == 0) {
                     CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, victimEntity.getEntityId());

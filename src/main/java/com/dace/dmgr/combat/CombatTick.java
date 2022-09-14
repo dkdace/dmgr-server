@@ -30,10 +30,14 @@ public class CombatTick {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                             99999, 0, false, false));
 
-                if (i % 10 == 0)
-                    combatUser.addUlt((float) IDLE_ULT_CHARGE / combatUser.getCharacter().getStats().getUltimate().getCost() / 2);
+                if (i % 10 == 0) {
+                    combatUser.addUlt((float) IDLE_ULT_CHARGE / combatUser.getCharacter().getCharacterStats().getActive(4).getCost() / 2);
 
-                float speedMultiplier = combatUser.getCharacter().getStats().getSpeed() * (100 + combatUser.getSpeedIncrement()) / 100;
+                    if (combatUser.getUlt() == 1 && !combatUser.getActiveSkillController(3).isUsing())
+                        combatUser.getActiveSkillController(3).ultimateCharge();
+                }
+
+                float speedMultiplier = combatUser.getCharacter().getCharacterStats().getSpeed() * (100 + combatUser.getSpeedIncrement()) / 100;
                 float speed = BASE_SPEED * speedMultiplier;
 
                 if (combatUser.getEntity().isSprinting())
