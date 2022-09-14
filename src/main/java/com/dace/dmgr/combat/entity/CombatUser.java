@@ -30,6 +30,18 @@ public class CombatUser extends CombatEntity<Player> {
         combatUserList.put(entity.getUniqueId(), this);
     }
 
+    public SkillController getPassiveSkillController(int index) {
+        return passiveSkillControllers[index];
+    }
+
+    public SkillController getActiveSkillController(int index) {
+        return activeSkillControllers[index];
+    }
+
+    public WeaponController getWeaponController() {
+        return weaponController;
+    }
+
     public Map<CombatUser, Float> getDamageList() {
         return damageList;
     }

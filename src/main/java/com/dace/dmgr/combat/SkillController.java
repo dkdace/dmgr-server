@@ -7,6 +7,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -48,7 +49,7 @@ public class SkillController {
     }
 
     public void runDuration(float duration) {
-        CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration * 20L);
+        CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, (long) (duration * 20));
         CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, 0);
 
         if (duration == 0) {
@@ -57,13 +58,14 @@ public class SkillController {
             itemStack.setDurability((short) 5);
             apply();
         } else {
+            SkillController skillController = this;
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     if (combatUserList.get(combatUser.getEntity().getUniqueId()) == null)
                         cancel();
 
-                    itemStack.setAmount((int) Math.ceil((float) CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION) / 20));
+                    itemStack.setAmount((int) Math.ceil((float) CooldownManager.getCooldown(skillController, Cooldown.SKILL_DURATION) / 20));
                     itemStack.setDurability((short) 5);
                     apply();
 
@@ -82,7 +84,13 @@ public class SkillController {
     }
 
     public void runCooldown() {
-        runCooldown(skill.getCooldown());
+        if (skill.isUltimate()) {
+            itemStack.setAmount(1);
+            itemStack.setDurability((short) 15);
+            itemStack.removeEnchantment(Enchantment.LUCK);
+            apply();
+        } else
+            runCooldown(skill.getCooldown());
     }
 
     public void runCooldown(int cooldown) {
@@ -102,7 +110,6 @@ public class SkillController {
                     itemStack.setAmount((int) Math.ceil((float) CooldownManager.getCooldown(skillController, Cooldown.SKILL_COOLDOWN) / 20));
                     itemStack.setDurability((short) 15);
                     apply();
-
 
                     if (isCooldownFinished()) {
                         if (!isUsing())
@@ -130,6 +137,13 @@ public class SkillController {
     private void reset() {
         itemStack.setAmount(1);
         itemStack.setDurability((short) 14);
+        apply();
+    }
+
+    public void ultimateCharge() {
+        itemStack.setAmount(1);
+        itemStack.setDurability((short) 10);
+        itemStack.addEnchantment(Enchantment.LUCK, 0);
         apply();
     }
 

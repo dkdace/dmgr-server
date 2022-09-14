@@ -77,7 +77,7 @@ public class Arkace extends Character implements HasCSWeapon {
 
     protected void useActive3(CombatUser combatUser, SkillController skillController) {
         combatUser.getEntity().sendMessage("skill 3");
-        if (skillController.isCooldownFinished())
+        if (skillController.isCooldownFinished() && !skillController.isUsing())
             skillController.runDuration(ArkaceStats.Active3.DURATION);
         else
             combatUser.getEntity().sendMessage("스킬 쿨타임");
@@ -85,5 +85,9 @@ public class Arkace extends Character implements HasCSWeapon {
 
     protected void useUltimate(CombatUser combatUser, SkillController skillController) {
         combatUser.getEntity().sendMessage("ultimate");
+        if (combatUser.getUlt() == 1 && !skillController.isUsing())
+            skillController.runDuration(ArkaceStats.Ultimate.DURATION);
+        else
+            combatUser.getEntity().sendMessage("궁극기 미충전");
     }
 }
