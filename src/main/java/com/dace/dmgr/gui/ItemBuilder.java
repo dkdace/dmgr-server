@@ -23,7 +23,7 @@ public class ItemBuilder {
     private final ItemMeta itemMeta;
 
     public ItemBuilder(ItemStack itemStack) {
-        this.itemStack = itemStack;
+        this.itemStack = itemStack.clone();
         itemMeta = itemStack.getItemMeta();
     }
 

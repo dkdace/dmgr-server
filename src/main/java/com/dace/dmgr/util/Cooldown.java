@@ -9,7 +9,9 @@ public enum Cooldown {
     DAMAGE_ANIMATION(6),
     DAMAGE_SUM_TIME_LIMIT(Combat.DAMAGE_SUM_TIME_LIMIT),
     FASTKILL_TIME_LIMIT(Combat.FASTKILL_TIME_LIMIT),
-    RESPAWN_TIME(Combat.RESPAWN_TIME);
+    RESPAWN_TIME(Combat.RESPAWN_TIME),
+    SKILL_COOLDOWN(0),
+    SKILL_DURATION(0);
 
     private final long defaultValue;
 

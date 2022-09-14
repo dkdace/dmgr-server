@@ -31,9 +31,9 @@ public class CombatTick {
                             99999, 0, false, false));
 
                 if (i % 10 == 0)
-                    combatUser.addUlt((float) IDLE_ULT_CHARGE / combatUser.getCharacter().getStats().getUltimate().getCost() / 2);
+                    combatUser.addUlt((float) IDLE_ULT_CHARGE / combatUser.getCharacter().getCharacterStats().getActive(4).getCost() / 2);
 
-                float speedMultiplier = combatUser.getCharacter().getStats().getSpeed() * (100 + combatUser.getSpeedIncrement()) / 100;
+                float speedMultiplier = combatUser.getCharacter().getCharacterStats().getSpeed() * (100 + combatUser.getSpeedIncrement()) / 100;
                 float speed = BASE_SPEED * speedMultiplier;
 
                 if (combatUser.getEntity().isSprinting())

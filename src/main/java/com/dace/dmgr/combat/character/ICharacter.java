@@ -1,29 +1,23 @@
 package com.dace.dmgr.combat.character;
 
-import com.dace.dmgr.combat.Weapon;
+import com.dace.dmgr.combat.SkillController;
+import com.dace.dmgr.combat.WeaponController;
 import com.dace.dmgr.combat.entity.CombatUser;
 
 public interface ICharacter {
-    IStats getStats();
-
-    Weapon getWeapon();
+    ICharacterStats getCharacterStats();
 
     String getName();
 
     String getSkinName();
 
-    void useWeaponLeft(CombatUser combatUser);
+    void useWeaponLeft(CombatUser combatUser, WeaponController weaponController);
 
-    void useWeaponRight(CombatUser combatUser);
+    void useWeaponRight(CombatUser combatUser, WeaponController weaponController);
 
-    default void useSkill1(CombatUser combatUser) {
+    default void usePassive(int number, CombatUser combatUser, SkillController skillController) {
     }
 
-    default void useSkill2(CombatUser combatUser) {
+    default void useActive(int number, CombatUser combatUser, SkillController skillController) {
     }
-
-    default void useSkill3(CombatUser combatUser) {
-    }
-
-    void useUltimate(CombatUser combatUser);
 }
