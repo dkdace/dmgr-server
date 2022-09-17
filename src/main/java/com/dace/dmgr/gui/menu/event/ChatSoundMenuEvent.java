@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userHashMap;
 
 public class ChatSoundMenuEvent extends MenuEvent {
     private static final ChatSoundMenuEvent instance = new ChatSoundMenuEvent();
@@ -25,7 +25,7 @@ public class ChatSoundMenuEvent extends MenuEvent {
     @Override
     public void onMenuClick(InventoryClickEvent event, Player player, ItemStack clickItem, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = userList.get(player.getUniqueId());
+            User user = userHashMap.get(player);
 
             ChatSound chatSound = user.getUserConfig().getChatSound();
             switch (clickItemName) {

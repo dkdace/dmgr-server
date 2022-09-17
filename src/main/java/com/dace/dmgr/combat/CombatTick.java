@@ -1,13 +1,12 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class CombatTick {
     public static final int IDLE_ULT_CHARGE = 10;
@@ -16,15 +15,11 @@ public class CombatTick {
     public static void run(CombatUser combatUser) {
         Player player = combatUser.getEntity();
 
-        new BukkitRunnable() {
-            int i = 0;
-
+        new TaskTimer(1) {
             @Override
-            public void run() {
-                i++;
-
-                if (combatUserList.get(player.getUniqueId()) == null)
-                    cancel();
+            public boolean run(int i) {
+                if (combatUserHashMap.get(player) == null)
+                    return false;
 
                 if (player.getPotionEffect(PotionEffectType.WATER_BREATHING) == null)
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
@@ -45,7 +40,9 @@ public class CombatTick {
                 else
                     speed *= speed / BASE_SPEED;
                 combatUser.getEntity().setWalkSpeed(speed);
+
+                return true;
             }
-        }.runTaskTimer(DMGR.getPlugin(), 1, 1);
+        };
     }
 }

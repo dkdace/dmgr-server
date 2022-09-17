@@ -9,13 +9,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class OnInventoryClick implements Listener {
     @EventHandler
     public static void event(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        CombatUser combatUser = combatUserList.get(player.getUniqueId());
+        CombatUser combatUser = combatUserHashMap.get(player);
 
         if (combatUser != null)
             event.setCancelled(true);

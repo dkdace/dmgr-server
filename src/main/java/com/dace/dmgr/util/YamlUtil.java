@@ -6,22 +6,20 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.List;
 
-public class YamlModel {
-    private final String key;
+public class YamlUtil {
     private final String modelName;
+    private final String key;
     private YamlConfiguration config;
     private File file;
 
-    protected YamlModel(String modelName, String key) {
+    public YamlUtil(String modelName, String key) {
         this.modelName = modelName;
         this.key = key;
         initConfig();
     }
 
-    protected YamlModel(String modelName) {
-        this.modelName = modelName;
-        this.key = "default";
-        initConfig();
+    public YamlUtil(String modelName) {
+        this(modelName, "default");
     }
 
     private void initConfig() {
@@ -35,7 +33,7 @@ public class YamlModel {
         }
     }
 
-    protected void saveValue(String path, Object value) {
+    public void saveValue(String path, Object value) {
         try {
             config.set(key + "." + path, value);
             config.save(file);
@@ -44,19 +42,19 @@ public class YamlModel {
         }
     }
 
-    protected <T> T loadValue(String path) {
+    public <T> T loadValue(String path) {
         return (T) config.get(key + "." + path);
     }
 
-    protected <T> T loadValue(String path, T def) {
+    public <T> T loadValue(String path, T def) {
         return (T) config.get(key + "." + path, def);
     }
 
-    protected <T> List<T> loadValues(String path) {
+    public <T> List<T> loadValues(String path) {
         return (List<T>) config.getList(key + "." + path);
     }
 
-    protected <T> List<T> loadValues(String path, List<T> def) {
+    public <T> List<T> loadValues(String path, List<T> def) {
         return (List<T>) config.getList(key + "." + path, def);
     }
 }

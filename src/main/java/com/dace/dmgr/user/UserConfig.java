@@ -1,25 +1,19 @@
 package com.dace.dmgr.user;
 
-import com.dace.dmgr.util.YamlModel;
+import com.dace.dmgr.util.YamlUtil;
 import org.bukkit.entity.Player;
 
-public class UserConfig extends YamlModel {
+public class UserConfig {
+    private final YamlUtil yamlUtil;
     private String chatSound = ChatSound.PLING.toString();
     private boolean koreanChat = false;
     private boolean nightVision = false;
 
     public UserConfig(Player player) {
-        super("UserConfig", player.getUniqueId().toString());
-        this.koreanChat = loadValue("koreanChat", koreanChat);
-        this.nightVision = loadValue("nightVision", nightVision);
-        this.chatSound = loadValue("chatSound", chatSound);
-        saveConfig();
-    }
-
-    private void saveConfig() {
-        saveValue("koreanChat", koreanChat);
-        saveValue("nightVision", nightVision);
-        saveValue("chatSound", chatSound);
+        this.yamlUtil = new YamlUtil("UserConfig", player.getUniqueId().toString());
+        this.koreanChat = yamlUtil.loadValue("koreanChat", koreanChat);
+        this.nightVision = yamlUtil.loadValue("nightVision", nightVision);
+        this.chatSound = yamlUtil.loadValue("chatSound", chatSound);
     }
 
     public ChatSound getChatSound() {
@@ -28,7 +22,7 @@ public class UserConfig extends YamlModel {
 
     public void setChatSound(ChatSound chatSound) {
         this.chatSound = chatSound.toString();
-        saveValue("chatSound", this.chatSound);
+        yamlUtil.saveValue("chatSound", this.chatSound);
     }
 
     public boolean isKoreanChat() {
@@ -37,7 +31,7 @@ public class UserConfig extends YamlModel {
 
     public void setKoreanChat(boolean koreanChat) {
         this.koreanChat = koreanChat;
-        saveValue("koreanChat", this.koreanChat);
+        yamlUtil.saveValue("koreanChat", this.koreanChat);
     }
 
     public boolean isNightVision() {
@@ -46,6 +40,6 @@ public class UserConfig extends YamlModel {
 
     public void setNightVision(boolean nightVision) {
         this.nightVision = nightVision;
-        saveValue("nightVision", this.nightVision);
+        yamlUtil.saveValue("nightVision", this.nightVision);
     }
 }

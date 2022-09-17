@@ -13,6 +13,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import static com.dace.dmgr.system.HashMapList.userHashMap;
+
 public class OnPlayerJoin implements Listener {
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
     private static final String TITLE = "§3Welcome to §b§lDMGR";
@@ -21,8 +23,9 @@ public class OnPlayerJoin implements Listener {
     public static void event(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = new User(player);
-
+        userHashMap.put(player, user);
         Lobby.lobbyTick(player);
+
         event.setJoinMessage(PREFIX + player.getName());
 
         if (!user.getUserConfig().isKoreanChat())
@@ -61,9 +64,9 @@ public class OnPlayerJoin implements Listener {
                         SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 1.05F);
                         return true;
                 }
+
                 return true;
             }
         };
     }
-
 }
