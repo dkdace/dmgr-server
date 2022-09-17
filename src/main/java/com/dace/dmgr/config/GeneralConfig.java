@@ -1,23 +1,16 @@
 package com.dace.dmgr.config;
 
-import com.dace.dmgr.util.YamlModel;
+import com.dace.dmgr.util.YamlUtil;
 
-public class GeneralConfig extends YamlModel {
+public class GeneralConfig {
+    public static YamlUtil yamlUtil = new YamlUtil("GeneralConfig");
     public static String resourcePackUrl = "";
     public static int chatCooldown = 0;
     public static int commandCooldown = 0;
 
     public GeneralConfig() {
-        super("GeneralConfig");
-        resourcePackUrl = loadValue("resourcePackUrl", resourcePackUrl);
-        chatCooldown = loadValue("chatCooldown", chatCooldown);
-        commandCooldown = loadValue("commandCooldown", commandCooldown);
-        saveConfig();
-    }
-
-    private void saveConfig() {
-        saveValue("resourcePackUrl", resourcePackUrl);
-        saveValue("chatCooldown", chatCooldown);
-        saveValue("commandCooldown", commandCooldown);
+        resourcePackUrl = yamlUtil.loadValue("resourcePackUrl", resourcePackUrl);
+        chatCooldown = yamlUtil.loadValue("chatCooldown", chatCooldown);
+        commandCooldown = yamlUtil.loadValue("commandCooldown", commandCooldown);
     }
 }

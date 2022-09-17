@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.system.PacketListener;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.user.Lobby;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
@@ -19,17 +20,15 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.dace.dmgr.system.EntityList.combatEntityList;
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatEntityHashMap;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class Combat {
     public static final float HITS_HITBOX = 0.15F;
@@ -48,7 +47,7 @@ public class Combat {
         double dist = range;
 
         for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
-            ICombatEntity target = combatEntityList.get(entity.getEntityId());
+            ICombatEntity target = combatEntityHashMap.get(entity);
 
             if (target != null) {
                 if (target != attacker && isEnemy(attacker, target)) {
@@ -84,7 +83,7 @@ public class Combat {
 
                     if (dist >= location.distance(eLocation)) {
                         dist = location.distance(eLocation);
-                        retTarget = combatEntityList.get(entity.getEntityId());
+                        retTarget = combatEntityHashMap.get(entity);
 
                     }
 
@@ -96,7 +95,7 @@ public class Combat {
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
         Player attackerEntity = attacker.getEntity();
-        LivingEntity victimEntity = victim.getEntity();
+        Entity victimEntity = victim.getEntity();
         boolean killed = false;
 
         if (!victimEntity.isDead()) {
@@ -217,23 +216,27 @@ public class Combat {
         victimEntity.setGameMode(GameMode.SPECTATOR);
         victimEntity.setVelocity(new Vector());
 
-        new BukkitRunnable() {
+        new TaskTimer(1) {
             @Override
-            public void run() {
+            public boolean run(int i) {
                 long cooldown = CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME);
-                if (combatUserList.get(victimEntity.getUniqueId()) == null || cooldown <= 0) cancel();
+                if (combatUserHashMap.get(victimEntity) == null || cooldown <= 0)
+                    return false;
 
                 victimEntity.sendTitle("§c§l죽었습니다!",
                         String.format("%.1f", Math.ceil((float) cooldown / 20)) + "초 후 부활합니다.", 0, 20, 10);
                 victimEntity.teleport(deadLocation);
 
-                if (isCancelled()) {
-                    victim.setHealth(victim.getMaxHealth());
-                    victimEntity.teleport(Lobby.lobby);
-                    victimEntity.setGameMode(GameMode.SURVIVAL);
-                }
+                return true;
             }
-        }.runTaskTimer(DMGR.getPlugin(), 0, 1);
+
+            @Override
+            public void onEnd() {
+                victim.setHealth(victim.getMaxHealth());
+                victimEntity.teleport(Lobby.lobby);
+                victimEntity.setGameMode(GameMode.SURVIVAL);
+            }
+        };
     }
 
     private static void sendDamage(Entity entity) {

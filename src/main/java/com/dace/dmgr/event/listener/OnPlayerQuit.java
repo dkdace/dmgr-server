@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userHashMap;
 
 public class OnPlayerQuit implements Listener {
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
@@ -20,10 +20,11 @@ public class OnPlayerQuit implements Listener {
     @EventHandler
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        User user = userList.get(player.getUniqueId());
-
+        User user = userHashMap.get(player);
         user.reset();
+
         event.setQuitMessage(PREFIX + player.getName());
+        userHashMap.remove(player);
 
         new TaskWait(1) {
             @Override
@@ -32,8 +33,6 @@ public class OnPlayerQuit implements Listener {
                 playQuitSound();
             }
         };
-
-        userList.remove(player.getUniqueId());
     }
 
     private static void playQuitSound() {
@@ -48,6 +47,7 @@ public class OnPlayerQuit implements Listener {
                         SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
                         return true;
                 }
+
                 return true;
             }
         };

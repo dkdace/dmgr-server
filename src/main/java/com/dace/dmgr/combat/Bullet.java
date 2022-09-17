@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.SoundPlayer;
@@ -70,7 +71,10 @@ public abstract class Bullet {
     }
 
     public void shoot() {
-        shoot(shooter.getEntity().getEyeLocation(), shooter.getEntity().getLocation().getDirection());
+        if (shooter instanceof CombatUser)
+            shoot(((CombatUser) shooter).getEntity().getEyeLocation(), shooter.getEntity().getLocation().getDirection());
+        else
+            shoot(shooter.getEntity().getLocation(), shooter.getEntity().getLocation().getDirection());
     }
 
     public abstract void trail(Location location);

@@ -1,47 +1,35 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.system.SkinManager;
-import com.dace.dmgr.util.YamlModel;
+import com.dace.dmgr.util.YamlUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
-public class User extends YamlModel {
-    public final BPlayerBoard lobbySidebar;
+public class User {
+    private final BPlayerBoard lobbySidebar;
     private final Player player;
     private final UserConfig userConfig;
-    public boolean resourcePack = false;
-    public PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
-    private String name;
+    private final YamlUtil yamlUtil;
     private int xp = 0;
     private int level = 1;
     private int money = 0;
     private int rank = 100;
+    private boolean resourcePack = false;
+    private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
     public User(Player player) {
-        super("User", player.getUniqueId().toString());
         this.player = player;
-        this.name = player.getName();
         this.userConfig = new UserConfig(player);
-        this.xp = loadValue("xp", xp);
-        this.level = loadValue("level", level);
-        this.money = loadValue("money", money);
-        this.rank = loadValue("rank", rank);
         this.lobbySidebar = new BPlayerBoard(player, "lobbySidebar");
-        userList.put(player.getUniqueId(), this);
-        saveConfig();
-    }
-
-    private void saveConfig() {
-        saveValue("name", name);
-        saveValue("xp", xp);
-        saveValue("level", level);
-        saveValue("money", money);
-        saveValue("rank", rank);
+        this.yamlUtil = new YamlUtil("User", player.getUniqueId().toString());
+        this.xp = yamlUtil.loadValue("xp", xp);
+        this.level = yamlUtil.loadValue("level", level);
+        this.money = yamlUtil.loadValue("money", money);
+        this.rank = yamlUtil.loadValue("rank", rank);
     }
 
     public Player getPlayer() {
@@ -52,15 +40,6 @@ public class User extends YamlModel {
         return userConfig;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        saveValue("name", this.name);
-    }
-
     public int getXp() {
         return xp;
     }
@@ -68,7 +47,7 @@ public class User extends YamlModel {
     public void setXp(int xp) {
         if (xp < 0) xp = 0;
         this.xp = xp;
-        saveValue("xp", this.xp);
+        yamlUtil.saveValue("xp", this.xp);
     }
 
     public int getLevel() {
@@ -78,7 +57,7 @@ public class User extends YamlModel {
     public void setLevel(int level) {
         if (level < 0) level = 0;
         this.level = level;
-        saveValue("level", this.level);
+        yamlUtil.saveValue("level", this.level);
     }
 
     public int getMoney() {
@@ -88,7 +67,7 @@ public class User extends YamlModel {
     public void setMoney(int money) {
         if (money < 0) money = 0;
         this.money = money;
-        saveValue("money", this.money);
+        yamlUtil.saveValue("money", this.money);
     }
 
     public int getRank() {
@@ -97,7 +76,27 @@ public class User extends YamlModel {
 
     public void setRank(int rank) {
         this.rank = rank;
-        saveValue("rank", this.rank);
+        yamlUtil.saveValue("rank", this.rank);
+    }
+
+    public BPlayerBoard getLobbySidebar() {
+        return lobbySidebar;
+    }
+
+    public boolean isResourcePack() {
+        return resourcePack;
+    }
+
+    public void setResourcePack(boolean resourcePack) {
+        this.resourcePack = resourcePack;
+    }
+
+    public PlayerResourcePackStatusEvent.Status getResourcePackStatus() {
+        return resourcePackStatus;
+    }
+
+    public void setResourcePackStatus(PlayerResourcePackStatusEvent.Status resourcePackStatus) {
+        this.resourcePackStatus = resourcePackStatus;
     }
 
     public void reset() {
@@ -110,11 +109,11 @@ public class User extends YamlModel {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        combatUserList.remove(player.getUniqueId());
+        combatUserHashMap.remove(player);
     }
 
     public String getLevelPrefix() {
-        String color = "";
+        String color;
 
         if (level <= 100)
             color = "§f§l";

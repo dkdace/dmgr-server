@@ -15,8 +15,6 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
-
 public class CombatUser extends CombatEntity<Player> {
     private final Map<String, Integer> shield = new HashMap<>();
     private final Map<CombatUser, Float> damageList = new HashMap<>();
@@ -27,7 +25,6 @@ public class CombatUser extends CombatEntity<Player> {
 
     public CombatUser(Player entity) {
         super(entity, entity.getName());
-        combatUserList.put(entity.getUniqueId(), this);
     }
 
     public SkillController getPassiveSkillController(int index) {

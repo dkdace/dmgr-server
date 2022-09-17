@@ -2,12 +2,12 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class OnEntityDamageByEntity implements Listener {
     @EventHandler
@@ -15,8 +15,8 @@ public class OnEntityDamageByEntity implements Listener {
         Entity attacker = event.getDamager();
         Entity victim = event.getEntity();
 
-        if (attacker.getType() == EntityType.PLAYER) {
-            CombatUser attCombatUser = combatUserList.get(attacker.getUniqueId());
+        if (attacker instanceof Player) {
+            CombatUser attCombatUser = combatUserHashMap.get(attacker);
 
             if (attCombatUser.getCharacter() != null)
                 event.setCancelled(true);

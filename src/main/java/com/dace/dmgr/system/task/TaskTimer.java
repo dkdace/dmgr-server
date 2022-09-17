@@ -25,6 +25,7 @@ public abstract class TaskTimer {
             public void run() {
                 if (!TaskTimer.this.run(i++)) {
                     cancel();
+                    onEnd();
                     return;
                 }
 
@@ -32,6 +33,9 @@ public abstract class TaskTimer {
                     if (i * period > duration) cancel();
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
+    }
+
+    public void onEnd() {
     }
 
     public abstract boolean run(int i);

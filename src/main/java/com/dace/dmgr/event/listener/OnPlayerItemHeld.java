@@ -5,12 +5,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class OnPlayerItemHeld implements Listener {
     @EventHandler
     public static void event(PlayerItemHeldEvent event) {
-        CombatUser combatUser = combatUserList.get(event.getPlayer().getUniqueId());
+        CombatUser combatUser = combatUserHashMap.get(event.getPlayer());
 
         if (combatUser != null) {
             event.setCancelled(true);

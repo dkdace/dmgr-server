@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userHashMap;
 
 public class OnPlayerResourcePackStatus implements Listener {
     private static final String DENY_KICK_MESSAGE = DMGR.PREFIX.CHAT_WARN + "리소스팩 적용을 활성화 해주세요!" +
@@ -26,27 +26,27 @@ public class OnPlayerResourcePackStatus implements Listener {
     @EventHandler
     public static void event(PlayerResourcePackStatusEvent event) {
         Player player = event.getPlayer();
-        User user = userList.get(player.getUniqueId());
+        User user = userHashMap.get(player);
 
-        user.resourcePackStatus = event.getStatus();
+        user.setResourcePackStatus(event.getStatus());
 
-        if (user.resourcePackStatus == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
+        if (user.getResourcePackStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
             player.kickPlayer(ERR_KICK_MESSAGE);
         }
     }
 
     public static void sendResourcePack(Player player) {
-        User user = userList.get(player.getUniqueId());
+        User user = userHashMap.get(player);
 
-        if (!user.resourcePack) {
-            user.resourcePack = true;
+        if (!user.isResourcePack()) {
+            user.setResourcePack(true);
             user.getPlayer().setResourcePack(GeneralConfig.resourcePackUrl);
 
             new TaskWait(160) {
                 @Override
                 public void run() {
                     if (player.isOnline())
-                        if (user.resourcePackStatus == null || user.resourcePackStatus == PlayerResourcePackStatusEvent.Status.DECLINED)
+                        if (user.getResourcePackStatus() == null || user.getResourcePackStatus() == PlayerResourcePackStatusEvent.Status.DECLINED)
                             user.getPlayer().kickPlayer(DENY_KICK_MESSAGE);
                 }
             };

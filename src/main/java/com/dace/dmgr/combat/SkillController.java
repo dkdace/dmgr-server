@@ -1,17 +1,16 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.character.ISkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownManager;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
 
 public class SkillController {
     private static final Material MATERIAL = Material.STAINED_GLASS_PANE;
@@ -59,11 +58,11 @@ public class SkillController {
             apply();
         } else {
             SkillController skillController = this;
-            new BukkitRunnable() {
+            new TaskTimer(1) {
                 @Override
-                public void run() {
-                    if (combatUserList.get(combatUser.getEntity().getUniqueId()) == null)
-                        cancel();
+                public boolean run(int i) {
+                    if (combatUserHashMap.get(combatUser.getEntity()) == null)
+                        return false;
 
                     itemStack.setAmount((int) Math.ceil((float) CooldownManager.getCooldown(skillController, Cooldown.SKILL_DURATION) / 20));
                     itemStack.setDurability((short) 5);
@@ -71,10 +70,12 @@ public class SkillController {
 
                     if (!isUsing()) {
                         runCooldown();
-                        cancel();
+                        return false;
                     }
+
+                    return true;
                 }
-            }.runTaskTimer(DMGR.getPlugin(), 0, 1);
+            };
         }
     }
 
@@ -101,11 +102,11 @@ public class SkillController {
             reset();
         else {
             SkillController skillController = this;
-            new BukkitRunnable() {
+            new TaskTimer(1) {
                 @Override
-                public void run() {
-                    if (combatUserList.get(combatUser.getEntity().getUniqueId()) == null)
-                        cancel();
+                public boolean run(int i) {
+                    if (combatUserHashMap.get(combatUser.getEntity()) == null)
+                        return false;
 
                     itemStack.setAmount((int) Math.ceil((float) CooldownManager.getCooldown(skillController, Cooldown.SKILL_COOLDOWN) / 20));
                     itemStack.setDurability((short) 15);
@@ -114,10 +115,12 @@ public class SkillController {
                     if (isCooldownFinished()) {
                         if (!isUsing())
                             reset();
-                        cancel();
+                        return false;
                     }
+
+                    return true;
                 }
-            }.runTaskTimer(DMGR.getPlugin(), 0, 1);
+            };
         }
     }
 
