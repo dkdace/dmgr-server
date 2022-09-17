@@ -1,13 +1,15 @@
-package com.dace.dmgr.event;
+package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatUser;
-import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import static com.dace.dmgr.system.EntityList.combatUserList;
 
-public class PlayerInteract {
-    public static void event(PlayerInteractEvent event, Player player) {
+public class OnPlayerInteract implements Listener {
+    @EventHandler
+    public static void event(PlayerInteractEvent event) {
         CombatUser combatUser = combatUserList.get(event.getPlayer().getUniqueId());
 
         if (combatUser != null) {
