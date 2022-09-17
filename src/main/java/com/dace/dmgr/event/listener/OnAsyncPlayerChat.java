@@ -1,4 +1,4 @@
-package com.dace.dmgr.event;
+package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.user.User;
@@ -7,12 +7,16 @@ import com.dace.dmgr.util.CooldownManager;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import static com.dace.dmgr.system.EntityList.userList;
 
-public class PlayerChat {
-    public static void event(AsyncPlayerChatEvent event, Player player) {
+public class OnAsyncPlayerChat implements Listener {
+    @EventHandler
+    public static void event(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
         User user = userList.get(player.getUniqueId());
 
         event.setCancelled(true);
