@@ -5,7 +5,7 @@ import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.gui.SkullIcon;
 import com.dace.dmgr.gui.slot.ButtonSlot;
 import com.dace.dmgr.gui.slot.DisplaySlot;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.Player;
 
 import static com.dace.dmgr.system.HashMapList.userMap;

@@ -1,8 +1,8 @@
 package com.dace.dmgr.gui.menu.event;
 
 import com.dace.dmgr.gui.menu.ChatSoundMenu;
-import com.dace.dmgr.user.ChatSound;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.ChatSound;
+import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

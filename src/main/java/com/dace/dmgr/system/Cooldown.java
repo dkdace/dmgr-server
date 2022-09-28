@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.system;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.config.GeneralConfig;

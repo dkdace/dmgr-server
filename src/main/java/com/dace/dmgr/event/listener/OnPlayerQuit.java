@@ -3,7 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

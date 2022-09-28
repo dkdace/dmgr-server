@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.admin;
 
 import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.character.arkace.Arkace;

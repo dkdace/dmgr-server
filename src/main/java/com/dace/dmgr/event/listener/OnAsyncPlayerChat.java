@@ -1,9 +1,9 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownManager;
+import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

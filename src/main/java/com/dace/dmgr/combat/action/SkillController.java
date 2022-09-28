@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownManager;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;

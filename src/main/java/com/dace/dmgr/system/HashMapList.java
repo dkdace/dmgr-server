@@ -3,7 +3,7 @@ package com.dace.dmgr.system;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 

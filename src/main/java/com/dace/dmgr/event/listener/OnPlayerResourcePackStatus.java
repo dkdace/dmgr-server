@@ -3,7 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
