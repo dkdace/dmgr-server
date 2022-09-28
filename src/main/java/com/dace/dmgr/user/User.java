@@ -7,7 +7,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class User {
     private final BPlayerBoard lobbySidebar;
@@ -109,7 +109,7 @@ public class User {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        combatUserHashMap.remove(player);
+        combatUserMap.remove(player);
     }
 
     public String getLevelPrefix() {

@@ -9,25 +9,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class Lobby {
     public static Location lobby = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
 
     public static void spawn(Player player) {
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
 
         player.teleport(lobby);
         user.reset();
     }
 
     public static void lobbyTick(Player player) {
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
 
         new TaskTimer(20) {
             @Override
             public boolean run(int i) {
-                if (userHashMap.get(player) == null)
+                if (userMap.get(player) == null)
                     return false;
 
                 if (user.getUserConfig().isNightVision())

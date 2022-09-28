@@ -7,13 +7,13 @@ public abstract class TaskTimer {
     private final long period;
     private final long duration;
 
-    protected TaskTimer(long period, long duration) {
+    public TaskTimer(long period, long duration) {
         this.period = period;
         this.duration = duration;
         execute();
     }
 
-    protected TaskTimer(long period) {
+    public TaskTimer(long period) {
         this(period, 0);
     }
 

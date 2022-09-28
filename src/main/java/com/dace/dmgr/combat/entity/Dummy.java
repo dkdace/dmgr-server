@@ -14,9 +14,12 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dace.dmgr.system.HashMapList.combatEntityMap;
+
 public class Dummy extends TemporalEntity<Zombie> {
     public Dummy(Location location, int health) {
         super(EntityType.ZOMBIE, "§7§lDummy", location);
+        combatEntityMap.put(getEntity(), this);
         setMaxHealth(health);
         setHealth(health);
         setTeam("DUMMY");

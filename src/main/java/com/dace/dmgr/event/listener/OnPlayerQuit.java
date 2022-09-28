@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OnPlayerQuit implements Listener {
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
@@ -20,11 +20,11 @@ public class OnPlayerQuit implements Listener {
     @EventHandler
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
         user.reset();
 
         event.setQuitMessage(PREFIX + player.getName());
-        userHashMap.remove(player);
+        userMap.remove(player);
 
         new TaskWait(1) {
             @Override

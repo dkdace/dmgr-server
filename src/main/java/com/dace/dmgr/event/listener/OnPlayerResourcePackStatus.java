@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OnPlayerResourcePackStatus implements Listener {
     private static final String DENY_KICK_MESSAGE = DMGR.PREFIX.CHAT_WARN + "리소스팩 적용을 활성화 해주세요!" +
@@ -26,7 +26,7 @@ public class OnPlayerResourcePackStatus implements Listener {
     @EventHandler
     public static void event(PlayerResourcePackStatusEvent event) {
         Player player = event.getPlayer();
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
 
         user.setResourcePackStatus(event.getStatus());
 
@@ -36,7 +36,7 @@ public class OnPlayerResourcePackStatus implements Listener {
     }
 
     public static void sendResourcePack(Player player) {
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
 
         if (!user.isResourcePack()) {
             user.setResourcePack(true);

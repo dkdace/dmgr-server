@@ -10,14 +10,14 @@ import com.dace.dmgr.user.UserConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class ChatSoundMenu extends Menu {
     public ChatSoundMenu(Player player) {
         super(2, "§8채팅 효과음 설정");
         super.fillRow(2, ItemBuilder.fromSlotItem(DisplaySlot.EMPTY).build());
 
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
         UserConfig userConfig = user.getUserConfig();
 
         super.setSelectButton(0, new ItemBuilder(Material.BARRIER).setName("§c§l음소거").build(),

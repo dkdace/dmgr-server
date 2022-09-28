@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public abstract class TaskWait {
     private final long delay;
 
-    protected TaskWait(long delay) {
+    public TaskWait(long delay) {
         this.delay = delay;
         execute();
     }

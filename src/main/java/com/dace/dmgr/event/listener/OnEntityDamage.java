@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class OnEntityDamage implements Listener {
     @EventHandler
@@ -15,7 +15,7 @@ public class OnEntityDamage implements Listener {
         Entity entity = event.getEntity();
 
         if (entity instanceof Player) {
-            CombatUser combatUser = combatUserHashMap.get(entity);
+            CombatUser combatUser = combatUserMap.get(entity);
 
             if (combatUser != null) {
                 switch (event.getCause()) {
