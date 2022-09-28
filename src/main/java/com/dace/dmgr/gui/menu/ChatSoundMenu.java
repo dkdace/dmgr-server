@@ -4,9 +4,9 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.gui.slot.ButtonSlot;
 import com.dace.dmgr.gui.slot.DisplaySlot;
-import com.dace.dmgr.user.ChatSound;
-import com.dace.dmgr.user.User;
-import com.dace.dmgr.user.UserConfig;
+import com.dace.dmgr.lobby.ChatSound;
+import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 

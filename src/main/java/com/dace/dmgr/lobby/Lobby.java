@@ -1,4 +1,4 @@
-package com.dace.dmgr.user;
+package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringUtil;

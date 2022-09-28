@@ -1,4 +1,4 @@
-package com.dace.dmgr.user;
+package com.dace.dmgr.lobby;
 
 public enum ChatSound {
     MUTE(""),
