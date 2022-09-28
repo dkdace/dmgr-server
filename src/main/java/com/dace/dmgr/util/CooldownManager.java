@@ -6,8 +6,11 @@ public class CooldownManager {
     private static final HashMap<String, Long> cooldownList = new HashMap<>();
 
     public static void setCooldown(String id, long duration) {
-        if (duration == 0) cooldownList.remove(id);
+        if (duration == 0)
+            cooldownList.remove(id);
         else {
+            if (duration == -1)
+                duration = 99999;
             long time = System.currentTimeMillis();
             time += duration * 50;
             cooldownList.put(id, time);

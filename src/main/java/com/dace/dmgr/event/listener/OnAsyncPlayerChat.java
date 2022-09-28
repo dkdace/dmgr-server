@@ -11,7 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OnAsyncPlayerChat implements Listener {
     @EventHandler
@@ -19,7 +19,7 @@ public class OnAsyncPlayerChat implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        User user = userHashMap.get(player);
+        User user = userMap.get(player);
 
         if (!player.isOp()) {
             if (CooldownManager.getCooldown(user, Cooldown.CHAT) > 0) {
@@ -31,7 +31,7 @@ public class OnAsyncPlayerChat implements Listener {
 
         Bukkit.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), event.getMessage()));
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            User user2 = userHashMap.get(player2);
+            User user2 = userMap.get(player2);
             SoundPlayer.play(user2.getUserConfig().getChatSound().getSound(), player2, 1000F, 1.414F);
         });
     }

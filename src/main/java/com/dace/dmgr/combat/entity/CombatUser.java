@@ -1,9 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.SkillController;
-import com.dace.dmgr.combat.SkillTrigger;
-import com.dace.dmgr.combat.WeaponController;
-import com.dace.dmgr.combat.character.HasCSWeapon;
+import com.dace.dmgr.combat.action.Skill;
+import com.dace.dmgr.combat.action.SkillController;
+import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
@@ -13,34 +12,28 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class CombatUser extends CombatEntity<Player> {
-    private final Map<String, Integer> shield = new HashMap<>();
-    private final Map<CombatUser, Float> damageList = new HashMap<>();
-    private final SkillController[] passiveSkillControllers = new SkillController[3];
-    private final SkillController[] activeSkillControllers = new SkillController[4];
-    private WeaponController weaponController = null;
+    private final HashMap<String, Integer> shield = new HashMap<>();
+    private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     private ICharacter character = null;
+    private WeaponController weaponController;
+    private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
 
     public CombatUser(Player entity) {
         super(entity, entity.getName());
-    }
-
-    public SkillController getPassiveSkillController(int index) {
-        return passiveSkillControllers[index];
-    }
-
-    public SkillController getActiveSkillController(int index) {
-        return activeSkillControllers[index];
     }
 
     public WeaponController getWeaponController() {
         return weaponController;
     }
 
-    public Map<CombatUser, Float> getDamageList() {
-        return damageList;
+    public SkillController getSkillController(Skill skill) {
+        return skillControllerMap.get(skill);
+    }
+
+    public HashMap<CombatUser, Float> getDamageMap() {
+        return damageMap;
     }
 
     public float getUlt() {
@@ -50,13 +43,26 @@ public class CombatUser extends CombatEntity<Player> {
     }
 
     public void setUlt(float value) {
-        if (value >= 1) value = 0.999F;
+        if (character == null) value = 0;
+        if (value >= 1) {
+            chargeUlt();
+            value = 0.999F;
+        }
         entity.setExp(value);
         entity.setLevel(Math.round(value * 100));
     }
 
     public void addUlt(float value) {
         setUlt(getUlt() + value);
+    }
+
+    public void chargeUlt() {
+        if (character != null) {
+            setUlt(1);
+            SkillController skillController = skillControllerMap.get(character.getUltimate());
+            if (!skillController.isCharged())
+                skillController.setCooldown();
+        }
     }
 
     public ICharacter getCharacter() {
@@ -67,12 +73,12 @@ public class CombatUser extends CombatEntity<Player> {
         try {
             reset();
             SkinManager.applySkin(entity, character.getSkinName());
-            setMaxHealth(character.getCharacterStats().getHealth());
-            setHealth(character.getCharacterStats().getHealth());
-            weaponController = new WeaponController(this, character.getCharacterStats().getWeapon());
+            setMaxHealth(character.getHealth());
+            setHealth(character.getHealth());
             entity.getInventory().setItem(9, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_HEAL).build());
             entity.getInventory().setItem(10, ItemBuilder.fromSlotItem(CommunicationSlot.SHOW_ULT).build());
             entity.getInventory().setItem(11, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_RALLY).build());
+            weaponController = new WeaponController(this, character.getWeapon());
 
             this.character = character;
             resetSkills();
@@ -90,53 +96,28 @@ public class CombatUser extends CombatEntity<Player> {
     }
 
     private void resetSkills() {
-        for (int i = 0; i < passiveSkillControllers.length; i++) {
-            if (passiveSkillControllers[i] != null) {
-                passiveSkillControllers[i].clear();
-                passiveSkillControllers[i] = null;
+        skillControllerMap.clear();
+        character.getActionKeyMap().getAll().forEach((actionKey, action) -> {
+            if (action instanceof Skill) {
+                int slot = -1;
+                switch (actionKey) {
+                    case SLOT_1:
+                        slot = 0;
+                        break;
+                    case SLOT_2:
+                        slot = 1;
+                        break;
+                    case SLOT_3:
+                        slot = 2;
+                        break;
+                    case SLOT_4:
+                        slot = 3;
+                        break;
+                }
+
+                skillControllerMap.put((Skill) action, new SkillController(this, (Skill) action, slot));
             }
-            if (character.getCharacterStats().getPassive(i + 1) != null) {
-                passiveSkillControllers[i] = new SkillController(this, character.getCharacterStats().getPassive(i + 1));
-            }
-        }
-        for (int i = 0; i < activeSkillControllers.length; i++) {
-            if (activeSkillControllers[i] != null) {
-                activeSkillControllers[i].clear();
-                activeSkillControllers[i] = null;
-            }
-            if (character.getCharacterStats().getActive(i + 1) != null)
-                activeSkillControllers[i] = new SkillController(this, character.getCharacterStats().getActive(i + 1), i);
-        }
-    }
-
-    public void onLeftClick() {
-        if (character != null)
-            character.useWeaponLeft(this, weaponController);
-    }
-
-    public void onRightClick() {
-        if (character != null)
-            character.useWeaponRight(this, weaponController);
-    }
-
-    public void onWeaponShoot() {
-        if (character != null && character instanceof HasCSWeapon)
-            ((HasCSWeapon) character).useWeaponShoot(this);
-    }
-
-    public void onItemHeld(int slot) {
-        if (slot >= 0 && slot <= 3)
-            if (character != null && activeSkillControllers[slot] != null)
-                character.useActive(slot + 1, this, activeSkillControllers[slot]);
-    }
-
-    public void onToggleSprint(boolean sprint) {
-        if (character != null) {
-            for (int i = 0; i < passiveSkillControllers.length; i++) {
-                if (passiveSkillControllers[i] != null && passiveSkillControllers[i].getSkill().getSkillTrigger() == SkillTrigger.SPRINT)
-                    character.usePassive(i + 1, this, passiveSkillControllers[i]);
-            }
-        }
+        });
     }
 
     public Location getLeftHand() {

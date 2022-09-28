@@ -13,7 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import static com.dace.dmgr.system.HashMapList.userHashMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OnPlayerJoin implements Listener {
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
@@ -23,7 +23,7 @@ public class OnPlayerJoin implements Listener {
     public static void event(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = new User(player);
-        userHashMap.put(player, user);
+        userMap.put(player, user);
         Lobby.lobbyTick(player);
 
         event.setJoinMessage(PREFIX + player.getName());

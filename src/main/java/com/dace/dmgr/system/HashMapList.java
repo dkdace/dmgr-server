@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 
 public class HashMapList {
-    public static HashMap<Player, User> userHashMap = new HashMap<>();
-    public static HashMap<Player, CombatUser> combatUserHashMap = new HashMap<>();
-    public static HashMap<Entity, ICombatEntity> combatEntityHashMap = new HashMap<>();
-    public static HashMap<Entity, TemporalEntity<?>> temporalEntityHashMap = new HashMap<>();
+    public static HashMap<Player, User> userMap = new HashMap<>();
+    public static HashMap<Player, CombatUser> combatUserMap = new HashMap<>();
+    public static HashMap<Entity, ICombatEntity> combatEntityMap = new HashMap<>();
+    public static HashMap<Entity, TemporalEntity<?>> temporalEntityMap = new HashMap<>();
 }

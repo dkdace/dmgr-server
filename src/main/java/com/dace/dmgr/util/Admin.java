@@ -5,12 +5,12 @@ import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import org.bukkit.entity.Player;
 
-import static com.dace.dmgr.system.HashMapList.combatUserHashMap;
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class Admin {
     public static void selectCharacter(Player player, String team, String character) {
         CombatUser combatUser = new CombatUser(player);
-        combatUserHashMap.put(player, combatUser);
+        combatUserMap.put(player, combatUser);
 
         combatUser.setTeam(team);
         combatUser.setCharacter(Arkace.getInstance());
