@@ -18,7 +18,7 @@ public class OnEntityDamageByEntity implements Listener {
         if (attacker instanceof Player) {
             CombatUser attCombatUser = combatUserMap.get(attacker);
 
-            if (attCombatUser.getCharacter() != null)
+            if (attCombatUser != null && attCombatUser.getCharacter() != null)
                 event.setCancelled(true);
         }
     }
