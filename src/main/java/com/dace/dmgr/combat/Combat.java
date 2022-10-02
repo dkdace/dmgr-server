@@ -8,9 +8,10 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.system.PacketListener;
-import com.dace.dmgr.user.Lobby;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownManager;
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.lobby.Lobby;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.RegionUtil;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
@@ -19,17 +20,15 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.dace.dmgr.system.EntityList.combatEntityList;
-import static com.dace.dmgr.system.EntityList.combatUserList;
+import static com.dace.dmgr.system.HashMapList.combatEntityMap;
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class Combat {
     public static final float HITS_HITBOX = 0.15F;
@@ -48,7 +47,7 @@ public class Combat {
         double dist = range;
 
         for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
-            ICombatEntity target = combatEntityList.get(entity.getEntityId());
+            ICombatEntity target = combatEntityMap.get(entity);
 
             if (target != null) {
                 if (target != attacker && isEnemy(attacker, target)) {
@@ -64,7 +63,7 @@ public class Combat {
                         if (((Player) entity).isSneaking())
                             hitboxHeight -= 0.35;
 
-                        float statHitbox = ((CombatUser) entity).getCharacter().getCharacterStats().getHitbox();
+                        float statHitbox = ((CombatUser) entity).getCharacter().getHitbox();
                         hitboxWidth += statHitbox - 1.0;
                         hitboxHeight += statHitbox - 1.0;
                     } else if (entity.getType() == EntityType.IRON_GOLEM) {
@@ -84,7 +83,7 @@ public class Combat {
 
                     if (dist >= location.distance(eLocation)) {
                         dist = location.distance(eLocation);
-                        retTarget = combatEntityList.get(entity.getEntityId());
+                        retTarget = combatEntityMap.get(entity);
 
                     }
 
@@ -96,7 +95,7 @@ public class Combat {
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
         Player attackerEntity = attacker.getEntity();
-        LivingEntity victimEntity = victim.getEntity();
+        Entity victimEntity = victim.getEntity();
         boolean killed = false;
 
         if (!victimEntity.isDead()) {
@@ -141,20 +140,20 @@ public class Combat {
 
             if (victim instanceof CombatUser && attacker != victim) {
                 if (ult)
-                    attacker.addUlt((float) damage / attacker.getCharacter().getCharacterStats().getActive(4).getCost());
+                    attacker.addUlt((float) damage / attacker.getCharacter().getUltimate().getCost());
 
                 if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId()) == 0) {
                     CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, victimEntity.getEntityId());
                 }
                 CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId());
 
-                float sumDamage = ((CombatUser) victim).getDamageList().getOrDefault(attacker, 0F);
+                float sumDamage = ((CombatUser) victim).getDamageMap().getOrDefault(attacker, 0F);
                 if (killed)
-                    ((CombatUser) victim).getDamageList().put(attacker, sumDamage + (float) victim.getHealth() / victim.getMaxHealth());
+                    ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) victim.getHealth() / victim.getMaxHealth());
                 else
-                    ((CombatUser) victim).getDamageList().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
+                    ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
                 if (sumDamage > 1)
-                    ((CombatUser) victim).getDamageList().put(attacker, 1F);
+                    ((CombatUser) victim).getDamageMap().put(attacker, 1F);
             }
 
             if (killed && !RegionUtil.isInRegion(victimEntity, "BattleTrain")) {
@@ -171,7 +170,7 @@ public class Combat {
             victim.setHealth(victim.getMaxHealth());
 
             if (CooldownManager.getCooldown((CombatUser) victim, Cooldown.RESPAWN_TIME) == 0) {
-                Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageList();
+                Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageMap();
                 Set<String> attackerNames = damageList.keySet().stream().map((CombatUser _attacker) ->
                         "§f　§l" + attacker.getName()).collect(Collectors.toSet());
                 String victimName = "§f　§l" + victim.getName();
@@ -217,23 +216,27 @@ public class Combat {
         victimEntity.setGameMode(GameMode.SPECTATOR);
         victimEntity.setVelocity(new Vector());
 
-        new BukkitRunnable() {
+        new TaskTimer(1) {
             @Override
-            public void run() {
+            public boolean run(int i) {
                 long cooldown = CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME);
-                if (combatUserList.get(victimEntity.getUniqueId()) == null || cooldown <= 0) cancel();
+                if (combatUserMap.get(victimEntity) == null || cooldown <= 0)
+                    return false;
 
                 victimEntity.sendTitle("§c§l죽었습니다!",
                         String.format("%.1f", Math.ceil((float) cooldown / 20)) + "초 후 부활합니다.", 0, 20, 10);
                 victimEntity.teleport(deadLocation);
 
-                if (isCancelled()) {
-                    victim.setHealth(victim.getMaxHealth());
-                    victimEntity.teleport(Lobby.lobby);
-                    victimEntity.setGameMode(GameMode.SURVIVAL);
-                }
+                return true;
             }
-        }.runTaskTimer(DMGR.getPlugin(), 0, 1);
+
+            @Override
+            public void onEnd() {
+                victim.setHealth(victim.getMaxHealth());
+                victimEntity.teleport(Lobby.lobby);
+                victimEntity.setGameMode(GameMode.SURVIVAL);
+            }
+        };
     }
 
     private static void sendDamage(Entity entity) {

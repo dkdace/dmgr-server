@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.entity;
 
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 
 public interface ICombatEntity {
-    LivingEntity getEntity();
+    Entity getEntity();
 
     String getTeam();
 

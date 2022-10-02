@@ -4,21 +4,22 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.gui.slot.ButtonSlot;
 import com.dace.dmgr.gui.slot.DisplaySlot;
-import com.dace.dmgr.user.ChatSound;
-import com.dace.dmgr.user.User;
-import com.dace.dmgr.user.UserConfig;
+import com.dace.dmgr.lobby.ChatSound;
+import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserConfig;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class ChatSoundMenu extends Menu {
     public ChatSoundMenu(Player player) {
         super(2, "§8채팅 효과음 설정");
         super.fillRow(2, ItemBuilder.fromSlotItem(DisplaySlot.EMPTY).build());
 
-        User user = userList.get(player.getUniqueId());
+        User user = userMap.get(player);
         UserConfig userConfig = user.getUserConfig();
+
         super.setSelectButton(0, new ItemBuilder(Material.BARRIER).setName("§c§l음소거").build(),
                 userConfig.getChatSound() == ChatSound.MUTE);
         super.setSelectButton(1, new ItemBuilder(Material.GLOWSTONE).setName("§e§l플링 §f(기본값)").build(),

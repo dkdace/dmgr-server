@@ -3,8 +3,6 @@ package com.dace.dmgr.combat.entity;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
-import static com.dace.dmgr.system.EntityList.combatEntityList;
-
 public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     protected final T entity;
     private String name;
@@ -14,7 +12,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     protected CombatEntity(T entity, String name) {
         this.entity = entity;
         this.name = name;
-        combatEntityList.put(entity.getEntityId(), this);
     }
 
     @Override

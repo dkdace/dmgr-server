@@ -5,17 +5,18 @@ import com.dace.dmgr.gui.Menu;
 import com.dace.dmgr.gui.SkullIcon;
 import com.dace.dmgr.gui.slot.ButtonSlot;
 import com.dace.dmgr.gui.slot.DisplaySlot;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.Player;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OptionMenu extends Menu {
     public OptionMenu(Player player) {
         super(2, "§8설정");
         super.fillRow(2, ItemBuilder.fromSlotItem(DisplaySlot.EMPTY).build());
 
-        User user = userList.get(player.getUniqueId());
+        User user = userMap.get(player);
+
         super.setToggleButton(0,
                 ItemBuilder.fromSkullIcon(SkullIcon.KOREAN_CHAT).setName("§e§l한글 자동 변환").setLore("§f채팅 자동 한글 변환을 활성화합니다.").build(),
                 user.getUserConfig().isKoreanChat(), 9);

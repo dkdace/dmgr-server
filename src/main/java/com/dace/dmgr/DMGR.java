@@ -1,7 +1,8 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.config.GeneralConfig;
-import com.dace.dmgr.system.EventListener;
+import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.system.PacketListener;
 import com.dace.dmgr.system.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,9 +17,10 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info(PREFIX.LOG + "플러그인 활성화 완료");
-        getServer().getPluginManager().registerEvents(new EventListener(), this);
-        registerCommand();
+        MainEventManager.init();
+        CombatEventManager.init();
         PacketListener.init();
+        registerCommand();
         new GeneralConfig();
     }
 
@@ -36,7 +38,7 @@ public class DMGR extends JavaPlugin {
 
     public static class PREFIX {
         public final static String LOG = "[ DMGR-Core ] ";
-        public final static String CHAT = "§b§l[ DMGR ] §f";
-        public final static String CHAT_WARN = "§b§l[ DMGR ] §c";
+        public final static String CHAT = "§3§l[ §b§lDMGR §3§l] §f";
+        public final static String CHAT_WARN = "§3§l[ §b§lDMGR §3§l] §c";
     }
 }

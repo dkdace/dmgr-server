@@ -2,13 +2,13 @@ package com.dace.dmgr.gui.menu.event;
 
 import com.dace.dmgr.gui.menu.ChatSoundMenu;
 import com.dace.dmgr.gui.menu.OptionMenu;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import static com.dace.dmgr.system.EntityList.userList;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OptionMenuEvent extends MenuEvent {
     private static final OptionMenuEvent instance = new OptionMenuEvent();
@@ -24,8 +24,9 @@ public class OptionMenuEvent extends MenuEvent {
     @Override
     public void onMenuClick(InventoryClickEvent event, Player player, ItemStack clickItem, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = userList.get(player.getUniqueId());
             super.playClickSound(player);
+
+            User user = userMap.get(player);
 
             switch (clickItemName) {
                 case "한글 자동 변환":
