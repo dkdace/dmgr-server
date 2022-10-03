@@ -17,7 +17,11 @@ public class User {
     private int xp = 0;
     private int level = 1;
     private int money = 0;
+    private int rankPlay = 0;
     private int rank = 100;
+    private boolean isRanked = false;
+    private int rankPlacementPlay = 0;
+    private int mmr = 100;
     private boolean resourcePack = false;
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
@@ -77,6 +81,29 @@ public class User {
     public void setRank(int rank) {
         this.rank = rank;
         yamlUtil.saveValue("rank", this.rank);
+    }
+
+    public int getRankPlay() {
+        return rankPlay;
+    }
+
+    public void setRankPlay(int rankPlay) {
+        this.rankPlay = rankPlay;
+        yamlUtil.saveValue("rankPlay", this.rankPlay);
+    }
+
+    public int getMMR() { return mmr; }
+
+    public void setMMR(int mmr) {
+        this.mmr = mmr;
+        yamlUtil.saveValue("rankPlay", this.mmr);
+    }
+
+    public boolean isRanked() { return isRanked; }
+
+    public void setRanked(boolean ranked) {
+        this.isRanked = ranked;
+        yamlUtil.saveValue("isRanked", this.isRanked);
     }
 
     public BPlayerBoard getLobbySidebar() {
