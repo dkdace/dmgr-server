@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -48,6 +49,18 @@ public class CombatUser extends CombatEntity<Player> {
         this.bulletSpread += bulletSpread;
         if (this.bulletSpread < 0) this.bulletSpread = 0;
         if (this.bulletSpread > max) this.bulletSpread = max;
+    }
+
+    public void allowSprint(boolean allow) {
+        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
+
+        packet.setHealth((float) this.getEntity().getHealth());
+        if (allow)
+            packet.setFood(19);
+        else
+            packet.setFood(2);
+
+        packet.sendPacket(this.getEntity());
     }
 
     public float getUlt() {

@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,8 +27,25 @@ public class WeaponController {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
-    public void setCooldown() {
+    public void setCooldown(long cooldown) {
+        if (cooldown == -1) {
+            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, -1);
+//            setItemCooldown(1);
+        } else {
+            if (isCooldownFinished()) {
+                CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
+//                runCooldown();
+            } else
+                CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
+        }
+    }
 
+    public void setCooldown() {
+        setCooldown(weapon.getCooldown());
+    }
+
+    public boolean isCooldownFinished() {
+        return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
     }
 
     public boolean isReloading() {
@@ -63,6 +82,7 @@ public class WeaponController {
         long duration = ((Reloadable) weapon).getReloadDuration();
         if (remainingAmmo == 0)
             duration = ((Reloadable) weapon).getReloadDurationFull();
+        CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {
             @Override
@@ -78,6 +98,7 @@ public class WeaponController {
 
             @Override
             public void onEnd(boolean cancelled) {
+                CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, 0);
                 if (cancelled)
                     return;
 

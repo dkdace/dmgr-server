@@ -1,9 +1,10 @@
 package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.action.Reloadable;
-import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -22,7 +23,7 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class CombatTick {
     public static final int IDLE_ULT_CHARGE = 10;
-    public static final float BASE_SPEED = 0.23F;
+    public static final float BASE_SPEED = 0.25F;
 
     public static void run(CombatUser combatUser) {
         Player player = combatUser.getEntity();
@@ -38,6 +39,12 @@ public class CombatTick {
                 if (player.getPotionEffect(PotionEffectType.WATER_BREATHING) == null)
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                             99999, 0, false, false));
+
+                if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0 &&
+                        CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_RELOAD) == 0)
+                    combatUser.allowSprint(true);
+                else
+                    combatUser.allowSprint(false);
 
                 if (i % 10 == 0) {
                     UltimateSkill ultimateSkill = combatUser.getCharacter().getUltimate();
@@ -78,16 +85,6 @@ public class CombatTick {
             int maxCapacity = ((Reloadable) combatUser.getCharacter().getWeapon()).getCapacity();
 
             StringJoiner text = new StringJoiner("    ");
-
-//            String health = new StringJoiner(" ")
-//                    .add("" + TextIcon.HEAL)
-//                    .add(StringUtil.getBar(capacity, maxCapacity, ChatColor.WHITE, maxCapacity))
-//                    .add(StringUtil.getBar(capacity, maxCapacity, ChatColor.WHITE, maxCapacity))
-//                    .add(new StringJoiner("/", "[", "]")
-//                            .add(capacityDisplay)
-//                            .add(maxCapacityDisplay)
-//                            .toString())
-//                    .toString();
 
             String ammo = getContext(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
 

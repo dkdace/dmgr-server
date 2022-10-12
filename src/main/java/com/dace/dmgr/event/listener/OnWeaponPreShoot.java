@@ -19,7 +19,7 @@ public class OnWeaponPreShoot implements Listener {
         if (combatUser != null && combatUser.getCharacter() != null) {
             WeaponController weaponController = combatUser.getWeaponController();
 
-            if (weaponController.getRemainingAmmo() == 0)
+            if (weaponController.getRemainingAmmo() == 0 || weaponController.isReloading())
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);

@@ -23,7 +23,8 @@ public class OnWeaponPrepareShoot implements Listener {
 
                 if (!weaponController.isReloading())
                     SoundPlayer.play(Sound.UI_BUTTON_CLICK, event.getPlayer().getLocation(), 0.6F, 1.8F);
-            }
+            } else if (weaponController.isReloading())
+                weaponController.setReloading(false);
         }
     }
 }

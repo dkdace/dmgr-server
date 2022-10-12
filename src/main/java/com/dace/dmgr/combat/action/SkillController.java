@@ -92,7 +92,6 @@ public class SkillController {
                 CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
         }
         CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, 0);
-
     }
 
     public void setCooldown() {

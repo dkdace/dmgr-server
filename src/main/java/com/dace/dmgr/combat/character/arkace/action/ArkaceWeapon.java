@@ -9,6 +9,8 @@ import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.SoundPlayer;
@@ -66,12 +68,17 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
     @Override
     public void use(CombatUser combatUser, WeaponController weaponController) {
+        CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 4);
+        if (combatUser.getSkillController(ArkaceP1.getInstance()).isUsing())
+            weaponController.setCooldown(3);
+        if (!weaponController.isCooldownFinished())
+            return;
+
         Location location = combatUser.getEntity().getLocation();
         SoundPlayer.play("random.gun2.scarlight_1", location, 3F, 1F);
         SoundPlayer.play("random.gun_reverb", location, 5F, 1.2F);
         CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
         CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
-        weaponController.setReloading(false);
         weaponController.consume(1);
         new Bullet(combatUser, 7) {
             @Override

@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
@@ -11,7 +9,6 @@ import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.PacketListener;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.RegionUtil;
 import com.dace.dmgr.util.SoundPlayer;
@@ -280,17 +277,13 @@ public class Combat {
     }
 
     private static void sendDamage(Entity entity) {
-        ProtocolManager protocolManager = PacketListener.protocolManager;
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_STATUS);
+        WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
-        packet.getIntegers().writeSafely(0, entity.getEntityId());
-        packet.getBytes().writeSafely(0, (byte) 2);
+        packet.setEntityID(entity.getEntityId());
+        packet.setEntityStatus((byte) 2);
+
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
-            try {
-                protocolManager.sendServerPacket(player, packet);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            packet.sendPacket(player);
         });
     }
 
