@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -22,7 +22,10 @@ public class SkillController {
         this.skill = skill;
         this.itemStack = skill.getItemStack().clone();
         this.slot = slot;
-        setCooldown();
+        if (skill instanceof UltimateSkill)
+            setCooldown(-1);
+        else
+            setCooldown();
     }
 
     public SkillController(CombatUser combatUser, Skill skill) {
@@ -89,10 +92,12 @@ public class SkillController {
                 CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
         }
         CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, 0);
+
     }
 
     public void setCooldown() {
-        setCooldown(skill.getCooldown());
+        if (skill instanceof HasCooldown)
+            setCooldown(((HasCooldown) skill).getCooldown());
     }
 
     public void addCooldown(long cooldown) {
@@ -115,7 +120,8 @@ public class SkillController {
     }
 
     public void setDuration() {
-        setDuration(skill.getDuration());
+        if (skill instanceof HasDuration)
+            setDuration(((HasDuration) skill).getDuration());
     }
 
     public void addDuration(long duration) {
@@ -128,7 +134,7 @@ public class SkillController {
     }
 
     public boolean isCharged() {
-        return itemStack.getDurability() != 15;
+        return combatUser.getUlt() == 1;
     }
 
     public boolean isUsing() {

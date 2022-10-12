@@ -5,6 +5,8 @@ import org.bukkit.entity.Entity;
 public interface ICombatEntity {
     Entity getEntity();
 
+    Hitbox getHitbox();
+
     String getTeam();
 
     void setTeam(String team);

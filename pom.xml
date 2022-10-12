@@ -104,5 +104,10 @@
             <artifactId>netherboard-bukkit</artifactId>
             <version>1.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.comphenix.packetwrapper</groupId>
+            <artifactId>PacketWrapper</artifactId>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

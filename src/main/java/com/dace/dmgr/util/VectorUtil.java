@@ -19,8 +19,8 @@ public class VectorUtil {
         return getRollAxis(location).getCrossProduct(getYawAxis(location));
     }
 
-    public static Vector spread(Vector vector, int amount) {
+    public static Vector spread(Vector vector, float amount) {
         Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.02);
-        return vector.add(spread);
+        return vector.clone().add(spread);
     }
 }

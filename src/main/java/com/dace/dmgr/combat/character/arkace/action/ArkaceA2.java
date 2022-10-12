@@ -1,27 +1,26 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActiveSkill;
+import com.dace.dmgr.combat.action.HasCooldown;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
 
-public class ArkaceA2 extends ActiveSkill {
-    public static final long COOLDOWN = 7 * 20;
-    public static final int DAMAGE_DIRECT = 50;
-    public static final int DAMAGE_EXPLODE = 100;
-    public static final float RADIUS = 3.5F;
+public class ArkaceA2 extends ActiveSkill implements HasCooldown {
+    public static final int COOLDOWN = 12 * 20;
+    public static final int HEAL = 350;
+    public static final long DURATION = (long) (2.5 * 20);
     private static final ArkaceA2 instance = new ArkaceA2();
 
     public ArkaceA2() {
-        super(2, "다이아코어 미사일",
+        super(2, "생체 회복막",
                 "",
-                "§f소형 미사일을 3회 연속으로 발사하여 §c⚔ 광역 피해",
-                "§f를 입힙니다.",
+                "§6⌛ 지속시간§f동안 동안 회복막을 활성화하여 §a✚ 회복§f합니다.",
                 "",
-                "§c⚔ §f직격 50 + 폭발 100",
-                "§c✸ §f3.5m",
-                "§f⟳ §f7초",
+                "§6⌛ §f2.5초",
+                "§a✚ §f350",
+                "§f⟳ §f12초",
                 "",
-                "§7§l[2] [좌클릭] §f사용");
+                "§7§l[3] §f사용");
     }
 
     public static ArkaceA2 getInstance() {
@@ -35,9 +34,9 @@ public class ArkaceA2 extends ActiveSkill {
 
     @Override
     public void use(CombatUser combatUser, SkillController skillController) {
-        combatUser.getEntity().sendMessage("skill 2");
-        if (skillController.isCooldownFinished())
-            skillController.setCooldown();
+        combatUser.getEntity().sendMessage("skill 3");
+        if (skillController.isCooldownFinished() && !skillController.isUsing())
+            skillController.setDuration(DURATION);
         else
             combatUser.getEntity().sendMessage("스킬 쿨타임");
     }

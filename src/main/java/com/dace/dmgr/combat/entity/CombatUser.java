@@ -13,15 +13,19 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
+
 public class CombatUser extends CombatEntity<Player> {
     private final HashMap<String, Integer> shield = new HashMap<>();
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     private ICharacter character = null;
     private WeaponController weaponController;
     private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
+    private float bulletSpread = 0;
 
     public CombatUser(Player entity) {
         super(entity, entity.getName());
+        combatUserMap.put(entity, this);
     }
 
     public WeaponController getWeaponController() {
@@ -34,6 +38,16 @@ public class CombatUser extends CombatEntity<Player> {
 
     public HashMap<CombatUser, Float> getDamageMap() {
         return damageMap;
+    }
+
+    public float getBulletSpread() {
+        return bulletSpread;
+    }
+
+    public void addBulletSpread(float bulletSpread, float max) {
+        this.bulletSpread += bulletSpread;
+        if (this.bulletSpread < 0) this.bulletSpread = 0;
+        if (this.bulletSpread > max) this.bulletSpread = max;
     }
 
     public float getUlt() {
@@ -56,9 +70,8 @@ public class CombatUser extends CombatEntity<Player> {
         setUlt(getUlt() + value);
     }
 
-    public void chargeUlt() {
+    private void chargeUlt() {
         if (character != null) {
-            setUlt(1);
             SkillController skillController = skillControllerMap.get(character.getUltimate());
             if (!skillController.isCharged())
                 skillController.setCooldown();

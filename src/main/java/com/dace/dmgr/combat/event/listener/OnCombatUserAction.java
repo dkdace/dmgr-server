@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.event.listener;
 
-import com.dace.dmgr.combat.action.Action;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.Skill;
-import com.dace.dmgr.combat.action.Weapon;
+import com.dace.dmgr.combat.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import org.bukkit.event.EventHandler;
@@ -16,10 +13,11 @@ public class OnCombatUserAction implements Listener {
         ActionKey actionKey = event.getActionKey();
         Action action = combatUser.getCharacter().getActionKeyMap().get(actionKey);
 
-        if (action instanceof Weapon)
-            ((Weapon) action).use(combatUser, combatUser.getWeaponController());
-        else if (action instanceof Skill)
+        if (action instanceof Weapon) {
+            WeaponController weaponController = combatUser.getWeaponController();
+            if (weaponController.getRemainingAmmo() > 0)
+                ((Weapon) action).use(combatUser, weaponController);
+        } else if (action instanceof Skill)
             ((Skill) action).use(combatUser, combatUser.getSkillController((Skill) action));
-
     }
 }

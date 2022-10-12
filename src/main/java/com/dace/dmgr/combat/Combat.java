@@ -5,13 +5,14 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
-import com.dace.dmgr.system.PacketListener;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.PacketListener;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.RegionUtil;
 import com.dace.dmgr.util.SoundPlayer;
 import org.bukkit.Bukkit;
@@ -23,6 +24,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,9 +33,6 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class Combat {
-    public static final float HITS_HITBOX = 0.15F;
-    public static final float PROJ_HITBOX = 0.3F;
-    public static final float MELEE_HITBOX = 0.6F;
     public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
     public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
     public static final int RESPAWN_TIME = 10 * 20;
@@ -46,50 +45,91 @@ public class Combat {
         ICombatEntity retTarget = null;
         double dist = range;
 
-        for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
-            ICombatEntity target = combatEntityMap.get(entity);
+        Collection<ICombatEntity> combatEntityList = combatEntityMap.values();
 
-            if (target != null) {
-                if (target != attacker && isEnemy(attacker, target)) {
-                    Location eLocation = entity.getLocation();
-                    double hitboxWidth = entity.getWidth();
-                    double hitboxHeight = entity.getHeight();
+        for (ICombatEntity target : combatEntityList) {
+            Hitbox hitbox = target.getHitbox();
 
-                    if (Math.abs(eLocation.getPitch()) > 35)
-                        hitboxHeight -= 0.1;
-                    if (Math.abs(eLocation.getPitch()) > 70)
-                        hitboxHeight -= 0.1;
-                    if (entity.getType() == EntityType.PLAYER) {
-                        if (((Player) entity).isSneaking())
-                            hitboxHeight -= 0.35;
+            if (target != attacker && isEnemy(attacker, target)) {
+                Location eLocation = hitbox.getLocation();
+                double hitboxWidth = hitbox.getWidth();
+                double hitboxHeight = hitbox.getHeight();
 
-                        float statHitbox = ((CombatUser) entity).getCharacter().getHitbox();
-                        hitboxWidth += statHitbox - 1.0;
-                        hitboxHeight += statHitbox - 1.0;
-                    } else if (entity.getType() == EntityType.IRON_GOLEM) {
-                        hitboxWidth += 0.3;
-                        hitboxHeight += 1.5;
-                    }
+                if (Math.abs(eLocation.getPitch()) > 35)
+                    hitboxHeight -= 0.1;
+                if (Math.abs(eLocation.getPitch()) > 70)
+                    hitboxHeight -= 0.1;
+                if (target instanceof CombatUser) {
+                    if (((Player) target.getEntity()).isSneaking())
+                        hitboxHeight -= 0.35;
 
-                    eLocation.setY(location.getY());
-                    if (eLocation.getY() > entity.getLocation().add(0, hitboxHeight, 0).getY())
-                        eLocation.setY(entity.getLocation().add(0, hitboxHeight, 0).getY());
-                    if (eLocation.getY() < entity.getLocation().getY())
-                        eLocation.setY(entity.getLocation().getY());
+                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
+                    hitboxWidth += statHitbox - 1.0;
+                    hitboxHeight += statHitbox - 1.0;
+                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
+                    hitboxWidth += 0.3;
+                    hitboxHeight += 1.5;
+                }
 
-                    Vector v = location.toVector().subtract(eLocation.toVector());
-                    v.normalize().multiply((hitboxWidth / 2) + 0.1);
-                    eLocation.add(v);
+                eLocation.setY(location.getY());
+                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
+                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
+                if (eLocation.getY() < hitbox.getLocation().getY())
+                    eLocation.setY(hitbox.getLocation().getY());
 
-                    if (dist >= location.distance(eLocation)) {
-                        dist = location.distance(eLocation);
-                        retTarget = combatEntityMap.get(entity);
+                Vector v = location.toVector().subtract(eLocation.toVector());
+                v.normalize().multiply((hitboxWidth / 2) + 0.1);
+                eLocation.add(v);
 
-                    }
-
+                if (dist >= location.distance(eLocation)) {
+                    dist = location.distance(eLocation);
+                    retTarget = target;
                 }
             }
         }
+//        for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
+//            ICombatEntity target = combatEntityMap.get(entity);
+//
+//            if (target != null) {
+//                if (target != attacker && isEnemy(attacker, target)) {
+//                    Location eLocation = entity.getLocation();
+//                    double hitboxWidth = entity.getWidth();
+//                    double hitboxHeight = entity.getHeight();
+//
+//                    if (Math.abs(eLocation.getPitch()) > 35)
+//                        hitboxHeight -= 0.1;
+//                    if (Math.abs(eLocation.getPitch()) > 70)
+//                        hitboxHeight -= 0.1;
+//                    if (target instanceof CombatUser) {
+//                        if (((Player) entity).isSneaking())
+//                            hitboxHeight -= 0.35;
+//
+//                        float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
+//                        hitboxWidth += statHitbox - 1.0;
+//                        hitboxHeight += statHitbox - 1.0;
+//                    } else if (entity.getType() == EntityType.IRON_GOLEM) {
+//                        hitboxWidth += 0.3;
+//                        hitboxHeight += 1.5;
+//                    }
+//
+//                    eLocation.setY(location.getY());
+//                    if (eLocation.getY() > entity.getLocation().add(0, hitboxHeight, 0).getY())
+//                        eLocation.setY(entity.getLocation().add(0, hitboxHeight, 0).getY());
+//                    if (eLocation.getY() < entity.getLocation().getY())
+//                        eLocation.setY(entity.getLocation().getY());
+//
+//                    Vector v = location.toVector().subtract(eLocation.toVector());
+//                    v.normalize().multiply((hitboxWidth / 2) + 0.1);
+//                    eLocation.add(v);
+//
+//                    if (dist >= location.distance(eLocation)) {
+//                        dist = location.distance(eLocation);
+//                        retTarget = combatEntityMap.get(entity);
+//                    }
+//
+//                }
+//            }
+//        }
         return retTarget;
     }
 
@@ -224,14 +264,14 @@ public class Combat {
                     return false;
 
                 victimEntity.sendTitle("§c§l죽었습니다!",
-                        String.format("%.1f", Math.ceil((float) cooldown / 20)) + "초 후 부활합니다.", 0, 20, 10);
+                        String.format("%.1f", (float) cooldown / 20F) + "초 후 부활합니다.", 0, 20, 10);
                 victimEntity.teleport(deadLocation);
 
                 return true;
             }
 
             @Override
-            public void onEnd() {
+            public void onEnd(boolean cancelled) {
                 victim.setHealth(victim.getMaxHealth());
                 victimEntity.teleport(Lobby.lobby);
                 victimEntity.setGameMode(GameMode.SURVIVAL);
@@ -257,6 +297,12 @@ public class Combat {
     private static void playKillSound(Player player) {
         SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 1F, 1.25F);
         SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 0.6F, 1.25F);
+    }
+
+    public static class HITBOX {
+        static final float HITSCAN = 0.15F;
+        static final float PROJECTILE = 0.3F;
+        static final float MELEE = 0.6F;
     }
 
     private static class SUBTITLES {

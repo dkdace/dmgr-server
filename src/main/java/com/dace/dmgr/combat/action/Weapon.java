@@ -12,5 +12,7 @@ public abstract class Weapon extends Action {
         super(name, itemStack);
     }
 
+    public abstract long getCooldown();
+
     public abstract void use(CombatUser combatUser, WeaponController weaponController);
 }

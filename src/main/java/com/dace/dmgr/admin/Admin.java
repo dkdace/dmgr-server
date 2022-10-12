@@ -10,7 +10,6 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 public class Admin {
     public static void selectCharacter(Player player, String team, String character) {
         CombatUser combatUser = new CombatUser(player);
-        combatUserMap.put(player, combatUser);
 
         combatUser.setTeam(team);
         combatUser.setCharacter(Arkace.getInstance());

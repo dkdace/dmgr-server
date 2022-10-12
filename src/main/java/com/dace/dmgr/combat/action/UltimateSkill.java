@@ -9,12 +9,5 @@ public abstract class UltimateSkill extends ActiveSkill {
         itemStack.addUnsafeEnchantment(Enchantment.LUCK, 1);
     }
 
-    public int getCost() {
-        return 0;
-    }
-
-    @Override
-    public long getCooldown() {
-        return -1;
-    }
+    public abstract int getCost();
 }

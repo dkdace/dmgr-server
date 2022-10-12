@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.HasDuration;
 import com.dace.dmgr.combat.action.PassiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
 
-public class ArkaceP1 extends PassiveSkill {
+public class ArkaceP1 extends PassiveSkill implements HasDuration {
     public static final int SPRINT_SPEED = 30;
     private static final ArkaceP1 instance = new ArkaceP1();
 
@@ -33,7 +34,7 @@ public class ArkaceP1 extends PassiveSkill {
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability((short) (combatUser.getCharacter().getWeapon().getItemStack().getDurability() + 1000));
         } else {
-            skillController.setCooldown();
+            skillController.setDuration(0);
             combatUser.addSpeedIncrement(-SPRINT_SPEED);
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability(combatUser.getCharacter().getWeapon().getItemStack().getDurability());

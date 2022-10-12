@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -34,11 +35,15 @@ public abstract class Bullet {
         location.getWorld().spawnParticle(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
     }
 
-    public void shoot(Location origin, Vector direction) {
+    public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         ICombatEntity target = null;
+        direction = VectorUtil.spread(direction, spread);
         Vector subDir = direction.clone().multiply(0.5);
+
+//        Location trailLoc = loc.clone().add(VectorUtil.getPitchAxis(loc).multiply(-0.2)).add(0, -0.2, 0);
+//        origin.getWorld().spawnParticle(Particle.FLAME, trailLoc, 0, 0, 1, 0, 6);
 
         for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
             Location hitLoc = loc.clone().add(direction);
@@ -51,7 +56,7 @@ public abstract class Bullet {
             }
 
             if (loc.distance(origin) > 0.5) {
-                target = Combat.getNearEnemy(shooter, loc, Combat.HITS_HITBOX * hitboxMultiplier);
+                target = Combat.getNearEnemy(shooter, loc, Combat.HITBOX.HITSCAN * hitboxMultiplier);
                 if (target != null) {
                     break;
                 }
@@ -66,15 +71,27 @@ public abstract class Bullet {
         }
     }
 
+
+    public void shoot(Location origin, float spread) {
+        shoot(origin, shooter.getEntity().getLocation().getDirection(), spread);
+    }
+
     public void shoot(Location origin) {
-        shoot(origin, shooter.getEntity().getLocation().getDirection());
+        shoot(origin, 0);
+    }
+
+    public void shoot(float spread) {
+        if (shooter instanceof CombatUser)
+            shoot(((CombatUser) shooter).getEntity().getEyeLocation(), spread);
+        else
+            shoot(shooter.getEntity().getLocation(), spread);
     }
 
     public void shoot() {
         if (shooter instanceof CombatUser)
-            shoot(((CombatUser) shooter).getEntity().getEyeLocation(), shooter.getEntity().getLocation().getDirection());
+            shoot(((CombatUser) shooter).getEntity().getEyeLocation());
         else
-            shoot(shooter.getEntity().getLocation(), shooter.getEntity().getLocation().getDirection());
+            shoot(shooter.getEntity().getLocation());
     }
 
     public abstract void trail(Location location);
