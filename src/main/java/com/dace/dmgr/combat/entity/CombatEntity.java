@@ -13,8 +13,8 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     private int speedIncrement = 0;
 
     protected CombatEntity(T entity, String name) {
-        this.hitbox = new Hitbox(this, entity.getWidth(), entity.getHeight());
         this.entity = entity;
+        this.hitbox = new Hitbox(this, entity.getWidth(), entity.getHeight());
         this.name = name;
         combatEntityMap.put(entity, this);
     }

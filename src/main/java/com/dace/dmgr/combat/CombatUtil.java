@@ -27,8 +27,8 @@ public class CombatUtil {
     }
 
     public static void sendRecoil(CombatUser combatUser, float up, float side, float upSpread, float sideSpread, int ticks, float firstMultiplier) {
-        final float _upSpread = (float) (upSpread * (Math.random() - Math.random()) * 0.5);
-        final float _sideSpread = (float) (sideSpread * (Math.random() - Math.random()) * 0.5);
+        final float finalUpSpread = (float) (upSpread * (Math.random() - Math.random()) * 0.5);
+        final float finalSideSpread = (float) (sideSpread * (Math.random() - Math.random()) * 0.5);
         final boolean first = CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0;
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY);
 
@@ -36,18 +36,19 @@ public class CombatUtil {
         for (int i = 1; i <= ticks; i++) {
             sum += i;
         }
-        final int _sum = sum;
+
+        final int finalSum = sum;
 
         new TaskTimer(1, ticks) {
             @Override
             public boolean run(int i) {
-                float _up = (up + _upSpread) / ((float) _sum / (ticks - i));
-                float _side = (side + _sideSpread) / ((float) _sum / (ticks - i));
+                float finalUp = (up + finalUpSpread) / ((float) finalSum / (ticks - i));
+                float finalSide = (side + finalSideSpread) / ((float) finalSum / (ticks - i));
                 if (first) {
-                    _up *= firstMultiplier;
-                    _side *= firstMultiplier;
+                    finalUp *= firstMultiplier;
+                    finalSide *= firstMultiplier;
                 }
-                sendPacket(combatUser.getEntity(), _side, -_up);
+                sendPacket(combatUser.getEntity(), finalSide, -finalUp);
 
                 return true;
             }

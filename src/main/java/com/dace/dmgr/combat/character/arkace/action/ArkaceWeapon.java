@@ -35,12 +35,11 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
                 "§7사격§f하여 " + TextIcon.DAMAGE + " §c피해§f를 입힙니다.",
                 "",
-                "§f" + TextIcon.DAMAGE + "    " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
-                "§f" + TextIcon.ATTACK_SPEED + "    0.1초",
-                "§f" + TextIcon.CAPACITY + "    30+1발",
-                "§f" + TextIcon.CAPACITY + TextIcon.COOLDOWN + "  1.4초 (1.9초)",
+                "§f" + TextIcon.DAMAGE + "   §c" + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
+                "§f" + TextIcon.ATTACK_SPEED + "   0.1초",
+                "§f" + TextIcon.CAPACITY + "   30+1발",
                 "",
-                "§7§l[우클릭] §f사용 §7§l[Q] §f재장전").build());
+                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전").build());
     }
 
     public static ArkaceWeapon getInstance() {
@@ -91,7 +90,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
             @Override
             public void onHitEntity(Location location, ICombatEntity target) {
-                Combat.attack(combatUser, target, DAMAGE, "", false, false);
+                Combat.attack(combatUser, target, DAMAGE, "", false, true);
             }
         }.shoot(combatUser.getBulletSpread());
     }

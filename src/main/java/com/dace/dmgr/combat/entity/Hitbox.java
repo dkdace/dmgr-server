@@ -10,6 +10,7 @@ public class Hitbox {
 
     public Hitbox(ICombatEntity combatEntity, double width, double height) {
         this.combatEntity = combatEntity;
+        this.location = combatEntity.getEntity().getLocation();
         this.width = width;
         this.height = height;
     }

@@ -35,7 +35,9 @@ public abstract class Hitscan extends Bullet {
                 while (LocationUtil.isNonSolid(loc))
                     loc.add(subDir);
 
-                onHitBlock(loc.subtract(subDir), hitLoc.getBlock());
+                loc.subtract(subDir);
+                onHit(loc);
+                onHitBlock(loc, hitLoc.getBlock());
                 break;
             }
 
@@ -44,6 +46,7 @@ public abstract class Hitscan extends Bullet {
 
                 if (target != null) {
                     if (!targetSet.add(target)) {
+                        onHit(hitLoc);
                         onHitEntity(hitLoc, target);
 
                         if (!penetration)

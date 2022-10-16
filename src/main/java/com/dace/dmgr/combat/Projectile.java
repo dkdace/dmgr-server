@@ -48,15 +48,18 @@ public abstract class Projectile extends Bullet {
                         while (LocationUtil.isNonSolid(loc))
                             loc.add(subDir);
 
-                        onHitBlock(loc.subtract(subDir), hitLoc.getBlock());
+                        loc.subtract(subDir);
+                        onHit(loc);
+                        onHitBlock(loc, hitLoc.getBlock());
                         return false;
                     }
 
                     if (loc.distance(origin) > 0.5) {
-                        ICombatEntity target = Combat.getNearEnemy(shooter, loc, Combat.HITBOX.HITSCAN * hitboxMultiplier);
+                        ICombatEntity target = Combat.getNearEnemy(shooter, loc, Combat.HITBOX.PROJECTILE * hitboxMultiplier);
 
                         if (target != null) {
                             if (!targetList.add(target)) {
+                                onHit(hitLoc);
                                 onHitEntity(hitLoc, target);
 
                                 if (!penetration)

@@ -21,7 +21,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,13 +42,16 @@ public class Combat {
         ICombatEntity retTarget = null;
         double dist = range;
 
-        Collection<ICombatEntity> combatEntityList = combatEntityMap.values();
+        location.getWorld().getNearbyEntities(location, range, range, range);
+        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
+                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
 
         for (ICombatEntity target : combatEntityList) {
             Hitbox hitbox = target.getHitbox();
 
             if (target != attacker && isEnemy(attacker, target)) {
                 Location eLocation = hitbox.getLocation();
+                location.getWorld().getChunkAt(location).getEntities();
                 double hitboxWidth = hitbox.getWidth();
                 double hitboxHeight = hitbox.getHeight();
 
@@ -84,50 +87,58 @@ public class Combat {
                 }
             }
         }
-//        for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
-//            ICombatEntity target = combatEntityMap.get(entity);
-//
-//            if (target != null) {
-//                if (target != attacker && isEnemy(attacker, target)) {
-//                    Location eLocation = entity.getLocation();
-//                    double hitboxWidth = entity.getWidth();
-//                    double hitboxHeight = entity.getHeight();
-//
-//                    if (Math.abs(eLocation.getPitch()) > 35)
-//                        hitboxHeight -= 0.1;
-//                    if (Math.abs(eLocation.getPitch()) > 70)
-//                        hitboxHeight -= 0.1;
-//                    if (target instanceof CombatUser) {
-//                        if (((Player) entity).isSneaking())
-//                            hitboxHeight -= 0.35;
-//
-//                        float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
-//                        hitboxWidth += statHitbox - 1.0;
-//                        hitboxHeight += statHitbox - 1.0;
-//                    } else if (entity.getType() == EntityType.IRON_GOLEM) {
-//                        hitboxWidth += 0.3;
-//                        hitboxHeight += 1.5;
-//                    }
-//
-//                    eLocation.setY(location.getY());
-//                    if (eLocation.getY() > entity.getLocation().add(0, hitboxHeight, 0).getY())
-//                        eLocation.setY(entity.getLocation().add(0, hitboxHeight, 0).getY());
-//                    if (eLocation.getY() < entity.getLocation().getY())
-//                        eLocation.setY(entity.getLocation().getY());
-//
-//                    Vector v = location.toVector().subtract(eLocation.toVector());
-//                    v.normalize().multiply((hitboxWidth / 2) + 0.1);
-//                    eLocation.add(v);
-//
-//                    if (dist >= location.distance(eLocation)) {
-//                        dist = location.distance(eLocation);
-//                        retTarget = combatEntityMap.get(entity);
-//                    }
-//
-//                }
-//            }
-//        }
+
         return retTarget;
+    }
+
+    public static HashSet<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
+        HashSet<ICombatEntity> retTargets = new HashSet<>();
+
+        location.getWorld().getNearbyEntities(location, range, range, range);
+        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
+                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
+
+        for (ICombatEntity target : combatEntityList) {
+            Hitbox hitbox = target.getHitbox();
+
+            if (target != attacker && isEnemy(attacker, target)) {
+                Location eLocation = hitbox.getLocation();
+                location.getWorld().getChunkAt(location).getEntities();
+                double hitboxWidth = hitbox.getWidth();
+                double hitboxHeight = hitbox.getHeight();
+
+                if (Math.abs(eLocation.getPitch()) > 35)
+                    hitboxHeight -= 0.1;
+                if (Math.abs(eLocation.getPitch()) > 70)
+                    hitboxHeight -= 0.1;
+                if (target instanceof CombatUser) {
+                    if (((Player) target.getEntity()).isSneaking())
+                        hitboxHeight -= 0.35;
+
+                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
+                    hitboxWidth += statHitbox - 1.0;
+                    hitboxHeight += statHitbox - 1.0;
+                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
+                    hitboxWidth += 0.3;
+                    hitboxHeight += 1.5;
+                }
+
+                eLocation.setY(location.getY());
+                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
+                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
+                if (eLocation.getY() < hitbox.getLocation().getY())
+                    eLocation.setY(hitbox.getLocation().getY());
+
+                Vector v = location.toVector().subtract(eLocation.toVector());
+                v.normalize().multiply((hitboxWidth / 2) + 0.1);
+                eLocation.add(v);
+
+                if (range >= location.distance(eLocation))
+                    retTargets.add(target);
+            }
+        }
+
+        return retTargets;
     }
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
