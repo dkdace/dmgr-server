@@ -13,9 +13,9 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -74,7 +74,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         if (!weaponController.isCooldownFinished())
             return;
 
-        Location location = combatUser.getEntity().getEyeLocation();
+        Location location = combatUser.getEntity().getLocation();
         SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
         SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
         CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
@@ -84,7 +84,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         new Hitscan(combatUser, false, 7) {
             @Override
             public void trail(Location location) {
-                Location trailLoc = location.add(VectorUtil.getPitchAxis(location).multiply(-0.2)).add(0, -0.2, 0);
+                Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, 0, 0).add(0, -0.2, 0);
                 ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
             }
 

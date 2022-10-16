@@ -11,9 +11,9 @@ import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -59,8 +59,7 @@ public class ArkaceA1 extends ActiveSkill implements HasCooldown {
             new TaskTimer(5, 3) {
                 @Override
                 public boolean run(int i) {
-                    Location location = combatUser.getEntity().getEyeLocation();
-                    location.add(VectorUtil.getPitchAxis(location).multiply(0.2)).add(VectorUtil.getYawAxis(location).multiply(0.4));
+                    Location location = LocationUtil.setRelativeOffset(combatUser.getEntity().getEyeLocation(), -0.2, 0.4, 0);
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 

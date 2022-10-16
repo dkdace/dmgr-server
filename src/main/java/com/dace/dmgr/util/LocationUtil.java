@@ -71,4 +71,14 @@ public class LocationUtil {
 
         return locList;
     }
+
+    public static Location setRelativeOffset(Location location, double offsetX, double offsetY, double offsetZ) {
+        Location loc = location.clone();
+
+        loc.add(VectorUtil.getPitchAxis(loc).multiply(-offsetX));
+        loc.add(VectorUtil.getYawAxis(loc).multiply(offsetX));
+        loc.add(VectorUtil.getRollAxis(loc).multiply(offsetX));
+
+        return loc;
+    }
 }
