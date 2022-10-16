@@ -90,7 +90,7 @@ public class WeaponController {
                 if (!reloading)
                     return false;
 
-                String time = String.format("%.1f", (float) (duration - i) / 20);
+                String time = String.format("%.1f", (float) (repeat - i) / 20);
                 combatUser.getEntity().sendTitle("", "§f재장전 §7[" + time + "초]", 0, 2, 5);
 
                 return true;

@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -158,9 +158,9 @@ public class SkillController {
         itemStack.setAmount(amount);
         apply();
         if (skill instanceof UltimateSkill)
-            SoundPlayer.play(Sound.ENTITY_PLAYER_LEVELUP, combatUser.getEntity(), 0.5F, 2F);
+            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
         else if (skill instanceof ActiveSkill)
-            SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, combatUser.getEntity(), 0.2F, 2F);
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
     public void reset() {

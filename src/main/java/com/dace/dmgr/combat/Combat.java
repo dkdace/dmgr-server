@@ -11,7 +11,7 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.RegionUtil;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -154,12 +154,12 @@ public class Combat {
             if (attacker != victim) {
                 if (crit) {
                     attackerEntity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
-                    SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, attackerEntity, 0.6F, 1.9F);
-                    SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, attackerEntity, 0.35F, 0F);
+                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attackerEntity);
+                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attackerEntity);
                 } else {
                     attackerEntity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
-                    SoundPlayer.play("random.stab", attackerEntity, 0.4F, 2F);
-                    SoundPlayer.play(Sound.ENTITY_GENERIC_SMALL_FALL, attackerEntity, 0.4F, 1.5F);
+                    SoundUtil.play("random.stab", 0.4F, 2F, attackerEntity);
+                    SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attackerEntity);
                 }
             }
 
@@ -288,8 +288,8 @@ public class Combat {
     }
 
     private static void playKillSound(Player player) {
-        SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 1F, 1.25F);
-        SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 0.6F, 1.25F);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, player);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, player);
     }
 
     public static class HITBOX {

@@ -3,7 +3,7 @@ package com.dace.dmgr.gui.menu.event;
 import com.dace.dmgr.gui.menu.ChatSoundMenu;
 import com.dace.dmgr.lobby.ChatSound;
 import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -77,7 +77,7 @@ public class ChatSoundMenuEvent extends MenuEvent {
                     return;
             }
 
-            SoundPlayer.play(chatSound.getSound(), player, 1F, 1.414F);
+            SoundUtil.play(chatSound.getSound(), 1F, 1.414F, player);
             user.getUserConfig().setChatSound(chatSound);
             new ChatSoundMenu(player).open(player);
         }

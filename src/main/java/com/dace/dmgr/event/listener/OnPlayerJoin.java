@@ -5,7 +5,7 @@ import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -56,10 +56,10 @@ public class OnPlayerJoin implements Listener {
             public boolean run(int i) {
                 switch (i) {
                     case 0:
-                        SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 0.7F);
+                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.7F);
                         return true;
                     case 3:
-                        SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 1.05F);
+                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 1.05F);
                         return true;
                 }
 

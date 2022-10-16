@@ -23,7 +23,7 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class CombatTick {
     public static final int IDLE_ULT_CHARGE = 10;
-    public static final float BASE_SPEED = 0.25F;
+    public static final float BASE_SPEED = 0.24F;
 
     public static void run(CombatUser combatUser) {
         Player player = combatUser.getEntity();

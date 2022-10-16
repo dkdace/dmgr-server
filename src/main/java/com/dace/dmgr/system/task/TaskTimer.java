@@ -5,11 +5,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class TaskTimer {
     protected final long period;
-    protected final long duration;
+    protected final long repeat;
 
-    public TaskTimer(long period, long duration) {
+    public TaskTimer(long period, long repeat) {
         this.period = period;
-        this.duration = duration;
+        this.repeat = repeat;
         execute();
     }
 
@@ -29,8 +29,8 @@ public abstract class TaskTimer {
                     return;
                 }
 
-                if (duration > 0)
-                    if (i * period > duration) {
+                if (repeat > 0)
+                    if (i >= repeat) {
                         cancel();
                         onEnd(false);
                     }

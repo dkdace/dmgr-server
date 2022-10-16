@@ -4,7 +4,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -41,10 +41,10 @@ public class OnPlayerQuit implements Listener {
             public boolean run(int i) {
                 switch (i) {
                     case 0:
-                        SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);
+                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);
                         return true;
                     case 3:
-                        SoundPlayer.play(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
+                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
                         return true;
                 }
 

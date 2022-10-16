@@ -2,7 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import com.shampaggon.crackshot.events.WeaponPrepareShootEvent;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
@@ -22,7 +22,7 @@ public class OnWeaponPrepareShoot implements Listener {
                 event.setCancelled(true);
 
                 if (!weaponController.isReloading())
-                    SoundPlayer.play(Sound.UI_BUTTON_CLICK, event.getPlayer().getLocation(), 0.6F, 1.8F);
+                    SoundUtil.play(Sound.UI_BUTTON_CLICK, event.getPlayer().getLocation(), 0.6F, 1.8F);
             } else if (weaponController.isReloading())
                 weaponController.setReloading(false);
         }

@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.Bullet;
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.Hitscan;
 import com.dace.dmgr.combat.action.Reloadable;
 import com.dace.dmgr.combat.action.Weapon;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -13,7 +13,8 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -74,17 +75,18 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         if (!weaponController.isCooldownFinished())
             return;
 
-        Location location = combatUser.getEntity().getLocation();
-        SoundPlayer.play("random.gun2.scarlight_1", location, 3F, 1F);
-        SoundPlayer.play("random.gun_reverb", location, 5F, 1.2F);
+        Location location = combatUser.getEntity().getEyeLocation();
+        SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
+        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
         CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
         CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
         weaponController.consume(1);
-        new Bullet(combatUser, 7) {
+
+        new Hitscan(combatUser, false, 7) {
             @Override
             public void trail(Location location) {
                 Location trailLoc = location.add(VectorUtil.getPitchAxis(location).multiply(-0.2)).add(0, -0.2, 0);
-                location.getWorld().spawnParticle(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+                ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
             }
 
             @Override
@@ -104,25 +106,25 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
                 switch (i) {
                     case 4:
-                        SoundPlayer.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
+                        SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
                         break;
                     case 5:
-                        SoundPlayer.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
+                        SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
                         break;
                     case 22:
-                        SoundPlayer.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
+                        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
                         break;
                     case 23:
-                        SoundPlayer.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
+                        SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
                         break;
                     case 24:
-                        SoundPlayer.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                        SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
                         break;
                     case 34:
-                        SoundPlayer.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
+                        SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
                         break;
                     case 36:
-                        SoundPlayer.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                        SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
                         break;
                 }
 

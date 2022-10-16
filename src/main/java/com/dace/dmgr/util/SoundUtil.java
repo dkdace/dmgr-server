@@ -6,7 +6,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 
-public class SoundPlayer {
+public class SoundUtil {
     public static void play(Sound sound, Location location, Float volume, Float pitch) {
         location.getWorld().playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
@@ -15,20 +15,20 @@ public class SoundPlayer {
         location.getWorld().playSound(location, sound, SoundCategory.MASTER, volume, pitch);
     }
 
-    public static void play(Sound sound, Player player, Float volume, Float pitch) {
+    public static void play(Sound sound, Float volume, Float pitch, Player player) {
         player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
     }
 
-    public static void play(String sound, Player player, Float volume, Float pitch) {
+    public static void play(String sound, Float volume, Float pitch, Player player) {
         player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
     }
 
-    public static void play(Sound sound, Float volume, Float pitch) {
+    public static void playAll(Sound sound, Float volume, Float pitch) {
         Bukkit.getOnlinePlayers().forEach((Player player) ->
                 player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch));
     }
 
-    public static void play(String sound, Float volume, Float pitch) {
+    public static void playAll(String sound, Float volume, Float pitch) {
         Bukkit.getOnlinePlayers().forEach((Player player) ->
                 player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch));
     }

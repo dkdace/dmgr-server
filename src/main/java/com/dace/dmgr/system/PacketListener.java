@@ -9,7 +9,7 @@ import com.dace.dmgr.DMGR;
 import org.bukkit.entity.Player;
 
 public class PacketListener {
-    public static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+    private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
     public static void init() {
         PacketAdapter playServerUpdateHealth = new PacketAdapter(DMGR.getPlugin(), PacketType.Play.Server.UPDATE_HEALTH) {

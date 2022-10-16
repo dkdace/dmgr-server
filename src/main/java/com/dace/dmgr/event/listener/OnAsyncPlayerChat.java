@@ -4,7 +4,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +32,7 @@ public class OnAsyncPlayerChat implements Listener {
         Bukkit.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), event.getMessage()));
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             User user2 = userMap.get(player2);
-            SoundPlayer.play(user2.getUserConfig().getChatSound().getSound(), player2, 1000F, 1.414F);
+            SoundUtil.play(user2.getUserConfig().getChatSound().getSound(), 1000F, 1.414F, player2);
         });
     }
 }
