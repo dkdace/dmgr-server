@@ -72,13 +72,18 @@ public class LocationUtil {
         return locList;
     }
 
-    public static Location setRelativeOffset(Location location, double offsetX, double offsetY, double offsetZ) {
+    public static Location setRelativeOffset(Location location, Vector direction, double offsetX, double offsetY, double offsetZ) {
         Location loc = location.clone();
+        loc.setDirection(direction);
 
         loc.add(VectorUtil.getPitchAxis(loc).multiply(-offsetX));
-        loc.add(VectorUtil.getYawAxis(loc).multiply(offsetX));
-        loc.add(VectorUtil.getRollAxis(loc).multiply(offsetX));
+        loc.add(VectorUtil.getYawAxis(loc).multiply(-offsetY));
+        loc.add(VectorUtil.getRollAxis(loc).multiply(offsetZ));
 
         return loc;
+    }
+
+    public static Location setRelativeOffset(Location location, double offsetX, double offsetY, double offsetZ) {
+        return setRelativeOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
     }
 }

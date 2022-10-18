@@ -84,7 +84,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         new Hitscan(combatUser, false, 7) {
             @Override
             public void trail(Location location) {
-                Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, 0, 0).add(0, -0.2, 0);
+                Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
                 ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
             }
 

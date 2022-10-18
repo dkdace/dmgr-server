@@ -83,6 +83,7 @@ public class ParticleUtil {
         packet.setOffsetY(green / 255);
         packet.setOffsetZ(blue / 255);
         packet.setParticleData(1);
+        packet.setLongDistance(true);
 
         return packet;
     }
@@ -100,6 +101,7 @@ public class ParticleUtil {
         packet.setOffsetZ(offsetZ);
         packet.setParticleData(speed);
         packet.setData(new int[]{material.getId() + 4096 * data});
+        packet.setLongDistance(true);
 
         return packet;
     }

@@ -10,12 +10,11 @@ import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.RegionUtil;
 import com.dace.dmgr.util.SoundUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -242,8 +241,8 @@ public class Combat {
                             String.join(" ,", attackerNames) + " §4§l-> " + victimName);
 
                     damageList.clear();
-                    respawn(attacker, (CombatUser) victim);
                 }
+                respawn(attacker, (CombatUser) victim);
             }
         } else {
             attackerEntity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
@@ -285,6 +284,28 @@ public class Combat {
                 victimEntity.setGameMode(GameMode.SURVIVAL);
             }
         };
+    }
+
+    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
+        if (victim.getHealth() == victim.getMaxHealth())
+            return;
+
+        int bonus = 0;
+
+        amount = amount * (100 + bonus) / 100;
+        victim.setHealth(victim.getHealth() + amount);
+
+        if (amount > 100)
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
+                    0.3F, 0.1F, 0.3F, 0);
+        else if (amount / 100F > Math.random()) {
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
+        }
+
+        if (ult)
+            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
     }
 
     private static void sendDamage(Entity entity) {

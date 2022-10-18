@@ -52,7 +52,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
 
     @Override
     public int getHealth() {
-        return (int) (entity.getHealth() * 50);
+        return (int) (Math.round(entity.getHealth() * 50 * 100) / 100);
     }
 
     @Override

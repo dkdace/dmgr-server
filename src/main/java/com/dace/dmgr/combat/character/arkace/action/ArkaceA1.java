@@ -50,7 +50,7 @@ public class ArkaceA1 extends ActiveSkill implements HasCooldown {
 
     @Override
     public void use(CombatUser combatUser, SkillController skillController) {
-        if (skillController.isCooldownFinished()) {
+        if (skillController.isCooldownFinished() && !skillController.isUsing()) {
             skillController.setDuration(-1);
 
             WeaponController weaponController = combatUser.getWeaponController();
@@ -59,7 +59,8 @@ public class ArkaceA1 extends ActiveSkill implements HasCooldown {
             new TaskTimer(5, 3) {
                 @Override
                 public boolean run(int i) {
-                    Location location = LocationUtil.setRelativeOffset(combatUser.getEntity().getEyeLocation(), -0.2, 0.4, 0);
+                    Location location = LocationUtil.setRelativeOffset(combatUser.getEntity().getEyeLocation(),
+                            combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
@@ -98,12 +99,12 @@ public class ArkaceA1 extends ActiveSkill implements HasCooldown {
         }
     }
 
-    public void explode(CombatUser combatUser, Location location) {
+    private void explode(CombatUser combatUser, Location location) {
         SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.8F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.4F);
         SoundUtil.play("random.gun_reverb2", location, 6F, 0.9F);
-        ParticleUtil.playRGB(location, 180, 1.8F, 1.8F, 1.8F, 32, 250, 225);
-        ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.4F, 0.4F, 0.4F, 0.2F);
+        ParticleUtil.playRGB(location, 180, 2F, 2F, 2F, 32, 250, 225);
+        ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)
             Combat.attack(combatUser, combatUser, DAMAGE_EXPLODE, "", false, true);
