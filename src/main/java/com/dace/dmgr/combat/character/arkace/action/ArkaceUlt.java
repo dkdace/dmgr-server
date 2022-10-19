@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.TextIcon;
 
 public class ArkaceUlt extends UltimateSkill {
     private static final ArkaceUlt instance = new ArkaceUlt();
@@ -12,11 +13,11 @@ public class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt() {
         super("인피니버스터",
                 "",
-                "§6⌛ 지속시간§f동안 기본 무기에 장탄수 무한, 탄퍼짐 제거, 거리별",
+                "§f" + TextIcon.COOLDOWN + " §6지속시간§f동안 기본 무기에 장탄수 무한, 탄퍼짐 제거, 거리별",
                 "§f피해 감소 제거 효과가 적용됩니다.",
                 "",
-                "§6⌛ §f12초",
-                "§f⚡ §f7000",
+                "§f" + TextIcon.COOLDOWN + "   §612초",
+                "§f⚡   7000",
                 "",
                 "§7§l[4] §f사용");
     }
@@ -32,10 +33,9 @@ public class ArkaceUlt extends UltimateSkill {
 
     @Override
     public void use(CombatUser combatUser, SkillController skillController) {
-        combatUser.getEntity().sendMessage("ultimate");
-        if (skillController.isCharged() && !skillController.isUsing())
+        if (!skillController.isUsing()) {
             skillController.setDuration(DURATION);
-        else
-            combatUser.getEntity().sendMessage("궁극기 미충전");
+            combatUser.getWeaponController().setRemainingAmmo(ArkaceWeapon.CAPACITY);
+        }
     }
 }

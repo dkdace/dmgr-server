@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
+import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class User {
     private final BPlayerBoard lobbySidebar;
@@ -17,10 +18,10 @@ public class User {
     private int xp = 0;
     private int level = 1;
     private int money = 0;
-    private int rankPlay = 0;
     private int rank = 100;
+    private int rankPlay = 0;
     private boolean isRanked = false;
-    private int rankPlacementPlay = 0;
+    //    private int rankPlacementPlay = 0;
     private int mmr = 100;
     private boolean resourcePack = false;
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
@@ -34,6 +35,10 @@ public class User {
         this.level = yamlUtil.loadValue("level", level);
         this.money = yamlUtil.loadValue("money", money);
         this.rank = yamlUtil.loadValue("rank", rank);
+        this.rankPlay = yamlUtil.loadValue("rankPlay", rankPlay);
+        this.isRanked = yamlUtil.loadValue("isRanked", isRanked);
+        this.mmr = yamlUtil.loadValue("mmr", mmr);
+        userMap.put(player, this);
     }
 
     public Player getPlayer() {
@@ -92,14 +97,18 @@ public class User {
         yamlUtil.saveValue("rankPlay", this.rankPlay);
     }
 
-    public int getMMR() { return mmr; }
+    public int getMMR() {
+        return mmr;
+    }
 
     public void setMMR(int mmr) {
         this.mmr = mmr;
-        yamlUtil.saveValue("rankPlay", this.mmr);
+        yamlUtil.saveValue("mmr", this.mmr);
     }
 
-    public boolean isRanked() { return isRanked; }
+    public boolean isRanked() {
+        return isRanked;
+    }
 
     public void setRanked(boolean ranked) {
         this.isRanked = ranked;

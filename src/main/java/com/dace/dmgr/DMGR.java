@@ -3,6 +3,7 @@ package com.dace.dmgr;
 import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.event.MainEventManager;
+import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.PacketListener;
 import com.dace.dmgr.system.command.LobbyCommand;
@@ -34,6 +35,7 @@ public class DMGR extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
             userMap.put(player, user);
+            Lobby.lobbyTick(player);
             getServer().broadcastMessage(PREFIX.CHAT + "플레이어 할당 : §e§n" + player.getName());
         });
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
@@ -45,6 +47,8 @@ public class DMGR extends JavaPlugin {
     public void onDisable() {
         getLogger().info(PREFIX.LOG + "플러그인 비활성화 완료");
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
+            User user = new User(player);
+            user.getLobbySidebar().delete();
             player.sendMessage(PREFIX.CHAT + "시스템 재부팅 중...");
         });
     }

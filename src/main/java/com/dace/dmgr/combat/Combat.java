@@ -1,28 +1,26 @@
 package com.dace.dmgr.combat;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
-import com.dace.dmgr.system.PacketListener;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.RegionUtil;
-import com.dace.dmgr.util.SoundPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import com.dace.dmgr.util.SoundUtil;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,9 +29,6 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class Combat {
-    public static final float HITS_HITBOX = 0.15F;
-    public static final float PROJ_HITBOX = 0.3F;
-    public static final float MELEE_HITBOX = 0.6F;
     public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
     public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
     public static final int RESPAWN_TIME = 10 * 20;
@@ -46,51 +41,103 @@ public class Combat {
         ICombatEntity retTarget = null;
         double dist = range;
 
-        for (Entity entity : attacker.getEntity().getWorld().getNearbyEntities(location, range, range, range)) {
-            ICombatEntity target = combatEntityMap.get(entity);
+        location.getWorld().getNearbyEntities(location, range, range, range);
+        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
+                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
 
-            if (target != null) {
-                if (target != attacker && isEnemy(attacker, target)) {
-                    Location eLocation = entity.getLocation();
-                    double hitboxWidth = entity.getWidth();
-                    double hitboxHeight = entity.getHeight();
+        for (ICombatEntity target : combatEntityList) {
+            Hitbox hitbox = target.getHitbox();
 
-                    if (Math.abs(eLocation.getPitch()) > 35)
-                        hitboxHeight -= 0.1;
-                    if (Math.abs(eLocation.getPitch()) > 70)
-                        hitboxHeight -= 0.1;
-                    if (entity.getType() == EntityType.PLAYER) {
-                        if (((Player) entity).isSneaking())
-                            hitboxHeight -= 0.35;
+            if (target != attacker && isEnemy(attacker, target)) {
+                Location eLocation = hitbox.getLocation();
+                location.getWorld().getChunkAt(location).getEntities();
+                double hitboxWidth = hitbox.getWidth();
+                double hitboxHeight = hitbox.getHeight();
 
-                        float statHitbox = ((CombatUser) entity).getCharacter().getHitbox();
-                        hitboxWidth += statHitbox - 1.0;
-                        hitboxHeight += statHitbox - 1.0;
-                    } else if (entity.getType() == EntityType.IRON_GOLEM) {
-                        hitboxWidth += 0.3;
-                        hitboxHeight += 1.5;
-                    }
+                if (Math.abs(eLocation.getPitch()) > 35)
+                    hitboxHeight -= 0.1;
+                if (Math.abs(eLocation.getPitch()) > 70)
+                    hitboxHeight -= 0.1;
+                if (target instanceof CombatUser) {
+                    if (((Player) target.getEntity()).isSneaking())
+                        hitboxHeight -= 0.35;
 
-                    eLocation.setY(location.getY());
-                    if (eLocation.getY() > entity.getLocation().add(0, hitboxHeight, 0).getY())
-                        eLocation.setY(entity.getLocation().add(0, hitboxHeight, 0).getY());
-                    if (eLocation.getY() < entity.getLocation().getY())
-                        eLocation.setY(entity.getLocation().getY());
+                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
+                    hitboxWidth += statHitbox - 1.0;
+                    hitboxHeight += statHitbox - 1.0;
+                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
+                    hitboxWidth += 0.3;
+                    hitboxHeight += 1.5;
+                }
 
-                    Vector v = location.toVector().subtract(eLocation.toVector());
-                    v.normalize().multiply((hitboxWidth / 2) + 0.1);
-                    eLocation.add(v);
+                eLocation.setY(location.getY());
+                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
+                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
+                if (eLocation.getY() < hitbox.getLocation().getY())
+                    eLocation.setY(hitbox.getLocation().getY());
 
-                    if (dist >= location.distance(eLocation)) {
-                        dist = location.distance(eLocation);
-                        retTarget = combatEntityMap.get(entity);
+                Vector v = location.toVector().subtract(eLocation.toVector());
+                v.normalize().multiply((hitboxWidth / 2) + 0.1);
+                eLocation.add(v);
 
-                    }
-
+                if (dist >= location.distance(eLocation)) {
+                    dist = location.distance(eLocation);
+                    retTarget = target;
                 }
             }
         }
+
         return retTarget;
+    }
+
+    public static HashSet<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
+        HashSet<ICombatEntity> retTargets = new HashSet<>();
+
+        location.getWorld().getNearbyEntities(location, range, range, range);
+        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
+                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
+
+        for (ICombatEntity target : combatEntityList) {
+            Hitbox hitbox = target.getHitbox();
+
+            if (target != attacker && isEnemy(attacker, target)) {
+                Location eLocation = hitbox.getLocation();
+                location.getWorld().getChunkAt(location).getEntities();
+                double hitboxWidth = hitbox.getWidth();
+                double hitboxHeight = hitbox.getHeight();
+
+                if (Math.abs(eLocation.getPitch()) > 35)
+                    hitboxHeight -= 0.1;
+                if (Math.abs(eLocation.getPitch()) > 70)
+                    hitboxHeight -= 0.1;
+                if (target instanceof CombatUser) {
+                    if (((Player) target.getEntity()).isSneaking())
+                        hitboxHeight -= 0.35;
+
+                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
+                    hitboxWidth += statHitbox - 1.0;
+                    hitboxHeight += statHitbox - 1.0;
+                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
+                    hitboxWidth += 0.3;
+                    hitboxHeight += 1.5;
+                }
+
+                eLocation.setY(location.getY());
+                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
+                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
+                if (eLocation.getY() < hitbox.getLocation().getY())
+                    eLocation.setY(hitbox.getLocation().getY());
+
+                Vector v = location.toVector().subtract(eLocation.toVector());
+                v.normalize().multiply((hitboxWidth / 2) + 0.1);
+                eLocation.add(v);
+
+                if (range >= location.distance(eLocation))
+                    retTargets.add(target);
+            }
+        }
+
+        return retTargets;
     }
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
@@ -117,12 +164,12 @@ public class Combat {
             if (attacker != victim) {
                 if (crit) {
                     attackerEntity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
-                    SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, attackerEntity, 0.6F, 1.9F);
-                    SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, attackerEntity, 0.35F, 0F);
+                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attackerEntity);
+                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attackerEntity);
                 } else {
                     attackerEntity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
-                    SoundPlayer.play("random.stab", attackerEntity, 0.4F, 2F);
-                    SoundPlayer.play(Sound.ENTITY_GENERIC_SMALL_FALL, attackerEntity, 0.4F, 1.5F);
+                    SoundUtil.play("random.stab", 0.4F, 2F, attackerEntity);
+                    SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attackerEntity);
                 }
             }
 
@@ -194,8 +241,8 @@ public class Combat {
                             String.join(" ,", attackerNames) + " §4§l-> " + victimName);
 
                     damageList.clear();
-                    respawn(attacker, (CombatUser) victim);
                 }
+                respawn(attacker, (CombatUser) victim);
             }
         } else {
             attackerEntity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
@@ -224,14 +271,14 @@ public class Combat {
                     return false;
 
                 victimEntity.sendTitle("§c§l죽었습니다!",
-                        String.format("%.1f", Math.ceil((float) cooldown / 20)) + "초 후 부활합니다.", 0, 20, 10);
+                        String.format("%.1f", (float) cooldown / 20F) + "초 후 부활합니다.", 0, 20, 10);
                 victimEntity.teleport(deadLocation);
 
                 return true;
             }
 
             @Override
-            public void onEnd() {
+            public void onEnd(boolean cancelled) {
                 victim.setHealth(victim.getMaxHealth());
                 victimEntity.teleport(Lobby.lobby);
                 victimEntity.setGameMode(GameMode.SURVIVAL);
@@ -239,24 +286,48 @@ public class Combat {
         };
     }
 
-    private static void sendDamage(Entity entity) {
-        ProtocolManager protocolManager = PacketListener.protocolManager;
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_STATUS);
+    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
+        if (victim.getHealth() == victim.getMaxHealth())
+            return;
 
-        packet.getIntegers().writeSafely(0, entity.getEntityId());
-        packet.getBytes().writeSafely(0, (byte) 2);
+        int bonus = 0;
+
+        amount = amount * (100 + bonus) / 100;
+        victim.setHealth(victim.getHealth() + amount);
+
+        if (amount > 100)
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
+                    0.3F, 0.1F, 0.3F, 0);
+        else if (amount / 100F > Math.random()) {
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
+        }
+
+        if (ult)
+            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
+    }
+
+    private static void sendDamage(Entity entity) {
+        WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
+
+        packet.setEntityID(entity.getEntityId());
+        packet.setEntityStatus((byte) 2);
+
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
-            try {
-                protocolManager.sendServerPacket(player, packet);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            packet.sendPacket(player);
         });
     }
 
     private static void playKillSound(Player player) {
-        SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 1F, 1.25F);
-        SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, player, 0.6F, 1.25F);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, player);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, player);
+    }
+
+    public static class HITBOX {
+        static final float HITSCAN = 0.15F;
+        static final float PROJECTILE = 0.3F;
+        static final float MELEE = 0.6F;
     }
 
     private static class SUBTITLES {

@@ -22,13 +22,7 @@ public abstract class Skill extends Action {
         return number;
     }
 
-    public long getDuration() {
-        return 0;
-    }
-
-    public long getCooldown() {
-        return 0;
-    }
+    public abstract long getCooldown();
 
     public abstract void use(CombatUser combatUser, SkillController skillController);
 }

@@ -1,7 +1,6 @@
 package com.dace.dmgr.gui.menu.event;
 
-import com.dace.dmgr.gui.Menu;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -40,7 +39,7 @@ public abstract class MenuEvent {
     }
 
     protected void playClickSound(Player player) {
-        SoundPlayer.play(Sound.UI_BUTTON_CLICK, player, 1F, 1F);
+        SoundUtil.play(Sound.UI_BUTTON_CLICK, 1F, 1F, player);
     }
 
     protected abstract void onMenuClick(InventoryClickEvent event, Player player, ItemStack clickItem, String clickItemName);

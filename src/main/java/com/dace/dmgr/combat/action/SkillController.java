@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.util.SoundPlayer;
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -23,10 +23,6 @@ public class SkillController {
         this.itemStack = skill.getItemStack().clone();
         this.slot = slot;
         setCooldown();
-    }
-
-    public SkillController(CombatUser combatUser, Skill skill) {
-        this(combatUser, skill, -1);
     }
 
     public void apply() {
@@ -76,9 +72,10 @@ public class SkillController {
     }
 
     public void setCooldown(long cooldown) {
-        if (cooldown == 0)
+        if (cooldown == 0) {
+            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, 0);
             setItemReady(1);
-        else if (cooldown == -1) {
+        } else if (cooldown == -1) {
             CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, -1);
             setItemCooldown(1);
         } else {
@@ -115,7 +112,8 @@ public class SkillController {
     }
 
     public void setDuration() {
-        setDuration(skill.getDuration());
+        if (skill instanceof HasDuration)
+            setDuration(((HasDuration) skill).getDuration());
     }
 
     public void addDuration(long duration) {
@@ -127,10 +125,6 @@ public class SkillController {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
     }
 
-    public boolean isCharged() {
-        return itemStack.getDurability() != 15;
-    }
-
     public boolean isUsing() {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION) > 0;
     }
@@ -138,7 +132,7 @@ public class SkillController {
     private void setItemCooldown(int amount) {
         itemStack.setAmount(amount);
         itemStack.setDurability((short) 15);
-        itemStack.removeEnchantment(Enchantment.LUCK);
+        itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
         apply();
     }
 
@@ -152,10 +146,11 @@ public class SkillController {
         itemStack = skill.getItemStack().clone();
         itemStack.setAmount(amount);
         apply();
+
         if (skill instanceof UltimateSkill)
-            SoundPlayer.play(Sound.ENTITY_PLAYER_LEVELUP, combatUser.getEntity(), 0.5F, 2F);
+            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
         else if (skill instanceof ActiveSkill)
-            SoundPlayer.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, combatUser.getEntity(), 0.2F, 2F);
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
     public void reset() {

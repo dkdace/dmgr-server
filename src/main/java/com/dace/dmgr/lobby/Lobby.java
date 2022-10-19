@@ -38,6 +38,7 @@ public class Lobby {
                 int reqXp = user.getNextLevelXp();
                 int reqRank = user.getNextTierScore();
                 int curRank = user.getCurrentTierScore();
+                user.getLobbySidebar().clear();
                 user.getLobbySidebar().setName("§b§n" + player.getName());
                 user.getLobbySidebar().setAll(
                         "§f",

@@ -4,7 +4,7 @@ import com.dace.dmgr.DMGR;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class TaskWait {
-    private final long delay;
+    protected final long delay;
 
     public TaskWait(long delay) {
         this.delay = delay;

@@ -4,12 +4,12 @@ import com.dace.dmgr.DMGR;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class TaskTimer {
-    private final long period;
-    private final long duration;
+    protected final long period;
+    protected final long repeat;
 
-    public TaskTimer(long period, long duration) {
+    public TaskTimer(long period, long repeat) {
         this.period = period;
-        this.duration = duration;
+        this.repeat = repeat;
         execute();
     }
 
@@ -25,17 +25,20 @@ public abstract class TaskTimer {
             public void run() {
                 if (!TaskTimer.this.run(i++)) {
                     cancel();
-                    onEnd();
+                    onEnd(true);
                     return;
                 }
 
-                if (duration > 0)
-                    if (i * period > duration) cancel();
+                if (repeat > 0)
+                    if (i >= repeat) {
+                        cancel();
+                        onEnd(false);
+                    }
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
     }
 
-    public void onEnd() {
+    public void onEnd(boolean cancelled) {
     }
 
     public abstract boolean run(int i);

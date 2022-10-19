@@ -1,6 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
@@ -16,9 +17,15 @@ public class OnWeaponPreShoot implements Listener {
         CombatUser combatUser = combatUserMap.get(event.getPlayer());
 
         if (combatUser != null && combatUser.getCharacter() != null) {
-            CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);
+            WeaponController weaponController = combatUser.getWeaponController();
 
-            Bukkit.getServer().getPluginManager().callEvent(newEvent);
+            if (weaponController.getRemainingAmmo() == 0 || weaponController.isReloading())
+                event.setCancelled(true);
+            else {
+                CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);
+
+                Bukkit.getServer().getPluginManager().callEvent(newEvent);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -7,11 +8,15 @@ import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class CombatUser extends CombatEntity<Player> {
     private final HashMap<String, Integer> shield = new HashMap<>();
@@ -19,9 +24,11 @@ public class CombatUser extends CombatEntity<Player> {
     private ICharacter character = null;
     private WeaponController weaponController;
     private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
+    private float bulletSpread = 0;
 
     public CombatUser(Player entity) {
         super(entity, entity.getName());
+        combatUserMap.put(entity, this);
     }
 
     public WeaponController getWeaponController() {
@@ -34,6 +41,28 @@ public class CombatUser extends CombatEntity<Player> {
 
     public HashMap<CombatUser, Float> getDamageMap() {
         return damageMap;
+    }
+
+    public float getBulletSpread() {
+        return bulletSpread;
+    }
+
+    public void addBulletSpread(float bulletSpread, float max) {
+        this.bulletSpread += bulletSpread;
+        if (this.bulletSpread < 0) this.bulletSpread = 0;
+        if (this.bulletSpread > max) this.bulletSpread = max;
+    }
+
+    public void allowSprint(boolean allow) {
+        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
+
+        packet.setHealth((float) this.getEntity().getHealth());
+        if (allow)
+            packet.setFood(19);
+        else
+            packet.setFood(2);
+
+        packet.sendPacket(this.getEntity());
     }
 
     public float getUlt() {
@@ -56,12 +85,16 @@ public class CombatUser extends CombatEntity<Player> {
         setUlt(getUlt() + value);
     }
 
-    public void chargeUlt() {
+    public void useUlt() {
+        setUlt(0);
+        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, entity.getLocation(), 10F, 2F);
+    }
+
+    private void chargeUlt() {
         if (character != null) {
-            setUlt(1);
             SkillController skillController = skillControllerMap.get(character.getUltimate());
-            if (!skillController.isCharged())
-                skillController.setCooldown();
+            if (!skillController.isCooldownFinished())
+                skillController.setCooldown(0);
         }
     }
 

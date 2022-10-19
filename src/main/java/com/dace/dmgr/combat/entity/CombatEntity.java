@@ -3,20 +3,30 @@ package com.dace.dmgr.combat.entity;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
+import static com.dace.dmgr.system.HashMapList.combatEntityMap;
+
 public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     protected final T entity;
+    private final Hitbox hitbox;
     private String name;
     private String team = "";
     private int speedIncrement = 0;
 
     protected CombatEntity(T entity, String name) {
         this.entity = entity;
+        this.hitbox = new Hitbox(this, entity.getWidth(), entity.getHeight());
         this.name = name;
+        combatEntityMap.put(entity, this);
     }
 
     @Override
     public T getEntity() {
         return entity;
+    }
+
+    @Override
+    public Hitbox getHitbox() {
+        return hitbox;
     }
 
     @Override
@@ -42,7 +52,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
 
     @Override
     public int getHealth() {
-        return (int) (entity.getHealth() * 50);
+        return (int) (Math.round(entity.getHealth() * 50 * 100) / 100);
     }
 
     @Override

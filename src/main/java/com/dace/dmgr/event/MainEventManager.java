@@ -20,9 +20,11 @@ public class MainEventManager extends EventManager {
         registerListener(new OnEntityDeath());
         registerListener(new OnPlayerSwapHandItems());
         registerListener(new OnPlayerToggleSprint());
+        registerListener(new OnPlayerDropItem());
         registerListener(new OnTabComplete());
         registerListener(new OnPlayerCommandPreprocess());
         registerListener(new OnWeaponPreShoot());
+        registerListener(new OnWeaponPrepareShoot());
         registerListener(new OnPlayerItemHeld());
         registerListener(new OnPlayerInteract());
     }

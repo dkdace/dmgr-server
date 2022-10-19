@@ -19,8 +19,26 @@ public class VectorUtil {
         return getRollAxis(location).getCrossProduct(getYawAxis(location));
     }
 
-    public static Vector spread(Vector vector, int amount) {
+    public static Vector rotate(Vector vector, Vector axis, float angle) {
+        double sin = Math.sin(angle * Math.toRadians(1));
+        double cos = Math.cos(angle * Math.toRadians(1));
+        Vector finalAxis = axis.clone().normalize();
+        double ax = finalAxis.getX();
+        double ay = finalAxis.getY();
+        double az = finalAxis.getZ();
+
+        Vector rotX = new Vector(cos + ax * ax * (1.0 - cos), ax * ay * (1.0 - cos) - az * sin, ax * az * (1.0 - cos) + ay * sin);
+        Vector rotY = new Vector(ay * ax * (1.0 - cos) + az * sin, cos + ay * ay * (1.0 - cos), ay * az * (1.0 - cos) - ax * sin);
+        Vector rotZ = new Vector(az * ax * (1.0 - cos) - ay * sin, az * ay * (1.0 - cos) + ax * sin, cos + az * az * (1.0 - cos));
+        double x = rotX.dot(vector);
+        double y = rotY.dot(vector);
+        double z = rotZ.dot(vector);
+
+        return new Vector(x, y, z);
+    }
+
+    public static Vector spread(Vector vector, float amount) {
         Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.02);
-        return vector.add(spread);
+        return vector.clone().add(spread);
     }
 }

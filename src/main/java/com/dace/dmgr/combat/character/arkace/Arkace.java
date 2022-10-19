@@ -46,9 +46,9 @@ public class Arkace extends Character {
     public ActiveSkill getActive(int number) {
         switch (number) {
             case 2:
-                return ArkaceA2.getInstance();
+                return ArkaceA1.getInstance();
             case 3:
-                return ArkaceA3.getInstance();
+                return ArkaceA2.getInstance();
             case 4:
                 return ArkaceUlt.getInstance();
             default:

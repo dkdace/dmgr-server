@@ -22,7 +22,7 @@ public class CooldownManager {
         setCooldown(saveId, duration);
     }
 
-    public static <T> void setCooldown(Object object, Cooldown id, T subId, long duration) {
+    public static void setCooldown(Object object, Cooldown id, Object subId, long duration) {
         String saveId = object.toString() + id + subId;
         setCooldown(saveId, duration);
     }
@@ -31,7 +31,7 @@ public class CooldownManager {
         setCooldown(object.toString(), id, id.getDefaultValue());
     }
 
-    public static <T> void setCooldown(Object object, Cooldown id, T subId) {
+    public static void setCooldown(Object object, Cooldown id, Object subId) {
         setCooldown(object.toString(), id, subId, id.getDefaultValue());
     }
 
@@ -52,7 +52,7 @@ public class CooldownManager {
         return getCooldown(saveId);
     }
 
-    public static <T> long getCooldown(Object object, Cooldown id, T subId) {
+    public static long getCooldown(Object object, Cooldown id, Object subId) {
         String saveId = object.toString() + id + subId;
         return getCooldown(saveId);
     }
@@ -72,7 +72,7 @@ public class CooldownManager {
         addCooldown(saveId, duration);
     }
 
-    public static <T> void addCooldown(Object object, Cooldown id, T subId, long duration) {
+    public static void addCooldown(Object object, Cooldown id, Object subId, long duration) {
         String saveId = object.toString() + id + subId;
         addCooldown(saveId, duration);
     }
