@@ -13,6 +13,7 @@ public class TemporalEntity<T extends LivingEntity> extends CombatEntity<T> {
     }
 
     public void remove() {
+        entity.setHealth(0);
         entity.remove();
     }
 }

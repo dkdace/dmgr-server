@@ -8,8 +8,10 @@ import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -83,11 +85,16 @@ public class CombatUser extends CombatEntity<Player> {
         setUlt(getUlt() + value);
     }
 
+    public void useUlt() {
+        setUlt(0);
+        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, entity.getLocation(), 10F, 2F);
+    }
+
     private void chargeUlt() {
         if (character != null) {
             SkillController skillController = skillControllerMap.get(character.getUltimate());
-            if (!skillController.isCharged())
-                skillController.setCooldown();
+            if (!skillController.isCooldownFinished())
+                skillController.setCooldown(0);
         }
     }
 

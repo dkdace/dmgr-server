@@ -22,14 +22,7 @@ public class SkillController {
         this.skill = skill;
         this.itemStack = skill.getItemStack().clone();
         this.slot = slot;
-        if (skill instanceof UltimateSkill)
-            setCooldown(-1);
-        else
-            setCooldown();
-    }
-
-    public SkillController(CombatUser combatUser, Skill skill) {
-        this(combatUser, skill, -1);
+        setCooldown();
     }
 
     public void apply() {
@@ -79,9 +72,10 @@ public class SkillController {
     }
 
     public void setCooldown(long cooldown) {
-        if (cooldown == 0)
+        if (cooldown == 0) {
+            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, 0);
             setItemReady(1);
-        else if (cooldown == -1) {
+        } else if (cooldown == -1) {
             CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, -1);
             setItemCooldown(1);
         } else {
@@ -95,8 +89,7 @@ public class SkillController {
     }
 
     public void setCooldown() {
-        if (skill instanceof HasCooldown)
-            setCooldown(((HasCooldown) skill).getCooldown());
+        setCooldown(skill.getCooldown());
     }
 
     public void addCooldown(long cooldown) {
@@ -132,10 +125,6 @@ public class SkillController {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
     }
 
-    public boolean isCharged() {
-        return combatUser.getUlt() == 1;
-    }
-
     public boolean isUsing() {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION) > 0;
     }
@@ -143,7 +132,7 @@ public class SkillController {
     private void setItemCooldown(int amount) {
         itemStack.setAmount(amount);
         itemStack.setDurability((short) 15);
-        itemStack.removeEnchantment(Enchantment.LUCK);
+        itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
         apply();
     }
 
@@ -157,6 +146,7 @@ public class SkillController {
         itemStack = skill.getItemStack().clone();
         itemStack.setAmount(amount);
         apply();
+
         if (skill instanceof UltimateSkill)
             SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
         else if (skill instanceof ActiveSkill)

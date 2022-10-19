@@ -22,7 +22,6 @@ public class WeaponController {
         apply();
     }
 
-
     public void apply() {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
@@ -58,6 +57,10 @@ public class WeaponController {
 
     public int getRemainingAmmo() {
         return remainingAmmo;
+    }
+
+    public void setRemainingAmmo(int remainingAmmo) {
+        this.remainingAmmo = remainingAmmo;
     }
 
     public void consume(int amount) {

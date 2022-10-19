@@ -22,6 +22,11 @@ public class ArkaceP1 extends PassiveSkill implements HasDuration {
     }
 
     @Override
+    public long getCooldown() {
+        return 0;
+    }
+
+    @Override
     public long getDuration() {
         return -1;
     }

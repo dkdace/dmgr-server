@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.action.ActiveSkill;
-import com.dace.dmgr.combat.action.HasCooldown;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
@@ -14,7 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class ArkaceA2 extends ActiveSkill implements HasCooldown {
+public class ArkaceA2 extends ActiveSkill {
     public static final int COOLDOWN = 12 * 20;
     public static final int HEAL = 350;
     public static final long DURATION = (long) (2.5 * 20);
@@ -43,7 +42,7 @@ public class ArkaceA2 extends ActiveSkill implements HasCooldown {
 
     @Override
     public void use(CombatUser combatUser, SkillController skillController) {
-        if (skillController.isCooldownFinished() && !skillController.isUsing()) {
+        if (!skillController.isUsing()) {
             skillController.setDuration(DURATION);
 
             Location location = combatUser.getEntity().getLocation();

@@ -74,18 +74,30 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         if (!weaponController.isCooldownFinished())
             return;
 
+        boolean isUlt = combatUser.getSkillController(ArkaceUlt.getInstance()).isUsing();
         Location location = combatUser.getEntity().getLocation();
-        SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
-        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-        CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
-        CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
-        weaponController.consume(1);
+
+        if (isUlt) {
+            SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
+            SoundUtil.play("random.energy", location, 4F, 1.6F);
+            SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+            combatUser.addBulletSpread(1, 0);
+        } else {
+            SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
+            SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+            CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
+            CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
+            weaponController.consume(1);
+        }
 
         new Hitscan(combatUser, false, 7) {
             @Override
             public void trail(Location location) {
                 Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
-                ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+                if (isUlt)
+                    ParticleUtil.playRGB(trailLoc, 1, 0, 0, 0, 0, 230, 255);
+                else
+                    ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
             }
 
             @Override
@@ -93,6 +105,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 Combat.attack(combatUser, target, DAMAGE, "", false, true);
             }
         }.shoot(combatUser.getBulletSpread());
+
     }
 
     @Override

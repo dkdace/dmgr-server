@@ -22,5 +22,7 @@ public abstract class Skill extends Action {
         return number;
     }
 
+    public abstract long getCooldown();
+
     public abstract void use(CombatUser combatUser, SkillController skillController);
 }

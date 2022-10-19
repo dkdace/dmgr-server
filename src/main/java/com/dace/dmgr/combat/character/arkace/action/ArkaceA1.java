@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.action.ActiveSkill;
-import com.dace.dmgr.combat.action.HasCooldown;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -18,7 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class ArkaceA1 extends ActiveSkill implements HasCooldown {
+public class ArkaceA1 extends ActiveSkill {
     public static final long COOLDOWN = 7 * 20;
     public static final int DAMAGE_EXPLODE = 100;
     public static final int DAMAGE_DIRECT = 50;
@@ -50,7 +49,7 @@ public class ArkaceA1 extends ActiveSkill implements HasCooldown {
 
     @Override
     public void use(CombatUser combatUser, SkillController skillController) {
-        if (skillController.isCooldownFinished() && !skillController.isUsing()) {
+        if (!skillController.isUsing()) {
             skillController.setDuration(-1);
 
             WeaponController weaponController = combatUser.getWeaponController();
