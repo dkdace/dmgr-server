@@ -18,11 +18,15 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 
 public class Dummy extends TemporalEntity<Zombie> {
     public Dummy(Location location, int health) {
-        super(EntityType.ZOMBIE, "§7§lDummy", location);
-        combatEntityMap.put(getEntity(), this);
+        super(EntityType.ZOMBIE, "§7§lDummy", location, new Hitbox(location.clone().add(0, 0.9, 0),
+                0.6, 2, 0.3));
         setMaxHealth(health);
         setHealth(health);
         setTeam("DUMMY");
+        entity.setBaby(false);
+        entity.leaveVehicle();
+        entity.setAI(false);
+        combatEntityMap.put(getEntity(), this);
 
         List<ItemStack> equipment = new ArrayList<>();
         equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());

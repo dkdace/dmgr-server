@@ -19,9 +19,9 @@ public class VectorUtil {
         return getRollAxis(location).getCrossProduct(getYawAxis(location));
     }
 
-    public static Vector rotate(Vector vector, Vector axis, float angle) {
-        double sin = Math.sin(angle * Math.toRadians(1));
-        double cos = Math.cos(angle * Math.toRadians(1));
+    public static Vector rotate(Vector vector, Vector axis, double angle) {
+        double sin = Math.sin(Math.toRadians(angle));
+        double cos = Math.cos(Math.toRadians(angle));
         Vector finalAxis = axis.clone().normalize();
         double ax = finalAxis.getX();
         double ay = finalAxis.getY();

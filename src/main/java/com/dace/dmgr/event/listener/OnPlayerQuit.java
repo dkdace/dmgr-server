@@ -1,9 +1,9 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -36,7 +36,7 @@ public class OnPlayerQuit implements Listener {
     }
 
     private static void playQuitSound() {
-        new TaskTimer(1, 3) {
+        new TaskTimer(1, 4) {
             @Override
             public boolean run(int i) {
                 switch (i) {

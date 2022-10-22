@@ -3,35 +3,37 @@ package com.dace.dmgr.combat.entity;
 import org.bukkit.Location;
 
 public class Hitbox {
-    private final ICombatEntity combatEntity;
-    private final double width;
-    private final double height;
-    private Location location;
+    private final double sizeX;
+    private final double sizeY;
+    private final double sizeZ;
+    private Location center;
 
-    public Hitbox(ICombatEntity combatEntity, double width, double height) {
-        this.combatEntity = combatEntity;
-        this.location = combatEntity.getEntity().getLocation();
-        this.width = width;
-        this.height = height;
+    public Hitbox(Location center, double sizeX, double sizeY, double sizeZ) {
+        this.center = center;
+        center.setPitch(0);
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.sizeZ = sizeZ;
     }
 
-    public ICombatEntity getCombatEntity() {
-        return combatEntity;
+    public double getSizeX() {
+        return sizeX;
     }
 
-    public Location getLocation() {
-        return location.clone();
+    public double getSizeY() {
+        return sizeY;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public double getSizeZ() {
+        return sizeZ;
     }
 
-    public double getWidth() {
-        return width;
+    public Location getCenter() {
+        return center.clone();
     }
 
-    public double getHeight() {
-        return height;
+    public void setCenter(Location center) {
+        this.center = center;
+        center.setPitch(0);
     }
 }
