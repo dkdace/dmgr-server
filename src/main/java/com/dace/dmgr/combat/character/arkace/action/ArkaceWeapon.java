@@ -79,7 +79,6 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
                 break;
             case CS_USE:
-                System.out.println(weaponController.isCooldownFinished());
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = combatUser.getSkillController(ArkaceUlt.getInstance()).isUsing();
                 Location location = combatUser.getEntity().getLocation();
