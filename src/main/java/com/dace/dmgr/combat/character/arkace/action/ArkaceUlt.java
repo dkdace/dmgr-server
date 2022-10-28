@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -32,7 +33,7 @@ public class ArkaceUlt extends UltimateSkill {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController) {
+    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
             skillController.setDuration(DURATION);
             combatUser.getWeaponController().setRemainingAmmo(ArkaceWeapon.CAPACITY);

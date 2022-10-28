@@ -5,7 +5,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import org.bukkit.Material;
 
 public abstract class Skill extends Action {
-    private static final Material MATERIAL = Material.STAINED_GLASS_PANE;
+    public static final Material MATERIAL = Material.STAINED_GLASS_PANE;
     private static final String PREFIX = "§e§l[스킬] §c";
     private final int number;
 
@@ -24,5 +24,5 @@ public abstract class Skill extends Action {
 
     public abstract long getCooldown();
 
-    public abstract void use(CombatUser combatUser, SkillController skillController);
+    public abstract void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey);
 }

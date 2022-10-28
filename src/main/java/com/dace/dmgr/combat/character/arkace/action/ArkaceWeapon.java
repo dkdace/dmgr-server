@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Hitscan;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.Reloadable;
 import com.dace.dmgr.combat.action.Weapon;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -67,45 +68,53 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     }
 
     @Override
-    public void use(CombatUser combatUser, WeaponController weaponController) {
-        CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 4);
-        if (combatUser.getSkillController(ArkaceP1.getInstance()).isUsing())
-            weaponController.setCooldown(3);
-        if (!weaponController.isCooldownFinished())
-            return;
+    public void use(CombatUser combatUser, WeaponController weaponController, ActionKey actionKey) {
+        switch (actionKey) {
+            case CS_PRE_USE:
+                if (!combatUser.getSkillController(ArkaceP1.getInstance()).isUsing())
+                    return;
 
-        boolean isUlt = combatUser.getSkillController(ArkaceUlt.getInstance()).isUsing();
-        Location location = combatUser.getEntity().getLocation();
+                weaponController.setCooldown(4);
+                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
 
-        if (isUlt) {
-            SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
-            SoundUtil.play("random.energy", location, 4F, 1.6F);
-            SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-            combatUser.addBulletSpread(1, 0);
-        } else {
-            SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
-            SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-            CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
-            CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
-            weaponController.consume(1);
+                break;
+            case CS_USE:
+                System.out.println(weaponController.isCooldownFinished());
+                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                boolean isUlt = combatUser.getSkillController(ArkaceUlt.getInstance()).isUsing();
+                Location location = combatUser.getEntity().getLocation();
+
+                if (isUlt) {
+                    SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
+                    SoundUtil.play("random.energy", location, 4F, 1.6F);
+                    SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+                    combatUser.addBulletSpread(1, 0);
+                } else {
+                    SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
+                    SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+                    CombatUtil.sendRecoil(combatUser, RECOIL.UP, RECOIL.SIDE, RECOIL.UP_SPREAD, RECOIL.SIDE_SPREAD, 2, 2F);
+                    CombatUtil.applyBulletSpread(combatUser, SPREAD.INCREMENT, SPREAD.RECOVERY, SPREAD.MAX);
+                    weaponController.consume(1);
+                }
+
+                new Hitscan(combatUser, false, 7) {
+                    @Override
+                    public void trail(Location location) {
+                        Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
+                        if (isUlt)
+                            ParticleUtil.playRGB(trailLoc, 1, 0, 0, 0, 0, 230, 255);
+                        else
+                            ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+                    }
+
+                    @Override
+                    public void onHitEntity(Location location, ICombatEntity target) {
+                        Combat.attack(combatUser, target, DAMAGE, "", false, true);
+                    }
+                }.shoot(combatUser.getBulletSpread());
+
+                break;
         }
-
-        new Hitscan(combatUser, false, 7) {
-            @Override
-            public void trail(Location location) {
-                Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
-                if (isUlt)
-                    ParticleUtil.playRGB(trailLoc, 1, 0, 0, 0, 0, 230, 255);
-                else
-                    ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
-            }
-
-            @Override
-            public void onHitEntity(Location location, ICombatEntity target) {
-                Combat.attack(combatUser, target, DAMAGE, "", false, true);
-            }
-        }.shoot(combatUser.getBulletSpread());
-
     }
 
     @Override

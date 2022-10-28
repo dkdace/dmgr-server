@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -48,12 +49,13 @@ public class ArkaceA1 extends ActiveSkill {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController) {
+    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
-            skillController.setDuration(-1);
-
             WeaponController weaponController = combatUser.getWeaponController();
-            weaponController.setCooldown(-1);
+
+            weaponController.setCooldown(10);
+            skillController.setGlobalCooldown(10);
+            skillController.setDuration(-1);
 
             new TaskTimer(5, 3) {
                 @Override
@@ -90,7 +92,6 @@ public class ArkaceA1 extends ActiveSkill {
                         @Override
                         public void run() {
                             skillController.setCooldown();
-                            weaponController.setCooldown(0);
                         }
                     };
                 }

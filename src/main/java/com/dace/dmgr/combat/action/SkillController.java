@@ -153,6 +153,16 @@ public class SkillController {
             SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
+    public boolean isGlobalCooldownFinished() {
+        return combatUser.getEntity().getCooldown(Skill.MATERIAL) == 0;
+    }
+
+    public void setGlobalCooldown(int cooldown) {
+        if (cooldown == -1)
+            cooldown = 9999;
+        combatUser.getEntity().setCooldown(Skill.MATERIAL, cooldown);
+    }
+
     public void reset() {
         CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, 0);
         CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, 0);

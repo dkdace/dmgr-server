@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -41,7 +42,7 @@ public class ArkaceA2 extends ActiveSkill {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController) {
+    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
             skillController.setDuration(DURATION);
 

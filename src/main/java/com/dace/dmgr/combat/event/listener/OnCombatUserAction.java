@@ -15,17 +15,28 @@ public class OnCombatUserAction implements Listener {
         WeaponController weaponController = combatUser.getWeaponController();
 
         if (action instanceof Weapon) {
-            if (weaponController.getRemainingAmmo() > 0)
-                ((Weapon) action).use(combatUser, weaponController);
+            if (!weaponController.isCooldownFinished())
+                return;
+            if (action instanceof Reloadable)
+                if (weaponController.getRemainingAmmo() == 0)
+                    return;
+
+            ((Weapon) action).use(combatUser, weaponController, actionKey);
 
         } else if (action instanceof Skill) {
             SkillController skillController = combatUser.getSkillController((Skill) action);
-            if (skillController.isCooldownFinished()) {
+
+            if (!skillController.isCooldownFinished())
+                return;
+            if (action instanceof ActiveSkill) {
+                if (!skillController.isGlobalCooldownFinished())
+                    return;
                 weaponController.setReloading(false);
-                if (action instanceof UltimateSkill && !skillController.isUsing())
-                    combatUser.useUlt();
-                ((Skill) action).use(combatUser, skillController);
             }
+            if (action instanceof UltimateSkill && !skillController.isUsing())
+                combatUser.useUlt();
+
+            ((Skill) action).use(combatUser, skillController, actionKey);
         }
     }
 }
