@@ -26,25 +26,23 @@ public class WeaponController {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
-    public void setCooldown(long cooldown) {
-        if (cooldown == -1) {
-            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, -1);
-//            setItemCooldown(1);
-        } else {
-            if (isCooldownFinished()) {
-                CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-//                runCooldown();
-            } else
-                CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-        }
+    public void setCooldown(int cooldown, boolean force) {
+        if (cooldown == -1)
+            cooldown = 9999;
+        if (force || cooldown > combatUser.getEntity().getCooldown(Weapon.MATERIAL))
+            combatUser.getEntity().setCooldown(Weapon.MATERIAL, cooldown);
+    }
+
+    public void setCooldown(int cooldown) {
+        setCooldown(cooldown, false);
     }
 
     public void setCooldown() {
-        setCooldown(weapon.getCooldown());
+        setCooldown((int) weapon.getCooldown());
     }
 
     public boolean isCooldownFinished() {
-        return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
+        return combatUser.getEntity().getCooldown(Weapon.MATERIAL) == 0;
     }
 
     public boolean isReloading() {

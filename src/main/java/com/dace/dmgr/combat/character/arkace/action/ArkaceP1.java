@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.HasDuration;
 import com.dace.dmgr.combat.action.PassiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
@@ -32,7 +33,7 @@ public class ArkaceP1 extends PassiveSkill implements HasDuration {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController) {
+    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
             skillController.setDuration();
             combatUser.addSpeedIncrement(SPRINT_SPEED);

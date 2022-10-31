@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -22,7 +23,7 @@ public class ArkaceA1 extends ActiveSkill {
     public static final int DAMAGE_EXPLODE = 100;
     public static final int DAMAGE_DIRECT = 50;
     public static final int VELOCITY = 60;
-    public static final float RADIUS = 3.5F;
+    public static final float RADIUS = 3;
     private static final ArkaceA1 instance = new ArkaceA1();
 
     public ArkaceA1() {
@@ -32,7 +33,7 @@ public class ArkaceA1 extends ActiveSkill {
                 "§f를 입힙니다.",
                 "",
                 "§f" + TextIcon.DAMAGE + "   §c폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT,
-                "§f" + TextIcon.DAMAGE + "✸ §c3.5m",
+                "§f" + TextIcon.DAMAGE + "✸ §c3m",
                 "§f" + TextIcon.COOLDOWN + "   §f7초",
                 "",
                 "§7§l[2] [좌클릭] §f사용");
@@ -48,12 +49,13 @@ public class ArkaceA1 extends ActiveSkill {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController) {
+    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
-            skillController.setDuration(-1);
-
             WeaponController weaponController = combatUser.getWeaponController();
-            weaponController.setCooldown(-1);
+
+            weaponController.setCooldown(10);
+            skillController.setGlobalCooldown(10);
+            skillController.setDuration(-1);
 
             new TaskTimer(5, 3) {
                 @Override
@@ -90,7 +92,6 @@ public class ArkaceA1 extends ActiveSkill {
                         @Override
                         public void run() {
                             skillController.setCooldown();
-                            weaponController.setCooldown(0);
                         }
                     };
                 }
@@ -102,7 +103,7 @@ public class ArkaceA1 extends ActiveSkill {
         SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.8F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.4F);
         SoundUtil.play("random.gun_reverb2", location, 6F, 0.9F);
-        ParticleUtil.playRGB(location, 180, 2F, 2F, 2F, 32, 250, 225);
+        ParticleUtil.playRGB(location, 200, 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)

@@ -1,5 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.TaskWait;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
@@ -12,9 +15,9 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     private String team = "";
     private int speedIncrement = 0;
 
-    protected CombatEntity(T entity, String name) {
+    protected CombatEntity(T entity, String name, Hitbox hitbox) {
         this.entity = entity;
-        this.hitbox = new Hitbox(this, entity.getWidth(), entity.getHeight());
+        this.hitbox = hitbox;
         this.name = name;
         combatEntityMap.put(entity, this);
     }
@@ -22,6 +25,28 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     @Override
     public T getEntity() {
         return entity;
+    }
+
+    @Override
+    public void updateHitboxTick() {
+        new TaskTimer(1) {
+            @Override
+            public boolean run(int i) {
+                if (combatEntityMap.get(entity) == null)
+                    return false;
+
+                Location oldLoc = entity.getLocation();
+
+                new TaskWait(2) {
+                    @Override
+                    public void run() {
+                        hitbox.setLocation(oldLoc);
+                    }
+                };
+
+                return true;
+            }
+        };
     }
 
     @Override

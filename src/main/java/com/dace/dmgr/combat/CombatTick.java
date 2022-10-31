@@ -7,12 +7,10 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.StringUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -33,8 +31,6 @@ public class CombatTick {
             public boolean run(int i) {
                 if (combatUserMap.get(player) == null)
                     return false;
-
-                updateHitbox(combatUser);
 
                 if (player.getPotionEffect(PotionEffectType.WATER_BREATHING) == null)
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
@@ -64,17 +60,6 @@ public class CombatTick {
                 showActionbar(combatUser);
 
                 return true;
-            }
-        };
-    }
-
-    private static void updateHitbox(CombatUser combatUser) {
-        Location oldLoc = combatUser.getEntity().getLocation();
-
-        new TaskWait(2) {
-            @Override
-            public void run() {
-                combatUser.getHitbox().setLocation(oldLoc);
             }
         };
     }

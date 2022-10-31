@@ -3,7 +3,6 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.Lobby;
@@ -20,7 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,106 +37,21 @@ public class Combat {
     }
 
     public static ICombatEntity getNearEnemy(ICombatEntity attacker, Location location, float range) {
-        ICombatEntity retTarget = null;
-        double dist = range;
-
-        location.getWorld().getNearbyEntities(location, range, range, range);
-        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
-                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
-
-        for (ICombatEntity target : combatEntityList) {
-            Hitbox hitbox = target.getHitbox();
-
-            if (target != attacker && isEnemy(attacker, target)) {
-                Location eLocation = hitbox.getLocation();
-                location.getWorld().getChunkAt(location).getEntities();
-                double hitboxWidth = hitbox.getWidth();
-                double hitboxHeight = hitbox.getHeight();
-
-                if (Math.abs(eLocation.getPitch()) > 35)
-                    hitboxHeight -= 0.1;
-                if (Math.abs(eLocation.getPitch()) > 70)
-                    hitboxHeight -= 0.1;
-                if (target instanceof CombatUser) {
-                    if (((Player) target.getEntity()).isSneaking())
-                        hitboxHeight -= 0.35;
-
-                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
-                    hitboxWidth += statHitbox - 1.0;
-                    hitboxHeight += statHitbox - 1.0;
-                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
-                    hitboxWidth += 0.3;
-                    hitboxHeight += 1.5;
-                }
-
-                eLocation.setY(location.getY());
-                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
-                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
-                if (eLocation.getY() < hitbox.getLocation().getY())
-                    eLocation.setY(hitbox.getLocation().getY());
-
-                Vector v = location.toVector().subtract(eLocation.toVector());
-                v.normalize().multiply((hitboxWidth / 2) + 0.1);
-                eLocation.add(v);
-
-                if (dist >= location.distance(eLocation)) {
-                    dist = location.distance(eLocation);
-                    retTarget = target;
-                }
-            }
-        }
-
-        return retTarget;
+        return combatEntityMap.values().stream()
+                .min(Comparator.comparing(combatEntity ->
+                        location.distance(combatEntity.getHitbox().getCenter())))
+                .filter(combatEntity ->
+                        combatEntity != attacker && isEnemy(attacker, combatEntity) &&
+                                LocationUtil.isInHitbox(location, combatEntity.getHitbox(), range))
+                .orElse(null);
     }
 
-    public static HashSet<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
-        HashSet<ICombatEntity> retTargets = new HashSet<>();
-
-        location.getWorld().getNearbyEntities(location, range, range, range);
-        Set<ICombatEntity> combatEntityList = combatEntityMap.values().stream().filter(combatEntity ->
-                location.distance(combatEntity.getEntity().getLocation()) < range + 3).collect(Collectors.toSet());
-
-        for (ICombatEntity target : combatEntityList) {
-            Hitbox hitbox = target.getHitbox();
-
-            if (target != attacker && isEnemy(attacker, target)) {
-                Location eLocation = hitbox.getLocation();
-                location.getWorld().getChunkAt(location).getEntities();
-                double hitboxWidth = hitbox.getWidth();
-                double hitboxHeight = hitbox.getHeight();
-
-                if (Math.abs(eLocation.getPitch()) > 35)
-                    hitboxHeight -= 0.1;
-                if (Math.abs(eLocation.getPitch()) > 70)
-                    hitboxHeight -= 0.1;
-                if (target instanceof CombatUser) {
-                    if (((Player) target.getEntity()).isSneaking())
-                        hitboxHeight -= 0.35;
-
-                    float statHitbox = ((CombatUser) target).getCharacter().getHitbox();
-                    hitboxWidth += statHitbox - 1.0;
-                    hitboxHeight += statHitbox - 1.0;
-                } else if (target.getEntity().getType() == EntityType.IRON_GOLEM) {
-                    hitboxWidth += 0.3;
-                    hitboxHeight += 1.5;
-                }
-
-                eLocation.setY(location.getY());
-                if (eLocation.getY() > hitbox.getLocation().add(0, hitboxHeight, 0).getY())
-                    eLocation.setY(hitbox.getLocation().add(0, hitboxHeight, 0).getY());
-                if (eLocation.getY() < hitbox.getLocation().getY())
-                    eLocation.setY(hitbox.getLocation().getY());
-
-                Vector v = location.toVector().subtract(eLocation.toVector());
-                v.normalize().multiply((hitboxWidth / 2) + 0.1);
-                eLocation.add(v);
-
-                if (range >= location.distance(eLocation))
-                    retTargets.add(target);
-            }
-        }
-
-        return retTargets;
+    public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
+        return combatEntityMap.values().stream()
+                .filter(combatEntity ->
+                        combatEntity != attacker && isEnemy(attacker, combatEntity) &&
+                                LocationUtil.isInHitbox(location, combatEntity.getHitbox(), range))
+                .collect(Collectors.toSet());
     }
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
@@ -145,50 +59,33 @@ public class Combat {
         Entity victimEntity = victim.getEntity();
         boolean killed = false;
 
-        if (!victimEntity.isDead()) {
-            int rdamage = damage;
+        if (victimEntity.isDead())
+            return;
+        if (!victim.isDamageable())
+            return;
 
-            if (victim instanceof CombatUser)
-                if (((Player) victimEntity).getGameMode() != GameMode.SURVIVAL)
-                    return;
-            if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
-                crit = false;
-            if (crit)
-                damage *= 1.5;
+        if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
+            crit = false;
 
-            int atkBonus = 0;
-            int defBonus = 0;
+        int rdamage = damage;
+        damage = getFinalDamage(attacker, victim, damage, crit);
 
-            damage = damage * (100 + atkBonus - defBonus) / 100;
+        playHitEffect(attackerEntity, victimEntity, crit);
 
-            if (attacker != victim) {
-                if (crit) {
-                    attackerEntity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
-                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attackerEntity);
-                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attackerEntity);
-                } else {
-                    attackerEntity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
-                    SoundUtil.play("random.stab", 0.4F, 2F, attackerEntity);
-                    SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attackerEntity);
-                }
-            }
-
-            if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_ANIMATION) == 0) {
-                CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_ANIMATION);
-                sendDamage(victimEntity);
-            }
-
-            if (RegionUtil.isInRegion(attackerEntity.getPlayer(), "BattleTrain") && victim.getHealth() - damage <= 0)
+        if (victim.getHealth() - damage <= 0) {
+            if (isKillable(attacker, victim))
+                killed = true;
+            else
                 victim.setHealth(1);
-            else {
-                if (victim.getHealth() - damage <= 0) killed = true;
-                else victim.setHealth(victim.getHealth() - damage);
-            }
+        } else
+            victim.setHealth(victim.getHealth() - damage);
 
-            if (victim instanceof CombatUser && attacker != victim) {
-                if (ult)
+        if (attacker != victim && victim.isUltChargeable()) {
+            if (ult)
+                if (!attacker.getSkillController(attacker.getCharacter().getUltimate()).isUsing())
                     attacker.addUlt((float) damage / attacker.getCharacter().getUltimate().getCost());
 
+            if (victim instanceof CombatUser) {
                 if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId()) == 0) {
                     CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, victimEntity.getEntityId());
                 }
@@ -202,11 +99,39 @@ public class Combat {
                 if (sumDamage > 1)
                     ((CombatUser) victim).getDamageMap().put(attacker, 1F);
             }
-
-            if (killed && !RegionUtil.isInRegion(victimEntity, "BattleTrain")) {
-                kill(attacker, victim);
-            }
         }
+
+        if (killed)
+            kill(attacker, victim);
+    }
+
+    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
+        if (victim.getHealth() == victim.getMaxHealth())
+            return;
+
+        int bonus = 0;
+
+        amount = amount * (100 + bonus) / 100;
+        victim.setHealth(victim.getHealth() + amount);
+
+        if (amount > 100)
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
+                    0.3F, 0.1F, 0.3F, 0);
+        else if (amount / 100F > Math.random()) {
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
+        }
+
+        if (ult)
+            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
+    }
+
+    private static boolean isKillable(CombatUser attacker, ICombatEntity victim) {
+        if (RegionUtil.isInRegion(attacker.getEntity(), "BattleTrain"))
+            return false;
+
+        return true;
     }
 
     private static void kill(CombatUser attacker, ICombatEntity victim) {
@@ -216,7 +141,7 @@ public class Combat {
         if (victim instanceof CombatUser) {
             victim.setHealth(victim.getMaxHealth());
 
-            if (CooldownManager.getCooldown((CombatUser) victim, Cooldown.RESPAWN_TIME) == 0) {
+            if (CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME) == 0) {
                 Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageMap();
                 Set<String> attackerNames = damageList.keySet().stream().map((CombatUser _attacker) ->
                         "§f　§l" + attacker.getName()).collect(Collectors.toSet());
@@ -286,48 +211,47 @@ public class Combat {
         };
     }
 
-    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
-        if (victim.getHealth() == victim.getMaxHealth())
-            return;
-
-        int bonus = 0;
-
-        amount = amount * (100 + bonus) / 100;
-        victim.setHealth(victim.getHealth() + amount);
-
-        if (amount > 100)
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
-                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
-                    0.3F, 0.1F, 0.3F, 0);
-        else if (amount / 100F > Math.random()) {
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
-                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
-        }
-
-        if (ult)
-            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
-    }
-
-    private static void sendDamage(Entity entity) {
+    private static void sendDamagePacket(Entity entity) {
         WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
         packet.setEntityID(entity.getEntityId());
         packet.setEntityStatus((byte) 2);
 
-        Bukkit.getOnlinePlayers().forEach((Player player) -> {
-            packet.sendPacket(player);
-        });
+        packet.broadcastPacket();
+    }
+
+    private static void playHitEffect(Player attacker, Entity victim, boolean crit) {
+        if (attacker != victim) {
+            if (crit) {
+                attacker.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attacker);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attacker);
+            } else {
+                attacker.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
+                SoundUtil.play("random.stab", 0.4F, 2F, attacker);
+                SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attacker);
+            }
+        }
+
+        if (CooldownManager.getCooldown(victim, Cooldown.DAMAGE_ANIMATION) == 0) {
+            CooldownManager.setCooldown(victim, Cooldown.DAMAGE_ANIMATION);
+            sendDamagePacket(victim);
+        }
+    }
+
+    private static int getFinalDamage(CombatUser attacker, ICombatEntity victim, int damage, boolean crit) {
+        if (crit)
+            damage *= 1.5;
+
+        int atkBonus = 0;
+        int defBonus = 0;
+
+        return damage * (100 + atkBonus - defBonus) / 100;
     }
 
     private static void playKillSound(Player player) {
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, player);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, player);
-    }
-
-    public static class HITBOX {
-        static final float HITSCAN = 0.15F;
-        static final float PROJECTILE = 0.3F;
-        static final float MELEE = 0.6F;
     }
 
     private static class SUBTITLES {

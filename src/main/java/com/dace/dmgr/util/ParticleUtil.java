@@ -2,7 +2,6 @@ package com.dace.dmgr.util;
 
 import com.comphenix.packetwrapper.WrapperPlayServerWorldParticles;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -12,7 +11,7 @@ public class ParticleUtil {
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = getNormalPacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
 
-        Bukkit.getOnlinePlayers().forEach(packet::sendPacket);
+        packet.broadcastPacket();
     }
 
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
@@ -22,15 +21,15 @@ public class ParticleUtil {
     }
 
 
-    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, float red, float green, float blue) {
+    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         for (int i = 0; i < count; i++) {
             WrapperPlayServerWorldParticles packet = getRGBPacket(location, offsetX, offsetY, offsetZ, red, green, blue);
 
-            Bukkit.getOnlinePlayers().forEach(packet::sendPacket);
+            packet.broadcastPacket();
         }
     }
 
-    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, float red, float green, float blue, Player player) {
+    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue, Player player) {
         for (int i = 0; i < count; i++) {
             WrapperPlayServerWorldParticles packet = getRGBPacket(location, offsetX, offsetY, offsetZ, red, green, blue);
 
@@ -41,7 +40,7 @@ public class ParticleUtil {
     public static void playBlock(Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = getBlockPacket(material, data, location, count, offsetX, offsetY, offsetZ, speed);
 
-        Bukkit.getOnlinePlayers().forEach(packet::sendPacket);
+        packet.broadcastPacket();
     }
 
     public static void playBlock(Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
@@ -68,7 +67,11 @@ public class ParticleUtil {
         return packet;
     }
 
-    private static WrapperPlayServerWorldParticles getRGBPacket(Location location, float offsetX, float offsetY, float offsetZ, float red, float green, float blue) {
+    private static WrapperPlayServerWorldParticles getRGBPacket(Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
+        if (red == 0) red = 1;
+        if (green == 0) green = 1;
+        if (blue == 0) blue = 1;
+
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
         float finalOffsetX = (float) ((Math.random() - Math.random()) * offsetX);
@@ -79,9 +82,9 @@ public class ParticleUtil {
         packet.setY((float) location.getY() + finalOffsetY);
         packet.setZ((float) location.getZ() + finalOffsetZ);
         packet.setNumberOfParticles(0);
-        packet.setOffsetX(red / 255);
-        packet.setOffsetY(green / 255);
-        packet.setOffsetZ(blue / 255);
+        packet.setOffsetX(red / 255F);
+        packet.setOffsetY(green / 255F);
+        packet.setOffsetZ(blue / 255F);
         packet.setParticleData(1);
         packet.setLongDistance(true);
 

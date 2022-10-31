@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class Weapon extends Action {
-    private final static Material material = Material.DIAMOND_HOE;
+    public final static Material MATERIAL = Material.DIAMOND_HOE;
     private static final String PREFIX = "§e§l[기본무기] §f";
 
     public Weapon(String name, ItemStack itemStack) {
@@ -14,5 +14,5 @@ public abstract class Weapon extends Action {
 
     public abstract long getCooldown();
 
-    public abstract void use(CombatUser combatUser, WeaponController weaponController);
+    public abstract void use(CombatUser combatUser, WeaponController weaponController, ActionKey actionKey);
 }

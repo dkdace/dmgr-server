@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class Projectile extends Bullet {
+    private static final float SIZE = 0.3F;
     protected int velocity;
 
     public Projectile(ICombatEntity shooter, boolean penetration, int velocity, int trailInterval, float hitboxMultiplier) {
@@ -55,7 +56,7 @@ public abstract class Projectile extends Bullet {
                     }
 
                     if (loc.distance(origin) > 0.5) {
-                        ICombatEntity target = Combat.getNearEnemy(shooter, loc, Combat.HITBOX.PROJECTILE * hitboxMultiplier);
+                        ICombatEntity target = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
 
                         if (target != null) {
                             if (!targetList.add(target)) {

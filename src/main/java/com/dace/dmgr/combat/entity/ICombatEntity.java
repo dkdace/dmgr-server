@@ -5,6 +5,8 @@ import org.bukkit.entity.Entity;
 public interface ICombatEntity {
     Entity getEntity();
 
+    void updateHitboxTick();
+
     Hitbox getHitbox();
 
     String getTeam();
@@ -26,4 +28,12 @@ public interface ICombatEntity {
     int getSpeedIncrement();
 
     void addSpeedIncrement(int speedIncrement);
+
+    default boolean isUltChargeable() {
+        return false;
+    }
+
+    default boolean isDamageable() {
+        return true;
+    }
 }

@@ -51,7 +51,7 @@ public class OnPlayerJoin implements Listener {
     }
 
     private static void playJoinSound() {
-        new TaskTimer(1, 3) {
+        new TaskTimer(1, 4) {
             @Override
             public boolean run(int i) {
                 switch (i) {

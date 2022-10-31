@@ -9,8 +9,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
-import org.bukkit.Location;
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -27,8 +26,10 @@ public class CombatUser extends CombatEntity<Player> {
     private float bulletSpread = 0;
 
     public CombatUser(Player entity) {
-        super(entity, entity.getName());
+        super(entity, entity.getName(), new Hitbox(entity.getLocation(), 0, entity.getHeight() / 2, 0,
+                0.65, 2.1, 0.5));
         combatUserMap.put(entity, this);
+        updateHitboxTick();
     }
 
     public WeaponController getWeaponController() {
@@ -90,12 +91,22 @@ public class CombatUser extends CombatEntity<Player> {
         SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, entity.getLocation(), 10F, 2F);
     }
 
+    @Override
+    public boolean isUltChargeable() {
+        return true;
+    }
+
     private void chargeUlt() {
         if (character != null) {
             SkillController skillController = skillControllerMap.get(character.getUltimate());
             if (!skillController.isCooldownFinished())
                 skillController.setCooldown(0);
         }
+    }
+
+    @Override
+    public boolean isDamageable() {
+        return entity.getGameMode() == GameMode.SURVIVAL;
     }
 
     public ICharacter getCharacter() {
@@ -151,15 +162,5 @@ public class CombatUser extends CombatEntity<Player> {
                 skillControllerMap.put((Skill) action, new SkillController(this, (Skill) action, slot));
             }
         });
-    }
-
-    public Location getLeftHand() {
-        return entity.getEyeLocation().subtract(0, 0.2, 0)
-                .add(VectorUtil.getPitchAxis(entity.getLocation()).multiply(0.2));
-    }
-
-    public Location getRightHand() {
-        return entity.getEyeLocation().subtract(0, 0.2, 0)
-                .add(VectorUtil.getPitchAxis(entity.getLocation()).multiply(-0.2));
     }
 }
