@@ -3,7 +3,6 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Dummy;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.Lobby;
@@ -60,71 +59,79 @@ public class Combat {
         Entity victimEntity = victim.getEntity();
         boolean killed = false;
 
-        if (!victimEntity.isDead()) {
-            int rdamage = damage;
+        if (victimEntity.isDead())
+            return;
+        if (!victim.isDamageable())
+            return;
 
-            if (victim instanceof CombatUser)
-                if (((Player) victimEntity).getGameMode() != GameMode.SURVIVAL)
-                    return;
-            if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
-                crit = false;
-            if (crit)
-                damage *= 1.5;
+        if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
+            crit = false;
 
-            int atkBonus = 0;
-            int defBonus = 0;
+        int rdamage = damage;
+        damage = getFinalDamage(attacker, victim, damage, crit);
 
-            damage = damage * (100 + atkBonus - defBonus) / 100;
+        playHitEffect(attackerEntity, victimEntity, crit);
 
-            if (attacker != victim) {
-                if (crit) {
-                    attackerEntity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
-                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attackerEntity);
-                    SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attackerEntity);
-                } else {
-                    attackerEntity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
-                    SoundUtil.play("random.stab", 0.4F, 2F, attackerEntity);
-                    SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attackerEntity);
-                }
-            }
-
-            if (CooldownManager.getCooldown(victim, Cooldown.DAMAGE_ANIMATION) == 0) {
-                CooldownManager.setCooldown(victim, Cooldown.DAMAGE_ANIMATION);
-                sendDamage(victimEntity);
-            }
-
-            if (RegionUtil.isInRegion(attackerEntity.getPlayer(), "BattleTrain") && victim.getHealth() - damage <= 0)
+        if (victim.getHealth() - damage <= 0) {
+            if (isKillable(attacker, victim))
+                killed = true;
+            else
                 victim.setHealth(1);
-            else {
-                if (victim.getHealth() - damage <= 0) killed = true;
-                else victim.setHealth(victim.getHealth() - damage);
-            }
+        } else
+            victim.setHealth(victim.getHealth() - damage);
 
-            if ((victim instanceof CombatUser || victim instanceof Dummy) && attacker != victim) {
-                if (ult)
-                    if (!attacker.getSkillController(attacker.getCharacter().getUltimate()).isUsing())
-                        attacker.addUlt((float) damage / attacker.getCharacter().getUltimate().getCost());
+        if (attacker != victim && victim.isUltChargeable()) {
+            if (ult)
+                if (!attacker.getSkillController(attacker.getCharacter().getUltimate()).isUsing())
+                    attacker.addUlt((float) damage / attacker.getCharacter().getUltimate().getCost());
 
-                if (victim instanceof CombatUser) {
-                    if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId()) == 0) {
-                        CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, victimEntity.getEntityId());
-                    }
-                    CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId());
-
-                    float sumDamage = ((CombatUser) victim).getDamageMap().getOrDefault(attacker, 0F);
-                    if (killed)
-                        ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) victim.getHealth() / victim.getMaxHealth());
-                    else
-                        ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
-                    if (sumDamage > 1)
-                        ((CombatUser) victim).getDamageMap().put(attacker, 1F);
+            if (victim instanceof CombatUser) {
+                if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId()) == 0) {
+                    CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, victimEntity.getEntityId());
                 }
-            }
+                CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, victimEntity.getEntityId());
 
-            if (killed && !RegionUtil.isInRegion(victimEntity, "BattleTrain")) {
-                kill(attacker, victim);
+                float sumDamage = ((CombatUser) victim).getDamageMap().getOrDefault(attacker, 0F);
+                if (killed)
+                    ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) victim.getHealth() / victim.getMaxHealth());
+                else
+                    ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
+                if (sumDamage > 1)
+                    ((CombatUser) victim).getDamageMap().put(attacker, 1F);
             }
         }
+
+        if (killed)
+            kill(attacker, victim);
+    }
+
+    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
+        if (victim.getHealth() == victim.getMaxHealth())
+            return;
+
+        int bonus = 0;
+
+        amount = amount * (100 + bonus) / 100;
+        victim.setHealth(victim.getHealth() + amount);
+
+        if (amount > 100)
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
+                    0.3F, 0.1F, 0.3F, 0);
+        else if (amount / 100F > Math.random()) {
+            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
+        }
+
+        if (ult)
+            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
+    }
+
+    private static boolean isKillable(CombatUser attacker, ICombatEntity victim) {
+        if (RegionUtil.isInRegion(attacker.getEntity(), "BattleTrain"))
+            return false;
+
+        return true;
     }
 
     private static void kill(CombatUser attacker, ICombatEntity victim) {
@@ -134,7 +141,7 @@ public class Combat {
         if (victim instanceof CombatUser) {
             victim.setHealth(victim.getMaxHealth());
 
-            if (CooldownManager.getCooldown((CombatUser) victim, Cooldown.RESPAWN_TIME) == 0) {
+            if (CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME) == 0) {
                 Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageMap();
                 Set<String> attackerNames = damageList.keySet().stream().map((CombatUser _attacker) ->
                         "§f　§l" + attacker.getName()).collect(Collectors.toSet());
@@ -204,35 +211,42 @@ public class Combat {
         };
     }
 
-    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
-        if (victim.getHealth() == victim.getMaxHealth())
-            return;
-
-        int bonus = 0;
-
-        amount = amount * (100 + bonus) / 100;
-        victim.setHealth(victim.getHealth() + amount);
-
-        if (amount > 100)
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
-                            0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
-                    0.3F, 0.1F, 0.3F, 0);
-        else if (amount / 100F > Math.random()) {
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
-                    0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
-        }
-
-        if (ult)
-            attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
-    }
-
-    private static void sendDamage(Entity entity) {
+    private static void sendDamagePacket(Entity entity) {
         WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
         packet.setEntityID(entity.getEntityId());
         packet.setEntityStatus((byte) 2);
 
         packet.broadcastPacket();
+    }
+
+    private static void playHitEffect(Player attacker, Entity victim, boolean crit) {
+        if (attacker != victim) {
+            if (crit) {
+                attacker.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attacker);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attacker);
+            } else {
+                attacker.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
+                SoundUtil.play("random.stab", 0.4F, 2F, attacker);
+                SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, attacker);
+            }
+        }
+
+        if (CooldownManager.getCooldown(victim, Cooldown.DAMAGE_ANIMATION) == 0) {
+            CooldownManager.setCooldown(victim, Cooldown.DAMAGE_ANIMATION);
+            sendDamagePacket(victim);
+        }
+    }
+
+    private static int getFinalDamage(CombatUser attacker, ICombatEntity victim, int damage, boolean crit) {
+        if (crit)
+            damage *= 1.5;
+
+        int atkBonus = 0;
+        int defBonus = 0;
+
+        return damage * (100 + atkBonus - defBonus) / 100;
     }
 
     private static void playKillSound(Player player) {

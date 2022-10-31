@@ -5,11 +5,7 @@ import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.system.PacketListener;
-import com.dace.dmgr.system.command.LobbyCommand;
-import com.dace.dmgr.system.command.MainMenuCommand;
-import com.dace.dmgr.system.command.OptionCommand;
-import com.dace.dmgr.system.command.SelectCharCommand;
+import com.dace.dmgr.system.command.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +24,6 @@ public class DMGR extends JavaPlugin {
         getLogger().info(PREFIX.LOG + "플러그인 활성화 완료");
         MainEventManager.init();
         CombatEventManager.init();
-        PacketListener.init();
         new GeneralConfig();
         registerCommand();
 

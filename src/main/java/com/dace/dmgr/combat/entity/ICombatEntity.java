@@ -28,4 +28,12 @@ public interface ICombatEntity {
     int getSpeedIncrement();
 
     void addSpeedIncrement(int speedIncrement);
+
+    default boolean isUltChargeable() {
+        return false;
+    }
+
+    default boolean isDamageable() {
+        return true;
+    }
 }

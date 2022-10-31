@@ -1,8 +1,12 @@
 package com.dace.dmgr.event;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.dace.dmgr.event.listener.*;
 
 public class MainEventManager extends EventManager {
+    private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+
     public static void init() {
         registerListener(new OnPlayerJoin());
         registerListener(new OnPlayerQuit());
@@ -27,5 +31,7 @@ public class MainEventManager extends EventManager {
         registerListener(new OnWeaponPrepareShoot());
         registerListener(new OnPlayerItemHeld());
         registerListener(new OnPlayerInteract());
+        registerPacketListener(new OnPlayServerUpdateHealth());
+        registerPacketListener(new OnPlayClientArmAnimation());
     }
 }

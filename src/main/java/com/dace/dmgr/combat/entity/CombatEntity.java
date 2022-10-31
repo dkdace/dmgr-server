@@ -40,7 +40,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
                 new TaskWait(2) {
                     @Override
                     public void run() {
-                        hitbox.setCenter(oldLoc);
+                        hitbox.setLocation(oldLoc);
                     }
                 };
 
