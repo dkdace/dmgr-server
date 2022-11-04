@@ -79,7 +79,6 @@ public class WeaponController {
             return;
 
         reloading = true;
-        boolean full = remainingAmmo == 0;
 
         long duration = ((Reloadable) weapon).getReloadDuration();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
@@ -103,9 +102,9 @@ public class WeaponController {
                 if (cancelled)
                     return;
 
+                combatUser.sendActionBar("§a§l재장전 완료", 8);
+
                 remainingAmmo = ((Reloadable) weapon).getCapacity();
-                if (!full)
-                    remainingAmmo++;
                 reloading = false;
             }
         };
