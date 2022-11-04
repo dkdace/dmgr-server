@@ -26,8 +26,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     public static final int DAMAGE_DISTANCE = 25;
     public static final long COOLDOWN = (long) (0.1 * 20);
     public static final int CAPACITY = 30;
-    public static final long RELOAD_DURATION = (long) (1.4 * 20);
-    public static final long RELOAD_DURATION_FULL = (long) (1.9 * 20);
+    public static final long RELOAD_DURATION = (long) (1.5 * 20);
     private static final ArkaceWeapon instance = new ArkaceWeapon();
 
     public ArkaceWeapon() {
@@ -38,7 +37,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 "",
                 "§f" + TextIcon.DAMAGE + "   §c" + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
                 "§f" + TextIcon.ATTACK_SPEED + "   0.1초",
-                "§f" + TextIcon.CAPACITY + "   30+1발",
+                "§f" + TextIcon.CAPACITY + "   30발",
                 "",
                 "§7§l[우클릭] §f사격 §7§l[Q] §f재장전").build());
     }
@@ -63,14 +62,13 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     }
 
     @Override
-    public long getReloadDurationFull() {
-        return RELOAD_DURATION_FULL;
-    }
-
-    @Override
     public void use(CombatUser combatUser, WeaponController weaponController, ActionKey actionKey) {
         switch (actionKey) {
             case CS_PRE_USE:
+                if (weaponController.getRemainingAmmo() == 0) {
+                    reload(combatUser, weaponController);
+                    return;
+                }
                 if (!combatUser.getSkillController(ArkaceP1.getInstance()).isUsing())
                     return;
 
@@ -113,37 +111,48 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 }.shoot(combatUser.getBulletSpread());
 
                 break;
+            case DROP:
+                reload(combatUser, weaponController);
+
+                break;
         }
     }
 
     @Override
-    public void onReload(CombatUser combatUser, WeaponController weaponController) {
-        new TaskTimer(1, RELOAD_DURATION_FULL) {
+    public void reload(CombatUser combatUser, WeaponController weaponController) {
+        if (weaponController.isReloading())
+            return;
+
+        weaponController.reload();
+
+        new TaskTimer(1, RELOAD_DURATION) {
             @Override
             public boolean run(int i) {
                 if (!weaponController.isReloading())
                     return false;
 
+                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
+
                 switch (i) {
-                    case 4:
+                    case 3:
                         SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
                         break;
-                    case 5:
+                    case 4:
                         SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
                         break;
-                    case 22:
+                    case 18:
                         SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
                         break;
-                    case 23:
+                    case 19:
                         SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
                         break;
-                    case 24:
+                    case 20:
                         SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
                         break;
-                    case 34:
+                    case 26:
                         SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
                         break;
-                    case 36:
+                    case 27:
                         SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
                         break;
                 }

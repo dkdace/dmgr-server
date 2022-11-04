@@ -7,8 +7,12 @@ import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.slot.CommunicationSlot;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.SoundUtil;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -20,6 +24,7 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 public class CombatUser extends CombatEntity<Player> {
     private final HashMap<String, Integer> shield = new HashMap<>();
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
+    private final TextComponent actionBar = new TextComponent();
     private ICharacter character = null;
     private WeaponController weaponController;
     private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
@@ -162,5 +167,17 @@ public class CombatUser extends CombatEntity<Player> {
                 skillControllerMap.put((Skill) action, new SkillController(this, (Skill) action, slot));
             }
         });
+    }
+
+    public void sendActionBar(String message, long overrideTicks) {
+        if (overrideTicks > 0)
+            CooldownManager.setCooldown(this, Cooldown.ACTION_BAR, overrideTicks);
+
+        actionBar.setText(message);
+        entity.spigot().sendMessage(ChatMessageType.ACTION_BAR, actionBar);
+    }
+
+    public void sendActionBar(String message) {
+        sendActionBar(message, 0);
     }
 }

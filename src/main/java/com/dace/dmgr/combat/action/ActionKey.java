@@ -9,6 +9,7 @@ public enum ActionKey {
     SLOT_2,
     SLOT_3,
     SLOT_4,
+    DROP,
     SPRINT,
     SNEAK;
 }

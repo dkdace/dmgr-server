@@ -25,6 +25,7 @@ public class OnWeaponPreShoot implements Listener {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                weaponController.setReloading(false);
             }
         }
     }

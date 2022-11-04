@@ -7,7 +7,5 @@ public interface Reloadable {
 
     long getReloadDuration();
 
-    long getReloadDurationFull();
-
-    void onReload(CombatUser combatUser, WeaponController weaponController);
+    void reload(CombatUser combatUser, WeaponController weaponController);
 }

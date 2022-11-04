@@ -14,7 +14,8 @@ public enum Cooldown {
     WEAPON_RELOAD(0),
     NO_SPRINT(0),
     SKILL_COOLDOWN(0),
-    SKILL_DURATION(0);
+    SKILL_DURATION(0),
+    ACTION_BAR(0);
 
     private final long defaultValue;
 

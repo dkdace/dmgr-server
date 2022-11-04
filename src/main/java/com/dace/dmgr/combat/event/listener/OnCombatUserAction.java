@@ -17,9 +17,6 @@ public class OnCombatUserAction implements Listener {
         if (action instanceof Weapon) {
             if (!weaponController.isCooldownFinished())
                 return;
-            if (action instanceof Reloadable)
-                if (weaponController.getRemainingAmmo() == 0)
-                    return;
 
             ((Weapon) action).use(combatUser, weaponController, actionKey);
 

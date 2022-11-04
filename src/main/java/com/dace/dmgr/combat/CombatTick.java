@@ -8,8 +8,6 @@ import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringUtil;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -36,11 +34,7 @@ public class CombatTick {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                             99999, 0, false, false));
 
-                if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0 &&
-                        CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_RELOAD) == 0)
-                    combatUser.allowSprint(true);
-                else
-                    combatUser.allowSprint(false);
+                combatUser.allowSprint(CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0);
 
                 if (i % 10 == 0) {
                     UltimateSkill ultimateSkill = combatUser.getCharacter().getUltimate();
@@ -65,7 +59,8 @@ public class CombatTick {
     }
 
     private static void showActionbar(CombatUser combatUser) {
-        if (combatUser.getCharacter().getWeapon() instanceof Reloadable) {
+        if (combatUser.getCharacter().getWeapon() instanceof Reloadable &&
+                CooldownManager.getCooldown(combatUser, Cooldown.ACTION_BAR) == 0) {
             int capacity = combatUser.getWeaponController().getRemainingAmmo();
             int maxCapacity = ((Reloadable) combatUser.getCharacter().getWeapon()).getCapacity();
 
@@ -75,8 +70,7 @@ public class CombatTick {
 
             text.add(ammo);
 
-            combatUser.getEntity().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    new TextComponent(text.toString()));
+            combatUser.sendActionBar(text.toString());
         }
     }
 

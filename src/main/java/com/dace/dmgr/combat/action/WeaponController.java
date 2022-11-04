@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.StringUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 public class WeaponController {
@@ -77,12 +79,8 @@ public class WeaponController {
             return;
 
         reloading = true;
-        boolean full = remainingAmmo == 0;
 
-        ((Reloadable) weapon).onReload(combatUser, this);
         long duration = ((Reloadable) weapon).getReloadDuration();
-        if (remainingAmmo == 0)
-            duration = ((Reloadable) weapon).getReloadDurationFull();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {
@@ -92,7 +90,8 @@ public class WeaponController {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                combatUser.getEntity().sendTitle("", "§f재장전 §7[" + time + "초]", 0, 2, 5);
+                combatUser.sendActionBar("§c§l재장전... " + StringUtil.getBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
+                        2);
 
                 return true;
             }
@@ -103,11 +102,9 @@ public class WeaponController {
                 if (cancelled)
                     return;
 
-                combatUser.getEntity().sendTitle("", "§a재장전 완료", 0, 2, 10);
+                combatUser.sendActionBar("§a§l재장전 완료", 8);
 
                 remainingAmmo = ((Reloadable) weapon).getCapacity();
-                if (!full)
-                    remainingAmmo++;
                 reloading = false;
             }
         };
