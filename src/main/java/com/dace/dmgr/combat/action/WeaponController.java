@@ -81,7 +81,6 @@ public class WeaponController {
         reloading = true;
         boolean full = remainingAmmo == 0;
 
-        ((Reloadable) weapon).onReload(combatUser, this);
         long duration = ((Reloadable) weapon).getReloadDuration();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 

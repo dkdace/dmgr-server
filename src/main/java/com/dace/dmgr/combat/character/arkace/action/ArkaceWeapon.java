@@ -71,6 +71,10 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     public void use(CombatUser combatUser, WeaponController weaponController, ActionKey actionKey) {
         switch (actionKey) {
             case CS_PRE_USE:
+                if (weaponController.getRemainingAmmo() == 0) {
+                    reload(combatUser, weaponController);
+                    return;
+                }
                 if (!combatUser.getSkillController(ArkaceP1.getInstance()).isUsing())
                     return;
 
@@ -113,16 +117,25 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 }.shoot(combatUser.getBulletSpread());
 
                 break;
+            case DROP:
+                reload(combatUser, weaponController);
         }
     }
 
     @Override
-    public void onReload(CombatUser combatUser, WeaponController weaponController) {
+    public void reload(CombatUser combatUser, WeaponController weaponController) {
+        if (weaponController.isReloading())
+            return;
+
+        weaponController.reload();
+
         new TaskTimer(1, RELOAD_DURATION_FULL) {
             @Override
             public boolean run(int i) {
                 if (!weaponController.isReloading())
                     return false;
+
+                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
 
                 switch (i) {
                     case 4:

@@ -21,16 +21,12 @@ public class OnWeaponPrepareShoot implements Listener {
 
             if (!weaponController.isCooldownFinished())
                 event.setCancelled(true);
-            if (weaponController.getRemainingAmmo() == 0) {
-                event.setCancelled(true);
-
-                if (!weaponController.isReloading())
-                    weaponController.reload();
-            } else {
+            else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_PRE_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
-                weaponController.setReloading(false);
+                if (weaponController.getRemainingAmmo() > 0)
+                    weaponController.setReloading(false);
             }
         }
     }

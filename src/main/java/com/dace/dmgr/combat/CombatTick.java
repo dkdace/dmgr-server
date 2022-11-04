@@ -34,11 +34,7 @@ public class CombatTick {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                             99999, 0, false, false));
 
-                if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0 &&
-                        CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_RELOAD) == 0)
-                    combatUser.allowSprint(true);
-                else
-                    combatUser.allowSprint(false);
+                combatUser.allowSprint(CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0);
 
                 if (i % 10 == 0) {
                     UltimateSkill ultimateSkill = combatUser.getCharacter().getUltimate();
