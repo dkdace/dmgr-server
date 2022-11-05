@@ -14,11 +14,11 @@ public class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt() {
         super("인피니버스터",
                 "",
-                "§f" + TextIcon.COOLDOWN + " §6지속시간§f동안 기본 무기에 장탄수 무한, 탄퍼짐 제거, 거리별",
+                "§6" + TextIcon.DURATION + " 지속시간§f동안 기본 무기에 장탄수 무한, 탄퍼짐 제거, 거리별",
                 "§f피해 감소 제거 효과가 적용됩니다.",
                 "",
-                "§f" + TextIcon.COOLDOWN + "   §612초",
-                "§f⚡   7000",
+                "§6" + TextIcon.DURATION + "§f 12초",
+                "§f" + TextIcon.ULTIMATE + "§f 7000",
                 "",
                 "§7§l[4] §f사용");
     }
