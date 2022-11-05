@@ -33,11 +33,11 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         super("HLN-12", ItemBuilder.fromCSItem("HLN-12").setLore(
                 "",
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
-                "§7사격§f하여 " + TextIcon.DAMAGE + " §c피해§f를 입힙니다.",
+                "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
                 "",
-                "§f" + TextIcon.DAMAGE + "   §c" + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
-                "§f" + TextIcon.ATTACK_SPEED + "   0.1초",
-                "§f" + TextIcon.CAPACITY + "   30발",
+                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
+                "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
+                "§f" + TextIcon.CAPACITY + "§f 30발",
                 "",
                 "§7§l[우클릭] §f사격 §7§l[Q] §f재장전").build());
     }

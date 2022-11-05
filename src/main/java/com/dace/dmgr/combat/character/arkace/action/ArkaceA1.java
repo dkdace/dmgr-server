@@ -29,12 +29,11 @@ public class ArkaceA1 extends ActiveSkill {
     public ArkaceA1() {
         super(1, "다이아코어 미사일",
                 "",
-                "§f소형 미사일을 3회 연속으로 발사하여 " + TextIcon.DAMAGE + " §c광역 피해",
+                "§f소형 미사일을 3회 연속으로 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
                 "§f를 입힙니다.",
                 "",
-                "§f" + TextIcon.DAMAGE + "   §c폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT,
-                "§f" + TextIcon.DAMAGE + "✸ §c3m",
-                "§f" + TextIcon.COOLDOWN + "   §f7초",
+                "§c" + TextIcon.DAMAGE + "§f 폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT + "  §c" + TextIcon.RADIUS + "§f 3m",
+                "§f" + TextIcon.COOLDOWN + "§f 7초",
                 "",
                 "§7§l[2] [좌클릭] §f사용");
     }

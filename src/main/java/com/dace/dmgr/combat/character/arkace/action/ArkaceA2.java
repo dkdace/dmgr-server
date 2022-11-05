@@ -23,11 +23,11 @@ public class ArkaceA2 extends ActiveSkill {
     public ArkaceA2() {
         super(2, "생체 회복막",
                 "",
-                "§f" + TextIcon.COOLDOWN + " §6지속시간§f동안 회복막을 활성화하여 " + TextIcon.HEAL + " §a회복§f합니다.",
+                "§6" + TextIcon.DURATION + " 지속시간§f동안 회복막을 활성화하여 §a" + TextIcon.HEAL + " 회복§f합니다.",
                 "",
-                "§f" + TextIcon.COOLDOWN + "   §62.5초",
-                "§f" + TextIcon.HEAL + "   §a350",
-                "§f" + TextIcon.COOLDOWN + "   §f12초",
+                "§6" + TextIcon.DURATION + "§f 2.5초",
+                "§a" + TextIcon.HEAL + "§f 350",
+                "§f" + TextIcon.COOLDOWN + "§f 12초",
                 "",
                 "§7§l[3] §f사용");
     }
