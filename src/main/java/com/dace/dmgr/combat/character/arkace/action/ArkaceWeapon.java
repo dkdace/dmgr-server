@@ -108,6 +108,11 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     public void onHitEntity(Location location, ICombatEntity target) {
                         Combat.attack(combatUser, target, DAMAGE, "", false, true);
                     }
+
+                    @Override
+                    public void onHitCritEntity(Location location, ICombatEntity target) {
+                        Combat.attack(combatUser, target, DAMAGE, "", true, true);
+                    }
                 }.shoot(combatUser.getBulletSpread());
 
                 break;
