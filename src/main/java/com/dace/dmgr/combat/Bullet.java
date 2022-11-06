@@ -68,6 +68,10 @@ public abstract class Bullet {
 
     public abstract void onHitEntity(Location location, ICombatEntity target);
 
-    public void onHit(Location location) {
+    public void onHitCritEntity(Location location, ICombatEntity target) {
+        onHitEntity(location, target);
     }
+
+    public void onHit(Location location) {    }
+
 }
