@@ -9,6 +9,8 @@ public interface ICombatEntity {
 
     Hitbox getHitbox();
 
+    Hitbox getCritHitbox();
+
     String getTeam();
 
     void setTeam(String team);
