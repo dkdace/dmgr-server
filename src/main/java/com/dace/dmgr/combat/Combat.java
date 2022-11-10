@@ -56,20 +56,14 @@ public class Combat {
         else return null;
     }
 
-    public static Map<ICombatEntity, Boolean> getNearEnemies(ICombatEntity attacker, Location location, float range) {
-        Map<ICombatEntity, Boolean> result = new HashMap<>();
-        combatEntityMap.values().stream()
+    public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
+        return combatEntityMap.values().stream()
                 .filter(entity ->
                         entity != attacker && isEnemy(attacker, entity))
-                .forEach(entity -> {
-                    if (LocationUtil.isInHitbox(location, entity.getCritHitbox(), range)) {
-                        result.put(entity, true);
-                    }
-                    else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
-                        result.put(entity, false);
-                    }
-                });
-        return result;
+                .filter(entity ->
+                        LocationUtil.isInHitbox(location, entity.getHitbox(), range) ||
+                        LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
+                .collect(Collectors.toSet());
     }
 
     public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
