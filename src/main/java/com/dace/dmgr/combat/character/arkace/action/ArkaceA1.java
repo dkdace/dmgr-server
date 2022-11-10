@@ -78,7 +78,7 @@ public class ArkaceA1 extends ActiveSkill {
                         }
 
                         @Override
-                        public void onHitEntity(Location location, ICombatEntity target) {
+                        public void onHitEntity(Location location, ICombatEntity target, boolean isCrit) {
                             Combat.attack(combatUser, target, DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);

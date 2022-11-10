@@ -65,10 +65,7 @@ public abstract class Projectile extends Bullet {
                         if (target != null) {
                             if (!targetList.add(target)) {
                                 onHit(hitLoc);
-                                if (isCrit)
-                                    onHitCritEntity(hitLoc, target);
-                                else
-                                    onHitEntity(hitLoc, target);
+                                onHitEntity(hitLoc, target, isCrit);
 
                                 if (!penetration)
                                     return false;

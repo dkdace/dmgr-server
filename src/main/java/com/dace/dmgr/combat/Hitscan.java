@@ -53,10 +53,7 @@ public abstract class Hitscan extends Bullet {
                 if (target != null) {
                     if (!targetSet.add(target)) {
                         onHit(hitLoc);
-                        if (isCrit)
-                            onHitCritEntity(hitLoc, target);
-                        else
-                            onHitEntity(hitLoc, target);
+                        onHitEntity(hitLoc, target, isCrit);
 
                         if (!penetration)
                             break;

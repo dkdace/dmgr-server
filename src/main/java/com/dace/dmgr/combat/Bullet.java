@@ -66,11 +66,7 @@ public abstract class Bullet {
         Bullet.bulletHitEffect(location, hitBlock, true);
     }
 
-    public abstract void onHitEntity(Location location, ICombatEntity target);
-
-    public void onHitCritEntity(Location location, ICombatEntity target) {
-        onHitEntity(location, target);
-    }
+    public abstract void onHitEntity(Location location, ICombatEntity target, boolean isCrit);
 
     public void onHit(Location location) {    }
 
