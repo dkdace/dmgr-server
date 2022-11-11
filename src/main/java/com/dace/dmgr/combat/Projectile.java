@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Projectile extends Bullet {
@@ -56,12 +57,15 @@ public abstract class Projectile extends Bullet {
                     }
 
                     if (loc.distance(origin) > 0.5) {
-                        ICombatEntity target = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
+                        Map.Entry<ICombatEntity, Boolean> targetEntry
+                                = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
+                        ICombatEntity target = targetEntry.getKey();
+                        boolean isCrit = targetEntry.getValue();
 
                         if (target != null) {
                             if (!targetList.add(target)) {
                                 onHit(hitLoc);
-                                onHitEntity(hitLoc, target);
+                                onHitEntity(hitLoc, target, isCrit);
 
                                 if (!penetration)
                                     return false;

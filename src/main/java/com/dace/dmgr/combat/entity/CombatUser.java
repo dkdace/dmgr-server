@@ -31,8 +31,12 @@ public class CombatUser extends CombatEntity<Player> {
     private float bulletSpread = 0;
 
     public CombatUser(Player entity) {
-        super(entity, entity.getName(), new Hitbox(entity.getLocation(), 0, entity.getHeight() / 2, 0,
-                0.65, 2.1, 0.5));
+        super(
+                entity,
+                entity.getName(),
+                new Hitbox(entity.getLocation(), 0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
+                new Hitbox(entity.getLocation(), 0, entity.getHeight() * 0.83, 0, 0.4, 0.2, 0.4)
+        );
         combatUserMap.put(entity, this);
         updateHitboxTick();
     }

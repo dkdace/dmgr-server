@@ -120,9 +120,4 @@ public class LocationUtil {
     public static boolean isInHitbox(Location location, Hitbox hitbox) {
         return isInHitbox(location, hitbox, 0);
     }
-
-    public static boolean isHeadshot(Location location, LivingEntity entity) {
-        return false;
-    }
-
 }

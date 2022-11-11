@@ -18,8 +18,13 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 
 public class Dummy extends TemporalEntity<Zombie> {
     public Dummy(Location location, int health) {
-        super(EntityType.ZOMBIE, "§7§lDummy", location, new Hitbox(location, 0, 0.9, 0,
-                0.65, 2.1, 0.5));
+        super(
+                EntityType.ZOMBIE,
+                "§7§lDummy",
+                location,
+                new Hitbox(location, 0, 0.9, 0, 0.65, 2.1, 0.5),
+                new Hitbox(location, 0, 1.5, 0, 0.4, 0.2, 0.4)
+        );
         setMaxHealth(health);
         setHealth(health);
         setTeam("DUMMY");

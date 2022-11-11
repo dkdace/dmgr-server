@@ -11,13 +11,19 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     protected final T entity;
     private final Hitbox hitbox;
+    private final Hitbox critHitbox;
     private String name;
     private String team = "";
     private int speedIncrement = 0;
 
     protected CombatEntity(T entity, String name, Hitbox hitbox) {
+        this(entity, name, hitbox, null);
+    }
+
+    protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox) {
         this.entity = entity;
         this.hitbox = hitbox;
+        this.critHitbox = critHitbox;
         this.name = name;
         combatEntityMap.put(entity, this);
     }
@@ -53,6 +59,9 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     public Hitbox getHitbox() {
         return hitbox;
     }
+
+    @Override
+    public Hitbox getCritHitbox() { return critHitbox; };
 
     @Override
     public String getTeam() {
