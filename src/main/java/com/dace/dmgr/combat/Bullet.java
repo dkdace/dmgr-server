@@ -32,7 +32,8 @@ public abstract class Bullet {
         if (sound)
             SoundUtil.play("random.gun.ricochet", location, 0.8F, (float) (0.975 + Math.random() * 0.05));
 
-        ParticleUtil.playBlock(hitBlock.getType(), hitBlock.getData(), location, 3, 0, 0, 0, 0.1F);
+        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
+                3, 0, 0, 0, 0.1F);
         ParticleUtil.play(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
     }
 

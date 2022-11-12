@@ -25,7 +25,6 @@ public abstract class Projectile extends Bullet {
         this.velocity = velocity;
     }
 
-
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
