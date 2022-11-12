@@ -14,17 +14,19 @@ import java.util.Set;
 public abstract class Projectile extends Bullet {
     private static final float SIZE = 0.3F;
     protected int velocity;
+    protected boolean hasGravity;
+    protected boolean bouncing;
 
-    public Projectile(ICombatEntity shooter, boolean penetration, int velocity, int trailInterval, float hitboxMultiplier) {
-        super(shooter, penetration, trailInterval, hitboxMultiplier);
-        this.velocity = velocity;
+    /**
+     * {@code Projectile}을 생성할 때는 {@link ProjectileParam.Builder}를 이용해 얻은 객체를 전달해주세요.
+     * @param param {@link ProjectileParam} 객체
+     */
+    public Projectile(ProjectileParam param) {
+        super(param.shooter, param.penetrating, param.trailInterval, param.hitboxMultiplier);
+        this.velocity = param.velocity;
+        this.hasGravity = param.hasGravity;
+        this.bouncing = param.bouncing;
     }
-
-    public Projectile(ICombatEntity shooter, boolean penetration, int velocity, int trailInterval) {
-        super(shooter, penetration, trailInterval);
-        this.velocity = velocity;
-    }
-
 
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);

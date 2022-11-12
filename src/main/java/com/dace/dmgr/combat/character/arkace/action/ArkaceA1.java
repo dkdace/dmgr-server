@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
+import com.dace.dmgr.combat.ProjectileParam;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
@@ -64,7 +65,11 @@ public class ArkaceA1 extends ActiveSkill {
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                    new Projectile(combatUser, false, VELOCITY, 5) {
+                    ProjectileParam param = new ProjectileParam.Builder(combatUser, VELOCITY)
+                            .trailInterval(5)
+                            .build();
+
+                    new Projectile(param) {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);

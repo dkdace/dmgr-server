@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 public abstract class Bullet {
     protected static final int MAX_RANGE = 70;
     protected static final float HITBOX_INTERVAL = 0.25F;
+    protected static final int TRAIL_INTERVAL = 7;
     protected final ICombatEntity shooter;
     protected final int trailInterval;
     protected final float hitboxMultiplier;
