@@ -99,7 +99,8 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
                         if (isUlt)
-                            ParticleUtil.playRGB(trailLoc, 1, 0, 0, 0, 0, 230, 255);
+                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
+                                    0, 0, 0, 0, 230, 255);
                         else
                             ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
                     }

@@ -10,10 +10,12 @@ import com.dace.dmgr.gui.slot.CommunicationSlot;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -179,5 +181,10 @@ public class CombatUser extends CombatEntity<Player> {
 
     public void sendActionBar(String message) {
         sendActionBar(message, 0);
+    }
+
+    public void playBleedingEffect(int count) {
+        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
+                entity.getLocation().add(0, entity.getHeight() / 2, 0), count, 0.2F, 0.35F, 0.2F, 0.03F);
     }
 }

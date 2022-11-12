@@ -21,34 +21,33 @@ public class ParticleUtil {
     }
 
 
-    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
+    public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         for (int i = 0; i < count; i++) {
-            WrapperPlayServerWorldParticles packet = getRGBPacket(location, offsetX, offsetY, offsetZ, red, green, blue);
+            WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
 
             packet.broadcastPacket();
         }
     }
 
-    public static void playRGB(Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue, Player player) {
+    public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue, Player player) {
         for (int i = 0; i < count; i++) {
-            WrapperPlayServerWorldParticles packet = getRGBPacket(location, offsetX, offsetY, offsetZ, red, green, blue);
+            WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
 
             packet.sendPacket(player);
         }
     }
 
-    public static void playBlock(Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
-        WrapperPlayServerWorldParticles packet = getBlockPacket(material, data, location, count, offsetX, offsetY, offsetZ, speed);
+    public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
+        WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.broadcastPacket();
     }
 
-    public static void playBlock(Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
-        WrapperPlayServerWorldParticles packet = getBlockPacket(material, data, location, count, offsetX, offsetY, offsetZ, speed);
+    public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
+        WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.sendPacket(player);
     }
-
 
     private static WrapperPlayServerWorldParticles getNormalPacket(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
@@ -67,7 +66,7 @@ public class ParticleUtil {
         return packet;
     }
 
-    private static WrapperPlayServerWorldParticles getRGBPacket(Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
+    private static WrapperPlayServerWorldParticles getColoredPacket(ColoredParticle particle, Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         if (red == 0) red = 1;
         if (green == 0) green = 1;
         if (blue == 0) blue = 1;
@@ -77,7 +76,7 @@ public class ParticleUtil {
         float finalOffsetX = (float) ((Math.random() - Math.random()) * offsetX);
         float finalOffsetY = (float) ((Math.random() - Math.random()) * offsetY);
         float finalOffsetZ = (float) ((Math.random() - Math.random()) * offsetZ);
-        packet.setParticleType(EnumWrappers.Particle.REDSTONE);
+        packet.setParticleType(EnumWrappers.Particle.valueOf(particle.toString()));
         packet.setX((float) location.getX() + finalOffsetX);
         packet.setY((float) location.getY() + finalOffsetY);
         packet.setZ((float) location.getZ() + finalOffsetZ);
@@ -91,10 +90,10 @@ public class ParticleUtil {
         return packet;
     }
 
-    private static WrapperPlayServerWorldParticles getBlockPacket(Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
+    private static WrapperPlayServerWorldParticles getBlockPacket(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
-        packet.setParticleType(EnumWrappers.Particle.BLOCK_DUST);
+        packet.setParticleType(EnumWrappers.Particle.valueOf(particle.toString()));
         packet.setX((float) location.getX());
         packet.setY((float) location.getY());
         packet.setZ((float) location.getZ());
@@ -107,5 +106,13 @@ public class ParticleUtil {
         packet.setLongDistance(true);
 
         return packet;
+    }
+
+    public enum ColoredParticle {
+        REDSTONE, SPELL_MOB, SPELL_MOB_AMBIENT
+    }
+
+    public enum BlockParticle {
+        BLOCK_DUST, FALLING_DUST
     }
 }

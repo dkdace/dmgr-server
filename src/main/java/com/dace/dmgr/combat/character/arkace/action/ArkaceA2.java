@@ -62,9 +62,12 @@ public class ArkaceA2 extends ActiveSkill {
                     Vector vec1 = VectorUtil.rotate(vector, axis, i * 10);
                     Vector vec2 = VectorUtil.rotate(vector, axis, i * 10 + 120);
                     Vector vec3 = VectorUtil.rotate(vector, axis, i * 10 + 240);
-                    ParticleUtil.playRGB(loc.clone().add(vec1), 3, 0, 0.4F, 0, 220, 255, 36);
-                    ParticleUtil.playRGB(loc.clone().add(vec2), 3, 0, 0.4F, 0, 190, 255, 36);
-                    ParticleUtil.playRGB(loc.clone().add(vec3), 3, 0, 0.4F, 0, 160, 255, 36);
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 3,
+                            0, 0.4F, 0, 220, 255, 36);
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec2), 3,
+                            0, 0.4F, 0, 190, 255, 36);
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec3), 3,
+                            0, 0.4F, 0, 160, 255, 36);
 
                     int amount = (int) (HEAL / DURATION);
                     if (i == 0)
