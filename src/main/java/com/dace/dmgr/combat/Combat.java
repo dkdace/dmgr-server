@@ -45,7 +45,7 @@ public class Combat {
                 .orElse(null);
 
         if (entity == null)
-            return null;
+            return new AbstractMap.SimpleEntry<>(null, false);
 
         if (LocationUtil.isInHitbox(location, entity.getCritHitbox(), range)) {
             return new AbstractMap.SimpleEntry<>(entity, true);
@@ -53,7 +53,7 @@ public class Combat {
         else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
             return new AbstractMap.SimpleEntry<>(entity, false);
         }
-        else return null;
+        else return new AbstractMap.SimpleEntry<>(null, false);
     }
 
     public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
