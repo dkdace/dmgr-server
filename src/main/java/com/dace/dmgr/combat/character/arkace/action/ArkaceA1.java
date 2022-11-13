@@ -73,7 +73,8 @@ public class ArkaceA1 extends ActiveSkill {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
-                            ParticleUtil.playRGB(location, 1, 0, 0, 0, 32, 250, 225);
+                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
+                                    0, 0, 0, 32, 250, 225);
                         }
 
                         @Override
@@ -107,7 +108,8 @@ public class ArkaceA1 extends ActiveSkill {
         SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.8F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.4F);
         SoundUtil.play("random.gun_reverb2", location, 6F, 0.9F);
-        ParticleUtil.playRGB(location, 200, 2.5F, 2.5F, 2.5F, 32, 250, 225);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
+                2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)

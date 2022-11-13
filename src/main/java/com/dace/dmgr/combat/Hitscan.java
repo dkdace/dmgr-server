@@ -47,10 +47,11 @@ public abstract class Hitscan extends Bullet {
             if (loc.distance(origin) > 0.5) {
                 Map.Entry<ICombatEntity, Boolean> targetEntry
                         = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                ICombatEntity target = targetEntry.getKey();
-                boolean isCrit = targetEntry.getValue();
 
-                if (target != null) {
+                if (targetEntry != null) {
+                    ICombatEntity target = targetEntry.getKey();
+                    boolean isCrit = targetEntry.getValue();
+
                     if (!targetSet.add(target)) {
                         onHit(hitLoc);
                         onHitEntity(hitLoc, target, isCrit);

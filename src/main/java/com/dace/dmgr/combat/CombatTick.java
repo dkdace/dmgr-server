@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat;
 
+import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.action.Reloadable;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -42,6 +44,12 @@ public class CombatTick {
                     combatUser.addUlt((float) IDLE_ULT_CHARGE / ultimateSkill.getCost() / 2);
                 }
 
+                if (combatUser.getHealth() <= combatUser.getMaxHealth() / 4) {
+                    combatUser.playBleedingEffect(1);
+                    sendWorldBorderPacket(player, true);
+                } else
+                    sendWorldBorderPacket(player, false);
+
                 float speedMultiplier = combatUser.getCharacter().getSpeed() * (100 + combatUser.getSpeedIncrement()) / 100;
                 float speed = BASE_SPEED * speedMultiplier;
 
@@ -56,6 +64,15 @@ public class CombatTick {
                 return true;
             }
         };
+    }
+
+    public static void sendWorldBorderPacket(Player player, boolean toggle) {
+        WrapperPlayServerWorldBorder packet = new WrapperPlayServerWorldBorder();
+
+        packet.setAction(EnumWrappers.WorldBorderAction.SET_WARNING_BLOCKS);
+        packet.setWarningDistance(toggle ? 999999999 : 0);
+
+        packet.sendPacket(player);
     }
 
     private static void showActionbar(CombatUser combatUser) {

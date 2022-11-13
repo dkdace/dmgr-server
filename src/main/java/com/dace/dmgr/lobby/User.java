@@ -1,5 +1,6 @@
 package com.dace.dmgr.lobby;
 
+import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.YamlUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
@@ -146,6 +147,7 @@ public class User {
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
         combatUserMap.remove(player);
+        CombatTick.sendWorldBorderPacket(player, false);
     }
 
     public String getLevelPrefix() {
