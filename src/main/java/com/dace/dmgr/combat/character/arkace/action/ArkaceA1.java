@@ -19,10 +19,15 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public class ArkaceA1 extends ActiveSkill {
+    /** 쿨타임 */
     public static final long COOLDOWN = 7 * 20;
+    /** 피해량 (폭발) */
     public static final int DAMAGE_EXPLODE = 100;
+    /** 피해량 (직격) */
     public static final int DAMAGE_DIRECT = 50;
+    /** 투사체 속력 */
     public static final int VELOCITY = 60;
+    /** 피해 범위 */
     public static final float RADIUS = 3;
     private static final ArkaceA1 instance = new ArkaceA1();
 
@@ -59,7 +64,7 @@ public class ArkaceA1 extends ActiveSkill {
             new TaskTimer(5, 3) {
                 @Override
                 public boolean run(int i) {
-                    Location location = LocationUtil.setRelativeOffset(combatUser.getEntity().getEyeLocation(),
+                    Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
                             combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);

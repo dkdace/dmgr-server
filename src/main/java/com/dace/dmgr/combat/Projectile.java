@@ -28,7 +28,7 @@ public abstract class Projectile extends Bullet {
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
-        direction = VectorUtil.spread(direction, spread);
+        direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<ICombatEntity> targetList = new HashSet<>();
 
         Vector finalDirection = direction;

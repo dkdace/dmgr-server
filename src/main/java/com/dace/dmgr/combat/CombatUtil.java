@@ -12,7 +12,17 @@ import java.util.HashSet;
 
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
+/**
+ * 전투 시스템에 사용되는 기능을 제공하는 클래스.
+ */
 public class CombatUtil {
+    /**
+     * 지정한 플레이어에게 이동 패킷을 전송한다.
+     *
+     * @param player 대상 플레이어
+     * @param yaw    변경할 yaw
+     * @param pitch  변경할 pitch
+     */
     private static void sendPacket(Player player, float yaw, float pitch) {
         WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
 
@@ -26,6 +36,17 @@ public class CombatUtil {
         packet.sendPacket(player);
     }
 
+    /**
+     * 지정한 플레이어에게 화면 반동 효과를 전송한다. 총기 반동에 사용된다.
+     *
+     * @param combatUser      대상 플레이어
+     * @param up              수직 반동
+     * @param side            수평 반동
+     * @param upSpread        수직 반동 분산도
+     * @param sideSpread      수평 반동 분산도
+     * @param ticks           반동 진행 시간
+     * @param firstMultiplier 초탄 반동 계수
+     */
     public static void sendRecoil(CombatUser combatUser, float up, float side, float upSpread, float sideSpread, int ticks, float firstMultiplier) {
         final float finalUpSpread = (float) (upSpread * (Math.random() - Math.random()) * 0.5);
         final float finalSideSpread = (float) (sideSpread * (Math.random() - Math.random()) * 0.5);
@@ -55,6 +76,14 @@ public class CombatUtil {
         };
     }
 
+    /**
+     * 지정한 플레이어에게 총기 탄퍼짐 시스템을 적용한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @param increment  탄퍼짐 증가량
+     * @param recovery   탄퍼짐 회복량
+     * @param max        탄퍼짐 최대치
+     */
     public static void applyBulletSpread(CombatUser combatUser, float increment, float recovery, float max) {
         if (combatUser.getBulletSpread() == 0) {
             combatUser.addBulletSpread(increment, max);

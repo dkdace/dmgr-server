@@ -15,8 +15,11 @@ import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public class ArkaceA2 extends ActiveSkill {
+    /** 쿨타임 */
     public static final int COOLDOWN = 12 * 20;
+    /** 치유량 */
     public static final int HEAL = 350;
+    /** 지속시간 */
     public static final long DURATION = (long) (2.5 * 20);
     private static final ArkaceA2 instance = new ArkaceA2();
 
@@ -59,9 +62,9 @@ public class ArkaceA2 extends ActiveSkill {
                     Vector vector = VectorUtil.getRollAxis(loc);
                     Vector axis = VectorUtil.getYawAxis(loc);
 
-                    Vector vec1 = VectorUtil.rotate(vector, axis, i * 10);
-                    Vector vec2 = VectorUtil.rotate(vector, axis, i * 10 + 120);
-                    Vector vec3 = VectorUtil.rotate(vector, axis, i * 10 + 240);
+                    Vector vec1 = VectorUtil.getRotatedVector(vector, axis, i * 10);
+                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, i * 10 + 120);
+                    Vector vec3 = VectorUtil.getRotatedVector(vector, axis, i * 10 + 240);
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 3,
                             0, 0.4F, 0, 220, 255, 36);
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec2), 3,

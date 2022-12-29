@@ -22,10 +22,15 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public class ArkaceWeapon extends Weapon implements Reloadable {
+    /** 피해량 */
     public static final int DAMAGE = 75;
+    /** 피해량 감소 시작 거리 */
     public static final int DAMAGE_DISTANCE = 25;
+    /** 쿨타임 */
     public static final long COOLDOWN = (long) (0.1 * 20);
+    /** 장탄수 */
     public static final int CAPACITY = 30;
+    /** 재장전 시간 */
     public static final long RELOAD_DURATION = (long) (1.5 * 20);
     private static final ArkaceWeapon instance = new ArkaceWeapon();
 
@@ -97,7 +102,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 new Hitscan(combatUser, false, 7) {
                     @Override
                     public void trail(Location location) {
-                        Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
+                        Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
                         if (isUlt)
                             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
                                     0, 0, 0, 0, 230, 255);
@@ -163,16 +168,29 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         };
     }
 
+    /**
+     * 반동 정보.
+     */
     public static class RECOIL {
+        /** 수직 반동 */
         static final float UP = 0.6F;
+        /** 수평 반동 */
         static final float SIDE = 0.04F;
+        /** 수직 반동 분산도 */
         static final float UP_SPREAD = 0.1F;
+        /** 수평 반동 분산도 */
         static final float SIDE_SPREAD = 0.06F;
     }
 
+    /**
+     * 탄퍼짐 정보.
+     */
     public static class SPREAD {
+        /** 탄퍼짐 증가량 */
         static final float INCREMENT = 0.15F;
+        /** 탄퍼짐 회복량 */
         static final float RECOVERY = 1F;
+        /** 탄퍼짐 최대치 */
         static final float MAX = 2.3F;
     }
 }
