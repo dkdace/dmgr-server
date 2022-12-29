@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 
 public class ArkaceP1 extends PassiveSkill implements HasDuration {
+    /** 이동속도 증가량 */
     public static final int SPRINT_SPEED = 30;
     private static final ArkaceP1 instance = new ArkaceP1();
 

@@ -14,7 +14,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class OnPlayerJoin implements Listener {
+    /** 입장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
+    /** 입장 시 타이틀 메시지 */
     private static final String TITLE = "§3Welcome to §b§lDMGR";
 
     @EventHandler
@@ -50,6 +52,9 @@ public class OnPlayerJoin implements Listener {
         };
     }
 
+    /**
+     * 입장 효과음을 재생한다.
+     */
     private static void playJoinSound() {
         new TaskTimer(1, 4) {
             @Override

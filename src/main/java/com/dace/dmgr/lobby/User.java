@@ -1,8 +1,9 @@
 package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.combat.CombatTick;
+import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.SkinManager;
-import com.dace.dmgr.util.YamlUtil;
+import com.dace.dmgr.util.YamlFile;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -11,34 +12,57 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 import static com.dace.dmgr.system.HashMapList.userMap;
 
+/**
+ * 유저 정보를 관리하는 클래스.
+ */
 public class User {
+    /** 로비 사이드바 */
     private final BPlayerBoard lobbySidebar;
+    /** 플레이어 객체 */
     private final Player player;
+    /** 유저 설정 정보 관리를 위한 객체 */
     private final UserConfig userConfig;
-    private final YamlUtil yamlUtil;
+    /** 설정파일 관리를 위한 객체 */
+    private final YamlFile yamlFile;
+    /** 경험치 */
     private int xp = 0;
+    /** 레벨 */
     private int level = 1;
+    /** 돈 */
     private int money = 0;
+    /** 랭크 점수 */
     private int rank = 100;
+    /** 랭크게임 플레이 판 수 */
     private int rankPlay = 0;
+    /** 랭크게임 플레이 여부 */
     private boolean isRanked = false;
-    //    private int rankPlacementPlay = 0;
+    /** 매치메이킹 점수 */
     private int mmr = 100;
+    /** 리소스팩 적용 여부 */
     private boolean resourcePack = false;
+    /** 리소스팩 적용 상태 */
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
+    /**
+     * 유저 인스턴스를 생성하고 {@link HashMapList#userMap}에 추가한다.
+     *
+     * <p>플레이어가 서버에 접속할 때 호출해야 하며, 퇴장 시 {@link HashMapList#userMap}에서
+     * 제거해야 한다.</p>
+     *
+     * @param player 대상 플레이어
+     */
     public User(Player player) {
         this.player = player;
         this.userConfig = new UserConfig(player);
         this.lobbySidebar = new BPlayerBoard(player, "lobbySidebar");
-        this.yamlUtil = new YamlUtil("User", player.getUniqueId().toString());
-        this.xp = yamlUtil.loadValue("xp", xp);
-        this.level = yamlUtil.loadValue("level", level);
-        this.money = yamlUtil.loadValue("money", money);
-        this.rank = yamlUtil.loadValue("rank", rank);
-        this.rankPlay = yamlUtil.loadValue("rankPlay", rankPlay);
-        this.isRanked = yamlUtil.loadValue("isRanked", isRanked);
-        this.mmr = yamlUtil.loadValue("mmr", mmr);
+        this.yamlFile = new YamlFile("User/" + player.getUniqueId().toString());
+        this.xp = yamlFile.get("xp", xp);
+        this.level = yamlFile.get("level", level);
+        this.money = yamlFile.get("money", money);
+        this.rank = yamlFile.get("rank", rank);
+        this.rankPlay = yamlFile.get("rankPlay", rankPlay);
+        this.isRanked = yamlFile.get("isRanked", isRanked);
+        this.mmr = yamlFile.get("mmr", mmr);
         userMap.put(player, this);
     }
 
@@ -57,7 +81,7 @@ public class User {
     public void setXp(int xp) {
         if (xp < 0) xp = 0;
         this.xp = xp;
-        yamlUtil.saveValue("xp", this.xp);
+        yamlFile.set("xp", this.xp);
     }
 
     public int getLevel() {
@@ -67,7 +91,7 @@ public class User {
     public void setLevel(int level) {
         if (level < 0) level = 0;
         this.level = level;
-        yamlUtil.saveValue("level", this.level);
+        yamlFile.set("level", this.level);
     }
 
     public int getMoney() {
@@ -77,7 +101,7 @@ public class User {
     public void setMoney(int money) {
         if (money < 0) money = 0;
         this.money = money;
-        yamlUtil.saveValue("money", this.money);
+        yamlFile.set("money", this.money);
     }
 
     public int getRank() {
@@ -86,7 +110,7 @@ public class User {
 
     public void setRank(int rank) {
         this.rank = rank;
-        yamlUtil.saveValue("rank", this.rank);
+        yamlFile.set("rank", this.rank);
     }
 
     public int getRankPlay() {
@@ -95,7 +119,7 @@ public class User {
 
     public void setRankPlay(int rankPlay) {
         this.rankPlay = rankPlay;
-        yamlUtil.saveValue("rankPlay", this.rankPlay);
+        yamlFile.set("rankPlay", this.rankPlay);
     }
 
     public int getMMR() {
@@ -104,7 +128,7 @@ public class User {
 
     public void setMMR(int mmr) {
         this.mmr = mmr;
-        yamlUtil.saveValue("mmr", this.mmr);
+        yamlFile.set("mmr", this.mmr);
     }
 
     public boolean isRanked() {
@@ -113,7 +137,7 @@ public class User {
 
     public void setRanked(boolean ranked) {
         this.isRanked = ranked;
-        yamlUtil.saveValue("isRanked", this.isRanked);
+        yamlFile.set("isRanked", this.isRanked);
     }
 
     public BPlayerBoard getLobbySidebar() {
@@ -136,6 +160,9 @@ public class User {
         this.resourcePackStatus = resourcePackStatus;
     }
 
+    /**
+     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
+     */
     public void reset() {
         SkinManager.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
@@ -147,9 +174,14 @@ public class User {
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
         combatUserMap.remove(player);
-        CombatTick.sendWorldBorderPacket(player, false);
+        CombatTick.playLowHealthScreenEffect(player, false);
     }
 
+    /**
+     * 레벨에 따른 칭호를 반환한다.
+     *
+     * @return 레벨 칭호
+     */
     public String getLevelPrefix() {
         String color;
 
@@ -167,6 +199,11 @@ public class User {
         return color + "[ Lv." + level + " ]";
     }
 
+    /**
+     * 티어에 따른 칭호를 반환한다.
+     *
+     * @return 티어 칭호
+     */
     public String getTierPrefix() {
         if (rank <= 0)
             return "§8§l[ F ]";
@@ -184,10 +221,20 @@ public class User {
             return "§e§l[ S ]";
     }
 
+    /**
+     * 레벨업에 필요한 경험치를 반환한다.
+     *
+     * @return 레벨업에 필요한 경험치
+     */
     public int getNextLevelXp() {
         return 250 + (level * 50);
     }
 
+    /**
+     * 승급에 필요한 랭크 점수를 반환한다.
+     *
+     * @return 승급에 필요한 랭크 점수
+     */
     public int getNextTierScore() {
         if (rank <= 0)
             return 0;
@@ -203,6 +250,11 @@ public class User {
             return 2000;
     }
 
+    /**
+     * 현재 티어의 최소 랭크 점수를 반환한다.
+     *
+     * @return 현재 티어의 최소 랭크 점수
+     */
     public int getCurrentTierScore() {
         if (rank <= 300)
             return 0;

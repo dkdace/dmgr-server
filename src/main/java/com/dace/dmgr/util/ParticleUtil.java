@@ -7,20 +7,58 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
+/**
+ * 입자 생성 기능을 제공하는 클래스.
+ */
 public class ParticleUtil {
+    /**
+     * 지정한 위치에 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     */
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = getNormalPacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.broadcastPacket();
     }
 
+    /**
+     * 지정한 위치에 특정 플레이어만 볼 수 있는 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     * @param player   대상 플레이어
+     */
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
         WrapperPlayServerWorldParticles packet = getNormalPacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.sendPacket(player);
     }
 
-
+    /**
+     * 지정한 위치에 색이 있는 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param red      빨강. {@code 0 ~ 255} 사이의 값
+     * @param green    초록. {@code 0 ~ 255} 사이의 값
+     * @param blue     파랑. {@code 0 ~ 255} 사이의 값
+     */
     public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         for (int i = 0; i < count; i++) {
             WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
@@ -29,6 +67,20 @@ public class ParticleUtil {
         }
     }
 
+    /**
+     * 지정한 위치에 특정 플레이어만 볼 수 있는 색이 있는 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param red      빨강. {@code 0 ~ 255} 사이의 값
+     * @param green    초록. {@code 0 ~ 255} 사이의 값
+     * @param blue     파랑. {@code 0 ~ 255} 사이의 값
+     * @param player   대상 플레이어
+     */
     public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue, Player player) {
         for (int i = 0; i < count; i++) {
             WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
@@ -37,18 +89,57 @@ public class ParticleUtil {
         }
     }
 
+    /**
+     * 지정한 위치에 블록 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param material 블록 종류
+     * @param data     블록의 데이터. 나무의 종류나 양털의 색 등
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     */
     public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.broadcastPacket();
     }
 
+    /**
+     * 지정한 위치에 특정 플레이어만 볼 수 있는 블록 입자를 생성한다.
+     *
+     * @param particle 입자 종류
+     * @param material 블록 종류
+     * @param data     블록의 데이터. 나무의 종류나 양털의 색 등
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     * @param player   대상 플레이어
+     */
     public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
         WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.sendPacket(player);
     }
 
+    /**
+     * 일반 입자 패킷을 반환한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     * @return 입자 패킷
+     */
     private static WrapperPlayServerWorldParticles getNormalPacket(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
@@ -66,6 +157,19 @@ public class ParticleUtil {
         return packet;
     }
 
+    /**
+     * 색이 있는 입자 패킷을 반환한다.
+     *
+     * @param particle 입자 종류
+     * @param location 대상 위치
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param red      빨강. {@code 0 ~ 255} 사이의 값
+     * @param green    초록. {@code 0 ~ 255} 사이의 값
+     * @param blue     파랑. {@code 0 ~ 255} 사이의 값
+     * @return 입자 패킷
+     */
     private static WrapperPlayServerWorldParticles getColoredPacket(ColoredParticle particle, Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         if (red == 0) red = 1;
         if (green == 0) green = 1;
@@ -90,6 +194,20 @@ public class ParticleUtil {
         return packet;
     }
 
+    /**
+     * 블록 입자 패킷을 반환한다.
+     *
+     * @param particle 입자 종류
+     * @param material 블록 종류
+     * @param data     블록의 데이터. 나무의 종류나 양털의 색 등
+     * @param location 대상 위치
+     * @param count    입자의 양
+     * @param offsetX  입자가 X축으로 퍼지는 범위
+     * @param offsetY  입자가 Y축으로 퍼지는 범위
+     * @param offsetZ  입자가 Z축으로 퍼지는 범위
+     * @param speed    입자의 속도
+     * @return 입자 패킷
+     */
     private static WrapperPlayServerWorldParticles getBlockPacket(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
@@ -108,11 +226,25 @@ public class ParticleUtil {
         return packet;
     }
 
+    /**
+     * 색이 있는 입자 종류.
+     */
     public enum ColoredParticle {
-        REDSTONE, SPELL_MOB, SPELL_MOB_AMBIENT
+        /** 레드스톤 입자 */
+        REDSTONE,
+        /** 포션 이펙트 입자 */
+        SPELL_MOB,
+        /** 포션 이펙트 입자(반투명) */
+        SPELL_MOB_AMBIENT
     }
 
+    /**
+     * 블록 입자 종류.
+     */
     public enum BlockParticle {
-        BLOCK_DUST, FALLING_DUST
+        /** 블록 파편 입자 */
+        BLOCK_DUST,
+        /** 블록 먼지 입자 */
+        FALLING_DUST
     }
 }
