@@ -21,19 +21,19 @@ public abstract class Projectile extends Bullet {
     protected int velocity;
     /** 중력의 영향을 받는지 여부 */
     protected boolean hasGravity;
-    /**  */
+    /** 투사체가 튕기는 지 여부 */
     protected boolean bouncing;
 
     /**
      * 투사체 인스턴스를 생성한다.<br>
      *
-     * 투사체를 생성에 필요한 옵션이 다양하므로 매개변수 대신 {@link ProjectileOption} 객체를 통해 전달받는다.
+     * 투사체를 생성에 필요한 옵션이 가변적이므로 매개변수 대신 {@link ProjectileOption} 객체를 통해 전달받는다.
      * {@link ProjectileOption} 객체는 {@link ProjectileOption.Builder}를 통해 제작할 수 있다.
      * 다음 예시를 참고하라: <pre>
-     *  ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
-     *                             .trailInterval(5)
-     *                             .build();
-     *  new Projectile(option) { /* ... &#42;/}.shoot();
+     * ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
+     *                              .trailInterval(5)
+     *                              .build();
+     * new Projectile(option){ /* ... &#42;/}.shoot();
      * </pre>
      * @param option 투사체 옵션
      * @see ProjectileOption
@@ -79,11 +79,11 @@ public abstract class Projectile extends Bullet {
                         Map.Entry<ICombatEntity, Boolean> targetEntry
                                 = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
 
-                        if (targetEntry != null) {
-                            ICombatEntity target = targetEntry.getKey();
+                        ICombatEntity target = targetEntry.getKey();
+                        if (target != null) {
                             boolean isCrit = targetEntry.getValue();
 
-                            if (!targetList.add(target)) {
+                            if (targetList.add(target)) {
                                 onHit(hitLoc);
                                 onHitEntity(hitLoc, target, isCrit);
 
