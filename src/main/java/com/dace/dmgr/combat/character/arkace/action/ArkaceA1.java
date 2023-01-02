@@ -70,11 +70,11 @@ public class ArkaceA1 extends ActiveSkill {
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                    ProjectileOption param = new ProjectileOption.Builder(combatUser, VELOCITY)
+                    ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
                             .trailInterval(5)
                             .build();
 
-                    new Projectile(param) {
+                    new Projectile(option) {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);

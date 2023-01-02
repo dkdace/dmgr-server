@@ -25,8 +25,13 @@ public abstract class Projectile extends Bullet {
     protected boolean bouncing;
 
     /**
-     * 투사체를 생성한다.
+     * 투사체 인스턴스를 생성한다.
      *
+     * 투사체를 생성에 필요한 옵션(매개변수)가 많아 통상적인 생성자 대신
+     * {@link ProjectileOption.Builder}를 통해 생성한 {@link ProjectileOption} 객체를 전달받는다.
+     * 다음 예시를 참고하라: {@code
+     *
+     * }
      * @param param 투사체 옵션
      * @see ProjectileOption
      */
