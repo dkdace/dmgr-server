@@ -25,21 +25,24 @@ public abstract class Projectile extends Bullet {
     protected boolean bouncing;
 
     /**
-     * 투사체 인스턴스를 생성한다.
+     * 투사체 인스턴스를 생성한다.<br>
      *
-     * 투사체를 생성에 필요한 옵션(매개변수)가 많아 통상적인 생성자 대신
-     * {@link ProjectileOption.Builder}를 통해 생성한 {@link ProjectileOption} 객체를 전달받는다.
-     * 다음 예시를 참고하라: {@code
-     *
-     * }
-     * @param param 투사체 옵션
+     * 투사체를 생성에 필요한 옵션이 다양하므로 매개변수 대신 {@link ProjectileOption} 객체를 통해 전달받는다.
+     * {@link ProjectileOption} 객체는 {@link ProjectileOption.Builder}를 통해 제작할 수 있다.
+     * 다음 예시를 참고하라: <pre>
+     *  ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
+     *                             .trailInterval(5)
+     *                             .build();
+     *  new Projectile(option) { /* ... &#42;/}.shoot();
+     * </pre>
+     * @param option 투사체 옵션
      * @see ProjectileOption
      */
-    public Projectile(ProjectileOption param) {
-        super(param.shooter, param.penetrating, param.trailInterval, param.hitboxMultiplier);
-        this.velocity = param.velocity;
-        this.hasGravity = param.hasGravity;
-        this.bouncing = param.bouncing;
+    public Projectile(ProjectileOption option) {
+        super(option.shooter, option.penetrating, option.trailInterval, option.hitboxMultiplier);
+        this.velocity = option.velocity;
+        this.hasGravity = option.hasGravity;
+        this.bouncing = option.bouncing;
     }
 
     public void shoot(Location origin, Vector direction, float spread) {
