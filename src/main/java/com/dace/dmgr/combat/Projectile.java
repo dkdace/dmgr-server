@@ -28,9 +28,9 @@ public abstract class Projectile extends Bullet {
      * 투사체를 생성한다.
      *
      * @param param 투사체 옵션
-     * @see ProjectileParam
+     * @see ProjectileOption
      */
-    public Projectile(ProjectileParam param) {
+    public Projectile(ProjectileOption param) {
         super(param.shooter, param.penetrating, param.trailInterval, param.hitboxMultiplier);
         this.velocity = param.velocity;
         this.hasGravity = param.hasGravity;
@@ -79,7 +79,7 @@ public abstract class Projectile extends Bullet {
                                 onHit(hitLoc);
                                 onHitEntity(hitLoc, target, isCrit);
 
-                                if (!penetration)
+                                if (!penetrating)
                                     return false;
                             }
                         }

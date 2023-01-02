@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.ICombatEntity;
 
 import static com.dace.dmgr.combat.Bullet.TRAIL_INTERVAL;
 
-public class ProjectileParam {
+public class ProjectileOption {
     ICombatEntity shooter;
     boolean penetrating;
     int trailInterval;
@@ -13,16 +13,16 @@ public class ProjectileParam {
     boolean hasGravity;
     boolean bouncing;
 
-    protected ProjectileParam(ICombatEntity shooter, int velocity) {
+    protected ProjectileOption(ICombatEntity shooter, int velocity) {
         this.shooter = shooter;
         this.velocity = velocity;
     }
 
     static public class Builder {
-        protected ProjectileParam instance;
+        protected ProjectileOption instance;
 
         public Builder(ICombatEntity shooter, int velocity) {
-            instance = new ProjectileParam(shooter, velocity);
+            instance = new ProjectileOption(shooter, velocity);
             instance.penetrating = false;
             instance.trailInterval = TRAIL_INTERVAL;
             instance.hitboxMultiplier = 1.0f;
@@ -55,7 +55,7 @@ public class ProjectileParam {
             return this;
         }
 
-        public ProjectileParam build() {
+        public ProjectileOption build() {
             return instance;
         }
     }

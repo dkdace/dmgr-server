@@ -28,7 +28,7 @@ public abstract class Bullet {
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
     protected final float hitboxMultiplier;
     /** 관통 여부 */
-    protected final boolean penetration;
+    protected final boolean penetrating;
 
     /**
      * 총알 인스턴스를 생성한다.
@@ -41,7 +41,7 @@ public abstract class Bullet {
         this.shooter = shooter;
         this.trailInterval = trailInterval;
         this.hitboxMultiplier = hitboxMultiplier;
-        this.penetration = penetration;
+        this.penetrating = penetration;
     }
 
     /**

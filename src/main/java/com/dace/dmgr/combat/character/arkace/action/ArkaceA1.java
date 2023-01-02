@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
-import com.dace.dmgr.combat.ProjectileParam;
+import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
@@ -70,7 +70,7 @@ public class ArkaceA1 extends ActiveSkill {
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                    ProjectileParam param = new ProjectileParam.Builder(combatUser, VELOCITY)
+                    ProjectileOption param = new ProjectileOption.Builder(combatUser, VELOCITY)
                             .trailInterval(5)
                             .build();
 
