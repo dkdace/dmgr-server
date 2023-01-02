@@ -1,37 +1,36 @@
 package com.dace.dmgr.event;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import com.dace.dmgr.event.listener.*;
 
-public class MainEventManager extends EventManager {
-    private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-
+/**
+ * 메인 이벤트를 등록하는 클래스.
+ */
+public class MainEventManager {
     public static void init() {
-        registerListener(new OnPlayerJoin());
-        registerListener(new OnPlayerQuit());
-        registerListener(new OnPlayerResourcePackStatus());
-        registerListener(new OnAsyncPlayerChat());
-        registerListener(new OnBlockBreak());
-        registerListener(new OnBlockPlace());
-        registerListener(new OnInventoryClick());
-        registerListener(new OnBlockFade());
-        registerListener(new OnBlockBurn());
-        registerListener(new OnWeatherChange());
-        registerListener(new OnFoodLevelChange());
-        registerListener(new OnEntityDamage());
-        registerListener(new OnEntityDamageByEntity());
-        registerListener(new OnEntityDeath());
-        registerListener(new OnPlayerSwapHandItems());
-        registerListener(new OnPlayerToggleSprint());
-        registerListener(new OnPlayerDropItem());
-        registerListener(new OnTabComplete());
-        registerListener(new OnPlayerCommandPreprocess());
-        registerListener(new OnWeaponPreShoot());
-        registerListener(new OnWeaponPrepareShoot());
-        registerListener(new OnPlayerItemHeld());
-        registerListener(new OnPlayerInteract());
-        registerPacketListener(new OnPlayServerUpdateHealth());
-        registerPacketListener(new OnPlayClientArmAnimation());
+        EventUtil.registerListener(new OnPlayerJoin());
+        EventUtil.registerListener(new OnPlayerQuit());
+        EventUtil.registerListener(new OnPlayerResourcePackStatus());
+        EventUtil.registerListener(new OnAsyncPlayerChat());
+        EventUtil.registerListener(new OnBlockBreak());
+        EventUtil.registerListener(new OnBlockPlace());
+        EventUtil.registerListener(new OnInventoryClick());
+        EventUtil.registerListener(new OnBlockFade());
+        EventUtil.registerListener(new OnBlockBurn());
+        EventUtil.registerListener(new OnWeatherChange());
+        EventUtil.registerListener(new OnFoodLevelChange());
+        EventUtil.registerListener(new OnEntityDamage());
+        EventUtil.registerListener(new OnEntityDamageByEntity());
+        EventUtil.registerListener(new OnEntityDeath());
+        EventUtil.registerListener(new OnPlayerSwapHandItems());
+        EventUtil.registerListener(new OnPlayerToggleSprint());
+        EventUtil.registerListener(new OnPlayerDropItem());
+        EventUtil.registerListener(new OnTabComplete());
+        EventUtil.registerListener(new OnPlayerCommandPreprocess());
+        EventUtil.registerListener(new OnWeaponPreShoot());
+        EventUtil.registerListener(new OnWeaponPrepareShoot());
+        EventUtil.registerListener(new OnPlayerItemHeld());
+        EventUtil.registerListener(new OnPlayerInteract());
+        EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
+        EventUtil.registerPacketListener(new OnPlayClientArmAnimation());
     }
 }

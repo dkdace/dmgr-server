@@ -12,9 +12,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 public class OnPlayerDropItem implements Listener {
-    private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
-    private static final String TITLE = "§3Welcome to §b§lDMGR";
-
     @EventHandler
     public static void event(PlayerDropItemEvent event) {
         Player player = event.getPlayer();

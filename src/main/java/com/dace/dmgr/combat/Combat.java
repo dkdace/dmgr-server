@@ -19,21 +19,45 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
+/**
+ * 전투 관련 기능을 제공하는 클래스.
+ */
 public class Combat {
+    /** 적 처치 기여 (데미지 누적) 제한시간 */
     public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
+    /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
     public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
+    /** 리스폰 시간 */
     public static final int RESPAWN_TIME = 10 * 20;
 
+    /**
+     * 두 엔티티가 서로 적인 지 확인한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @return 적이면 {@code true} 반환
+     */
     public static boolean isEnemy(ICombatEntity attacker, ICombatEntity victim) {
         return !attacker.getTeam().equals(victim.getTeam());
     }
 
+    /**
+     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     *
+     * @param attacker 공격자 (기준 엔티티)
+     * @param location 위치
+     * @param range    범위 (반지름)
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link ICombatEntity#getCritHitbox()} 안에 있으면 {@code true})
+     */
     public static Map.Entry<ICombatEntity, Boolean> getNearEnemy(ICombatEntity attacker, Location location, float range) {
         ICombatEntity entity = combatEntityMap.values().stream()
                 .min(Comparator.comparing(combatEntity -> Math.min(
@@ -49,24 +73,40 @@ public class Combat {
 
         if (LocationUtil.isInHitbox(location, entity.getCritHitbox(), range)) {
             return new AbstractMap.SimpleEntry<>(entity, true);
-        }
-        else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
+        } else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
             return new AbstractMap.SimpleEntry<>(entity, false);
-        }
-        else return new AbstractMap.SimpleEntry<>(null, false);
+        } else return new AbstractMap.SimpleEntry<>(null, false);
     }
 
+    /**
+     * 지정한 위치를 기준으로 범위 안에 있는 모든 적을 반환한다.
+     *
+     * @param attacker 공격자 (기준 엔티티)
+     * @param location 위치
+     * @param range    범위 (반지름)
+     * @return 범위 내 모든 적
+     */
     public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
         return combatEntityMap.values().stream()
                 .filter(entity ->
                         entity != attacker && isEnemy(attacker, entity))
                 .filter(entity ->
                         LocationUtil.isInHitbox(location, entity.getHitbox(), range) ||
-                        LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
+                                LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
                 .collect(Collectors.toSet());
     }
 
-    public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean crit, boolean ult) {
+    /**
+     * 공격 이벤트를 호출한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param damage   피해량
+     * @param type     타입
+     * @param isCrit   치명타 여부
+     * @param isUlt    궁극기 충전 여부
+     */
+    public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean isCrit, boolean isUlt) {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
         boolean killed = false;
@@ -77,12 +117,12 @@ public class Combat {
             return;
 
         if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
-            crit = false;
+            isCrit = false;
 
         int rdamage = damage;
-        damage = getFinalDamage(attacker, victim, damage, crit);
+        damage = getFinalDamage(attacker, victim, damage, isCrit);
 
-        playHitEffect(attackerEntity, victimEntity, crit);
+        playHitEffect(attackerEntity, victimEntity, isCrit);
 
         if (victim.getHealth() - damage <= 0) {
             if (isKillable(attacker, victim))
@@ -92,8 +132,8 @@ public class Combat {
         } else
             victim.setHealth(victim.getHealth() - damage);
 
-        if (attacker != victim && victim.isUltChargeable()) {
-            if (ult)
+        if (attacker != victim && victim.isUltProvider()) {
+            if (isUlt)
                 if (!attacker.getSkillController(attacker.getCharacter().getUltimate()).isUsing())
                     attacker.addUlt((float) damage / attacker.getCharacter().getUltimate().getCost());
 
@@ -117,7 +157,15 @@ public class Combat {
             kill(attacker, victim);
     }
 
-    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean ult) {
+    /**
+     * 치유 이벤트를 호출한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param amount   치유량
+     * @param isUlt    궁극기 충전 여부
+     */
+    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean isUlt) {
         if (victim.getHealth() == victim.getMaxHealth())
             return;
 
@@ -127,18 +175,29 @@ public class Combat {
         victim.setHealth(victim.getHealth() + amount);
 
         if (amount > 100)
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(victim.getEntity().getLocation(),
                             0, victim.getEntity().getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
                     0.3F, 0.1F, 0.3F, 0);
         else if (amount / 100F > Math.random()) {
-            ParticleUtil.play(Particle.HEART, LocationUtil.setRelativeOffset(victim.getEntity().getLocation(),
+            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(victim.getEntity().getLocation(),
                     0, victim.getEntity().getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
         }
 
-        if (ult)
+        if (isUlt)
             attacker.addUlt((float) amount / attacker.getCharacter().getUltimate().getCost());
     }
 
+    /**
+     * 공격자가 피격자를 죽일 수 있는 지 확인한다.
+     *
+     * <p>Condition:</p>
+     *
+     * <p>- 훈련장에 있을 때는 죽일 수 없다.</p>
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @return 대상을 죽일 수 있으면 {@code true} 반환
+     */
     private static boolean isKillable(CombatUser attacker, ICombatEntity victim) {
         if (RegionUtil.isInRegion(attacker.getEntity(), "BattleTrain"))
             return false;
@@ -146,6 +205,12 @@ public class Combat {
         return true;
     }
 
+    /**
+     * 처치 이벤트를 호출한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     */
     private static void kill(CombatUser attacker, ICombatEntity victim) {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
@@ -189,6 +254,12 @@ public class Combat {
         }
     }
 
+    /**
+     * 피격자를 리스폰시킨다. 처치 이벤트에서 사용된다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     */
     private static void respawn(CombatUser attacker, CombatUser victim) {
         Player attackerEntity = attacker.getEntity();
         Player victimEntity = victim.getEntity();
@@ -223,6 +294,11 @@ public class Combat {
         };
     }
 
+    /**
+     * 엔티티에게 피격 효과 패킷을 전송한다.
+     *
+     * @param entity 대상 엔티티
+     */
     private static void sendDamagePacket(Entity entity) {
         WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
@@ -232,9 +308,16 @@ public class Combat {
         packet.broadcastPacket();
     }
 
-    private static void playHitEffect(Player attacker, Entity victim, boolean crit) {
+    /**
+     * 공격자/피격자에게 공격/피격 효과를 재생한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param isCrit   치명타 여부
+     */
+    private static void playHitEffect(Player attacker, Entity victim, boolean isCrit) {
         if (attacker != victim) {
-            if (crit) {
+            if (isCrit) {
                 attacker.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
                 SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, attacker);
                 SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, attacker);
@@ -251,8 +334,17 @@ public class Combat {
         }
     }
 
-    private static int getFinalDamage(CombatUser attacker, ICombatEntity victim, int damage, boolean crit) {
-        if (crit)
+    /**
+     * 각종 변수를 계산하여 최종 피해량을 반환한다.
+     *
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param damage   피해량
+     * @param isCrit   치명타 여부
+     * @return 최종 피해량
+     */
+    private static int getFinalDamage(CombatUser attacker, ICombatEntity victim, int damage, boolean isCrit) {
+        if (isCrit)
             damage *= 1.5;
 
         int atkBonus = 0;
@@ -261,15 +353,27 @@ public class Combat {
         return damage * (100 + atkBonus - defBonus) / 100;
     }
 
+    /**
+     * 플레이어에게 처치 효과음을 재생한다.
+     *
+     * @param player 대상 플레이어
+     */
     private static void playKillSound(Player player) {
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, player);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, player);
     }
 
+    /**
+     * 전투에 사용되는 자막(Subtitle) 종류.
+     */
     private static class SUBTITLES {
+        /** 공격 */
         static final String HIT = "§f×";
+        /** 공격 (치명타) */
         static final String CRIT = "§c§l×";
+        /** 처치 (플레이어) */
         static final String KILL_PLAYER = "§c§lKILL";
+        /** 처치 (엔티티) */
         static final String KILL_ENTITY = "§c✔";
     }
 }

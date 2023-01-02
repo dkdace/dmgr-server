@@ -8,7 +8,9 @@ import com.dace.dmgr.system.TextIcon;
 
 public class ArkaceUlt extends UltimateSkill {
     private static final ArkaceUlt instance = new ArkaceUlt();
+    /** 궁극기 필요 충전량 */
     public static int COST = 7000;
+    /** 지속시간 */
     public static long DURATION = (long) 12 * 20;
 
     public ArkaceUlt() {

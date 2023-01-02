@@ -24,7 +24,7 @@ public abstract class Hitscan extends Bullet {
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
-        direction = VectorUtil.spread(direction, spread);
+        direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<ICombatEntity> targetSet = new HashSet<>();
 
 //        Location trailLoc = loc.clone().add(VectorUtil.getPitchAxis(loc).multiply(-0.2)).add(0, -0.2, 0);
