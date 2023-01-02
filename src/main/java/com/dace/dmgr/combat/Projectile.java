@@ -11,15 +11,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
+ */
 public abstract class Projectile extends Bullet {
+    /** 투사체의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.3F;
+    /** 투사체의 속력 */
     protected int velocity;
+    /** 중력의 영향을 받는지 여부 */
     protected boolean hasGravity;
+    /**  */
     protected boolean bouncing;
 
     /**
-     * {@code Projectile}을 생성할 때는 {@link ProjectileParam.Builder}를 이용해 얻은 객체를 전달해주세요.
-     * @param param {@link ProjectileParam} 객체
+     * 투사체를 생성한다.
+     *
+     * @param param 투사체 옵션
+     * @see ProjectileParam
      */
     public Projectile(ProjectileParam param) {
         super(param.shooter, param.penetrating, param.trailInterval, param.hitboxMultiplier);
