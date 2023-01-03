@@ -37,11 +37,11 @@ public abstract class Bullet {
      * @param trailInterval     트레일 파티클을 남기는 주기. 단위: 판정점 개수
      * @param hitboxMultiplier  판정 반경의 배수 (판정의 엄격함에 영향을 미침)
      */
-    public Bullet(ICombatEntity shooter, boolean penetration, int trailInterval, float hitboxMultiplier) {
+    public Bullet(ICombatEntity shooter, boolean penetrating, int trailInterval, float hitboxMultiplier) {
         this.shooter = shooter;
         this.trailInterval = trailInterval;
         this.hitboxMultiplier = hitboxMultiplier;
-        this.penetrating = penetration;
+        this.penetrating = penetrating;
     }
 
     /**
@@ -50,8 +50,8 @@ public abstract class Bullet {
      * @param penetration       관통 여부
      * @param trailInterval     트레일 파티클을 남기는 주기. 단위: 판정점 개수
      */
-    public Bullet(ICombatEntity shooter, boolean penetration, int trailInterval) {
-        this(shooter, penetration, trailInterval, 1);
+    public Bullet(ICombatEntity shooter, boolean penetrating, int trailInterval) {
+        this(shooter, penetrating, trailInterval, 1);
     }
 
     /**

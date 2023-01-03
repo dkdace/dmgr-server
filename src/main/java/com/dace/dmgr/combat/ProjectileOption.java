@@ -4,6 +4,9 @@ import com.dace.dmgr.combat.entity.ICombatEntity;
 
 import static com.dace.dmgr.combat.Bullet.TRAIL_INTERVAL;
 
+/**
+ * @deprecated Projectile.Builder로 옮길 예정
+ */
 public class ProjectileOption {
     ICombatEntity shooter;
     boolean penetrating;

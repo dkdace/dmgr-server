@@ -45,6 +45,13 @@ public abstract class Projectile extends Bullet {
         this.bouncing = option.bouncing;
     }
 
+    /**
+     * 투사체를 발사한다.
+     * @param origin    발화점
+     * @param direction 발사 방향
+     * @param spread    탄퍼짐 정도
+     */
+    @Override
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
