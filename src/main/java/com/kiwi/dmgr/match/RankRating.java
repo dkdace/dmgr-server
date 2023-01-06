@@ -9,22 +9,35 @@ import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class RankRating {
 
+    /** 원하는 플레이어의 평균 랭크 레이트를 설정 */
     private static final int AVERAGE_RR = 400;
+    /** 예상하는 K/DA 평균을 기입 */
     private static final float AVERAGE_KDA = 2F;
+    /** 예상하는 1분당 얻는 점수를 기입 */
     private static final float MIN_PER_AVERAGE_SCORE = 100F;
 
+    /** MMR 수치에 영향을 미치는 전회 플레이 횟수를 설정 */
     private static final int MAX_MMR_PLAY = 25;
+    /** 랭크가 결정되는 배치 판 수를 설정 */
     private static final int MAX_PLACEMENT_PLAY = 5;
 
-    public static int getPlayerRankRanking(Player p) {
-        return 4;
+    /** 플레이어의 랭크 등수를 반환
+     *
+     *  @return 랭크 등수 */
+    public static int getPlayerRankPlace(Player player) {
+        User user = userMap.get(player);
+        return user.getRank();
     }
 
-    public static String getPlayerTierPrefix(Player p) {
-        int RR = 0;//getPlayerRankRating(p);
+    /** 플레이어의 랭크 접두사(칭호)를 반환
+     *
+     *  @param player 플레이어
+     *  @return 플레이어 랭크 접두사 */
+    public static String getPlayerTierPrefix(Player player) {
+        int RR = getPlayerRR(player);
         String ret = "§f없음";
         if (RR >= 1000) {
-            if (getPlayerRankRanking(p) <= 5) {
+            if (getPlayerRankPlace(player) <= 5) {
                 ret = "§5네더라이트";
             } else {
                 ret = "§b다이아몬드";
@@ -40,7 +53,12 @@ public class RankRating {
         return ret;
     }
 
-    public static String getPlayerRankRakingDisplay(Player p) {
+    /** 플레이어의 표시되는 랭크 레이팅을 반환
+     *  0 미만이면 <0 으로 표시됨
+     *
+     *  @param player 플레이어
+     *  @return 표시되는 랭크 레이팅 */
+    public static String getPlayerRankRakingDisplay(Player player) {
         int RR = 0;//getRank(p);
         if (RR < 0) {
             return "<0";
@@ -49,111 +67,117 @@ public class RankRating {
         }
     }
 
-    // 랭크 종료 함수
-    public static void finishPlayerRankMatch(Player p) {
-        int rr = getPlayerRR(p);
-        int mmr = getPlayerMMR(p);
-        int play = getPlayerPlay(p);
+    /** 랭크 배치가 종료된 후 플레어의 랭크 레이팅을 결정
+     *
+     *  @param player 플레이어 */
+    public static void finishPlayerRankMatch(Player player) {
+        int rr = getPlayerRR(player);
+        int mmr = getPlayerMMR(player);
+        int play = getPlayerPlay(player);
         //setPlayerMMR(p, getFinalMMR(mmr, getExtractedMMR(), play));
-        if (!isPlayerRanked(p)) {
+        if (!isPlayerRanked(player)) {
             if (play == MAX_PLACEMENT_PLAY) {
-                int finalRR = (int) (getPlayerMMR(p) * 0.9);
+                int finalRR = (int) (mmr * 0.9);
                 if (finalRR > 749) finalRR = 749;
-                setPlayerRR(p, finalRR);
-                setPlayerRanked(p, true);
+                setPlayerRR(player, finalRR);
+                setPlayerRanked(player, true);
             }
         } else {
             int changeValue = 2;//getFinalRating();
-            setPlayerRR(p, rr + changeValue);
+            setPlayerRR(player, rr + changeValue);
         }
     }
 
-    // MMR 계산 함수
+    /** 경기를 마치고 나서 얻은 MMR 을 기존 MMR 과 결합하여 최종 MMR 을 반환
+     *
+     *  @param preMMR 기존 MMR
+     *  @param addMMR 추가 MMR
+     *  @param play 플레이 횟수
+     *  @return MMR */
     private static int getFinalMMR(int preMMR, int addMMR, int play) {
-        double finalMMR = 0;
+        double finalMMR;
         if (play < MAX_MMR_PLAY) {
-            finalMMR = (preMMR * play / (play+1)) + addMMR * (1 / (play+1));
+            finalMMR = (preMMR * play / (play+1F)) + addMMR * (1F / (play+1));
         } else {
             play = MAX_MMR_PLAY;
-            finalMMR = (preMMR * (play-1) / (play)) + addMMR * (1 / (play));
+            finalMMR = (preMMR * (play-1F) / (play)) + addMMR * (1F / (play));
         }
 
         return (int) finalMMR;
     }
 
-    // MMR / RR 불러오기 / 저장 함수
-    public static int getPlayerRR(Player p) {
-        User user = userMap.get(p);
+    public static int getPlayerRR(Player player) {
+        User user = userMap.get(player);
         return user.getRank();
     }
 
-    public static void setPlayerRR(Player p, int rr) {
-        User user = userMap.get(p);
-        user.setRank(rr);
+    public static void setPlayerRR(Player player, int rank) {
+        User user = userMap.get(player);
+        user.setRank(rank);
     }
 
-    public static int getPlayerMMR(Player p) {
-        User user = userMap.get(p);
+    public static int getPlayerMMR(Player player) {
+        User user = userMap.get(player);
         return user.getMMR();
     }
 
-    public static void setPlayerMMR(Player p, int mmr) {
-        User user = userMap.get(p);
+    public static void setPlayerMMR(Player player, int mmr) {
+        User user = userMap.get(player);
         user.setMMR(mmr);
     }
 
-    public static int getPlayerPlay(Player p) {
-        User user = userMap.get(p);
+    public static int getPlayerPlay(Player player) {
+        User user = userMap.get(player);
         return user.getRankPlay();
     }
 
-    public static void setPlayerRankPlay(Player p, int play) {
-        User user = userMap.get(p);
+    public static void setPlayerRankPlay(Player player, int play) {
+        User user = userMap.get(player);
         user.setRankPlay(play);
     }
 
-    public static boolean isPlayerRanked(Player p) {
-        User user = userMap.get(p);
+    public static boolean isPlayerRanked(Player player) {
+        User user = userMap.get(player);
         return user.isRanked();
     }
 
-    public static void setPlayerRanked(Player p, boolean ranked) {
-        User user = userMap.get(p);
+    public static void setPlayerRanked(Player player, boolean ranked) {
+        User user = userMap.get(player);
         user.setRanked(ranked);
     }
 
 
     // MMR / RR 계산 함수.
     // playTime 은 초 단위를 기준으로 할 것.
-    private static float getKDARating(float kda) {
+    private float getKDARating(float kda) {
         float ret = (kda / AVERAGE_KDA) * 20;
         return ret;
     }
 
-    private static float getScoreRating(int score, float playTime) {
+    private float getScoreRating(int score, float playTime) {
         float ret = ((score / MIN_PER_AVERAGE_SCORE) / playTime / 60) * 20;
         return ret;
     }
 
-    private static float getResultRating(String result) {
+    private float getResultRating(String result) {
         if (result.equals("win")) return 10;
         else if (result.equals("lose")) return -8;
         return 0;
     }
 
-    private static float getCorrectRating(int mmr, int rr, int averageRating) {
+    private float getCorrectRating(int mmr, int rr, int averageRating) {
         float averageDiffValue = (float) (AVERAGE_RR + averageRating) / 2 - rr;
         float weightValue = mmr-rr;
         return (float) (averageDiffValue * 0.04 + weightValue * 0.1);
     }
 
-    private static int getFinalRating(float kda, int score, float playTime, String result, int mmr, int rr, int averageRating) {
+    private int getFinalRating(float kda, int score, float playTime, String result, int mmr, int rr, int averageRating) {
         float finalRating = getKDARating(kda) + getScoreRating(score, playTime) +
                 getResultRating(result) + getCorrectRating(mmr, rr, averageRating);
         return Math.round(finalRating);
     }
 
-    private static float getExtractedMMR(float kda, int score, float playTime, int averageRating) {
+    private float getExtractedMMR(float kda, int score, float playTime, int averageRating) {
         float midValue = (getKDARating(kda) + getScoreRating(score, playTime)) * 10;
         return (float) Math.pow(midValue, 0.95);
     }
