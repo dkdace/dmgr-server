@@ -46,6 +46,8 @@ public class ItemBuilder {
         return itemBuilder;
     }
 
+    private static Field profileField;
+
     public static ItemBuilder fromSkullIcon(SkullIcon skullIcon) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
         SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
@@ -54,8 +56,10 @@ public class ItemBuilder {
         gameProfile.getProperties().put("textures", new Property("textures", skullIcon.getUrl()));
 
         try {
-            Field profileField = skullMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
+            if (profileField == null) {
+                profileField = skullMeta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+            }
             profileField.set(skullMeta, gameProfile);
         } catch (Exception e) {
             e.printStackTrace();
