@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,30 +16,35 @@ public class Game {
     /** 플레이어 목록 */
     private final ArrayList<Player> playerList;
     /** 플레이어 팀 */
-    private HashMap<Player, Team> playerTeam;
+    private HashMap<Team, ArrayList<Player>> teamPlayerMapList;
     /** 팀 스폰 위치 */
-    private HashMap<Team, Location> teamSpawn;
+    private HashMap<Team, Location> teamSpawnLocation;
+    /** 팀 스코어 */
+    private HashMap<Team, Integer> teamScore;
+    /** 잔여 시간 */
+    private long remainTime;
     /** 게임 타입 */
     private GameType type;
     /** 게임 진행 여부 */
     private boolean play;
     /** 전장 맵 */
-    private World map;
+    private World world;
     /** 랭크 매치 여부 */
     private boolean isRanked;
 
     /**
      * 매치 큐 인스턴스를 호출하고 {@link GameMapList#gameMap}에 추가한다.
-     *
-     * <p> 되도록이면 {@link Game#Game(GameType)}을 사용한다.</p>
      */
     public Game() {
         this.playerList = new ArrayList<>();
-        this.playerTeam = new HashMap<>();
-        this.teamSpawn = new HashMap<>();
+        this.teamPlayerMapList = new HashMap<>();
+        this.teamSpawnLocation = new HashMap<>();
+        this.teamScore = new HashMap<>();
+        this.teamScore = new HashMap<>();
+        this.remainTime = 0;
         this.type = null;
         this.play = false;
-        this.map = null;
+        this.world = null;
         this.isRanked = false;
     }
 
@@ -64,20 +70,36 @@ public class Game {
         return this.playerList;
     }
 
-    public HashMap<Player, Team> getPlayerTeam() {
-        return playerTeam;
+    public ArrayList<Player> getTeamPlayerList(Team team) {
+        return teamPlayerMapList.get(team);
     }
 
-    public void setPlayerTeam(HashMap<Player, Team> playerTeam) {
-        this.playerTeam = playerTeam;
+    public void setTeamPlayerList(Team team, ArrayList<Player> playerList) {
+        this.teamPlayerMapList.put(team, playerList);
     }
 
-    public HashMap<Team, Location> getTeamSpawn() {
-        return teamSpawn;
+    public Location getTeamSpawn(Team team) {
+        return this.teamSpawnLocation.get(team);
     }
 
-    public void setTeamSpawn(HashMap<Team, Location> teamSpawn) {
-        this.teamSpawn = teamSpawn;
+    public void setTeamSpawn(Team team, Location location) {
+        this.teamSpawnLocation.put(team, location);
+    }
+
+    public int getTeamScore(Team team) {
+        return this.teamScore.get(team);
+    }
+
+    public void setTeamScore(Team team, int score) {
+        this.teamScore.put(team, score);
+    }
+
+    public long getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(long remainTime) {
+        this.remainTime = remainTime;
     }
 
     public GameType getType() {
@@ -97,11 +119,11 @@ public class Game {
     }
 
     public World getMap() {
-        return map;
+        return world;
     }
 
-    public void setMap(World map) {
-        this.map = map;
+    public void setMap(World world) {
+        this.world = world;
     }
 
     public boolean isRanked() {
@@ -122,6 +144,6 @@ public class Game {
      * @return boolean 인원 필요 여부
      */
     public boolean isNeedPlayer() {
-        return true;
+        return false;
     }
 }

@@ -1,5 +1,7 @@
 package com.kiwi.dmgr;
 
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,6 +11,7 @@ import java.util.HashMap;
 public class GameMapList {
 
     public static final HashMap<GameType, ArrayList<Game>> gameMap = new HashMap<>();
+    public static final HashMap<Player, GameUser> gameUserMap = new HashMap<>();
 
     /**
      * 게임 리스트에 게임을 쉽게 추가하도록 하는 함수

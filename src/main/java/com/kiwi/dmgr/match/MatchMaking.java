@@ -52,7 +52,7 @@ public class MatchMaking {
      * @param playerList 플레이어 목록
      * @return 정렬된 플레이어 목록
      */
-    public static ArrayList<Player> playerMMRSort(ArrayList<Player> playerList) {
+    public static ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
         HashMap<Player, Integer> playerMap = new HashMap<>();
         for (Player player : playerList) {
             User user = userMap.get(player);
@@ -78,11 +78,11 @@ public class MatchMaking {
      * @param game 게임
      * @return 분배된 팀 맵리스트
      */
-    public static HashMap<Team, ArrayList<Player>> playerDivision(Game game) {
+    public static HashMap<Team, ArrayList<Player>> getPlayerListDivision(Game game) {
         HashMap<Team, ArrayList<Player>> teamPlayerMapList = new HashMap<>();
         ArrayList<Player> team1 = new ArrayList<>();
         ArrayList<Player> team2 = new ArrayList<>();
-        ArrayList<Player> playerList = playerMMRSort(game.getPlayerList());
+        ArrayList<Player> playerList = getPlayerListMMRSort(game.getPlayerList());
 
         int size = game.getPlayerList().size();
         for (int i=0; i<size/4; i++) {
