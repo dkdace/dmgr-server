@@ -24,7 +24,8 @@ public class RankRating {
     /**
      *  플레이어의 랭크 등수를 반환
      *
-     *  @return 랭크 등수 */
+     *  @return 랭크 등수
+     */
     public static int getPlayerRankPlace(Player player) {
         User user = userMap.get(player);
         return user.getRank();
@@ -34,7 +35,8 @@ public class RankRating {
      *  플레이어의 랭크 접두사(칭호)를 반환
      *
      *  @param player 플레이어
-     *  @return 플레이어 랭크 접두사 */
+     *  @return 플레이어 랭크 접두사
+     */
     public static String getPlayerTierPrefix(Player player) {
         User user = userMap.get(player);
         int rank = user.getRank();
@@ -61,7 +63,8 @@ public class RankRating {
      *  0 미만이면 <0 으로 표시됨
      *
      *  @param player 플레이어
-     *  @return 표시되는 랭크 레이팅 */
+     *  @return 표시되는 랭크 레이팅
+     */
     public static String getPlayerRankRakingDisplay(Player player) {
         User user = userMap.get(player);
         int rank = user.getRank();
@@ -77,7 +80,8 @@ public class RankRating {
      *  랭크 레이팅은 MMR * 0.9로 설정
      *  배치되는 랭크가 750 이상으로 넘어갈 수 없음
      *
-     *  @param player 플레이어 */
+     *  @param player 플레이어
+     */
     public static void finishPlayerRankMatch(Player player) {
         User user = userMap.get(player);
         int rank = user.getRank();
@@ -104,7 +108,8 @@ public class RankRating {
      *  @param preMMR 기존 MMR
      *  @param addMMR 추가 MMR
      *  @param play 플레이 횟수
-     *  @return MMR */
+     *  @return MMR
+     */
     private static int getFinalMMR(int preMMR, int addMMR, int play) {
         double finalMMR;
         if (play < MAX_MMR_PLAY) {

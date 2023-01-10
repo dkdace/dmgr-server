@@ -22,8 +22,8 @@ public class GameUser {
     private long outgoingDamage;
     /** 받은 데미지량 */
     private long incomingDamage;
-    /** 받은 데미지의 플레이어 리스트 (킬/어시스트 판별) */
-    private final HashMap<GameUser, Long> incomingDamagePlayerList;
+    /** 받은 데미지의 플레이어 맵 (킬/어시스트 판별) */
+    private final HashMap<GameUser, Long> incomingDamagePlayerMap;
     /** 힐량 */
     private long heal;
     /** 생존 시간 */
@@ -44,7 +44,7 @@ public class GameUser {
         this.assist = 0;
         this.outgoingDamage = 0;
         this.incomingDamage = 0;
-        this.incomingDamagePlayerList = new HashMap<>();
+        this.incomingDamagePlayerMap = new HashMap<>();
         this.heal = 0;
         this.surviveTime = 0;
     }
@@ -98,11 +98,11 @@ public class GameUser {
     }
 
     public HashMap<GameUser, Long> getIncomingDamagePlayerList() {
-        return incomingDamagePlayerList;
+        return incomingDamagePlayerMap;
     }
 
     public void addIncomingDamagePlayer(GameUser attacker, long damage) {
-        this.incomingDamagePlayerList.put(attacker, this.incomingDamagePlayerList.get(this) + damage);
+        this.incomingDamagePlayerMap.put(attacker, this.incomingDamagePlayerMap.get(this) + damage);
     }
 
     public long getHeal() {
