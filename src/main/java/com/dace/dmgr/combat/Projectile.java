@@ -17,7 +17,7 @@ import java.util.Set;
 public abstract class Projectile extends Bullet {
     /** 투사체의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.3F;
-    /** 투사체의 속력 */
+    /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
     /** 중력의 영향을 받는지 여부 */
     protected boolean hasGravity;
@@ -37,6 +37,7 @@ public abstract class Projectile extends Bullet {
      * </pre>
      * @param option 투사체 옵션
      * @see ProjectileOption
+     * @deprecated
      */
     public Projectile(ProjectileOption option) {
         super(option.shooter, option.penetrating, option.trailInterval, option.hitboxMultiplier);
@@ -45,11 +46,13 @@ public abstract class Projectile extends Bullet {
         this.bouncing = option.bouncing;
     }
 
+
+
     /**
      * 투사체를 발사한다.
      * @param origin    발화점
      * @param direction 발사 방향
-     * @param spread    탄퍼짐 정도
+     * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     @Override
     public void shoot(Location origin, Vector direction, float spread) {

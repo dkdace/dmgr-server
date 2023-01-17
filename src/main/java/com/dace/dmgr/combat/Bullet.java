@@ -22,37 +22,67 @@ public abstract class Bullet {
     /** {@code trailInterval} 기본값. 단위: 판정점 개수 */
     protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
-    protected final ICombatEntity shooter;
+    protected ICombatEntity shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
-    protected final int trailInterval;
+    protected int trailInterval;
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
-    protected final float hitboxMultiplier;
+    protected float hitboxMultiplier;
     /** 관통 여부 */
-    protected final boolean penetrating;
+    protected boolean penetrating;
 
-    /**
-     * 총알 인스턴스를 생성한다.
-     * @param shooter           총알을 발사하는 엔티티
-     * @param penetration       관통 여부
-     * @param trailInterval     트레일 파티클을 남기는 주기. 단위: 판정점 개수
-     * @param hitboxMultiplier  판정 반경의 배수 (판정의 엄격함에 영향을 미침)
-     */
-    public Bullet(ICombatEntity shooter, boolean penetrating, int trailInterval, float hitboxMultiplier) {
-        this.shooter = shooter;
-        this.trailInterval = trailInterval;
-        this.hitboxMultiplier = hitboxMultiplier;
-        this.penetrating = penetrating;
+    /** 하위 클래스의 생성은 각 클래스 별 Builder를 이용하라 */
+    private Bullet() {
+        this.shooter = null;
+        this.trailInterval = TRAIL_INTERVAL;
+        this.hitboxMultiplier = 1.0f;
+        this.penetrating = false;
     }
 
-    /**
-     * 총알 인스턴스를 생성한다.
-     * @param shooter           총알을 발사하는 엔티티
-     * @param penetration       관통 여부
-     * @param trailInterval     트레일 파티클을 남기는 주기. 단위: 판정점 개수
+    /** 
+     * 빌더
      */
-    public Bullet(ICombatEntity shooter, boolean penetrating, int trailInterval) {
-        this(shooter, penetrating, trailInterval, 1);
+    public abstract static class Builder<T extends Bullet, B extends Builder> {
+        protected ICombatEntity shooter;
+        protected int           trailInterval;
+        protected float         hitboxMultiplier;
+        protected boolean       penetrating;
+
+        public Builder() {
+            this.shooter            = null;
+            this.trailInterval      = TRAIL_INTERVAL;
+            this.hitboxMultiplier   = 1.0f;
+            this.penetrating        = false;
+        }
+
+        public B shooter(ICombatEntity value) {
+            this.shooter = value;
+            return self();
+        }
+
+        public B trailInterval(int value) {
+            this.trailInterval = value;
+            return self();
+        }
+
+        public B hitboxMultiplier(float value) {
+            this.hitboxMultiplier = value;
+            return self();
+        }
+
+        public B penetrating(boolean value) {
+            this.penetrating = value;
+            return self();
+        }
+
+        public abstract T build();
+
+        @SuppressWarnings("unchecked")
+        public B self() {
+            return (B) this;
+        }
     }
+
+
 
     /**
      * 총알이 맞았을 때의 파티클, 소리 효과를 재생한다.
