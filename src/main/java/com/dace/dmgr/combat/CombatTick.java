@@ -5,6 +5,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.action.Reloadable;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
@@ -42,11 +43,16 @@ public class CombatTick {
                 if (combatUserMap.get(player) == null)
                     return false;
 
-                if (player.getPotionEffect(PotionEffectType.WATER_BREATHING) == null)
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
-                            99999, 0, false, false));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
+                        99999, 0, false, false), true);
 
-                combatUser.allowSprint(CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0);
+                combatUser.allowSprint(isSprintable(combatUser));
+
+                if (isJumpable(combatUser))
+                    player.removePotionEffect(PotionEffectType.JUMP);
+                else
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
+                            9999, -6, false, false), true);
 
                 if (i % 10 == 0) {
                     UltimateSkill ultimateSkill = combatUser.getCharacter().getUltimate();
@@ -67,6 +73,9 @@ public class CombatTick {
                     speed *= 0.88;
                 else
                     speed *= speed / BASE_SPEED;
+                if (!isMoveable(combatUser))
+                    speed = 0.0001F;
+
                 combatUser.getEntity().setWalkSpeed(speed);
 
                 showActionbar(combatUser);
@@ -74,6 +83,49 @@ public class CombatTick {
                 return true;
             }
         };
+    }
+
+    /**
+     * 엔티티가 움직일 수 있는 지 확인한다.
+     *
+     * @param combatEntity 대상 엔티티
+     * @return 이동 가능 여부
+     */
+    private static boolean isMoveable(ICombatEntity combatEntity) {
+        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) == 0)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * 플레이어가 달리기를 할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 달리기 가능 여부
+     */
+    private static boolean isSprintable(CombatUser combatUser) {
+        if (CooldownManager.getCooldown(combatUser, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatUser, Cooldown.SNARE) == 0 &&
+                CooldownManager.getCooldown(combatUser, Cooldown.GROUNDING) == 0)
+            return true;
+        if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * 엔티티가 점프할 수 있는 지 확인한다.
+     *
+     * @param combatEntity 대상 엔티티
+     * @return 점프 가능  여부
+     */
+    private static boolean isJumpable(ICombatEntity combatEntity) {
+        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) == 0 &&
+                CooldownManager.getCooldown(combatEntity, Cooldown.GROUNDING) == 0)
+            return true;
+
+        return false;
     }
 
     /**

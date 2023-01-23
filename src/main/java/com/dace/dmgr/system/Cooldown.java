@@ -30,7 +30,17 @@ public enum Cooldown {
     /** 스킬 지속시간 */
     SKILL_DURATION(0),
     /** 액션바 지속시간 */
-    ACTION_BAR(0);
+    ACTION_BAR(0),
+    /** 기절 지속시간 */
+    STUN(0),
+    /** 속박 지속시간 */
+    SNARE(0),
+    /** 고정 지속시간 */
+    GROUNDING(0),
+    /** 침묵 지속시간 */
+    SILENCE(0),
+    /** 화염 지속시간 */
+    BURN(0);
 
     /** 쿨타임 기본값 */
     private final long defaultValue;
