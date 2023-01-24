@@ -38,51 +38,6 @@ public abstract class Bullet {
         this.penetrating = false;
     }
 
-    /** 
-     * 빌더
-     */
-    public abstract static class Builder<T extends Bullet, B extends Builder> {
-        protected ICombatEntity shooter;
-        protected int           trailInterval;
-        protected float         hitboxMultiplier;
-        protected boolean       penetrating;
-
-        public Builder() {
-            this.shooter            = null;
-            this.trailInterval      = TRAIL_INTERVAL;
-            this.hitboxMultiplier   = 1.0f;
-            this.penetrating        = false;
-        }
-
-        public B shooter(ICombatEntity value) {
-            this.shooter = value;
-            return self();
-        }
-
-        public B trailInterval(int value) {
-            this.trailInterval = value;
-            return self();
-        }
-
-        public B hitboxMultiplier(float value) {
-            this.hitboxMultiplier = value;
-            return self();
-        }
-
-        public B penetrating(boolean value) {
-            this.penetrating = value;
-            return self();
-        }
-
-        public abstract T build();
-
-        @SuppressWarnings("unchecked")
-        public B self() {
-            return (B) this;
-        }
-    }
-
-
 
     /**
      * 총알이 맞았을 때의 파티클, 소리 효과를 재생한다.
