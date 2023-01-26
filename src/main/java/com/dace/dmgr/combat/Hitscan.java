@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Hitscan extends Bullet {
@@ -23,7 +24,7 @@ public abstract class Hitscan extends Bullet {
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
-        direction = VectorUtil.spread(direction, spread);
+        direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<ICombatEntity> targetSet = new HashSet<>();
 
 //        Location trailLoc = loc.clone().add(VectorUtil.getPitchAxis(loc).multiply(-0.2)).add(0, -0.2, 0);
@@ -44,12 +45,16 @@ public abstract class Hitscan extends Bullet {
             }
 
             if (loc.distance(origin) > 0.5) {
-                ICombatEntity target = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
+                Map.Entry<ICombatEntity, Boolean> targetEntry
+                        = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
 
-                if (target != null) {
+                if (targetEntry != null) {
+                    ICombatEntity target = targetEntry.getKey();
+                    boolean isCrit = targetEntry.getValue();
+
                     if (!targetSet.add(target)) {
                         onHit(hitLoc);
-                        onHitEntity(hitLoc, target);
+                        onHitEntity(hitLoc, target, isCrit);
 
                         if (!penetration)
                             break;

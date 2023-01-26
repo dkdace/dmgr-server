@@ -16,16 +16,33 @@ import java.util.List;
 
 import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 
+/**
+ * 더미(훈련용 봇) 엔티티 클래스.
+ */
 public class Dummy extends TemporalEntity<Zombie> {
+    /**
+     * 더미 인스턴스를 생성하고 지정한 위치에 소환한다.
+     *
+     * @param location 대상 위치
+     * @param health   체력
+     */
     public Dummy(Location location, int health) {
-        super(EntityType.ZOMBIE, "§7§lDummy", location, new Hitbox(location, 0, 0.9, 0,
-                0.65, 2.1, 0.5));
+        super(
+                EntityType.ZOMBIE,
+                "§7§lDummy",
+                location,
+                new Hitbox(location, 0, 0.9, 0, 0.65, 2.1, 0.5),
+                new Hitbox(location, 0, 2, 0, 0.3, 0.1, 0.3)
+        );
         setMaxHealth(health);
         setHealth(health);
         setTeam("DUMMY");
         init();
     }
 
+    /**
+     * 더미의 상태를 초기화한다. 소환 시 호출해야 한다.
+     */
     private void init() {
         entity.setBaby(false);
         entity.leaveVehicle();
@@ -51,7 +68,7 @@ public class Dummy extends TemporalEntity<Zombie> {
     }
 
     @Override
-    public boolean isUltChargeable() {
+    public boolean isUltProvider() {
         return true;
     }
 }

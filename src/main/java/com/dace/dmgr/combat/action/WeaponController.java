@@ -4,17 +4,31 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.StringUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * 무기 상태를 관리하는 컨트롤러 클래스.
+ */
 public class WeaponController {
+    /** 플레이어 객체 */
     private final CombatUser combatUser;
+    /** 무기 객체 */
     private final Weapon weapon;
+    /** 무기 아이템 */
     private final ItemStack itemStack;
+    /** 남은 탄약 수 */
     private int remainingAmmo = -1;
+    /** 재장전 상태 */
     private boolean reloading = false;
 
+    /**
+     * 무기 컨트롤러 인스턴스를 생성한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @param weapon     무기 객체
+     */
     public WeaponController(CombatUser combatUser, Weapon weapon) {
         this.combatUser = combatUser;
         this.weapon = weapon;
@@ -24,10 +38,19 @@ public class WeaponController {
         apply();
     }
 
+    /**
+     * 플레이어의 인벤토리에 무기 아이템을 적용한다.
+     */
     public void apply() {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
+    /**
+     * 무기의 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     * @param force    덮어쓰기 여부
+     */
     public void setCooldown(int cooldown, boolean force) {
         if (cooldown == -1)
             cooldown = 9999;
@@ -35,14 +58,27 @@ public class WeaponController {
             combatUser.getEntity().setCooldown(Weapon.MATERIAL, cooldown);
     }
 
+    /**
+     * 무기의 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick)
+     */
     public void setCooldown(int cooldown) {
         setCooldown(cooldown, false);
     }
 
+    /**
+     * 무기의 쿨타임을 무기 정보에 설정된 기본 쿨타임으로 설정한다.
+     */
     public void setCooldown() {
         setCooldown((int) weapon.getCooldown());
     }
 
+    /**
+     * 무기의 쿨타임이 끝났는 지 확인한다.
+     *
+     * @return 쿨타임 종료 여부
+     */
     public boolean isCooldownFinished() {
         return combatUser.getEntity().getCooldown(Weapon.MATERIAL) == 0;
     }
@@ -63,12 +99,22 @@ public class WeaponController {
         this.remainingAmmo = remainingAmmo;
     }
 
+    /**
+     * 지정한 양만큼 무기의 탄약을 소모한다.
+     *
+     * @param amount 탄약 소모량
+     */
     public void consume(int amount) {
         remainingAmmo -= amount;
         if (remainingAmmo < 0)
             remainingAmmo = 0;
     }
 
+    /**
+     * 무기를 재장전한다.
+     *
+     * <p>{@link Reloadable}을 상속받는 클래스여야 한다.</p>
+     */
     public void reload() {
         if (!(weapon instanceof Reloadable))
             return;
@@ -90,7 +136,7 @@ public class WeaponController {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                combatUser.sendActionBar("§c§l재장전... " + StringUtil.getBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
+                combatUser.sendActionBar("§c§l재장전... " + StringFormUtil.getProgressBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
                         2);
 
                 return true;

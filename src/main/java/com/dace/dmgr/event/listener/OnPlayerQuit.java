@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class OnPlayerQuit implements Listener {
+    /** 퇴장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 
     @EventHandler
@@ -35,6 +36,9 @@ public class OnPlayerQuit implements Listener {
         };
     }
 
+    /**
+     * 퇴장 효과음을 재생한다.
+     */
     private static void playQuitSound() {
         new TaskTimer(1, 4) {
             @Override

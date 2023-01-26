@@ -19,22 +19,26 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public class ArkaceA1 extends ActiveSkill {
+    /** 쿨타임 */
     public static final long COOLDOWN = 7 * 20;
+    /** 피해량 (폭발) */
     public static final int DAMAGE_EXPLODE = 100;
+    /** 피해량 (직격) */
     public static final int DAMAGE_DIRECT = 50;
+    /** 투사체 속력 */
     public static final int VELOCITY = 60;
+    /** 피해 범위 */
     public static final float RADIUS = 3;
     private static final ArkaceA1 instance = new ArkaceA1();
 
     public ArkaceA1() {
         super(1, "다이아코어 미사일",
                 "",
-                "§f소형 미사일을 3회 연속으로 발사하여 " + TextIcon.DAMAGE + " §c광역 피해",
+                "§f소형 미사일을 3회 연속으로 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
                 "§f를 입힙니다.",
                 "",
-                "§f" + TextIcon.DAMAGE + "   §c폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT,
-                "§f" + TextIcon.DAMAGE + "✸ §c3m",
-                "§f" + TextIcon.COOLDOWN + "   §f7초",
+                "§c" + TextIcon.DAMAGE + "§f 폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT + "  §c" + TextIcon.RADIUS + "§f 3m",
+                "§f" + TextIcon.COOLDOWN + "§f 7초",
                 "",
                 "§7§l[2] [좌클릭] §f사용");
     }
@@ -60,7 +64,7 @@ public class ArkaceA1 extends ActiveSkill {
             new TaskTimer(5, 3) {
                 @Override
                 public boolean run(int i) {
-                    Location location = LocationUtil.setRelativeOffset(combatUser.getEntity().getEyeLocation(),
+                    Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
                             combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
@@ -69,7 +73,8 @@ public class ArkaceA1 extends ActiveSkill {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
-                            ParticleUtil.playRGB(location, 1, 0, 0, 0, 32, 250, 225);
+                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
+                                    0, 0, 0, 32, 250, 225);
                         }
 
                         @Override
@@ -78,7 +83,7 @@ public class ArkaceA1 extends ActiveSkill {
                         }
 
                         @Override
-                        public void onHitEntity(Location location, ICombatEntity target) {
+                        public void onHitEntity(Location location, ICombatEntity target, boolean isCrit) {
                             Combat.attack(combatUser, target, DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);
@@ -103,7 +108,8 @@ public class ArkaceA1 extends ActiveSkill {
         SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.8F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.4F);
         SoundUtil.play("random.gun_reverb2", location, 6F, 0.9F);
-        ParticleUtil.playRGB(location, 200, 2.5F, 2.5F, 2.5F, 32, 250, 225);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
+                2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)
