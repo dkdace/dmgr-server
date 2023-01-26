@@ -25,6 +25,8 @@ public class ItemBuilder {
     private final ItemStack itemStack;
     /** 생성할 아이템의 정보 객체 */
     private final ItemMeta itemMeta;
+    /** 플레이어 머리 생성에 사용하는 필드 객체 */
+    private static Field profileField;
 
     /**
      * 아이템을 생성하기 위한 빌더 인스턴스를 생성한다.
@@ -90,8 +92,10 @@ public class ItemBuilder {
         gameProfile.getProperties().put("textures", new Property("textures", skullIcon.getUrl()));
 
         try {
-            Field profileField = skullMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
+            if (profileField == null) {
+                profileField = skullMeta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+            }
             profileField.set(skullMeta, gameProfile);
         } catch (Exception e) {
             e.printStackTrace();
