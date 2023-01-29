@@ -1,6 +1,6 @@
 package com.dace.dmgr.system.command;
 
-import com.dace.dmgr.gui.menu.OptionMenu;
+import com.dace.dmgr.gui.menu.MenuOption;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class OptionCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        OptionMenu optionMenu = new OptionMenu(player);
+        MenuOption optionMenu = new MenuOption(player);
         optionMenu.open(player);
 
         return true;

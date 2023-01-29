@@ -1,6 +1,6 @@
 package com.dace.dmgr.system.command;
 
-import com.dace.dmgr.gui.menu.MainMenu;
+import com.dace.dmgr.gui.menu.Menu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class MainMenuCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        MainMenu mainMenu = new MainMenu(player);
+        Menu mainMenu = new Menu(player);
         mainMenu.open(player);
 
         return true;
