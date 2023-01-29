@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
  *
  * <p>Usage: /메뉴</p>
  */
-public class MainMenuCommand implements CommandExecutor {
+public class MenuCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        Menu mainMenu = new Menu(player);
-        mainMenu.open(player);
+        Menu menu = new Menu(player);
+        menu.open(player);
 
         return true;
     }

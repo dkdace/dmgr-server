@@ -13,8 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 
-public class ChatSoundGui extends Gui {
-    public ChatSoundGui(Player player) {
+public class ChatSoundOption extends Gui {
+    public ChatSoundOption(Player player) {
         super(2, "§8채팅 효과음 설정");
         super.fillRow(2, DisplayItem.EMPTY.getItemStack());
 
@@ -44,7 +44,7 @@ public class ChatSoundGui extends Gui {
 
             SoundUtil.play(chatSound.getSound(), 1F, 1.414F, player);
             user.getUserConfig().setChatSound(chatSound);
-            new ChatSoundGui(player).open(player);
+            new ChatSoundOption(player).open(player);
         }
     }
 }

@@ -12,8 +12,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 
-public class MenuOption extends Gui {
-    public MenuOption(Player player) {
+public class PlayerOption extends Gui {
+    public PlayerOption(Player player) {
         super(2, "§8설정");
         super.fillRow(2, DisplayItem.EMPTY.getItemStack());
 
@@ -63,7 +63,7 @@ public class MenuOption extends Gui {
                     user.getUserConfig().setNightVision(!user.getUserConfig().isNightVision());
                     break;
                 case "채팅 효과음 설정":
-                    new ChatSoundGui(player).open(player);
+                    new ChatSoundOption(player).open(player);
                     return;
                 case "이전":
                     player.performCommand("메뉴");
@@ -73,7 +73,7 @@ public class MenuOption extends Gui {
                     return;
             }
 
-            new MenuOption(player).open(player);
+            new PlayerOption(player).open(player);
         }
     }
 }

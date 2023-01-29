@@ -1,6 +1,6 @@
 package com.dace.dmgr.system.command;
 
-import com.dace.dmgr.gui.menu.MenuOption;
+import com.dace.dmgr.gui.menu.PlayerOption;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
  *
  * <p>Usage: /설정</p>
  */
-public class OptionCommand implements CommandExecutor {
+public class PlayerOptionCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        MenuOption optionMenu = new MenuOption(player);
-        optionMenu.open(player);
+        PlayerOption playerOption = new PlayerOption(player);
+        playerOption.open(player);
 
         return true;
     }
