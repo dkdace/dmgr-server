@@ -56,7 +56,8 @@ public class Combat {
      * @param attacker 공격자 (기준 엔티티)
      * @param location 위치
      * @param range    범위 (반지름)
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link ICombatEntity#getCritHitbox()} 안에 있으면 {@code true})
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link ICombatEntity#getCritHitbox()}
+     * 안에 있으면 {@code true})
      */
     public static Map.Entry<ICombatEntity, Boolean> getNearEnemy(ICombatEntity attacker, Location location, float range) {
         ICombatEntity entity = combatEntityMap.values().stream()
