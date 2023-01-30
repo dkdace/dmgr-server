@@ -5,8 +5,7 @@ import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.character.ICharacter;
-import com.dace.dmgr.gui.ItemBuilder;
-import com.dace.dmgr.gui.slot.CommunicationSlot;
+import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.HashMapList;
@@ -186,9 +185,9 @@ public class CombatUser extends CombatEntity<Player> {
             SkinManager.applySkin(entity, character.getSkinName());
             setMaxHealth(character.getHealth());
             setHealth(character.getHealth());
-            entity.getInventory().setItem(9, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_HEAL).build());
-            entity.getInventory().setItem(10, ItemBuilder.fromSlotItem(CommunicationSlot.SHOW_ULT).build());
-            entity.getInventory().setItem(11, ItemBuilder.fromSlotItem(CommunicationSlot.REQ_RALLY).build());
+            entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
+            entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
+            entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
             weaponController = new WeaponController(this, character.getWeapon());
 
             this.character = character;

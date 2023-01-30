@@ -66,8 +66,8 @@ public class DMGR extends JavaPlugin {
      */
     private void registerCommand() {
         getCommand("스폰").setExecutor(new LobbyCommand());
-        getCommand("메뉴").setExecutor(new MainMenuCommand());
-        getCommand("설정").setExecutor(new OptionCommand());
+        getCommand("메뉴").setExecutor(new MenuCommand());
+        getCommand("설정").setExecutor(new PlayerOptionCommand());
         getCommand("선택").setExecutor(new SelectCharCommand());
     }
 

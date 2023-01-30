@@ -1,6 +1,5 @@
 package com.dace.dmgr.gui;
 
-import com.dace.dmgr.gui.slot.ISlotItem;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.shampaggon.crackshot.CSUtility;
@@ -21,12 +20,12 @@ import java.util.UUID;
 public class ItemBuilder {
     /** 크랙샷 아이템을 생성하기 위한 크랙샷 객체 */
     public static final CSUtility csUtility = new CSUtility();
+    /** 플레이어 머리 생성에 사용하는 필드 객체 */
+    private static Field profileField;
     /** 생성할 아이템 객체 */
     private final ItemStack itemStack;
     /** 생성할 아이템의 정보 객체 */
     private final ItemMeta itemMeta;
-    /** 플레이어 머리 생성에 사용하는 필드 객체 */
-    private static Field profileField;
 
     /**
      * 아이템을 생성하기 위한 빌더 인스턴스를 생성한다.
@@ -52,21 +51,6 @@ public class ItemBuilder {
     }
 
     /**
-     * 아이템을 생성하기 위한 빌더 인스턴스를 {@link ISlotItem}으로 생성한다.
-     *
-     * @param slotItem 슬롯 아이템
-     * @return ItemBuilder
-     */
-    public static ItemBuilder fromSlotItem(ISlotItem slotItem) {
-        ItemBuilder itemBuilder = new ItemBuilder(slotItem.getMaterial())
-                .setDamage(slotItem.getDamage())
-                .setName(slotItem.getName())
-                .addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
-        itemBuilder.getItemMeta().setUnbreakable(true);
-        return itemBuilder;
-    }
-
-    /**
      * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 플레이어의 머리로 생성한다.
      *
      * @param player 대상 플레이어
@@ -79,17 +63,17 @@ public class ItemBuilder {
     }
 
     /**
-     * 아이템을 생성하기 위한 빌더 인스턴스를 {@link SkullIcon}으로 생성한다.
+     * 아이템을 생성하기 위한 빌더 인스턴스를 {@link PlayerSkull}으로 생성한다.
      *
-     * @param skullIcon 플레이어 머리 아이템
+     * @param playerSkull 플레이어 머리 아이템
      * @return ItemBuilder
      */
-    public static ItemBuilder fromSkullIcon(SkullIcon skullIcon) {
+    public static ItemBuilder fromPlayerSkull(PlayerSkull playerSkull) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
         SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-        gameProfile.getProperties().put("textures", new Property("textures", skullIcon.getUrl()));
+        gameProfile.getProperties().put("textures", new Property("textures", playerSkull.getUrl()));
 
         try {
             if (profileField == null) {
