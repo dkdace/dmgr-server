@@ -3,13 +3,9 @@ package com.dace.dmgr.combat;
 import lombok.Builder;
 
 @Builder
-public class ProjectileOption {
+public class HitscanOption {
     @Builder.Default
     boolean penetrating = false;
     @Builder.Default
     float hitboxMultiplier = 1;
-    @Builder.Default
-    boolean hasGravity = false;
-    @Builder.Default
-    boolean bouncing = false;
 }

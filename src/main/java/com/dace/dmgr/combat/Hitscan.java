@@ -17,16 +17,23 @@ public abstract class Hitscan extends Bullet {
     /** 히트스캔의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.15F;
 
-    public Hitscan(ICombatEntity shooter, boolean penetrating, int trailInterval, float hitboxMultiplier) {
-        super(shooter, penetrating, trailInterval, hitboxMultiplier);
+    /**
+     * 히트스캔 인스턴스를 생성한다.
+     */
+    public Hitscan(ICombatEntity shooter, int trailInterval, HitscanOption option) {
+        super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
     }
 
-    public Hitscan(ICombatEntity shooter, boolean penetrating, int trailInterval) {
-        super(shooter, penetrating, trailInterval);
+    /**
+     * 히트스캔 인스턴스를 생성한다.
+     */
+    public Hitscan(ICombatEntity shooter, int trailInterval) {
+        super(shooter, trailInterval);
     }
 
     /**
      * 히트스캔 총알을 발사한다.
+     *
      * @param origin    발화점
      * @param direction 발사 방향
      * @param spread    탄퍼짐 정도
@@ -54,11 +61,10 @@ public abstract class Hitscan extends Bullet {
             if (loc.distance(origin) > 0.5) {
                 Map.Entry<ICombatEntity, Boolean> targetEntry
                         = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
+                ICombatEntity target = targetEntry.getKey();
+                boolean isCrit = targetEntry.getValue();
 
-                if (targetEntry != null) {
-                    ICombatEntity target = targetEntry.getKey();
-                    boolean isCrit = targetEntry.getValue();
-
+                if (target != null) {
                     if (!targetSet.add(target)) {
                         onHit(hitLoc);
                         onHitEntity(hitLoc, target, isCrit);

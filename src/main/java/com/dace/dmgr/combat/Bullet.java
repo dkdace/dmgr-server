@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -11,9 +13,12 @@ import org.bukkit.util.Vector;
 
 /**
  * 총알. 원거리 공격(투사체, 히트박스) 등을 관리하기 위한 클래스.
+ *
  * @see Hitscan
  * @see Projectile
  */
+@RequiredArgsConstructor
+@AllArgsConstructor
 public abstract class Bullet {
     /** 총알의 최대 사거리 */
     protected static final int MAX_RANGE = 70;
@@ -22,28 +27,20 @@ public abstract class Bullet {
     /** {@code trailInterval} 기본값. 단위: 판정점 개수 */
     protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
-    protected ICombatEntity shooter;
+    protected final ICombatEntity shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
-    protected int trailInterval;
-    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
-    protected float hitboxMultiplier;
+    protected final int trailInterval;
     /** 관통 여부 */
     protected boolean penetrating;
-
-    /** 하위 클래스의 생성은 각 클래스 별 Builder를 이용하라 */
-    private Bullet() {
-        this.shooter = null;
-        this.trailInterval = TRAIL_INTERVAL;
-        this.hitboxMultiplier = 1.0f;
-        this.penetrating = false;
-    }
-
+    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
+    protected float hitboxMultiplier;
 
     /**
      * 총알이 맞았을 때의 파티클, 소리 효과를 재생한다.
-     * @param location  총알이 피격된 위치
-     * @param hitBlock  총알이 피격된 블록
-     * @param sound     피격음 재생 여부
+     *
+     * @param location 총알이 피격된 위치
+     * @param hitBlock 총알이 피격된 블록
+     * @param sound    피격음 재생 여부
      */
     public static void bulletHitEffect(Location location, Block hitBlock, boolean sound) {
         if (sound)
@@ -56,6 +53,7 @@ public abstract class Bullet {
 
     /**
      * 총알을 발사한다.
+     *
      * @param origin    발화점
      * @param direction 발사 방향
      * @param spread    탄퍼짐 정도
@@ -64,6 +62,7 @@ public abstract class Bullet {
 
     /**
      * 엔티티가 보는 방향으로 총알을 발사한다.
+     *
      * @param origin 발화점
      * @param spread 탄퍼짐 정도
      */
@@ -73,6 +72,7 @@ public abstract class Bullet {
 
     /**
      * 엔티티가 보는 방향으로 탄퍼짐 없이 총알을 발사한다.
+     *
      * @param origin 발화점
      */
     public void shoot(Location origin) {
@@ -81,6 +81,7 @@ public abstract class Bullet {
 
     /**
      * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
+     *
      * @param spread 탄퍼짐 정도
      */
     public void shoot(float spread) {
@@ -102,12 +103,14 @@ public abstract class Bullet {
 
     /**
      * 주어진 위치에 트레일을 남긴다.
+     *
      * @param location 위치
      */
     public abstract void trail(Location location);
 
     /**
      * 총알이 블록에 맞았을 때 실행될 작업
+     *
      * @param location 총알이 맞힌 위치
      * @param hitBlock 총알이 맞힌 블록
      * @see Bullet#onHit
@@ -119,9 +122,10 @@ public abstract class Bullet {
 
     /**
      * 총알이 엔티티에 맞았을 때 실행될 작업
+     *
      * @param location 총알이 맞힌 위치
-     * @param target 총알이 맞힌 엔티티
-     * @param isCrit 치명타 여부
+     * @param target   총알이 맞힌 엔티티
+     * @param isCrit   치명타 여부
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
@@ -134,6 +138,7 @@ public abstract class Bullet {
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
-    public void onHit(Location location) {    }
+    public void onHit(Location location) {
+    }
 
 }

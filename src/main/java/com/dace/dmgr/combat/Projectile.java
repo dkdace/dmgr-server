@@ -26,30 +26,37 @@ public abstract class Projectile extends Bullet {
 
     /**
      * 투사체 인스턴스를 생성한다.<br>
-     *
+     * <p>
      * 투사체를 생성에 필요한 옵션이 가변적이므로 매개변수 대신 {@link ProjectileOption} 객체를 통해 전달받는다.
-     * {@link ProjectileOption} 객체는 {@link ProjectileOption.Builder}를 통해 제작할 수 있다.
+     * {@link ProjectileOption} 객체는 {@link ProjectileOption#builder()}를 통해 제작할 수 있다.
      * 다음 예시를 참고하라: <pre>
      * ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
      *                              .trailInterval(5)
      *                              .build();
      * new Projectile(option){ /* ... &#42;/}.shoot();
      * </pre>
+     *
      * @param option 투사체 옵션
      * @see ProjectileOption
-     * @deprecated
      */
-    public Projectile(ProjectileOption option) {
-        super(option.shooter, option.penetrating, option.trailInterval, option.hitboxMultiplier);
-        this.velocity = option.velocity;
+    public Projectile(ICombatEntity shooter, int trailInterval, int velocity, ProjectileOption option) {
+        super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
+        this.velocity = velocity;
         this.hasGravity = option.hasGravity;
         this.bouncing = option.bouncing;
     }
 
-
+    public Projectile(ICombatEntity shooter, int trailInterval, int velocity) {
+        super(shooter, trailInterval);
+        ProjectileOption option = ProjectileOption.builder().build();
+        this.velocity = velocity;
+        this.hasGravity = option.hasGravity;
+        this.bouncing = option.bouncing;
+    }
 
     /**
      * 투사체를 발사한다.
+     *
      * @param origin    발화점
      * @param direction 발사 방향
      * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
