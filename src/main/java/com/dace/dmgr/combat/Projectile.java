@@ -21,8 +21,8 @@ public abstract class Projectile extends Bullet {
     protected int velocity;
     /** 중력의 영향을 받는지 여부 */
     protected boolean hasGravity;
-    /** 투사체가 튕기는 지 여부 */
-    protected boolean bouncing;
+    /** 투사체가 튕기는 횟수 (0: 튕기지 않음). */
+    protected int bouncing;
 
     /**
      * 투사체 인스턴스를 생성한다.<br>
@@ -68,20 +68,27 @@ public abstract class Projectile extends Bullet {
         direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<ICombatEntity> targetList = new HashSet<>();
 
-        Vector finalDirection = direction;
+        int loopCount = velocity / 5;
+        int sum = 0;
+        for (int i = 0; i <= loopCount; i++) {
+            sum += i;
+        }
+
+        final Vector finalDirection = direction;
+        final int finalSum = sum;
 
         new TaskTimer(1) {
             int count = 0;
 
             @Override
             public boolean run(int _i) {
-                for (int i = 0; i < velocity / 5; i++) {
+                for (int i = 0; i < loopCount; i++) {
                     if (loc.distance(origin) >= MAX_RANGE)
                         return false;
 
                     Location hitLoc = loc.clone().add(finalDirection);
                     if (!LocationUtil.isNonSolid(hitLoc)) {
-                        Vector subDir = finalDirection.clone().multiply(0.5);
+                        Vector subDir = finalDirection.clone().multiply(0.25);
 
                         while (LocationUtil.isNonSolid(loc))
                             loc.add(subDir);
@@ -89,17 +96,29 @@ public abstract class Projectile extends Bullet {
                         loc.subtract(subDir);
                         onHit(loc);
                         onHitBlock(loc, hitLoc.getBlock());
-                        return false;
+
+                        if (bouncing-- > 0) {
+                            Vector hitDir = hitLoc.getBlock().getLocation().subtract(loc.getBlock().getLocation()).toVector();
+
+                            if (Math.abs(hitDir.getX()) > 0.5)
+                                finalDirection.setX(-finalDirection.getX());
+                            else if (Math.abs(hitDir.getY()) > 0.5)
+                                finalDirection.setY(-finalDirection.getY());
+                            else if (Math.abs(hitDir.getZ()) > 0.5)
+                                finalDirection.setZ(-finalDirection.getZ());
+
+                            return true;
+                        } else
+                            return false;
                     }
 
                     if (loc.distance(origin) > 0.5) {
                         Map.Entry<ICombatEntity, Boolean> targetEntry
                                 = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-
                         ICombatEntity target = targetEntry.getKey();
-                        if (target != null) {
-                            boolean isCrit = targetEntry.getValue();
+                        boolean isCrit = targetEntry.getValue();
 
+                        if (target != null) {
                             if (targetList.add(target)) {
                                 onHit(hitLoc);
                                 onHitEntity(hitLoc, target, isCrit);
@@ -108,6 +127,9 @@ public abstract class Projectile extends Bullet {
                                     return false;
                             }
                         }
+                    }
+                    if (hasGravity) {
+                        finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
                     }
                     loc.add(finalDirection);
                     if (count++ % trailInterval == 0) trail(loc.clone());

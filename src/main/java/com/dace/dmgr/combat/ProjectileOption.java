@@ -11,5 +11,5 @@ public class ProjectileOption {
     @Builder.Default
     boolean hasGravity = false;
     @Builder.Default
-    boolean bouncing = false;
+    int bouncing = 0;
 }
