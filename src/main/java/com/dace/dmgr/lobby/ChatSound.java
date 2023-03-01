@@ -1,10 +1,14 @@
 package com.dace.dmgr.lobby;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.Material;
 
 /**
  * 채팅 효과음 목록.
  */
+@AllArgsConstructor
+@Getter
 public enum ChatSound {
     /** 음소거 */
     MUTE("음소거", "", Material.BARRIER),
@@ -41,22 +45,4 @@ public enum ChatSound {
     private final String sound;
     /** 블록 (노트블록 기준) */
     private final Material material;
-
-    ChatSound(String name, String sound, Material material) {
-        this.sound = sound;
-        this.name = name;
-        this.material = material;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSound() {
-        return sound;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
 }
