@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.ItemBuilder;
+import lombok.Getter;
 import org.bukkit.Material;
 
 /**
@@ -13,6 +14,7 @@ public abstract class Skill extends Action {
     /** 스킬 이름의 접두사 */
     private static final String PREFIX = "§e§l[스킬] §c";
     /** 번호 */
+    @Getter
     private final int number;
 
     public Skill(int number, String name, String... lore) {
@@ -22,10 +24,6 @@ public abstract class Skill extends Action {
                 .setLore(lore)
                 .build());
         this.number = number;
-    }
-
-    public int getNumber() {
-        return number;
     }
 
     /**
