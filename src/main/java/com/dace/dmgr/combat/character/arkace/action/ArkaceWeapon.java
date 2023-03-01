@@ -99,7 +99,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     weaponController.consume(1);
                 }
 
-                new Hitscan(combatUser, false, 7) {
+                new Hitscan(combatUser, 7) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);

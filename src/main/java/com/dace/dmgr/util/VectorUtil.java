@@ -67,6 +67,35 @@ public class VectorUtil {
     }
 
     /**
+     * 벡터의 Yaw 값을 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @return Yaw 값
+     */
+    public static double getYaw(Vector vector) {
+        if (vector.getX() == 0 && vector.getZ() == 0)
+            return 0;
+
+        double yaw = Math.toDegrees(Math.atan2(vector.getZ(), vector.getX())) + 90;
+        if (yaw > 360)
+            yaw -= 360;
+
+        return yaw;
+    }
+
+    /**
+     * 벡터의 Pitch 값을 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @return Pitch 값
+     */
+    public static double getPitch(Vector vector) {
+        double xy = Math.sqrt(vector.getX() * vector.getX() + vector.getZ() * vector.getZ());
+
+        return -Math.toDegrees(Math.atan(vector.getY() / xy));
+    }
+
+    /**
      * 벡터의 성분을 지정한 값만큼 무작위로 분산시킨 벡터를 반환한다.
      *
      * @param vector 대상 벡터
