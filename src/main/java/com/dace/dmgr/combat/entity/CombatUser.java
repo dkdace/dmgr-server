@@ -12,6 +12,8 @@ import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
@@ -26,6 +28,7 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
+@Getter
 public class CombatUser extends CombatEntity<Player> {
     /** 보호막 (노란 체력) 목록 */
     private final HashMap<String, Integer> shield = new HashMap<>();
@@ -61,20 +64,8 @@ public class CombatUser extends CombatEntity<Player> {
         updateHitboxTick();
     }
 
-    public WeaponController getWeaponController() {
-        return weaponController;
-    }
-
     public SkillController getSkillController(Skill skill) {
         return skillControllerMap.get(skill);
-    }
-
-    public HashMap<CombatUser, Float> getDamageMap() {
-        return damageMap;
-    }
-
-    public float getBulletSpread() {
-        return bulletSpread;
     }
 
     /**
@@ -168,10 +159,6 @@ public class CombatUser extends CombatEntity<Player> {
     @Override
     public boolean isDamageable() {
         return entity.getGameMode() == GameMode.SURVIVAL;
-    }
-
-    public ICharacter getCharacter() {
-        return character;
     }
 
     /**
