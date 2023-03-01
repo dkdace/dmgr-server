@@ -3,11 +3,26 @@ package com.dace.dmgr.util;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+/**
+ * 벡터 관련 기능을 제공하는 클래스.
+ */
 public class VectorUtil {
+    /**
+     * 위치의 방향을 기준으로 Roll 축을 반환한다.
+     *
+     * @param location 기준 위치
+     * @return Roll 축
+     */
     public static Vector getRollAxis(Location location) {
         return location.getDirection();
     }
 
+    /**
+     * 위치의 방향을 기준으로 Yaw 축을 반환한다.
+     *
+     * @param location 기준 위치
+     * @return Yaw 축
+     */
     public static Vector getYawAxis(Location location) {
         Location loc = location.clone();
         loc.setYaw(location.getYaw() + 90);
@@ -15,11 +30,25 @@ public class VectorUtil {
         return getRollAxis(location).getCrossProduct(loc.getDirection()).normalize();
     }
 
+    /**
+     * 위치의 방향을 기준으로 Pitch 축을 반환한다.
+     *
+     * @param location 기준 위치
+     * @return Pitch 축
+     */
     public static Vector getPitchAxis(Location location) {
         return getRollAxis(location).getCrossProduct(getYawAxis(location));
     }
 
-    public static Vector rotate(Vector vector, Vector axis, double angle) {
+    /**
+     * 회전행렬을 이용하여 축을 기준으로 지정한 각도만큼 회전시킨 벡터를 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @param axis   기준 축
+     * @param angle  각도
+     * @return 최종 벡터
+     */
+    public static Vector getRotatedVector(Vector vector, Vector axis, double angle) {
         double sin = Math.sin(Math.toRadians(angle));
         double cos = Math.cos(Math.toRadians(angle));
         Vector finalAxis = axis.clone().normalize();
@@ -37,7 +66,43 @@ public class VectorUtil {
         return new Vector(x, y, z);
     }
 
-    public static Vector spread(Vector vector, float amount) {
+    /**
+     * 벡터의 Yaw 값을 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @return Yaw 값
+     */
+    public static double getYaw(Vector vector) {
+        if (vector.getX() == 0 && vector.getZ() == 0)
+            return 0;
+
+        double yaw = Math.toDegrees(Math.atan2(vector.getZ(), vector.getX())) + 90;
+        if (yaw > 360)
+            yaw -= 360;
+
+        return yaw;
+    }
+
+    /**
+     * 벡터의 Pitch 값을 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @return Pitch 값
+     */
+    public static double getPitch(Vector vector) {
+        double xy = Math.sqrt(vector.getX() * vector.getX() + vector.getZ() * vector.getZ());
+
+        return -Math.toDegrees(Math.atan(vector.getY() / xy));
+    }
+
+    /**
+     * 벡터의 성분을 지정한 값만큼 무작위로 분산시킨 벡터를 반환한다.
+     *
+     * @param vector 대상 벡터
+     * @param amount 값
+     * @return 최종 벡터
+     */
+    public static Vector getSpreadedVector(Vector vector, float amount) {
         Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.02);
         return vector.clone().add(spread);
     }

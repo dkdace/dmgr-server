@@ -22,10 +22,15 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public class ArkaceWeapon extends Weapon implements Reloadable {
+    /** 피해량 */
     public static final int DAMAGE = 75;
+    /** 피해량 감소 시작 거리 */
     public static final int DAMAGE_DISTANCE = 25;
+    /** 쿨타임 */
     public static final long COOLDOWN = (long) (0.1 * 20);
+    /** 장탄수 */
     public static final int CAPACITY = 30;
+    /** 재장전 시간 */
     public static final long RELOAD_DURATION = (long) (1.5 * 20);
     private static final ArkaceWeapon instance = new ArkaceWeapon();
 
@@ -33,11 +38,11 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         super("HLN-12", ItemBuilder.fromCSItem("HLN-12").setLore(
                 "",
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
-                "§7사격§f하여 " + TextIcon.DAMAGE + " §c피해§f를 입힙니다.",
+                "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
                 "",
-                "§f" + TextIcon.DAMAGE + "   §c" + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
-                "§f" + TextIcon.ATTACK_SPEED + "   0.1초",
-                "§f" + TextIcon.CAPACITY + "   30발",
+                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
+                "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
+                "§f" + TextIcon.CAPACITY + "§f 30발",
                 "",
                 "§7§l[우클릭] §f사격 §7§l[Q] §f재장전").build());
     }
@@ -94,19 +99,20 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     weaponController.consume(1);
                 }
 
-                new Hitscan(combatUser, false, 7) {
+                new Hitscan(combatUser, 7) {
                     @Override
                     public void trail(Location location) {
-                        Location trailLoc = LocationUtil.setRelativeOffset(location, 0.2, -0.2, 0);
+                        Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
                         if (isUlt)
-                            ParticleUtil.playRGB(trailLoc, 1, 0, 0, 0, 0, 230, 255);
+                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
+                                    0, 0, 0, 0, 230, 255);
                         else
                             ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
                     }
 
                     @Override
-                    public void onHitEntity(Location location, ICombatEntity target) {
-                        Combat.attack(combatUser, target, DAMAGE, "", false, true);
+                    public void onHitEntity(Location location, ICombatEntity target, boolean isCrit) {
+                        Combat.attack(combatUser, target, DAMAGE, "", isCrit, true);
                     }
                 }.shoot(combatUser.getBulletSpread());
 
@@ -162,16 +168,29 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
         };
     }
 
+    /**
+     * 반동 정보.
+     */
     public static class RECOIL {
+        /** 수직 반동 */
         static final float UP = 0.6F;
+        /** 수평 반동 */
         static final float SIDE = 0.04F;
+        /** 수직 반동 분산도 */
         static final float UP_SPREAD = 0.1F;
+        /** 수평 반동 분산도 */
         static final float SIDE_SPREAD = 0.06F;
     }
 
+    /**
+     * 탄퍼짐 정보.
+     */
     public static class SPREAD {
+        /** 탄퍼짐 증가량 */
         static final float INCREMENT = 0.15F;
+        /** 탄퍼짐 회복량 */
         static final float RECOVERY = 1F;
+        /** 탄퍼짐 최대치 */
         static final float MAX = 2.3F;
     }
 }
