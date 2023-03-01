@@ -50,6 +50,11 @@ public abstract class TaskTimer {
         execute();
     }
 
+    /**
+     * {@link TaskTimer#run(int)}을 무한 반복하여 호출한다.
+     *
+     * @param period 실행 주기 (tick)
+     */
     public TaskTimer(long period) {
         this(period, 0);
     }
