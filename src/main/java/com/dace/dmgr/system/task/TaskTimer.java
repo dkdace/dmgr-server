@@ -42,7 +42,7 @@ public abstract class TaskTimer {
      * 지정한 횟수만큼 {@link TaskTimer#run(int)}을 반복하여 호출한다.
      *
      * @param period 실행 주기 (tick)
-     * @param repeat 반복 횟수
+     * @param repeat 반복 횟수(0: 무한 반복)
      */
     public TaskTimer(long period, long repeat) {
         this.period = period;
