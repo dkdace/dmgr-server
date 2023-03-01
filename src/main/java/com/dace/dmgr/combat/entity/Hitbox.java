@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.util.LocationUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 
 /**
@@ -8,10 +9,13 @@ import org.bukkit.Location;
  */
 public class Hitbox {
     /** 가로 */
+    @Getter
     private final double sizeX;
     /** 높이 */
+    @Getter
     private final double sizeY;
     /** 세로 */
+    @Getter
     private final double sizeZ;
     /** 중앙 위치의 오프셋. 왼쪽(-) / 오른쪽(+) */
     private final double offsetX;
@@ -41,18 +45,6 @@ public class Hitbox {
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         setCenter(center);
-    }
-
-    public double getSizeX() {
-        return sizeX;
-    }
-
-    public double getSizeY() {
-        return sizeY;
-    }
-
-    public double getSizeZ() {
-        return sizeZ;
     }
 
     public Location getCenter() {
