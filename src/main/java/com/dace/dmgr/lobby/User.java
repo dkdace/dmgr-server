@@ -5,6 +5,8 @@ import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.YamlFile;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
@@ -15,6 +17,7 @@ import static com.dace.dmgr.system.HashMapList.userMap;
 /**
  * 유저 정보를 관리하는 클래스.
  */
+@Getter
 public class User {
     /** 로비 사이드바 */
     private final BPlayerBoard lobbySidebar;
@@ -39,8 +42,10 @@ public class User {
     /** 매치메이킹 점수 */
     private int mmr = 100;
     /** 리소스팩 적용 여부 */
+    @Setter
     private boolean resourcePack = false;
     /** 리소스팩 적용 상태 */
+    @Setter
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
     /**
@@ -66,26 +71,10 @@ public class User {
         userMap.put(player, this);
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public UserConfig getUserConfig() {
-        return userConfig;
-    }
-
-    public int getXp() {
-        return xp;
-    }
-
     public void setXp(int xp) {
         if (xp < 0) xp = 0;
         this.xp = xp;
         yamlFile.set("xp", this.xp);
-    }
-
-    public int getLevel() {
-        return level;
     }
 
     public void setLevel(int level) {
@@ -94,18 +83,10 @@ public class User {
         yamlFile.set("level", this.level);
     }
 
-    public int getMoney() {
-        return money;
-    }
-
     public void setMoney(int money) {
         if (money < 0) money = 0;
         this.money = money;
         yamlFile.set("money", this.money);
-    }
-
-    public int getRank() {
-        return rank;
     }
 
     public void setRank(int rank) {
@@ -113,17 +94,9 @@ public class User {
         yamlFile.set("rank", this.rank);
     }
 
-    public int getRankPlay() {
-        return rankPlay;
-    }
-
     public void setRankPlay(int rankPlay) {
         this.rankPlay = rankPlay;
         yamlFile.set("rankPlay", this.rankPlay);
-    }
-
-    public int getMMR() {
-        return mmr;
     }
 
     public void setMMR(int mmr) {
@@ -140,24 +113,8 @@ public class User {
         yamlFile.set("isRanked", this.isRanked);
     }
 
-    public BPlayerBoard getLobbySidebar() {
-        return lobbySidebar;
-    }
-
     public boolean isResourcePack() {
         return resourcePack;
-    }
-
-    public void setResourcePack(boolean resourcePack) {
-        this.resourcePack = resourcePack;
-    }
-
-    public PlayerResourcePackStatusEvent.Status getResourcePackStatus() {
-        return resourcePackStatus;
-    }
-
-    public void setResourcePackStatus(PlayerResourcePackStatusEvent.Status resourcePackStatus) {
-        this.resourcePackStatus = resourcePackStatus;
     }
 
     /**

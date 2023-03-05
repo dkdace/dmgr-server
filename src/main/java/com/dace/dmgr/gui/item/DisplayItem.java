@@ -1,6 +1,7 @@
 package com.dace.dmgr.gui.item;
 
 import com.dace.dmgr.gui.ItemBuilder;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,7 @@ public enum DisplayItem implements IGuiItem {
     ENABLED((short) 7);
 
     private final Material MATERIAL = Material.CARROT_STICK;
+    @Getter
     private final ItemStack itemStack;
 
     DisplayItem(short damage) {
@@ -32,10 +34,5 @@ public enum DisplayItem implements IGuiItem {
     @Override
     public String getName() {
         return null;
-    }
-
-    @Override
-    public ItemStack getItemStack() {
-        return itemStack;
     }
 }

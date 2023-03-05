@@ -3,11 +3,13 @@ package com.dace.dmgr.combat.character.arkace;
 import com.dace.dmgr.combat.action.*;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.action.*;
+import lombok.Getter;
 
 /**
  * 전투원 - 아케이스 클래스.
  */
 public class Arkace extends Character {
+    @Getter
     private static final Arkace instance = new Arkace();
     private static final ActionKeyMap keymap = new ActionKeyMap()
             .put(ActionKey.LEFT_CLICK, instance.getActive(2))
@@ -21,10 +23,6 @@ public class Arkace extends Character {
 
     private Arkace() {
         super("아케이스", "DVArkace", 1000, 1.0F, 1.0F);
-    }
-
-    public static Arkace getInstance() {
-        return instance;
     }
 
     @Override

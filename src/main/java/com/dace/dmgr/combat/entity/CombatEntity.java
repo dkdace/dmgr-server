@@ -3,6 +3,8 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -14,6 +16,7 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
  *
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
  */
+@Getter
 public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     /** 엔티티 객체 */
     protected final T entity;
@@ -24,6 +27,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     /** 이름 */
     private String name;
     /** 팀 */
+    @Setter
     private String team = "";
     /** 이동속도 증가량 */
     private int speedIncrement = 0;
@@ -61,11 +65,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
         combatEntityMap.put(entity, this);
     }
 
-    @Override
-    public T getEntity() {
-        return entity;
-    }
-
     /**
      * 엔티티의 히트박스 위치를 갱신하는 스케쥴러를 실행한다.
      *
@@ -91,33 +90,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
                 return true;
             }
         };
-    }
-
-    @Override
-    public Hitbox getHitbox() {
-        return hitbox;
-    }
-
-    @Override
-    public Hitbox getCritHitbox() {
-        return critHitbox;
-    }
-
-    ;
-
-    @Override
-    public String getTeam() {
-        return team;
-    }
-
-    @Override
-    public void setTeam(String team) {
-        this.team = team;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -167,11 +139,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
     @Override
     public void setMaxHealth(int health) {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
-    }
-
-    @Override
-    public int getSpeedIncrement() {
-        return speedIncrement;
     }
 
     @Override
