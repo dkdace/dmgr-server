@@ -16,6 +16,10 @@ public class CombatUserEvent extends Event {
     /** 이벤트를 호출한 플레이어 */
     protected final CombatUser combatUser;
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     @Override
     public HandlerList getHandlers() {
         return handlers;
