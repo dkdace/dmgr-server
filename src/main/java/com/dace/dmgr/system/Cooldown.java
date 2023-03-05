@@ -41,7 +41,7 @@ public enum Cooldown {
     SILENCE(0),
     /** 화염 지속시간 */
     BURN(0),
-    /** 재장전 */
+    /** 2중 탄창 무기 교체 */
     WEAPON_SWAP(0),
     ;
     /** 쿨타임 기본값 */

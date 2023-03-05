@@ -18,12 +18,18 @@ public class WeaponController {
     private final Weapon weapon;
     /** 무기 아이템 */
     private final ItemStack itemStack;
+
     /** 남은 탄약 수 */
     private int remainingAmmo = -1;
     /** 재장전 상태 */
     private boolean reloading = false;
+
+    /** 보조무기 아이템 */
+    private ItemStack subweaponItemStack = null;
     /** 보조무기 상태 */
     private Swappable.State swappingState = Swappable.State.PRIMARY;
+    /** (2중 무기) 반대 무기 탄약 수 */
+    private int oppositeAmmo = -1;
     
 
     /**
@@ -38,6 +44,12 @@ public class WeaponController {
         this.itemStack = weapon.getItemStack().clone();
         if (weapon instanceof Reloadable)
             this.remainingAmmo = ((Reloadable) weapon).getCapacity();
+        if (weapon instanceof Swappable) {
+            Weapon subWeapon = ((Swappable) weapon).getSubweapon();
+            this.subweaponItemStack = subWeapon.getItemStack().clone();
+            if (subWeapon instanceof Reloadable)
+                this.oppositeAmmo = ((Reloadable) subWeapon).getCapacity();
+        }
         apply();
     }
 
@@ -46,6 +58,13 @@ public class WeaponController {
      */
     public void apply() {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
+    }
+
+    /**
+     * 플레이어의 인벤토리에 보조무기 아이템을 적용한다.
+     */
+    public void applySubweapon() {
+        combatUser.getEntity().getInventory().setItem(4, subweaponItemStack);
     }
 
     /**
@@ -72,9 +91,14 @@ public class WeaponController {
 
     /**
      * 무기의 쿨타임을 무기 정보에 설정된 기본 쿨타임으로 설정한다.
+     *
+     * 보조무기를 들고 있다면 보조무기의 쿨타임으로 설정한다.
      */
     public void setCooldown() {
-        setCooldown((int) weapon.getCooldown());
+        if (swappingState == Swappable.State.PRIMARY)
+            setCooldown((int) weapon.getCooldown());
+        else if (swappingState == Swappable.State.SECONDARY)
+            setCooldown((int) ((Swappable) weapon).getSubweaponCooldown());
     }
 
     /**
@@ -131,7 +155,11 @@ public class WeaponController {
 
         reloading = true;
 
-        long duration = ((Reloadable) weapon).getReloadDuration();
+        long duration;
+        if (swappingState == Swappable.State.PRIMARY)
+            duration = ((Reloadable) weapon).getReloadDuration();
+        else
+            duration = ((Swappable) weapon).getSubweaponCooldown();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {
@@ -155,7 +183,10 @@ public class WeaponController {
 
                 combatUser.sendActionBar("§a§l재장전 완료", 8);
 
-                remainingAmmo = ((Reloadable) weapon).getCapacity();
+                if (swappingState == Swappable.State.PRIMARY)
+                    remainingAmmo = ((Reloadable) weapon).getCapacity();
+                else
+                    remainingAmmo = ((Reloadable)((Swappable) weapon).getSubweapon()).getCapacity();
                 reloading = false;
             }
         };
@@ -198,6 +229,14 @@ public class WeaponController {
                 
                 combatUser.sendActionBar("§a§l무기 교체 완료", 8);
                 swappingState = targetState;
+
+                // remainingAmmo와 oppositeAmmo 교체 (XOR algorithm)
+                remainingAmmo = remainingAmmo ^ oppositeAmmo ^ (oppositeAmmo = remainingAmmo);
+
+                if (targetState == Swappable.State.PRIMARY)
+                    apply();
+                else
+                    applySubweapon();
             }
         };
     };
