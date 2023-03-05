@@ -22,6 +22,9 @@ public class WeaponController {
     private int remainingAmmo = -1;
     /** 재장전 상태 */
     private boolean reloading = false;
+    /** 보조무기 상태 */
+    private Swappable.State swappingState = Swappable.State.PRIMARY;
+    
 
     /**
      * 무기 컨트롤러 인스턴스를 생성한다.
@@ -154,6 +157,54 @@ public class WeaponController {
                 reloading = false;
             }
         };
+    }
 
+    /**
+     * 이중 탄창 무기의 모드를 특정 상태로 교체합니다.
+     */
+    private void swapTo(Swappable.State targetState) {
+        if (!(weapon instanceof Swappable))
+            return;
+        if (swappingState == targetState || swappingState == Swappable.State.SWAPPING)
+            return;
+        if (targetState == Swappable.State.SWAPPING)
+            return;
+
+        swappingState = Swappable.State.SWAPPING;
+
+        long duration = ((Swappable) weapon).getSwapDuration();
+        CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_SWAP, duration);
+
+        new TaskTimer(1, duration) {
+            @Override
+            public boolean run(int i) {
+                if (swappingState != Swappable.State.SWAPPING)
+                    return false;
+
+                String time = String.format("%.1f", (float) (repeat - i) / 20);
+                combatUser.sendActionBar("§c§l무기 교체 중... " + StringFormUtil.getProgressBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
+                        2);
+                return true;
+            }
+            @Override
+            public void onEnd(boolean cancelled) {
+                CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, 0);
+                if (cancelled)
+                    return;
+                
+                combatUser.sendActionBar("§a§l무기 교체 완료", 8);
+                swappingState = targetState;
+            }
+        };
+    };
+
+    /**
+     * 이중 탄창 무기의 모드를 반대 무기로 교체합니다.
+     */
+    public void swap() {
+        if (swappingState == Swappable.State.PRIMARY)
+            swapTo(Swappable.State.SECONDARY);
+        else if (swappingState == Swappable.State.SECONDARY)
+            swapTo(Swappable.State.PRIMARY);
     }
 }

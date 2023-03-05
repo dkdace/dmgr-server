@@ -40,8 +40,10 @@ public enum Cooldown {
     /** 침묵 지속시간 */
     SILENCE(0),
     /** 화염 지속시간 */
-    BURN(0);
-
+    BURN(0),
+    /** 재장전 */
+    WEAPON_SWAP(0),
+    ;
     /** 쿨타임 기본값 */
     private final long defaultValue;
 
