@@ -24,10 +24,10 @@ public class WeaponController {
     /** 재장전 상태 */
     private boolean reloading = false;
 
-    /** 보조무기 아이템 */
-    private ItemStack subweaponItemStack = null;
     /** 보조무기 상태 */
     private Swappable.State swappingState = Swappable.State.PRIMARY;
+    /** 보조무기 아이템 */
+    private ItemStack subweaponItemStack = null;
     /** (2중 무기) 반대 무기 탄약 수 */
     private int oppositeAmmo = -1;
     
