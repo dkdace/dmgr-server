@@ -126,6 +126,8 @@ public class WeaponController {
             return;
         if (reloading)
             return;
+        if (swappingState == Swappable.State.SWAPPING)
+            return;
 
         reloading = true;
 
@@ -168,6 +170,8 @@ public class WeaponController {
         if (swappingState == targetState || swappingState == Swappable.State.SWAPPING)
             return;
         if (targetState == Swappable.State.SWAPPING)
+            return;
+        if (reloading)
             return;
 
         swappingState = Swappable.State.SWAPPING;
