@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
+import lombok.AllArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
