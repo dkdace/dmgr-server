@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * 정조준이 가능한 무기의 인터페이스.
