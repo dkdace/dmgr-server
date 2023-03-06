@@ -7,6 +7,8 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * 무기 상태를 관리하는 컨트롤러 클래스.
@@ -22,6 +24,8 @@ public class WeaponController {
     private int remainingAmmo = -1;
     /** 재장전 상태 */
     private boolean reloading = false;
+    /** 정조준 상태 */
+    private boolean aiming = false;
 
     /**
      * 무기 컨트롤러 인스턴스를 생성한다.
@@ -85,6 +89,10 @@ public class WeaponController {
 
     public boolean isReloading() {
         return reloading;
+    }
+
+    public boolean isAiming() {
+        return aiming;
     }
 
     public void setReloading(boolean reloading) {
@@ -154,6 +162,29 @@ public class WeaponController {
                 reloading = false;
             }
         };
+
+    }
+
+    /**
+     * 무기를 정조준한다.
+     *
+     * <p>{@link Aimable}을 상속받는 클래스여야 한다.</p>
+     */
+    public void aim() {
+        if (!(weapon instanceof Aimable))
+            return;
+
+        if (!aiming) {
+            combatUser.getEntity().getInventory().getItem(4)
+                    .setDurability((short) (combatUser.getCharacter().getWeapon().getItemStack().getDurability() + ((Aimable) weapon).getScope()));
+            combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000000, 5, false, false));
+            aiming = true;
+        } else {
+            combatUser.getEntity().getInventory().getItem(4)
+                    .setDurability(combatUser.getCharacter().getWeapon().getItemStack().getDurability());
+            combatUser.getEntity().removePotionEffect(PotionEffectType.SLOW);
+            aiming = false;
+        }
 
     }
 }
