@@ -19,6 +19,8 @@ public class OnCombatUserAction implements Listener {
         if (action instanceof Weapon) {
             if (!weaponController.isCooldownFinished())
                 return;
+            if (weaponController.isSwapping())
+                return;
 
             ((Weapon) action).use(combatUser, weaponController, actionKey);
 

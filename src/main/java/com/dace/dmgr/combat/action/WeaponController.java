@@ -114,6 +114,8 @@ public class WeaponController {
         return reloading;
     }
 
+    public boolean isSwapping() { return swappingState == Swappable.State.SWAPPING; }
+
     public void setReloading(boolean reloading) {
         this.reloading = reloading;
     }
