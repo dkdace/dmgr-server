@@ -16,7 +16,7 @@ public class MenuCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        Menu menu = new Menu(player);
+        Menu menu = Menu.getInstance();
         menu.open(player);
 
         return true;

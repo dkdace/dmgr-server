@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.gui.Gui;
 import org.bukkit.event.Listener;
 
 /**

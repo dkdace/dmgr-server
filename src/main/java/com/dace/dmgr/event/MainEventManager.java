@@ -1,6 +1,9 @@
 package com.dace.dmgr.event;
 
 import com.dace.dmgr.event.listener.*;
+import com.dace.dmgr.gui.menu.ChatSoundOption;
+import com.dace.dmgr.gui.menu.Menu;
+import com.dace.dmgr.gui.menu.PlayerOption;
 
 /**
  * 메인 이벤트를 등록하는 클래스.
@@ -30,6 +33,9 @@ public class MainEventManager {
         EventUtil.registerListener(new OnWeaponPrepareShoot());
         EventUtil.registerListener(new OnPlayerItemHeld());
         EventUtil.registerListener(new OnPlayerInteract());
+        EventUtil.registerListener(new Menu());
+        EventUtil.registerListener(new PlayerOption());
+        EventUtil.registerListener(new ChatSoundOption());
         EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
         EventUtil.registerPacketListener(new OnPlayClientArmAnimation());
         EventUtil.registerPacketListener(new OnPlayServerNamedSoundEffect());
