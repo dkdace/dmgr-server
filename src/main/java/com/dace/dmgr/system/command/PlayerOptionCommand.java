@@ -16,7 +16,7 @@ public class PlayerOptionCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 
-        PlayerOption playerOption = new PlayerOption(player);
+        PlayerOption playerOption = PlayerOption.getInstance();
         playerOption.open(player);
 
         return true;

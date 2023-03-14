@@ -1,8 +1,11 @@
 package com.dace.dmgr.gui;
 
+import lombok.Getter;
+
 /**
  * 플레이어 머리 아이템 목록.
  */
+@Getter
 public enum PlayerSkull {
     /** 한글 채팅 */
     KOREAN_CHAT("YjAyYWYzY2EyZDVhMTYwY2ExMTE0MDQ4Yjc5NDc1OTQyNjlhZmUyYjFiNWVjMjU1ZWU3MmI2ODNiNjBiOTliOSJ9fX0=\\"),
@@ -20,9 +23,5 @@ public enum PlayerSkull {
 
     PlayerSkull(String texture) {
         this.url = PREFIX + texture;
-    }
-
-    public String getUrl() {
-        return url;
     }
 }

@@ -46,9 +46,9 @@ public class CombatTick {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                         99999, 0, false, false), true);
 
-                combatUser.allowSprint(isSprintable(combatUser));
+                combatUser.allowSprint(canSprint(combatUser));
 
-                if (isJumpable(combatUser))
+                if (canJump(combatUser))
                     player.removePotionEffect(PotionEffectType.JUMP);
                 else
                     player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
@@ -73,7 +73,7 @@ public class CombatTick {
                     speed *= 0.88;
                 else
                     speed *= speed / BASE_SPEED;
-                if (!isMoveable(combatUser))
+                if (!canMove(combatUser))
                     speed = 0.0001F;
 
                 combatUser.getEntity().setWalkSpeed(speed);
@@ -91,11 +91,11 @@ public class CombatTick {
      * @param combatEntity 대상 엔티티
      * @return 이동 가능 여부
      */
-    private static boolean isMoveable(ICombatEntity combatEntity) {
-        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) == 0)
-            return true;
+    private static boolean canMove(ICombatEntity combatEntity) {
+        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) > 0 || CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) > 0)
+            return false;
 
-        return false;
+        return true;
     }
 
     /**
@@ -104,14 +104,14 @@ public class CombatTick {
      * @param combatUser 대상 플레이어
      * @return 달리기 가능 여부
      */
-    private static boolean isSprintable(CombatUser combatUser) {
-        if (CooldownManager.getCooldown(combatUser, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatUser, Cooldown.SNARE) == 0 &&
-                CooldownManager.getCooldown(combatUser, Cooldown.GROUNDING) == 0)
-            return true;
-        if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) == 0)
-            return true;
+    private static boolean canSprint(CombatUser combatUser) {
+        if (CooldownManager.getCooldown(combatUser, Cooldown.STUN) > 0 || CooldownManager.getCooldown(combatUser, Cooldown.SNARE) > 0 ||
+                CooldownManager.getCooldown(combatUser, Cooldown.GROUNDING) > 0)
+            return false;
+        if (CooldownManager.getCooldown(combatUser, Cooldown.NO_SPRINT) > 0)
+            return false;
 
-        return false;
+        return true;
     }
 
     /**
@@ -120,12 +120,12 @@ public class CombatTick {
      * @param combatEntity 대상 엔티티
      * @return 점프 가능  여부
      */
-    private static boolean isJumpable(ICombatEntity combatEntity) {
-        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) == 0 && CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) == 0 &&
-                CooldownManager.getCooldown(combatEntity, Cooldown.GROUNDING) == 0)
-            return true;
+    private static boolean canJump(ICombatEntity combatEntity) {
+        if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) > 0 || CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) > 0 ||
+                CooldownManager.getCooldown(combatEntity, Cooldown.GROUNDING) > 0)
+            return false;
 
-        return false;
+        return true;
     }
 
     /**
