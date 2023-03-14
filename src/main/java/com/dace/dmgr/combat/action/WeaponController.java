@@ -114,6 +114,8 @@ public class WeaponController {
         return reloading;
     }
 
+    public boolean isSwapping() { return swappingState == Swappable.State.SWAPPING; }
+
     public void setReloading(boolean reloading) {
         this.reloading = reloading;
     }
@@ -159,7 +161,7 @@ public class WeaponController {
         if (swappingState == Swappable.State.PRIMARY)
             duration = ((Reloadable) weapon).getReloadDuration();
         else
-            duration = ((Swappable) weapon).getSubweaponCooldown();
+            duration = ((Reloadable)((Swappable) weapon).getSubweapon()).getReloadDuration();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {

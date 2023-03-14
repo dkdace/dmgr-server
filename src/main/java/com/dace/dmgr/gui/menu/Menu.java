@@ -4,64 +4,73 @@ import com.dace.dmgr.gui.Gui;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
+import com.dace.dmgr.util.InventoryUtil;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 
 public class Menu extends Gui {
-    public Menu(Player player) {
-        super(6, "§8메뉴");
-        super.fillAll(DisplayItem.EMPTY.getItemStack());
+    @Getter
+    private static final Menu instance = new Menu();
 
-        super.getInventory().setItem(4,
+    public Menu() {
+        super(6, "§8메뉴");
+    }
+
+    @Override
+    public void onOpen(Player player, Inventory inventory) {
+        InventoryUtil.fillAll(inventory, DisplayItem.EMPTY.getItemStack());
+        inventory.setItem(4,
                 ItemBuilder.fromPlayerSkull(player)
                         .setName("§f§l[ null ] §f" + player.getName())
                         .build());
-        super.getInventory().setItem(19,
+        inventory.setItem(19,
                 new ItemBuilder(Material.IRON_SWORD)
                         .setName("§e§l게임 시작")
                         .setLore("§f전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.")
                         .addItemFlags(ItemFlag.HIDE_ATTRIBUTES).build());
-        super.getInventory().setItem(21,
+        inventory.setItem(21,
                 new ItemBuilder(Material.LEATHER_BOOTS)
                         .setName("§e§l이동")
                         .setLore("§f원하는 장소로 이동합니다.")
                         .addItemFlags(ItemFlag.HIDE_ATTRIBUTES).build());
-        super.getInventory().setItem(23,
+        inventory.setItem(23,
                 new ItemBuilder(Material.NAME_TAG)
                         .setName("§e§l전적")
                         .setLore("§f개인 전적을 확인합니다.")
                         .build());
-        super.getInventory().setItem(25,
+        inventory.setItem(25,
                 new ItemBuilder(Material.BOOK)
                         .setName("§e§l업적")
                         .setLore("§f업적 목록을 확인합니다.")
                         .build());
-        super.getInventory().setItem(37,
+        inventory.setItem(37,
                 new ItemBuilder(Material.REDSTONE_COMPARATOR)
                         .setName("§e§l설정")
                         .setLore("§f설정 관련 메뉴를 확인합니다.")
                         .build());
-        super.getInventory().setItem(39,
+        inventory.setItem(39,
                 new ItemBuilder(Material.FIREWORK_CHARGE).setName("§e§l코어 확인")
                         .setLore("§f전투원에 할당된 코어를 확인합니다.")
                         .addItemFlags(ItemFlag.HIDE_ATTRIBUTES).build());
-        super.getInventory().setItem(41,
+        inventory.setItem(41,
                 new ItemBuilder(Material.COMMAND)
                         .setName("§e§l명령어 목록")
                         .setLore("§f서버 명령어 목록을 확인합니다.").build());
-        super.getInventory().setItem(43,
+        inventory.setItem(43,
                 new ItemBuilder(Material.BARRIER)
                         .setName("§e§l차단 목록")
                         .setLore("§f차단된 플레이어 목록을 확인합니다.")
                         .build());
-        super.getInventory().setItem(53, ButtonItem.EXIT.getItemStack());
+        inventory.setItem(53, ButtonItem.EXIT.getItemStack());
     }
 
     @Override
-    protected void onClick(InventoryClickEvent event, Player player, String clickItemName) {
+    public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
             switch (clickItemName) {
                 case "게임 시작":
