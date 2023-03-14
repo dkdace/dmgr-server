@@ -6,32 +6,43 @@ import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.lobby.ChatSound;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.util.InventoryUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class ChatSoundOption extends Gui {
-    public ChatSoundOption(Player player) {
-        super(2, "§8채팅 효과음 설정");
-        super.fillRow(2, DisplayItem.EMPTY.getItemStack());
+    @Getter
+    private static final ChatSoundOption instance = new ChatSoundOption();
 
+    public ChatSoundOption() {
+        super(2, "§8채팅 효과음 설정");
+    }
+
+    @Override
+    public void onOpen(Player player, Inventory inventory) {
         User user = userMap.get(player);
 
         ChatSound[] chatSounds = ChatSound.values();
 
+        InventoryUtil.fillRow(inventory, 2, DisplayItem.EMPTY.getItemStack());
         for (int i = 0; i < chatSounds.length; i++) {
-            super.setSelectButton(i, new ItemBuilder(chatSounds[i].getMaterial()).setName("§e§l" + chatSounds[i].getName()).build(),
+            InventoryUtil.setSelectButton(inventory, i, new ItemBuilder(chatSounds[i].getMaterial())
+                            .setName("§e§l" + chatSounds[i].getName() + " " + "§8§o" + chatSounds[i].toString())
+                            .build(),
                     user.getUserConfig().getChatSound() == chatSounds[i]);
         }
 
-        super.getInventory().setItem(17, ButtonItem.LEFT.getItemStack());
+        inventory.setItem(17, ButtonItem.LEFT.getItemStack());
     }
 
     @Override
-    protected void onClick(InventoryClickEvent event, Player player, String clickItemName) {
+    public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
             User user = userMap.get(player);
 
@@ -40,11 +51,12 @@ public class ChatSoundOption extends Gui {
                 return;
             }
 
-            ChatSound chatSound = ChatSound.valueOf(clickItemName);
+            String[] _clickItemName = clickItemName.split(" ");
+            ChatSound chatSound = ChatSound.valueOf(_clickItemName[_clickItemName.length - 1]);
 
             SoundUtil.play(chatSound.getSound(), 1F, 1.414F, player);
             user.getUserConfig().setChatSound(chatSound);
-            new ChatSoundOption(player).open(player);
+            open(player);
         }
     }
 }
