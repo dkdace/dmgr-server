@@ -7,8 +7,6 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /**
  * 무기 상태를 관리하는 컨트롤러 클래스.
@@ -91,12 +89,12 @@ public class WeaponController {
         return reloading;
     }
 
-    public boolean isAiming() {
-        return aiming;
-    }
-
     public void setReloading(boolean reloading) {
         this.reloading = reloading;
+    }
+
+    public boolean isAiming() {
+        return aiming;
     }
 
     public int getRemainingAmmo() {
@@ -143,6 +141,9 @@ public class WeaponController {
                 if (!reloading)
                     return false;
 
+                if (i == 1 && aiming)
+                    aim();
+
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
                 combatUser.sendActionBar("§c§l재장전... " + StringFormUtil.getProgressBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
                         2);
@@ -175,14 +176,11 @@ public class WeaponController {
             return;
 
         if (!aiming) {
-            combatUser.getEntity().getInventory().getItem(4)
-                    .setDurability((short) (combatUser.getCharacter().getWeapon().getItemStack().getDurability() + ((Aimable) weapon).getScope()));
-            combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000000, 5, false, false));
+            combatUser.getEntity().getEquipment().getItemInMainHand().setDurability((short) (weapon.getItemStack().getDurability() + ((Aimable) weapon).getScope()));
             aiming = true;
+            reloading = false;
         } else {
-            combatUser.getEntity().getInventory().getItem(4)
-                    .setDurability(combatUser.getCharacter().getWeapon().getItemStack().getDurability());
-            combatUser.getEntity().removePotionEffect(PotionEffectType.SLOW);
+            combatUser.getEntity().getEquipment().getItemInMainHand().setDurability(weapon.getItemStack().getDurability());
             aiming = false;
         }
 
