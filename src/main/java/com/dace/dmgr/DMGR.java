@@ -69,6 +69,7 @@ public class DMGR extends JavaPlugin {
         getCommand("메뉴").setExecutor(new MenuCommand());
         getCommand("설정").setExecutor(new PlayerOptionCommand());
         getCommand("선택").setExecutor(new SelectCharCommand());
+        getCommand("test").setExecutor(new TestCommand());
     }
 
     /**
