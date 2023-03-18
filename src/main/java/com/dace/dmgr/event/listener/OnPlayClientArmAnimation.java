@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
@@ -26,7 +27,12 @@ public class OnPlayClientArmAnimation extends PacketAdapter {
             if (combatUser.getCharacter() != null) {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.LEFT_CLICK);
 
-                Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                    }
+                }.runTaskLater(DMGR.getPlugin(), 0);
             }
         }
     }

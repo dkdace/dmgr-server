@@ -23,6 +23,8 @@ public class WeaponController {
     private int remainingAmmo = -1;
     /** 재장전 상태 */
     private boolean reloading = false;
+    /** 정조준 상태 */
+    private boolean aiming = false;
 
     /** 보조무기 상태 */
     private Swappable.State swappingState = Swappable.State.PRIMARY;
@@ -120,6 +122,10 @@ public class WeaponController {
         this.reloading = reloading;
     }
 
+    public boolean isAiming() {
+        return aiming;
+    }
+
     public int getRemainingAmmo() {
         return remainingAmmo;
     }
@@ -169,6 +175,9 @@ public class WeaponController {
             public boolean run(int i) {
                 if (!reloading)
                     return false;
+
+                if (i == 1 && aiming)
+                    aim();
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
                 combatUser.sendActionBar("§c§l재장전... " + StringFormUtil.getProgressBar(i, duration, ChatColor.WHITE) + " §f[" + time + "초]",
@@ -251,5 +260,25 @@ public class WeaponController {
             swapTo(Swappable.State.SECONDARY);
         else if (swappingState == Swappable.State.SECONDARY)
             swapTo(Swappable.State.PRIMARY);
+    }
+
+    /**
+     * 무기를 정조준한다.
+     *
+     * <p>{@link Aimable}을 상속받는 클래스여야 한다.</p>
+     */
+    public void aim() {
+        if (!(weapon instanceof Aimable))
+            return;
+
+        if (!aiming) {
+            combatUser.getEntity().getEquipment().getItemInMainHand().setDurability((short) (weapon.getItemStack().getDurability() + ((Aimable) weapon).getScope()));
+            aiming = true;
+            reloading = false;
+        } else {
+            combatUser.getEntity().getEquipment().getItemInMainHand().setDurability(weapon.getItemStack().getDurability());
+            aiming = false;
+        }
+
     }
 }
