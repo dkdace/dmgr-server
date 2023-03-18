@@ -5,7 +5,11 @@ import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.system.command.*;
+import com.dace.dmgr.system.command.LobbyCommand;
+import com.dace.dmgr.system.command.MenuCommand;
+import com.dace.dmgr.system.command.PlayerOptionCommand;
+import com.dace.dmgr.system.command.test.DummyCommand;
+import com.dace.dmgr.system.command.test.SelectCharCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,7 +38,8 @@ public class DMGR extends JavaPlugin {
         GeneralConfig.init();
         MainEventManager.init();
         CombatEventManager.init();
-        registerCommand();
+        registerCommands();
+        registerTestCommands();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
@@ -64,12 +69,18 @@ public class DMGR extends JavaPlugin {
     /**
      * 모든 명령어를 등록한다.
      */
-    private void registerCommand() {
+    private void registerCommands() {
         getCommand("스폰").setExecutor(new LobbyCommand());
         getCommand("메뉴").setExecutor(new MenuCommand());
         getCommand("설정").setExecutor(new PlayerOptionCommand());
+    }
+
+    /**
+     * 모든 테스트용 명령어를 등록한다.
+     */
+    private void registerTestCommands() {
         getCommand("선택").setExecutor(new SelectCharCommand());
-        getCommand("test").setExecutor(new TestCommand());
+        getCommand("소환").setExecutor(new DummyCommand());
     }
 
     /**
