@@ -6,7 +6,7 @@ import java.util.HashMap;
  * 쿨타임을 관리하는 클래스.
  */
 public class CooldownManager {
-    /** 진행중인 쿨타임 목록 */
+    /** 진행중인 쿨타임 목록 (쿨타임 ID : 남은 시간) */
     private static final HashMap<String, Long> cooldownMap = new HashMap<>();
 
     /**
