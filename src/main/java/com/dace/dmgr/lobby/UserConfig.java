@@ -1,6 +1,7 @@
 package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.util.YamlFile;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,8 +13,10 @@ public class UserConfig {
     /** 채팅 효과음 */
     private String chatSound = ChatSound.PLING.toString();
     /** 한글 채팅 여부 */
+    @Getter
     private boolean koreanChat = false;
     /** 야간 투시 여부 */
+    @Getter
     private boolean nightVision = false;
 
     /**
@@ -39,17 +42,9 @@ public class UserConfig {
         yamlFile.set("chatSound", this.chatSound);
     }
 
-    public boolean isKoreanChat() {
-        return koreanChat;
-    }
-
     public void setKoreanChat(boolean koreanChat) {
         this.koreanChat = koreanChat;
         yamlFile.set("koreanChat", this.koreanChat);
-    }
-
-    public boolean isNightVision() {
-        return nightVision;
     }
 
     public void setNightVision(boolean nightVision) {
