@@ -8,6 +8,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 인벤토리 내부의 아이템 관련 기능을 제공하는 클래스.
+ */
 public class InventoryUtil {
     /**
      * 지정한 인벤토리의 모든 칸을 특정 아이템으로 채운다.
