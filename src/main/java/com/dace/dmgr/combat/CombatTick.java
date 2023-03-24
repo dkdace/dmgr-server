@@ -76,6 +76,12 @@ public class CombatTick {
                 if (!canMove(combatUser))
                     speed = 0.0001F;
 
+                if (combatUser.getWeaponController().isAiming())
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,
+                            99999, 5, false, false), true);
+                else
+                    player.removePotionEffect(PotionEffectType.SLOW);
+
                 combatUser.getEntity().setWalkSpeed(speed);
 
                 showActionbar(combatUser);
