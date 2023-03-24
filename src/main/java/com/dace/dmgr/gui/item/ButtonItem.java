@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 /**
  * 클릭 가능한 버튼 아이템 목록.
  */
-@Getter
 public enum ButtonItem implements IGuiItem {
     EXIT((short) 8, "§c§l나가기"),
     LEFT((short) 9, "§6§l이전"),
@@ -18,7 +17,9 @@ public enum ButtonItem implements IGuiItem {
     DOWN((short) 12, "§6§l아래로");
 
     private final Material MATERIAL = Material.CARROT_STICK;
+    @Getter
     private final String name;
+    @Getter
     private final ItemStack itemStack;
 
     ButtonItem(short damage, String name) {
