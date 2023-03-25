@@ -1,4 +1,4 @@
-package com.kiwi.dmgr;
+package com.kiwi.dmgr.game;
 
 public enum Team {
     RED,

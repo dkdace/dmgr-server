@@ -122,49 +122,6 @@ public class RankRating {
         return (int) finalMMR;
     }
 
-    /**
-    public static int getPlayerRR(Player player) {
-        User user = userMap.get(player);
-        return user.getRank();
-    }
-
-    public static void setPlayerRR(Player player, int rank) {
-        User user = userMap.get(player);
-        user.setRank(rank);
-    }
-
-    public static int getPlayerMMR(Player player) {
-        User user = userMap.get(player);
-        return user.getMMR();
-    }
-
-    public static void setPlayerMMR(Player player, int mmr) {
-        User user = userMap.get(player);
-        user.setMMR(mmr);
-    }
-
-    public static int getPlayerPlay(Player player) {
-        User user = userMap.get(player);
-        return user.getRankPlay();
-    }
-
-    public static void setPlayerRankPlay(Player player, int play) {
-        User user = userMap.get(player);
-        user.setRankPlay(play);
-    }
-
-    public static boolean isPlayerRanked(Player player) {
-        User user = userMap.get(player);
-        return user.isRanked();
-    }
-
-    public static void setPlayerRanked(Player player, boolean ranked) {
-        User user = userMap.get(player);
-        user.setRanked(ranked);
-    }
-     */
-
-
     // MMR / RR 계산 함수.
     // playTime 은 초 단위를 기준으로 할 것.
     private float getKDARating(float kda) {
