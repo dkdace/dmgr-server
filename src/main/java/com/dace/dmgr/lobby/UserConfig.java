@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 
 /**
  * 유저 설정 정보를 관리하는 클래스.
+ *
+ * @see User
  */
 public class UserConfig {
     /** 설정파일 관리를 위한 객체 */

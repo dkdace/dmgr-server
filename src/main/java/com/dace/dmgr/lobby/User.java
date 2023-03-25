@@ -66,6 +66,7 @@ public class User {
      * 제거해야 한다.</p>
      *
      * @param player 대상 플레이어
+     * @see HashMapList#userMap
      */
     public User(Player player) {
         this.player = player;

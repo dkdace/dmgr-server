@@ -55,6 +55,7 @@ public class CombatUser extends CombatEntity<Player> {
      * 에서 제거해야 한다.</p>
      *
      * @param entity 대상 플레이어
+     * @see HashMapList#combatUserMap
      */
     public CombatUser(Player entity) {
         super(
@@ -234,6 +235,7 @@ public class CombatUser extends CombatEntity<Player> {
      *
      * @param message       메시지
      * @param overrideTicks 지속시간 (tick)
+     * @see CombatTick#run(CombatUser)
      */
     public void sendActionBar(String message, long overrideTicks) {
         if (overrideTicks > 0)
@@ -249,6 +251,7 @@ public class CombatUser extends CombatEntity<Player> {
      * <p>{@link CombatTick#run(CombatUser)} 스케쥴러에서 사용한다.</p>
      *
      * @param message 메시지
+     * @see CombatTick#run(CombatUser)
      */
     public void sendActionBar(String message) {
         sendActionBar(message, 0);

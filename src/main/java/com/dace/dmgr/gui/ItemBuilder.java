@@ -69,6 +69,7 @@ public class ItemBuilder {
      *
      * @param playerSkull 플레이어 머리 아이템
      * @return ItemBuilder
+     * @see PlayerSkull
      */
     public static ItemBuilder fromPlayerSkull(PlayerSkull playerSkull) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);

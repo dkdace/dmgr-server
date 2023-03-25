@@ -4,6 +4,8 @@ import lombok.Builder;
 
 /**
  * 히트스캔의 선택적 옵션을 관리하는 빌더 클래스.
+ *
+ * @see Hitscan
  */
 @Builder
 public class HitscanOption {

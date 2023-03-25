@@ -6,6 +6,11 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * 상호작용(무기, 패시브 스킬, 액티브 스킬 등) 정보를 관리하는 클래스.
+ *
+ * @see Weapon
+ * @see PassiveSkill
+ * @see ActiveSkill
+ * @see UltimateSkill
  */
 @AllArgsConstructor
 @Getter

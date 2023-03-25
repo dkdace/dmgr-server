@@ -4,6 +4,8 @@ import lombok.Builder;
 
 /**
  * 투사체의 선택적 옵션을 관리하는 빌더 클래스.
+ *
+ * @see Projectile
  */
 @Builder
 public class ProjectileOption {

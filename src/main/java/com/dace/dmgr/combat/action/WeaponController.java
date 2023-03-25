@@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * 무기 상태를 관리하는 컨트롤러 클래스.
+ *
+ * @see Weapon
  */
 public class WeaponController {
     /** 플레이어 객체 */
@@ -105,6 +107,8 @@ public class WeaponController {
      * 무기의 쿨타임을 무기 정보에 설정된 기본 쿨타임으로 설정한다.
      *
      * <p>보조무기 상태라면 보조무기의 기본 쿨타임으로 설정한다.</p>
+     *
+     * @see Weapon#getCooldown()
      */
     public void setCooldown() {
         if (swappingState == Swappable.State.PRIMARY)
@@ -146,6 +150,8 @@ public class WeaponController {
      * 무기를 재장전한다.
      *
      * <p>무기가 {@link Reloadable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Reloadable
      */
     public void reload() {
         if (!(weapon instanceof Reloadable))
@@ -205,6 +211,7 @@ public class WeaponController {
      * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
      *
      * @param targetState 변경할 상태
+     * @see Swappable
      */
     private void swapTo(Swappable.State targetState) {
         if (!(weapon instanceof Swappable))
@@ -257,6 +264,8 @@ public class WeaponController {
      * 이중 무기의 모드를 반대 무기로 교체한다.
      *
      * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Swappable
      */
     public void swap() {
         if (!(weapon instanceof Aimable))
@@ -271,6 +280,8 @@ public class WeaponController {
      * 무기를 정조준한다.
      *
      * <p>무기가 {@link Aimable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Aimable
      */
     public void aim() {
         if (!(weapon instanceof Aimable))

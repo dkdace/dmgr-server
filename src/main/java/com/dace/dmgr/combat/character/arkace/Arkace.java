@@ -7,6 +7,12 @@ import lombok.Getter;
 
 /**
  * 전투원 - 아케이스 클래스.
+ *
+ * @see ArkaceWeapon
+ * @see ArkaceP1
+ * @see ArkaceA1
+ * @see ArkaceA2
+ * @see ArkaceUlt
  */
 public class Arkace extends Character {
     @Getter
