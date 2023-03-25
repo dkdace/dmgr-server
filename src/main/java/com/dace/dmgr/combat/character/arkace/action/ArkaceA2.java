@@ -10,6 +10,7 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -21,6 +22,7 @@ public class ArkaceA2 extends ActiveSkill {
     public static final int HEAL = 350;
     /** 지속시간 */
     public static final long DURATION = (long) (2.5 * 20);
+    @Getter
     private static final ArkaceA2 instance = new ArkaceA2();
 
     public ArkaceA2() {
@@ -33,10 +35,6 @@ public class ArkaceA2 extends ActiveSkill {
                 "§f" + TextIcon.COOLDOWN + "§f 12초",
                 "",
                 "§7§l[3] §f사용");
-    }
-
-    public static ArkaceA2 getInstance() {
-        return instance;
     }
 
     @Override

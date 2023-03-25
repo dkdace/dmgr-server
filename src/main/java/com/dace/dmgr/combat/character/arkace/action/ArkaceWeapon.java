@@ -17,6 +17,7 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -32,6 +33,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     public static final int CAPACITY = 30;
     /** 재장전 시간 */
     public static final long RELOAD_DURATION = (long) (1.5 * 20);
+    @Getter
     private static final ArkaceWeapon instance = new ArkaceWeapon();
 
     public ArkaceWeapon() {
@@ -45,10 +47,6 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 "§f" + TextIcon.CAPACITY + "§f 30발",
                 "",
                 "§7§l[우클릭] §f사격 §7§l[Q] §f재장전").build());
-    }
-
-    public static ArkaceWeapon getInstance() {
-        return instance;
     }
 
     @Override
