@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
-import com.dace.dmgr.combat.character.ICharacter;
+import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
@@ -38,7 +38,7 @@ public class CombatUser extends CombatEntity<Player> {
     private final TextComponent actionBar = new TextComponent();
     /** 선택한 전투원 */
     @Getter
-    private ICharacter character = null;
+    private Character character = null;
     /** 무기 컨트롤러 객체 */
     @Getter
     private WeaponController weaponController;
@@ -170,7 +170,7 @@ public class CombatUser extends CombatEntity<Player> {
      *
      * @param character 전투원
      */
-    public void setCharacter(ICharacter character) {
+    public void setCharacter(Character character) {
         try {
             reset();
             SkinManager.applySkin(entity, character.getSkinName());
