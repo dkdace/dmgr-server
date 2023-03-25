@@ -15,6 +15,9 @@ import org.bukkit.inventory.Inventory;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 
+/**
+ * 메뉴 - 설정 GUI 클래스.
+ */
 public class PlayerOption extends Gui {
     @Getter
     private static final PlayerOption instance = new PlayerOption();
