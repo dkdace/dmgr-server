@@ -155,7 +155,7 @@ public class SkillController {
     /**
      * 스킬의 지속시간을 스킬 정보에 설정된 기본 지속시간으로 설정한다.
      *
-     * <p>{@link HasDuration}을 상속받는 클래스여야 한다.</p>
+     * <p>스킬이 {@link HasDuration}을 상속받는 클래스여야 한다.</p>
      */
     public void setDuration() {
         if (skill instanceof HasDuration)
