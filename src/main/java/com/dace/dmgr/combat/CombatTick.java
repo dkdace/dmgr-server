@@ -4,8 +4,8 @@ import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.action.Reloadable;
 import com.dace.dmgr.combat.action.UltimateSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.TextIcon;
@@ -97,7 +97,7 @@ public class CombatTick {
      * @param combatEntity 대상 엔티티
      * @return 이동 가능 여부
      */
-    private static boolean canMove(ICombatEntity combatEntity) {
+    private static boolean canMove(CombatEntity<?> combatEntity) {
         if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) > 0 || CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) > 0)
             return false;
 
@@ -126,7 +126,7 @@ public class CombatTick {
      * @param combatEntity 대상 엔티티
      * @return 점프 가능  여부
      */
-    private static boolean canJump(ICombatEntity combatEntity) {
+    private static boolean canJump(CombatEntity<?> combatEntity) {
         if (CooldownManager.getCooldown(combatEntity, Cooldown.STUN) > 0 || CooldownManager.getCooldown(combatEntity, Cooldown.SNARE) > 0 ||
                 CooldownManager.getCooldown(combatEntity, Cooldown.GROUNDING) > 0)
             return false;

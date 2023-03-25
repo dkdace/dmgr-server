@@ -1,6 +1,6 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class OnEntityDeath implements Listener {
         Entity entity = event.getEntity();
 
         if (!(entity instanceof Player)) {
-            ICombatEntity combatEntity = combatEntityMap.get(entity);
+            CombatEntity<?> combatEntity = combatEntityMap.get(entity);
 
             if (combatEntity instanceof TemporalEntity) {
                 combatEntityMap.remove(entity);

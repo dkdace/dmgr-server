@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -35,7 +35,7 @@ public abstract class Projectile extends Bullet {
      * @param option        선택적 옵션
      * @see ProjectileOption
      */
-    public Projectile(ICombatEntity shooter, int trailInterval, int velocity, ProjectileOption option) {
+    public Projectile(CombatEntity<?> shooter, int trailInterval, int velocity, ProjectileOption option) {
         super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
@@ -49,7 +49,7 @@ public abstract class Projectile extends Bullet {
      * @param trailInterval 트레일 실행 주기
      * @param velocity      속력
      */
-    public Projectile(ICombatEntity shooter, int trailInterval, int velocity) {
+    public Projectile(CombatEntity<?> shooter, int trailInterval, int velocity) {
         super(shooter, trailInterval);
         ProjectileOption option = ProjectileOption.builder().build();
         this.velocity = velocity;
@@ -69,7 +69,7 @@ public abstract class Projectile extends Bullet {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         direction = VectorUtil.getSpreadedVector(direction, spread);
-        Set<ICombatEntity> targetList = new HashSet<>();
+        Set<CombatEntity<?>> targetList = new HashSet<>();
 
         int loopCount = velocity / 5;
         int sum = 0;
@@ -116,9 +116,9 @@ public abstract class Projectile extends Bullet {
                     }
 
                     if (loc.distance(origin) > 0.5) {
-                        Map.Entry<ICombatEntity, Boolean> targetEntry
+                        Map.Entry<CombatEntity<?>, Boolean> targetEntry
                                 = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                        ICombatEntity target = targetEntry.getKey();
+                        CombatEntity<?> target = targetEntry.getKey();
                         boolean isCrit = targetEntry.getValue();
 
                         if (target != null) {

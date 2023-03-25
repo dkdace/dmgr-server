@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public abstract class Bullet {
     /** {@link Bullet#trailInterval}의 기본값. */
     protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
-    protected final ICombatEntity shooter;
+    protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     protected final int trailInterval;
     /** 관통 여부 */
@@ -131,7 +131,7 @@ public abstract class Bullet {
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    public abstract void onHitEntity(Location location, ICombatEntity target, boolean isCrit);
+    public abstract void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit);
 
     /**
      * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업

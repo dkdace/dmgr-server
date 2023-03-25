@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -17,7 +18,7 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
  */
 @Getter
-public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
+public abstract class CombatEntity<T extends LivingEntity> {
     /** 엔티티 객체 */
     protected final T entity;
     /** 히트박스 객체 */
@@ -72,7 +73,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      *
      * <p>넷코드 문제를 해결하기 위해 사용하며, 고정된 엔티티는 사용하지 않는다.</p>
      */
-    @Override
     public void updateHitboxTick() {
         new TaskTimer(1) {
             @Override
@@ -94,7 +94,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
         };
     }
 
-    @Override
     public void setName(String name) {
         entity.setCustomName(name);
         this.name = name;
@@ -105,7 +104,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      *
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    @Override
     public int getHealth() {
         return (int) (Math.round(entity.getHealth() * 50 * 100) / 100);
     }
@@ -115,7 +113,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    @Override
     public void setHealth(int health) {
         if (health < 0) health = 0;
         if (health > getMaxHealth()) health = getMaxHealth();
@@ -128,7 +125,6 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      *
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    @Override
     public int getMaxHealth() {
         return (int) (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * 50);
     }
@@ -138,15 +134,42 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    @Override
     public void setMaxHealth(int health) {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 
-    @Override
+    /**
+     * 엔티티의 이동속도 증가량을 설정한다.
+     *
+     * @param speedIncrement 이동속도 증가량. 최소 값은 {@code -100}, 최대 값은 {@code 100}
+     */
     public void addSpeedIncrement(int speedIncrement) {
         this.speedIncrement += speedIncrement;
         if (this.speedIncrement < -100) this.speedIncrement = -100;
         if (this.speedIncrement > 100) this.speedIncrement = 100;
     }
+
+    /**
+     * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
+     *
+     * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 궁극기 제공 여부
+     */
+    public boolean isUltProvider() {
+        return false;
+    }
+
+    /**
+     * 엔티티가 피해를 받을 수 있는 지 확인한다.
+     *
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 피격 가능 여부
+     * @see Combat#attack(CombatUser, ICombatEntity, int, String, boolean, boolean)
+     */
+    public boolean isDamageable() {
+        return true;
+    }
+
 }
