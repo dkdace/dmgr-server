@@ -9,14 +9,15 @@ import org.bukkit.inventory.ItemStack;
 /**
  * 전투 관련 아이템 목록.
  */
-@Getter
 public enum CombatItem implements IGuiItem {
     REQ_HEAL((short) 5, "§a치료 요청"),
     SHOW_ULT((short) 5, "§a궁극기 상태"),
     REQ_RALLY((short) 5, "§a집결 요청");
 
     private final Material MATERIAL = Material.STAINED_GLASS_PANE;
+    @Getter
     private final String name;
+    @Getter
     private final ItemStack itemStack;
 
     CombatItem(short damage, String name) {

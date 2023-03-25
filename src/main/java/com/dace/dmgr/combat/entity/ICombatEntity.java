@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.Combat;
 import org.bukkit.entity.Entity;
 
 /**
@@ -52,6 +53,7 @@ public interface ICombatEntity {
      * 엔티티가 피해를 받을 수 있는 지 확인한다.
      *
      * @return 피격 가능 여부
+     * @see Combat#attack(CombatUser, ICombatEntity, int, String, boolean, boolean)
      */
     default boolean isDamageable() {
         return true;

@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 /**
  * 상호작용 키 매핑 목록을 관리하는 클래스.
+ *
+ * @see ActionKey
+ * @see Action
  */
 public class ActionKeyMap {
     /** 상호작용 키와 상호작용 목록 */

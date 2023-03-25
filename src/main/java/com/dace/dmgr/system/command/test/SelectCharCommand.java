@@ -1,6 +1,7 @@
 package com.dace.dmgr.system.command.test;
 
 import com.dace.dmgr.combat.CombatTick;
+import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.HashMapList;
@@ -15,6 +16,8 @@ import org.bukkit.potion.PotionEffectType;
  * 전투원 선택 명령어 클래스.
  *
  * <p>Usage: /선택 플레이어 팀 전투원</p>
+ * 
+ * @see CombatUser#setCharacter(ICharacter) 
  */
 public class SelectCharCommand implements CommandExecutor {
     @Override

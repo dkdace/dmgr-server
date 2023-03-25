@@ -6,10 +6,12 @@ import com.dace.dmgr.combat.action.PassiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
+import lombok.Getter;
 
 public class ArkaceP1 extends PassiveSkill implements HasDuration {
     /** 이동속도 증가량 */
     public static final int SPRINT_SPEED = 30;
+    @Getter
     private static final ArkaceP1 instance = new ArkaceP1();
 
     public ArkaceP1() {
@@ -18,10 +20,6 @@ public class ArkaceP1 extends PassiveSkill implements HasDuration {
                 "§f달리기의 §b" + TextIcon.WALK_SPEED_INCREASE + " 속도§f가 빨라집니다.",
                 "",
                 "§b" + TextIcon.WALK_SPEED_INCREASE + "§f 30%");
-    }
-
-    public static ArkaceP1 getInstance() {
-        return instance;
     }
 
     @Override

@@ -17,34 +17,45 @@ import static com.dace.dmgr.system.HashMapList.userMap;
 /**
  * 유저 정보를 관리하는 클래스.
  */
-@Getter
 public class User {
     /** 로비 사이드바 */
+    @Getter
     private final BPlayerBoard lobbySidebar;
     /** 플레이어 객체 */
+    @Getter
     private final Player player;
     /** 유저 설정 정보 관리를 위한 객체 */
+    @Getter
     private final UserConfig userConfig;
     /** 설정파일 관리를 위한 객체 */
     private final YamlFile yamlFile;
     /** 경험치 */
+    @Getter
     private int xp = 0;
     /** 레벨 */
+    @Getter
     private int level = 1;
     /** 돈 */
+    @Getter
     private int money = 0;
     /** 랭크 점수 */
+    @Getter
     private int rank = 100;
     /** 랭크게임 플레이 판 수 */
+    @Getter
     private int rankPlay = 0;
     /** 랭크게임 플레이 여부 */
+    @Getter
     private boolean isRanked = false;
     /** 매치메이킹 점수 */
+    @Getter
     private int MMR = 100;
     /** 리소스팩 적용 여부 */
+    @Getter
     @Setter
     private boolean resourcePack = false;
     /** 리소스팩 적용 상태 */
+    @Getter
     @Setter
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
@@ -55,6 +66,7 @@ public class User {
      * 제거해야 한다.</p>
      *
      * @param player 대상 플레이어
+     * @see HashMapList#userMap
      */
     public User(Player player) {
         this.player = player;
@@ -104,17 +116,9 @@ public class User {
         yamlFile.set("mmr", this.MMR);
     }
 
-    public boolean isRanked() {
-        return isRanked;
-    }
-
     public void setRanked(boolean ranked) {
         this.isRanked = ranked;
         yamlFile.set("isRanked", this.isRanked);
-    }
-
-    public boolean isResourcePack() {
-        return resourcePack;
     }
 
     /**

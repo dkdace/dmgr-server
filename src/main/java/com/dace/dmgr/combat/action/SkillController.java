@@ -13,6 +13,8 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 스킬 상태를 관리하는 컨트롤러 클래스.
+ *
+ * @see Skill
  */
 public class SkillController {
     /** 플레이어 객체 */
@@ -118,6 +120,8 @@ public class SkillController {
 
     /**
      * 스킬의 쿨타임을 스킬 정보에 설정된 기본 쿨타임으로 설정한다.
+     *
+     * @see Skill#getCooldown()
      */
     public void setCooldown() {
         setCooldown(skill.getCooldown());
@@ -155,7 +159,9 @@ public class SkillController {
     /**
      * 스킬의 지속시간을 스킬 정보에 설정된 기본 지속시간으로 설정한다.
      *
-     * <p>{@link HasDuration}을 상속받는 클래스여야 한다.</p>
+     * <p>스킬이 {@link HasDuration}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see HasDuration
      */
     public void setDuration() {
         if (skill instanceof HasDuration)

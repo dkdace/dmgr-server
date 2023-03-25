@@ -3,6 +3,7 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.Lobby;
@@ -58,6 +59,7 @@ public class Combat {
      * @param range    범위 (반지름)
      * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link ICombatEntity#getCritHitbox()}
      * 안에 있으면 {@code true})
+     * @see Hitbox
      */
     public static Map.Entry<ICombatEntity, Boolean> getNearEnemy(ICombatEntity attacker, Location location, float range) {
         ICombatEntity entity = combatEntityMap.values().stream()
@@ -86,6 +88,7 @@ public class Combat {
      * @param location 위치
      * @param range    범위 (반지름)
      * @return 범위 내 모든 적
+     * @see Hitbox
      */
     public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
         return combatEntityMap.values().stream()
