@@ -28,21 +28,24 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-@Getter
 public class CombatUser extends CombatEntity<Player> {
     /** 보호막 (노란 체력) 목록 (보호막 이름 : 보호막의 양) */
     private final HashMap<String, Integer> shield = new HashMap<>();
     /** 킬 기여자 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 기여도) */
+    @Getter
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     /** 액션바 텍스트 객체 */
     private final TextComponent actionBar = new TextComponent();
     /** 선택한 전투원 */
+    @Getter
     private ICharacter character = null;
     /** 무기 컨트롤러 객체 */
+    @Getter
     private WeaponController weaponController;
     /** 스킬 컨트롤러 객체 목록 (스킬 : 스킬 컨트롤러) */
     private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
     /** 현재 무기 탄퍼짐 */
+    @Getter
     private float bulletSpread = 0;
 
     /**
