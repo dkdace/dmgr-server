@@ -41,6 +41,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      * @param entity 대상 엔티티
      * @param name   이름
      * @param hitbox 히트박스
+     * @see HashMapList#combatEntityMap
      */
     protected CombatEntity(T entity, String name, Hitbox hitbox) {
         this(entity, name, hitbox, null);
@@ -56,6 +57,7 @@ public class CombatEntity<T extends LivingEntity> implements ICombatEntity {
      * @param name       이름
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
+     * @see HashMapList#combatEntityMap
      */
     protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox) {
         this.entity = entity;

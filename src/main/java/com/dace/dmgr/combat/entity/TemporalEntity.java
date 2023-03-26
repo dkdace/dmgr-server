@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.system.HashMapList;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -15,25 +16,27 @@ import static com.dace.dmgr.system.HashMapList.temporalEntityMap;
  */
 public class TemporalEntity<T extends LivingEntity> extends CombatEntity<T> {
     /**
-     * 엔티티 인스턴스를 생성하고 지정한 위치에 소환한다.
+     * 엔티티를 지정한 위치에 소환하고 {@link HashMapList#temporalEntityMap}에 추가한다.
      *
      * @param entityType 엔티티 타입
      * @param name       이름
      * @param location   대상 위치
      * @param hitbox     히트박스
+     * @see HashMapList#temporalEntityMap
      */
     protected TemporalEntity(EntityType entityType, String name, Location location, Hitbox hitbox) {
         this(entityType, name, location, hitbox, null);
     }
 
     /**
-     * 엔티티 인스턴스를 생성하고 지정한 위치에 소환한다.
+     * 엔티티를 지정한 위치에 소환하고 {@link HashMapList#temporalEntityMap}에 추가한다.
      *
      * @param entityType 엔티티 타입
      * @param name       이름
      * @param location   대상 위치
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
+     * @see HashMapList#temporalEntityMap
      */
     protected TemporalEntity(EntityType entityType, String name, Location location, Hitbox hitbox, Hitbox critHitbox) {
         super((T) location.getWorld().spawnEntity(location, entityType), name, hitbox, critHitbox);

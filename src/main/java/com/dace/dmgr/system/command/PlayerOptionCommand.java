@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
  * 메뉴 - 설정 명령어 클래스.
  *
  * <p>Usage: /설정</p>
+ *
+ * @see PlayerOption
  */
 public class PlayerOptionCommand implements CommandExecutor {
     @Override

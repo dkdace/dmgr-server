@@ -14,6 +14,7 @@ import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -29,6 +30,7 @@ public class ArkaceA1 extends ActiveSkill {
     public static final int VELOCITY = 60;
     /** 피해 범위 */
     public static final float RADIUS = 3;
+    @Getter
     private static final ArkaceA1 instance = new ArkaceA1();
 
     public ArkaceA1() {
@@ -41,10 +43,6 @@ public class ArkaceA1 extends ActiveSkill {
                 "§f" + TextIcon.COOLDOWN + "§f 7초",
                 "",
                 "§7§l[2] [좌클릭] §f사용");
-    }
-
-    public static ArkaceA1 getInstance() {
-        return instance;
     }
 
     @Override

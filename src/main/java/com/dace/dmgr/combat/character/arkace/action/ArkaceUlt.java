@@ -5,13 +5,15 @@ import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
+import lombok.Getter;
 
 public class ArkaceUlt extends UltimateSkill {
-    private static final ArkaceUlt instance = new ArkaceUlt();
     /** 궁극기 필요 충전량 */
-    public static int COST = 7000;
+    public static final int COST = 7000;
     /** 지속시간 */
-    public static long DURATION = (long) 12 * 20;
+    public static final long DURATION = (long) 12 * 20;
+    @Getter
+    private static final ArkaceUlt instance = new ArkaceUlt();
 
     public ArkaceUlt() {
         super("인피니버스터",
@@ -23,10 +25,6 @@ public class ArkaceUlt extends UltimateSkill {
                 "§f" + TextIcon.ULTIMATE + "§f 7000",
                 "",
                 "§7§l[4] §f사용");
-    }
-
-    public static ArkaceUlt getInstance() {
-        return instance;
     }
 
     @Override

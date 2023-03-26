@@ -153,6 +153,7 @@ public class LocationUtil {
      * @param hitbox   히트박스
      * @param margin   마진. 히트박스 크기에 margin을 더해 계산
      * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
+     * @see Hitbox
      */
     public static boolean isInHitbox(Location location, Hitbox hitbox, float margin) {
         Location[] points = new Location[4];
@@ -188,6 +189,7 @@ public class LocationUtil {
      * @param location 확인할 위치
      * @param hitbox   히트박스
      * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
+     * @see Hitbox
      */
     public static boolean isInHitbox(Location location, Hitbox hitbox) {
         return isInHitbox(location, hitbox, 0);

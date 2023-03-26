@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
  * 메뉴 명령어 클래스.
  *
  * <p>Usage: /메뉴</p>
+ *
+ * @see Menu
  */
 public class MenuCommand implements CommandExecutor {
     @Override

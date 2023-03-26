@@ -8,13 +8,13 @@ import org.bukkit.Location;
  * 공격 판정에 사용하는 히트박스 클래스.
  */
 public class Hitbox {
-    /** 가로 */
+    /** 가로. 단위: 블록 */
     @Getter
     private final double sizeX;
-    /** 높이 */
+    /** 높이. 단위: 블록 */
     @Getter
     private final double sizeY;
-    /** 세로 */
+    /** 세로. 단위: 블록 */
     @Getter
     private final double sizeZ;
     /** 중앙 위치의 오프셋. 왼쪽(-) / 오른쪽(+) */

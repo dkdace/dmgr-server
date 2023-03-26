@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
+import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
@@ -13,7 +14,6 @@ import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
@@ -28,21 +28,24 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-@Getter
 public class CombatUser extends CombatEntity<Player> {
-    /** 보호막 (노란 체력) 목록 */
+    /** 보호막 (노란 체력) 목록 (보호막 이름 : 보호막의 양) */
     private final HashMap<String, Integer> shield = new HashMap<>();
-    /** 킬 기여자 목록. 처치 점수 분배에 사용한다. */
+    /** 킬 기여자 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 기여도) */
+    @Getter
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     /** 액션바 텍스트 객체 */
     private final TextComponent actionBar = new TextComponent();
     /** 선택한 전투원 */
+    @Getter
     private ICharacter character = null;
     /** 무기 컨트롤러 객체 */
+    @Getter
     private WeaponController weaponController;
-    /** 스킬 컨트롤러 객체 목록 */
+    /** 스킬 컨트롤러 객체 목록 (스킬 : 스킬 컨트롤러) */
     private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
     /** 현재 무기 탄퍼짐 */
+    @Getter
     private float bulletSpread = 0;
 
     /**
@@ -52,6 +55,7 @@ public class CombatUser extends CombatEntity<Player> {
      * 에서 제거해야 한다.</p>
      *
      * @param entity 대상 플레이어
+     * @see HashMapList#combatUserMap
      */
     public CombatUser(Player entity) {
         super(
@@ -226,11 +230,12 @@ public class CombatUser extends CombatEntity<Player> {
     /**
      * 플레이어에게 액션바를 전송한다.
      *
-     * <p>{@link com.dace.dmgr.combat.CombatTick#run(CombatUser)} 스케쥴러의 액션바를 덮어쓰며, 주로 재장전과
+     * <p>{@link CombatTick#run(CombatUser)} 스케쥴러의 액션바를 덮어쓰며, 주로 재장전과
      * 스킬 중요 알림에 사용한다.</p>
      *
      * @param message       메시지
      * @param overrideTicks 지속시간 (tick)
+     * @see CombatTick#run(CombatUser)
      */
     public void sendActionBar(String message, long overrideTicks) {
         if (overrideTicks > 0)
@@ -243,9 +248,10 @@ public class CombatUser extends CombatEntity<Player> {
     /**
      * 플레이어에게 액션바를 전송한다.
      *
-     * <p>{@link com.dace.dmgr.combat.CombatTick#run(CombatUser)} 스케쥴러에서 사용한다.</p>
+     * <p>{@link CombatTick#run(CombatUser)} 스케쥴러에서 사용한다.</p>
      *
      * @param message 메시지
+     * @see CombatTick#run(CombatUser)
      */
     public void sendActionBar(String message) {
         sendActionBar(message, 0);
