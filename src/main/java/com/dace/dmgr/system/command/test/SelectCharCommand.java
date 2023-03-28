@@ -1,7 +1,6 @@
 package com.dace.dmgr.system.command.test;
 
 import com.dace.dmgr.combat.CombatTick;
-import com.dace.dmgr.combat.character.ICharacter;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.HashMapList;

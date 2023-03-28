@@ -2,9 +2,9 @@ package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
-import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
@@ -47,7 +47,7 @@ public class Combat {
      * @param victim   피격자
      * @return 적이면 {@code true} 반환
      */
-    public static boolean isEnemy(ICombatEntity attacker, ICombatEntity victim) {
+    public static boolean isEnemy(CombatEntity<?> attacker, CombatEntity<?> victim) {
         return !attacker.getTeam().equals(victim.getTeam());
     }
 
@@ -57,12 +57,12 @@ public class Combat {
      * @param attacker 공격자 (기준 엔티티)
      * @param location 위치
      * @param range    범위 (반지름)
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link ICombatEntity#getCritHitbox()}
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
      * 안에 있으면 {@code true})
      * @see Hitbox
      */
-    public static Map.Entry<ICombatEntity, Boolean> getNearEnemy(ICombatEntity attacker, Location location, float range) {
-        ICombatEntity entity = combatEntityMap.values().stream()
+    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+        CombatEntity<?> entity = combatEntityMap.values().stream()
                 .min(Comparator.comparing(combatEntity -> Math.min(
                         location.distance(combatEntity.getHitbox().getCenter()),
                         location.distance(combatEntity.getCritHitbox().getCenter())
@@ -90,7 +90,7 @@ public class Combat {
      * @return 범위 내 모든 적
      * @see Hitbox
      */
-    public static Set<ICombatEntity> getNearEnemies(ICombatEntity attacker, Location location, float range) {
+    public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range) {
         return combatEntityMap.values().stream()
                 .filter(entity ->
                         entity != attacker && isEnemy(attacker, entity))
@@ -110,7 +110,7 @@ public class Combat {
      * @param isCrit   치명타 여부
      * @param isUlt    궁극기 충전 여부
      */
-    public static void attack(CombatUser attacker, ICombatEntity victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public static void attack(CombatUser attacker, CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
         boolean killed = false;
@@ -169,7 +169,7 @@ public class Combat {
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
      */
-    public static void heal(CombatUser attacker, ICombatEntity victim, int amount, boolean isUlt) {
+    public static void heal(CombatUser attacker, CombatEntity<?> victim, int amount, boolean isUlt) {
         if (victim.getHealth() == victim.getMaxHealth())
             return;
 
@@ -202,7 +202,7 @@ public class Combat {
      * @param victim   피격자
      * @return 대상을 죽일 수 있으면 {@code true} 반환
      */
-    private static boolean isKillable(CombatUser attacker, ICombatEntity victim) {
+    private static boolean isKillable(CombatUser attacker, CombatEntity<?> victim) {
         if (RegionUtil.isInRegion(attacker.getEntity(), "BattleTrain"))
             return false;
 
@@ -215,7 +215,7 @@ public class Combat {
      * @param attacker 공격자
      * @param victim   피격자
      */
-    private static void kill(CombatUser attacker, ICombatEntity victim) {
+    private static void kill(CombatUser attacker, CombatEntity<?> victim) {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
 
@@ -347,7 +347,7 @@ public class Combat {
      * @param isCrit   치명타 여부
      * @return 최종 피해량
      */
-    private static int getFinalDamage(CombatUser attacker, ICombatEntity victim, int damage, boolean isCrit) {
+    private static int getFinalDamage(CombatUser attacker, CombatEntity<?> victim, int damage, boolean isCrit) {
         if (isCrit)
             damage *= 1.5;
 

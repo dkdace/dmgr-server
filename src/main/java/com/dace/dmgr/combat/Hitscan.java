@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
@@ -27,7 +27,7 @@ public abstract class Hitscan extends Bullet {
      * @param option        선택적 옵션
      * @see HitscanOption
      */
-    public Hitscan(ICombatEntity shooter, int trailInterval, HitscanOption option) {
+    public Hitscan(CombatEntity<?> shooter, int trailInterval, HitscanOption option) {
         super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
     }
 
@@ -37,7 +37,7 @@ public abstract class Hitscan extends Bullet {
      * @param shooter       발사하는 엔티티
      * @param trailInterval 트레일 실행 주기
      */
-    public Hitscan(ICombatEntity shooter, int trailInterval) {
+    public Hitscan(CombatEntity<?> shooter, int trailInterval) {
         super(shooter, trailInterval);
     }
 
@@ -52,7 +52,7 @@ public abstract class Hitscan extends Bullet {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         direction = VectorUtil.getSpreadedVector(direction, spread);
-        Set<ICombatEntity> targetSet = new HashSet<>();
+        Set<CombatEntity<?>> targetSet = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
             Location hitLoc = loc.clone().add(direction);
@@ -69,9 +69,9 @@ public abstract class Hitscan extends Bullet {
             }
 
             if (loc.distance(origin) > 0.5) {
-                Map.Entry<ICombatEntity, Boolean> targetEntry
+                Map.Entry<CombatEntity<?>, Boolean> targetEntry
                         = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                ICombatEntity target = targetEntry.getKey();
+                CombatEntity<?> target = targetEntry.getKey();
                 boolean isCrit = targetEntry.getValue();
 
                 if (target != null) {

@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * GUI상에서 빈칸 및 값 등의 표시를 위한 아이템 목록.
  */
-public enum DisplayItem implements IGuiItem {
+public enum DisplayItem implements GuiItem {
     EMPTY((short) 1),
     EMPTY_LEFT((short) 2),
     EMPTY_RIGHT((short) 3),

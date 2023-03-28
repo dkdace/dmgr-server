@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * 클릭 가능한 버튼 아이템 목록.
  */
-public enum ButtonItem implements IGuiItem {
+public enum ButtonItem implements GuiItem {
     EXIT((short) 8, "§c§l나가기"),
     LEFT((short) 9, "§6§l이전"),
     RIGHT((short) 10, "§6§l다음"),

@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * 전투 관련 아이템 목록.
  */
-public enum CombatItem implements IGuiItem {
+public enum CombatItem implements GuiItem {
     REQ_HEAL((short) 5, "§a치료 요청"),
     SHOW_ULT((short) 5, "§a궁극기 상태"),
     REQ_RALLY((short) 5, "§a집결 요청");

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
@@ -21,7 +21,7 @@ public class CombatStatusEffect {
      * @param victim   피격자
      * @param duration 지속시간 (tick)
      */
-    public static void stun(CombatUser attacker, ICombatEntity victim, long duration) {
+    public static void stun(CombatUser attacker, CombatEntity<?> victim, long duration) {
         final long finalDuration = getFinalDuration(attacker, victim, duration);
 
         if (victim instanceof CombatUser)
@@ -61,7 +61,7 @@ public class CombatStatusEffect {
      * @param victim   피격자
      * @param duration 지속시간 (tick)
      */
-    public static void snare(CombatUser attacker, ICombatEntity victim, long duration) {
+    public static void snare(CombatUser attacker, CombatEntity<?> victim, long duration) {
         final long finalDuration = getFinalDuration(attacker, victim, duration);
 
         if (CooldownManager.getCooldown(victim, Cooldown.SNARE) == 0) {
@@ -92,7 +92,7 @@ public class CombatStatusEffect {
      * @param victim   피격자
      * @param duration 지속시간 (tick)
      */
-    public static void grounding(CombatUser attacker, ICombatEntity victim, long duration) {
+    public static void grounding(CombatUser attacker, CombatEntity<?> victim, long duration) {
         final long finalDuration = getFinalDuration(attacker, victim, duration);
 
         if (CooldownManager.getCooldown(victim, Cooldown.GROUNDING) == 0) {
@@ -123,7 +123,7 @@ public class CombatStatusEffect {
      * @param victim   피격자
      * @param duration 지속시간 (tick)
      */
-    public static void silence(CombatUser attacker, ICombatEntity victim, long duration) {
+    public static void silence(CombatUser attacker, CombatEntity<?> victim, long duration) {
         final long finalDuration = getFinalDuration(attacker, victim, duration);
 
         if (CooldownManager.getCooldown(victim, Cooldown.SILENCE) == 0) {
@@ -159,7 +159,7 @@ public class CombatStatusEffect {
      * @param type     타입
      * @param isUlt    궁극기 충전 여부
      */
-    public static void burn(CombatUser attacker, ICombatEntity victim, long duration, int damage, String type, boolean isUlt) {
+    public static void burn(CombatUser attacker, CombatEntity<?> victim, long duration, int damage, String type, boolean isUlt) {
         final long finalDuration = getFinalDuration(attacker, victim, duration);
 
         if (CooldownManager.getCooldown(victim, Cooldown.BURN, type) == 0) {
@@ -191,7 +191,7 @@ public class CombatStatusEffect {
      * @param duration 지속시간 (tick)
      * @return 최종 지속시간 (tick)
      */
-    private static long getFinalDuration(CombatUser attacker, ICombatEntity victim, long duration) {
+    private static long getFinalDuration(CombatUser attacker, CombatEntity<?> victim, long duration) {
         int bonus = 0;
 
         return duration * (100 + bonus) / 100;

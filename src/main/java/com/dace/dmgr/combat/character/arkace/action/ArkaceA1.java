@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -81,7 +81,7 @@ public class ArkaceA1 extends ActiveSkill {
                         }
 
                         @Override
-                        public void onHitEntity(Location location, ICombatEntity target, boolean isCrit) {
+                        public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
                             Combat.attack(combatUser, target, DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);
