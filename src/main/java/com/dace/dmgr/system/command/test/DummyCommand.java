@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
  * 훈련용 봇 소환 명령어 클래스.
  *
  * <p>Usage: /소환 체력</p>
+ *
+ * @see Dummy
  */
 public class DummyCommand implements CommandExecutor {
     @Override

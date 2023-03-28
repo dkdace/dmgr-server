@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
  * 로비 이동 명령어 클래스.
  *
  * <p>Usage: /스폰</p>
+ *
+ * @see Lobby#spawn(Player)
  */
 public class LobbyCommand implements CommandExecutor {
     @Override

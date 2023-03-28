@@ -2,10 +2,14 @@ package com.dace.dmgr.system;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.config.GeneralConfig;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 쿨타임 종류.
  */
+@AllArgsConstructor
+@Getter
 public enum Cooldown {
     /** 채팅 */
     CHAT(GeneralConfig.chatCooldown),
@@ -46,17 +50,4 @@ public enum Cooldown {
     ;
     /** 쿨타임 기본값 */
     private final long defaultValue;
-
-    Cooldown(long defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    /**
-     * 쿨타임 기본값을 반환한다.
-     *
-     * @return 쿨타임 기본값
-     */
-    public long getDefaultValue() {
-        return defaultValue;
-    }
 }

@@ -19,24 +19,20 @@ public abstract class Projectile extends Bullet {
     private static final float SIZE = 0.3F;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
-    /** 중력의 영향을 받는지 여부 */
+    /** 중력 작용 여부 */
     protected boolean hasGravity;
-    /** 투사체가 튕기는 횟수 (0: 튕기지 않음). */
+    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
     protected int bouncing;
 
     /**
-     * 투사체 인스턴스를 생성한다.<br>
-     * <p>
-     * 투사체를 생성에 필요한 옵션이 가변적이므로 매개변수 대신 {@link ProjectileOption} 객체를 통해 전달받는다.
-     * {@link ProjectileOption} 객체는 {@link ProjectileOption#builder()}를 통해 제작할 수 있다.
-     * 다음 예시를 참고하라: <pre>
-     * ProjectileOption option = new ProjectileOption.Builder(combatUser, VELOCITY)
-     *                              .trailInterval(5)
-     *                              .build();
-     * new Projectile(option){ /* ... &#42;/}.shoot();
-     * </pre>
+     * 투사체 인스턴스를 생성한다.
      *
-     * @param option 투사체 옵션
+     * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
+     *
+     * @param shooter       발사하는 엔티티
+     * @param trailInterval 트레일 실행 주기
+     * @param velocity      속력
+     * @param option        선택적 옵션
      * @see ProjectileOption
      */
     public Projectile(ICombatEntity shooter, int trailInterval, int velocity, ProjectileOption option) {
@@ -46,6 +42,13 @@ public abstract class Projectile extends Bullet {
         this.bouncing = option.bouncing;
     }
 
+    /**
+     * 투사체 인스턴스를 생성한다.
+     *
+     * @param shooter       발사하는 엔티티
+     * @param trailInterval 트레일 실행 주기
+     * @param velocity      속력
+     */
     public Projectile(ICombatEntity shooter, int trailInterval, int velocity) {
         super(shooter, trailInterval);
         ProjectileOption option = ProjectileOption.builder().build();

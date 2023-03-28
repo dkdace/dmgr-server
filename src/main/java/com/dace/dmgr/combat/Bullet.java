@@ -12,7 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 /**
- * 총알. 원거리 공격(투사체, 히트박스) 등을 관리하기 위한 클래스.
+ * 총알. 원거리 공격(투사체, 히트스캔) 등을 관리하기 위한 클래스.
  *
  * @see Hitscan
  * @see Projectile
@@ -24,7 +24,7 @@ public abstract class Bullet {
     protected static final int MAX_RANGE = 70;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.25F;
-    /** {@code trailInterval} 기본값. 단위: 판정점 개수 */
+    /** {@link Bullet#trailInterval}의 기본값. */
     protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
     protected final ICombatEntity shooter;
@@ -32,7 +32,7 @@ public abstract class Bullet {
     protected final int trailInterval;
     /** 관통 여부 */
     protected boolean penetrating;
-    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
+    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */
     protected float hitboxMultiplier;
 
     /**
@@ -64,7 +64,7 @@ public abstract class Bullet {
      * 엔티티가 보는 방향으로 총알을 발사한다.
      *
      * @param origin 발화점
-     * @param spread 탄퍼짐 정도
+     * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     public void shoot(Location origin, float spread) {
         shoot(origin, shooter.getEntity().getLocation().getDirection(), spread);
@@ -82,7 +82,7 @@ public abstract class Bullet {
     /**
      * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
      *
-     * @param spread 탄퍼짐 정도
+     * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     public void shoot(float spread) {
         if (shooter instanceof CombatUser)
@@ -102,7 +102,9 @@ public abstract class Bullet {
     }
 
     /**
-     * 주어진 위치에 트레일을 남긴다.
+     * {@link Bullet#trailInterval} 주기마다 실행될 작업
+     *
+     * <p>주로 파티클을 남길 때 사용한다.</p>
      *
      * @param location 위치
      */
@@ -111,8 +113,8 @@ public abstract class Bullet {
     /**
      * 총알이 블록에 맞았을 때 실행될 작업
      *
-     * @param location 총알이 맞힌 위치
-     * @param hitBlock 총알이 맞힌 블록
+     * @param location 맞은 위치
+     * @param hitBlock 맞은 블록
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
@@ -123,8 +125,8 @@ public abstract class Bullet {
     /**
      * 총알이 엔티티에 맞았을 때 실행될 작업
      *
-     * @param location 총알이 맞힌 위치
-     * @param target   총알이 맞힌 엔티티
+     * @param location 맞은 위치
+     * @param target   맞은 엔티티
      * @param isCrit   치명타 여부
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
@@ -132,13 +134,12 @@ public abstract class Bullet {
     public abstract void onHitEntity(Location location, ICombatEntity target, boolean isCrit);
 
     /**
-     * 총알이 (블록이든 엔티티든) 맞았을 때 실행될 작업
+     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업
      *
-     * @param location 총알이 맞힌 위치
+     * @param location 맞은 위치
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
     public void onHit(Location location) {
     }
-
 }

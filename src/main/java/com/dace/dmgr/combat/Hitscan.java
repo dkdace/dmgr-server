@@ -19,6 +19,13 @@ public abstract class Hitscan extends Bullet {
 
     /**
      * 히트스캔 인스턴스를 생성한다.
+     *
+     * <p>히트스캔의 선택적 옵션은 {@link HitscanOption} 객체를 통해 전달받는다.</p>
+     *
+     * @param shooter       발사하는 엔티티
+     * @param trailInterval 트레일 실행 주기
+     * @param option        선택적 옵션
+     * @see HitscanOption
      */
     public Hitscan(ICombatEntity shooter, int trailInterval, HitscanOption option) {
         super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
@@ -26,6 +33,9 @@ public abstract class Hitscan extends Bullet {
 
     /**
      * 히트스캔 인스턴스를 생성한다.
+     *
+     * @param shooter       발사하는 엔티티
+     * @param trailInterval 트레일 실행 주기
      */
     public Hitscan(ICombatEntity shooter, int trailInterval) {
         super(shooter, trailInterval);
@@ -36,7 +46,7 @@ public abstract class Hitscan extends Bullet {
      *
      * @param origin    발화점
      * @param direction 발사 방향
-     * @param spread    탄퍼짐 정도
+     * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);

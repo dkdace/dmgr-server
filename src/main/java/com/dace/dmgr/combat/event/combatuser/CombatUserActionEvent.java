@@ -3,13 +3,14 @@ package com.dace.dmgr.combat.event.combatuser;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.CombatUserEvent;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
  * 플레이어가 상호작용할 시 호출되는 이벤트.
  *
  * <p>상호작용은 좌클릭, 우클릭 등을 말하며 종류는 {@link ActionKey}에 있다.</p>
+ *
+ * @see ActionKey
  */
 @Getter
 public class CombatUserActionEvent extends CombatUserEvent {

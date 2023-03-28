@@ -5,11 +5,15 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * 무기 상태를 관리하는 컨트롤러 클래스.
+ *
+ * @see Weapon
  */
 public class WeaponController {
     /** 플레이어 객체 */
@@ -20,19 +24,26 @@ public class WeaponController {
     private final ItemStack itemStack;
 
     /** 남은 탄약 수 */
+    @Getter
+    @Setter
     private int remainingAmmo = -1;
     /** 재장전 상태 */
+    @Getter
+    @Setter
     private boolean reloading = false;
     /** 정조준 상태 */
+    @Getter
     private boolean aiming = false;
 
-    /** 보조무기 상태 */
+    /** 현재 무기의 상태 */
     private Swappable.State swappingState = Swappable.State.PRIMARY;
     /** 보조무기 아이템 */
     private ItemStack subweaponItemStack = null;
-    /** (2중 무기) 반대 무기 탄약 수 */
+    /** 반대 무기 탄약 수 */
+    @Getter
+    @Setter
     private int oppositeAmmo = -1;
-    
+
 
     /**
      * 무기 컨트롤러 인스턴스를 생성한다.
@@ -44,6 +55,7 @@ public class WeaponController {
         this.combatUser = combatUser;
         this.weapon = weapon;
         this.itemStack = weapon.getItemStack().clone();
+
         if (weapon instanceof Reloadable)
             this.remainingAmmo = ((Reloadable) weapon).getCapacity();
         if (weapon instanceof Swappable) {
@@ -85,7 +97,7 @@ public class WeaponController {
     /**
      * 무기의 쿨타임을 설정한다.
      *
-     * @param cooldown 쿨타임 (tick)
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setCooldown(int cooldown) {
         setCooldown(cooldown, false);
@@ -94,7 +106,9 @@ public class WeaponController {
     /**
      * 무기의 쿨타임을 무기 정보에 설정된 기본 쿨타임으로 설정한다.
      *
-     * 보조무기를 들고 있다면 보조무기의 쿨타임으로 설정한다.
+     * <p>보조무기 상태라면 보조무기의 기본 쿨타임으로 설정한다.</p>
+     *
+     * @see Weapon#getCooldown()
      */
     public void setCooldown() {
         if (swappingState == Swappable.State.PRIMARY)
@@ -112,26 +126,13 @@ public class WeaponController {
         return combatUser.getEntity().getCooldown(Weapon.MATERIAL) == 0;
     }
 
-    public boolean isReloading() {
-        return reloading;
-    }
-
-    public boolean isSwapping() { return swappingState == Swappable.State.SWAPPING; }
-
-    public void setReloading(boolean reloading) {
-        this.reloading = reloading;
-    }
-
-    public boolean isAiming() {
-        return aiming;
-    }
-
-    public int getRemainingAmmo() {
-        return remainingAmmo;
-    }
-
-    public void setRemainingAmmo(int remainingAmmo) {
-        this.remainingAmmo = remainingAmmo;
+    /**
+     * 이중 무기의 모드를 교체 중인 지 확인한다.
+     *
+     * @return 교체 중 여부
+     */
+    public boolean isSwapping() {
+        return swappingState == Swappable.State.SWAPPING;
     }
 
     /**
@@ -148,12 +149,13 @@ public class WeaponController {
     /**
      * 무기를 재장전한다.
      *
-     * <p>{@link Reloadable}을 상속받는 클래스여야 한다.</p>
+     * <p>무기가 {@link Reloadable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Reloadable
      */
     public void reload() {
         if (!(weapon instanceof Reloadable))
             return;
-
         if (remainingAmmo >= ((Reloadable) weapon).getCapacity())
             return;
         if (reloading)
@@ -167,7 +169,7 @@ public class WeaponController {
         if (swappingState == Swappable.State.PRIMARY)
             duration = ((Reloadable) weapon).getReloadDuration();
         else
-            duration = ((Reloadable)((Swappable) weapon).getSubweapon()).getReloadDuration();
+            duration = ((Reloadable) ((Swappable) weapon).getSubweapon()).getReloadDuration();
         CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {
@@ -197,14 +199,19 @@ public class WeaponController {
                 if (swappingState == Swappable.State.PRIMARY)
                     remainingAmmo = ((Reloadable) weapon).getCapacity();
                 else
-                    remainingAmmo = ((Reloadable)((Swappable) weapon).getSubweapon()).getCapacity();
+                    remainingAmmo = ((Reloadable) ((Swappable) weapon).getSubweapon()).getCapacity();
                 reloading = false;
             }
         };
     }
 
     /**
-     * 이중 탄창 무기의 모드를 특정 상태로 교체합니다.
+     * 이중 무기의 상태를 변경한다.
+     *
+     * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @param targetState 변경할 상태
+     * @see Swappable
      */
     private void swapTo(Swappable.State targetState) {
         if (!(weapon instanceof Swappable))
@@ -232,12 +239,13 @@ public class WeaponController {
                         2);
                 return true;
             }
+
             @Override
             public void onEnd(boolean cancelled) {
                 CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_RELOAD, 0);
                 if (cancelled)
                     return;
-                
+
                 combatUser.sendActionBar("§a§l무기 교체 완료", 8);
                 swappingState = targetState;
 
@@ -250,12 +258,18 @@ public class WeaponController {
                     applySubweapon();
             }
         };
-    };
+    }
 
     /**
-     * 이중 탄창 무기의 모드를 반대 무기로 교체합니다.
+     * 이중 무기의 모드를 반대 무기로 교체한다.
+     *
+     * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Swappable
      */
     public void swap() {
+        if (!(weapon instanceof Aimable))
+            return;
         if (swappingState == Swappable.State.PRIMARY)
             swapTo(Swappable.State.SECONDARY);
         else if (swappingState == Swappable.State.SECONDARY)
@@ -265,7 +279,9 @@ public class WeaponController {
     /**
      * 무기를 정조준한다.
      *
-     * <p>{@link Aimable}을 상속받는 클래스여야 한다.</p>
+     * <p>무기가 {@link Aimable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @see Aimable
      */
     public void aim() {
         if (!(weapon instanceof Aimable))
@@ -279,6 +295,5 @@ public class WeaponController {
             combatUser.getEntity().getEquipment().getItemInMainHand().setDurability(weapon.getItemStack().getDurability());
             aiming = false;
         }
-
     }
 }
