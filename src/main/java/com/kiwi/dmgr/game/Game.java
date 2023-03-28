@@ -1,13 +1,12 @@
 package com.kiwi.dmgr.game;
 
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.mode.GameMode;
-import com.kiwi.dmgr.match.MatchType;
+import com.kiwi.dmgr.match.type.MatchType;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -66,6 +65,7 @@ public class Game {
         this.mode = mode;
 
         GameMapList.addGame(this);
+        GameScheduler.run(this);
     }
 
     /**
@@ -163,39 +163,20 @@ public class Game {
     }
 
     /**
-     * 게임 스케쥴러를 실행한다.
+     * 게임에 있는 모든 플레이어에게 알림 메세지를 보낸다.
      *
-     * 게임 인원이 시작 가능 인원이 되면 시작 카운트가 시작된다.
-     *
-     * 인원이 0명이면 방이 삭제된다.
+     * @param message 메세지
      */
-    public void run() {
-        new TaskTimer(20) {
-            int playerCount = 0;
+    protected void sendAlertMessage(String message) {
+        for (Player player : playerList)
+            player.sendMessage(DMGR.PREFIX.CHAT + message);
+    }
 
-            @Override
-            public boolean run(int i) {
-
-                playerCount = playerList.size();
-
-                if (playerCount == 0)
-                    return false;
-
-                // 테스트로 대기 플레이어에게 메세지로 전송함.
-                if (mode.isStartAble(playerCount)) {
-
-                } else {
-                    i = 0;
-                }
-
-
-                return true;
-            }
-
-            @Override
-            public void onEnd(boolean cancelled) {
-                delete();
-            }
-        };
+    /**
+     * 게임에 난입 인원이 필요한지 여부를 리턴한다.
+     * 인원이 홀수이면 true 를 반환한다.
+     */
+    public boolean isNeedPlayer() {
+        return (playerList.size() % 2 != 0);
     }
 }
