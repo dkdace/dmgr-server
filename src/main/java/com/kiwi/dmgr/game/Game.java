@@ -4,7 +4,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.mode.GameMode;
-import com.kiwi.dmgr.match.type.MatchType;
+import com.kiwi.dmgr.match.MatchType;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.World;

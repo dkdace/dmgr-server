@@ -31,22 +31,22 @@ public class MatchMaking {
      * @param player 플레이어
      * @param mode 게임모드
      */
-    public static void addPlayerUnranked(Player player, MatchType type) {
-        for (Game game : gameList.get(type)) {
+    public static void addPlayerUnranked(Player player, GameMode mode) {
+        for (Game game : gameList.get(MatchType.UNRANKED)) {
             if (game.isNeedPlayer()) {
                 // 난입
                 return;
             }
         }
 
-        for (Game game : gameList.get(type)) {
+        for (Game game : gameList.get(MatchType.UNRANKED)) {
             if (!game.isPlay()) {
                 // 참가
                 return;
             }
         }
 
-        Game newGame = new Game(type);
+        Game newGame = new Game(MatchType.UNRANKED, mode);
         // 참가
     }
 
@@ -60,7 +60,7 @@ public class MatchMaking {
      *
      * @param player 플레이어
      * @param type 게임모드
-     */
+
     public static void addPlayer(Player player, MatchType type) {
         for (Game game : gameList.get(type)) {
             if (game.isNeedPlayer()) {
@@ -79,5 +79,6 @@ public class MatchMaking {
         Game newGame = new Game(type);
         // 참가
     }
+    */
 
 }
