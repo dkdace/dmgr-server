@@ -166,7 +166,7 @@ public class Game {
      *
      * @param message 메세지
      */
-    protected void sendAlertMessage(String message) {
+    public void sendAlertMessage(String message) {
         for (Player player : playerList)
             player.sendMessage(DMGR.PREFIX.CHAT + message);
     }

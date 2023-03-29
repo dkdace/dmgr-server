@@ -15,6 +15,7 @@ public interface IGameMode {
 
     /**
      * 해당 게임모드 스케쥴러를 실행한다.
+     * 스케쥴러 주기는 1초(20 Tick)로 한다.
      *
      * @param game 게임
      */
