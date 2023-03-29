@@ -4,10 +4,12 @@ import com.kiwi.dmgr.game.mode.GameMode;
 
 import java.util.ArrayList;
 
+import static com.kiwi.dmgr.game.GameMapList.gameMatchModeList;
+
 public enum MatchType {
 
-    UNRANKED(null, true, false, true, false),
-    COMPETITIVE(null, true, false, true, false);
+    UNRANKED(true, false, true, false),
+    COMPETITIVE(true, false, true, false);
 
     /* 매치 타입이 가능한 게임 모드 */
     final ArrayList<GameMode> ableGameMode;
@@ -24,8 +26,8 @@ public enum MatchType {
     /* 게임 결과로 인한 랭크 변동 여부 */
     final boolean isRankChangeAble;
 
-    MatchType(ArrayList<GameMode> ableGameMode, boolean isIntrusionAble, boolean isEscapePenalty, boolean isMMRChangeAble, boolean isRankChangeAble) {
-        this.ableGameMode = ableGameMode;
+    MatchType(boolean isIntrusionAble, boolean isEscapePenalty, boolean isMMRChangeAble, boolean isRankChangeAble) {
+        this.ableGameMode = gameMatchModeList.get(this);
         this.isIntrusionAble = isIntrusionAble;
         this.isEscapePenalty = isEscapePenalty;
         this.isMMRChangeAble = isMMRChangeAble;
