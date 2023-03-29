@@ -14,6 +14,8 @@ public class GameUser {
 
     /** 플레이어 */
     private Player player;
+    /** 플레이 중인 게임 (해당 게임유저가 적용중인 게임) */
+    private Game game;
     /** 점수 */
     private int score;
     /** 킬 */
@@ -42,6 +44,8 @@ public class GameUser {
      * @param player 대상 플레이어
      */
     public GameUser(Player player) {
+        this.player = player;
+        this.game = null;
         this.score = 0;
         this.kill = 0;
         this.death = 0;

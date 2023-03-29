@@ -82,14 +82,13 @@ public class Game {
      */
     public void initPlayer(Player player) {
         GameUser user = new GameUser(player);
+        user.setGame(this);
         if (!playerList.contains(player))
             playerList.add(player);
     }
 
     public void initPlayer(Player player, Team team) {
-        GameUser user = new GameUser(player);
-        if (!playerList.contains(player))
-            playerList.add(player);
+        initPlayer(player);
 
         for (Team tempTeam : Team.values())
             teamPlayerMapList.get(team).remove(player);
