@@ -14,8 +14,8 @@ import java.util.HashMap;
 public class GameMapList {
 
     public static final HashMap<MatchType, ArrayList<Game>> gameList = new HashMap<>();
+    public static final HashMap<MatchType, ArrayList<GameMode>> gameMatchModeList = new HashMap<>();
     public static final HashMap<Player, GameUser> gameUserMap = new HashMap<>();
-    public static final ArrayList<Class<?>> gameModeList = new ArrayList<>();
     public static final HashMap<GameMode, ArrayList<GameMap>> gameMapList = new HashMap<>();
 
     /**
@@ -34,5 +34,25 @@ public class GameMapList {
      */
     public static void delGame(Game game) {
         gameList.get(game.getMatchType()).remove(game);
+    }
+
+    /**
+     * 게임 모드 리스트에 모드를 쉽게 추가하도록 하는 함수
+     *
+     * @param matchType 매치 타입
+     * @param gameMode 게임 모드
+     */
+    public static void addMatchMode(MatchType matchType, GameMode gameMode) {
+        gameMatchModeList.get(matchType).add(gameMode);
+    }
+
+    /**
+     * 게임 모드 리스트에 모드를 쉽게 제거하도록 하는 함수
+     *
+     * @param matchType 매치 타입
+     * @param gameMode 게임 모드
+     */
+    public static void delMatchMode(MatchType matchType, GameMode gameMode) {
+        gameMatchModeList.get(matchType).remove(gameMode);
     }
 }
