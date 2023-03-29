@@ -8,9 +8,6 @@ public abstract class GameMode implements IGameMode {
     /* 팀전 유무 */
     public final boolean isVerseTeam;
 
-    /*  */
-    public boolean isStartAble;
-
     protected GameMode(boolean isVerseTeam, int maxPlayer) {
         this.isVerseTeam = isVerseTeam;
         this.maxPlayer = maxPlayer;
