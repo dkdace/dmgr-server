@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.event.combatuser;
 
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.CombatUserEvent;
 import lombok.Getter;

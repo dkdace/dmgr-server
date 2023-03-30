@@ -1,13 +1,8 @@
 package com.kiwi.dmgr.game;
 
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.event.combatuser.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-
-import java.util.HashMap;
 
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
