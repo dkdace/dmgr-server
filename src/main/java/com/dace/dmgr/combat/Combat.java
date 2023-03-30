@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.combat.event.combatuser.CombatUserAssistEvent;
 import com.dace.dmgr.combat.event.combatuser.CombatUserAttackEvent;
 import com.dace.dmgr.combat.event.combatuser.CombatUserHealEvent;
 import com.dace.dmgr.combat.event.combatuser.CombatUserKillEvent;
@@ -243,8 +244,12 @@ public class Combat {
                     _attackerEntity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
                     if (score > 30) {
                         _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
+                        CombatUserKillEvent newEvent = new CombatUserKillEvent(attacker, (CombatUser) victim);
+                        Bukkit.getServer().getPluginManager().callEvent(newEvent);
                     } else {
                         _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
+                        CombatUserAssistEvent newEvent = new CombatUserAssistEvent(attacker, (CombatUser) victim);
+                        Bukkit.getServer().getPluginManager().callEvent(newEvent);
                     }
                     playKillSound(_attackerEntity);
                 });
@@ -256,8 +261,6 @@ public class Combat {
                     damageList.clear();
                 }
                 respawn(attacker, (CombatUser) victim);
-                CombatUserKillEvent newEvent = new CombatUserKillEvent(attacker, (CombatUser) victim);
-                Bukkit.getServer().getPluginManager().callEvent(newEvent);
             }
         } else {
             attackerEntity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
