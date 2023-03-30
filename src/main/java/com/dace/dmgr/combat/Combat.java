@@ -156,6 +156,8 @@ public class Combat {
                     ((CombatUser) victim).getDamageMap().put(attacker, sumDamage + (float) damage / victim.getMaxHealth());
                 if (sumDamage > 1)
                     ((CombatUser) victim).getDamageMap().put(attacker, 1F);
+                CombatUserAttackEvent newEvent = new CombatUserAttackEvent(attacker, (CombatUser) victim, damage);
+                Bukkit.getServer().getPluginManager().callEvent(newEvent);
             }
         }
 
