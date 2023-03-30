@@ -6,6 +6,8 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.combat.event.combatuser.CombatUserAttackEvent;
+import com.dace.dmgr.combat.event.combatuser.CombatUserKillEvent;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
@@ -249,6 +251,8 @@ public class Combat {
                     damageList.clear();
                 }
                 respawn(attacker, (CombatUser) victim);
+                CombatUserKillEvent newEvent = new CombatUserKillEvent(attacker, (CombatUser) victim);
+                Bukkit.getServer().getPluginManager().callEvent(newEvent);
             }
         } else {
             attackerEntity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
