@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.ICombatEntity;
 import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.combat.event.combatuser.CombatUserAttackEvent;
+import com.dace.dmgr.combat.event.combatuser.CombatUserHealEvent;
 import com.dace.dmgr.combat.event.combatuser.CombatUserKillEvent;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
@@ -181,6 +182,8 @@ public class Combat {
 
         amount = amount * (100 + bonus) / 100;
         victim.setHealth(victim.getHealth() + amount);
+        CombatUserHealEvent newEvent = new CombatUserHealEvent(attacker, (CombatUser) victim, amount);
+        Bukkit.getServer().getPluginManager().callEvent(newEvent);
 
         if (amount > 100)
             ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(victim.getEntity().getLocation(),
