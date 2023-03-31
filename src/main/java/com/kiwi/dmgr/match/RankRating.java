@@ -7,6 +7,9 @@ import java.util.*;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 
+/**
+ * 경쟁 점수와 MMR 기능을 제공하는 클래스
+ */
 public class RankRating {
 
     /** 원하는 플레이어의 평균 랭크 레이트를 설정 */
@@ -65,7 +68,7 @@ public class RankRating {
      *  @param player 플레이어
      *  @return 표시되는 랭크 레이팅
      */
-    public static String getPlayerRankRakingDisplay(Player player) {
+    public static String getPlayerRankDisplay(Player player) {
         User user = userMap.get(player);
         int rank = user.getRank();
         if (rank < 0) {
@@ -76,9 +79,12 @@ public class RankRating {
     }
 
     /**
-     *  랭크 배치가 종료된 후 플레어의 랭크 레이팅을 결정
-     *  랭크 레이팅은 MMR * 0.9로 설정
+     *  랭크 매치 종료후 플레이어의 랭크와 MMR 을 결정하는 함수
+     *
+     *  <p>
+     *  랭크 배치 중이면 플레이어의 랭크 레이팅을 MMR * 0.9로 결정
      *  배치되는 랭크가 750 이상으로 넘어갈 수 없음
+     *  </p>
      *
      *  @param player 플레이어
      */
