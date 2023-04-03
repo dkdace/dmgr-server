@@ -9,7 +9,7 @@ import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 import static com.kiwi.dmgr.game.GameUser.isGameUserEventVaild;
 
 /**
- * 게임 유저가 처치 하였을때 발생하는 이벤트
+ * 게임 유저가 사망 하였을때 발생하는 이벤트
  */
 public class OnGameUserDeath implements Listener {
     @EventHandler

@@ -1,6 +1,7 @@
 package com.kiwi.dmgr.game;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.mode.GameMode;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import static com.dace.dmgr.system.HashMapList.userMap;
 
 /**
- * 게임의 정보를 담는 클래스
+ * 게임의 정보를 담고 관리하는 클래스
  */
 @Getter
 @Setter
@@ -76,6 +77,39 @@ public class Game {
     }
 
     /**
+     * 게임을 시작할 때 이 함수를 호출해야한다.
+     *
+     * @see GameMode
+     */
+    public void start() {
+        this.play = true;
+        this.remainTime = this.mode.getPlayTime();
+    }
+
+    /**
+     * 게임이 끝날 때 이 함수를 호출해야한다.
+     * 강제종료로 끝나는 경우 매치 결과, 보상 및 랭크 변동이 스킵된다.
+     *
+     * @param force 강제종료 여부
+     * @see GameMode
+     */
+    public void finish(boolean force) {
+        this.play = false;
+        for (Player player : this.playerList) {
+            player.teleport(Lobby.lobby);
+        }
+
+        if (!force) {
+            if (this.getMatchType() == MatchType.COMPETITIVE) {
+                // 랭크 결과...
+            } else {
+                // 게임 결과...
+            }
+        }
+        this.delete();
+    }
+
+    /**
      * 해당 게임에 플레이어 입장을 원활하게 하기 위해 초기 상태로 설정한다.
      *
      * @param player 플레이어
@@ -100,10 +134,10 @@ public class Game {
     /**
      * 게임에 플레이어를 추가한다.
      *
-     * 게임이 시작되지 않았으면 해당 월드의 대기방으로 이동
+     * <p> 게임이 시작되지 않았으면 해당 월드의 대기방으로 이동
      * 게임 중일 경우(난입) 난입이 필요한 팀으로 이동
      * 난입이 필요한 팀이 없으면 대기 플레이어 리스트에 추가
-     * 대기 플레이어 리스트에 2명이 있으면 MMR에 맞게 각 팀에 난입
+     * 대기 플레이어 리스트에 2명이 있으면 MMR에 맞게 각 팀에 난입 </p>
      *
      * @param player 플레이어
      */

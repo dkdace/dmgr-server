@@ -7,6 +7,9 @@ import org.bukkit.Location;
 
 import java.util.HashMap;
 
+/**
+ * 게임 맵의 정보를 담는 클래스
+ */
 @Getter
 public abstract class GameMap {
 

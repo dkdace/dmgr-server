@@ -2,7 +2,11 @@ package com.kiwi.dmgr.game.mode;
 
 import com.dace.dmgr.system.task.TaskTimer;
 import com.kiwi.dmgr.game.Game;
+import org.bukkit.scoreboard.Scoreboard;
 
+/**
+ * 게임 모드 인터페이스 클래스
+ */
 public interface IGameMode {
 
     /**
@@ -20,4 +24,12 @@ public interface IGameMode {
      * @param game 게임
      */
     void run(Game game);
+
+    /**
+     * 해당 게임모드 스코어보드를 리턴한다.
+     *
+     * @return 스코어보드
+
+    Scoreboard getScoreboard();
+    */
 }

@@ -12,8 +12,7 @@ import static com.dace.dmgr.system.HashMapList.userMap;
 import static com.kiwi.dmgr.game.GameMapList.gameList;
 
 /**
- * 게임을 관리하는 클래스
- * 모든 매치 타입에 사용할 수 있다.
+ * 게임을 관리하는 클래스. 모든 매치 타입에 사용할 수 있다.
  */
 public class GameManager extends Game {
 

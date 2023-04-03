@@ -2,14 +2,16 @@ package com.kiwi.dmgr.game;
 
 import com.dace.dmgr.system.task.TaskTimer;
 
+/**
+ * 게임에 매 주기마다 기능을 추가해 게임을 원활하게 하는 게임 스케쥴러 클래스
+ */
 public class GameScheduler extends Game {
 
     /**
      * 게임 스케쥴러를 실행한다.
      *
-     * 게임 인원이 시작 가능 인원이 되면 시작 카운트가 시작된다.
-     *
-     * 인원이 0명이면 방이 삭제된다.
+     * <p> 게임 인원이 시작 가능 인원이 되면 시작 카운트가 시작된다.
+     *     인원이 0명이면 방이 삭제된다. </p>
      */
     public static void run(Game game) {
         new TaskTimer(20) {
@@ -43,6 +45,7 @@ public class GameScheduler extends Game {
                     else if (startTimer == 1)
                         game.sendAlertMessage("게임이 1초 뒤에 시작합니다.");
                     else if (startTimer == 0) {
+                        game.start();
                         // 해당 게임 모드의 스케쥴러를 실행
                         game.getMode().run(game);
 

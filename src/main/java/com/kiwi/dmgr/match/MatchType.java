@@ -6,13 +6,16 @@ import java.util.ArrayList;
 
 import static com.kiwi.dmgr.game.GameMapList.gameMatchModeList;
 
+/**
+ * 매치 타입과 그 정보를 담는 클래스
+ */
 public enum MatchType {
 
     UNRANKED(true, false, true, false),
     COMPETITIVE(true, false, true, false);
 
     /* 매치 타입이 가능한 게임 모드 */
-    final ArrayList<GameMode> ableGameMode;
+    private ArrayList<GameMode> ableGameMode;
 
     /* 난입 가능 여부 */
     final boolean isIntrusionAble;
@@ -27,7 +30,6 @@ public enum MatchType {
     final boolean isRankChangeAble;
 
     MatchType(boolean isIntrusionAble, boolean isEscapePenalty, boolean isMMRChangeAble, boolean isRankChangeAble) {
-        this.ableGameMode = gameMatchModeList.get(this);
         this.isIntrusionAble = isIntrusionAble;
         this.isEscapePenalty = isEscapePenalty;
         this.isMMRChangeAble = isMMRChangeAble;
