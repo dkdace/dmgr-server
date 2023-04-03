@@ -1,6 +1,7 @@
 package com.kiwi.dmgr.match;
 
 import com.kiwi.dmgr.game.Game;
+import com.kiwi.dmgr.game.mode.EnumGameMode;
 import com.kiwi.dmgr.game.mode.GameMode;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ public class MatchMaking {
      * @param player 플레이어
      * @param mode 게임모드
      */
-    public static void addPlayerUnranked(Player player, GameMode mode) {
+    public static void addPlayerUnranked(Player player, EnumGameMode mode) {
         for (Game game : gameList.get(MatchType.UNRANKED)) {
             if (game.isNeedPlayer()) {
                 game.joinPlayer(player);

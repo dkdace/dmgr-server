@@ -41,7 +41,6 @@ public class DMGR extends JavaPlugin {
         CombatEventManager.init();
         registerCommands();
         registerTestCommands();
-        GameModeManager.registerGameModes();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
