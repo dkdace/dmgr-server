@@ -22,14 +22,14 @@ public class GameUser {
     private int death;
     /** 어시스트 */
     private int assist;
-    /** 준 데미지량 */
+    /** 준 피해량 */
     private long outgoingDamage;
-    /** 받은 데미지량 */
+    /** 받은 피해량 */
     private long incomingDamage;
     /** 힐량 */
     private long heal;
-    /** 생존 시간 */
-    private long surviveTime;
+    /** 막은 피해량 */
+    private long blockDamage;
 
     /**
      * 게임 유저 인스턴스를 생성하고 {@link GameMapList#gameUserMap}에 추가한다.
@@ -49,7 +49,7 @@ public class GameUser {
         this.outgoingDamage = 0;
         this.incomingDamage = 0;
         this.heal = 0;
-        this.surviveTime = 0;
+        this.blockDamage = 0;
 
         gameUserMap.put(player, this);
     }
