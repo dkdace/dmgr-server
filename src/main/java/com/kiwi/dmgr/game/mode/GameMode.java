@@ -7,19 +7,4 @@ import lombok.Getter;
  */
 @Getter
 public abstract class GameMode implements IGameMode {
-
-    /* 최대 수용 가능한 플레이어 수 */
-    private final int maxPlayer;
-
-    /* 팀전 유무 */
-    private final boolean isVerseTeam;
-
-    /* 플레이 타임 */
-    private final int playTime;
-
-    public GameMode(boolean isVerseTeam, int maxPlayer, int playTime) {
-        this.isVerseTeam = isVerseTeam;
-        this.maxPlayer = maxPlayer;
-        this.playTime = playTime;
-    }
 }

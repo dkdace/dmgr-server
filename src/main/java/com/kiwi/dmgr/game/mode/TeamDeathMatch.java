@@ -4,28 +4,17 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.kiwi.dmgr.game.Game;
 import com.kiwi.dmgr.game.GameUser;
 import com.kiwi.dmgr.game.Team;
-import com.kiwi.dmgr.match.MatchType;
 import org.bukkit.entity.Player;
 
-import static com.kiwi.dmgr.game.GameMapList.addMatchMode;
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
-import static org.bukkit.Bukkit.getLogger;
-import static org.bukkit.Bukkit.getServer;
-
 /**
  * 팀데스매치 클래스
  */
 public class TeamDeathMatch extends GameMode implements IGameMode {
 
-    private static final boolean VERSE_TEAM = true;
-    private static final int MAX_PLAYER = 10;
-    private static final int PLAY_TIME = 600;
-
-    public TeamDeathMatch() {
-        super(VERSE_TEAM, MAX_PLAYER, PLAY_TIME);
-        addMatchMode(MatchType.UNRANKED, this);
-        addMatchMode(MatchType.COMPETITIVE, this);
-    }
+    private static final boolean VERSE_TEAM = EnumGameMode.TeamDeathMatch.isVerseTeam();
+    private static final int MAX_PLAYER = EnumGameMode.TeamDeathMatch.getMaxPlayer();
+    private static final int PLAY_TIME = EnumGameMode.TeamDeathMatch.getPlayTime();
 
     @Override
     public boolean isStartAble(int playerCount) {
