@@ -1,12 +1,17 @@
 package com.kiwi.dmgr.game;
 
+import com.dace.dmgr.DMGR;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.mode.GameMode;
 import com.kiwi.dmgr.match.MatchType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 /**
  * 각 모드마다 게임의 리스트를 보관하는 클래스
@@ -24,7 +29,10 @@ public class GameMapList {
      * @param game 게임
      */
     public static void addGame(Game game) {
-        gameList.get(game.getMatchType()).add(game);
+        if (gameList.get(game.getMatchType()) == null)
+            gameList.put(game.getMatchType(), new ArrayList<>(Collections.singletonList(game)));
+        else
+            gameList.get(game.getMatchType()).add(game);
     }
 
     /**
@@ -33,7 +41,8 @@ public class GameMapList {
      * @param game 게임
      */
     public static void delGame(Game game) {
-        gameList.get(game.getMatchType()).remove(game);
+        if (gameList.get(game.getMatchType()) == null)
+            gameList.get(game.getMatchType()).remove(game);
     }
 
     /**
@@ -43,7 +52,10 @@ public class GameMapList {
      * @param gameMode 게임 모드
      */
     public static void addMatchMode(MatchType matchType, GameMode gameMode) {
-        gameMatchModeList.get(matchType).add(gameMode);
+        if (gameMatchModeList.get(matchType) == null)
+            gameMatchModeList.put(matchType, new ArrayList<>(Collections.singletonList(gameMode)));
+        else
+            gameMatchModeList.get(matchType).add(gameMode);
     }
 
     /**
@@ -53,6 +65,7 @@ public class GameMapList {
      * @param gameMode 게임 모드
      */
     public static void delMatchMode(MatchType matchType, GameMode gameMode) {
-        gameMatchModeList.get(matchType).remove(gameMode);
+        if (gameMatchModeList.get(matchType) == null)
+            gameMatchModeList.get(matchType).remove(gameMode);
     }
 }
