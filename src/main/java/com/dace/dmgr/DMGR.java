@@ -10,12 +10,12 @@ import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
+import com.kiwi.dmgr.game.mode.GameModeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
-import static com.kiwi.dmgr.game.mode.GameMode.registerGameModes;
 
 /**
  * 플러그인 메인 클래스.
@@ -41,7 +41,7 @@ public class DMGR extends JavaPlugin {
         CombatEventManager.init();
         registerCommands();
         registerTestCommands();
-        registerGameModes();
+        GameModeManager.registerGameModes();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
