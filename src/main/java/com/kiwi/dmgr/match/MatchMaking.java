@@ -2,11 +2,9 @@ package com.kiwi.dmgr.match;
 
 import com.kiwi.dmgr.game.Game;
 import com.kiwi.dmgr.game.mode.EnumGameMode;
-import com.kiwi.dmgr.game.mode.GameMode;
 import org.bukkit.entity.Player;
 
 import static com.kiwi.dmgr.game.GameMapList.gameList;
-
 
 /**
  * 게임 대기열 클래스
@@ -28,17 +26,19 @@ public class MatchMaking {
      * @param mode 게임모드
      */
     public static void addPlayerUnranked(Player player, EnumGameMode mode) {
-        for (Game game : gameList.get(MatchType.UNRANKED)) {
-            if (game.isNeedPlayer()) {
-                game.joinPlayer(player);
-                return;
+        if (gameList.get(MatchType.UNRANKED) != null) {
+            for (Game game : gameList.get(MatchType.UNRANKED)) {
+                if (game.isNeedPlayer()) {
+                    game.joinPlayer(player);
+                    return;
+                }
             }
-        }
 
-        for (Game game : gameList.get(MatchType.UNRANKED)) {
-            if (!game.isPlay()) {
-                game.joinPlayer(player);
-                return;
+            for (Game game : gameList.get(MatchType.UNRANKED)) {
+                if (!game.isPlay()) {
+                    game.joinPlayer(player);
+                    return;
+                }
             }
         }
 
