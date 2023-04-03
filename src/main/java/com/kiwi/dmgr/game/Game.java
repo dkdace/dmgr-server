@@ -4,6 +4,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.kiwi.dmgr.game.map.GameMap;
+import com.kiwi.dmgr.game.mode.EnumGameMode;
 import com.kiwi.dmgr.game.mode.GameMode;
 import com.kiwi.dmgr.match.MatchType;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class Game {
     /** 잔여 시간 */
     private long remainTime;
     /** 게임 모드 */
-    private GameMode mode;
+    private EnumGameMode mode;
     /** 게임 매치 타입 */
     private MatchType matchType;
     /** 게임 진행 여부 */
@@ -59,9 +60,8 @@ public class Game {
         this.world = null;
     }
 
-    public Game(MatchType type, GameMode mode) {
+    public Game(MatchType type, EnumGameMode mode) {
         super();
-        this.playerList = null;
         this.matchType = type;
         this.mode = mode;
 

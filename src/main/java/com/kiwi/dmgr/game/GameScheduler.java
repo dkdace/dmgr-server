@@ -30,7 +30,7 @@ public class GameScheduler extends Game {
                 }
 
                 // 테스트로 대기 플레이어에게 메세지로 전송
-                if (game.getMode().isStartAble(playerCount)) {
+                if (game.getMode().getInstance().isStartAble(playerCount)) {
 
                     if (startTimer == 60)
                         game.sendAlertMessage("게임이 60초 뒤에 시작합니다.");
@@ -47,7 +47,7 @@ public class GameScheduler extends Game {
                     else if (startTimer == 0) {
                         game.start();
                         // 해당 게임 모드의 스케쥴러를 실행
-                        game.getMode().run(game);
+                        game.getMode().getInstance().run(game);
 
                         return false;
                     }
