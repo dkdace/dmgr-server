@@ -41,7 +41,7 @@ public class GameMapList {
      * @param game 게임
      */
     public static void delGame(Game game) {
-        if (gameList.get(game.getMatchType()) == null)
+        if (gameList.get(game.getMatchType()) != null)
             gameList.get(game.getMatchType()).remove(game);
     }
 
@@ -65,7 +65,7 @@ public class GameMapList {
      * @param gameMode 게임 모드
      */
     public static void delMatchMode(MatchType matchType, GameMode gameMode) {
-        if (gameMatchModeList.get(matchType) == null)
+        if (gameMatchModeList.get(matchType) != null)
             gameMatchModeList.get(matchType).remove(gameMode);
     }
 }
