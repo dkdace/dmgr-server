@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
+import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
 /**
  * 게임의 정보를 담고 관리하는 클래스
@@ -113,7 +114,7 @@ public class Game {
      * @param player 플레이어
      */
     public void initPlayer(Player player) {
-        GameUser user = new GameUser(player);
+        GameUser user = gameUserMap.get(player);
         user.setGame(this);
         if (!playerList.contains(player))
             playerList.add(player);
