@@ -48,22 +48,19 @@ public class Game {
     /**
      * 게임 인스턴스를 호출하고 {@link GameMapList#gameList}에 추가한다.
      */
-    public Game() {
+    public Game(MatchType type, EnumGameMode mode) {
         this.playerList = new ArrayList<>();
         this.waitPlayerList = new ArrayList<>();
         this.teamPlayerMapList = new HashMap<>();
         this.teamScore = new HashMap<>();
         this.remainTime = 0;
-        this.matchType = null;
-        this.mode = null;
         this.play = false;
         this.world = null;
-    }
-
-    public Game(MatchType type, EnumGameMode mode) {
-        super();
         this.matchType = type;
         this.mode = mode;
+
+        for (Team tempTeam : Team.values())
+            this.teamPlayerMapList.put(tempTeam, new ArrayList<>());
 
         GameMapList.addGame(this);
         GameScheduler.run(this);
@@ -95,8 +92,9 @@ public class Game {
      */
     public void finish(boolean force) {
         this.play = false;
+        this.sendAlertMessage("게임 종료");
         for (Player player : this.playerList) {
-            player.teleport(Lobby.lobby);
+            //player.teleport(Lobby.lobby);
         }
 
         if (!force) {
