@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
+import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
 public class OnPlayerQuit implements Listener {
     /** 퇴장 메시지의 접두사 */
@@ -26,6 +27,7 @@ public class OnPlayerQuit implements Listener {
 
         event.setQuitMessage(PREFIX + player.getName());
         userMap.remove(player);
+        gameUserMap.remove(player);
 
         new TaskWait(1) {
             @Override
