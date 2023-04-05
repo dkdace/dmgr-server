@@ -14,7 +14,7 @@ import static com.kiwi.dmgr.game.GameMapList.gameList;
 /**
  * 게임을 관리하는 클래스. 모든 매치 타입에 사용할 수 있다.
  */
-public class GameManager extends Game {
+public class GameManager {
 
     /**
      * 플레이어를 MMR 기준으로 내림차순 정렬한다.
