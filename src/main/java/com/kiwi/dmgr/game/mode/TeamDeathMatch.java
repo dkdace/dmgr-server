@@ -40,48 +40,52 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
                 startTimer -= 1;
                 return true;
             }
-        };
-        game.sendAlertMessage("전투 시작");
-        game.sendAlertMessage("적을 처치하십시오.");
-        /* 게임 모드 진행 스케쥴러 */
-        new TaskTimer(2) {
-            @Override
-            public boolean run(int i) {
-                long time = game.getRemainTime();
-                if (time == 300) {
-                    game.sendAlertMessage("게임 종료까지 5분 남았습니다.");
-                }
-                if (time == 60) {
-                    game.sendAlertMessage("게임 종료까지 1분 남았습니다.");
-                }
-                if (time == 30) {
-                    game.sendAlertMessage("게임 종료까지 30초 남았습니다.");
-                }
-                if (time == 10) {
-                    game.sendAlertMessage("게임 종료까지 10초 남았습니다.");
-                }
-                if (time < 0) {
-                    return false;
-                }
-                int redScore = 0;
-                int blueScore = 0;
-                for (Player player : game.getTeamPlayerMapList().get(Team.RED)) {
-                    GameUser user = gameUserMap.get(player);
-                    blueScore += user.getDeath();
-                }
-                for (Player player : game.getTeamPlayerMapList().get(Team.BLUE)) {
-                    GameUser user = gameUserMap.get(player);
-                    redScore += user.getDeath();
-                }
-                game.getTeamScore().put(Team.RED, redScore);
-                game.getTeamScore().put(Team.BLUE, blueScore);
-                game.setRemainTime((long) (time - 0.1));
-                return true;
-            }
 
             @Override
             public void onEnd(boolean cancelled) {
-                game.finish(false);
+                game.sendAlertMessage("전투 시작");
+                game.sendAlertMessage("적을 처치하십시오.");
+                /* 게임 모드 진행 스케쥴러 */
+                new TaskTimer(20) {
+                    @Override
+                    public boolean run(int i) {
+                        long time = game.getRemainTime();
+                        if (time == 300) {
+                            game.sendAlertMessage("게임 종료까지 5분 남았습니다.");
+                        }
+                        if (time == 60) {
+                            game.sendAlertMessage("게임 종료까지 1분 남았습니다.");
+                        }
+                        if (time == 30) {
+                            game.sendAlertMessage("게임 종료까지 30초 남았습니다.");
+                        }
+                        if (time == 10) {
+                            game.sendAlertMessage("게임 종료까지 10초 남았습니다.");
+                        }
+                        if (time <= 0) {
+                            return false;
+                        }
+                        int redScore = 0;
+                        int blueScore = 0;
+                        for (Player player : game.getTeamPlayerMapList().get(Team.RED)) {
+                            GameUser user = gameUserMap.get(player);
+                            blueScore += user.getDeath();
+                        }
+                        for (Player player : game.getTeamPlayerMapList().get(Team.BLUE)) {
+                            GameUser user = gameUserMap.get(player);
+                            redScore += user.getDeath();
+                        }
+                        game.getTeamScore().put(Team.RED, redScore);
+                        game.getTeamScore().put(Team.BLUE, blueScore);
+                        game.setRemainTime(time - 1);
+                        return true;
+                    }
+
+                    @Override
+                    public void onEnd(boolean cancelled) {
+                        game.finish(false);
+                    }
+                };
             }
         };
     }
