@@ -9,8 +9,8 @@ import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
+import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
-import com.kiwi.dmgr.game.mode.GameModeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -82,6 +82,7 @@ public class DMGR extends JavaPlugin {
     private void registerTestCommands() {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
+        getCommand("게임테스트").setExecutor(new GameTestCommand());
     }
 
     /**

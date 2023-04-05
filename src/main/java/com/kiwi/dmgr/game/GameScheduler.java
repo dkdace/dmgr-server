@@ -5,7 +5,7 @@ import com.dace.dmgr.system.task.TaskTimer;
 /**
  * 게임에 매 주기마다 기능을 추가해 게임을 원활하게 하는 게임 스케쥴러 클래스
  */
-public class GameScheduler extends Game {
+public class GameScheduler {
 
     /**
      * 게임 스케쥴러를 실행한다.

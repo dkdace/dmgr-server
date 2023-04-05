@@ -42,3 +42,6 @@ commands:
       - dummy
       - 더미
       - ejal
+  게임테스트:
+    permission: admin
+    description: DMGR Test command
