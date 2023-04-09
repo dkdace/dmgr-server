@@ -31,6 +31,8 @@ public enum Cooldown {
     NO_SPRINT(0),
     /** 스킬 쿨타임 */
     SKILL_COOLDOWN(0),
+    /** 스킬 스택 충전 쿨타임 */
+    SKILL_STACK_COOLDOWN(0),
     /** 스킬 지속시간 */
     SKILL_DURATION(0),
     /** 액션바 지속시간 */
