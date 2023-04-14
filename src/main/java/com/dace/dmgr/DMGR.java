@@ -11,6 +11,7 @@ import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
+import com.kiwi.dmgr.game.GameUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,6 +45,7 @@ public class DMGR extends JavaPlugin {
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
+            new GameUser(player);
             userMap.put(player, user);
             Lobby.lobbyTick(player);
             getServer().broadcastMessage(PREFIX.CHAT + "플레이어 할당 : §e§n" + player.getName());
