@@ -1,13 +1,14 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.HasDuration;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
-public class ArkaceUlt extends UltimateSkill {
+public class ArkaceUlt extends UltimateSkill implements HasDuration {
     /** 궁극기 필요 충전량 */
     public static final int COST = 7000;
     /** 지속시간 */
@@ -33,9 +34,14 @@ public class ArkaceUlt extends UltimateSkill {
     }
 
     @Override
+    public long getDuration() {
+        return DURATION;
+    }
+
+    @Override
     public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
-            skillController.setDuration(DURATION);
+            skillController.use();
             combatUser.getWeaponController().setRemainingAmmo(ArkaceWeapon.CAPACITY);
         }
     }

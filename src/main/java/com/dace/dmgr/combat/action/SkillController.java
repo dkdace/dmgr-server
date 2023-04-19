@@ -56,20 +56,27 @@ public class SkillController {
 
     /**
      * 스킬의 쿨타임을 실행한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    private void runCooldown() {
+    private void runCooldown(long cooldown) {
+        CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
+
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
                 if (combatUserMap.get(combatUser.getEntity()) == null)
                     return false;
 
-                if (!(skill instanceof Stackable))
+                if (stack == 0)
                     setItemCooldown();
 
                 if (isCooldownFinished()) {
-                    if (!(skill instanceof Stackable) && !isUsing())
-                        setItemReady();
+                    addStack(1);
+
+                    if (skill instanceof Stackable && stack < ((Stackable) skill).getMaxStack())
+                        runCooldown(cooldown);
+
                     return false;
                 }
 
@@ -80,8 +87,13 @@ public class SkillController {
 
     /**
      * 스킬의 지속시간을 실행한다.
+     *
+     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    private void runDuration() {
+    private void runDuration(long duration, long cooldown) {
+        CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
+
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
@@ -91,7 +103,10 @@ public class SkillController {
                 setItemDuration();
 
                 if (!isUsing()) {
-                    setCooldown();
+                    addStack(-1);
+                    if (isCooldownFinished())
+                        runCooldown(cooldown);
+
                     return false;
                 }
 
@@ -101,29 +116,57 @@ public class SkillController {
     }
 
     /**
-     * 스킬의 스택 충전 쿨타임을 실행한다.
+     * 스킬을 사용한다.
+     *
+     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
      */
-    private void runStackCooldown() {
-        new TaskTimer(1) {
-            @Override
-            public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
-                    return false;
-                if (stack >= ((Stackable) skill).getMaxStack())
-                    return false;
+    public void use() {
+        if (skill instanceof HasDuration)
+            if (isUsing())
+                setDuration(0);
+            else
+                runDuration(((HasDuration) skill).getDuration(), skill.getCooldown());
+        else {
+            addStack(-1);
+            if (isCooldownFinished())
+                runCooldown(skill.getCooldown());
+        }
+    }
 
-                if (isStackCooldownFinished()) {
-                    addStack(1);
-                    if (stack < ((Stackable) skill).getMaxStack()) {
-                        CooldownManager.setCooldown(SkillController.this, Cooldown.SKILL_STACK_COOLDOWN, ((Stackable) skill).getStackCooldown());
-                        runStackCooldown();
-                    }
-                    return false;
-                }
+    /**
+     * 스킬을 사용한다.
+     *
+     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    public void use(long cooldown) {
+        if (skill instanceof HasDuration) {
+            if (isUsing())
+                setDuration(0);
+            else
+                runDuration(((HasDuration) skill).getDuration(), cooldown);
+        } else {
+            addStack(-1);
+            if (isCooldownFinished())
+                runCooldown(cooldown);
+        }
+    }
 
-                return true;
-            }
-        };
+    /**
+     * 스킬을 사용한다.
+     *
+     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
+     *
+     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    public void use(long duration, long cooldown) {
+        if (isUsing())
+            setDuration(0);
+        else {
+            runDuration(duration, cooldown);
+        }
     }
 
     /**
@@ -132,24 +175,8 @@ public class SkillController {
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setCooldown(long cooldown) {
-        if (isCooldownFinished()) {
+        if (!isCooldownFinished())
             CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-            runCooldown();
-        } else
-            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-        CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, 0);
-
-        if (skill instanceof Stackable)
-            setStackCooldown();
-    }
-
-    /**
-     * 스킬의 쿨타임을 스킬 정보에 설정된 기본 쿨타임으로 설정한다.
-     *
-     * @see Skill#getCooldown()
-     */
-    public void setCooldown() {
-        setCooldown(skill.getCooldown());
     }
 
     /**
@@ -168,24 +195,8 @@ public class SkillController {
      * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setDuration(long duration) {
-        if (!isUsing()) {
+        if (isUsing())
             CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
-            runDuration();
-        } else
-            CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
-        CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, 0);
-    }
-
-    /**
-     * 스킬의 지속시간을 스킬 정보에 설정된 기본 지속시간으로 설정한다.
-     *
-     * <p>스킬이 {@link HasDuration}을 상속받는 클래스여야 한다.</p>
-     *
-     * @see HasDuration
-     */
-    public void setDuration() {
-        if (skill instanceof HasDuration)
-            setDuration(((HasDuration) skill).getDuration());
     }
 
     /**
@@ -199,37 +210,12 @@ public class SkillController {
     }
 
     /**
-     * 스킬의 스택 충전 쿨타임을 스킬 정보에 설정된 기본 쿨타임으로 설정한다.
-     *
-     * <p>스킬이 {@link Stackable}을 상속받는 클래스여야 한다.</p>
-     */
-    public void setStackCooldown() {
-        if (!(skill instanceof Stackable))
-            return;
-
-        addStack(-1);
-        if (isStackCooldownFinished()) {
-            CooldownManager.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, ((Stackable) skill).getStackCooldown());
-            runStackCooldown();
-        }
-    }
-
-    /**
      * 스킬의 쿨타임이 끝났는 지 확인한다.
      *
      * @return 쿨타임 종료 여부
      */
     public boolean isCooldownFinished() {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
-    }
-
-    /**
-     * 스킬의 스택 충전 쿨타임이 끝났는 지 확인한다.
-     *
-     * @return 쿨타임 종료 여부
-     */
-    public boolean isStackCooldownFinished() {
-        return CooldownManager.getCooldown(this, Cooldown.SKILL_STACK_COOLDOWN) == 0;
     }
 
     /**
@@ -250,12 +236,13 @@ public class SkillController {
      * @see Stackable
      */
     public void addStack(int amount) {
-        if (!(skill instanceof Stackable))
-            return;
+        int max = 1;
+        if (skill instanceof Stackable)
+            max = ((Stackable) skill).getMaxStack();
 
         stack += amount;
-        if (stack > ((Stackable) skill).getMaxStack())
-            stack = ((Stackable) skill).getMaxStack();
+        if (stack > max)
+            stack = max;
         if (stack <= 0) {
             stack = 0;
             setItemCooldown();
@@ -341,9 +328,6 @@ public class SkillController {
      * 스킬의 쿨타임과 지속시간을 초기화한다.
      */
     public void reset() {
-        if (skill instanceof Stackable)
-            setStackCooldown();
-        else
-            setCooldown();
+        runCooldown(skill.getCooldown());
     }
 }
