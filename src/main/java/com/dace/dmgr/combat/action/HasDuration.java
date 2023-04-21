@@ -7,7 +7,7 @@ public interface HasDuration {
     /**
      * 스킬의 지속시간을 반환한다.
      *
-     * @return 지속시간
+     * @return 지속시간 (tick)
      */
     long getDuration();
 }

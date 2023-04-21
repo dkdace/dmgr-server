@@ -27,6 +27,10 @@ public class SkillController {
     /** 스킬 설명 아이템 */
     private ItemStack itemStack;
 
+    /** 상태 변수 */
+    @Getter
+    private float stateValue = 0;
+
     /** 스킬 스택 수 */
     @Getter
     private int stack = 0;
@@ -76,6 +80,8 @@ public class SkillController {
 
                     if (skill instanceof Stackable && stack < ((Stackable) skill).getMaxStack())
                         runCooldown(cooldown);
+                    else if (skill instanceof Chargeable)
+                        runStateValueCharge();
 
                     return false;
                 }
@@ -102,6 +108,8 @@ public class SkillController {
 
                 setItemDuration();
 
+                if (skill instanceof Chargeable)
+                    addStateValue(-((Chargeable) skill).getStateValueDecrement() / 20F);
                 if (!isUsing()) {
                     addStack(-1);
                     if (isCooldownFinished())
@@ -111,6 +119,23 @@ public class SkillController {
                 }
 
                 return true;
+            }
+        };
+    }
+
+    /**
+     * 스킬의 상태 변수 충전을 실행한다.
+     */
+    private void runStateValueCharge() {
+        new TaskTimer(1) {
+            @Override
+            public boolean run(int i) {
+                if (combatUserMap.get(combatUser.getEntity()) == null)
+                    return false;
+
+                addStateValue(((Chargeable) skill).getStateValueIncrement() / 20F);
+
+                return stateValue < ((Chargeable) skill).getMaxStateValue() && !isUsing() && isCooldownFinished();
             }
         };
     }
@@ -252,6 +277,25 @@ public class SkillController {
             else
                 setItemReady();
         }
+    }
+
+    /**
+     * 지정한 양만큼 스킬의 상태 변수를 증가시킨다.
+     *
+     * <p>스킬이 {@link Chargeable}을 상속받는 클래스여야 한다.</p>
+     *
+     * @param increment 증가량
+     * @see Chargeable
+     */
+    public void addStateValue(float increment) {
+        if (!(skill instanceof Chargeable))
+            return;
+
+        stateValue += increment;
+        if (stateValue < 0)
+            stateValue = 0;
+        if (stateValue > ((Chargeable) skill).getMaxStateValue())
+            stateValue = ((Chargeable) skill).getMaxStateValue();
     }
 
     /**
