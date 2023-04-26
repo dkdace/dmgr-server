@@ -10,11 +10,7 @@ import org.bukkit.entity.Player;
 import static com.kiwi.dmgr.match.MatchMaking.addPlayerUnranked;
 
 /**
- * 훈련용 봇 소환 명령어 클래스.
- *
- * <p>Usage: /소환 체력</p>
- *
- * @see Dummy
+ * 게임 테스트 명령어 클래스
  */
 public class GameTestCommand implements CommandExecutor {
     @Override

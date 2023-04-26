@@ -1,7 +1,6 @@
 package com.kiwi.dmgr.game.mode;
 
 import lombok.Getter;
-import org.bukkit.scoreboard.Team;
 
 @Getter
 public enum EnumGameMode {
