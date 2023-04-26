@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
+import static com.kiwi.dmgr.game.map.MapUtil.mapLoad;
 
 /**
  * 플러그인 메인 클래스.
@@ -42,10 +43,10 @@ public class DMGR extends JavaPlugin {
         CombatEventManager.init();
         registerCommands();
         registerTestCommands();
+        mapLoad();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
-            new GameUser(player);
             userMap.put(player, user);
             Lobby.lobbyTick(player);
             getServer().broadcastMessage(PREFIX.CHAT + "플레이어 할당 : §e§n" + player.getName());
