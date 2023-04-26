@@ -27,7 +27,6 @@ public class OnPlayerQuit implements Listener {
 
         event.setQuitMessage(PREFIX + player.getName());
         userMap.remove(player);
-        gameUserMap.remove(player);
 
         new TaskWait(1) {
             @Override

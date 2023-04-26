@@ -14,6 +14,8 @@ public class GameUser {
     private Player player;
     /** 플레이 중인 게임 (해당 게임유저가 적용중인 게임) */
     private Game game;
+    /** 팀 */
+    private Team team;
     /** 점수 */
     private int score;
     /** 킬 */
@@ -34,8 +36,7 @@ public class GameUser {
     /**
      * 게임 유저 인스턴스를 생성하고 {@link GameMapList#gameUserMap}에 추가한다.
      *
-     * <p>플레이어가 서버에 접속할 때 호출해야 하며, 퇴장 시 {@link GameMapList#gameUserMap}에서
-     * 제거해야 한다.</p>
+     * <p> 게임이 시작될 때 호출하여야 한다. </p>
      *
      * @param player 대상 플레이어
      */
