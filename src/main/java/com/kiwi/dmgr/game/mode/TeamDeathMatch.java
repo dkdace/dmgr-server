@@ -12,10 +12,6 @@ import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
  */
 public class TeamDeathMatch extends GameMode implements IGameMode {
 
-    private static final boolean VERSE_TEAM = EnumGameMode.TeamDeathMatch.isVerseTeam();
-    private static final int MAX_PLAYER = EnumGameMode.TeamDeathMatch.getMaxPlayer();
-    private static final int PLAY_TIME = EnumGameMode.TeamDeathMatch.getPlayTime();
-
     @Override
     public boolean isStartAble(int playerCount) {
         return playerCount > 0 && playerCount % 2 == 0;
@@ -23,6 +19,7 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
 
     @Override
     public void run(Game game) {
+        game.teamDivide();
         game.sendAlertMessage("팀 데스매치");
         game.sendAlertMessage("전투를 준비하십시오.");
 
@@ -74,6 +71,9 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
                         for (Player player : game.getTeamPlayerMapList().get(Team.BLUE)) {
                             GameUser user = gameUserMap.get(player);
                             redScore += user.getDeath();
+                        }
+                        if (time % 10 == 0) {
+                            game.sendAlertMessage("Red " + redScore + " VS " + blueScore + " Blue");
                         }
                         game.getTeamScore().put(Team.RED, redScore);
                         game.getTeamScore().put(Team.BLUE, blueScore);
