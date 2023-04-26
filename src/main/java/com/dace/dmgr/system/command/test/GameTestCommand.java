@@ -1,6 +1,5 @@
 package com.dace.dmgr.system.command.test;
 
-import com.dace.dmgr.combat.entity.Dummy;
 import com.kiwi.dmgr.game.mode.EnumGameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

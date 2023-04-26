@@ -63,7 +63,7 @@ public class Game {
         this.matchType = type;
         this.mode = mode;
         this.map = GameMapList.getRandomMap(this.mode);
-        this.world = map + "_" + UUID.randomUUID();
+        this.world = map.getName() + "_" + UUID.randomUUID();
 
         for (Team tempTeam : Team.values())
             this.teamPlayerMapList.put(tempTeam, new ArrayList<>());
