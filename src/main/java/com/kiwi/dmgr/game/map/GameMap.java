@@ -1,9 +1,8 @@
 package com.kiwi.dmgr.game.map;
 
-import com.kiwi.dmgr.game.Team;
-import com.kiwi.dmgr.game.mode.GameMode;
+import com.kiwi.dmgr.game.mode.EnumGameMode;
 import lombok.Getter;
-import org.bukkit.Location;
+import lombok.Setter;
 
 import java.util.HashMap;
 
@@ -14,13 +13,30 @@ import java.util.HashMap;
 public abstract class GameMap {
 
     /* 게임 모드 타입 */
-    private final GameMode mode;
+    private final EnumGameMode mode;
 
-    /* 각 팀의 스폰 위치 */
-    private final HashMap<Team, Location> teamSpawnLocation;
+    /* 맵 이름 */
+    private final String name;
 
-    protected GameMap(GameMode mode, HashMap<Team, Location> teamSpawnLocation) {
+    /* 맵 월드 이름 */
+    private final String worldName;
+
+    @Setter
+    /* 맵 주요 위치
+    *
+    * <p> index 0, 1, 2에는 x, y, z
+    *     index 3, 4에는 yaw, pitch </p>
+    * */
+    private HashMap<Point, double[]> pointLocation;
+
+    public GameMap(EnumGameMode mode, String name, String worldName) {
         this.mode = mode;
-        this.teamSpawnLocation = teamSpawnLocation;
+        this.name = name;
+        this.worldName = worldName;
+        this.pointLocation = new HashMap<>();
+    }
+
+    public void addPointLocation(Point point, double[] location) {
+        this.pointLocation.put(point, location);
     }
 }
