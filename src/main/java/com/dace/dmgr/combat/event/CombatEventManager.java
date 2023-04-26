@@ -16,5 +16,6 @@ public class CombatEventManager {
         EventUtil.registerListener(new OnGameUserDeath());
         EventUtil.registerListener(new OnGameUserAssist());
         EventUtil.registerListener(new OnGameUserHeal());
+        EventUtil.registerListener(new OnGameUserRespawn());
     }
 }
