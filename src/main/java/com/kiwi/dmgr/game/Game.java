@@ -4,16 +4,19 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.kiwi.dmgr.game.map.GameMap;
+import com.kiwi.dmgr.game.map.Point;
+import com.kiwi.dmgr.game.map.WorldManager;
 import com.kiwi.dmgr.game.mode.EnumGameMode;
 import com.kiwi.dmgr.game.mode.GameMode;
 import com.kiwi.dmgr.match.MatchType;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
@@ -42,7 +45,7 @@ public class Game {
     /** 게임 진행 여부 */
     private boolean play;
     /** 전장 월드 */
-    private World world;
+    private String world;
     /** 맵 */
     private GameMap map;
 
@@ -59,6 +62,8 @@ public class Game {
         this.world = null;
         this.matchType = type;
         this.mode = mode;
+        this.map = GameMapList.getRandomMap(this.mode);
+        this.world = map + "_" + UUID.randomUUID();
 
         for (Team tempTeam : Team.values())
             this.teamPlayerMapList.put(tempTeam, new ArrayList<>());
@@ -72,6 +77,13 @@ public class Game {
      */
     public void delete() {
         GameMapList.delGame(this);
+    }
+
+    /**
+     * 월드를 로드한다.
+     */
+    public void loadWorld() {
+        WorldManager.generateWorld(map.getWorldName(), world);
     }
 
     /**
@@ -95,7 +107,7 @@ public class Game {
         this.play = false;
         this.sendAlertMessage("게임 종료");
         for (Player player : this.playerList) {
-            //player.teleport(Lobby.lobby);
+            player.teleport(Lobby.lobby);
         }
 
         if (!force) {
@@ -108,13 +120,81 @@ public class Game {
         this.delete();
     }
 
+
+    /**
+     * 플레이어를 MMR 기준으로 내림차순 정렬한다.
+     *
+     * @param playerList 플레이어 목록
+     * @return 정렬된 플레이어 목록
+     */
+    public ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
+        HashMap<Player, Integer> playerMap = new HashMap<>();
+        for (Player player : playerList) {
+            User user = userMap.get(player);
+            playerMap.put(player, user.getMMR());
+        }
+
+        List<Player> keySetList = new ArrayList<>(playerMap.keySet());
+        keySetList.sort(Comparator.comparing(playerMap::get));
+
+        return new ArrayList<>(keySetList);
+    }
+
+    /**
+     * MMR에 따라 팀 분배를 하여 플레이어를 실력에 따라 나눈다.
+     *
+     * <p> 팀 분배는 아래와 같이 이뤄진다. (플레이어 수를 i라고 하자.)
+     * 먼저 최상위 플레이어를 일부 얻는다. (i / 4의 내림값의 인원수)
+     * 그 최상위 플레이어를 1팀으로 이동시킨다.
+     * 그리고 중위권 플레이어를 2팀에 전부 이동시킨다.
+     * 나머지 하위권 플레이어를 1팀으로 전부 이동시킨다.
+     * 1팀, 2팀을 무작위로 RED, BLUE 팀으로 선정한다. </p>
+     */
+    public void teamDivide() {
+        playerList = getPlayerListMMRSort(this.playerList);
+        ArrayList<Player> team1 = new ArrayList<>();
+        ArrayList<Player> team2 = new ArrayList<>();
+
+        int size = this.playerList.size();
+        for (int i=0; i<size/4; i++) {
+            team1.add(playerList.get(0));
+            playerList.remove(0);
+        }
+
+        for (int i=0; i<size/2; i++) {
+            team2.add(playerList.get(0));
+            playerList.remove(0);
+        }
+
+        team1.addAll(playerList);
+
+        Random random = new Random();
+        double r = random.nextDouble();
+
+        if (r < 0.5) {
+            teamPlayerMapList.put(Team.RED, team1);
+            teamPlayerMapList.put(Team.BLUE, team2);
+            for (Player player : team1)
+                initPlayer(player, Team.RED);
+            for (Player player : team2)
+                initPlayer(player, Team.BLUE);
+        } else {
+            teamPlayerMapList.put(Team.BLUE, team1);
+            teamPlayerMapList.put(Team.RED, team2);
+            for (Player player : team1)
+                initPlayer(player, Team.BLUE);
+            for (Player player : team2)
+                initPlayer(player, Team.RED);
+        }
+    }
+
     /**
      * 해당 게임에 플레이어 입장을 원활하게 하기 위해 초기 상태로 설정한다.
      *
      * @param player 플레이어
      */
     public void initPlayer(Player player) {
-        GameUser user = gameUserMap.get(player);
+        GameUser user = new GameUser(player);
         user.setGame(this);
         if (!playerList.contains(player))
             playerList.add(player);
@@ -122,12 +202,16 @@ public class Game {
 
     public void initPlayer(Player player, Team team) {
         initPlayer(player);
+        GameUser user = gameUserMap.get(player);
+        user.setTeam(team);
+        sendAlertMessage(player.getName() + " - " + team.name());
 
         for (Team tempTeam : Team.values())
-            teamPlayerMapList.get(team).remove(player);
+            teamPlayerMapList.get(tempTeam).remove(player);
 
         teamPlayerMapList.get(team).add(player);
-        player.teleport(map.getTeamSpawnLocation().get(team));
+
+        player.teleport(getPointLocation(team));
     }
 
     /**
@@ -143,18 +227,18 @@ public class Game {
     public void joinPlayer(Player player) {
         if (!play) {
             initPlayer(player);
+            sendAlertMessage(player.getName() + "게임 추가");
         }
 
         else {
             int redAmount = teamPlayerMapList.get(Team.RED).size();
             int blueAmount = teamPlayerMapList.get(Team.BLUE).size();
-            Team team = null;
 
             if (redAmount < blueAmount)
-                team = Team.RED;
+                initPlayer(player, Team.RED);
 
             else if (redAmount > blueAmount)
-                team = Team.BLUE;
+                initPlayer(player, Team.BLUE);
 
             else {
                 if (waitPlayerList.size() == 1) {
@@ -192,6 +276,24 @@ public class Game {
             }
 
         }
+    }
+
+    /**
+     * 게임의 월드의 포인트 위치를 리턴한다.
+     *
+     * @see Point
+     * @param point 주요 위치 이름
+     */
+    public Location getPointLocation(Point point) {
+        World world = Bukkit.getWorld(this.world);
+        double[] args = this.map.getPointLocation().get(point);
+        return new Location(world, args[0], args[1], args[2], (float) args[3], (float) args[4]);
+    }
+
+    public Location getPointLocation(Team team) {
+        if (team == Team.RED) return getPointLocation(Point.RED_SPAWN);
+        else if (team == Team.BLUE) return getPointLocation(Point.BLUE_SPAWN);
+        else return Lobby.lobby;
     }
 
     /**

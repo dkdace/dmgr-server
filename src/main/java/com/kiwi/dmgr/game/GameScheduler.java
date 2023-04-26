@@ -17,7 +17,7 @@ public class GameScheduler {
         new TaskTimer(20) {
 
             int playerCount = 0;
-            int startTimer = 60;
+            int startTimer = 3;
 
             @Override
             public boolean run(int i) {
@@ -30,7 +30,9 @@ public class GameScheduler {
                 }
 
                 // 테스트로 대기 플레이어에게 메세지로 전송
-                if (game.getMode().getInstance().isStartAble(playerCount)) {
+                //if (game.getMode().getInstance().isStartAble(playerCount))
+
+                if (true) {
 
                     if (startTimer == 60)
                         game.sendAlertMessage("게임이 60초 뒤에 시작합니다.");
@@ -38,8 +40,10 @@ public class GameScheduler {
                         game.sendAlertMessage("게임이 30초 뒤에 시작합니다.");
                     else if (startTimer == 10)
                         game.sendAlertMessage("게임이 10초 뒤에 시작합니다.");
-                    else if (startTimer == 3)
+                    else if (startTimer == 3) {
+                        game.loadWorld();
                         game.sendAlertMessage("게임이 3초 뒤에 시작합니다.");
+                    }
                     else if (startTimer == 2)
                         game.sendAlertMessage("게임이 2초 뒤에 시작합니다.");
                     else if (startTimer == 1)
