@@ -29,7 +29,7 @@ public abstract class Skill extends Action {
     /**
      * 스킬의 쿨타임을 반환한다.
      *
-     * @return 쿨타임
+     * @return 쿨타임 (tick)
      */
     public abstract long getCooldown();
 

@@ -35,12 +35,12 @@ public class ArkaceP1 extends PassiveSkill implements HasDuration {
     @Override
     public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
-            skillController.setDuration();
+            skillController.use();
             combatUser.addSpeedIncrement(SPRINT_SPEED);
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability((short) (combatUser.getCharacter().getWeapon().getItemStack().getDurability() + 1000));
         } else {
-            skillController.setDuration(0);
+            skillController.use();
             combatUser.addSpeedIncrement(-SPRINT_SPEED);
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability(combatUser.getCharacter().getWeapon().getItemStack().getDurability());

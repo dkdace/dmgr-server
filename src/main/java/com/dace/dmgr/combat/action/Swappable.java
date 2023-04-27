@@ -14,7 +14,7 @@ public interface Swappable {
     /**
      * 보조무기의 쿨타임을 반환한다.
      *
-     * @return 쿨타임
+     * @return 쿨타임 (tick)
      */
     default long getSubweaponCooldown() {
         return getSubweapon().getCooldown();

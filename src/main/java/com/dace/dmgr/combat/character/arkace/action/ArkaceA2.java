@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
+import com.dace.dmgr.combat.action.HasDuration;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
@@ -15,7 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class ArkaceA2 extends ActiveSkill {
+public class ArkaceA2 extends ActiveSkill implements HasDuration {
     /** 쿨타임 */
     public static final int COOLDOWN = 12 * 20;
     /** 치유량 */
@@ -43,9 +44,14 @@ public class ArkaceA2 extends ActiveSkill {
     }
 
     @Override
+    public long getDuration() {
+        return DURATION;
+    }
+
+    @Override
     public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
-            skillController.setDuration(DURATION);
+            skillController.use();
 
             Location location = combatUser.getEntity().getLocation();
             SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, location, 1.5F, 0.9F);
@@ -79,7 +85,8 @@ public class ArkaceA2 extends ActiveSkill {
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    skillController.setCooldown();
+                    if (cancelled)
+                        skillController.use();
                 }
             };
         }

@@ -2,10 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.Projectile;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActiveSkill;
-import com.dace.dmgr.combat.action.SkillController;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
@@ -19,7 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class ArkaceA1 extends ActiveSkill {
+public class ArkaceA1 extends ActiveSkill implements HasDuration {
     /** 쿨타임 */
     public static final long COOLDOWN = 7 * 20;
     /** 피해량 (폭발) */
@@ -51,13 +48,18 @@ public class ArkaceA1 extends ActiveSkill {
     }
 
     @Override
+    public long getDuration() {
+        return -1;
+    }
+
+    @Override
     public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
         if (!skillController.isUsing()) {
             WeaponController weaponController = combatUser.getWeaponController();
 
             weaponController.setCooldown(10);
             skillController.setGlobalCooldown(10);
-            skillController.setDuration(-1);
+            skillController.use();
 
             new TaskTimer(5, 3) {
                 @Override
@@ -94,7 +96,7 @@ public class ArkaceA1 extends ActiveSkill {
                     new TaskWait(4) {
                         @Override
                         public void run() {
-                            skillController.setCooldown();
+                            skillController.use();
                         }
                     };
                 }
