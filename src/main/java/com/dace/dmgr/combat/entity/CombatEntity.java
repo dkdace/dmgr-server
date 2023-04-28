@@ -19,12 +19,14 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
  */
 @Getter
 public abstract class CombatEntity<T extends LivingEntity> {
-    /** 엔티티 객체 */
-    protected final T entity;
     /** 히트박스 객체 */
     private final Hitbox hitbox;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
+    /** 고정 여부 */
+    private final boolean isFixed;
+    /** 엔티티 객체 */
+    protected T entity;
     /** 이름 */
     private String name;
     /** 팀 */
@@ -34,38 +36,63 @@ public abstract class CombatEntity<T extends LivingEntity> {
     private int speedIncrement = 0;
 
     /**
-     * 전투 시스템의 엔티티 인스턴스를 생성하고 {@link HashMapList#combatEntityMap}에 추가한다.
+     * 전투 시스템의 엔티티 인스턴스를 생성하고 {@link HashMapList#temporalEntityMap}에 추가한다.
      *
-     * <p>일반 엔티티의 경우 생성 시 호출, 플레이어의 경우 전투 입장 시 호출해야 하며,
-     * 소멸 또는 퇴장 시 {@link HashMapList#combatEntityMap}에서 제거해야 한다.</p>
-     *
-     * @param entity 대상 엔티티
-     * @param name   이름
-     * @param hitbox 히트박스
-     * @see HashMapList#combatEntityMap
-     */
-    protected CombatEntity(T entity, String name, Hitbox hitbox) {
-        this(entity, name, hitbox, null);
-    }
-
-    /**
-     * 전투 시스템의 엔티티 인스턴스를 생성하고 {@link HashMapList#combatEntityMap}에 추가한다.
-     *
-     * <p>일반 엔티티의 경우 생성 시 호출, 플레이어의 경우 전투 입장 시 호출해야 하며,
-     * 소멸 또는 퇴장 시 {@link HashMapList#combatEntityMap}에서 제거해야 한다.</p>
+     * <p>플레이어의 경우 전투 입장 시 호출해야 하며, 퇴장 시 {@link HashMapList#combatEntityMap}
+     * 에서 제거해야 한다.</p>
      *
      * @param entity     대상 엔티티
      * @param name       이름
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
+     * @param isFixed    위치 고정 여부
      * @see HashMapList#combatEntityMap
      */
-    protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox) {
+    protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
         this.entity = entity;
+        this.name = name;
         this.hitbox = hitbox;
         this.critHitbox = critHitbox;
+        this.isFixed = isFixed;
+        init();
+    }
+
+    /**
+     * 전투 시스템의 엔티티 인스턴스를 생성한다.
+     *
+     * <p>아직 소환되지 않은 엔티티를 위한 생성자이며, 소환 후 {@link CombatEntity#init()}을
+     * 호출해야 한다.</p>
+     *
+     * @param name       이름
+     * @param hitbox     히트박스
+     * @param critHitbox 치명타 히트박스
+     * @param isFixed    위치 고정 여부
+     * @see CombatEntity#init()
+     */
+    protected CombatEntity(String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
         this.name = name;
+        this.hitbox = hitbox;
+        this.critHitbox = critHitbox;
+        this.isFixed = isFixed;
+    }
+
+    /**
+     * 엔티티를 초기화한다.
+     *
+     * <p>엔티티를 {@link HashMapList#temporalEntityMap}에 추가하며, 엔티티 소멸 시
+     * {@link HashMapList#combatEntityMap}에서 제거해야 한다.</p>
+     *
+     * @see HashMapList#combatEntityMap
+     */
+    protected void init() {
+        if (entity == null)
+            return;
+
         combatEntityMap.put(entity, this);
+        hitbox.setCenter(entity.getLocation());
+        critHitbox.setCenter(entity.getLocation());
+        if (!isFixed)
+            runHitboxTick();
     }
 
     /**
@@ -73,7 +100,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * <p>넷코드 문제를 해결하기 위해 사용하며, 고정된 엔티티는 사용하지 않는다.</p>
      */
-    public void updateHitboxTick() {
+    private void runHitboxTick() {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
@@ -86,6 +113,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
                     @Override
                     public void run() {
                         hitbox.setCenter(oldLoc);
+                        critHitbox.setCenter(oldLoc);
                     }
                 };
 
@@ -166,10 +194,31 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
      *
      * @return 피격 가능 여부
-     * @see Combat#attack(CombatUser, ICombatEntity, int, String, boolean, boolean)
+     * @see Combat#attack(CombatUser, CombatEntity, int, String, boolean, boolean)
      */
     public boolean isDamageable() {
         return true;
     }
 
+    /**
+     * 엔티티가 피해를 입었을 때 실행될 작업
+     *
+     * @param attacker 공격자
+     * @param damage   피해량
+     * @param type     타입
+     * @param isCrit   치명타 여부
+     * @param isUlt    궁극기 충전 여부
+     * @see Combat#attack(CombatUser, CombatEntity, int, String, boolean, boolean)
+     */
+    public void onDamage(CombatUser attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    }
+
+    /**
+     * 엔티티가 죽었을 때 실행될 작업
+     *
+     * @param attacker 공격자
+     * @see Combat#kill(CombatUser, CombatEntity)
+     */
+    public void onDeath(CombatUser attacker) {
+    }
 }

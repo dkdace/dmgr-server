@@ -126,6 +126,7 @@ public class Combat {
         int rdamage = damage;
         damage = getFinalDamage(attacker, victim, damage, isCrit);
 
+        victim.onDamage(attacker, damage, type, isCrit, isUlt);
         playHitEffect(attackerEntity, victimEntity, isCrit);
 
         if (victim.getHealth() - damage <= 0) {
@@ -218,6 +219,7 @@ public class Combat {
     private static void kill(CombatUser attacker, CombatEntity<?> victim) {
         Player attackerEntity = attacker.getEntity();
         Entity victimEntity = victim.getEntity();
+        victim.onDeath(attacker);
 
         if (victim instanceof CombatUser) {
             victim.setHealth(victim.getMaxHealth());

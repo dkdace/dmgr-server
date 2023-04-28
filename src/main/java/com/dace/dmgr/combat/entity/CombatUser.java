@@ -61,11 +61,11 @@ public class CombatUser extends CombatEntity<Player> {
         super(
                 entity,
                 entity.getName(),
-                new Hitbox(entity.getLocation(), 0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
-                new Hitbox(entity.getLocation(), 0, 2.05, 0, 0.15, 0.05, 0.15)
+                new Hitbox(0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
+                new Hitbox(0, 2.05, 0, 0.15, 0.05, 0.15),
+                false
         );
         combatUserMap.put(entity, this);
-        updateHitboxTick();
     }
 
     public SkillController getSkillController(Skill skill) {

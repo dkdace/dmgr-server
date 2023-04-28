@@ -17,11 +17,11 @@ public class Hitbox {
     /** 세로. 단위: 블록 */
     @Getter
     private final double sizeZ;
-    /** 중앙 위치의 오프셋. 왼쪽(-) / 오른쪽(+) */
+    /** 위치 오프셋. 왼쪽(-) / 오른쪽(+) */
     private final double offsetX;
-    /** 중앙 위치의 오프셋. 아래(-) / 위(+) */
+    /** 위치 오프셋. 아래(-) / 위(+) */
     private final double offsetY;
-    /** 중앙 위치의 오프셋. 뒤(-) / 앞(+) */
+    /** 위치 오프셋. 뒤(-) / 앞(+) */
     private final double offsetZ;
     /** 중앙 위치 */
     private Location center;
@@ -29,22 +29,20 @@ public class Hitbox {
     /**
      * 히트박스 인스턴스를 생성한다.
      *
-     * @param center  중앙 위치
-     * @param offsetX 중앙 위치의 오프셋. 왼쪽(-) / 오른쪽(+)
-     * @param offsetY 중앙 위치의 오프셋. 아래(-) / 위(+)
-     * @param offsetZ 중앙 위치의 오프셋. 뒤(-) / 앞(+)
+     * @param offsetX 위치 오프셋. 왼쪽(-) / 오른쪽(+)
+     * @param offsetY 위치 오프셋. 아래(-) / 위(+)
+     * @param offsetZ 위치 오프셋. 뒤(-) / 앞(+)
      * @param sizeX   가로
      * @param sizeY   높이
      * @param sizeZ   세로
      */
-    public Hitbox(Location center, double offsetX, double offsetY, double offsetZ, double sizeX, double sizeY, double sizeZ) {
+    public Hitbox(double offsetX, double offsetY, double offsetZ, double sizeX, double sizeY, double sizeZ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
-        setCenter(center);
     }
 
     public Location getCenter() {
