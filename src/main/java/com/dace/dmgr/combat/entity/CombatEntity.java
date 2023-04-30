@@ -1,13 +1,20 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.RegionUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import static com.dace.dmgr.system.HashMapList.combatEntityMap;
@@ -189,15 +196,156 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
+     * 지정한 대상 엔티티를 공격한다.
+     *
+     * @param target 공격 대상
+     * @param type   타입
+     * @param isCrit 치명타 여부
+     * @param isUlt  궁극기 충전 여부
+     */
+    public void attack(CombatEntity<?> target, int damage, String type, boolean isCrit, boolean isUlt) {
+        LivingEntity victimEntity = target.getEntity();
+        boolean killed = false;
+
+        if (victimEntity.isDead())
+            return;
+        if (!target.isDamageable())
+            return;
+
+        if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
+            isCrit = false;
+
+        int rdamage = damage;
+        damage = getFinalDamage(target, damage, isCrit);
+
+        onAttack(target, damage, type, isCrit, isUlt);
+        target.onDamage(this, damage, type, isCrit, isUlt);
+        target.playHitEffect();
+
+        if (target.getHealth() - damage <= 0) {
+            if (isKillable(target))
+                killed = true;
+            else
+                target.setHealth(1);
+        } else
+            target.setHealth(target.getHealth() - damage);
+
+        if (killed)
+            kill(target);
+    }
+
+    /**
+     * 지정한 대상 엔티티를 치유한다.
+     *
+     * @param target 치유 대상
+     * @param amount 치유량
+     * @param isUlt  궁극기 충전 여부
+     */
+    public void heal(CombatEntity<?> target, int amount, boolean isUlt) {
+        if (target.getHealth() == target.getMaxHealth())
+            return;
+
+        int bonus = 0;
+
+        amount = amount * (100 + bonus) / 100;
+        onHeal(target, amount, isUlt);
+        target.playHealEffect(amount);
+
+        target.setHealth(target.getHealth() + amount);
+    }
+
+    /**
+     * 지정한 대상 엔티티를 처치한다.
+     *
+     * @param target 공격 대상
+     */
+    public void kill(CombatEntity<?> target) {
+        onKill(target);
+        target.onDeath(this);
+    }
+
+    /**
+     * 각종 변수를 계산하여 최종 피해량을 반환한다.
+     *
+     * @param target 공격 대상
+     * @param damage 피해량
+     * @param isCrit 치명타 여부
+     * @return 최종 피해량
+     */
+    private int getFinalDamage(CombatEntity<?> target, int damage, boolean isCrit) {
+        if (isCrit)
+            damage *= 1.5;
+
+        int atkBonus = 0;
+        int defBonus = 0;
+
+        return damage * (100 + atkBonus - defBonus) / 100;
+    }
+
+    /**
      * 엔티티가 피해를 받을 수 있는 지 확인한다.
      *
      * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
      *
      * @return 피격 가능 여부
-     * @see Combat#attack(CombatUser, CombatEntity, int, String, boolean, boolean)
      */
     public boolean isDamageable() {
         return true;
+    }
+
+    /**
+     * 지정한 대상을 죽일 수 있는 지 확인한다.
+     *
+     * <p>Condition:</p>
+     *
+     * <p>- 훈련장에 있을 때는 죽일 수 없다.</p>
+     *
+     * @param target 대상
+     * @return 대상을 죽일 수 있으면 {@code true} 반환
+     */
+    private boolean isKillable(CombatEntity<?> target) {
+        if (RegionUtil.isInRegion(entity, "BattleTrain"))
+            return false;
+
+        return true;
+    }
+
+    /**
+     * 피격 효과를 재생한다.
+     */
+    private void playHitEffect() {
+        if (CooldownManager.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
+            CooldownManager.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
+            CombatUtil.sendDamagePacket(entity);
+        }
+    }
+
+    /**
+     * 치유 효과를 재생한다.
+     *
+     * @param amount 치유량
+     */
+    private void playHealEffect(int amount) {
+        if (amount > 100)
+            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(entity.getLocation(),
+                            0, entity.getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
+                    0.3F, 0.1F, 0.3F, 0);
+        else if (amount / 100F > Math.random()) {
+            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(entity.getLocation(),
+                    0, entity.getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
+        }
+    }
+
+    /**
+     * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업
+     *
+     * @param victim 피격자
+     * @param damage 피해량
+     * @param type   타입
+     * @param isCrit 치명타 여부
+     * @param isUlt  궁극기 충전 여부
+     */
+    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
@@ -208,17 +356,33 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param type     타입
      * @param isCrit   치명타 여부
      * @param isUlt    궁극기 충전 여부
-     * @see Combat#attack(CombatUser, CombatEntity, int, String, boolean, boolean)
      */
-    public void onDamage(CombatUser attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
-     * 엔티티가 죽었을 때 실행될 작업
+     * 엔티티가 다른 엔티티를 치유했을 때 실행될 작업
+     *
+     * @param victim 피격자
+     * @param amount 치유량
+     * @param isUlt  궁극기 충전 여부
+     */
+    public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+    }
+
+    /**
+     * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업
+     *
+     * @param victim 피격자
+     */
+    public void onKill(CombatEntity<?> victim) {
+    }
+
+    /**
+     * 엔티티가 다른 엔티티를 죽었을 때 실행될 작업
      *
      * @param attacker 공격자
-     * @see Combat#kill(CombatUser, CombatEntity)
      */
-    public void onDeath(CombatUser attacker) {
+    public void onDeath(CombatEntity<?> attacker) {
     }
 }

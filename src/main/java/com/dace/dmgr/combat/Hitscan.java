@@ -70,7 +70,7 @@ public abstract class Hitscan extends Bullet {
 
             if (loc.distance(origin) > 0.5) {
                 Map.Entry<CombatEntity<?>, Boolean> targetEntry
-                        = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
+                        = CombatUtil.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
                 CombatEntity<?> target = targetEntry.getKey();
                 boolean isCrit = targetEntry.getValue();
 

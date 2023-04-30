@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Hitscan;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -110,7 +109,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
                     @Override
                     public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                        Combat.attack(combatUser, target, DAMAGE, "", isCrit, true);
+                        combatUser.attack(target, DAMAGE, "", isCrit, true);
                     }
                 }.shoot(combatUser.getBulletSpread());
 
