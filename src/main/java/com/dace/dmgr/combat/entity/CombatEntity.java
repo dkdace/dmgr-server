@@ -185,23 +185,15 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
-     * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
-     *
-     * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
-     *
-     * @return 궁극기 제공 여부
-     */
-    public boolean isUltProvider() {
-        return false;
-    }
-
-    /**
      * 지정한 대상 엔티티를 공격한다.
      *
      * @param target 공격 대상
+     * @param damage 피해량
      * @param type   타입
      * @param isCrit 치명타 여부
      * @param isUlt  궁극기 충전 여부
+     * @see CombatEntity#heal(CombatEntity, int, boolean)
+     * @see CombatEntity#kill(CombatEntity)
      */
     public void attack(CombatEntity<?> target, int damage, String type, boolean isCrit, boolean isUlt) {
         LivingEntity victimEntity = target.getEntity();
@@ -240,6 +232,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param target 치유 대상
      * @param amount 치유량
      * @param isUlt  궁극기 충전 여부
+     * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
      */
     public void heal(CombatEntity<?> target, int amount, boolean isUlt) {
         if (target.getHealth() == target.getMaxHealth())
@@ -280,6 +273,17 @@ public abstract class CombatEntity<T extends LivingEntity> {
         int defBonus = 0;
 
         return damage * (100 + atkBonus - defBonus) / 100;
+    }
+
+    /**
+     * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
+     *
+     * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 궁극기 제공 여부
+     */
+    public boolean isUltProvider() {
+        return false;
     }
 
     /**
@@ -379,7 +383,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
-     * 엔티티가 다른 엔티티를 죽었을 때 실행될 작업
+     * 엔티티가 죽었을 때 실행될 작업
      *
      * @param attacker 공격자
      */
