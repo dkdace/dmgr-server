@@ -126,4 +126,43 @@ public class WorldManager {
             }
         }
     }
+
+    /**
+     * 특정 맵 월드를 언로드한다.
+     *
+     * @param name 월드 이름
+     * @return 월드 언로드 성공 여부
+     */
+    public static boolean unloadWorld(String name) {
+        World world = Bukkit.getWorld(name);
+        if (world == null) {
+            getLogger().info(Logging.COMMAND_PREFIX + ChatColor.RED + "World " + name + " is not loaded!");
+            return false;
+        } else {
+            List<Player> players = world.getPlayers();
+            if (!players.isEmpty()) {
+                World defaultWorld = (World) Bukkit.getWorlds().get(0);
+                Location spawnLocation = defaultWorld.getSpawnLocation();
+
+                while (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
+                    spawnLocation.add(0.0, 1.0, 0.0);
+                }
+
+                Iterator var7 = players.iterator();
+
+                while (var7.hasNext()) {
+                    Player player = (Player) var7.next();
+                    player.teleport(spawnLocation);
+                }
+            }
+
+            if (Bukkit.unloadWorld(world, true)) {
+                getLogger().info(Logging.COMMAND_PREFIX + ChatColor.GREEN + "World " + ChatColor.YELLOW + name + ChatColor.GREEN + " unloaded correctly.");
+            } else {
+                getLogger().info(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to unload world " + name + ".");
+            }
+
+            return true;
+        }
+    }
 }
