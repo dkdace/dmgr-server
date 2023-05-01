@@ -11,6 +11,7 @@ import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
+import com.kiwi.dmgr.game.map.MapUtil;
 import com.kiwi.dmgr.game.map.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,6 +45,7 @@ public class DMGR extends JavaPlugin {
         registerTestCommands();
 
         WorldManager.init();
+        MapUtil.mapLoad();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
