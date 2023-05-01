@@ -1,6 +1,6 @@
 package com.dace.dmgr.system;
 
-import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.config.GeneralConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,11 +18,11 @@ public enum Cooldown {
     /** 피격 시 애니메이션 */
     DAMAGE_ANIMATION(6),
     /** 적 처치 기여 (데미지 누적) 제한시간 */
-    DAMAGE_SUM_TIME_LIMIT(Combat.DAMAGE_SUM_TIME_LIMIT),
+    DAMAGE_SUM_TIME_LIMIT(CombatUser.DAMAGE_SUM_TIME_LIMIT),
     /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
-    FASTKILL_TIME_LIMIT(Combat.FASTKILL_TIME_LIMIT),
+    FASTKILL_TIME_LIMIT(CombatUser.FASTKILL_TIME_LIMIT),
     /** 리스폰 시간 */
-    RESPAWN_TIME(Combat.RESPAWN_TIME),
+    RESPAWN_TIME(CombatUser.RESPAWN_TIME),
     /** 총기류의 초탄 반동 딜레이 */
     WEAPON_FIRST_RECOIL_DELAY(4),
     /** 재장전 */

@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 
 /**
  * 훈련용 봇 소환 명령어 클래스.
@@ -20,7 +21,7 @@ public class DummyCommand implements CommandExecutor {
 
         int health = Integer.parseInt(args[0]);
 
-        new Dummy(player.getLocation(), health);
+        new Dummy(health).spawn(Zombie.class, player.getLocation(), health);
 
         return true;
     }

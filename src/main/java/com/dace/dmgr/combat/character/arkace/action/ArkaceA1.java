@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -84,7 +84,7 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
 
                         @Override
                         public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                            Combat.attack(combatUser, target, DAMAGE_DIRECT, "", false, true);
+                            combatUser.attack(target, DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);
 
@@ -113,8 +113,8 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)
-            Combat.attack(combatUser, combatUser, DAMAGE_EXPLODE, "", false, true);
-        Combat.getNearEnemies(combatUser, location, RADIUS).forEach(target ->
-                Combat.attack(combatUser, target, DAMAGE_EXPLODE, "", false, true));
+            combatUser.attack(combatUser, DAMAGE_EXPLODE, "", false, true);
+        CombatUtil.getNearEnemies(combatUser, location, RADIUS).forEach(target ->
+                combatUser.attack(target, DAMAGE_EXPLODE, "", false, true));
     }
 }

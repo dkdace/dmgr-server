@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.Combat;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActiveSkill;
 import com.dace.dmgr.combat.action.HasDuration;
@@ -79,7 +78,7 @@ public class ArkaceA2 extends ActiveSkill implements HasDuration {
                     int amount = (int) (HEAL / DURATION);
                     if (i == 0)
                         amount += (int) (HEAL % DURATION);
-                    Combat.heal(combatUser, combatUser, amount, true);
+                    combatUser.heal(combatUser, amount, true);
                     return true;
                 }
 

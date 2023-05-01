@@ -174,7 +174,7 @@ public class CombatStatusEffect {
 
                     victim.getEntity().setFireTicks(6);
                     if (i % 5 == 0)
-                        Combat.attack(attacker, victim, damage / 4, "burn-" + type, false, isUlt);
+                        attacker.attack(victim, damage / 4, "burn-" + type, false, isUlt);
 
                     return true;
                 }

@@ -1,27 +1,32 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.action.Skill;
 import com.dace.dmgr.combat.action.SkillController;
 import com.dace.dmgr.combat.action.WeaponController;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.gui.item.CombatItem;
+import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.HashMapList;
 import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
@@ -29,6 +34,13 @@ import static com.dace.dmgr.system.HashMapList.combatUserMap;
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public class CombatUser extends CombatEntity<Player> {
+    /** 적 처치 기여 (데미지 누적) 제한시간 */
+    public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
+    /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
+    public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
+    /** 리스폰 시간 */
+    public static final int RESPAWN_TIME = 10 * 20;
+
     /** 보호막 (노란 체력) 목록 (보호막 이름 : 보호막의 양) */
     private final HashMap<String, Integer> shield = new HashMap<>();
     /** 킬 기여자 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 기여도) */
@@ -61,11 +73,11 @@ public class CombatUser extends CombatEntity<Player> {
         super(
                 entity,
                 entity.getName(),
-                new Hitbox(entity.getLocation(), 0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
-                new Hitbox(entity.getLocation(), 0, 2.05, 0, 0.15, 0.05, 0.15)
+                new Hitbox(0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
+                new Hitbox(0, 2.05, 0, 0.15, 0.05, 0.15),
+                false
         );
         combatUserMap.put(entity, this);
-        updateHitboxTick();
     }
 
     public SkillController getSkillController(Skill skill) {
@@ -265,5 +277,145 @@ public class CombatUser extends CombatEntity<Player> {
     public void playBleedingEffect(int count) {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
                 entity.getLocation().add(0, entity.getHeight() / 2, 0), count, 0.2F, 0.35F, 0.2F, 0.03F);
+    }
+
+    @Override
+    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+        if (this == victim || !victim.isUltProvider() || !isUlt)
+            return;
+
+        if (isCrit) {
+            entity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, entity);
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, entity);
+        } else {
+            entity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
+            SoundUtil.play("random.stab", 0.4F, 2F, entity);
+            SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, entity);
+        }
+        if (!getSkillController(character.getUltimate()).isUsing())
+            addUlt((float) damage / character.getUltimate().getCost());
+    }
+
+    @Override
+    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+        if (this == attacker)
+            return;
+
+        if (attacker instanceof SummonEntity)
+            attacker = ((SummonEntity<?>) attacker).getOwner();
+        if (attacker instanceof CombatUser) {
+            if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId()) == 0) {
+                CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, entity.getEntityId());
+            }
+            CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId());
+
+            if (getHealth() - damage <= 0)
+                damage = getHealth();
+            float sumDamage = damageMap.getOrDefault(attacker, 0F);
+            damageMap.put(this, sumDamage + (float) damage / getMaxHealth());
+            if (sumDamage > 1)
+                damageMap.put(this, 1F);
+        }
+    }
+
+    @Override
+    public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+        if (isUlt)
+            addUlt((float) amount / character.getUltimate().getCost());
+    }
+
+    @Override
+    public void onKill(CombatEntity<?> victim) {
+        if (victim instanceof CombatUser) {
+            victim.setHealth(victim.getMaxHealth());
+
+            if (CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME) == 0) {
+                Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageMap();
+                Set<String> attackerNames = damageList.keySet().stream().map((CombatUser _attacker) ->
+                        "§f　§l" + _attacker.getName()).collect(Collectors.toSet());
+                String victimName = "§f　§l" + victim.getName();
+
+                damageList.forEach((CombatUser _attacker, Float damage) -> {
+                    Player _attackerEntity = _attacker.getEntity();
+
+                    int score = Math.round(damage * 100);
+
+                    _attackerEntity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
+                    if (score > 30) {
+                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
+                    } else {
+                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
+                    }
+                    playKillEffect();
+                });
+
+                if (damageList.size() > 0) {
+                    Bukkit.getServer().broadcastMessage(DMGR.PREFIX.CHAT +
+                            String.join(" ,", attackerNames) + " §4§l-> " + victimName);
+
+                    damageList.clear();
+                }
+            }
+        } else {
+            entity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
+            playKillEffect();
+
+            ((TemporalEntity<?>) victim).remove();
+        }
+    }
+
+    @Override
+    public void onDeath(CombatEntity<?> attacker) {
+        Location deadLocation = entity.getLocation().add(0, 0.5, 0);
+        deadLocation.setPitch(90);
+
+        CooldownManager.setCooldown(this, Cooldown.RESPAWN_TIME);
+        entity.setGameMode(GameMode.SPECTATOR);
+        entity.setVelocity(new Vector());
+
+        new TaskTimer(1) {
+            @Override
+            public boolean run(int i) {
+                long cooldown = CooldownManager.getCooldown(CombatUser.this, Cooldown.RESPAWN_TIME);
+                if (combatUserMap.get(entity) == null || cooldown <= 0)
+                    return false;
+
+                entity.sendTitle("§c§l죽었습니다!",
+                        String.format("%.1f", (float) cooldown / 20F) + "초 후 부활합니다.", 0, 20, 10);
+                entity.teleport(deadLocation);
+
+                return true;
+            }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                setHealth(getMaxHealth());
+                entity.teleport(Lobby.lobby);
+                entity.setGameMode(GameMode.SURVIVAL);
+            }
+        };
+    }
+
+    /**
+     * 플레이어에게 처치 효과를 재생한다.
+     */
+    private void playKillEffect() {
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
+    }
+
+    /**
+     * 전투에 사용되는 자막(Subtitle) 종류.
+     */
+    private static class SUBTITLES {
+        /** 공격 */
+        static final String HIT = "§f×";
+        /** 공격 (치명타) */
+        static final String CRIT = "§c§l×";
+        /** 처치 (플레이어) */
+        static final String KILL_PLAYER = "§c§lKILL";
+        /** 처치 (엔티티) */
+        static final String KILL_ENTITY = "§c✔";
     }
 }
