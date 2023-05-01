@@ -1,5 +1,6 @@
 package com.kiwi.dmgr.game.map;
 
+import com.dace.dmgr.DMGR;
 import com.grinderwolf.swm.api.exceptions.*;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeWorld;
@@ -9,11 +10,15 @@ import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.grinderwolf.swm.plugin.config.WorldData;
 import com.grinderwolf.swm.plugin.config.WorldsConfig;
 import com.grinderwolf.swm.plugin.log.Logging;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.apache.commons.io.FilenameUtils;
+import org.bukkit.*;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
@@ -27,16 +32,25 @@ public class WorldManager {
     /**
      * 복제 된 임시 월드를 전부 삭제한다.
      */
-    /*
-    public void init() {
-        Bukkit.getWorlds().forEach((World world) -> {
-            String[] names = world.getName().split("_");
-            try{
-                UUID uuid = UUID.fromString(names[1]);
+    public static void init() {
+        File dir = new File(Bukkit.getWorldContainer(), "slime_worlds");
+        File[] worlds = dir.listFiles();
 
-            } catch (IllegalArgumentException ignored) { }
-        });
-    } */
+        if (worlds != null) {
+            for (File file : worlds) {
+                String name = FilenameUtils.removeExtension(file.getName());
+                String[] names = name.split("_");
+                try{
+                    UUID uuid = UUID.fromString(names[1]);
+                    if (file.delete())
+                        DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 완료 (" + file.getName() + ")");
+                    else
+                        DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 실패 (" + file.getName() + ")");
+
+                } catch (IllegalArgumentException ignored) { }
+            }
+        }
+    }
 
     /**
      * 특정 맵 월드를 복사한다.
@@ -105,7 +119,7 @@ public class WorldManager {
                 });
                 world = Bukkit.getWorld(name);
                 if (world != null) {
-                    getLogger().info("월드 클론 완료 " + name);
+                    DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "월드 복제 완료 (" + world.getName() + ")");
                     return true;
                 }
                 else return false;
