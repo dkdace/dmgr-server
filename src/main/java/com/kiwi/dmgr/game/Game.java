@@ -63,7 +63,7 @@ public class Game {
         this.matchType = type;
         this.mode = mode;
         this.map = GameMapList.getRandomMap(this.mode);
-        this.world = map.getName() + "_" + UUID.randomUUID();
+        this.world = map.getWorldName() + "_" + UUID.randomUUID();
 
         for (Team tempTeam : Team.values())
             this.teamPlayerMapList.put(tempTeam, new ArrayList<>());
@@ -119,7 +119,6 @@ public class Game {
         }
         this.delete();
     }
-
 
     /**
      * 플레이어를 MMR 기준으로 내림차순 정렬한다.
