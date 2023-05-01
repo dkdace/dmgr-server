@@ -349,7 +349,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param isCrit 치명타 여부
      * @param isUlt  궁극기 충전 여부
      */
-    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    protected void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
@@ -361,7 +361,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param isCrit   치명타 여부
      * @param isUlt    궁극기 충전 여부
      */
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    protected void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
@@ -371,7 +371,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param amount 치유량
      * @param isUlt  궁극기 충전 여부
      */
-    public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+    protected void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
     }
 
     /**
@@ -379,7 +379,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param victim 피격자
      */
-    public void onKill(CombatEntity<?> victim) {
+    protected void onKill(CombatEntity<?> victim) {
     }
 
     /**
@@ -387,6 +387,6 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param attacker 공격자
      */
-    public void onDeath(CombatEntity<?> attacker) {
+    protected void onDeath(CombatEntity<?> attacker) {
     }
 }
