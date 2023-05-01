@@ -28,9 +28,8 @@ import static org.apache.logging.log4j.LogManager.getLogger;
  */
 public class WorldManager {
 
-
     /**
-     * 복제 된 임시 월드를 전부 삭제한다.
+     * 게임 맵 사용을 위해 복제된 월드를 삭제한다.
      */
     public static void init() {
         File dir = new File(Bukkit.getWorldContainer(), "slime_worlds");
@@ -53,11 +52,11 @@ public class WorldManager {
     }
 
     /**
-     * 특정 맵 월드를 복사한다.
+     * 특정 맵의 슬라임 월드를 복제한다.
      *
-     * @param loadWorld 복사할 월드
-     * @param name 복사본 맵 이름
-     * @return 복사 성공 여부
+     * @param loadWorld 복제할 월드
+     * @param name 복제본 맵 이름
+     * @return 복제 성공 여부
      */
     public static boolean generateWorld(String loadWorld, String name) {
         World world = Bukkit.getWorld(name);
@@ -128,7 +127,7 @@ public class WorldManager {
     }
 
     /**
-     * 특정 맵 월드를 언로드한다.
+     * 특정 슬라임 월드를 언로드한다.
      *
      * @param name 월드 이름
      * @return 월드 언로드 성공 여부
@@ -141,7 +140,7 @@ public class WorldManager {
         } else {
             List<Player> players = world.getPlayers();
             if (!players.isEmpty()) {
-                World defaultWorld = (World) Bukkit.getWorlds().get(0);
+                World defaultWorld = Bukkit.getWorlds().get(0);
                 Location spawnLocation = defaultWorld.getSpawnLocation();
 
                 while (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
