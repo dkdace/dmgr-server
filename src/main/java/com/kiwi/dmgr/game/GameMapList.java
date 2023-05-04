@@ -13,9 +13,13 @@ import java.util.*;
  */
 public class GameMapList {
 
+    /* 매치 타입마다 게임을 보관하는 리스트 */
     public static final HashMap<MatchType, ArrayList<Game>> gameList = new HashMap<>();
+    /* 매치 타입마다 플레이 가능한 게임모드를 보관하는 리스트 */
     public static final HashMap<MatchType, ArrayList<GameMode>> gameMatchModeList = new HashMap<>();
+    /* 현재 플레이어가 최근 게임 중인 해당 게임의 게임유저를 저장하는 맵 */
     public static final HashMap<Player, GameUser> gameUserMap = new HashMap<>();
+    /* 게임 모드마다 플레이 가능한 게임 맵을 보관하는 리스트 */
     public static final HashMap<EnumGameMode, ArrayList<GameMap>> gameMapList = new HashMap<>();
 
     /**
@@ -77,9 +81,10 @@ public class GameMapList {
     }
 
     /**
+     * 게임 맵 리스트에서 특정 모드에서 플레이 가능한 맵 중 하나를 출력하는 함수
      *
-     *
-     * 나중에
+     * @param mode 게임 모드
+     * @return 맵
      */
     public static GameMap getRandomMap(EnumGameMode mode) {
         ArrayList<GameMap> mapList;
