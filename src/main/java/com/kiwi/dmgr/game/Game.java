@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
-import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
 /**
  * 게임의 정보를 담고 관리하는 클래스
@@ -32,6 +31,8 @@ public class Game {
 
     /** 플레이어 목록 */
     private ArrayList<Player> playerList;
+    /** 게임 유저 맵 */
+    private HashMap<Player, GameUser> gameUserMap;
     /** 대기중인 플레이어 목록 */
     private ArrayList<Player> waitPlayerList;
     /** 플레이어 팀 */
@@ -56,6 +57,7 @@ public class Game {
      */
     public Game(MatchType type, EnumGameMode mode) {
         this.playerList = new ArrayList<>();
+        this.gameUserMap = new HashMap<>();
         this.waitPlayerList = new ArrayList<>();
         this.teamPlayerMapList = new HashMap<>();
         this.teamScore = new HashMap<>();
@@ -226,6 +228,8 @@ public class Game {
     public void initPlayer(Player player) {
         GameUser user = new GameUser(player);
         user.setGame(this);
+        GameMapList.gameUserMap.put(player, user);
+        this.gameUserMap.put(player, user);
         if (!playerList.contains(player))
             playerList.add(player);
     }

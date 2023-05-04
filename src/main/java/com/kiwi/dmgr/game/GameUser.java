@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
-import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
-
 @Getter
 @Setter
 public class GameUser {
@@ -34,7 +32,7 @@ public class GameUser {
     private long blockDamage;
 
     /**
-     * 게임 유저 인스턴스를 생성하고 {@link GameMapList#gameUserMap}에 추가한다.
+     * 게임 유저 인스턴스를 생성한다. 각 게임마다 게임유저가 저장한다.
      *
      * <p> 게임이 시작될 때 호출하여야 한다. </p>
      *
@@ -51,8 +49,6 @@ public class GameUser {
         this.incomingDamage = 0;
         this.heal = 0;
         this.blockDamage = 0;
-
-        gameUserMap.put(player, this);
     }
 
     /**
