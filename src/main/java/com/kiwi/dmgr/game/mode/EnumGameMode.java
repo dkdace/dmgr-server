@@ -5,7 +5,10 @@ import lombok.Getter;
 @Getter
 public enum EnumGameMode {
 
-    TeamDeathMatch(10, true, 600, new TeamDeathMatch());
+    TeamDeathMatch("팀데스 매치", 10, true, 600, new TeamDeathMatch());
+
+    /* 이름 */
+    private final String name;
 
     /* 최대 수용 가능한 플레이어 수 */
     private final int maxPlayer;
@@ -19,7 +22,8 @@ public enum EnumGameMode {
     /* 해당 게임 모드 인스턴스 */
     private final GameMode instance;
 
-    EnumGameMode(int maxPlayer, boolean isVerseTeam, int playTime, GameMode instance) {
+    EnumGameMode(String name, int maxPlayer, boolean isVerseTeam, int playTime, GameMode instance) {
+        this.name = name;
         this.maxPlayer = maxPlayer;
         this.isVerseTeam = isVerseTeam;
         this.playTime = playTime;

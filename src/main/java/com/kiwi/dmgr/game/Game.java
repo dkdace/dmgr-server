@@ -3,6 +3,7 @@ package com.kiwi.dmgr.game;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.util.SoundUtil;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.map.Point;
 import com.kiwi.dmgr.game.map.WorldManager;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -87,6 +89,13 @@ public class Game {
     }
 
     /**
+     * 월드를 언로드한다.
+     */
+    public void unloadWorld() {
+        WorldManager.unloadWorld(world);
+    }
+
+    /**
      * 게임을 시작할 때 이 함수를 호출해야한다.
      *
      * @see GameMode
@@ -108,13 +117,35 @@ public class Game {
         this.sendAlertMessage("게임 종료");
         for (Player player : this.playerList) {
             player.teleport(Lobby.lobby);
+            SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F, player);
         }
+        this.unloadWorld();
+
+        for (int i=0; i<20; i++)
+            this.sendAlertMessage("");
+
+        Team winner = teamScore.get(Team.RED) == teamScore.get(Team.BLUE) ? Team.NONE :
+                      teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
 
         if (!force) {
-            if (this.getMatchType() == MatchType.COMPETITIVE) {
+            if (this.matchType == MatchType.COMPETITIVE) {
                 // 랭크 결과...
             } else {
-                // 게임 결과...
+                this.sendAlertMessage(this.mode.getName() + " 일반전 게임 결과");
+                if (winner == Team.NONE)
+                    this.sendAlertMessage("* " + winner.color + "무승부");
+                else
+                    this.sendAlertMessage("* " + winner.color + winner.name() + "팀 승리");
+                this.sendAlertMessage("");
+                this.sendAlertMessage("내 게임 성적");
+                for (Player player : this.playerList) {
+                    GameUser gameUser = gameUserMap.get(player);
+                    this.sendAlertMessage(player, "* 점수: " + gameUser.getScore());
+                    this.sendAlertMessage(player, "* K/D/A: " + gameUser.getKill() + "/" + gameUser.getDeath() + "/" + gameUser.getAssist() +
+                            " (" + (gameUser.getKill() + gameUser.getAssist()) / ((gameUser.getDeath() == 0) ? 1 : gameUser.getDeath()) + ")");
+                    this.sendAlertMessage(player, "* 입힌 데미지: " + gameUser.getOutgoingDamage());
+                }
+                this.sendAlertMessage("");
             }
         }
         this.delete();
@@ -304,6 +335,10 @@ public class Game {
         for (Player player : playerList)
             player.sendMessage(DMGR.PREFIX.CHAT + message);
     }
+    public void sendAlertMessage(Player player, String message) {
+        player.sendMessage(DMGR.PREFIX.CHAT + message);
+    }
+
 
     /**
      * 게임에 난입 인원이 필요한지 여부를 리턴한다.
