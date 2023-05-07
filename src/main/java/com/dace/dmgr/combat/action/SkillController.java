@@ -395,16 +395,18 @@ public class SkillController {
 
         ItemStack falseItem = new ItemBuilder(Material.CONCRETE).setDamage((short) 14).build();
         ItemStack trueItem = new ItemBuilder(Material.CONCRETE).setDamage((short) 5).build();
-        ArmorStand entity = player.getWorld().spawn(player.getTargetBlock(null, maxDistance).getLocation(), ArmorStand.class);
-        entity.setMarker(true);
-        entity.setAI(false);
-        entity.setInvulnerable(true);
-        entity.setGravity(false);
-        entity.setVisible(false);
-        entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
+
+        ArmorStand pointer = player.getWorld().spawn(player.getTargetBlock(null, maxDistance).getLocation(), ArmorStand.class);
+        pointer.setMarker(true);
+        pointer.setAI(false);
+        pointer.setInvulnerable(true);
+        pointer.setGravity(false);
+        pointer.setSilent(true);
+        pointer.setVisible(false);
+        pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
-        packet.setEntityIds(new int[]{entity.getEntityId()});
+        packet.setEntityIds(new int[]{pointer.getEntityId()});
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             if (player != player2)
                 packet.sendPacket(player2);
@@ -420,22 +422,22 @@ public class SkillController {
 
                 Location location = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 0, 0.5);
 
-                entity.teleport(location.clone().add(0, -0.25, 0));
+                pointer.teleport(location.clone().add(0, -0.25, 0));
                 if (location.clone().add(0, 1, 0).getBlock().isEmpty() && !location.getBlock().isEmpty()) {
-                    GlowAPI.setGlowing(entity, GlowAPI.Color.GREEN, player);
-                    entity.setHelmet(trueItem);
+                    GlowAPI.setGlowing(pointer, GlowAPI.Color.GREEN, player);
+                    pointer.setHelmet(trueItem);
                 } else {
-                    GlowAPI.setGlowing(entity, GlowAPI.Color.RED, player);
-                    entity.setHelmet(falseItem);
+                    GlowAPI.setGlowing(pointer, GlowAPI.Color.RED, player);
+                    pointer.setHelmet(falseItem);
                 }
-                entity.setAI(false);
+                pointer.setAI(false);
 
                 return true;
             }
 
             @Override
             public void onEnd(boolean cancelled) {
-                entity.remove();
+                pointer.remove();
             }
         };
     }
