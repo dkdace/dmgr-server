@@ -1,14 +1,24 @@
 package com.dace.dmgr.combat.action;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.inventivetalent.glow.GlowAPI;
 
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
@@ -373,5 +383,60 @@ public class SkillController {
      */
     public void reset() {
         runCooldown(skill.getCooldown());
+    }
+
+    /**
+     * 스킬 설치 모드를 활성화한다.
+     *
+     * @param maxDistance 최대 설치 거리
+     */
+    public void enableDeployMode(int maxDistance) {
+        Player player = combatUser.getEntity();
+
+        ItemStack falseItem = new ItemBuilder(Material.CONCRETE).setDamage((short) 14).build();
+        ItemStack trueItem = new ItemBuilder(Material.CONCRETE).setDamage((short) 5).build();
+        ArmorStand entity = player.getWorld().spawn(player.getTargetBlock(null, maxDistance).getLocation(), ArmorStand.class);
+        entity.setMarker(true);
+        entity.setAI(false);
+        entity.setInvulnerable(true);
+        entity.setGravity(false);
+        entity.setVisible(false);
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
+
+        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
+        packet.setEntityIds(new int[]{entity.getEntityId()});
+        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
+            if (player != player2)
+                packet.sendPacket(player2);
+        });
+
+        new TaskTimer(1) {
+            @Override
+            public boolean run(int i) {
+                if (combatUserMap.get(combatUser.getEntity()) == null)
+                    return false;
+                if (!isUsing())
+                    return false;
+
+                Location location = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 0, 0.5);
+
+                entity.teleport(location.clone().add(0, -0.25, 0));
+                if (location.clone().add(0, 1, 0).getBlock().isEmpty() && !location.getBlock().isEmpty()) {
+                    GlowAPI.setGlowing(entity, GlowAPI.Color.GREEN, player);
+                    entity.setHelmet(trueItem);
+                } else {
+                    GlowAPI.setGlowing(entity, GlowAPI.Color.RED, player);
+                    entity.setHelmet(falseItem);
+                }
+                entity.setAI(false);
+
+                return true;
+            }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                entity.remove();
+            }
+        };
     }
 }
