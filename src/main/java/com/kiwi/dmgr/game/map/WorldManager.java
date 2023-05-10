@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -39,14 +40,16 @@ public class WorldManager {
             for (File file : worlds) {
                 String name = FilenameUtils.removeExtension(file.getName());
                 String[] names = name.split("_");
-                try{
-                    UUID uuid = UUID.fromString(names[1]);
-                    if (file.delete())
-                        DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 완료 (" + file.getName() + ")");
-                    else
-                        DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 실패 (" + file.getName() + ")");
+                if (Arrays.stream(names).count() >= 2) {
+                    try{
+                        UUID uuid = UUID.fromString(names[1]);
+                        if (file.delete())
+                            DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 완료 (" + file.getName() + ")");
+                        else
+                            DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 실패 (" + file.getName() + ")");
 
-                } catch (IllegalArgumentException ignored) { }
+                    } catch (IllegalArgumentException ignored) { }
+                }
             }
         }
     }
