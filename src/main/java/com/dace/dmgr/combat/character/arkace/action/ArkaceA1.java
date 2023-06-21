@@ -2,49 +2,28 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
-import com.dace.dmgr.combat.action.*;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasDuration;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class ArkaceA1 extends ActiveSkill implements HasDuration {
-    /** 쿨타임 */
-    public static final long COOLDOWN = 7 * 20;
-    /** 피해량 (폭발) */
-    public static final int DAMAGE_EXPLODE = 100;
-    /** 피해량 (직격) */
-    public static final int DAMAGE_DIRECT = 50;
-    /** 투사체 속력 */
-    public static final int VELOCITY = 60;
-    /** 피해 범위 */
-    public static final float RADIUS = 3;
-    @Getter
-    private static final ArkaceA1 instance = new ArkaceA1();
-
-    public ArkaceA1() {
-        super(1, "다이아코어 미사일",
-                "",
-                "§f소형 미사일을 3회 연속으로 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
-                "§f를 입힙니다.",
-                "",
-                "§c" + TextIcon.DAMAGE + "§f 폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT + "  §c" + TextIcon.RADIUS + "§f 3m",
-                "§f" + TextIcon.COOLDOWN + "§f 7초",
-                "",
-                "§7§l[2] [좌클릭] §f사용");
+public class ArkaceA1 extends Skill implements HasDuration {
+    public ArkaceA1(CombatUser combatUser) {
+        super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }
 
     @Override
     public long getCooldown() {
-        return COOLDOWN;
+        return ArkaceA1Info.COOLDOWN;
     }
 
     @Override
@@ -53,13 +32,11 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
-        if (!skillController.isUsing()) {
-            WeaponController weaponController = combatUser.getWeaponController();
-
-            weaponController.setCooldown(10);
-            skillController.setGlobalCooldown(10);
-            skillController.use();
+    public void onUse(ActionKey actionKey) {
+        if (!isUsing()) {
+            combatUser.getWeapon().setCooldown(10);
+            setGlobalCooldown(10);
+            use();
 
             new TaskTimer(5, 3) {
                 @Override
@@ -69,7 +46,7 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                    new Projectile(combatUser, 5, VELOCITY) {
+                    new Projectile(combatUser, 5, ArkaceA1Info.VELOCITY) {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
@@ -84,7 +61,7 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
 
                         @Override
                         public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                            combatUser.attack(target, DAMAGE_DIRECT, "", false, true);
+                            combatUser.attack(target, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);
 
@@ -96,7 +73,7 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
                     new TaskWait(4) {
                         @Override
                         public void run() {
-                            skillController.use();
+                            use();
                         }
                     };
                 }
@@ -112,9 +89,9 @@ public class ArkaceA1 extends ActiveSkill implements HasDuration {
                 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
-        if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)
-            combatUser.attack(combatUser, DAMAGE_EXPLODE, "", false, true);
-        CombatUtil.getNearEnemies(combatUser, location, RADIUS).forEach(target ->
-                combatUser.attack(target, DAMAGE_EXPLODE, "", false, true));
+        if (location.distance(combatUser.getEntity().getLocation()) < ArkaceA1Info.RADIUS)
+            combatUser.attack(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true);
+        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS).forEach(target ->
+                combatUser.attack(target, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
     }
 }

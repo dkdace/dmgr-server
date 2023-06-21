@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.action;
+package com.dace.dmgr.combat.action.skill;
 
 /**
  * 지속시간이 존재하는 스킬의 인터페이스.

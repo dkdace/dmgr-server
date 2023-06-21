@@ -1,7 +1,9 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.action.weapon.WeaponState;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
@@ -17,15 +19,17 @@ public class OnWeaponPreShoot implements Listener {
         CombatUser combatUser = combatUserMap.get(event.getPlayer());
 
         if (combatUser != null && combatUser.getCharacter() != null) {
-            WeaponController weaponController = combatUser.getWeaponController();
+            Weapon weapon = combatUser.getWeapon();
 
-            if (weaponController.getRemainingAmmo() == 0 || weaponController.isReloading() || weaponController.isSwapping())
+            if ((weapon instanceof Reloadable && (((Reloadable) weapon).getRemainingAmmo() == 0 || ((Reloadable) weapon).isReloading())) ||
+                    weapon.getWeaponState() == WeaponState.SWAPPING)
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
-                weaponController.setReloading(false);
+                if (weapon instanceof Reloadable)
+                    ((Reloadable) weapon).cancelReloading();
             }
         }
     }

@@ -1,6 +1,7 @@
-package com.dace.dmgr.combat.action;
+package com.dace.dmgr.combat.action.skill;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.Cooldown;
@@ -23,49 +24,41 @@ import org.inventivetalent.glow.GlowAPI;
 import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
- * 스킬 상태를 관리하는 컨트롤러 클래스.
- *
- * @see Skill
+ * 스킬의 상태를 관리하는 클래스.
  */
-public class SkillController {
-    /** 플레이어 객체 */
-    private final CombatUser combatUser;
-    /** 스킬 객체 */
-    private final Skill skill;
+@Getter
+public abstract class Skill extends Action {
     /** 스킬 슬롯 */
-    private final int slot;
-    /** 스킬 설명 아이템 */
-    private ItemStack itemStack;
-
-    /** 상태 변수 */
-    @Getter
-    private float stateValue = 0;
-
+    protected final int slot;
+    /** 번호 */
+    protected final int number;
     /** 스킬 스택 수 */
-    @Getter
-    private int stack = 0;
+    protected int stack = 0;
 
     /**
-     * 스킬 컨트롤러 인스턴스를 생성한다.
+     * 스킬 인스턴스를 생성한다.
      *
+     * @param number     번호
      * @param combatUser 대상 플레이어
-     * @param skill      스킬 객체
-     * @param slot       슬롯
+     * @param skillInfo  스킬 정보 객체
+     * @param slot       슬롯 번호
      */
-    public SkillController(CombatUser combatUser, Skill skill, int slot) {
-        this.combatUser = combatUser;
-        this.skill = skill;
-        this.itemStack = skill.getItemStack().clone();
+    protected Skill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
+        super(combatUser, skillInfo);
+        this.number = number;
         this.slot = slot;
-        reset();
+        runCooldown(getCooldown());
     }
 
     /**
-     * 플레이어의 인벤토리에 스킬 설명 아이템을 적용한다.
+     * 스킬의 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    private void apply() {
-        if (slot != -1)
-            combatUser.getEntity().getInventory().setItem(slot, itemStack);
+    @Override
+    public void setCooldown(long cooldown) {
+        if (!isCooldownFinished())
+            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
     }
 
     /**
@@ -88,9 +81,9 @@ public class SkillController {
                 if (isCooldownFinished()) {
                     addStack(1);
 
-                    if (skill instanceof Stackable && stack < ((Stackable) skill).getMaxStack())
+                    if (Skill.this instanceof Stackable && stack < ((Stackable) Skill.this).getMaxStack())
                         runCooldown(cooldown);
-                    else if (skill instanceof Chargeable)
+                    else if (Skill.this instanceof Chargeable)
                         runStateValueCharge();
 
                     return false;
@@ -118,8 +111,8 @@ public class SkillController {
 
                 setItemDuration();
 
-                if (skill instanceof Chargeable)
-                    addStateValue(-((Chargeable) skill).getStateValueDecrement() / 20F);
+                if (Skill.this instanceof Chargeable)
+                    ((Chargeable) Skill.this).addStateValue(-((Chargeable) Skill.this).getStateValueDecrement() / 20F);
                 if (!isUsing()) {
                     addStack(-1);
                     if (isCooldownFinished())
@@ -143,9 +136,9 @@ public class SkillController {
                 if (combatUserMap.get(combatUser.getEntity()) == null)
                     return false;
 
-                addStateValue(((Chargeable) skill).getStateValueIncrement() / 20F);
+                ((Chargeable) Skill.this).addStateValue(((Chargeable) Skill.this).getStateValueIncrement() / 20F);
 
-                return stateValue < ((Chargeable) skill).getMaxStateValue() && !isUsing() && isCooldownFinished();
+                return ((Chargeable) Skill.this).getStateValue() < ((Chargeable) Skill.this).getMaxStateValue() && !isUsing() && isCooldownFinished();
             }
         };
     }
@@ -155,16 +148,16 @@ public class SkillController {
      *
      * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
      */
-    public void use() {
-        if (skill instanceof HasDuration)
+    protected void use() {
+        if (this instanceof HasDuration)
             if (isUsing())
                 setDuration(0);
             else
-                runDuration(((HasDuration) skill).getDuration(), skill.getCooldown());
+                runDuration(((HasDuration) this).getDuration(), getCooldown());
         else {
             addStack(-1);
             if (isCooldownFinished())
-                runCooldown(skill.getCooldown());
+                runCooldown(getCooldown());
         }
     }
 
@@ -175,12 +168,12 @@ public class SkillController {
      *
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    public void use(long cooldown) {
-        if (skill instanceof HasDuration) {
+    protected void use(long cooldown) {
+        if (this instanceof HasDuration) {
             if (isUsing())
                 setDuration(0);
             else
-                runDuration(((HasDuration) skill).getDuration(), cooldown);
+                runDuration(((HasDuration) this).getDuration(), cooldown);
         } else {
             addStack(-1);
             if (isCooldownFinished())
@@ -196,22 +189,12 @@ public class SkillController {
      * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    public void use(long duration, long cooldown) {
+    protected void use(long duration, long cooldown) {
         if (isUsing())
             setDuration(0);
         else {
             runDuration(duration, cooldown);
         }
-    }
-
-    /**
-     * 스킬의 쿨타임을 설정한다.
-     *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
-     */
-    public void setCooldown(long cooldown) {
-        if (!isCooldownFinished())
-            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
     }
 
     /**
@@ -249,6 +232,7 @@ public class SkillController {
      *
      * @return 쿨타임 종료 여부
      */
+    @Override
     public boolean isCooldownFinished() {
         return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN) == 0;
     }
@@ -272,8 +256,8 @@ public class SkillController {
      */
     public void addStack(int amount) {
         int max = 1;
-        if (skill instanceof Stackable)
-            max = ((Stackable) skill).getMaxStack();
+        if (this instanceof Stackable)
+            max = ((Stackable) this).getMaxStack();
 
         stack += amount;
         if (stack > max)
@@ -290,31 +274,12 @@ public class SkillController {
     }
 
     /**
-     * 지정한 양만큼 스킬의 상태 변수를 증가시킨다.
-     *
-     * <p>스킬이 {@link Chargeable}을 상속받는 클래스여야 한다.</p>
-     *
-     * @param increment 증가량
-     * @see Chargeable
-     */
-    public void addStateValue(float increment) {
-        if (!(skill instanceof Chargeable))
-            return;
-
-        stateValue += increment;
-        if (stateValue < 0)
-            stateValue = 0;
-        if (stateValue > ((Chargeable) skill).getMaxStateValue())
-            stateValue = ((Chargeable) skill).getMaxStateValue();
-    }
-
-    /**
      * 스킬 설명 아이템에 쿨타임을 적용한다.
      */
     private void setItemCooldown() {
-        long cooldown = CooldownManager.getCooldown(SkillController.this, Cooldown.SKILL_COOLDOWN);
+        long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
 
-        if (skill instanceof Stackable || cooldown > 2000)
+        if (this instanceof Stackable || cooldown > 2000)
             itemStack.setAmount(1);
         else
             itemStack.setAmount((int) Math.ceil((float) cooldown / 20));
@@ -330,7 +295,7 @@ public class SkillController {
     private void setItemDuration() {
         long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
 
-        if (skill instanceof Stackable)
+        if (this instanceof Stackable)
             itemStack.setAmount(stack);
         else if (duration > 2000)
             itemStack.setAmount(1);
@@ -345,16 +310,16 @@ public class SkillController {
      * 스킬 설명 아이템을 준비 상태로 만든다.
      */
     private void setItemReady() {
-        itemStack = skill.getItemStack().clone();
-        if (skill instanceof Stackable)
+        itemStack = actionInfo.getItemStack().clone();
+        if (this instanceof Stackable)
             itemStack.setAmount(stack);
         else
             itemStack.setAmount(1);
         apply();
 
-        if (skill instanceof UltimateSkill)
+        if (actionInfo instanceof UltimateSkillInfo)
             SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
-        else if (skill instanceof ActiveSkill)
+        else if (actionInfo instanceof ActiveSkillInfo)
             SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
@@ -364,7 +329,7 @@ public class SkillController {
      * @return 전역 쿨타임 종료 여부
      */
     public boolean isGlobalCooldownFinished() {
-        return combatUser.getEntity().getCooldown(Skill.MATERIAL) == 0;
+        return combatUser.getEntity().getCooldown(SkillInfo.MATERIAL) == 0;
     }
 
     /**
@@ -375,14 +340,16 @@ public class SkillController {
     public void setGlobalCooldown(int cooldown) {
         if (cooldown == -1)
             cooldown = 9999;
-        combatUser.getEntity().setCooldown(Skill.MATERIAL, cooldown);
+        combatUser.getEntity().setCooldown(SkillInfo.MATERIAL, cooldown);
     }
 
     /**
-     * 스킬의 쿨타임과 지속시간을 초기화한다.
+     * 플레이어의 인벤토리에 스킬 설명 아이템을 적용한다.
      */
-    public void reset() {
-        runCooldown(skill.getCooldown());
+    @Override
+    protected void apply() {
+        if (slot != -1)
+            combatUser.getEntity().getInventory().setItem(slot, itemStack);
     }
 
     /**

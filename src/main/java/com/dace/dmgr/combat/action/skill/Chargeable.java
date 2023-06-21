@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.action;
+package com.dace.dmgr.combat.action.skill;
 
 /**
  * 상태 변수를 가지고 있는 충전형 스킬의 인터페이스.
@@ -6,6 +6,18 @@ package com.dace.dmgr.combat.action;
  * <p>기본적으로 충전형 스킬은 지속시간이 무한인 토글형이다.</p>
  */
 public interface Chargeable extends HasDuration {
+    /**
+     * @return 상태 변수
+     */
+    int getStateValue();
+
+    /**
+     * 지정한 양만큼 스킬의 상태 변수를 증가시킨다.
+     *
+     * @param increment 증가량
+     */
+    void addStateValue(float increment);
+
     /**
      * 상태 변수의 최댓값을 반환한다.
      *

@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.action;
+package com.dace.dmgr.combat.action.skill;
 
 /**
  * 여러 번 사용할 수 있는 스택형 스킬의 인터페이스.

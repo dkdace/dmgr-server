@@ -3,9 +3,8 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatTick;
-import com.dace.dmgr.combat.action.Skill;
-import com.dace.dmgr.combat.action.SkillController;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.skill.*;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
@@ -51,11 +50,11 @@ public class CombatUser extends CombatEntity<Player> {
     /** 선택한 전투원 */
     @Getter
     private Character character = null;
-    /** 무기 컨트롤러 객체 */
+    /** 무기 객체 */
     @Getter
-    private WeaponController weaponController;
-    /** 스킬 컨트롤러 객체 목록 (스킬 : 스킬 컨트롤러) */
-    private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
+    private Weapon weapon;
+    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
+    private HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
     /** 현재 무기 탄퍼짐 */
     @Getter
     private float bulletSpread = 0;
@@ -80,8 +79,8 @@ public class CombatUser extends CombatEntity<Player> {
         combatUserMap.put(entity, this);
     }
 
-    public SkillController getSkillController(Skill skill) {
-        return skillControllerMap.get(skill);
+    public Skill getSkill(SkillInfo skillInfo) {
+        return skillMap.get(skillInfo);
     }
 
     /**
@@ -166,9 +165,9 @@ public class CombatUser extends CombatEntity<Player> {
      */
     private void chargeUlt() {
         if (character != null) {
-            SkillController skillController = skillControllerMap.get(character.getUltimate());
-            if (!skillController.isCooldownFinished())
-                skillController.setCooldown(0);
+            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            if (!skill.isCooldownFinished())
+                skill.setCooldown(0);
         }
     }
 
@@ -191,7 +190,7 @@ public class CombatUser extends CombatEntity<Player> {
             entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
             entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
             entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
-            weaponController = new WeaponController(this, character.getWeapon());
+            weapon = character.getWeaponInfo().createWeapon(this);
 
             this.character = character;
             resetSkills();
@@ -215,28 +214,18 @@ public class CombatUser extends CombatEntity<Player> {
      * 플레이어의 스킬을 재설정한다. 전투원 선택 시 호출해야 한다.
      */
     private void resetSkills() {
-        skillControllerMap.clear();
-        character.getActionKeyMap().getAll().forEach((actionKey, action) -> {
-            if (action instanceof Skill) {
-                int slot = -1;
-                switch (actionKey) {
-                    case SLOT_1:
-                        slot = 0;
-                        break;
-                    case SLOT_2:
-                        slot = 1;
-                        break;
-                    case SLOT_3:
-                        slot = 2;
-                        break;
-                    case SLOT_4:
-                        slot = 3;
-                        break;
-                }
+        skillMap.clear();
 
-                skillControllerMap.put((Skill) action, new SkillController(this, (Skill) action, slot));
-            }
-        });
+        for (int i = 1; i <= 4; i++) {
+            ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
+            if (activeSkillInfo != null)
+                skillMap.put(activeSkillInfo, activeSkillInfo.createSkill(this));
+        }
+        for (int i = 1; i <= 4; i++) {
+            PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
+            if (passiveSkillInfo != null)
+                skillMap.put(passiveSkillInfo, passiveSkillInfo.createSkill(this));
+        }
     }
 
     /**
@@ -293,8 +282,8 @@ public class CombatUser extends CombatEntity<Player> {
             SoundUtil.play("random.stab", 0.4F, 2F, entity);
             SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, entity);
         }
-        if (!getSkillController(character.getUltimate()).isUsing())
-            addUlt((float) damage / character.getUltimate().getCost());
+        if (!getSkill(character.getUltimateSkillInfo()).isUsing())
+            addUlt((float) damage / ((HasCost) getSkill(character.getUltimateSkillInfo())).getCost());
     }
 
     @Override
@@ -322,7 +311,7 @@ public class CombatUser extends CombatEntity<Player> {
     @Override
     public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
         if (isUlt)
-            addUlt((float) amount / character.getUltimate().getCost());
+            addUlt((float) amount / ((HasCost) getSkill(character.getUltimateSkillInfo())).getCost());
     }
 
     @Override

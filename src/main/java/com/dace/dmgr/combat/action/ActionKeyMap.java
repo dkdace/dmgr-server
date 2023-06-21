@@ -7,15 +7,15 @@ import java.util.HashMap;
  * 상호작용 키 매핑 목록을 관리하는 클래스.
  *
  * @see ActionKey
- * @see Action
+ * @see ActionInfo
  */
 public class ActionKeyMap {
     /** 상호작용 키와 상호작용 목록 */
-    private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
+    private final EnumMap<ActionKey, ActionInfo> actionMap = new EnumMap<>(ActionKey.class);
     /** 상호작용과 상호작용 키 목록 */
-    private final HashMap<Action, ActionKey> keyMap = new HashMap<>();
+    private final HashMap<ActionInfo, ActionKey> keyMap = new HashMap<>();
 
-    public EnumMap<ActionKey, Action> getAll() {
+    public EnumMap<ActionKey, ActionInfo> getAll() {
         return actionMap;
     }
 
@@ -25,30 +25,30 @@ public class ActionKeyMap {
      * @param actionKey 상호작용 키
      * @return 상호작용
      */
-    public Action get(ActionKey actionKey) {
+    public ActionInfo get(ActionKey actionKey) {
         return actionMap.get(actionKey);
     }
 
     /**
      * 상호작용에 매핑된 상호작용 키를 반환한다.
      *
-     * @param action 상호작용
+     * @param actionInfo 상호작용
      * @return 상호작용 키
      */
-    public ActionKey getKey(Action action) {
-        return keyMap.get(action);
+    public ActionKey getKey(ActionInfo actionInfo) {
+        return keyMap.get(actionInfo);
     }
 
     /**
      * 상호작용 키 매핑 목록에 상호작용을 추가한다.
      *
      * @param actionKey 상호작용 키
-     * @param action    상호작용
+     * @param actionInfo    상호작용
      * @return ActionKeyMap
      */
-    public ActionKeyMap put(ActionKey actionKey, Action action) {
-        actionMap.put(actionKey, action);
-        keyMap.put(action, actionKey);
+    public ActionKeyMap put(ActionKey actionKey, ActionInfo actionInfo) {
+        actionMap.put(actionKey, actionInfo);
+        keyMap.put(actionInfo, actionKey);
         return this;
     }
 }

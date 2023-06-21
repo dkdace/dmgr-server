@@ -1,7 +1,8 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.shampaggon.crackshot.events.WeaponPrepareShootEvent;
@@ -17,16 +18,16 @@ public class OnWeaponPrepareShoot implements Listener {
         CombatUser combatUser = combatUserMap.get(event.getPlayer());
 
         if (combatUser != null && combatUser.getCharacter() != null) {
-            WeaponController weaponController = combatUser.getWeaponController();
+            Weapon weapon = combatUser.getWeapon();
 
-            if (!weaponController.isCooldownFinished())
+            if (!weapon.isCooldownFinished())
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_PRE_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
-                if (weaponController.getRemainingAmmo() > 0)
-                    weaponController.setReloading(false);
+                if (weapon instanceof Reloadable && ((Reloadable) weapon).getRemainingAmmo() > 0)
+                    ((Reloadable) weapon).cancelReloading();
             }
         }
     }

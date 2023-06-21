@@ -1,63 +1,43 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActiveSkill;
-import com.dace.dmgr.combat.action.HasDuration;
-import com.dace.dmgr.combat.action.SkillController;
+import com.dace.dmgr.combat.action.skill.HasDuration;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public class ArkaceA2 extends ActiveSkill implements HasDuration {
-    /** 쿨타임 */
-    public static final int COOLDOWN = 12 * 20;
-    /** 치유량 */
-    public static final int HEAL = 350;
-    /** 지속시간 */
-    public static final long DURATION = (long) (2.5 * 20);
-    @Getter
-    private static final ArkaceA2 instance = new ArkaceA2();
-
-    public ArkaceA2() {
-        super(2, "생체 회복막",
-                "",
-                "§6" + TextIcon.DURATION + " 지속시간§f동안 회복막을 활성화하여 §a" + TextIcon.HEAL + " 회복§f합니다.",
-                "",
-                "§6" + TextIcon.DURATION + "§f 2.5초",
-                "§a" + TextIcon.HEAL + "§f 350",
-                "§f" + TextIcon.COOLDOWN + "§f 12초",
-                "",
-                "§7§l[3] §f사용");
+public class ArkaceA2 extends Skill implements HasDuration {
+    public ArkaceA2(CombatUser combatUser) {
+        super(2, combatUser, ArkaceA2Info.getInstance(), 2);
     }
 
     @Override
     public long getCooldown() {
-        return COOLDOWN;
+        return ArkaceA2Info.COOLDOWN;
     }
 
     @Override
     public long getDuration() {
-        return DURATION;
+        return ArkaceA2Info.DURATION;
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
-        if (!skillController.isUsing()) {
-            skillController.use();
+    public void onUse(ActionKey actionKey) {
+        if (!isUsing()) {
+            use();
 
             Location location = combatUser.getEntity().getLocation();
             SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, location, 1.5F, 0.9F);
             SoundUtil.play(Sound.ITEM_ARMOR_EQUIP_DIAMOND, location, 1.5F, 1.4F);
             SoundUtil.play(Sound.ITEM_ARMOR_EQUIP_DIAMOND, location, 1.5F, 1.2F);
 
-            new TaskTimer(1, DURATION) {
+            new TaskTimer(1, ArkaceA2Info.DURATION) {
                 @Override
                 public boolean run(int i) {
                     Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
@@ -75,9 +55,9 @@ public class ArkaceA2 extends ActiveSkill implements HasDuration {
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec3), 3,
                             0, 0.4F, 0, 160, 255, 36);
 
-                    int amount = (int) (HEAL / DURATION);
+                    int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
                     if (i == 0)
-                        amount += (int) (HEAL % DURATION);
+                        amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
                     combatUser.heal(combatUser, amount, true);
                     return true;
                 }
@@ -85,7 +65,7 @@ public class ArkaceA2 extends ActiveSkill implements HasDuration {
                 @Override
                 public void onEnd(boolean cancelled) {
                     if (cancelled)
-                        skillController.use();
+                        use();
                 }
             };
         }

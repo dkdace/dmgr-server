@@ -3,14 +3,15 @@ package com.dace.dmgr.system.command.test;
 import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
+import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.HashMapList;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
+
+import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 전투원 선택 명령어 클래스.
@@ -26,16 +27,21 @@ public class SelectCharCommand implements CommandExecutor {
         String team = args[1];
         String character = args[2];
 
-        CombatUser combatUser = HashMapList.combatUserMap.getOrDefault(player, new CombatUser(player));
-
+        CombatUser combatUser = combatUserMap.get(player);
+        boolean first = false;
+        if (combatUser == null) {
+            combatUser = new CombatUser(player);
+            first = true;
+        }
         combatUser.setTeam(team);
+
         switch (character.toLowerCase()) {
             case "아케이스":
             case "arkace":
                 combatUser.setCharacter(Arkace.getInstance());
                 break;
         }
-        if (!player.hasPotionEffect(PotionEffectType.WATER_BREATHING))
+        if (first)
             CombatTick.run(combatUser);
 
         return true;
