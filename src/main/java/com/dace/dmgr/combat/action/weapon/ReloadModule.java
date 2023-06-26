@@ -52,7 +52,7 @@ public class ReloadModule {
             return;
         if (reloading)
             return;
-        if (weapon.getWeaponState() == WeaponState.SWAPPING)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SWAPPING)
             return;
 
         reloading = true;

@@ -12,6 +12,11 @@ public interface Swappable {
     Weapon getSubweapon();
 
     /**
+     * @return 무기 전환 상태
+     */
+    SwapModule.WeaponState getWeaponState();
+
+    /**
      * 무기 교체시간을 반환한다.
      *
      * @return 무기 교체시간 (tick)

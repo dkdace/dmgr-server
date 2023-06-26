@@ -21,7 +21,7 @@ public class OnCombatUserAction implements Listener {
         ActionKey actionKey = event.getActionKey();
         ActionInfo actionInfo = combatUser.getCharacter().getActionKeyMap().get(actionKey);
         Weapon weapon = combatUser.getWeapon();
-        if (weapon.getWeaponState() == WeaponState.SECONDARY)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (actionInfo instanceof WeaponInfo) {

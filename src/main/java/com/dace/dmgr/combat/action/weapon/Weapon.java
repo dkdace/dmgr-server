@@ -2,18 +2,11 @@ package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.entity.CombatUser;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 무기의 상태를 관리하는 클래스.
  */
-@Getter
 public abstract class Weapon extends Action {
-    /** 무기의 상태 */
-    @Setter
-    protected WeaponState weaponState = WeaponState.PRIMARY;
-
     /**
      * 무기 인스턴스를 생성한다.
      *
@@ -56,10 +49,7 @@ public abstract class Weapon extends Action {
      * @see Weapon#getCooldown()
      */
     public void setCooldown() {
-        if (weaponState == WeaponState.PRIMARY)
-            setCooldown((int) getCooldown());
-        else if (weaponState == WeaponState.SECONDARY)
-            setCooldown((int) ((Swappable) this).getSubweapon().getCooldown());
+        setCooldown((int) getCooldown());
     }
 
     /**

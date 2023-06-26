@@ -4,6 +4,7 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 
 /**
@@ -12,6 +13,9 @@ import org.bukkit.ChatColor;
 public class SwapModule {
     /** 무기 객체 */
     private final Weapon weapon;
+    /** 무기 전환 상태 */
+    @Getter
+    private WeaponState weaponState = WeaponState.PRIMARY;
 
     public SwapModule(Weapon weapon) {
         this.weapon = weapon;
@@ -26,15 +30,15 @@ public class SwapModule {
      * @see Swappable
      */
     private void swapTo(WeaponState targetState) {
-        if (weapon.getWeaponState() == targetState || weapon.getWeaponState() == WeaponState.SWAPPING)
+        if (weaponState == targetState || weaponState == WeaponState.SWAPPING)
             return;
         if (targetState == WeaponState.SWAPPING)
             return;
 
         ((Reloadable) weapon).cancelReloading();
-        if (weapon.getWeaponState() == WeaponState.SECONDARY)
+        if (weaponState == WeaponState.SECONDARY)
             ((Reloadable) ((Swappable) weapon).getSubweapon()).cancelReloading();
-        weapon.setWeaponState(WeaponState.SWAPPING);
+        weaponState = WeaponState.SWAPPING;
 
         long duration = ((Swappable) weapon).getSwapDuration();
         CooldownManager.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, duration);
@@ -42,7 +46,7 @@ public class SwapModule {
         new TaskTimer(1, duration) {
             @Override
             public boolean run(int i) {
-                if (weapon.getWeaponState() != WeaponState.SWAPPING)
+                if (weaponState != WeaponState.SWAPPING)
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
@@ -59,7 +63,7 @@ public class SwapModule {
                     return;
 
                 weapon.getCombatUser().sendActionBar("§a§l무기 교체 완료", 8);
-                weapon.setWeaponState(targetState);
+                weaponState = targetState;
 
                 // remainingAmmo와 oppositeAmmo 교체 (XOR algorithm)
                 //remainingAmmo = remainingAmmo ^ oppositeAmmo ^ (oppositeAmmo = remainingAmmo);
@@ -80,9 +84,21 @@ public class SwapModule {
      * @see Swappable
      */
     public void swap() {
-        if (weapon.getWeaponState() == WeaponState.PRIMARY)
+        if (weaponState == WeaponState.PRIMARY)
             swapTo(WeaponState.SECONDARY);
-        else if (weapon.getWeaponState() == WeaponState.SECONDARY)
+        else if (weaponState == WeaponState.SECONDARY)
             swapTo(WeaponState.PRIMARY);
+    }
+
+    /**
+     * 무기 전환 상태 목록.
+     */
+    public enum WeaponState {
+        /** 주무기 사용 중 */
+        PRIMARY,
+        /** 보조무기 사용 중 */
+        SECONDARY,
+        /** 교체 중 */
+        SWAPPING,
     }
 }

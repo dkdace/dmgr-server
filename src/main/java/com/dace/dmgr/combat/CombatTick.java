@@ -157,7 +157,7 @@ public class CombatTick {
      */
     private static void showActionbar(CombatUser combatUser) {
         Weapon weapon = combatUser.getWeapon();
-        if (weapon.getWeaponState() == WeaponState.SECONDARY)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (weapon instanceof Reloadable &&
