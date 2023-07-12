@@ -1,11 +1,10 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasDuration;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
 
-public class ArkaceP1 extends Skill implements HasDuration {
+public class ArkaceP1 extends Skill {
     public ArkaceP1(CombatUser combatUser) {
         super(1, combatUser, ArkaceP1Info.getInstance(), -1);
     }

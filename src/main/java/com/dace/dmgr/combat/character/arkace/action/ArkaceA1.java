@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasDuration;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -16,7 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public class ArkaceA1 extends Skill implements HasDuration {
+public class ArkaceA1 extends Skill {
     public ArkaceA1(CombatUser combatUser) {
         super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }

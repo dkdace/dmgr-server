@@ -35,7 +35,7 @@ public class OnCombatUserAction implements Listener {
 
             if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
                 return;
-            if (skill.getStack() <= 0)
+            if (!skill.canUse())
                 return;
             if (actionInfo instanceof ActiveSkillInfo) {
                 if (!skill.isGlobalCooldownFinished())

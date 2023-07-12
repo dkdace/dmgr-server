@@ -15,7 +15,7 @@ public abstract class Weapon extends Action {
      */
     protected Weapon(CombatUser combatUser, WeaponInfo weaponInfo) {
         super(combatUser, weaponInfo);
-        apply();
+        combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
     /**
@@ -60,13 +60,5 @@ public abstract class Weapon extends Action {
     @Override
     public boolean isCooldownFinished() {
         return combatUser.getEntity().getCooldown(WeaponInfo.MATERIAL) == 0;
-    }
-
-    /**
-     * 플레이어의 인벤토리에 무기 아이템을 적용한다.
-     */
-    @Override
-    public void apply() {
-        combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 }

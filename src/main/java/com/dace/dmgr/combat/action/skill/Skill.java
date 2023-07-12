@@ -32,8 +32,6 @@ public abstract class Skill extends Action {
     protected final int slot;
     /** 번호 */
     protected final int number;
-    /** 스킬 스택 수 */
-    protected int stack = 0;
 
     /**
      * 스킬 인스턴스를 생성한다.
@@ -66,7 +64,7 @@ public abstract class Skill extends Action {
      *
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    private void runCooldown(long cooldown) {
+    protected void runCooldown(long cooldown) {
         CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
 
         new TaskTimer(1) {
@@ -75,23 +73,57 @@ public abstract class Skill extends Action {
                 if (combatUserMap.get(combatUser.getEntity()) == null)
                     return false;
 
-                if (stack == 0)
-                    setItemCooldown();
+                onCooldownTick();
 
                 if (isCooldownFinished()) {
-                    addStack(1);
-
-                    if (Skill.this instanceof Stackable && stack < ((Stackable) Skill.this).getMaxStack())
-                        runCooldown(cooldown);
-                    else if (Skill.this instanceof Chargeable)
-                        runStateValueCharge();
-
+                    onCooldownFinished();
                     return false;
                 }
-
                 return true;
             }
         };
+    }
+
+    /**
+     * 쿨타임이 진행할 때 (매 tick마다) 실행할 작업.
+     *
+     * @see Skill#runCooldown(long)
+     */
+    protected void onCooldownTick() {
+        long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
+
+        displayCooldown((int) Math.ceil((float) cooldown / 20));
+    }
+
+    /**
+     * 쿨타임이 끝났을 때 실행할 작업.
+     *
+     * @see Skill#runCooldown(long)
+     */
+    protected void onCooldownFinished() {
+        displayReady(1);
+
+        if (actionInfo instanceof UltimateSkillInfo)
+            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
+        else if (actionInfo instanceof ActiveSkillInfo)
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
+    }
+
+    /**
+     * 스킬의 지속시간을 반환한다.
+     *
+     * @return 지속시간 (tick)
+     */
+    public abstract long getDuration();
+
+    /**
+     * 스킬의 지속시간을 설정한다.
+     *
+     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    public void setDuration(long duration) {
+        if (isUsing())
+            CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
     }
 
     /**
@@ -100,7 +132,7 @@ public abstract class Skill extends Action {
      * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    private void runDuration(long duration, long cooldown) {
+    protected void runDuration(long duration, long cooldown) {
         CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
 
         new TaskTimer(1) {
@@ -109,12 +141,10 @@ public abstract class Skill extends Action {
                 if (combatUserMap.get(combatUser.getEntity()) == null)
                     return false;
 
-                setItemDuration();
+                onDurationTick();
 
-                if (Skill.this instanceof Chargeable)
-                    ((Chargeable) Skill.this).addStateValue(-((Chargeable) Skill.this).getStateValueDecrement() / 20F);
                 if (!isUsing()) {
-                    addStack(-1);
+                    onDurationFinished();
                     if (isCooldownFinished())
                         runCooldown(cooldown);
 
@@ -127,20 +157,22 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 스킬의 상태 변수 충전을 실행한다.
+     * 지속시간이 진행할 때 (매 tick마다) 실행할 작업.
+     *
+     * @see Skill#runDuration(long, long)
      */
-    private void runStateValueCharge() {
-        new TaskTimer(1) {
-            @Override
-            public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
-                    return false;
+    protected void onDurationTick() {
+        long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
 
-                ((Chargeable) Skill.this).addStateValue(((Chargeable) Skill.this).getStateValueIncrement() / 20F);
+        displayUsing((int) Math.ceil((float) duration / 20));
+    }
 
-                return ((Chargeable) Skill.this).getStateValue() < ((Chargeable) Skill.this).getMaxStateValue() && !isUsing() && isCooldownFinished();
-            }
-        };
+    /**
+     * 지속시간이 끝났을 때 실행할 작업.
+     *
+     * @see Skill#runDuration(long, long)
+     */
+    protected void onDurationFinished() {
     }
 
     /**
@@ -149,13 +181,13 @@ public abstract class Skill extends Action {
      * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
      */
     protected void use() {
-        if (this instanceof HasDuration)
+        if (getDuration() != 0)
             if (isUsing())
                 setDuration(0);
             else
-                runDuration(((HasDuration) this).getDuration(), getCooldown());
+                runDuration(getDuration(), getCooldown());
         else {
-            addStack(-1);
+            setCooldown(getCooldown());
             if (isCooldownFinished())
                 runCooldown(getCooldown());
         }
@@ -169,13 +201,13 @@ public abstract class Skill extends Action {
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     protected void use(long cooldown) {
-        if (this instanceof HasDuration) {
+        if (getDuration() != 0) {
             if (isUsing())
                 setDuration(0);
             else
-                runDuration(((HasDuration) this).getDuration(), cooldown);
+                runDuration(getDuration(), cooldown);
         } else {
-            addStack(-1);
+            setCooldown(cooldown);
             if (isCooldownFinished())
                 runCooldown(cooldown);
         }
@@ -208,16 +240,6 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 스킬의 지속시간을 설정한다.
-     *
-     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
-     */
-    public void setDuration(long duration) {
-        if (isUsing())
-            CooldownManager.setCooldown(this, Cooldown.SKILL_DURATION, duration);
-    }
-
-    /**
      * 스킬의 지속시간을 증가시킨다.
      *
      * @param duration 추가할 지속시간 (tick)
@@ -247,80 +269,12 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 지정한 양만큼 스킬의 스택 수를 증가시킨다.
+     * 스킬을 사용할 수 있는 지 확인한다.
      *
-     * <p>스킬이 {@link Stackable}을 상속받는 클래스여야 한다.</p>
-     *
-     * @param amount 스택 증가량
-     * @see Stackable
+     * @return 사용 가능 여부
      */
-    public void addStack(int amount) {
-        int max = 1;
-        if (this instanceof Stackable)
-            max = ((Stackable) this).getMaxStack();
-
-        stack += amount;
-        if (stack > max)
-            stack = max;
-        if (stack <= 0) {
-            stack = 0;
-            setItemCooldown();
-        } else {
-            if (isUsing())
-                setItemDuration();
-            else
-                setItemReady();
-        }
-    }
-
-    /**
-     * 스킬 설명 아이템에 쿨타임을 적용한다.
-     */
-    private void setItemCooldown() {
-        long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
-
-        if (this instanceof Stackable || cooldown > 2000)
-            itemStack.setAmount(1);
-        else
-            itemStack.setAmount((int) Math.ceil((float) cooldown / 20));
-
-        itemStack.setDurability((short) 15);
-        itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
-        apply();
-    }
-
-    /**
-     * 스킬 설명 아이템에 지속시간을 적용한다.
-     */
-    private void setItemDuration() {
-        long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
-
-        if (this instanceof Stackable)
-            itemStack.setAmount(stack);
-        else if (duration > 2000)
-            itemStack.setAmount(1);
-        else
-            itemStack.setAmount((int) Math.ceil((float) duration / 20));
-
-        itemStack.setDurability((short) 5);
-        apply();
-    }
-
-    /**
-     * 스킬 설명 아이템을 준비 상태로 만든다.
-     */
-    private void setItemReady() {
-        itemStack = actionInfo.getItemStack().clone();
-        if (this instanceof Stackable)
-            itemStack.setAmount(stack);
-        else
-            itemStack.setAmount(1);
-        apply();
-
-        if (actionInfo instanceof UltimateSkillInfo)
-            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
-        else if (actionInfo instanceof ActiveSkillInfo)
-            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
+    public boolean canUse() {
+        return isCooldownFinished();
     }
 
     /**
@@ -344,12 +298,49 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 플레이어의 인벤토리에 스킬 설명 아이템을 적용한다.
+     * 스킬 설명 아이템을 쿨타임 상태로 표시한다.
+     *
+     * @param amount 아이템 수량
      */
-    @Override
-    protected void apply() {
-        if (slot != -1)
-            combatUser.getEntity().getInventory().setItem(slot, itemStack);
+    protected void displayCooldown(int amount) {
+        itemStack = actionInfo.getItemStack().clone();
+        itemStack.setDurability((short) 15);
+        itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
+        display(amount);
+    }
+
+    /**
+     * 스킬 설명 아이템을 준비 상태로 표시한다.
+     *
+     * @param amount 아이템 수량
+     */
+    protected void displayReady(int amount) {
+        itemStack = actionInfo.getItemStack().clone();
+        display(amount);
+    }
+
+    /**
+     * 스킬 설명 아이템을 사용 중인 상태로 표시한다.
+     *
+     * @param amount 아이템 수량
+     */
+    protected void displayUsing(int amount) {
+        itemStack = actionInfo.getItemStack().clone();
+        itemStack.setDurability((short) 5);
+        display(amount);
+    }
+
+    /**
+     * 스킬 설명 아이템을 적용한다.
+     *
+     * @param amount 아이템 수량
+     */
+    private void display(int amount) {
+        if (slot == -1)
+            return;
+
+        itemStack.setAmount(amount <= 127 ? amount : 1);
+        combatUser.getEntity().getInventory().setItem(slot, itemStack);
     }
 
     /**

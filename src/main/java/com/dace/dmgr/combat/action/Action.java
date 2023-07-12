@@ -49,11 +49,6 @@ public abstract class Action {
     public abstract boolean isCooldownFinished();
 
     /**
-     * 플레이어의 인벤토리에 설명 아이템을 적용한다.
-     */
-    protected abstract void apply();
-
-    /**
      * 사용 이벤트를 호출한다.
      *
      * @param actionKey 상호작용 키
