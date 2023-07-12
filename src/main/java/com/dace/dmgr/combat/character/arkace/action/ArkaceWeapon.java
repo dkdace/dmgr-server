@@ -28,7 +28,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     }
 
     @Override
-    public long getCooldown() {
+    public long getDefaultCooldown() {
         return ArkaceWeaponInfo.COOLDOWN;
     }
 

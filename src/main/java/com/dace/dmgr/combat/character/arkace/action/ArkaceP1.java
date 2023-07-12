@@ -10,24 +10,24 @@ public class ArkaceP1 extends Skill {
     }
 
     @Override
-    public long getCooldown() {
+    public long getDefaultCooldown() {
         return 0;
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return -1;
     }
 
     @Override
     public void onUse(ActionKey actionKey) {
         if (!isUsing()) {
-            use();
+            enable();
             combatUser.addSpeedIncrement(ArkaceP1Info.SPRINT_SPEED);
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability((short) (combatUser.getWeapon().getActionInfo().getItemStack().getDurability() + 1000));
         } else {
-            use();
+            disable();
             combatUser.addSpeedIncrement(-ArkaceP1Info.SPRINT_SPEED);
             combatUser.getEntity().getEquipment().getItemInMainHand()
                     .setDurability(combatUser.getWeapon().getActionInfo().getItemStack().getDurability());

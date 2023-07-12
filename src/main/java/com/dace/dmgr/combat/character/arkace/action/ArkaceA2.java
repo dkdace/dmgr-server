@@ -17,19 +17,19 @@ public class ArkaceA2 extends Skill {
     }
 
     @Override
-    public long getCooldown() {
+    public long getDefaultCooldown() {
         return ArkaceA2Info.COOLDOWN;
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return ArkaceA2Info.DURATION;
     }
 
     @Override
     public void onUse(ActionKey actionKey) {
         if (!isUsing()) {
-            use();
+            enable();
 
             Location location = combatUser.getEntity().getLocation();
             SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, location, 1.5F, 0.9F);
@@ -64,7 +64,7 @@ public class ArkaceA2 extends Skill {
                 @Override
                 public void onEnd(boolean cancelled) {
                     if (cancelled)
-                        use();
+                        disable();
                 }
             };
         }

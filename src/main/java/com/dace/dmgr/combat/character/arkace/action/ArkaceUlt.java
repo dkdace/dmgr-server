@@ -12,7 +12,7 @@ public class ArkaceUlt extends Skill implements HasCost {
     }
 
     @Override
-    public long getCooldown() {
+    public long getDefaultCooldown() {
         return -1;
     }
 
@@ -22,14 +22,14 @@ public class ArkaceUlt extends Skill implements HasCost {
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return ArkaceUltInfo.DURATION;
     }
 
     @Override
     public void onUse(ActionKey actionKey) {
         if (!isUsing()) {
-            use();
+            enable();
             ((Reloadable) combatUser.getWeapon()).setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
         }
     }

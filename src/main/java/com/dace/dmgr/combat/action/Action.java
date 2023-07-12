@@ -28,11 +28,11 @@ public abstract class Action {
     }
 
     /**
-     * 쿨타임을 반환한다.
+     * 기본 쿨타임을 반환한다.
      *
      * @return 쿨타임 (tick)
      */
-    public abstract long getCooldown();
+    public abstract long getDefaultCooldown();
 
     /**
      * 쿨타임을 설정한다.

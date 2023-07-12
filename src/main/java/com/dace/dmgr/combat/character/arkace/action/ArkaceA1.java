@@ -21,12 +21,12 @@ public class ArkaceA1 extends Skill {
     }
 
     @Override
-    public long getCooldown() {
+    public long getDefaultCooldown() {
         return ArkaceA1Info.COOLDOWN;
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return -1;
     }
 
@@ -35,7 +35,7 @@ public class ArkaceA1 extends Skill {
         if (!isUsing()) {
             combatUser.getWeapon().setCooldown(10);
             setGlobalCooldown(10);
-            use();
+            enable();
 
             new TaskTimer(5, 3) {
                 @Override
@@ -72,7 +72,7 @@ public class ArkaceA1 extends Skill {
                     new TaskWait(4) {
                         @Override
                         public void run() {
-                            use();
+                            disable();
                         }
                     };
                 }

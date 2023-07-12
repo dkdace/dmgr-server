@@ -45,7 +45,7 @@ public abstract class Skill extends Action {
         super(combatUser, skillInfo);
         this.number = number;
         this.slot = slot;
-        runCooldown(getCooldown());
+        runCooldown(getDefaultCooldown());
     }
 
     /**
@@ -110,11 +110,11 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 스킬의 지속시간을 반환한다.
+     * 스킬의 기본 지속시간을 반환한다.
      *
      * @return 지속시간 (tick)
      */
-    public abstract long getDuration();
+    public abstract long getDefaultDuration();
 
     /**
      * 스킬의 지속시간을 설정한다.
@@ -176,57 +176,24 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 스킬을 사용한다.
-     *
-     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
+     * 스킬을 활성화한다.
      */
-    protected void use() {
-        if (getDuration() != 0)
-            if (isUsing())
-                setDuration(0);
-            else
-                runDuration(getDuration(), getCooldown());
+    protected void enable() {
+        if (getDefaultDuration() != 0)
+            runDuration(getDefaultDuration(), getDefaultCooldown());
         else {
-            setCooldown(getCooldown());
+            setCooldown(getDefaultCooldown());
             if (isCooldownFinished())
-                runCooldown(getCooldown());
+                runCooldown(getDefaultCooldown());
         }
     }
 
     /**
-     * 스킬을 사용한다.
-     *
-     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
-     *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     * 스킬을 비활성화한다.
      */
-    protected void use(long cooldown) {
-        if (getDuration() != 0) {
-            if (isUsing())
-                setDuration(0);
-            else
-                runDuration(getDuration(), cooldown);
-        } else {
-            setCooldown(cooldown);
-            if (isCooldownFinished())
-                runCooldown(cooldown);
-        }
-    }
-
-    /**
-     * 스킬을 사용한다.
-     *
-     * <p>스킬이 사용 중이라면 스킬을 비활성화한다.</p>
-     *
-     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
-     */
-    protected void use(long duration, long cooldown) {
+    protected void disable() {
         if (isUsing())
             setDuration(0);
-        else {
-            runDuration(duration, cooldown);
-        }
     }
 
     /**

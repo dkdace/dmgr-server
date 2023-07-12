@@ -46,10 +46,10 @@ public abstract class Weapon extends Action {
      *
      * <p>보조무기 상태라면 보조무기의 기본 쿨타임으로 설정한다.</p>
      *
-     * @see Weapon#getCooldown()
+     * @see Weapon#getDefaultCooldown()
      */
     public void setCooldown() {
-        setCooldown((int) getCooldown());
+        setCooldown((int) getDefaultCooldown());
     }
 
     /**

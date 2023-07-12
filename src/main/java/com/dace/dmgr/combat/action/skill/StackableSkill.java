@@ -30,7 +30,7 @@ public abstract class StackableSkill extends Skill {
     protected void onCooldownFinished() {
         addStack(1);
         if (stack < getMaxStack())
-            runCooldown(getCooldown());
+            runCooldown(getDefaultCooldown());
 
         displayReady(stack);
 

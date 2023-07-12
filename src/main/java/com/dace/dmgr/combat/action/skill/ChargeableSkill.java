@@ -25,7 +25,7 @@ public abstract class ChargeableSkill extends Skill {
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return -1;
     }
 
