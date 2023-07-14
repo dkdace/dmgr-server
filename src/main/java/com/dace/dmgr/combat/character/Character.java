@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character;
 
-import com.dace.dmgr.combat.action.ActionKeyMap;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
@@ -24,11 +23,6 @@ public abstract class Character {
     private final float speed;
     /** 히트박스 크기 계수 */
     private final float hitbox;
-
-    /**
-     * @return 상호작용 키 매핑 목록
-     */
-    public abstract ActionKeyMap getActionKeyMap();
 
     /**
      * @return 무기 정보

@@ -1,7 +1,5 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActionKeyMap;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
@@ -22,16 +20,6 @@ import lombok.Getter;
 public class Arkace extends Character {
     @Getter
     private static final Arkace instance = new Arkace();
-    @Getter
-    private final ActionKeyMap actionKeyMap = new ActionKeyMap()
-            .put(ActionKey.LEFT_CLICK, ArkaceA1Info.getInstance())
-            .put(ActionKey.CS_PRE_USE, ArkaceWeaponInfo.getInstance())
-            .put(ActionKey.CS_USE, ArkaceWeaponInfo.getInstance())
-            .put(ActionKey.SLOT_2, ArkaceA1Info.getInstance())
-            .put(ActionKey.SLOT_3, ArkaceA2Info.getInstance())
-            .put(ActionKey.SLOT_4, ArkaceUltInfo.getInstance())
-            .put(ActionKey.DROP, ArkaceWeaponInfo.getInstance())
-            .put(ActionKey.SPRINT, ArkaceP1Info.getInstance());
 
     private Arkace() {
         super("아케이스", "DVArkace", 1000, 1.0F, 1.0F);

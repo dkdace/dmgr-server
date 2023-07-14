@@ -3,6 +3,8 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatTick;
+import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.*;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
@@ -22,6 +24,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +50,9 @@ public class CombatUser extends CombatEntity<Player> {
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     /** 액션바 텍스트 객체 */
     private final TextComponent actionBar = new TextComponent();
+    /** 상호작용 키 매핑 목록 (상호작용 키 : 상호작용) */
+    @Getter
+    private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
     /** 선택한 전투원 */
     @Getter
     private Character character = null;
@@ -190,10 +196,9 @@ public class CombatUser extends CombatEntity<Player> {
             entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
             entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
             entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
-            weapon = character.getWeaponInfo().createWeapon(this);
 
             this.character = character;
-            resetSkills();
+            resetActions();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -211,20 +216,29 @@ public class CombatUser extends CombatEntity<Player> {
     }
 
     /**
-     * 플레이어의 스킬을 재설정한다. 전투원 선택 시 호출해야 한다.
+     * 플레이어의 상호작용 설정을 재설정한다. 전투원 선택 시 호출해야 한다.
      */
-    private void resetSkills() {
+    private void resetActions() {
+        actionMap.clear();
         skillMap.clear();
+        weapon = character.getWeaponInfo().createWeapon(this);
+        weapon.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, weapon));
 
         for (int i = 1; i <= 4; i++) {
             ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
-            if (activeSkillInfo != null)
-                skillMap.put(activeSkillInfo, activeSkillInfo.createSkill(this));
+            if (activeSkillInfo != null) {
+                Skill skill = activeSkillInfo.createSkill(this);
+                skillMap.put(activeSkillInfo, skill);
+                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
+            }
         }
         for (int i = 1; i <= 4; i++) {
             PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
-            if (passiveSkillInfo != null)
-                skillMap.put(passiveSkillInfo, passiveSkillInfo.createSkill(this));
+            if (passiveSkillInfo != null) {
+                Skill skill = passiveSkillInfo.createSkill(this);
+                skillMap.put(passiveSkillInfo, skill);
+                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
+            }
         }
     }
 

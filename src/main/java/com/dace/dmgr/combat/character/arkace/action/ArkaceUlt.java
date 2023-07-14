@@ -6,9 +6,17 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.entity.CombatUser;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ArkaceUlt extends Skill implements HasCost {
     public ArkaceUlt(CombatUser combatUser) {
         super(4, combatUser, ArkaceUltInfo.getInstance(), 3);
+    }
+
+    @Override
+    public List<ActionKey> getDefaultActionKeys() {
+        return Arrays.asList(ActionKey.SLOT_4);
     }
 
     @Override

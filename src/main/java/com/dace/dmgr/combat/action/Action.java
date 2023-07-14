@@ -6,6 +6,8 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 /**
  * 상호작용(무기, 스킬)의 상태를 관리하는 클래스.
  *
@@ -26,6 +28,13 @@ public abstract class Action {
         this.actionInfo = actionInfo;
         this.itemStack = actionInfo.getItemStack().clone();
     }
+
+    /**
+     * 기본 상호작용 키를 반환한다.
+     *
+     * @return 기본 상호작용 키 목록
+     */
+    public abstract List<ActionKey> getDefaultActionKeys();
 
     /**
      * 기본 쿨타임을 반환한다.

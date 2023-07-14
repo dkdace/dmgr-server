@@ -15,9 +15,17 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ArkaceA1 extends Skill {
     public ArkaceA1(CombatUser combatUser) {
         super(1, combatUser, ArkaceA1Info.getInstance(), 1);
+    }
+
+    @Override
+    public List<ActionKey> getDefaultActionKeys() {
+        return Arrays.asList(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
     }
 
     @Override

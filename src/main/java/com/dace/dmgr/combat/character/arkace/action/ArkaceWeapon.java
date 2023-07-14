@@ -18,6 +18,9 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ArkaceWeapon extends Weapon implements Reloadable {
     /** 재장전 모듈 객체 */
     private final ReloadModule reloadModule;
@@ -25,6 +28,11 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this);
+    }
+
+    @Override
+    public List<ActionKey> getDefaultActionKeys() {
+        return Arrays.asList(ActionKey.CS_PRE_USE, ActionKey.CS_USE, ActionKey.DROP);
     }
 
     @Override
