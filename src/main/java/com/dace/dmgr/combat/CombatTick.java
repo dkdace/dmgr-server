@@ -2,8 +2,8 @@ package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.combat.action.Reloadable;
-import com.dace.dmgr.combat.action.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
@@ -55,7 +55,7 @@ public class CombatTick {
                             9999, -6, false, false), true);
 
                 if (i % 10 == 0) {
-                    UltimateSkill ultimateSkill = combatUser.getCharacter().getUltimate();
+                    UltimateSkill ultimateSkill = (UltimateSkill) combatUser.getSkill(combatUser.getCharacter().getUltimateSkillInfo());
 
                     combatUser.addUlt((float) IDLE_ULT_CHARGE / ultimateSkill.getCost() / 2);
                 }
@@ -76,7 +76,7 @@ public class CombatTick {
                 if (!canMove(combatUser))
                     speed = 0.0001F;
 
-                if (combatUser.getWeaponController().isAiming())
+                if (combatUser.getWeapon() instanceof Aimable && ((Aimable) combatUser.getWeapon()).isAiming())
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,
                             99999, 5, false, false), true);
                 else
@@ -155,14 +155,26 @@ public class CombatTick {
      * @param combatUser 대상 플레이어
      */
     private static void showActionbar(CombatUser combatUser) {
-        if (combatUser.getCharacter().getWeapon() instanceof Reloadable &&
+        Weapon weapon = combatUser.getWeapon();
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
+            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
+
+        if (weapon instanceof Reloadable &&
                 CooldownManager.getCooldown(combatUser, Cooldown.ACTION_BAR) == 0) {
-            int capacity = combatUser.getWeaponController().getRemainingAmmo();
-            int maxCapacity = ((Reloadable) combatUser.getCharacter().getWeapon()).getCapacity();
+            int capacity = ((Reloadable) weapon).getRemainingAmmo();
+            int maxCapacity = ((Reloadable) weapon).getCapacity();
 
             StringJoiner text = new StringJoiner("    ");
 
-            String ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
+            String ammo = null;
+            switch (combatUser.getCharacter().getName()) {
+                case "아케이스":
+                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
+                    break;
+                case "예거":
+                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '▨');
+                    break;
+            }
 
             text.add(ammo);
 

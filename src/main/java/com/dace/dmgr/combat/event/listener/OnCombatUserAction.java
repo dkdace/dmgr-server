@@ -1,6 +1,15 @@
 package com.dace.dmgr.combat.event.listener;
 
-import com.dace.dmgr.combat.action.*;
+import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.ActionInfo;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.SwapModule;
+import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.Cooldown;
@@ -13,31 +22,34 @@ public class OnCombatUserAction implements Listener {
     public static void event(CombatUserActionEvent event) {
         CombatUser combatUser = event.getCombatUser();
         ActionKey actionKey = event.getActionKey();
-        Action action = combatUser.getCharacter().getActionKeyMap().get(actionKey);
-        WeaponController weaponController = combatUser.getWeaponController();
+        Action action = combatUser.getActionMap().get(actionKey);
+        if (action == null)
+            return;
+
+        ActionInfo actionInfo = action.getActionInfo();
+        Weapon weapon = combatUser.getWeapon();
+
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
+            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof Weapon) {
-            if (!weaponController.isCooldownFinished())
+            if (!weapon.isCooldownFinished())
                 return;
-
-            ((Weapon) action).use(combatUser, weaponController, actionKey);
-
         } else if (action instanceof Skill) {
-            SkillController skillController = combatUser.getSkillController((Skill) action);
-
             if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
                 return;
-            if (skillController.getStack() <= 0)
+            if (!((Skill) action).canUse())
                 return;
-            if (action instanceof ActiveSkill) {
-                if (!skillController.isGlobalCooldownFinished())
+            if (actionInfo instanceof ActiveSkillInfo) {
+                if (!((Skill) action).isGlobalCooldownFinished())
                     return;
-                weaponController.setReloading(false);
+                if (weapon instanceof Reloadable)
+                    ((Reloadable) weapon).cancelReloading();
             }
-            if (action instanceof UltimateSkill && !skillController.isUsing())
+            if (actionInfo instanceof UltimateSkillInfo && !((Skill) action).isUsing())
                 combatUser.useUlt();
-
-            ((Skill) action).use(combatUser, skillController, actionKey);
         }
+
+        action.onUse(actionKey);
     }
 }

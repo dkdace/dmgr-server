@@ -3,9 +3,10 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatTick;
-import com.dace.dmgr.combat.action.Skill;
-import com.dace.dmgr.combat.action.SkillController;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.*;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
@@ -23,6 +24,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -48,14 +50,17 @@ public class CombatUser extends CombatEntity<Player> {
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     /** 액션바 텍스트 객체 */
     private final TextComponent actionBar = new TextComponent();
+    /** 상호작용 키 매핑 목록 (상호작용 키 : 상호작용) */
+    @Getter
+    private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
     /** 선택한 전투원 */
     @Getter
     private Character character = null;
-    /** 무기 컨트롤러 객체 */
+    /** 무기 객체 */
     @Getter
-    private WeaponController weaponController;
-    /** 스킬 컨트롤러 객체 목록 (스킬 : 스킬 컨트롤러) */
-    private HashMap<Skill, SkillController> skillControllerMap = new HashMap<>();
+    private Weapon weapon;
+    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
+    private HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
     /** 현재 무기 탄퍼짐 */
     @Getter
     private float bulletSpread = 0;
@@ -80,8 +85,8 @@ public class CombatUser extends CombatEntity<Player> {
         combatUserMap.put(entity, this);
     }
 
-    public SkillController getSkillController(Skill skill) {
-        return skillControllerMap.get(skill);
+    public Skill getSkill(SkillInfo skillInfo) {
+        return skillMap.get(skillInfo);
     }
 
     /**
@@ -166,9 +171,9 @@ public class CombatUser extends CombatEntity<Player> {
      */
     private void chargeUlt() {
         if (character != null) {
-            SkillController skillController = skillControllerMap.get(character.getUltimate());
-            if (!skillController.isCooldownFinished())
-                skillController.setCooldown(0);
+            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            if (!skill.isCooldownFinished())
+                skill.setCooldown(0);
         }
     }
 
@@ -191,10 +196,9 @@ public class CombatUser extends CombatEntity<Player> {
             entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
             entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
             entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
-            weaponController = new WeaponController(this, character.getWeapon());
 
             this.character = character;
-            resetSkills();
+            resetActions();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -212,31 +216,30 @@ public class CombatUser extends CombatEntity<Player> {
     }
 
     /**
-     * 플레이어의 스킬을 재설정한다. 전투원 선택 시 호출해야 한다.
+     * 플레이어의 상호작용 설정을 재설정한다. 전투원 선택 시 호출해야 한다.
      */
-    private void resetSkills() {
-        skillControllerMap.clear();
-        character.getActionKeyMap().getAll().forEach((actionKey, action) -> {
-            if (action instanceof Skill) {
-                int slot = -1;
-                switch (actionKey) {
-                    case SLOT_1:
-                        slot = 0;
-                        break;
-                    case SLOT_2:
-                        slot = 1;
-                        break;
-                    case SLOT_3:
-                        slot = 2;
-                        break;
-                    case SLOT_4:
-                        slot = 3;
-                        break;
-                }
+    private void resetActions() {
+        actionMap.clear();
+        skillMap.clear();
+        weapon = character.getWeaponInfo().createWeapon(this);
+        weapon.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, weapon));
 
-                skillControllerMap.put((Skill) action, new SkillController(this, (Skill) action, slot));
+        for (int i = 1; i <= 4; i++) {
+            ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
+            if (activeSkillInfo != null) {
+                Skill skill = activeSkillInfo.createSkill(this);
+                skillMap.put(activeSkillInfo, skill);
+                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
             }
-        });
+        }
+        for (int i = 1; i <= 4; i++) {
+            PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
+            if (passiveSkillInfo != null) {
+                Skill skill = passiveSkillInfo.createSkill(this);
+                skillMap.put(passiveSkillInfo, skill);
+                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
+            }
+        }
     }
 
     /**
@@ -293,8 +296,10 @@ public class CombatUser extends CombatEntity<Player> {
             SoundUtil.play("random.stab", 0.4F, 2F, entity);
             SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, entity);
         }
-        if (!getSkillController(character.getUltimate()).isUsing())
-            addUlt((float) damage / character.getUltimate().getCost());
+
+        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
+        if (!ultimateSkill.isUsing())
+            addUlt((float) damage / ultimateSkill.getCost());
     }
 
     @Override
@@ -321,8 +326,9 @@ public class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
         if (isUlt)
-            addUlt((float) amount / character.getUltimate().getCost());
+            addUlt((float) amount / ultimateSkill.getCost());
     }
 
     @Override

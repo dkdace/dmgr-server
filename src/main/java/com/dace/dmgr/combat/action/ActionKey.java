@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.action;
 
 /**
- * 상호작용 종류.
+ * 상호작용 키 목록.
  */
 public enum ActionKey {
     /** 좌클릭 */
