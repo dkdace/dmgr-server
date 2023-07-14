@@ -2,8 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.combat.action.skill.HasCost;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -56,9 +55,9 @@ public class CombatTick {
                             9999, -6, false, false), true);
 
                 if (i % 10 == 0) {
-                    Skill ultimateSkill = combatUser.getSkill(combatUser.getCharacter().getUltimateSkillInfo());
+                    UltimateSkill ultimateSkill = (UltimateSkill) combatUser.getSkill(combatUser.getCharacter().getUltimateSkillInfo());
 
-                    combatUser.addUlt((float) IDLE_ULT_CHARGE / ((HasCost) ultimateSkill).getCost() / 2);
+                    combatUser.addUlt((float) IDLE_ULT_CHARGE / ultimateSkill.getCost() / 2);
                 }
 
                 if (combatUser.getHealth() <= combatUser.getMaxHealth() / 4) {

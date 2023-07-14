@@ -296,8 +296,10 @@ public class CombatUser extends CombatEntity<Player> {
             SoundUtil.play("random.stab", 0.4F, 2F, entity);
             SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, entity);
         }
-        if (!getSkill(character.getUltimateSkillInfo()).isUsing())
-            addUlt((float) damage / ((HasCost) getSkill(character.getUltimateSkillInfo())).getCost());
+
+        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
+        if (!ultimateSkill.isUsing())
+            addUlt((float) damage / ultimateSkill.getCost());
     }
 
     @Override
@@ -324,8 +326,9 @@ public class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
         if (isUlt)
-            addUlt((float) amount / ((HasCost) getSkill(character.getUltimateSkillInfo())).getCost());
+            addUlt((float) amount / ultimateSkill.getCost());
     }
 
     @Override
