@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 /**
  * 소리 재생 기능을 제공하는 클래스.
  */
-public class SoundUtil {
+public final class SoundUtil {
     /**
      * 지정한 위치에 소리를 재생한다.
      *

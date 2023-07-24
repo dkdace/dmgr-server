@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * 자주 쓰이는 문자열 형식을 제공하는 클래스.
  */
-public class StringFormUtil {
+public final class StringFormUtil {
     /** 진행 막대의 기본 기호 */
     private static final char DEFAULT_SYMBOL = '■';
 
