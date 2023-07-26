@@ -56,7 +56,7 @@ public class Hitbox {
      */
     public void setCenter(Location location) {
         this.center = location.clone();
-        location.setPitch(0);
+        center.setPitch(0);
         center = LocationUtil.getLocationFromOffset(center, offsetX, offsetY, offsetZ);
     }
 }
