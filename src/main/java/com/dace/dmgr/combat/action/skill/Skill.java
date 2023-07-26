@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
@@ -20,8 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.inventivetalent.glow.GlowAPI;
-
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 스킬의 상태를 관리하는 클래스.
@@ -70,7 +69,7 @@ public abstract class Skill extends Action {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
+                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                     return false;
 
                 onCooldownTick();
@@ -138,7 +137,7 @@ public abstract class Skill extends Action {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
+                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                     return false;
 
                 onDurationTick();
@@ -340,7 +339,7 @@ public abstract class Skill extends Action {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
+                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                     return false;
                 if (!isUsing())
                     return false;

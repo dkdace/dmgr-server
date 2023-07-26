@@ -1,6 +1,6 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.DMGR;
+import com.dace.dmgr.system.SystemPrefix;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +14,7 @@ public class OnTabComplete implements Listener {
 
             if (!player.isOp()) {
                 if (event.getBuffer().split(" ").length == 1) {
-                    player.sendMessage(DMGR.PREFIX.CHAT_WARN + "금지된 행동입니다.");
+                    player.sendMessage(SystemPrefix.CHAT_WARN + "금지된 행동입니다.");
                     event.setCancelled(true);
                 }
             }

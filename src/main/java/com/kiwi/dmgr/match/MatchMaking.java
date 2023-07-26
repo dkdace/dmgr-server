@@ -1,6 +1,7 @@
 package com.kiwi.dmgr.match;
 
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.kiwi.dmgr.Game;
 import com.kiwi.dmgr.GameType;
 import com.kiwi.dmgr.Team;
@@ -8,7 +9,6 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
 import static com.kiwi.dmgr.GameMapList.gameMap;
 
 /**
@@ -55,7 +55,7 @@ public class MatchMaking {
     public static ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
         HashMap<Player, Integer> playerMap = new HashMap<>();
         for (Player player : playerList) {
-            User user = userMap.get(player);
+            User user = EntityInfoRegistry.getUser(player);
             playerMap.put(player, user.getMMR());
         }
 
@@ -107,7 +107,7 @@ public class MatchMaking {
             teamPlayerMapList.put(Team.BLUE, team1);
             teamPlayerMapList.put(Team.RED, team2);
         }
-        
+
         return teamPlayerMapList;
     }
 }

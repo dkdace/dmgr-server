@@ -4,11 +4,10 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
-
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
 
 /**
  * 전투 시스템의 상태 효과 기능을 제공하는 클래스.
@@ -34,7 +33,7 @@ public class CombatStatusEffect {
                 @Override
                 public boolean run(int i) {
                     long cooldown = CooldownManager.getCooldown(victim, Cooldown.STUN);
-                    if (combatEntityMap.get(victim.getEntity()) == null || cooldown <= 0)
+                    if (EntityInfoRegistry.getCombatEntity(victim.getEntity()) == null || cooldown <= 0)
                         return false;
 
                     if (victim instanceof CombatUser)
@@ -71,7 +70,7 @@ public class CombatStatusEffect {
                 @Override
                 public boolean run(int i) {
                     long cooldown = CooldownManager.getCooldown(victim, Cooldown.SNARE);
-                    if (combatEntityMap.get(victim.getEntity()) == null || cooldown <= 0)
+                    if (EntityInfoRegistry.getCombatEntity(victim.getEntity()) == null || cooldown <= 0)
                         return false;
 
                     if (victim instanceof CombatUser)
@@ -102,7 +101,7 @@ public class CombatStatusEffect {
                 @Override
                 public boolean run(int i) {
                     long cooldown = CooldownManager.getCooldown(victim, Cooldown.GROUNDING);
-                    if (combatEntityMap.get(victim.getEntity()) == null || cooldown <= 0)
+                    if (EntityInfoRegistry.getCombatEntity(victim.getEntity()) == null || cooldown <= 0)
                         return false;
 
                     if (victim instanceof CombatUser)
@@ -133,7 +132,7 @@ public class CombatStatusEffect {
                 @Override
                 public boolean run(int i) {
                     long cooldown = CooldownManager.getCooldown(victim, Cooldown.SILENCE);
-                    if (combatEntityMap.get(victim.getEntity()) == null || cooldown <= 0)
+                    if (EntityInfoRegistry.getCombatEntity(victim.getEntity()) == null || cooldown <= 0)
                         return false;
 
                     if (victim instanceof CombatUser) {
@@ -169,7 +168,7 @@ public class CombatStatusEffect {
                 @Override
                 public boolean run(int i) {
                     long cooldown = CooldownManager.getCooldown(victim, Cooldown.BURN, type);
-                    if (combatEntityMap.get(victim.getEntity()) == null || cooldown <= 0)
+                    if (EntityInfoRegistry.getCombatEntity(victim.getEntity()) == null || cooldown <= 0)
                         return false;
 
                     victim.getEntity().setFireTicks(6);

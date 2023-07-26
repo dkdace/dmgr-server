@@ -5,17 +5,16 @@ import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.shampaggon.crackshot.events.WeaponPrepareShootEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-
 public class OnWeaponPrepareShoot implements Listener {
     @EventHandler
     public static void event(WeaponPrepareShootEvent event) {
-        CombatUser combatUser = combatUserMap.get(event.getPlayer());
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
 
         if (combatUser != null && combatUser.getCharacter() != null) {
             Weapon weapon = combatUser.getWeapon();

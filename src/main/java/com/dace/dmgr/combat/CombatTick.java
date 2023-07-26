@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
@@ -17,8 +18,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.StringJoiner;
-
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 전투 스케쥴러를 제공하는 클래스.
@@ -40,7 +39,7 @@ public class CombatTick {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatUserMap.get(player) == null)
+                if (EntityInfoRegistry.getCombatUser(player) == null)
                     return false;
 
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
@@ -172,7 +171,7 @@ public class CombatTick {
                     ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
                     break;
                 case "예거":
-                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '▨');
+                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
                     break;
             }
 

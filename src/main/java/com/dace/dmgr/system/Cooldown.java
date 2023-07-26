@@ -12,9 +12,9 @@ import lombok.Getter;
 @Getter
 public enum Cooldown {
     /** 채팅 */
-    CHAT(GeneralConfig.chatCooldown),
+    CHAT(GeneralConfig.getInstance().getChatCooldown()),
     /** 명령어 */
-    COMMAND(GeneralConfig.commandCooldown),
+    COMMAND(GeneralConfig.getInstance().getCommandCooldown()),
     /** 피격 시 애니메이션 */
     DAMAGE_ANIMATION(6),
     /** 적 처치 기여 (데미지 누적) 제한시간 */

@@ -1,10 +1,9 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
-
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 상태 변수를 가지고 있는 충전형 스킬의 상태를 관리하는 클래스.
@@ -41,7 +40,7 @@ public abstract class ChargeableSkill extends Skill {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatUserMap.get(combatUser.getEntity()) == null)
+                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                     return false;
 
                 addStateValue(getStateValueIncrement() / 20F);

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import org.bukkit.Location;
@@ -15,9 +16,6 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 전투 시스템에 사용되는 기능을 제공하는 클래스.
@@ -52,7 +50,7 @@ public class CombatUtil {
      * @see Hitbox
      */
     public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
-        CombatEntity<?> entity = combatEntityMap.values().stream()
+        CombatEntity<?> entity = EntityInfoRegistry.getAllCombatEntities().stream()
                 .min(Comparator.comparing(combatEntity -> Math.min(
                         location.distance(combatEntity.getHitbox().getCenter()),
                         location.distance(combatEntity.getCritHitbox().getCenter())
@@ -81,7 +79,7 @@ public class CombatUtil {
      * @see Hitbox
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range) {
-        return combatEntityMap.values().stream()
+        return EntityInfoRegistry.getAllCombatEntities().stream()
                 .filter(entity ->
                         entity != attacker && isEnemy(attacker, entity))
                 .filter(entity ->
@@ -179,7 +177,7 @@ public class CombatUtil {
             new TaskTimer(1) {
                 @Override
                 public boolean run(int i) {
-                    if (combatUserMap.get(combatUser.getEntity()) == null)
+                    if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                         return false;
 
                     if (CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0) {

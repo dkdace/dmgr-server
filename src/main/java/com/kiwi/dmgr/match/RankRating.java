@@ -1,11 +1,8 @@
 package com.kiwi.dmgr.match;
 
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Player;
-
-import java.util.*;
-
-import static com.dace.dmgr.system.HashMapList.userMap;
 
 public class RankRating {
 
@@ -27,7 +24,7 @@ public class RankRating {
      *  @return 랭크 등수
      */
     public static int getPlayerRankPlace(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         return user.getRank();
     }
 
@@ -38,7 +35,7 @@ public class RankRating {
      *  @return 플레이어 랭크 접두사
      */
     public static String getPlayerTierPrefix(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         int rank = user.getRank();
         String ret = "§f없음";
         if (rank >= 1000) {
@@ -66,7 +63,7 @@ public class RankRating {
      *  @return 표시되는 랭크 레이팅
      */
     public static String getPlayerRankRakingDisplay(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         int rank = user.getRank();
         if (rank < 0) {
             return "<0";
@@ -83,7 +80,7 @@ public class RankRating {
      *  @param player 플레이어
      */
     public static void finishPlayerRankMatch(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         int rank = user.getRank();
         int mmr = user.getMMR();
         int play = user.getRankPlay();

@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -10,10 +9,7 @@ import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.HashMapList;
-import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.system.*;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -29,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
@@ -53,26 +47,24 @@ public class CombatUser extends CombatEntity<Player> {
     /** 상호작용 키 매핑 목록 (상호작용 키 : 상호작용) */
     @Getter
     private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
+    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
+    private final HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
     /** 선택한 전투원 */
     @Getter
     private Character character = null;
     /** 무기 객체 */
     @Getter
     private Weapon weapon;
-    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
-    private HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
     /** 현재 무기 탄퍼짐 */
     @Getter
     private float bulletSpread = 0;
 
     /**
-     * 전투 시스템의 플레이어 인스턴스를 생성하고 {@link HashMapList#combatUserMap}에 추가한다.
+     * 전투 시스템의 플레이어 인스턴스를 생성한다.
      *
-     * <p>플레이어가 전투 입장 시 호출해야 하며, 퇴장 시 {@link HashMapList#combatUserMap}
-     * 에서 제거해야 한다.</p>
+     * <p>{@link CombatUser#init()}을 호출하여 초기화해야 한다.</p>
      *
      * @param entity 대상 플레이어
-     * @see HashMapList#combatUserMap
      */
     public CombatUser(Player entity) {
         super(
@@ -82,7 +74,14 @@ public class CombatUser extends CombatEntity<Player> {
                 new Hitbox(0, 2.05, 0, 0.15, 0.05, 0.15),
                 false
         );
-        combatUserMap.put(entity, this);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        EntityInfoRegistry.addCombatUser(entity, this);
+        setMaxHealth(1000);
+        setHealth(1000);
     }
 
     public Skill getSkill(SkillInfo skillInfo) {
@@ -183,25 +182,21 @@ public class CombatUser extends CombatEntity<Player> {
     }
 
     /**
-     * 플레이어의 전투원을 설정하고 스킬을 초기화한다.
+     * 플레이어의 전투원을 설정하고 무기와 스킬을 초기화한다.
      *
      * @param character 전투원
      */
     public void setCharacter(Character character) {
-        try {
-            reset();
-            SkinManager.applySkin(entity, character.getSkinName());
-            setMaxHealth(character.getHealth());
-            setHealth(character.getHealth());
-            entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
-            entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
-            entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
+        reset();
+        SkinManager.applySkin(entity, character.getSkinName());
+        setMaxHealth(character.getHealth());
+        setHealth(character.getHealth());
+        entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
+        entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
+        entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
 
-            this.character = character;
-            resetActions();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.character = character;
+        resetActions();
     }
 
     /**
@@ -349,15 +344,15 @@ public class CombatUser extends CombatEntity<Player> {
 
                     _attackerEntity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
                     if (score > 30) {
-                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
+                        _attackerEntity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
                     } else {
-                        _attackerEntity.sendMessage(DMGR.PREFIX.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
+                        _attackerEntity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
                     }
                     playKillEffect();
                 });
 
                 if (damageList.size() > 0) {
-                    Bukkit.getServer().broadcastMessage(DMGR.PREFIX.CHAT +
+                    Bukkit.getServer().broadcastMessage(SystemPrefix.CHAT +
                             String.join(" ,", attackerNames) + " §4§l-> " + victimName);
 
                     damageList.clear();
@@ -384,7 +379,7 @@ public class CombatUser extends CombatEntity<Player> {
             @Override
             public boolean run(int i) {
                 long cooldown = CooldownManager.getCooldown(CombatUser.this, Cooldown.RESPAWN_TIME);
-                if (combatUserMap.get(entity) == null || cooldown <= 0)
+                if (EntityInfoRegistry.getCombatUser(entity) == null || cooldown <= 0)
                     return false;
 
                 entity.sendTitle("§c§l죽었습니다!",
@@ -397,7 +392,7 @@ public class CombatUser extends CombatEntity<Player> {
             @Override
             public void onEnd(boolean cancelled) {
                 setHealth(getMaxHealth());
-                entity.teleport(Lobby.lobby);
+                entity.teleport(Lobby.lobbyLocation);
                 entity.setGameMode(GameMode.SURVIVAL);
             }
         };

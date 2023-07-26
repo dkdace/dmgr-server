@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.HashMapList;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
@@ -17,8 +17,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
-
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 클래스.
  *
@@ -26,14 +24,16 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
  */
 @Getter
 public abstract class CombatEntity<T extends LivingEntity> {
+    /** 엔티티 객체 */
+    protected final T entity;
+    /** 속성 관리 객체 */
+    private final AttributeManager attributeManager = new AttributeManager();
     /** 히트박스 객체 */
     private final Hitbox hitbox;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
     /** 고정 여부 */
     private final boolean isFixed;
-    /** 엔티티 객체 */
-    protected T entity;
     /** 이름 */
     private String name;
     /** 팀 */
@@ -43,17 +43,15 @@ public abstract class CombatEntity<T extends LivingEntity> {
     private int speedIncrement = 0;
 
     /**
-     * 전투 시스템의 엔티티 인스턴스를 생성하고 {@link HashMapList#temporalEntityMap}에 추가한다.
+     * 전투 시스템의 엔티티 인스턴스를 생성한다.
      *
-     * <p>플레이어의 경우 전투 입장 시 호출해야 하며, 퇴장 시 {@link HashMapList#combatEntityMap}
-     * 에서 제거해야 한다.</p>
+     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
      *
      * @param entity     대상 엔티티
      * @param name       이름
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
      * @param isFixed    위치 고정 여부
-     * @see HashMapList#combatEntityMap
      */
     protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
         this.entity = entity;
@@ -61,41 +59,10 @@ public abstract class CombatEntity<T extends LivingEntity> {
         this.hitbox = hitbox;
         this.critHitbox = critHitbox;
         this.isFixed = isFixed;
-        init();
     }
 
-    /**
-     * 전투 시스템의 엔티티 인스턴스를 생성한다.
-     *
-     * <p>아직 소환되지 않은 엔티티를 위한 생성자이며, 소환 후 {@link CombatEntity#init()}을
-     * 호출해야 한다.</p>
-     *
-     * @param name       이름
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @param isFixed    위치 고정 여부
-     * @see CombatEntity#init()
-     */
-    protected CombatEntity(String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
-        this.name = name;
-        this.hitbox = hitbox;
-        this.critHitbox = critHitbox;
-        this.isFixed = isFixed;
-    }
-
-    /**
-     * 엔티티를 초기화한다.
-     *
-     * <p>엔티티를 {@link HashMapList#temporalEntityMap}에 추가하며, 엔티티 소멸 시
-     * {@link HashMapList#combatEntityMap}에서 제거해야 한다.</p>
-     *
-     * @see HashMapList#combatEntityMap
-     */
-    protected void init() {
-        if (entity == null)
-            return;
-
-        combatEntityMap.put(entity, this);
+    public void init() {
+        EntityInfoRegistry.addCombatEntity(entity, this);
         hitbox.setCenter(entity.getLocation());
         critHitbox.setCenter(entity.getLocation());
         if (!isFixed)
@@ -111,7 +78,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatEntityMap.get(entity) == null)
+                if (EntityInfoRegistry.getCombatEntity(entity) == null)
                     return false;
 
                 Location oldLoc = entity.getLocation();

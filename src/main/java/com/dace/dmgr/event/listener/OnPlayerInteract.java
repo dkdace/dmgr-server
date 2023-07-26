@@ -3,17 +3,16 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-
 public class OnPlayerInteract implements Listener {
     @EventHandler
     public static void event(PlayerInteractEvent event) {
-        CombatUser combatUser = combatUserMap.get(event.getPlayer());
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
 
         if (combatUser != null) {
             if (event.hasBlock())

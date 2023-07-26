@@ -6,14 +6,13 @@ import com.dace.dmgr.gui.PlayerSkull;
 import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.InventoryUtil;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-
-import static com.dace.dmgr.system.HashMapList.userMap;
 
 /**
  * 메뉴 - 설정 GUI 클래스.
@@ -28,7 +27,7 @@ public class PlayerOption extends Gui {
 
     @Override
     public void onOpen(Player player, Inventory inventory) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
 
         InventoryUtil.fillRow(inventory, 2, DisplayItem.EMPTY.getItemStack());
         InventoryUtil.setToggleButton(inventory, 0,
@@ -60,7 +59,7 @@ public class PlayerOption extends Gui {
     @Override
     public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = userMap.get(player);
+            User user = EntityInfoRegistry.getUser(player);
 
             switch (clickItemName) {
                 case "한글 자동 변환":

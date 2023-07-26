@@ -1,7 +1,6 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -23,8 +22,7 @@ public class OnPlayerJoin implements Listener {
     public static void event(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = new User(player);
-
-        Lobby.lobbyTick(player);
+        user.init();
 
         event.setJoinMessage(PREFIX + player.getName());
 
@@ -62,10 +60,10 @@ public class OnPlayerJoin implements Listener {
                 switch (i) {
                     case 0:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.7F);
-                        return true;
+                        break;
                     case 3:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 1.05F);
-                        return true;
+                        break;
                 }
 
                 return true;
