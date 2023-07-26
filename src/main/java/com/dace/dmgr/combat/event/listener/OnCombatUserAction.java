@@ -1,11 +1,10 @@
 package com.dace.dmgr.combat.event.listener;
 
 import com.dace.dmgr.combat.action.Action;
-import com.dace.dmgr.combat.action.ActionInfo;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -26,30 +25,30 @@ public class OnCombatUserAction implements Listener {
         if (action == null)
             return;
 
-        ActionInfo actionInfo = action.getActionInfo();
         Weapon weapon = combatUser.getWeapon();
-
         if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof Weapon) {
             if (!weapon.isCooldownFinished())
                 return;
+
+            weapon.onUse(actionKey);
         } else if (action instanceof Skill) {
             if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
                 return;
             if (!((Skill) action).canUse())
                 return;
-            if (actionInfo instanceof ActiveSkillInfo) {
+            if (action.getActionInfo() instanceof ActiveSkillInfo) {
                 if (!((Skill) action).isGlobalCooldownFinished())
                     return;
                 if (weapon instanceof Reloadable)
                     ((Reloadable) weapon).cancelReloading();
             }
-            if (actionInfo instanceof UltimateSkillInfo && !((Skill) action).isUsing())
+            if (action instanceof UltimateSkill && !((Skill) action).isUsing())
                 combatUser.useUlt();
-        }
 
-        action.onUse(actionKey);
+            action.onUse(actionKey);
+        }
     }
 }
