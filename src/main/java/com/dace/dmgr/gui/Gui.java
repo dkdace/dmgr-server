@@ -29,7 +29,7 @@ public abstract class Gui implements Listener {
      * @param rowSize 행 크기. {@code 1 ~ 6} 사이의 값
      * @param name    GUI 이름
      */
-    public Gui(int rowSize, String name) {
+    protected Gui(int rowSize, String name) {
         if (rowSize > 6) rowSize = 6;
         if (rowSize < 1) rowSize = 1;
         this.rowSize = rowSize;
