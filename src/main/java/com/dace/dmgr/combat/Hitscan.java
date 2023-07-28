@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,23 +21,25 @@ public abstract class Hitscan extends Bullet {
      *
      * <p>히트스캔의 선택적 옵션은 {@link HitscanOption} 객체를 통해 전달받는다.</p>
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
-     * @param option        선택적 옵션
+     * @param shooter 발사하는 엔티티
+     * @param option  선택적 옵션
      * @see HitscanOption
      */
-    public Hitscan(CombatEntity<?> shooter, int trailInterval, HitscanOption option) {
-        super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
+    protected Hitscan(CombatEntity<?> shooter, HitscanOption option) {
+        super(shooter, option.trailInterval, option.penetrating, option.hitboxMultiplier);
     }
 
     /**
      * 히트스캔 인스턴스를 생성한다.
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
+     * @param shooter 발사하는 엔티티
      */
-    public Hitscan(CombatEntity<?> shooter, int trailInterval) {
-        super(shooter, trailInterval);
+    protected Hitscan(CombatEntity<?> shooter) {
+        super(shooter);
+        HitscanOption hitscanOption = HitscanOption.builder().build();
+        this.trailInterval = hitscanOption.trailInterval;
+        this.penetrating = hitscanOption.penetrating;
+        this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
     }
 
     /**
@@ -52,38 +53,16 @@ public abstract class Hitscan extends Bullet {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         direction = VectorUtil.getSpreadedVector(direction, spread);
-        Set<CombatEntity<?>> targetSet = new HashSet<>();
+        Set<CombatEntity<?>> targets = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
-            Location hitLoc = loc.clone().add(direction);
-            if (!LocationUtil.isNonSolid(hitLoc)) {
-                Vector subDir = direction.clone().multiply(0.5);
-
-                while (LocationUtil.isNonSolid(loc))
-                    loc.add(subDir);
-
-                loc.subtract(subDir);
-                onHit(loc);
-                onHitBlock(loc, hitLoc.getBlock());
-                break;
+            if (!LocationUtil.isNonSolid(loc)) {
+                handleBlockCollision(loc, direction);
+                return;
             }
 
-            if (loc.distance(origin) > 0.5) {
-                Map.Entry<CombatEntity<?>, Boolean> targetEntry
-                        = CombatUtil.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                CombatEntity<?> target = targetEntry.getKey();
-                boolean isCrit = targetEntry.getValue();
+            if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE)) return;
 
-                if (target != null) {
-                    if (!targetSet.add(target)) {
-                        onHit(hitLoc);
-                        onHitEntity(hitLoc, target, isCrit);
-
-                        if (!penetrating)
-                            break;
-                    }
-                }
-            }
             loc.add(direction);
             if (i % trailInterval == 0) trail(loc.clone());
         }

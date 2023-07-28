@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 총알. 원거리 공격(투사체, 히트스캔) 등을 관리하기 위한 클래스.
@@ -20,16 +24,16 @@ import org.bukkit.util.Vector;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public abstract class Bullet {
+    /** 총알의 최소 사거리 */
+    protected static final float MIN_RANGE = 0.5F;
     /** 총알의 최대 사거리 */
     protected static final int MAX_RANGE = 70;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.25F;
-    /** {@link Bullet#trailInterval}의 기본값. */
-    protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
     protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
-    protected final int trailInterval;
+    protected int trailInterval;
     /** 관통 여부 */
     protected boolean penetrating;
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */
@@ -99,6 +103,49 @@ public abstract class Bullet {
             shoot(((CombatUser) shooter).getEntity().getEyeLocation());
         else
             shoot(shooter.getEntity().getLocation());
+    }
+
+    /**
+     * 총알의 블록 충돌 로직을 처리한다.
+     *
+     * @param location  위치
+     * @param direction 발사 방향
+     */
+    protected void handleBlockCollision(Location location, Vector direction) {
+        Location loc = location.clone();
+        Vector subDir = direction.clone().multiply(0.25);
+        Block hitBlock = location.getBlock();
+
+        while (!LocationUtil.isNonSolid(loc))
+            loc.subtract(subDir);
+
+        loc.subtract(subDir);
+        onHit(loc);
+        onHitBlock(loc, hitBlock);
+    }
+
+    /**
+     * 총알 주변의 적을 찾고 피격 로직을 처리한다.
+     *
+     * @param location 위치
+     * @param targets  피격자 목록
+     * @param size     기본 판정 범위
+     * @return 적 피격 시 {@code penetrating}이 {@code false}이면 {@code true} 반환
+     */
+    protected boolean findEnemyAndHandleCollision(Location location, Set<CombatEntity<?>> targets, float size) {
+        Map.Entry<CombatEntity<?>, Boolean> targetEntry
+                = CombatUtil.getNearEnemy(shooter, location, size * hitboxMultiplier);
+        CombatEntity<?> target = targetEntry.getKey();
+        boolean isCrit = targetEntry.getValue();
+
+        if (target != null && targets.add(target)) {
+            onHit(location);
+            onHitEntity(location, target, isCrit);
+
+            return !penetrating;
+        }
+
+        return false;
     }
 
     /**
