@@ -11,7 +11,7 @@ import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class OnPlayClientArmAnimation extends PacketAdapter {
+public final class OnPlayClientArmAnimation extends PacketAdapter {
     public OnPlayClientArmAnimation() {
         super(DMGR.getPlugin(), PacketType.Play.Client.ARM_ANIMATION);
     }

@@ -11,7 +11,7 @@ import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Player;
 
-public class OnPlayServerNamedSoundEffect extends PacketAdapter {
+public final class OnPlayServerNamedSoundEffect extends PacketAdapter {
     public OnPlayServerNamedSoundEffect() {
         super(DMGR.getPlugin(), PacketType.Play.Server.NAMED_SOUND_EFFECT);
     }

@@ -13,7 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class OnPlayerQuit implements Listener {
+public final class OnPlayerQuit implements Listener {
     /** 퇴장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 

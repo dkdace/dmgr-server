@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class OnPlayerJoin implements Listener {
+public final class OnPlayerJoin implements Listener {
     /** 입장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
     /** 입장 시 타이틀 메시지 */

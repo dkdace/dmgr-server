@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public class OnAsyncPlayerChat implements Listener {
+public final class OnAsyncPlayerChat implements Listener {
     @EventHandler
     public static void event(AsyncPlayerChatEvent event) {
         event.setCancelled(true);

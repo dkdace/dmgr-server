@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.TabCompleteEvent;
 
-public class OnTabComplete implements Listener {
+public final class OnTabComplete implements Listener {
     @EventHandler
     public static void event(TabCompleteEvent event) {
         if (event.getSender() instanceof Player) {

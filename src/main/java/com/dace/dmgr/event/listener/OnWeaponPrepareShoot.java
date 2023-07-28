@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class OnWeaponPrepareShoot implements Listener {
+public final class OnWeaponPrepareShoot implements Listener {
     @EventHandler
     public static void event(WeaponPrepareShootEvent event) {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());

@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-public class OnEntityDeath implements Listener {
+public final class OnEntityDeath implements Listener {
     @EventHandler
     public static void event(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();

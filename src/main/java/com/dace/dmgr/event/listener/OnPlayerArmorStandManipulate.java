@@ -10,7 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 
-public class OnPlayerArmorStandManipulate implements Listener {
+public final class OnPlayerArmorStandManipulate implements Listener {
     @EventHandler
     public static void event(PlayerArmorStandManipulateEvent event) {
         Player player = event.getPlayer();

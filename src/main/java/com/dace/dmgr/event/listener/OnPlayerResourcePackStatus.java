@@ -10,7 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-public class OnPlayerResourcePackStatus implements Listener {
+public final class OnPlayerResourcePackStatus implements Listener {
     /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
     private static final String DENY_KICK_MESSAGE = SystemPrefix.CHAT_WARN + "리소스팩 적용을 활성화 해주세요!" +
             "\n§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용" +

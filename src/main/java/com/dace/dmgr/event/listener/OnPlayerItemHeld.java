@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-public class OnPlayerItemHeld implements Listener {
+public final class OnPlayerItemHeld implements Listener {
     @EventHandler
     public static void event(PlayerItemHeldEvent event) {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());

@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
-public class OnPlayerToggleSprint implements Listener {
+public final class OnPlayerToggleSprint implements Listener {
     @EventHandler
     public static void event(PlayerToggleSprintEvent event) {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());

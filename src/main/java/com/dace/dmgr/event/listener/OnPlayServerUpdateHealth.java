@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.DMGR;
 import org.bukkit.entity.Player;
 
-public class OnPlayServerUpdateHealth extends PacketAdapter {
+public final class OnPlayServerUpdateHealth extends PacketAdapter {
     public OnPlayServerUpdateHealth() {
         super(DMGR.getPlugin(), PacketType.Play.Server.UPDATE_HEALTH);
     }
