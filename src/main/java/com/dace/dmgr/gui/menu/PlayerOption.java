@@ -17,7 +17,7 @@ import org.bukkit.inventory.Inventory;
 /**
  * 메뉴 - 설정 GUI 클래스.
  */
-public class PlayerOption extends Gui {
+public final class PlayerOption extends Gui {
     @Getter
     private static final PlayerOption instance = new PlayerOption();
 

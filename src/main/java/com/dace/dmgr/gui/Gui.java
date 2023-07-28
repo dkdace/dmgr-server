@@ -41,7 +41,7 @@ public abstract class Gui implements Listener {
      *
      * @param player 대상 플레이어
      */
-    public void open(Player player) {
+    public final void open(Player player) {
         Inventory inventory = Bukkit.createInventory(player, rowSize * 9, name);
         player.openInventory(inventory);
         onOpen(player, inventory);
@@ -68,7 +68,7 @@ public abstract class Gui implements Listener {
     }
 
     @EventHandler
-    public void event(InventoryClickEvent event) {
+    public final void event(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
         if (event.getInventory().getTitle().equals(name)) {

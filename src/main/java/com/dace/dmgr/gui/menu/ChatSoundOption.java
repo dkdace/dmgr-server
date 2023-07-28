@@ -18,7 +18,7 @@ import org.bukkit.inventory.Inventory;
 /**
  * 메뉴 - 채팅 효과음 설정 GUI 클래스.
  */
-public class ChatSoundOption extends Gui {
+public final class ChatSoundOption extends Gui {
     @Getter
     private static final ChatSoundOption instance = new ChatSoundOption();
 
