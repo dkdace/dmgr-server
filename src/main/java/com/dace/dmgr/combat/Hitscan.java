@@ -49,6 +49,7 @@ public abstract class Hitscan extends Bullet {
      * @param direction 발사 방향
      * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
+    @Override
     public void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();

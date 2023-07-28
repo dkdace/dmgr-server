@@ -70,7 +70,7 @@ public abstract class Bullet {
      * @param origin 발화점
      * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
-    public void shoot(Location origin, float spread) {
+    public final void shoot(Location origin, float spread) {
         shoot(origin, shooter.getEntity().getLocation().getDirection(), spread);
     }
 
@@ -79,7 +79,7 @@ public abstract class Bullet {
      *
      * @param origin 발화점
      */
-    public void shoot(Location origin) {
+    public final void shoot(Location origin) {
         shoot(origin, 0);
     }
 
@@ -88,7 +88,7 @@ public abstract class Bullet {
      *
      * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
-    public void shoot(float spread) {
+    public final void shoot(float spread) {
         if (shooter instanceof CombatUser)
             shoot(((CombatUser) shooter).getEntity().getEyeLocation(), spread);
         else
@@ -98,7 +98,7 @@ public abstract class Bullet {
     /**
      * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 탄퍼짐 없이 총알을 발사한다.
      */
-    public void shoot() {
+    public final void shoot() {
         if (shooter instanceof CombatUser)
             shoot(((CombatUser) shooter).getEntity().getEyeLocation());
         else
@@ -111,7 +111,7 @@ public abstract class Bullet {
      * @param location  위치
      * @param direction 발사 방향
      */
-    protected void handleBlockCollision(Location location, Vector direction) {
+    protected final void handleBlockCollision(Location location, Vector direction) {
         Location loc = location.clone();
         Vector subDir = direction.clone().multiply(0.25);
         Block hitBlock = location.getBlock();
@@ -132,7 +132,7 @@ public abstract class Bullet {
      * @param size     기본 판정 범위
      * @return 적 피격 시 {@code penetrating}이 {@code false}이면 {@code true} 반환
      */
-    protected boolean findEnemyAndHandleCollision(Location location, Set<CombatEntity<?>> targets, float size) {
+    protected final boolean findEnemyAndHandleCollision(Location location, Set<CombatEntity<?>> targets, float size) {
         Map.Entry<CombatEntity<?>, Boolean> targetEntry
                 = CombatUtil.getNearEnemy(shooter, location, size * hitboxMultiplier);
         CombatEntity<?> target = targetEntry.getKey();
