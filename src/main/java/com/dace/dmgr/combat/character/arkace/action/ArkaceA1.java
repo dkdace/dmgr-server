@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
+import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -53,7 +54,7 @@ public class ArkaceA1 extends Skill {
                     SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                     SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                    new Projectile(combatUser, 5, ArkaceA1Info.VELOCITY) {
+                    new Projectile(combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(5).build()) {
                         @Override
                         public void trail(Location location) {
                             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);

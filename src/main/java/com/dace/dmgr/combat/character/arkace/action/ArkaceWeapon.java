@@ -94,7 +94,6 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
                     SoundUtil.play("random.energy", location, 4F, 1.6F);
                     SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-                    combatUser.addBulletSpread(1, 0);
                 } else {
                     SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
                     SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
@@ -104,7 +103,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     reloadModule.consume(1);
                 }
 
-                new Hitscan(combatUser, 7) {
+                new Hitscan(combatUser) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
