@@ -17,7 +17,7 @@ import lombok.Getter;
  * @see ArkaceA2
  * @see ArkaceUlt
  */
-public class Arkace extends Character {
+public final class Arkace extends Character {
     @Getter
     private static final Arkace instance = new Arkace();
 

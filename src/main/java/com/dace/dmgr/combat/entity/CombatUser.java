@@ -352,7 +352,7 @@ public final class CombatUser extends CombatEntity<Player> {
         } else
             setLowHealthScreenEffect(false);
 
-        float speedMultiplier = character.getSpeed() * (100 + speedIncrement) / 100;
+        float speedMultiplier = character.getSpeedMultiplier() * (100 + speedIncrement) / 100;
         float speed = BASE_SPEED * speedMultiplier;
 
         if (entity.isSprinting())
