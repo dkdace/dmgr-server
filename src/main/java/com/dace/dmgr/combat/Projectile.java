@@ -104,7 +104,8 @@ public abstract class Projectile extends Bullet {
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
                     }
                     loc.add(finalDirection);
-                    if (count++ % trailInterval == 0) trail(loc.clone());
+                    if (count++ % trailInterval == 0)
+                        trail(loc.clone());
                 }
 
                 return true;

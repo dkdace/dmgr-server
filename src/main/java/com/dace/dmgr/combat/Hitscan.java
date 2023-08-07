@@ -62,10 +62,12 @@ public abstract class Hitscan extends Bullet {
                 return;
             }
 
-            if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE)) return;
+            if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE))
+                return;
 
             loc.add(direction);
-            if (i % trailInterval == 0) trail(loc.clone());
+            if (i % trailInterval == 0)
+                trail(loc.clone());
         }
     }
 }
