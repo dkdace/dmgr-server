@@ -15,7 +15,7 @@ import com.dace.dmgr.system.CooldownManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class OnCombatUserAction implements Listener {
+public final class OnCombatUserAction implements Listener {
     @EventHandler
     public static void event(CombatUserActionEvent event) {
         CombatUser combatUser = event.getCombatUser();
