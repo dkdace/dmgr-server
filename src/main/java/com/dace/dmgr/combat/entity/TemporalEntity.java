@@ -18,7 +18,7 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
-     * <p>{@link TemporalEntity#init()}을 호출하여 초기화해야 한다.</p>
+     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
      *
      * @param entity     대상 엔티티
      * @param name       이름
@@ -33,26 +33,30 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected final void onInit() {
         EntityInfoRegistry.addTemporalEntity(getEntity(), this);
         setMaxHealth(maxHealth);
         setHealth(maxHealth);
-        onInit(entity.getLocation());
+        onInitTemporalEntity(entity.getLocation());
     }
 
     /**
      * 엔티티를 제거한다.
      */
     public void remove() {
-        entity.setHealth(0);
+        EntityInfoRegistry.removeTemporalEntity(entity);
         entity.remove();
     }
 
+    @Override
+    public void onDeath(CombatEntity<?> attacker) {
+        remove();
+    }
+
     /**
-     * {@link TemporalEntity#init()} 호출 시 실행될 작업
+     * {@link TemporalEntity#init()} 호출 시 실행할 작업.
      *
      * @param location 소환된 위치
      */
-    protected abstract void onInit(Location location);
+    protected abstract void onInitTemporalEntity(Location location);
 }

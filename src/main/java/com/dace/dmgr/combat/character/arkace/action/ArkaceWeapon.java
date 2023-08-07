@@ -97,9 +97,9 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 } else {
                     SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
                     SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
+                    CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
-                    CombatUtil.applyBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
+                    CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
                     reloadModule.consume(1);
                 }
 
@@ -116,7 +116,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
                     @Override
                     public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                        combatUser.attack(target, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                        target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
                     }
                 }.shoot(combatUser.getBulletSpread());
 

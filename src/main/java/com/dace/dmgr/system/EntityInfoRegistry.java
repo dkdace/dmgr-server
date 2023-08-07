@@ -59,21 +59,6 @@ public final class EntityInfoRegistry {
     }
 
     /**
-     * @param entity       엔티티
-     * @param combatEntity 전투 시스템의 엔티티 객체
-     */
-    public static void addCombatEntity(LivingEntity entity, CombatEntity<?> combatEntity) {
-        combatEntityMap.put(entity, combatEntity);
-    }
-
-    /**
-     * @param entity 엔티티
-     */
-    public static void removeCombatEntity(LivingEntity entity) {
-        combatEntityMap.remove(entity);
-    }
-
-    /**
      * @param player 플레이어
      * @return 전투 시스템의 플레이어 객체
      */
@@ -87,6 +72,7 @@ public final class EntityInfoRegistry {
      */
     public static void addCombatUser(Player player, CombatUser combatUser) {
         combatUserMap.put(player, combatUser);
+        combatEntityMap.put(player, combatUser);
     }
 
     /**
@@ -94,6 +80,7 @@ public final class EntityInfoRegistry {
      */
     public static void removeCombatUser(Player player) {
         combatUserMap.remove(player);
+        combatEntityMap.remove(player);
     }
 
     /**
@@ -110,6 +97,7 @@ public final class EntityInfoRegistry {
      */
     public static void addTemporalEntity(LivingEntity entity, TemporalEntity<?> temporalEntity) {
         temporalEntityMap.put(entity, temporalEntity);
+        combatEntityMap.put(entity, temporalEntity);
     }
 
     /**
@@ -117,5 +105,6 @@ public final class EntityInfoRegistry {
      */
     public static void removeTemporalEntity(LivingEntity entity) {
         temporalEntityMap.remove(entity);
+        combatEntityMap.remove(entity);
     }
 }

@@ -1,6 +1,6 @@
 package com.dace.dmgr.lobby;
 
-import com.dace.dmgr.combat.CombatTick;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.YamlFile;
@@ -134,8 +134,12 @@ public final class User {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        EntityInfoRegistry.removeCombatUser(player);
-        CombatTick.playLowHealthScreenEffect(player, false);
+
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
+        if (combatUser != null) {
+            combatUser.reset();
+            EntityInfoRegistry.removeCombatUser(player);
+        }
     }
 
     /**

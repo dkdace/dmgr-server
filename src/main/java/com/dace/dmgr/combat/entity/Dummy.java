@@ -34,7 +34,7 @@ public class Dummy extends TemporalEntity<Zombie> {
     }
 
     @Override
-    public void onInit(Location location) {
+    protected void onInitTemporalEntity(Location location) {
         setTeam("DUMMY");
         entity.setBaby(false);
         entity.leaveVehicle();

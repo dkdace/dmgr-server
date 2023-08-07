@@ -34,7 +34,7 @@ public class ArkaceUlt extends UltimateSkill {
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    protected void onUseUltimateSkill(ActionKey actionKey) {
         if (!isUsing()) {
             enable();
             ((Reloadable) combatUser.getWeapon()).setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);

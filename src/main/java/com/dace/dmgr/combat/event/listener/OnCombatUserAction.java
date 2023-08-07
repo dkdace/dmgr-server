@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -45,8 +44,6 @@ public class OnCombatUserAction implements Listener {
                 if (weapon instanceof Reloadable)
                     ((Reloadable) weapon).cancelReloading();
             }
-            if (action instanceof UltimateSkill && !((Skill) action).isUsing())
-                combatUser.useUlt();
 
             action.onUse(actionKey);
         }

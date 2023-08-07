@@ -69,7 +69,7 @@ public class ArkaceA1 extends Skill {
 
                         @Override
                         public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                            combatUser.attack(target, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
+                            target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
                         }
                     }.shoot(location);
 
@@ -98,8 +98,8 @@ public class ArkaceA1 extends Skill {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         if (location.distance(combatUser.getEntity().getLocation()) < ArkaceA1Info.RADIUS)
-            combatUser.attack(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true);
+            combatUser.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true);
         CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS).forEach(target ->
-                combatUser.attack(target, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
+                target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
     }
 }
