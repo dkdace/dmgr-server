@@ -81,8 +81,8 @@ public final class CombatUser extends CombatEntity<Player> {
         super(
                 entity,
                 entity.getName(),
-                new Hitbox(0, entity.getHeight() / 2, 0, 0.65, 2.1, 0.5),
-                new Hitbox(0, 2.05, 0, 0.15, 0.05, 0.15),
+                new Hitbox(0.65, 2.1, 0.5, 0, entity.getHeight() / 2, 0),
+                new Hitbox(0.15, 0.05, 0.15, 0, 2.05, 0),
                 false
         );
     }
@@ -192,7 +192,7 @@ public final class CombatUser extends CombatEntity<Player> {
     public boolean canTakeDamage() {
         if (character == null)
             return false;
-        if (entity.getGameMode() == GameMode.SURVIVAL)
+        if (entity.getGameMode() != GameMode.SURVIVAL)
             return false;
 
         return true;
