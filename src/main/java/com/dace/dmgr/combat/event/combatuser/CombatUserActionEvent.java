@@ -6,22 +6,22 @@ import com.dace.dmgr.combat.event.CombatUserEvent;
 import lombok.Getter;
 
 /**
- * 플레이어가 상호작용할 시 호출되는 이벤트.
+ * 플레이어가 동작 사용 키를 입력할 시 호출되는 이벤트.
  *
- * <p>상호작용은 좌클릭, 우클릭 등을 말하며 종류는 {@link ActionKey}에 있다.</p>
+ * <p>동작 사용 키의 종류는 {@link ActionKey}에 있다.</p>
  *
  * @see ActionKey
  */
 @Getter
 public class CombatUserActionEvent extends CombatUserEvent {
-    /** 상호작용 종류 */
+    /** 동작 사용 키 종류 */
     private final ActionKey actionKey;
 
     /**
      * 이벤트를 생성한다.
      *
      * @param combatUser 이벤트를 호출한 플레이어
-     * @param actionKey  상호작용 종류
+     * @param actionKey  동작 사용 키
      */
     public CombatUserActionEvent(CombatUser combatUser, ActionKey actionKey) {
         super(combatUser);

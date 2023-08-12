@@ -7,7 +7,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
-public class ArkaceWeaponInfo extends WeaponInfo {
+public final class ArkaceWeaponInfo extends WeaponInfo {
     /** 피해량 */
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 */
@@ -65,5 +65,15 @@ public class ArkaceWeaponInfo extends WeaponInfo {
         static final float RECOVERY = 1F;
         /** 탄퍼짐 최대치 */
         static final float MAX = 2.3F;
+    }
+
+    /**
+     * 리소스별 아이템 내구도 정보.
+     */
+    public static class RESOURCE {
+        /** 기본 */
+        static final short DEFAULT = 1;
+        /** 달리기 */
+        static final short SPRINT = DEFAULT + 1000;
     }
 }

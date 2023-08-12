@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * 상호작용(무기, 패시브 스킬, 액티브 스킬 등) 정보를 관리하는 클래스.
+ * 동작(무기, 패시브 스킬, 액티브 스킬 등) 정보를 관리하는 클래스.
  *
  * @see WeaponInfo
  * @see PassiveSkillInfo

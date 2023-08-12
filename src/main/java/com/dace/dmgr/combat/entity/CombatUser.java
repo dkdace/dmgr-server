@@ -55,7 +55,7 @@ public final class CombatUser extends CombatEntity<Player> {
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
     /** 액션바 텍스트 객체 */
     private final TextComponent actionBar = new TextComponent();
-    /** 상호작용 키 매핑 목록 (상호작용 키 : 상호작용) */
+    /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     @Getter
     private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
@@ -239,7 +239,7 @@ public final class CombatUser extends CombatEntity<Player> {
     }
 
     /**
-     * 플레이어의 상호작용 설정을 초기화한다. 전투원 선택 시 호출해야 한다.
+     * 플레이어의 동작 설정을 초기화한다. 전투원 선택 시 호출해야 한다.
      */
     private void initActions() {
         actionMap.clear();

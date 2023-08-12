@@ -21,7 +21,7 @@ import org.bukkit.Sound;
 import java.util.Arrays;
 import java.util.List;
 
-public class ArkaceWeapon extends Weapon implements Reloadable {
+public final class ArkaceWeapon extends Weapon implements Reloadable {
     /** 재장전 모듈 객체 */
     private final ReloadModule reloadModule;
 
@@ -78,7 +78,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     reload();
                     return;
                 }
-                if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isUsing())
+                if (combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished())
                     return;
 
                 setCooldown(4);
@@ -87,7 +87,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 break;
             case CS_USE:
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
-                boolean isUlt = combatUser.getSkill(ArkaceUltInfo.getInstance()).isUsing();
+                boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location location = combatUser.getEntity().getLocation();
 
                 if (isUlt) {

@@ -8,7 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
  * 궁극기 정보를 관리하는 클래스.
  */
 public abstract class UltimateSkillInfo extends ActiveSkillInfo {
-    public UltimateSkillInfo(String name, String... lore) {
+    protected UltimateSkillInfo(String name, String... lore) {
         super(4, name, lore);
         itemStack.setDurability((short) 10);
         itemStack.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);

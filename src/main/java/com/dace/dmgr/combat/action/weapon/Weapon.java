@@ -18,47 +18,25 @@ public abstract class Weapon extends Action {
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
-    /**
-     * 무기의 쿨타임을 설정한다.
-     *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
-     */
     @Override
-    public void setCooldown(long cooldown) {
-        setCooldown(cooldown, false);
+    protected void onCooldownSet() {
+        combatUser.getEntity().setCooldown(WeaponInfo.MATERIAL, (int) getCooldown());
     }
 
     /**
-     * 무기의 쿨타임을 설정한다.
+     * 스킬 설명 아이템의 내구도를 변경한다.
      *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
-     * @param force    덮어쓰기 여부
+     * @param durability 내구도
      */
-    public void setCooldown(long cooldown, boolean force) {
-        if (cooldown == -1)
-            cooldown = 9999;
-        if (force || cooldown > combatUser.getEntity().getCooldown(WeaponInfo.MATERIAL))
-            combatUser.getEntity().setCooldown(WeaponInfo.MATERIAL, (int) cooldown);
+    public final void displayDurability(short durability) {
+        itemStack.setDurability(durability);
+        display();
     }
 
     /**
-     * 무기의 쿨타임을 무기에 설정된 기본 쿨타임으로 설정한다.
-     *
-     * <p>보조무기 상태라면 보조무기의 기본 쿨타임으로 설정한다.</p>
-     *
-     * @see Weapon#getDefaultCooldown()
+     * 무기 설명 아이템을 적용한다.
      */
-    public void setCooldown() {
-        setCooldown((int) getDefaultCooldown());
-    }
-
-    /**
-     * 무기의 쿨타임이 끝났는 지 확인한다.
-     *
-     * @return 쿨타임 종료 여부
-     */
-    @Override
-    public boolean isCooldownFinished() {
-        return combatUser.getEntity().getCooldown(WeaponInfo.MATERIAL) == 0;
+    private void display() {
+        combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 }

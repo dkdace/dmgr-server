@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import java.util.Arrays;
 import java.util.List;
 
-public class ArkaceP1 extends Skill {
+public final class ArkaceP1 extends Skill {
     public ArkaceP1(CombatUser combatUser) {
         super(1, combatUser, ArkaceP1Info.getInstance(), -1);
     }
@@ -29,16 +29,14 @@ public class ArkaceP1 extends Skill {
 
     @Override
     public void onUse(ActionKey actionKey) {
-        if (!isUsing()) {
-            enable();
+        if (isDurationFinished()) {
+            setDuration();
             combatUser.addSpeedIncrement(ArkaceP1Info.SPRINT_SPEED);
-            combatUser.getEntity().getEquipment().getItemInMainHand()
-                    .setDurability((short) (combatUser.getWeapon().getActionInfo().getItemStack().getDurability() + 1000));
+            combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
         } else {
-            disable();
+            setDuration(0);
             combatUser.addSpeedIncrement(-ArkaceP1Info.SPRINT_SPEED);
-            combatUser.getEntity().getEquipment().getItemInMainHand()
-                    .setDurability(combatUser.getWeapon().getActionInfo().getItemStack().getDurability());
+            combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
         }
     }
 }
