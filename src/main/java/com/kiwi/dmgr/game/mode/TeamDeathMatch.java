@@ -45,7 +45,7 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
                 game.sendAlertMessage("전투 시작");
                 game.sendAlertMessage("적을 처치하십시오.");
                 /* 게임 모드 진행 스케쥴러 */
-                new TaskTimer(1) {
+                new TaskTimer(20) {
                     @Override
                     public boolean run(int i) {
                         if (!vaildGame(game)) {
