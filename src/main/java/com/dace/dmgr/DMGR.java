@@ -11,6 +11,7 @@ import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
+import com.dace.dmgr.system.command.test.StatCommand;
 import com.kiwi.dmgr.game.map.MapUtil;
 import com.kiwi.dmgr.game.map.WorldManager;
 import org.bukkit.Bukkit;
@@ -88,6 +89,7 @@ public class DMGR extends JavaPlugin {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
         getCommand("게임테스트").setExecutor(new GameTestCommand());
+        getCommand("스텟").setExecutor(new StatCommand());
     }
 
     /**

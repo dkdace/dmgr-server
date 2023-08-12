@@ -24,7 +24,6 @@ public class OnPlayerJoin implements Listener {
     public static void event(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = new User(player);
-        new GameUser(player);
 
         Lobby.lobbyTick(player);
 

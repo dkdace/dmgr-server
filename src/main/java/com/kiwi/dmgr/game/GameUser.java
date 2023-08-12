@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 
+import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
+
 @Getter
 @Setter
 public class GameUser {
@@ -38,9 +40,9 @@ public class GameUser {
      *
      * @param player 대상 플레이어
      */
-    public GameUser(Player player) {
+    public GameUser(Player player, Game game) {
         this.player = player;
-        this.game = null;
+        this.game = game;
         this.score = 0;
         this.kill = 0;
         this.death = 0;
@@ -49,18 +51,16 @@ public class GameUser {
         this.incomingDamage = 0;
         this.heal = 0;
         this.blockDamage = 0;
+
+        gameUserMap.put(player, this);
     }
 
     /**
-     * 두 유저가 게임 유저 이벤트에 유효한지의(사용 가능한지의) 여부를 출력한다.
+     * 해당 게임 유저의 KDA 를 반환한다. 데스가 0이면 1로 가정한다.
      *
-     * <p> 게임 유저 데이터가 존재하며, 한 게임에 있으면 true를 출력한다. </p>
-     *
-     * @param user1 유저1
-     * @param user2 유저2
-     * @return 이벤트 유효 여부
+     * @return KDA
      */
-    public static boolean isGameUserEventVaild(GameUser user1, GameUser user2) {
-        return user1.getGame() == user2.getGame();
+    public float getKDA() {
+        return (float) (this.getKill() + this.getAssist()) / ((this.getDeath() == 0) ? 1 : this.getDeath());
     }
 }

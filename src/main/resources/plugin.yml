@@ -45,3 +45,10 @@ commands:
   게임테스트:
     permission: admin
     description: DMGR Test command
+  스텟:
+    permission: admin
+    description: DMGR Test command
+    aliases:
+      - stat
+      - tmxpt
+      - ㅅㅌ

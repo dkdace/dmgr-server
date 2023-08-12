@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
-import static com.kiwi.dmgr.game.GameUser.isGameUserEventVaild;
+import static com.kiwi.dmgr.game.GameUtil.isGameUserEventVaild;
 
 /**
  * 게임 유저가 치유 하였을때 발생하는 이벤트

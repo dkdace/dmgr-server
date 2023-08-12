@@ -10,6 +10,7 @@ import com.kiwi.dmgr.game.map.WorldManager;
 import com.kiwi.dmgr.game.mode.EnumGameMode;
 import com.kiwi.dmgr.game.mode.GameMode;
 import com.kiwi.dmgr.match.MatchType;
+import com.kiwi.dmgr.match.RankRating;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -40,7 +41,9 @@ public class Game {
     /** 팀 스코어 */
     private HashMap<Team, Integer> teamScore;
     /** 잔여 시간 */
-    private long remainTime;
+    private int remainTime;
+    /** 플레이 시간 */
+    private int playTime;
     /** 게임 모드 */
     private EnumGameMode mode;
     /** 게임 매치 타입 */
@@ -59,9 +62,10 @@ public class Game {
         this.playerList = new ArrayList<>();
         this.gameUserMap = new HashMap<>();
         this.waitPlayerList = new ArrayList<>();
-        this.teamPlayerMapList = new HashMap<>();
+        this.teamPlayerMapList = new HashMap<>() ;
         this.teamScore = new HashMap<>();
         this.remainTime = 0;
+        this.playTime = 0;
         this.play = false;
         this.world = null;
         this.matchType = type;
@@ -105,6 +109,9 @@ public class Game {
     public void start() {
         this.play = true;
         this.remainTime = this.mode.getPlayTime();
+
+        for (Team team : Team.values())
+            this.teamScore.put(team, 0);
     }
 
     /**
@@ -116,40 +123,53 @@ public class Game {
      */
     public void finish(boolean force) {
         this.play = false;
-        this.sendAlertMessage("게임 종료");
-        for (Player player : this.playerList) {
-            player.teleport(Lobby.lobby);
-            SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F, player);
-        }
-        this.unloadWorld();
 
         for (int i=0; i<20; i++)
             this.sendAlertMessage("");
 
-        Team winner = teamScore.get(Team.RED) == teamScore.get(Team.BLUE) ? Team.NONE :
+        Team winner = teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)) ? Team.NONE :
                       teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
 
         if (!force) {
             if (this.matchType == MatchType.COMPETITIVE) {
-                // 랭크 결과...
-            } else {
-                this.sendAlertMessage(this.mode.getName() + " 일반전 게임 결과");
-                if (winner == Team.NONE)
-                    this.sendAlertMessage("* " + winner.color + "무승부");
-                else
-                    this.sendAlertMessage("* " + winner.color + winner.name() + "팀 승리");
-                this.sendAlertMessage("");
-                this.sendAlertMessage("내 게임 성적");
                 for (Player player : this.playerList) {
-                    GameUser gameUser = gameUserMap.get(player);
-                    this.sendAlertMessage(player, "* 점수: " + gameUser.getScore());
-                    this.sendAlertMessage(player, "* K/D/A: " + gameUser.getKill() + "/" + gameUser.getDeath() + "/" + gameUser.getAssist() +
-                            " (" + (gameUser.getKill() + gameUser.getAssist()) / ((gameUser.getDeath() == 0) ? 1 : gameUser.getDeath()) + ")");
-                    this.sendAlertMessage(player, "* 입힌 데미지: " + gameUser.getOutgoingDamage());
+                    RankRating.updateRankAfterGame(player, winner);
                 }
-                this.sendAlertMessage("");
             }
+
+            else if (this.matchType == MatchType.UNRANKED) {
+                for (Player player : this.playerList) {
+                    RankRating.updateMMRAfterGame(player);
+                }
+            }
+
+            this.sendAlertMessage(this.mode.getName() + " " + this.matchType.getName() + "전 게임 결과");
+
+            if (winner == Team.NONE)
+                this.sendAlertMessage("* " + winner.color + "무승부");
+            else
+                this.sendAlertMessage("* " + winner.color + winner.name() + "팀 승리");
+            this.sendAlertMessage("");
+
+            this.sendAlertMessage("내 게임 성적");
+            for (Player player : this.playerList) {
+                GameUser gameUser = gameUserMap.get(player);
+                this.sendAlertMessage(player, "* 점수: " + gameUser.getScore());
+                this.sendAlertMessage(player, "* K/D/A: " + gameUser.getKill() + "/" + gameUser.getDeath() + "/" + gameUser.getAssist() +
+                        " (" + (gameUser.getKDA()) + ")");
+                this.sendAlertMessage(player, "* 입힌 데미지: " + gameUser.getOutgoingDamage());
+            }
+            this.sendAlertMessage("");
+        } else {
+            this.sendAlertMessage("관리자에 의해 게임이 강제종료 됨");
         }
+
+        for (Player player : this.playerList) {
+            GameMapList.gameUserMap.remove(player);
+            player.teleport(Lobby.lobby);
+            SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F, player);
+        }
+        this.unloadWorld();
         this.delete();
     }
 
@@ -159,7 +179,7 @@ public class Game {
      * @param playerList 플레이어 목록
      * @return 정렬된 플레이어 목록
      */
-    public ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
+    private ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
         HashMap<Player, Integer> playerMap = new HashMap<>();
         for (Player player : playerList) {
             User user = userMap.get(player);
@@ -221,14 +241,44 @@ public class Game {
     }
 
     /**
+     * 해당 게임의 평균 통계 지표를 반환한다.
+     *
+     * @param fieldName 지표
+     * @return 평균 지표
+     */
+    public double getAverageIndicator(String fieldName) {
+        return playerList.stream()
+                .mapToDouble(player -> {
+                    User user = userMap.get(player);
+                    GameUser gameUser = gameUserMap.get(player);
+                    switch (fieldName) {
+                        case "MMR":
+                            return user.getMMR();
+                        case "Rank":
+                            return user.getRank();
+                        case "score":
+                            return gameUser.getScore();
+                        case "kill":
+                            return gameUser.getKill();
+                        case "death":
+                            return gameUser.getDeath();
+                        case "assist":
+                            return gameUser.getAssist();
+                        default:
+                            throw new IllegalArgumentException("해당 지표는 존재하지 않습니다.");
+                    }
+                })
+                .average()
+                .orElseThrow(() -> new IllegalArgumentException("플레이어가 존재하지 않습니다."));
+    }
+
+    /**
      * 해당 게임에 플레이어 입장을 원활하게 하기 위해 초기 상태로 설정한다.
      *
      * @param player 플레이어
      */
     public void initPlayer(Player player) {
-        GameUser user = new GameUser(player);
-        user.setGame(this);
-        GameMapList.gameUserMap.put(player, user);
+        GameUser user = new GameUser(player, this);
         this.gameUserMap.put(player, user);
         if (!playerList.contains(player))
             playerList.add(player);
@@ -313,7 +363,7 @@ public class Game {
     }
 
     /**
-     * 게임의 월드의 포인트 위치를 리턴한다.
+     * 게임 월드의 포인트 위치를 리턴한다.
      *
      * @see Point
      * @param point 주요 위치 이름

@@ -50,10 +50,13 @@ public class User {
     /** 매치메이킹 점수 */
     @Getter
     private int MMR = 100;
+    /** MMR 게임 플레이 횟수 */
+    @Getter
+    private int MMRPlay = 0;
     /** 리소스팩 적용 여부 */
     @Getter
     @Setter
-    private boolean resourcePack = false;
+    private boolean resourcePack = true;
     /** 리소스팩 적용 상태 */
     @Getter
     @Setter
@@ -80,6 +83,7 @@ public class User {
         this.rankPlay = yamlFile.get("rankPlay", rankPlay);
         this.isRanked = yamlFile.get("isRanked", isRanked);
         this.MMR = yamlFile.get("mmr", MMR);
+        this.MMRPlay = yamlFile.get("mmrPlay", MMRPlay);
         userMap.put(player, this);
     }
 
@@ -114,6 +118,11 @@ public class User {
     public void setMMR(int mmr) {
         this.MMR = mmr;
         yamlFile.set("mmr", this.MMR);
+    }
+
+    public void setMMRPlay(int MMRPlay) {
+        this.MMRPlay = MMRPlay;
+        yamlFile.set("mmrPlay", this.MMRPlay);
     }
 
     public void setRanked(boolean ranked) {

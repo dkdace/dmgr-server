@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum EnumGameMode {
 
-    TeamDeathMatch("팀데스 매치", 10, true, 600, new TeamDeathMatch());
+    TeamDeathMatch("팀데스매치", 10, true, 600, new TeamDeathMatch());
 
     /* 이름 */
     private final String name;
