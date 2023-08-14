@@ -19,10 +19,10 @@ public abstract class Character {
     private final String skinName;
     /** 체력 */
     private final int health;
-    /** 이동속도 */
-    private final float speed;
+    /** 이동속도 계수 */
+    private final float speedMultiplier;
     /** 히트박스 크기 계수 */
-    private final float hitbox;
+    private final float hitboxMultiplier;
 
     /**
      * @return 무기 정보

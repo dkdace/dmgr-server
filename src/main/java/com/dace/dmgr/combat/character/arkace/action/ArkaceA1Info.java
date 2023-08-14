@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
-public class ArkaceA1Info extends ActiveSkillInfo {
+public final class ArkaceA1Info extends ActiveSkillInfo {
     /** 쿨타임 */
     public static final long COOLDOWN = 7 * 20;
     /** 피해량 (폭발) */

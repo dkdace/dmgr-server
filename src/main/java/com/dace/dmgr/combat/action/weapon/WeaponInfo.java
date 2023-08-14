@@ -10,11 +10,11 @@ import org.bukkit.inventory.ItemStack;
  */
 public abstract class WeaponInfo extends ActionInfo {
     /** 무기 아이템 타입 */
-    public final static Material MATERIAL = Material.DIAMOND_HOE;
+    public static final Material MATERIAL = Material.DIAMOND_HOE;
     /** 무기 이름의 접두사 */
     private static final String PREFIX = "§e§l[기본무기] §f";
 
-    public WeaponInfo(String name, ItemStack itemStack) {
+    protected WeaponInfo(String name, ItemStack itemStack) {
         super(name, itemStack);
     }
 

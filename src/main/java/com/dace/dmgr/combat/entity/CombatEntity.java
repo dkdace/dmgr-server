@@ -1,23 +1,19 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.HashMapList;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.RegionUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 클래스.
@@ -26,34 +22,34 @@ import static com.dace.dmgr.system.HashMapList.combatEntityMap;
  */
 @Getter
 public abstract class CombatEntity<T extends LivingEntity> {
+    /** 엔티티 객체 */
+    protected final T entity;
+    /** 속성 관리 객체 */
+    private final AttributeManager attributeManager = new AttributeManager();
     /** 히트박스 객체 */
     private final Hitbox hitbox;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
     /** 고정 여부 */
     private final boolean isFixed;
-    /** 엔티티 객체 */
-    protected T entity;
     /** 이름 */
-    private String name;
+    protected String name;
     /** 팀 */
     @Setter
-    private String team = "";
+    protected String team = "";
     /** 이동속도 증가량 */
-    private int speedIncrement = 0;
+    protected int speedIncrement = 0;
 
     /**
-     * 전투 시스템의 엔티티 인스턴스를 생성하고 {@link HashMapList#temporalEntityMap}에 추가한다.
+     * 전투 시스템의 엔티티 인스턴스를 생성한다.
      *
-     * <p>플레이어의 경우 전투 입장 시 호출해야 하며, 퇴장 시 {@link HashMapList#combatEntityMap}
-     * 에서 제거해야 한다.</p>
+     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
      *
      * @param entity     대상 엔티티
      * @param name       이름
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
      * @param isFixed    위치 고정 여부
-     * @see HashMapList#combatEntityMap
      */
     protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
         this.entity = entity;
@@ -61,73 +57,33 @@ public abstract class CombatEntity<T extends LivingEntity> {
         this.hitbox = hitbox;
         this.critHitbox = critHitbox;
         this.isFixed = isFixed;
-        init();
     }
 
     /**
-     * 전투 시스템의 엔티티 인스턴스를 생성한다.
-     *
-     * <p>아직 소환되지 않은 엔티티를 위한 생성자이며, 소환 후 {@link CombatEntity#init()}을
-     * 호출해야 한다.</p>
-     *
-     * @param name       이름
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @param isFixed    위치 고정 여부
-     * @see CombatEntity#init()
+     * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
-    protected CombatEntity(String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
-        this.name = name;
-        this.hitbox = hitbox;
-        this.critHitbox = critHitbox;
-        this.isFixed = isFixed;
-    }
-
-    /**
-     * 엔티티를 초기화한다.
-     *
-     * <p>엔티티를 {@link HashMapList#temporalEntityMap}에 추가하며, 엔티티 소멸 시
-     * {@link HashMapList#combatEntityMap}에서 제거해야 한다.</p>
-     *
-     * @see HashMapList#combatEntityMap
-     */
-    protected void init() {
-        if (entity == null)
-            return;
-
-        combatEntityMap.put(entity, this);
+    public final void init() {
         hitbox.setCenter(entity.getLocation());
         critHitbox.setCenter(entity.getLocation());
-        if (!isFixed)
-            runHitboxTick();
-    }
+        onInit();
 
-    /**
-     * 엔티티의 히트박스 위치를 갱신하는 스케쥴러를 실행한다.
-     *
-     * <p>넷코드 문제를 해결하기 위해 사용하며, 고정된 엔티티는 사용하지 않는다.</p>
-     */
-    private void runHitboxTick() {
         new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (combatEntityMap.get(entity) == null)
+                if (EntityInfoRegistry.getCombatEntity(entity) == null)
                     return false;
 
-                Location oldLoc = entity.getLocation();
-
-                new TaskWait(2) {
-                    @Override
-                    public void run() {
-                        hitbox.setCenter(oldLoc);
-                        critHitbox.setCenter(oldLoc);
-                    }
-                };
+                onTick(i);
 
                 return true;
             }
         };
     }
+
+    /**
+     * {@link CombatEntity#init()} 호출 시 실행할 작업.
+     */
+    protected abstract void onInit();
 
     public void setName(String name) {
         entity.setCustomName(name);
@@ -139,7 +95,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    public int getHealth() {
+    public final int getHealth() {
         return (int) (Math.round(entity.getHealth() * 50 * 100) / 100);
     }
 
@@ -148,7 +104,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    public void setHealth(int health) {
+    public final void setHealth(int health) {
         if (health < 0) health = 0;
         if (health > getMaxHealth()) health = getMaxHealth();
         double realHealth = health / 50.0;
@@ -160,7 +116,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    public int getMaxHealth() {
+    public final int getMaxHealth() {
         return (int) (entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() * 50);
     }
 
@@ -169,7 +125,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
-    public void setMaxHealth(int health) {
+    public final void setMaxHealth(int health) {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 
@@ -178,101 +134,77 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param speedIncrement 이동속도 증가량. 최소 값은 {@code -100}, 최대 값은 {@code 100}
      */
-    public void addSpeedIncrement(int speedIncrement) {
+    public final void addSpeedIncrement(int speedIncrement) {
         this.speedIncrement += speedIncrement;
         if (this.speedIncrement < -100) this.speedIncrement = -100;
         if (this.speedIncrement > 100) this.speedIncrement = 100;
     }
 
     /**
-     * 지정한 대상 엔티티를 공격한다.
+     * 엔티티에게 피해를 입힌다.
      *
-     * @param target 공격 대상
-     * @param damage 피해량
-     * @param type   타입
-     * @param isCrit 치명타 여부
-     * @param isUlt  궁극기 충전 여부
+     * @param attacker 공격자
+     * @param damage   피해량
+     * @param type     타입
+     * @param isCrit   치명타 여부
+     * @param isUlt    궁극기 충전 여부
      * @see CombatEntity#heal(CombatEntity, int, boolean)
-     * @see CombatEntity#kill(CombatEntity)
      */
-    public void attack(CombatEntity<?> target, int damage, String type, boolean isCrit, boolean isUlt) {
-        LivingEntity victimEntity = target.getEntity();
-        boolean killed = false;
-
-        if (victimEntity.isDead())
+    public final void damage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+        if (entity.isDead())
             return;
-        if (!target.isDamageable())
+        if (!canTakeDamage())
             return;
 
-        if (victimEntity.getType() != EntityType.ZOMBIE && victimEntity.getType() != EntityType.PLAYER)
-            isCrit = false;
+        damage = CombatUtil.getFinalDamage(attacker, this, damage, isCrit);
 
-        int rdamage = damage;
-        damage = getFinalDamage(target, damage, isCrit);
+        attacker.onAttack(this, damage, type, isCrit, isUlt);
+        onDamage(attacker, damage, type, isCrit, isUlt);
+        playDamageEffect();
 
-        onAttack(target, damage, type, isCrit, isUlt);
-        target.onDamage(this, damage, type, isCrit, isUlt);
-        target.playHitEffect();
-
-        if (target.getHealth() - damage <= 0) {
-            if (isKillable(target))
-                killed = true;
-            else
-                target.setHealth(1);
-        } else
-            target.setHealth(target.getHealth() - damage);
-
-        if (killed)
-            kill(target);
+        if (getHealth() - damage > 0)
+            setHealth(getHealth() - damage);
+        else {
+            if (canDie()) {
+                attacker.onKill(this);
+                onDeath(attacker);
+            } else
+                setHealth(1);
+        }
     }
 
     /**
-     * 지정한 대상 엔티티를 치유한다.
+     * 엔티티의 피격 효과를 재생한다.
+     */
+    private void playDamageEffect() {
+        if (CooldownManager.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
+            CooldownManager.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
+            WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
+
+            packet.setEntityID(entity.getEntityId());
+            packet.setEntityStatus((byte) 2);
+
+            packet.broadcastPacket();
+        }
+    }
+
+    /**
+     * 엔티티를 치유한다.
      *
-     * @param target 치유 대상
-     * @param amount 치유량
-     * @param isUlt  궁극기 충전 여부
+     * @param attacker 공격자
+     * @param amount   치유량
+     * @param isUlt    궁극기 충전 여부
      * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
      */
-    public void heal(CombatEntity<?> target, int amount, boolean isUlt) {
-        if (target.getHealth() == target.getMaxHealth())
+    public final void heal(CombatEntity<?> attacker, int amount, boolean isUlt) {
+        if (getHealth() == getMaxHealth())
+            return;
+        if (!canTakeHeal())
             return;
 
-        int bonus = 0;
+        attacker.onGiveHeal(this, amount, isUlt);
 
-        amount = amount * (100 + bonus) / 100;
-        onHeal(target, amount, isUlt);
-        target.playHealEffect(amount);
-
-        target.setHealth(target.getHealth() + amount);
-    }
-
-    /**
-     * 지정한 대상 엔티티를 처치한다.
-     *
-     * @param target 공격 대상
-     */
-    public void kill(CombatEntity<?> target) {
-        onKill(target);
-        target.onDeath(this);
-    }
-
-    /**
-     * 각종 변수를 계산하여 최종 피해량을 반환한다.
-     *
-     * @param target 공격 대상
-     * @param damage 피해량
-     * @param isCrit 치명타 여부
-     * @return 최종 피해량
-     */
-    private int getFinalDamage(CombatEntity<?> target, int damage, boolean isCrit) {
-        if (isCrit)
-            damage *= 1.5;
-
-        int atkBonus = 0;
-        int defBonus = 0;
-
-        return damage * (100 + atkBonus - defBonus) / 100;
+        setHealth(getHealth() + amount);
     }
 
     /**
@@ -293,100 +225,151 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @return 피격 가능 여부
      */
-    public boolean isDamageable() {
+    protected boolean canTakeDamage() {
         return true;
     }
 
     /**
-     * 지정한 대상을 죽일 수 있는 지 확인한다.
+     * 엔티티가 치유를 받을 수 있는 지 확인한다.
      *
-     * <p>Condition:</p>
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
      *
-     * <p>- 훈련장에 있을 때는 죽일 수 없다.</p>
-     *
-     * @param target 대상
-     * @return 대상을 죽일 수 있으면 {@code true} 반환
+     * @return 피격 가능 여부
      */
-    private boolean isKillable(CombatEntity<?> target) {
-        if (RegionUtil.isInRegion(entity, "BattleTrain"))
+    protected boolean canTakeHeal() {
+        return true;
+    }
+
+    /**
+     * 엔티티가 죽을 수 있는 지 확인한다.
+     *
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 죽을 수 있으면 {@code true} 반환
+     */
+    protected boolean canDie() {
+        return true;
+    }
+
+    /**
+     * 엔티티가 움직일 수 있는 지 확인한다.
+     *
+     * @return 이동 가능 여부
+     */
+    public final boolean canMove() {
+        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0)
             return false;
 
         return true;
     }
 
     /**
-     * 피격 효과를 재생한다.
-     */
-    private void playHitEffect() {
-        if (CooldownManager.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
-            CooldownManager.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
-            CombatUtil.sendDamagePacket(entity);
-        }
-    }
-
-    /**
-     * 치유 효과를 재생한다.
+     * 엔티티가 점프할 수 있는 지 확인한다.
      *
-     * @param amount 치유량
+     * @return 점프 가능  여부
      */
-    private void playHealEffect(int amount) {
-        if (amount > 100)
-            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(entity.getLocation(),
-                            0, entity.getHeight() + 0.3, 0), (int) Math.ceil(amount / 100F),
-                    0.3F, 0.1F, 0.3F, 0);
-        else if (amount / 100F > Math.random()) {
-            ParticleUtil.play(Particle.HEART, LocationUtil.getLocationFromOffset(entity.getLocation(),
-                    0, entity.getHeight() + 0.3, 0), 1, 0.3F, 0.1F, 0.3F, 0);
-        }
+    public final boolean canJump() {
+        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0 ||
+                CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
+            return false;
+
+        return true;
     }
 
     /**
-     * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업
+     * {@link CombatEntity#init()}에서 매 틱마다 실행될 작업.
+     *
+     * @param i 인덱스
+     */
+    public void onTick(int i) {
+        if (!isFixed)
+            updateHitboxTick();
+
+        if (canJump())
+            entity.removePotionEffect(PotionEffectType.JUMP);
+        else
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
+                    9999, -6, false, false), true);
+    }
+
+    /**
+     * 엔티티의 히트박스를 업데이트한다.
+     */
+    private void updateHitboxTick() {
+        Location oldLoc = entity.getLocation();
+
+        new TaskWait(2) {
+            @Override
+            public void run() {
+                hitbox.setCenter(oldLoc);
+                critHitbox.setCenter(oldLoc);
+            }
+        };
+    }
+
+    /**
+     * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.
      *
      * @param victim 피격자
      * @param damage 피해량
      * @param type   타입
      * @param isCrit 치명타 여부
      * @param isUlt  궁극기 충전 여부
+     * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
      */
-    protected void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
-     * 엔티티가 피해를 입었을 때 실행될 작업
+     * 엔티티가 피해를 입었을 때 실행될 작업.
      *
      * @param attacker 공격자
      * @param damage   피해량
      * @param type     타입
      * @param isCrit   치명타 여부
      * @param isUlt    궁극기 충전 여부
+     * @see CombatEntity#onAttack(CombatEntity, int, String, boolean, boolean)
      */
-    protected void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
     }
 
     /**
-     * 엔티티가 다른 엔티티를 치유했을 때 실행될 작업
+     * 엔티티가 다른 엔티티를 치유했을 때 실행될 작업.
      *
      * @param victim 피격자
      * @param amount 치유량
      * @param isUlt  궁극기 충전 여부
+     * @see CombatEntity#onTakeHeal(CombatEntity, int, boolean)
      */
-    protected void onHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+    public void onGiveHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
     }
 
     /**
-     * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업
-     *
-     * @param victim 피격자
-     */
-    protected void onKill(CombatEntity<?> victim) {
-    }
-
-    /**
-     * 엔티티가 죽었을 때 실행될 작업
+     * 엔티티가 치유를 받았을 때 실행될 작업.
      *
      * @param attacker 공격자
+     * @param amount   치유량
+     * @param isUlt    궁극기 충전 여부
+     * @see CombatEntity#onGiveHeal(CombatEntity, int, boolean)
      */
-    protected void onDeath(CombatEntity<?> attacker) {
+    public void onTakeHeal(CombatEntity<?> attacker, int amount, boolean isUlt) {
+    }
+
+    /**
+     * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업.
+     *
+     * @param victim 피격자
+     * @see CombatEntity#onDeath(CombatEntity)
+     */
+    public void onKill(CombatEntity<?> victim) {
+    }
+
+    /**
+     * 엔티티가 죽었을 때 실행될 작업.
+     *
+     * @param attacker 공격자
+     * @see CombatEntity#onKill(CombatEntity)
+     */
+    public void onDeath(CombatEntity<?> attacker) {
     }
 }

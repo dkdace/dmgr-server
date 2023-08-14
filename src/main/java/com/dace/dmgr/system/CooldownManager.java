@@ -7,8 +7,8 @@ import java.util.HashMap;
  *
  * @see Cooldown
  */
-public class CooldownManager {
-    /** 진행중인 쿨타임 목록 (쿨타임 ID : 남은 시간) */
+public final class CooldownManager {
+    /** 진행중인 쿨타임 목록 (쿨타임 ID : 종료 시각) */
     private static final HashMap<String, Long> cooldownMap = new HashMap<>();
 
     /**
@@ -40,7 +40,7 @@ public class CooldownManager {
      * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
      */
     public static void setCooldown(Object object, Cooldown id, long duration) {
-        setCooldown("" + object.hashCode() + id, duration);
+        setCooldown(String.valueOf(object.hashCode()) + id, duration);
     }
 
     /**
@@ -55,7 +55,7 @@ public class CooldownManager {
      * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
      */
     public static void setCooldown(Object object, Cooldown id, Object subId, long duration) {
-        setCooldown("" + object.hashCode() + id + subId, duration);
+        setCooldown(String.valueOf(object.hashCode()) + id + subId, duration);
     }
 
     /**
@@ -119,7 +119,7 @@ public class CooldownManager {
      * @return 남은 시간 (tick)
      */
     public static long getCooldown(Object object, Cooldown id) {
-        return getCooldown("" + object.hashCode() + id);
+        return getCooldown(String.valueOf(object.hashCode()) + id);
     }
 
     /**
@@ -133,23 +133,7 @@ public class CooldownManager {
      * @return 남은 시간 (tick)
      */
     public static long getCooldown(Object object, Cooldown id, Object subId) {
-        return getCooldown("" + object.hashCode() + id + subId);
-    }
-
-    /**
-     * 쿨타임의 남은 시간을 추가한다.
-     *
-     * @param id       쿨타임 ID
-     * @param duration 추가할 시간 (tick)
-     */
-    private static void addCooldown(String id, long duration) {
-        Long time = cooldownMap.get(id);
-        if (time == null)
-            setCooldown(id, duration);
-        else {
-            time += duration * 50;
-            cooldownMap.replace(id, time);
-        }
+        return getCooldown(String.valueOf(object.hashCode()) + id + subId);
     }
 
     /**

@@ -27,7 +27,7 @@ public abstract class TaskWait {
      *
      * @param delay 딜레이 (tick)
      */
-    public TaskWait(long delay) {
+    protected TaskWait(long delay) {
         this.delay = delay;
         execute();
     }

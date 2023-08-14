@@ -1,35 +1,31 @@
 package com.dace.dmgr.combat;
 
-import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.SwapModule;
+import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.StringFormUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-
 /**
  * 전투 시스템에 사용되는 기능을 제공하는 클래스.
  */
-public class CombatUtil {
-    /** 적 처치 기여 (데미지 누적) 제한시간 */
-    public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
-    /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
-    public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
-    /** 리스폰 시간 */
-    public static final int RESPAWN_TIME = 10 * 20;
-
+public final class CombatUtil {
     /**
      * 두 엔티티가 서로 적인 지 확인한다.
      *
@@ -52,7 +48,7 @@ public class CombatUtil {
      * @see Hitbox
      */
     public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
-        CombatEntity<?> entity = combatEntityMap.values().stream()
+        CombatEntity<?> entity = EntityInfoRegistry.getAllCombatEntities().stream()
                 .min(Comparator.comparing(combatEntity -> Math.min(
                         location.distance(combatEntity.getHitbox().getCenter()),
                         location.distance(combatEntity.getCritHitbox().getCenter())
@@ -81,7 +77,7 @@ public class CombatUtil {
      * @see Hitbox
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range) {
-        return combatEntityMap.values().stream()
+        return EntityInfoRegistry.getAllCombatEntities().stream()
                 .filter(entity ->
                         entity != attacker && isEnemy(attacker, entity))
                 .filter(entity ->
@@ -91,27 +87,32 @@ public class CombatUtil {
     }
 
     /**
-     * 엔티티에게 피격 효과 패킷을 전송한다.
+     * 각종 변수를 계산하여 최종 피해량을 반환한다.
      *
-     * @param entity 대상 엔티티
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param damage   피해량
+     * @param isCrit   치명타 여부
+     * @return 최종 피해량
      */
-    public static void sendDamagePacket(Entity entity) {
-        WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
+    public static int getFinalDamage(CombatEntity<?> attacker, CombatEntity<?> victim, int damage, boolean isCrit) {
+        if (isCrit)
+            damage *= 1.5;
 
-        packet.setEntityID(entity.getEntityId());
-        packet.setEntityStatus((byte) 2);
+        int atkBonus = 0;
+        int defBonus = 0;
 
-        packet.broadcastPacket();
+        return damage * (100 + atkBonus - defBonus) / 100;
     }
 
     /**
-     * 지정한 플레이어에게 이동 패킷을 전송한다.
+     * 지정한 플레이어의 시야(yaw/pitch)를 변경한다.
      *
      * @param player 대상 플레이어
      * @param yaw    변경할 yaw
      * @param pitch  변경할 pitch
      */
-    private static void sendPacket(Player player, float yaw, float pitch) {
+    private static void setYawAndPitch(Player player, float yaw, float pitch) {
         WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
 
         packet.setX(0);
@@ -125,7 +126,7 @@ public class CombatUtil {
     }
 
     /**
-     * 지정한 플레이어에게 화면 반동 효과를 전송한다. 총기 반동에 사용된다.
+     * 지정한 플레이어에게 화면 반동 효과를 적용한다. 총기 반동에 사용된다.
      *
      * @param combatUser      대상 플레이어
      * @param up              수직 반동
@@ -133,9 +134,9 @@ public class CombatUtil {
      * @param upSpread        수직 반동 분산도
      * @param sideSpread      수평 반동 분산도
      * @param ticks           반동 진행 시간
-     * @param firstMultiplier 초탄 반동 계수
+     * @param firstMultiplier 초탄 반동 계수. {@code 1}로 설정 시 차탄과 동일
      */
-    public static void sendRecoil(CombatUser combatUser, float up, float side, float upSpread, float sideSpread, int ticks, float firstMultiplier) {
+    public static void setRecoil(CombatUser combatUser, float up, float side, float upSpread, float sideSpread, int ticks, float firstMultiplier) {
         final float finalUpSpread = (float) (upSpread * (Math.random() - Math.random()) * 0.5);
         final float finalSideSpread = (float) (sideSpread * (Math.random() - Math.random()) * 0.5);
         final boolean first = CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0;
@@ -157,7 +158,7 @@ public class CombatUtil {
                     finalUp *= firstMultiplier;
                     finalSide *= firstMultiplier;
                 }
-                sendPacket(combatUser.getEntity(), finalSide, -finalUp);
+                setYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
 
                 return true;
             }
@@ -172,14 +173,14 @@ public class CombatUtil {
      * @param recovery   탄퍼짐 회복량
      * @param max        탄퍼짐 최대치
      */
-    public static void applyBulletSpread(CombatUser combatUser, float increment, float recovery, float max) {
+    public static void setBulletSpread(CombatUser combatUser, float increment, float recovery, float max) {
         if (combatUser.getBulletSpread() == 0) {
             combatUser.addBulletSpread(increment, max);
 
             new TaskTimer(1) {
                 @Override
                 public boolean run(int i) {
-                    if (combatUserMap.get(combatUser.getEntity()) == null)
+                    if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                         return false;
 
                     if (CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0) {
@@ -192,5 +193,74 @@ public class CombatUtil {
             };
         } else
             combatUser.addBulletSpread(increment, max);
+    }
+
+    /**
+     * 플레이어에게 전체 액션바를 표시한다.
+     *
+     * @param combatUser 대상 플레이어
+     */
+    public static void showActionbar(CombatUser combatUser) {
+        Weapon weapon = combatUser.getWeapon();
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
+            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
+
+        if (weapon instanceof Reloadable &&
+                CooldownManager.getCooldown(combatUser, Cooldown.ACTION_BAR) == 0) {
+            int capacity = ((Reloadable) weapon).getRemainingAmmo();
+            int maxCapacity = ((Reloadable) weapon).getCapacity();
+
+            StringJoiner text = new StringJoiner("    ");
+
+            String ammo = null;
+            switch (combatUser.getCharacter().getName()) {
+                case "아케이스":
+                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
+                    break;
+                case "예거":
+                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
+                    break;
+            }
+
+            text.add(ammo);
+
+            combatUser.sendActionBar(text.toString());
+        }
+    }
+
+    /**
+     * 액션바에 사용되는 진행 막대를 반환한다.
+     *
+     * <p>Example:</p>
+     *
+     * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
+     *
+     * @param icon    아이콘
+     * @param current 현재 값
+     * @param max     최대 값
+     * @param length  막대 길이 (글자 수)
+     * @param symbol  막대 기호
+     * @return 액션바 진행 막대 문자열
+     */
+    private static String getActionbarProgressBar(char icon, int current, int max, int length, char symbol) {
+        ChatColor color;
+        if (current <= max / 4)
+            color = ChatColor.RED;
+        else if (current <= max / 2)
+            color = ChatColor.YELLOW;
+        else
+            color = ChatColor.WHITE;
+
+        String currentDisplay = String.format("%" + (int) (Math.log10(max) + 1) + "d", current);
+        String maxDisplay = Integer.toString(max);
+
+        return new StringJoiner(" §f")
+                .add(String.valueOf(icon))
+                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
+                .add(new StringJoiner("§f/", "[", "]")
+                        .add(color + currentDisplay)
+                        .add(maxDisplay)
+                        .toString())
+                .toString();
     }
 }

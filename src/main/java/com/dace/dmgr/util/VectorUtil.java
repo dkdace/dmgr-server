@@ -6,7 +6,7 @@ import org.bukkit.util.Vector;
 /**
  * 벡터 관련 기능을 제공하는 클래스.
  */
-public class VectorUtil {
+public final class VectorUtil {
     /**
      * 위치의 방향을 기준으로 Roll 축을 반환한다.
      *

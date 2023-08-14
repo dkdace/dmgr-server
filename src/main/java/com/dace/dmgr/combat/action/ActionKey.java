@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.action;
 
 /**
- * 상호작용 키 목록.
+ * 동작 사용 키 목록.
  */
 public enum ActionKey {
     /** 좌클릭 */
@@ -12,13 +12,13 @@ public enum ActionKey {
     CS_PRE_USE,
     /** 크랙샷 무기 사격 */
     CS_USE,
-    /** 1번 키 */
+    /** 1번 슬롯 */
     SLOT_1,
-    /** 2번 키 */
+    /** 2번 슬롯 */
     SLOT_2,
-    /** 3번 키 */
+    /** 3번 슬롯 */
     SLOT_3,
-    /** 4번 키 */
+    /** 4번 슬롯 */
     SLOT_4,
     /** 버리기(Q) */
     DROP,

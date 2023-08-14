@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
  *
  * @see User
  */
-public class UserConfig {
+public final class UserConfig {
     /** 설정파일 관리를 위한 객체 */
     private final YamlFile yamlFile;
     /** 채팅 효과음 */

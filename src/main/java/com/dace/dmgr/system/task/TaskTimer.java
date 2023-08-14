@@ -44,7 +44,7 @@ public abstract class TaskTimer {
      * @param period 실행 주기 (tick)
      * @param repeat 반복 횟수(0: 무한 반복)
      */
-    public TaskTimer(long period, long repeat) {
+    protected TaskTimer(long period, long repeat) {
         this.period = period;
         this.repeat = repeat;
         execute();
@@ -55,7 +55,7 @@ public abstract class TaskTimer {
      *
      * @param period 실행 주기 (tick)
      */
-    public TaskTimer(long period) {
+    protected TaskTimer(long period) {
         this(period, 0);
     }
 
@@ -71,11 +71,10 @@ public abstract class TaskTimer {
                     return;
                 }
 
-                if (repeat > 0)
-                    if (i >= repeat) {
-                        cancel();
-                        onEnd(false);
-                    }
+                if (repeat > 0 && (i >= repeat)) {
+                    cancel();
+                    onEnd(false);
+                }
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
     }

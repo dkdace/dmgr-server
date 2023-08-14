@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
-public class ArkaceUltInfo extends UltimateSkillInfo {
+public final class ArkaceUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
     public static final int COST = 7000;
     /** 지속시간 */

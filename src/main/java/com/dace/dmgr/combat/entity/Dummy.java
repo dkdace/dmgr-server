@@ -22,18 +22,19 @@ public class Dummy extends TemporalEntity<Zombie> {
      *
      * @param maxHealth 최대 체력
      */
-    public Dummy(int maxHealth) {
+    public Dummy(Zombie entity, int maxHealth) {
         super(
+                entity,
                 "§7§lDummy",
-                new Hitbox(0, 0.9, 0, 0.65, 2.1, 0.5),
-                new Hitbox(0, 2, 0, 0.3, 0.1, 0.3),
+                new Hitbox(0.65, 2.1, 0.5, 0, 0.9, 0),
+                new Hitbox(0.3, 0.1, 0.3, 0, 2, 0),
                 true,
                 maxHealth
         );
     }
 
     @Override
-    public void onSummon(Location location) {
+    protected void onInitTemporalEntity(Location location) {
         setTeam("DUMMY");
         entity.setBaby(false);
         entity.leaveVehicle();

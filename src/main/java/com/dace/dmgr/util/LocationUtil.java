@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 위치 관련 기능을 제공하는 클래스.
  */
-public class LocationUtil {
+public final class LocationUtil {
     /**
      * 지정한 위치를 통과할 수 있는지 확인한다.
      *
@@ -45,17 +45,15 @@ public class LocationUtil {
 
             MaterialData materialData = block.getState().getData();
             if (materialData instanceof Step) {
-                if (((Step) materialData).isInverted()) {
+                if (((Step) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
-                } else {
+                else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
-                }
             } else if (materialData instanceof Stairs) {
-                if (((Stairs) materialData).isInverted()) {
+                if (((Stairs) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
-                } else {
+                else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
-                }
             }
             return true;
         }
@@ -104,8 +102,8 @@ public class LocationUtil {
      * <p>Example:</p>
      *
      * <pre>{@code
-     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * // loc과 dir을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
+     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * }</pre>
      *
      * @param location  기준 위치
@@ -132,8 +130,8 @@ public class LocationUtil {
      * <p>Example:</p>
      *
      * <pre>{@code
-     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * // loc의 방향을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
+     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * }</pre>
      *
      * @param location 기준 위치

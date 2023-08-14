@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
-public class ArkaceP1Info extends PassiveSkillInfo {
+public final class ArkaceP1Info extends PassiveSkillInfo {
     /** 이동속도 증가량 */
     public static final int SPRINT_SPEED = 30;
     @Getter

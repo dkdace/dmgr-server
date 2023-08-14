@@ -10,19 +10,23 @@ import org.bukkit.ChatColor;
 
 /**
  * 무기의 재장전 모듈 클래스.
+ *
+ * <p>무기가 {@link Reloadable}을 상속받는 클래스여야 한다.</p>
+ *
+ * @see Reloadable
  */
-public class ReloadModule {
+public final class ReloadModule {
     /** 무기 객체 */
     private final Weapon weapon;
 
     /** 남은 탄약 수 */
     @Getter
     @Setter
-    protected int remainingAmmo;
+    private int remainingAmmo;
     /** 재장전 상태 */
     @Getter
     @Setter
-    protected boolean reloading = false;
+    private boolean reloading = false;
 
     public ReloadModule(Weapon weapon) {
         this.weapon = weapon;
@@ -42,10 +46,6 @@ public class ReloadModule {
 
     /**
      * 무기를 재장전한다.
-     *
-     * <p>무기가 {@link Reloadable}을 상속받는 클래스여야 한다.</p>
-     *
-     * @see Reloadable
      */
     public void reload() {
         if (remainingAmmo >= ((Reloadable) weapon).getCapacity())

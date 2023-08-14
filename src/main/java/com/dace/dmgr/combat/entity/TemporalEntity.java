@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.system.HashMapList;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-
-import static com.dace.dmgr.system.HashMapList.temporalEntityMap;
 
 /**
  * 일시적인 엔티티 클래스.
@@ -20,47 +18,45 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
+     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
+     *
+     * @param entity     대상 엔티티
      * @param name       이름
      * @param hitbox     히트박스
      * @param critHitbox 치명타 히트박스
      * @param isFixed    위치 고정 여부
      * @param maxHealth  최대 체력
-     * @see HashMapList#temporalEntityMap
      */
-    protected TemporalEntity(String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed, int maxHealth) {
-        super(name, hitbox, critHitbox, isFixed);
+    protected TemporalEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed, int maxHealth) {
+        super(entity, name, hitbox, critHitbox, isFixed);
         this.maxHealth = maxHealth;
     }
 
-    /**
-     * 엔티티를 지정한 위치에 소환하고 {@link HashMapList#temporalEntityMap}에 추가한다.
-     *
-     * @param entityType 엔티티 타입
-     * @param location   대상 위치
-     * @param health     체력
-     * @see HashMapList#temporalEntityMap
-     */
-    public void spawn(Class<T> entityType, Location location, int health) {
-        entity = location.getWorld().spawn(location, entityType);
-        temporalEntityMap.put(getEntity(), this);
-        init();
+    @Override
+    protected final void onInit() {
+        EntityInfoRegistry.addTemporalEntity(getEntity(), this);
         setMaxHealth(maxHealth);
-        setHealth(health);
-        onSummon(location);
+        setHealth(maxHealth);
+        onInitTemporalEntity(entity.getLocation());
     }
 
     /**
      * 엔티티를 제거한다.
      */
     public void remove() {
-        entity.setHealth(0);
+        EntityInfoRegistry.removeTemporalEntity(entity);
         entity.remove();
     }
 
+    @Override
+    public void onDeath(CombatEntity<?> attacker) {
+        remove();
+    }
+
     /**
-     * 엔티티를 소환했을 때 실행될 작업
+     * {@link TemporalEntity#init()} 호출 시 실행할 작업.
      *
      * @param location 소환된 위치
      */
-    protected abstract void onSummon(Location location);
+    protected abstract void onInitTemporalEntity(Location location);
 }

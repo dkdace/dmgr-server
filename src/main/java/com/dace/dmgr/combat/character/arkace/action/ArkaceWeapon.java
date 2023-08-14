@@ -21,7 +21,7 @@ import org.bukkit.Sound;
 import java.util.Arrays;
 import java.util.List;
 
-public class ArkaceWeapon extends Weapon implements Reloadable {
+public final class ArkaceWeapon extends Weapon implements Reloadable {
     /** 재장전 모듈 객체 */
     private final ReloadModule reloadModule;
 
@@ -78,7 +78,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                     reload();
                     return;
                 }
-                if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isUsing())
+                if (combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished())
                     return;
 
                 setCooldown(4);
@@ -87,24 +87,23 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
                 break;
             case CS_USE:
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
-                boolean isUlt = combatUser.getSkill(ArkaceUltInfo.getInstance()).isUsing();
+                boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location location = combatUser.getEntity().getLocation();
 
                 if (isUlt) {
                     SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
                     SoundUtil.play("random.energy", location, 4F, 1.6F);
                     SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-                    combatUser.addBulletSpread(1, 0);
                 } else {
                     SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
                     SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
+                    CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
-                    CombatUtil.applyBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
+                    CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
                     reloadModule.consume(1);
                 }
 
-                new Hitscan(combatUser, 7) {
+                new Hitscan(combatUser) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
@@ -117,7 +116,7 @@ public class ArkaceWeapon extends Weapon implements Reloadable {
 
                     @Override
                     public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                        combatUser.attack(target, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                        target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
                     }
                 }.shoot(combatUser.getBulletSpread());
 

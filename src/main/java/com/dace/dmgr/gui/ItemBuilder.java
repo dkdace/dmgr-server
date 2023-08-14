@@ -18,7 +18,7 @@ import java.util.UUID;
 /**
  * 아이템 생성 기능을 제공하는 빌더 클래스.
  */
-public class ItemBuilder {
+public final class ItemBuilder {
     /** 크랙샷 아이템을 생성하기 위한 크랙샷 객체 */
     private static final CSUtility csUtility = new CSUtility();
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
@@ -84,8 +84,8 @@ public class ItemBuilder {
                 profileField.setAccessible(true);
             }
             profileField.set(skullMeta, gameProfile);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         return itemBuilder;

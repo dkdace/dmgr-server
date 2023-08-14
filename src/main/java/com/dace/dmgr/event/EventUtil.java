@@ -4,7 +4,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.gui.Gui;
 import org.bukkit.event.Listener;
 
 /**
@@ -12,7 +11,7 @@ import org.bukkit.event.Listener;
  *
  * <p>이벤트는 반드시 플러그인이 활성화될 때 등록해야 한다.</p>
  */
-public class EventUtil {
+public final class EventUtil {
     /** 패킷 이벤트 등록을 위한 객체 */
     private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 

@@ -9,8 +9,12 @@ import org.bukkit.ChatColor;
 
 /**
  * 무기의 2중 무기 모듈 클래스.
+ *
+ * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
+ *
+ * @see Swappable
  */
-public class SwapModule {
+public final class SwapModule {
     /** 무기 객체 */
     private final Weapon weapon;
     /** 무기 전환 상태 */
@@ -24,10 +28,7 @@ public class SwapModule {
     /**
      * 이중 무기의 상태를 변경한다.
      *
-     * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
-     *
      * @param targetState 변경할 상태
-     * @see Swappable
      */
     private void swapTo(WeaponState targetState) {
         if (weaponState == targetState || weaponState == WeaponState.SWAPPING)
@@ -64,14 +65,6 @@ public class SwapModule {
 
                 weapon.getCombatUser().sendActionBar("§a§l무기 교체 완료", 8);
                 weaponState = targetState;
-
-                // remainingAmmo와 oppositeAmmo 교체 (XOR algorithm)
-                //remainingAmmo = remainingAmmo ^ oppositeAmmo ^ (oppositeAmmo = remainingAmmo);
-
-                //if (targetState == WeaponState.PRIMARY)
-                //    apply();
-                //else
-                //    applySubweapon();
             }
         };
     }

@@ -5,13 +5,12 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
 
 /**
  * 전투원 선택 명령어 클래스.
@@ -27,10 +26,11 @@ public class SelectCharCommand implements CommandExecutor {
         String team = args[1];
         String character = args[2];
 
-        CombatUser combatUser = combatUserMap.get(player);
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         boolean first = false;
         if (combatUser == null) {
             combatUser = new CombatUser(player);
+            combatUser.init();
             first = true;
         }
         combatUser.setTeam(team);

@@ -5,7 +5,7 @@ package com.dace.dmgr.combat.action.skill;
  */
 public abstract class ActiveSkillInfo extends SkillInfo {
 
-    public ActiveSkillInfo(int number, String name, String... lore) {
+    protected ActiveSkillInfo(int number, String name, String... lore) {
         super(number, name, lore);
         itemStack.setDurability((short) 14);
     }
