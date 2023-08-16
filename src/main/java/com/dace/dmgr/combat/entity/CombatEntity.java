@@ -24,8 +24,10 @@ import org.bukkit.potion.PotionEffectType;
 public abstract class CombatEntity<T extends LivingEntity> {
     /** 엔티티 객체 */
     protected final T entity;
-    /** 속성 관리 객체 */
-    private final AttributeManager attributeManager = new AttributeManager();
+    /** 능력치 목록 관리 객체 */
+    protected final AbilityStatusManager abilityStatusManager = new AbilityStatusManager();
+    /** 속성 목록 관리 객체 */
+    protected final PropertyManager propertyManager = new PropertyManager();
     /** 히트박스 객체 */
     private final Hitbox hitbox;
     /** 치명타 히트박스 객체 */
@@ -37,8 +39,6 @@ public abstract class CombatEntity<T extends LivingEntity> {
     /** 팀 */
     @Setter
     protected String team = "";
-    /** 이동속도 증가량 */
-    protected int speedIncrement = 0;
 
     /**
      * 전투 시스템의 엔티티 인스턴스를 생성한다.
@@ -127,17 +127,6 @@ public abstract class CombatEntity<T extends LivingEntity> {
      */
     public final void setMaxHealth(int health) {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
-    }
-
-    /**
-     * 엔티티의 이동속도 증가량을 설정한다.
-     *
-     * @param speedIncrement 이동속도 증가량. 최소 값은 {@code -100}, 최대 값은 {@code 100}
-     */
-    public final void addSpeedIncrement(int speedIncrement) {
-        this.speedIncrement += speedIncrement;
-        if (this.speedIncrement < -100) this.speedIncrement = -100;
-        if (this.speedIncrement > 100) this.speedIncrement = 100;
     }
 
     /**

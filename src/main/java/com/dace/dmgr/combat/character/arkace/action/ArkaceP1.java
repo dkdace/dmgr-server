@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
 
 import java.util.Arrays;
@@ -31,11 +32,11 @@ public final class ArkaceP1 extends Skill {
     public void onUse(ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.addSpeedIncrement(ArkaceP1Info.SPRINT_SPEED);
+            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("ArkaceP1", ArkaceP1Info.SPRINT_SPEED);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
         } else {
             setDuration(0);
-            combatUser.addSpeedIncrement(-ArkaceP1Info.SPRINT_SPEED);
+            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("ArkaceP1");
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
         }
     }

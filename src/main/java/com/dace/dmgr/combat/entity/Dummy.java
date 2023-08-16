@@ -20,6 +20,7 @@ public class Dummy extends TemporalEntity<Zombie> {
     /**
      * 더미 인스턴스를 생성한다.
      *
+     * @param entity    대상 엔티티
      * @param maxHealth 최대 체력
      */
     public Dummy(Zombie entity, int maxHealth) {

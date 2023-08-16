@@ -92,6 +92,7 @@ public final class CombatUser extends CombatEntity<Player> {
         EntityInfoRegistry.addCombatUser(entity, this);
         setMaxHealth(1000);
         setHealth(1000);
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED);
     }
 
     public Skill getSkill(SkillInfo skillInfo) {
@@ -218,6 +219,7 @@ public final class CombatUser extends CombatEntity<Player> {
         SkinManager.applySkin(entity, character.getSkinName());
         setMaxHealth(character.getHealth());
         setHealth(character.getHealth());
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * character.getSpeedMultiplier());
         entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
         entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
         entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
@@ -336,12 +338,6 @@ public final class CombatUser extends CombatEntity<Player> {
 
         setCanSprint(canSprint());
 
-        if (canJump())
-            entity.removePotionEffect(PotionEffectType.JUMP);
-        else
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
-                    9999, -6, false, false), true);
-
         if (i % 10 == 0) {
             addUltGauge((float) IDLE_ULT_CHARGE / 2);
         }
@@ -352,9 +348,7 @@ public final class CombatUser extends CombatEntity<Player> {
         } else
             setLowHealthScreenEffect(false);
 
-        float speedMultiplier = character.getSpeedMultiplier() * (100 + speedIncrement) / 100;
-        float speed = BASE_SPEED * speedMultiplier;
-
+        double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
         if (entity.isSprinting())
             speed *= 0.88F;
         else
@@ -362,13 +356,13 @@ public final class CombatUser extends CombatEntity<Player> {
         if (!canMove())
             speed = 0.0001F;
 
+        entity.setWalkSpeed((float) speed);
+
         if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,
                     99999, 5, false, false), true);
         else
             entity.removePotionEffect(PotionEffectType.SLOW);
-
-        entity.setWalkSpeed(speed);
 
         CombatUtil.showActionbar(this);
     }
@@ -422,7 +416,7 @@ public final class CombatUser extends CombatEntity<Player> {
             if (getHealth() - damage <= 0)
                 damage = getHealth();
             float sumDamage = damageMap.getOrDefault(attacker, 0F);
-            damageMap.put(this, sumDamage + (float) damage / getMaxHealth());
+            damageMap.put((CombatUser) attacker, sumDamage + (float) damage / getMaxHealth());
             if (sumDamage > 1)
                 damageMap.put(this, 1F);
         }

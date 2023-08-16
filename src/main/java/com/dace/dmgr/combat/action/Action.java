@@ -22,7 +22,7 @@ import java.util.List;
 public abstract class Action {
     /** 플레이어 객체 */
     protected final CombatUser combatUser;
-    /** 상호작용 정보 객체 */
+    /** 동작 정보 객체 */
     protected final ActionInfo actionInfo;
     /** 아이템 */
     protected ItemStack itemStack;
