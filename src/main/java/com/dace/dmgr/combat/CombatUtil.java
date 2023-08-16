@@ -87,25 +87,6 @@ public final class CombatUtil {
     }
 
     /**
-     * 각종 변수를 계산하여 최종 피해량을 반환한다.
-     *
-     * @param attacker 공격자
-     * @param victim   피격자
-     * @param damage   피해량
-     * @param isCrit   치명타 여부
-     * @return 최종 피해량
-     */
-    public static int getFinalDamage(CombatEntity<?> attacker, CombatEntity<?> victim, int damage, boolean isCrit) {
-        if (isCrit)
-            damage *= 1.5;
-
-        int atkBonus = 0;
-        int defBonus = 0;
-
-        return damage * (100 + atkBonus - defBonus) / 100;
-    }
-
-    /**
      * 지정한 플레이어의 시야(yaw/pitch)를 변경한다.
      *
      * @param player 대상 플레이어

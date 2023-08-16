@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
@@ -66,6 +65,8 @@ public abstract class CombatEntity<T extends LivingEntity> {
     public final void init() {
         hitbox.setCenter(entity.getLocation());
         critHitbox.setCenter(entity.getLocation());
+        abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
+        abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
         onInit();
 
         new TaskTimer(1) {
@@ -146,7 +147,11 @@ public abstract class CombatEntity<T extends LivingEntity> {
         if (!canTakeDamage())
             return;
 
-        damage = CombatUtil.getFinalDamage(attacker, this, damage, isCrit);
+        double damageMultiplier = attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
+        double defenseMultiplier = abilityStatusManager.getAbilityStatus(Ability.DEFENSE).getValue();
+        damage *= (int) (1 + damageMultiplier - defenseMultiplier);
+        if (isCrit)
+            damage *= 2;
 
         attacker.onAttack(this, damage, type, isCrit, isUlt);
         onDamage(attacker, damage, type, isCrit, isUlt);
@@ -184,7 +189,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param attacker 공격자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
-     * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
+     * @see CombatEntity#damage(CombatEntity, int, String, boolean, boolean)
      */
     public final void heal(CombatEntity<?> attacker, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
