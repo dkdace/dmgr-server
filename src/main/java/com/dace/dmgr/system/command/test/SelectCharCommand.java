@@ -37,6 +37,10 @@ public class SelectCharCommand implements CommandExecutor {
             case "arkace":
                 combatUser.setCharacter(Arkace.getInstance());
                 break;
+            case "예거":
+            case "jager":
+                combatUser.setCharacter(Jager.getInstance());
+                break;
         }
 
         return true;

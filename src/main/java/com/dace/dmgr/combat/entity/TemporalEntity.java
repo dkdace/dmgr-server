@@ -55,11 +55,13 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     public void onTick(int i) {
         super.onTick(i);
 
-        double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-        if (!canMove())
-            speed = 0.0001F;
+        if (!isFixed()) {
+            double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
+            if (!canMove())
+                speed = 0.0001F;
 
-        entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
+            entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
+        }
     }
 
     @Override

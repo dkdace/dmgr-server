@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.skill.*;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.*;
@@ -324,6 +325,8 @@ public final class CombatUser extends CombatEntity<Player> {
                 CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
             return false;
         if (CooldownManager.getCooldown(this, Cooldown.NO_SPRINT) > 0)
+            return false;
+        if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
 
         return true;

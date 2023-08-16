@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -261,6 +262,8 @@ public abstract class CombatEntity<T extends LivingEntity> {
         if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0 ||
                 CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
             return false;
+        if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_JUMP)
+            return false;
 
         return true;
     }
@@ -279,6 +282,10 @@ public abstract class CombatEntity<T extends LivingEntity> {
         else
             entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                     9999, -6, false, false), true);
+
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).addModifier("JagerT1", -propertyManager.getValue(Property.FREEZE));
+        if (CooldownManager.getCooldown(this, Cooldown.FREEZE_VALUE_DURATION) == 0)
+            propertyManager.setValue(Property.FREEZE, 0);
     }
 
     /**

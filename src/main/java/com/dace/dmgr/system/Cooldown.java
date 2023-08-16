@@ -1,5 +1,6 @@
 package com.dace.dmgr.system;
 
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.config.GeneralConfig;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,9 @@ public enum Cooldown {
     BURN(0),
     /** 2중 탄창 무기 교체 */
     WEAPON_SWAP(0),
-    ;
+    /** 빙결 수치 지속시간 */
+    FREEZE_VALUE_DURATION(JagerT1Info.DURATION);
+
     /** 쿨타임 기본값 */
     private final long defaultValue;
 }
