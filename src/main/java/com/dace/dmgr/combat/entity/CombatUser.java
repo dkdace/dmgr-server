@@ -326,6 +326,8 @@ public final class CombatUser extends CombatEntity<Player> {
             return false;
         if (CooldownManager.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
+        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
+            return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
 
@@ -360,12 +362,6 @@ public final class CombatUser extends CombatEntity<Player> {
             speed = 0.0001F;
 
         entity.setWalkSpeed((float) speed);
-
-        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,
-                    99999, 5, false, false), true);
-        else
-            entity.removePotionEffect(PotionEffectType.SLOW);
 
         CombatUtil.showActionbar(this);
     }

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -47,6 +48,8 @@ public final class SwapModule {
         new TaskTimer(1, duration) {
             @Override
             public boolean run(int i) {
+                if (EntityInfoRegistry.getCombatUser(weapon.getCombatUser().getEntity()) == null)
+                    return false;
                 if (weaponState != WeaponState.SWAPPING)
                     return false;
 

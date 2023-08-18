@@ -154,15 +154,6 @@ public abstract class Skill extends Action {
     }
 
     /**
-     * 스킬을 사용할 수 있는 지 확인한다.
-     *
-     * @return 사용 가능 여부
-     */
-    public boolean canUse() {
-        return isCooldownFinished();
-    }
-
-    /**
      * 스킬 전역 쿨타임이 끝났는 지 확인한다.
      *
      * @return 전역 쿨타임 종료 여부

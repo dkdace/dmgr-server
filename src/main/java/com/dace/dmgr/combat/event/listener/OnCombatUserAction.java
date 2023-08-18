@@ -29,14 +29,14 @@ public final class OnCombatUserAction implements Listener {
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof Weapon) {
-            if (!weapon.isCooldownFinished())
+            if (!weapon.canUse())
                 return;
 
             weapon.onUse(actionKey);
         } else if (action instanceof Skill) {
-            if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
+            if (!action.canUse())
                 return;
-            if (!((Skill) action).canUse())
+            if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
                 return;
             if (action.getActionInfo() instanceof ActiveSkillInfo) {
                 if (!((Skill) action).isGlobalCooldownFinished())

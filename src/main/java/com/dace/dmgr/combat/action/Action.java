@@ -139,6 +139,15 @@ public abstract class Action {
     }
 
     /**
+     * 동작을 사용할 수 있는 지 확인한다.
+     *
+     * @return 사용 가능 여부
+     */
+    public boolean canUse() {
+        return isCooldownFinished();
+    }
+
+    /**
      * 사용 시 호출되는 이벤트.
      *
      * @param actionKey 사용 키

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -36,20 +37,25 @@ public final class ReloadModule {
     /**
      * 지정한 양만큼 무기의 탄약을 소모한다.
      *
+     * <p>탄약을 전부 소진하면 {@link Reloadable#reload()}를 호출한다.</p>
+     *
      * @param amount 탄약 소모량
      */
     public void consume(int amount) {
         remainingAmmo -= amount;
         if (remainingAmmo < 0)
             remainingAmmo = 0;
+
+        if (reloading)
+            reloading = false;
+        else if (remainingAmmo == 0)
+            ((Reloadable) weapon).reload();
     }
 
     /**
      * 무기를 재장전한다.
      */
     public void reload() {
-        if (remainingAmmo >= ((Reloadable) weapon).getCapacity())
-            return;
         if (reloading)
             return;
         if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SWAPPING)
@@ -63,6 +69,8 @@ public final class ReloadModule {
         new TaskTimer(1, duration) {
             @Override
             public boolean run(int i) {
+                if (EntityInfoRegistry.getCombatUser(weapon.getCombatUser().getEntity()) == null)
+                    return false;
                 if (!reloading)
                     return false;
                 if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
