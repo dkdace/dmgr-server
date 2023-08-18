@@ -12,6 +12,9 @@ public class ProjectileOption {
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     @Builder.Default
     final int trailInterval = 7;
+    /** 총알의 최대 사거리. 단위: 블록 */
+    @Builder.Default
+    final int maxDistance = 70;
     /** 관통 여부 */
     @Builder.Default
     final boolean penetrating = false;
@@ -21,7 +24,7 @@ public class ProjectileOption {
     /** 중력 작용 여부 */
     @Builder.Default
     final boolean hasGravity = false;
-    /** 투사체가 튕기는 횟수 {@code 0}으로 설정 시 튕기지 않음 */
+    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
     @Builder.Default
     final int bouncing = 0;
 }

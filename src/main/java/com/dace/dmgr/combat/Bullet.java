@@ -25,15 +25,15 @@ import java.util.Set;
 @AllArgsConstructor
 public abstract class Bullet {
     /** 총알의 최소 사거리 */
-    protected static final float MIN_RANGE = 0.5F;
-    /** 총알의 최대 사거리 */
-    protected static final int MAX_RANGE = 70;
+    protected static final float MIN_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.25F;
     /** 총알을 발사하는 엔티티 */
     protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     protected int trailInterval;
+    /** 총알의 최대 사거리 */
+    protected int maxDistance;
     /** 관통 여부 */
     protected boolean penetrating;
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */

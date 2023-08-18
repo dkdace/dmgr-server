@@ -26,7 +26,7 @@ public abstract class Hitscan extends Bullet {
      * @see HitscanOption
      */
     protected Hitscan(CombatEntity<?> shooter, HitscanOption option) {
-        super(shooter, option.trailInterval, option.penetrating, option.hitboxMultiplier);
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
     }
 
     /**
@@ -38,6 +38,7 @@ public abstract class Hitscan extends Bullet {
         super(shooter);
         HitscanOption hitscanOption = HitscanOption.builder().build();
         this.trailInterval = hitscanOption.trailInterval;
+        this.maxDistance = hitscanOption.maxDistance;
         this.penetrating = hitscanOption.penetrating;
         this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
     }
@@ -56,13 +57,13 @@ public abstract class Hitscan extends Bullet {
         direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
-        for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
+        for (int i = 0; loc.distance(origin) < maxDistance; i++) {
             if (!LocationUtil.isNonSolid(loc)) {
                 handleBlockCollision(loc, direction);
                 return;
             }
 
-            if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE))
+            if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc, targets, SIZE))
                 return;
 
             loc.add(direction);

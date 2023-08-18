@@ -34,7 +34,7 @@ public abstract class Projectile extends Bullet {
      * @see ProjectileOption
      */
     protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
-        super(shooter, option.trailInterval, option.penetrating, option.hitboxMultiplier);
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
         this.bouncing = option.bouncing;
@@ -50,6 +50,7 @@ public abstract class Projectile extends Bullet {
         super(shooter);
         ProjectileOption option = ProjectileOption.builder().build();
         this.trailInterval = option.trailInterval;
+        this.maxDistance = option.maxDistance;
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
         this.velocity = velocity;
@@ -86,7 +87,7 @@ public abstract class Projectile extends Bullet {
             @Override
             public boolean run(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= MAX_RANGE)
+                    if (loc.distance(origin) >= maxDistance)
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc)) {
@@ -97,7 +98,7 @@ public abstract class Projectile extends Bullet {
                             return false;
                     }
 
-                    if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE))
+                    if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc, targets, SIZE))
                         return false;
 
                     if (hasGravity) {
