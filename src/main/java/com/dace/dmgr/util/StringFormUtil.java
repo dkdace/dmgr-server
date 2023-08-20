@@ -3,6 +3,7 @@ package com.dace.dmgr.util;
 import org.bukkit.ChatColor;
 
 import java.util.Arrays;
+import java.util.StringJoiner;
 
 /**
  * 자주 쓰이는 문자열 형식을 제공하는 클래스.
@@ -76,5 +77,41 @@ public final class StringFormUtil {
      */
     public static String getProgressBar(double current, double max, ChatColor color) {
         return getProgressBar(current, max, color, 10);
+    }
+
+    /**
+     * 액션바에 사용되는 진행 막대를 반환한다.
+     *
+     * <p>Example:</p>
+     *
+     * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
+     *
+     * @param icon    아이콘
+     * @param current 현재 값
+     * @param max     최대 값
+     * @param length  막대 길이 (글자 수)
+     * @param symbol  막대 기호
+     * @return 액션바 진행 막대 문자열
+     */
+    public static String getActionbarProgressBar(char icon, int current, int max, int length, char symbol) {
+        ChatColor color;
+        if (current <= max / 4)
+            color = ChatColor.RED;
+        else if (current <= max / 2)
+            color = ChatColor.YELLOW;
+        else
+            color = ChatColor.WHITE;
+
+        String currentDisplay = String.format("%" + (int) (Math.log10(max) + 1) + "d", current);
+        String maxDisplay = Integer.toString(max);
+
+        return new StringJoiner(" §f")
+                .add(String.valueOf(icon))
+                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
+                .add(new StringJoiner("§f/", "[", "]")
+                        .add(color + currentDisplay)
+                        .add(maxDisplay)
+                        .toString())
+                .toString();
     }
 }

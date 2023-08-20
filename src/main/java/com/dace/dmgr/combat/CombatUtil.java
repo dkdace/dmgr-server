@@ -1,21 +1,14 @@
 package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.SwapModule;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.StringFormUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -174,74 +167,5 @@ public final class CombatUtil {
             };
         } else
             combatUser.addBulletSpread(increment, max);
-    }
-
-    /**
-     * 플레이어에게 전체 액션바를 표시한다.
-     *
-     * @param combatUser 대상 플레이어
-     */
-    public static void showActionbar(CombatUser combatUser) {
-        Weapon weapon = combatUser.getWeapon();
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
-            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
-
-        if (weapon instanceof Reloadable &&
-                CooldownManager.getCooldown(combatUser, Cooldown.ACTION_BAR) == 0) {
-            int capacity = ((Reloadable) weapon).getRemainingAmmo();
-            int maxCapacity = ((Reloadable) weapon).getCapacity();
-
-            StringJoiner text = new StringJoiner("    ");
-
-            String ammo = null;
-            switch (combatUser.getCharacter().getName()) {
-                case "아케이스":
-                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
-                    break;
-                case "예거":
-                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
-                    break;
-            }
-
-            text.add(ammo);
-
-            combatUser.sendActionBar(text.toString());
-        }
-    }
-
-    /**
-     * 액션바에 사용되는 진행 막대를 반환한다.
-     *
-     * <p>Example:</p>
-     *
-     * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
-     *
-     * @param icon    아이콘
-     * @param current 현재 값
-     * @param max     최대 값
-     * @param length  막대 길이 (글자 수)
-     * @param symbol  막대 기호
-     * @return 액션바 진행 막대 문자열
-     */
-    private static String getActionbarProgressBar(char icon, int current, int max, int length, char symbol) {
-        ChatColor color;
-        if (current <= max / 4)
-            color = ChatColor.RED;
-        else if (current <= max / 2)
-            color = ChatColor.YELLOW;
-        else
-            color = ChatColor.WHITE;
-
-        String currentDisplay = String.format("%" + (int) (Math.log10(max) + 1) + "d", current);
-        String maxDisplay = Integer.toString(max);
-
-        return new StringJoiner(" §f")
-                .add(String.valueOf(icon))
-                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
-                .add(new StringJoiner("§f/", "[", "]")
-                        .add(color + currentDisplay)
-                        .add(maxDisplay)
-                        .toString())
-                .toString();
     }
 }

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -23,6 +24,14 @@ public abstract class Character {
     private final float speedMultiplier;
     /** 히트박스 크기 계수 */
     private final float hitboxMultiplier;
+
+    /**
+     * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 액션바 문자열
+     */
+    public abstract String getActionbarString(CombatUser combatUser);
 
     /**
      * @return 무기 정보

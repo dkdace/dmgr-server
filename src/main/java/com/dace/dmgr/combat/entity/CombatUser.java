@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.*;
@@ -28,10 +27,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -363,7 +359,18 @@ public final class CombatUser extends CombatEntity<Player> {
 
         entity.setWalkSpeed((float) speed);
 
-        CombatUtil.showActionbar(this);
+        onTickActionbar();
+    }
+
+    /**
+     * {@link CombatUser#onTick(int)}에서 사용하며, 액션바 전송 작업을 실행한다.
+     */
+    private void onTickActionbar() {
+        StringJoiner text = new StringJoiner("    ");
+
+        text.add(character.getActionbarString(this));
+
+        sendActionBar(text.toString());
     }
 
     @Override
