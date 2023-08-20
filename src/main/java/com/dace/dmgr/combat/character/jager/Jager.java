@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.JagerWeaponLInfo;
+import com.dace.dmgr.combat.character.jager.action.JagerWeaponInfo;
 import lombok.Getter;
 
 /**
@@ -21,7 +22,7 @@ public final class Jager extends Character {
 
     @Override
     public WeaponInfo getWeaponInfo() {
-        return JagerWeaponLInfo.getInstance();
+        return JagerWeaponInfo.getInstance();
     }
 
     @Override
