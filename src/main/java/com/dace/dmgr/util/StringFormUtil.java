@@ -86,14 +86,14 @@ public final class StringFormUtil {
      *
      * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
      *
-     * @param icon    아이콘
+     * @param prefix  접두사
      * @param current 현재 값
      * @param max     최대 값
      * @param length  막대 길이 (글자 수)
      * @param symbol  막대 기호
      * @return 액션바 진행 막대 문자열
      */
-    public static String getActionbarProgressBar(char icon, int current, int max, int length, char symbol) {
+    public static String getActionbarProgressBar(String prefix, int current, int max, int length, char symbol) {
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.RED;
@@ -106,7 +106,7 @@ public final class StringFormUtil {
         String maxDisplay = Integer.toString(max);
 
         return new StringJoiner(" §f")
-                .add(String.valueOf(icon))
+                .add(prefix)
                 .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
                 .add(new StringJoiner("§f/", "[", "]")
                         .add(color + currentDisplay)

@@ -110,6 +110,10 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
+                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming()) {
+                    ((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).confirm();
+                    return;
+                }
                 if (getRemainingAmmo() == 0) {
                     reload();
                     return;
@@ -142,12 +146,18 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                 break;
             }
             case RIGHT_CLICK: {
+                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming())
+                    return;
+
                 aim();
                 swap();
 
                 break;
             }
             case DROP: {
+                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming())
+                    return;
+
                 reload();
 
                 break;
@@ -232,6 +242,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
 
     @Override
     public void aim() {
+        combatUser.getSkill(JagerA1Info.getInstance()).setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
         if (!isAiming())
             combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("JagerWeaponL", -JagerWeaponInfo.AIM_SPEED);
         else

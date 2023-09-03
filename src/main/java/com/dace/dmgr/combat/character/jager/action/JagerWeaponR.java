@@ -114,15 +114,17 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
 
                 break;
             }
-            case RIGHT_CLICK:
+            case RIGHT_CLICK: {
                 mainWeapon.aim();
                 mainWeapon.swap();
 
                 break;
-            case DROP:
+            }
+            case DROP: {
                 reload();
 
                 break;
+            }
         }
     }
 

@@ -35,7 +35,7 @@ public final class Arkace extends Character {
         int capacity = weapon.getRemainingAmmo();
         int maxCapacity = weapon.getCapacity();
 
-        return StringFormUtil.getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
+        return StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
     }
 
     @Override

@@ -235,6 +235,10 @@ public final class CombatUser extends CombatEntity<Player> {
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
         entity.setFlying(false);
+        skillMap.forEach((skillInfo, skill) -> {
+            if (skill instanceof HasEntity)
+                ((HasEntity) skill).getSummonEntities().forEach(SummonEntity::remove);
+        });
     }
 
     /**
@@ -377,6 +381,10 @@ public final class CombatUser extends CombatEntity<Player> {
     public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
         if (this == victim)
             return;
+        if (character == null)
+            return;
+
+        character.onAttack(this, victim, damage, type, isCrit, isUlt);
 
         if (isCrit) {
             playCritAttackEffect();
@@ -410,6 +418,10 @@ public final class CombatUser extends CombatEntity<Player> {
     public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
+        if (character == null)
+            return;
+
+        character.onDamage(this, attacker, damage, type, isCrit, isUlt);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
@@ -430,12 +442,22 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onGiveHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+        if (character == null)
+            return;
+
+        character.onGiveHeal(this, victim, amount, isUlt);
+
         if (victim.isUltProvider() && isUlt)
             addUltGauge(amount);
     }
 
     @Override
     public void onTakeHeal(CombatEntity<?> attacker, int amount, boolean isUlt) {
+        if (character == null)
+            return;
+
+        character.onTakeHeal(this, attacker, amount, isUlt);
+
         playTakeHealEffect(amount);
     }
 
@@ -457,6 +479,11 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onKill(CombatEntity<?> victim) {
+        if (character == null)
+            return;
+
+        character.onKill(this, victim);
+
         if (victim instanceof CombatUser) {
             victim.setHealth(victim.getMaxHealth());
 
@@ -537,6 +564,11 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onDeath(CombatEntity<?> attacker) {
+        if (character == null)
+            return;
+
+        character.onDeath(this, attacker);
+
         Location deadLocation = entity.getLocation().add(0, 0.5, 0);
         deadLocation.setPitch(90);
 

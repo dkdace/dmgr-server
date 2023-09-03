@@ -37,6 +37,12 @@ public abstract class Skill extends Action {
     }
 
     @Override
+    protected void onCooldownSet() {
+        if (!isDurationFinished())
+            setDuration(0);
+    }
+
+    @Override
     protected void onCooldownTick() {
         long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
 
@@ -53,10 +59,7 @@ public abstract class Skill extends Action {
      * 쿨타임이 끝났을 때 효과음을 재생한다.
      */
     protected void playCooldownFinishSound() {
-        if (actionInfo instanceof UltimateSkillInfo)
-            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
-        else if (actionInfo instanceof ActiveSkillInfo)
-            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
     /**
@@ -141,7 +144,8 @@ public abstract class Skill extends Action {
      * 지속시간이 끝났을 때 실행할 작업.
      */
     protected void onDurationFinished() {
-        setCooldown();
+        if (isCooldownFinished())
+            setCooldown();
     }
 
     /**

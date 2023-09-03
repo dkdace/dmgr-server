@@ -73,7 +73,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
     @Override
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
-            case CS_PRE_USE:
+            case CS_PRE_USE: {
                 if (getRemainingAmmo() == 0) {
                     reload();
                     return;
@@ -85,7 +85,8 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
 
                 break;
-            case CS_USE:
+            }
+            case CS_USE: {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location location = combatUser.getEntity().getLocation();
@@ -121,10 +122,12 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                 }.shoot(combatUser.getBulletSpread());
 
                 break;
-            case DROP:
+            }
+            case DROP: {
                 reload();
 
                 break;
+            }
         }
     }
 

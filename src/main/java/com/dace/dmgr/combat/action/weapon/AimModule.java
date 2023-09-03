@@ -66,8 +66,7 @@ public final class AimModule {
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    if (cancelled)
-                        aiming = false;
+                    aiming = false;
                 }
             };
         }

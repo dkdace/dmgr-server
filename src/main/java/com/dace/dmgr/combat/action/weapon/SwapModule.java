@@ -18,6 +18,7 @@ import org.bukkit.ChatColor;
 public final class SwapModule {
     /** 무기 객체 */
     private final Weapon weapon;
+
     /** 무기 전환 상태 */
     @Getter
     private WeaponState weaponState = WeaponState.PRIMARY;

@@ -23,6 +23,11 @@ public abstract class UltimateSkill extends Skill {
     public abstract int getCost();
 
     @Override
+    protected void playCooldownFinishSound() {
+        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
+    }
+
+    @Override
     public final void onUse(ActionKey actionKey) {
         combatUser.setUltGaugePercent(0);
         playUseSound();
