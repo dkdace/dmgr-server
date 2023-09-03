@@ -18,6 +18,8 @@ public final class JagerA1Info extends ActiveSkillInfo {
     public static final int HEALTH = 600;
     /** 피해량 */
     public static final int DAMAGE = 150;
+    /** 치명상 감지 범위 */
+    public static final int LOW_HEALTH_DETECT_RADIUS = 20;
     /** 체력 최대 회복 시간 */
     public static final int RECOVER_DURATION = 6;
     @Getter

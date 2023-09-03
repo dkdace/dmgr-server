@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -38,6 +39,13 @@ public class JagerA1Entity extends SummonEntity<Wolf> {
         else if (i == JagerA1Info.SUMMON_DURATION) {
             playReadySound();
             entity.setAI(true);
+        }
+
+        if (i % 10 == 0 && entity.getTarget() == null) {
+            CombatUtil.getNearEnemies(owner, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS).forEach(target -> {
+                if (target.isLowHealth())
+                    entity.setTarget(target.getEntity());
+            });
         }
     }
 

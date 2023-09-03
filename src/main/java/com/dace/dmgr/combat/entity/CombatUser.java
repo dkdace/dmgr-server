@@ -347,7 +347,7 @@ public final class CombatUser extends CombatEntity<Player> {
             addUltGauge((float) IDLE_ULT_CHARGE / 2);
         }
 
-        if (getHealth() <= getMaxHealth() / 4) {
+        if (isLowHealth()) {
             playBleedingEffect(1);
             setLowHealthScreenEffect(true);
         } else

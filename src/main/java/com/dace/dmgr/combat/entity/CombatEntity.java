@@ -132,6 +132,15 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
+     * 엔티티가 치명상인 지 확인한다.
+     *
+     * @return 체력이 25% 이하이면 {@code true} 반환
+     */
+    public final boolean isLowHealth() {
+        return getHealth() <= getMaxHealth() / 4;
+    }
+
+    /**
      * 엔티티에게 피해를 입힌다.
      *
      * @param attacker 공격자

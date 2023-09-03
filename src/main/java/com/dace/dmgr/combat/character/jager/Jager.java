@@ -18,6 +18,10 @@ import java.util.StringJoiner;
 
 /**
  * 전투원 - 예거 클래스.
+ *
+ * @see JagerWeaponL
+ * @see JagerWeaponR
+ * @see JagerA1
  */
 public final class Jager extends Character {
     @Getter
