@@ -22,6 +22,8 @@ public abstract class Projectile extends Bullet {
     protected boolean hasGravity;
     /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
     protected int bouncing;
+    /** 투사체가 튕겼을 때의 속력 계수. {@link Projectile#bouncing}이 {@code 1} 이상이어야 함 */
+    protected float bounceVelocityMultiplier;
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -38,6 +40,7 @@ public abstract class Projectile extends Bullet {
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
         this.bouncing = option.bouncing;
+        this.bounceVelocityMultiplier = option.bounceVelocityMultiplier;
     }
 
     /**
@@ -56,6 +59,7 @@ public abstract class Projectile extends Bullet {
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
         this.bouncing = option.bouncing;
+        this.bounceVelocityMultiplier = option.bounceVelocityMultiplier;
     }
 
     /**
@@ -125,6 +129,7 @@ public abstract class Projectile extends Bullet {
         Location beforeHitBlockLocation = location.clone().subtract(direction).getBlock().getLocation();
         Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
 
+        direction.multiply(bounceVelocityMultiplier);
         if (Math.abs(hitDir.getX()) > 0.5)
             direction.setX(-direction.getX());
         else if (Math.abs(hitDir.getY()) > 0.5)

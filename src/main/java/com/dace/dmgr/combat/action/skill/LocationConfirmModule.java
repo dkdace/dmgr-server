@@ -40,7 +40,6 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.setSilent(true);
         pointer.setInvulnerable(true);
         pointer.setGravity(false);
-        pointer.setSilent(true);
         pointer.setAI(false);
         pointer.setMarker(true);
         pointer.setVisible(false);
