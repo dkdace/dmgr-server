@@ -59,16 +59,18 @@ public abstract class Hitscan extends Bullet {
 
         for (int i = 0; loc.distance(origin) < maxDistance; i++) {
             if (!LocationUtil.isNonSolid(loc)) {
-                handleBlockCollision(loc, direction);
-                return;
+                handleBlockCollision(loc.clone(), direction.clone());
+                break;
             }
 
-            if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc, targets, SIZE))
-                return;
+            if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc.clone(), targets, SIZE))
+                break;
 
             loc.add(direction);
             if (i % trailInterval == 0)
                 trail(loc.clone());
         }
+
+        onDestroy(loc.clone());
     }
 }

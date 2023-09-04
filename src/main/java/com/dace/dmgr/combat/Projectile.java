@@ -95,15 +95,19 @@ public abstract class Projectile extends Bullet {
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc)) {
-                        handleBlockCollision(loc, finalDirection);
+                        handleBlockCollision(loc.clone(), finalDirection.clone());
                         if (bouncing-- > 0)
-                            handleBounce(loc, finalDirection);
+                            handleBounce(loc.clone(), finalDirection);
                         else
                             return false;
                     }
 
-                    if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc, targets, SIZE))
-                        return false;
+                    if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc.clone(), targets, SIZE)) {
+                        if (bouncing-- > 0)
+                            finalDirection.multiply(-bounceVelocityMultiplier);
+                        else
+                            return false;
+                    }
 
                     if (hasGravity) {
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
@@ -114,6 +118,11 @@ public abstract class Projectile extends Bullet {
                 }
 
                 return true;
+            }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                onDestroy(loc.clone());
             }
         };
     }
@@ -126,7 +135,7 @@ public abstract class Projectile extends Bullet {
      */
     private void handleBounce(Location location, Vector direction) {
         Location hitBlockLocation = location.getBlock().getLocation();
-        Location beforeHitBlockLocation = location.clone().subtract(direction).getBlock().getLocation();
+        Location beforeHitBlockLocation = location.subtract(direction).getBlock().getLocation();
         Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
 
         direction.multiply(bounceVelocityMultiplier);

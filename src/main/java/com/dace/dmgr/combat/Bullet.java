@@ -108,26 +108,25 @@ public abstract class Bullet {
     /**
      * 총알의 블록 충돌 로직을 처리한다.
      *
-     * @param location  위치
+     * @param location  맞은 위치
      * @param direction 발사 방향
      */
     protected final void handleBlockCollision(Location location, Vector direction) {
-        Location loc = location.clone();
-        Vector subDir = direction.clone().multiply(0.25);
+        Vector subDir = direction.multiply(0.25);
         Block hitBlock = location.getBlock();
 
-        while (!LocationUtil.isNonSolid(loc))
-            loc.subtract(subDir);
+        while (!LocationUtil.isNonSolid(location))
+            location.subtract(subDir);
 
-        loc.subtract(subDir);
-        onHit(loc);
-        onHitBlock(loc, hitBlock);
+        location.subtract(subDir);
+        onHit(location);
+        onHitBlock(location, hitBlock);
     }
 
     /**
      * 총알 주변의 적을 찾고 피격 로직을 처리한다.
      *
-     * @param location 위치
+     * @param location 맞은 위치
      * @param targets  피격자 목록
      * @param size     기본 판정 범위
      * @return 적 피격 시 {@code penetrating}이 {@code false}이면 {@code true} 반환
@@ -158,7 +157,7 @@ public abstract class Bullet {
     public abstract void trail(Location location);
 
     /**
-     * 총알이 블록에 맞았을 때 실행될 작업
+     * 총알이 블록에 맞았을 때 실행될 작업.
      *
      * @param location 맞은 위치
      * @param hitBlock 맞은 블록
@@ -170,7 +169,7 @@ public abstract class Bullet {
     }
 
     /**
-     * 총알이 엔티티에 맞았을 때 실행될 작업
+     * 총알이 엔티티에 맞았을 때 실행될 작업.
      *
      * @param location 맞은 위치
      * @param target   맞은 엔티티
@@ -181,12 +180,20 @@ public abstract class Bullet {
     public abstract void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit);
 
     /**
-     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업
+     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업.
      *
      * @param location 맞은 위치
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
     public void onHit(Location location) {
+    }
+
+    /**
+     * 총알이 소멸했을 때 실행될 작업.
+     *
+     * @param location 소멸한 위치
+     */
+    public void onDestroy(Location location) {
     }
 }
