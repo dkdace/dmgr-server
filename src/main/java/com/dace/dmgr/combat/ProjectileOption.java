@@ -24,10 +24,4 @@ public class ProjectileOption {
     /** 중력 작용 여부 */
     @Builder.Default
     final boolean hasGravity = false;
-    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
-    @Builder.Default
-    final int bouncing = 0;
-    /** 투사체가 튕겼을 때의 속력 계수. {@link ProjectileOption#bouncing}이 {@code 1} 이상이어야 함 */
-    @Builder.Default
-    final float bounceVelocityMultiplier = 1;
 }

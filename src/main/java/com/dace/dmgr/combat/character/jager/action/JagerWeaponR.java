@@ -15,6 +15,7 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -107,8 +108,9 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
                     }
 
                     @Override
-                    public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         target.damage(combatUser, JagerWeaponInfo.SCOPE.DAMAGE, "", isCrit, true);
+                        return false;
                     }
                 }.shoot(0F);
 

@@ -18,6 +18,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -137,9 +138,10 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                     }
 
                     @Override
-                    public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         target.damage(combatUser, JagerWeaponInfo.DAMAGE, "", false, true);
                         JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+                        return false;
                     }
                 }.shoot(2.5F);
 

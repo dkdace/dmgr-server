@@ -20,10 +20,6 @@ public abstract class Projectile extends Bullet {
     protected int velocity;
     /** 중력 작용 여부 */
     protected boolean hasGravity;
-    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
-    protected int bouncing;
-    /** 투사체가 튕겼을 때의 속력 계수. {@link Projectile#bouncing}이 {@code 1} 이상이어야 함 */
-    protected float bounceVelocityMultiplier;
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -39,8 +35,6 @@ public abstract class Projectile extends Bullet {
         super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
-        this.bounceVelocityMultiplier = option.bounceVelocityMultiplier;
     }
 
     /**
@@ -58,8 +52,6 @@ public abstract class Projectile extends Bullet {
         this.hitboxMultiplier = option.hitboxMultiplier;
         this.velocity = velocity;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
-        this.bounceVelocityMultiplier = option.bounceVelocityMultiplier;
     }
 
     /**
@@ -94,20 +86,11 @@ public abstract class Projectile extends Bullet {
                     if (loc.distance(origin) >= maxDistance)
                         return false;
 
-                    if (!LocationUtil.isNonSolid(loc)) {
-                        handleBlockCollision(loc.clone(), finalDirection.clone());
-                        if (bouncing-- > 0)
-                            handleBounce(loc.clone(), finalDirection);
-                        else
-                            return false;
-                    }
+                    if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
+                        return false;
 
-                    if (loc.distance(origin) > MIN_DISTANCE && findEnemyAndHandleCollision(loc.clone(), targets, SIZE)) {
-                        if (bouncing-- > 0)
-                            finalDirection.multiply(-bounceVelocityMultiplier);
-                        else
-                            return false;
-                    }
+                    if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                        return false;
 
                     if (hasGravity) {
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
@@ -125,25 +108,5 @@ public abstract class Projectile extends Bullet {
                 onDestroy(loc.clone());
             }
         };
-    }
-
-    /**
-     * 투사체의 도탄 로직을 처리한다.
-     *
-     * @param location  위치
-     * @param direction 발사 방향
-     */
-    private void handleBounce(Location location, Vector direction) {
-        Location hitBlockLocation = location.getBlock().getLocation();
-        Location beforeHitBlockLocation = location.subtract(direction).getBlock().getLocation();
-        Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
-
-        direction.multiply(bounceVelocityMultiplier);
-        if (Math.abs(hitDir.getX()) > 0.5)
-            direction.setX(-direction.getX());
-        else if (Math.abs(hitDir.getY()) > 0.5)
-            direction.setY(-direction.getY());
-        else if (Math.abs(hitDir.getZ()) > 0.5)
-            direction.setZ(-direction.getZ());
     }
 }

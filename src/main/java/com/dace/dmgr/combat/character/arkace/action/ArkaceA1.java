@@ -15,6 +15,7 @@ import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,8 +73,9 @@ public final class ArkaceA1 extends Skill {
                     }
 
                     @Override
-                    public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
+                        return false;
                     }
                 }.shoot(location);
 
