@@ -14,7 +14,8 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 설랑 클래스.
  */
-public class JagerA1Entity extends SummonEntity<Wolf> {
+public final class JagerA1Entity extends SummonEntity<Wolf> {
+    /** 스킬 객체 */
     private final JagerA1 skill;
 
     public JagerA1Entity(Wolf entity, CombatUser owner) {
@@ -42,10 +43,10 @@ public class JagerA1Entity extends SummonEntity<Wolf> {
         }
 
         if (i % 10 == 0 && entity.getTarget() == null) {
-            CombatUtil.getNearEnemies(owner, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS).forEach(target -> {
-                if (target.isLowHealth())
-                    entity.setTarget(target.getEntity());
-            });
+            CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
+                    CombatEntity::isLowHealth).getKey();
+            if (target != null)
+                entity.setTarget(target.getEntity());
         }
     }
 

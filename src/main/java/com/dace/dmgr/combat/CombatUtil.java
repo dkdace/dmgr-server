@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -31,23 +32,24 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적과 치명타 여부를 반환한다.
      *
-     * @param attacker 공격자 (기준 엔티티)
-     * @param location 위치
-     * @param range    범위 (반지름)
+     * @param attacker  공격자 (기준 엔티티)
+     * @param location  위치
+     * @param range     범위 (반지름)
+     * @param predicate 조건
      * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
      * 안에 있으면 {@code true})
      * @see Hitbox
      */
-    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
         CombatEntity<?> entity = EntityInfoRegistry.getAllCombatEntities().stream()
+                .filter(predicate.and(combatEntity ->
+                        combatEntity != attacker && isEnemy(attacker, combatEntity)))
                 .min(Comparator.comparing(combatEntity -> Math.min(
                         location.distance(combatEntity.getHitbox().getCenter()),
                         location.distance(combatEntity.getCritHitbox().getCenter())
                 )))
-                .filter(combatEntity ->
-                        combatEntity != attacker && isEnemy(attacker, combatEntity))
                 .orElse(null);
 
         if (entity == null)
@@ -58,6 +60,20 @@ public final class CombatUtil {
         } else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
             return new AbstractMap.SimpleEntry<>(entity, false);
         } else return new AbstractMap.SimpleEntry<>(null, false);
+    }
+
+    /**
+     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     *
+     * @param attacker 공격자 (기준 엔티티)
+     * @param location 위치
+     * @param range    범위 (반지름)
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
+     * 안에 있으면 {@code true})
+     * @see Hitbox
+     */
+    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+        return getNearEnemy(attacker, location, range, combatEntity -> true);
     }
 
     /**
