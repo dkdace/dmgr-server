@@ -2,6 +2,10 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.statuseffect.Grounding;
+import com.dace.dmgr.combat.entity.statuseffect.Snare;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
+import com.dace.dmgr.combat.entity.statuseffect.Stun;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -212,6 +216,70 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
+     * 엔티티에게 상태 효과를 적용한다.
+     *
+     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
+     * 남은 시간보다 길 경우에만 적용한다.</p>
+     *
+     * @param statusEffect 적용할 상태 효과
+     * @param duration     지속시간 (tick)
+     */
+    public final void applyStatusEffect(StatusEffect statusEffect, long duration) {
+        if (!hasStatusEffect(statusEffect)) {
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect, duration);
+
+            statusEffect.onStart(this);
+
+            new TaskTimer(1) {
+                @Override
+                public boolean run(int i) {
+                    if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect))
+                        return false;
+
+                    statusEffect.onTick(CombatEntity.this, i);
+
+                    return true;
+                }
+
+                @Override
+                public void onEnd(boolean cancelled) {
+                    statusEffect.onEnd(CombatEntity.this);
+                }
+            };
+        } else if (getStatusEffectDuration(statusEffect) < duration)
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect, duration);
+    }
+
+    /**
+     * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
+     *
+     * @param statusEffect 확인할 상태 효과
+     * @return 남은 시간 (tick)
+     */
+    public final long getStatusEffectDuration(StatusEffect statusEffect) {
+        return CooldownManager.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffect);
+    }
+
+    /**
+     * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
+     *
+     * @param statusEffect 확인할 상태 효과
+     * @return 상태 효과를 가지고 있으면 {@code true} 반환
+     */
+    public final boolean hasStatusEffect(StatusEffect statusEffect) {
+        return getStatusEffectDuration(statusEffect) > 0;
+    }
+
+    /**
+     * 엔티티의 상태 효과를 제거한다.
+     *
+     * @param statusEffect 제거할 상태 효과
+     */
+    public final void removeStatusEffect(StatusEffect statusEffect) {
+        CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect);
+    }
+
+    /**
      * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
      *
      * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
@@ -261,7 +329,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 이동 가능 여부
      */
     public final boolean canMove() {
-        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0)
+        if (hasStatusEffect(Stun.getInstance()) || hasStatusEffect(Snare.getInstance()))
             return false;
 
         return true;
@@ -273,8 +341,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 점프 가능  여부
      */
     public final boolean canJump() {
-        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0 ||
-                CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
+        if (hasStatusEffect(Stun.getInstance()) || hasStatusEffect(Snare.getInstance()) || hasStatusEffect(Grounding.getInstance()))
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_JUMP)
             return false;
@@ -287,7 +354,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param i 인덱스
      */
-    public void onTick(int i) {
+    protected void onTick(int i) {
         if (!isFixed)
             updateHitboxTick();
 

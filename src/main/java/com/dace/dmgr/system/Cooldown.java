@@ -38,16 +38,8 @@ public enum Cooldown {
     SKILL_DURATION(0),
     /** 액션바 지속시간 */
     ACTION_BAR(0),
-    /** 기절 지속시간 */
-    STUN(0),
-    /** 속박 지속시간 */
-    SNARE(0),
-    /** 고정 지속시간 */
-    GROUNDING(0),
-    /** 침묵 지속시간 */
-    SILENCE(0),
-    /** 화염 지속시간 */
-    BURN(0),
+    /** 상태 효과 지속시간 */
+    STATUS_EFFECT(0),
     /** 2중 탄창 무기 교체 */
     WEAPON_SWAP(0),
     /** 빙결 수치 지속시간 */

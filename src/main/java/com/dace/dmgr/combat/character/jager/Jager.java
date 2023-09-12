@@ -22,6 +22,7 @@ import java.util.StringJoiner;
  * @see JagerWeaponL
  * @see JagerWeaponR
  * @see JagerA1
+ * @see JagerA2
  */
 public final class Jager extends Character {
     @Getter
@@ -87,6 +88,8 @@ public final class Jager extends Character {
         switch (number) {
             case 1:
                 return JagerA1Info.getInstance();
+            case 2:
+                return JagerA2Info.getInstance();
             default:
                 return null;
         }

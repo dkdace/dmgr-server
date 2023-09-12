@@ -9,9 +9,8 @@ import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.statuseffect.Silence;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -36,7 +35,7 @@ public final class OnCombatUserAction implements Listener {
         } else if (action instanceof Skill) {
             if (!action.canUse())
                 return;
-            if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
+            if (combatUser.hasStatusEffect(Silence.getInstance()))
                 return;
             if (action.getActionInfo() instanceof ActiveSkillInfo) {
                 if (!((Skill) action).isGlobalCooldownFinished())
