@@ -3,6 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.character.jager.action.JagerA1Entity;
 import com.dace.dmgr.combat.character.jager.action.JagerA1Info;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,8 +26,9 @@ public final class OnEntityDamageByEntity implements Listener {
         if (attCombatEntity != null || vicCombatEntity != null)
             event.setCancelled(true);
         if (vicCombatEntity != null) {
-            if (attCombatEntity instanceof JagerA1Entity)
-                vicCombatEntity.damage(attCombatEntity, JagerA1Info.DAMAGE, "", false, true);
+            if (attCombatEntity instanceof JagerA1Entity) {
+                vicCombatEntity.damage(attCombatEntity, JagerA1Info.DAMAGE, "", vicCombatEntity.hasStatusEffect(Snare.getInstance()), true);
+            }
         }
     }
 }

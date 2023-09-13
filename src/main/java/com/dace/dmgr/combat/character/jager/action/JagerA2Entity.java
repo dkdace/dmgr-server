@@ -106,6 +106,14 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     }
 
     @Override
+    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+        JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
+
+        if (!skill1.isDurationFinished() && skill1.getSummonEntities().get(0).getEntity().getTarget() == null)
+            skill1.getSummonEntities().get(0).getEntity().setTarget(victim.getEntity());
+    }
+
+    @Override
     public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
     }
