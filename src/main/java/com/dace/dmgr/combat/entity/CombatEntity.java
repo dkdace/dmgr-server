@@ -71,6 +71,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
         critHitbox.setCenter(entity.getLocation());
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
+        setName(name);
         onInit();
 
         new TaskTimer(1) {

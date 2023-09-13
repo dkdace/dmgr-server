@@ -1,18 +1,18 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.inventivetalent.glow.GlowAPI;
@@ -27,7 +27,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     public JagerA2Entity(MagmaCube entity, CombatUser owner) {
         super(
                 entity,
-                "§f곰덫",
+                "§f" + owner.getName() + "의 곰덫",
                 new Hitbox(0.8, 0.3, 0.8, 0, 0.15, 0),
                 new Hitbox(0, 0, 0, 0, 0, 0),
                 true,
@@ -141,16 +141,23 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     @Override
     protected void onInitTemporalEntity(Location location) {
         setTeam(owner.getTeam());
+        entity.setAI(false);
         entity.setSize(1);
         entity.setSilent(true);
         entity.setInvulnerable(true);
-        entity.setGravity(false);
-        entity.setAI(false);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
-        entity.teleport(entity.getLocation().add(0, 0.2, 0));
+        entity.teleport(location.add(0, 0.2, 0));
         setMaxHealth(JagerA2Info.HEALTH);
         setHealth(JagerA2Info.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+
+        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
+        packet.setEntityIds(new int[]{entity.getEntityId()});
+        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
+            CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
+            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
+                packet.sendPacket(player2);
+        });
     }
 
     /**

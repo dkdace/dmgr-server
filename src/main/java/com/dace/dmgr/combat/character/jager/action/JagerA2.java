@@ -101,6 +101,7 @@ public final class JagerA2 extends Skill implements HasEntity {
                         SoundUtil.play(Sound.ENTITY_HORSE_ARMOR, location, 0.5F, 1.6F);
                         SoundUtil.play("random.craft", location, 0.5F, 1.3F);
                         SoundUtil.play(Sound.ENTITY_PLAYER_HURT, location, 0.5F, 0.5F);
+
                         MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
                         JagerA2Entity jagerA2Entity = new JagerA2Entity(magmaCube, combatUser);
                         jagerA2Entity.init();

@@ -21,7 +21,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
     public JagerA1Entity(Wolf entity, CombatUser owner) {
         super(
                 entity,
-                "§f설랑",
+                "§f" + owner.getName() + "의 설랑",
                 new Hitbox(0.4, 0.8, 1.2, 0, 0.4, 0),
                 new Hitbox(0, 0, 0, 0, 0, 0),
                 false,
