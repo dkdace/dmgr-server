@@ -18,6 +18,8 @@ public abstract class Projectile extends Bullet {
     private static final float SIZE = 0.3F;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
+    /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
+    protected long duration;
     /** 중력 작용 여부 */
     protected boolean hasGravity;
 
@@ -34,6 +36,7 @@ public abstract class Projectile extends Bullet {
     protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
         super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
     }
 
@@ -51,6 +54,7 @@ public abstract class Projectile extends Bullet {
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
     }
 
@@ -83,7 +87,7 @@ public abstract class Projectile extends Bullet {
             @Override
             public boolean run(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= maxDistance)
+                    if (loc.distance(origin) >= maxDistance || (duration != -1 && _i >= duration))
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))

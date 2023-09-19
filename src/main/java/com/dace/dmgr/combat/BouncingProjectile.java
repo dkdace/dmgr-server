@@ -68,6 +68,7 @@ public abstract class BouncingProjectile extends Projectile {
         this.maxDistance = option.maxDistance;
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
         BouncingProjectileOption bouncingOption = BouncingProjectileOption.builder().build();
         this.bouncing = bouncing;

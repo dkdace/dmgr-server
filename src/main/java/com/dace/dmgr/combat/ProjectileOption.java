@@ -15,6 +15,9 @@ public class ProjectileOption {
     /** 총알의 최대 사거리. 단위: 블록 */
     @Builder.Default
     final int maxDistance = 70;
+    /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
+    @Builder.Default
+    final long duration = -1;
     /** 관통 여부 */
     @Builder.Default
     final boolean penetrating = false;
