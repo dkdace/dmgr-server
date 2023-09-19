@@ -113,14 +113,13 @@ public abstract class Bullet {
      * @return {@link Bullet#onHitBlock(Location, Vector, Block)}의 반환값
      */
     protected final boolean handleBlockCollision(Location location, Vector direction) {
-        Location loc = location.clone();
         Vector subDir = direction.clone().multiply(0.25);
-        Block hitBlock = loc.getBlock();
+        Block hitBlock = location.getBlock();
 
-        while (!LocationUtil.isNonSolid(loc))
-            loc.subtract(subDir);
+        if (direction.length() > 0.01)
+            while (!LocationUtil.isNonSolid(location))
+                location.subtract(subDir);
 
-        loc.subtract(subDir);
         onHit(location.clone());
         return onHitBlock(location.clone(), direction, hitBlock);
     }
@@ -167,10 +166,7 @@ public abstract class Bullet {
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
-    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
-        Bullet.bulletHitEffect(location, hitBlock, true);
-        return false;
-    }
+    public abstract boolean onHitBlock(Location location, Vector direction, Block hitBlock);
 
     /**
      * 총알이 엔티티에 맞았을 때 실행될 작업.

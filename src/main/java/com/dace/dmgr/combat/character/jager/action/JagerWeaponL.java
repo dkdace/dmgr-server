@@ -18,6 +18,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -135,6 +136,11 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
                         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
+                    }
+
+                    @Override
+                    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
+                        return false;
                     }
 
                     @Override

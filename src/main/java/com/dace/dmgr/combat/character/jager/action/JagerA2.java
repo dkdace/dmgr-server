@@ -17,6 +17,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
@@ -89,6 +90,11 @@ public final class JagerA2 extends Skill implements HasEntity {
                     public void trail(Location location) {
                         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 10,
                                 0.3F, 0, 0.3F, 120, 120, 135);
+                    }
+
+                    @Override
+                    public boolean onHitBlockBouncing(Location location, Vector direction, Block hitBlock) {
+                        return false;
                     }
 
                     @Override

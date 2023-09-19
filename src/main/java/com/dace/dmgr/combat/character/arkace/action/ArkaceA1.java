@@ -15,6 +15,7 @@ import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -70,6 +71,11 @@ public final class ArkaceA1 extends Skill {
                     @Override
                     public void onHit(Location location) {
                         explode(combatUser, location);
+                    }
+
+                    @Override
+                    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
+                        return false;
                     }
 
                     @Override
