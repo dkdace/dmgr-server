@@ -25,7 +25,8 @@ public abstract class BouncingProjectile extends Projectile {
      * <p>튕기는 투사체의 선택적 옵션은 {@link BouncingProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter        발사하는 엔티티
-     * @param velocity       속력
+     * @param velocity       투사체의 속력. 단위: 블록/s
+     * @param bouncing       투사체가 튕기는 횟수. {@code -1}로 설정 시 계속 튕김
      * @param option         투사체의 선택적 옵션
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
      * @see BouncingProjectileOption
@@ -43,7 +44,8 @@ public abstract class BouncingProjectile extends Projectile {
      * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
+     * @param bouncing 투사체가 튕기는 횟수. {@code -1}로 설정 시 계속 튕김
      * @param option   투사체의 선택적 옵션
      * @see ProjectileOption
      */
@@ -59,7 +61,8 @@ public abstract class BouncingProjectile extends Projectile {
      * 튕기는 투사체 인스턴스를 생성한다.
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
+     * @param bouncing 투사체가 튕기는 횟수. {@code -1}로 설정 시 계속 튕김
      */
     protected BouncingProjectile(CombatEntity<?> shooter, int velocity, int bouncing) {
         super(shooter, velocity);

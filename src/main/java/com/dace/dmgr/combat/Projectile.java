@@ -29,7 +29,7 @@ public abstract class Projectile extends Bullet {
      * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
      * @param option   선택적 옵션
      * @see ProjectileOption
      */
@@ -44,7 +44,7 @@ public abstract class Projectile extends Bullet {
      * 투사체 인스턴스를 생성한다.
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
      */
     protected Projectile(CombatEntity<?> shooter, int velocity) {
         super(shooter);
@@ -96,10 +96,11 @@ public abstract class Projectile extends Bullet {
                     if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
                         return false;
 
-                    if (hasGravity) {
+                    if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
-                    }
-                    loc.add(finalDirection);
+
+                    if (finalDirection.length() > 0.01)
+                        loc.add(finalDirection);
                     if (count++ % trailInterval == 0)
                         trail(loc.clone());
                 }
