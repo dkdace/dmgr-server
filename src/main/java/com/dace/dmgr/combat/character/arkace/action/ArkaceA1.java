@@ -108,9 +108,7 @@ public final class ArkaceA1 extends Skill {
                 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
-        if (location.distance(combatUser.getEntity().getLocation()) < ArkaceA1Info.RADIUS)
-            combatUser.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true);
-        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS).forEach(target ->
+        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS, true).forEach(target ->
                 target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
     }
 }
