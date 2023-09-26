@@ -109,7 +109,9 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
 
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, JagerWeaponInfo.SCOPE.DAMAGE, "", isCrit, true);
+                        int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
+                                JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
+                        target.damage(combatUser, damage, "", isCrit, true);
                         return false;
                     }
                 }.shoot(0F);

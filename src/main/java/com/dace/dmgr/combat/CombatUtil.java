@@ -32,6 +32,43 @@ public final class CombatUtil {
     }
 
     /**
+     * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 최종 피해량 : 10 (20m) ~ 5 (40m)
+     * int damage = getDistantDamage(loc1, loc2, 10, 20, true)
+     * // 최종 피해량 : 20 (10m) ~ 10 (20m) ~ 0 (30m)
+     * int damage = getDistantDamage(loc1, loc2, 20, 10, false)
+     * }</pre>
+     *
+     * @param start             시작 위치
+     * @param end               끝 위치
+     * @param damage            피해량
+     * @param weakeningDistance 피해 감소가 시작하는 거리
+     * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소하며,
+     *                          {@code false}면 최소 피해량이 0이 될 때까지 감소한다.
+     * @return 최종 피해량
+     */
+    public static int getDistantDamage(Location start, Location end, int damage, double weakeningDistance, boolean isHalf) {
+        double distance = start.distance(end);
+
+        if (distance > weakeningDistance) {
+            distance = distance - weakeningDistance;
+            int finalDamage = (int) ((damage / 2) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2);
+
+            if (isHalf && finalDamage < damage / 2) {
+                finalDamage = damage / 2;
+            } else if (finalDamage < 0)
+                finalDamage = 0;
+
+            return finalDamage;
+        } else
+            return damage;
+    }
+
+    /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적과 치명타 여부를 반환한다.
      *
      * @param attacker  공격자 (기준 엔티티)

@@ -118,7 +118,14 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
 
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                        if (isUlt)
+                            target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                        else {
+                            int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
+                                    ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
+                            target.damage(combatUser, damage, "", isCrit, true);
+                        }
+
                         return false;
                     }
                 }.shoot(combatUser.getBulletSpread());
