@@ -105,7 +105,8 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
 
     @Override
     public boolean canUse() {
-        return super.canUse() && getWeaponState() != SwapModule.WeaponState.SWAPPING;
+        return super.canUse() && getWeaponState() != SwapModule.WeaponState.SWAPPING &&
+                combatUser.getSkill(JagerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.StringJoiner;
  * @see JagerWeaponR
  * @see JagerA1
  * @see JagerA2
+ * @see JagerA3
  */
 public final class Jager extends Character {
     @Getter
@@ -90,6 +91,8 @@ public final class Jager extends Character {
                 return JagerA1Info.getInstance();
             case 2:
                 return JagerA2Info.getInstance();
+            case 3:
+                return JagerA3Info.getInstance();
             default:
                 return null;
         }

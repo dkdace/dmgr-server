@@ -17,6 +17,6 @@ public final class JagerTrait {
      */
     public static void addFreezeValue(CombatEntity<?> victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
-        CooldownManager.setCooldown(victim, Cooldown.FREEZE_VALUE_DURATION);
+        CooldownManager.setCooldown(victim, Cooldown.JAGER_FREEZE_VALUE_DURATION);
     }
 }

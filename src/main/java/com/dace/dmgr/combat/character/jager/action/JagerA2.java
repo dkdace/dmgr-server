@@ -51,7 +51,8 @@ public final class JagerA2 extends Skill implements HasEntity {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming();
+        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming() &&
+                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -61,11 +62,11 @@ public final class JagerA2 extends Skill implements HasEntity {
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 
-        Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
-                combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
+        Location location = combatUser.getEntity().getLocation();
         SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
         summonEntities.forEach(SummonEntity::remove);
         summonEntities.clear();
+        setGlobalCooldown((int) JagerA2Info.READY_DURATION);
         setDuration();
 
         new TaskTimer(1, JagerA2Info.READY_DURATION) {
@@ -84,7 +85,7 @@ public final class JagerA2 extends Skill implements HasEntity {
                         combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
-                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, 10, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),
+                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),
                         BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).destroyOnHitFloor(true).build()) {
                     @Override
                     public void trail(Location location) {

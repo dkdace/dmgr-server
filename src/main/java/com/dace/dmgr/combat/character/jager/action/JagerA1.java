@@ -66,7 +66,8 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity, Locatio
 
     @Override
     public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(JagerA2Info.getInstance()).isDurationFinished();
+        return super.canUse() && combatUser.getSkill(JagerA2Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
