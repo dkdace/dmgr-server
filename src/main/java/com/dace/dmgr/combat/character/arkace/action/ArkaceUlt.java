@@ -10,17 +10,12 @@ import java.util.List;
 
 public final class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt(CombatUser combatUser) {
-        super(4, combatUser, ArkaceUltInfo.getInstance(), 3);
+        super(4, combatUser, ArkaceUltInfo.getInstance());
     }
 
     @Override
     public List<ActionKey> getDefaultActionKeys() {
         return Arrays.asList(ActionKey.SLOT_4);
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return -1;
     }
 
     @Override

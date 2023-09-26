@@ -11,8 +11,13 @@ import org.bukkit.Sound;
  */
 @Getter
 public abstract class UltimateSkill extends Skill {
-    protected UltimateSkill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
-        super(number, combatUser, skillInfo, slot);
+    protected UltimateSkill(int number, CombatUser combatUser, UltimateSkillInfo ultimateSkillInfo) {
+        super(number, combatUser, ultimateSkillInfo, 3);
+    }
+
+    @Override
+    public final long getDefaultCooldown() {
+        return -1;
     }
 
     /**
