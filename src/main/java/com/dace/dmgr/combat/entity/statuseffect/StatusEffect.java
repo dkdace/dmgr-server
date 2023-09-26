@@ -7,6 +7,11 @@ import com.dace.dmgr.combat.entity.CombatEntity;
  */
 public interface StatusEffect {
     /**
+     * @return 상태 효과의 종류
+     */
+    StatusEffectType getStatusEffectType();
+
+    /**
      * 상태 효과 적용 시 실행할 작업.
      *
      * @param combatEntity 대상 엔티티

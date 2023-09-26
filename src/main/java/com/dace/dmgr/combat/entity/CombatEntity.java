@@ -2,10 +2,8 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
-import com.dace.dmgr.combat.entity.statuseffect.Grounding;
-import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.statuseffect.Stun;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -226,15 +224,15 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param duration     지속시간 (tick)
      */
     public final void applyStatusEffect(StatusEffect statusEffect, long duration) {
-        if (!hasStatusEffect(statusEffect)) {
-            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect, duration);
+        if (!hasStatusEffect(statusEffect.getStatusEffectType())) {
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getStatusEffectType(), duration);
 
             statusEffect.onStart(this);
 
             new TaskTimer(1) {
                 @Override
                 public boolean run(int i) {
-                    if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect))
+                    if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect.getStatusEffectType()))
                         return false;
 
                     statusEffect.onTick(CombatEntity.this, i);
@@ -247,37 +245,37 @@ public abstract class CombatEntity<T extends LivingEntity> {
                     statusEffect.onEnd(CombatEntity.this);
                 }
             };
-        } else if (getStatusEffectDuration(statusEffect) < duration)
-            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect, duration);
+        } else if (getStatusEffectDuration(statusEffect.getStatusEffectType()) < duration)
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getStatusEffectType(), duration);
     }
 
     /**
      * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
      *
-     * @param statusEffect 확인할 상태 효과
+     * @param statusEffectType 확인할 상태 효과 종류
      * @return 남은 시간 (tick)
      */
-    public final long getStatusEffectDuration(StatusEffect statusEffect) {
-        return CooldownManager.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffect);
+    public final long getStatusEffectDuration(StatusEffectType statusEffectType) {
+        return CooldownManager.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType);
     }
 
     /**
      * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
      *
-     * @param statusEffect 확인할 상태 효과
+     * @param statusEffectType 확인할 상태 효과 종류
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
-    public final boolean hasStatusEffect(StatusEffect statusEffect) {
-        return getStatusEffectDuration(statusEffect) > 0;
+    public final boolean hasStatusEffect(StatusEffectType statusEffectType) {
+        return getStatusEffectDuration(statusEffectType) > 0;
     }
 
     /**
      * 엔티티의 상태 효과를 제거한다.
      *
-     * @param statusEffect 제거할 상태 효과
+     * @param statusEffectType 제거할 상태 효과 종류
      */
-    public final void removeStatusEffect(StatusEffect statusEffect) {
-        CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect);
+    public final void removeStatusEffect(StatusEffectType statusEffectType) {
+        CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType);
     }
 
     /**
@@ -330,7 +328,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 이동 가능 여부
      */
     public final boolean canMove() {
-        if (hasStatusEffect(Stun.getInstance()) || hasStatusEffect(Snare.getInstance()))
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE))
             return false;
 
         return true;
@@ -342,7 +340,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 점프 가능  여부
      */
     public final boolean canJump() {
-        if (hasStatusEffect(Stun.getInstance()) || hasStatusEffect(Snare.getInstance()) || hasStatusEffect(Grounding.getInstance()))
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) || hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_JUMP)
             return false;
@@ -366,7 +364,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
                     9999, -6, false, false), true);
 
         abilityStatusManager.getAbilityStatus(Ability.SPEED).addModifier("JagerT1", -propertyManager.getValue(Property.FREEZE));
-        if (CooldownManager.getCooldown(this, Cooldown.FREEZE_VALUE_DURATION) == 0)
+        if (CooldownManager.getCooldown(this, Cooldown.JAGER_FREEZE_VALUE_DURATION) == 0)
             propertyManager.setValue(Property.FREEZE, 0);
     }
 

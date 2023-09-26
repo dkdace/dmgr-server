@@ -2,14 +2,15 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import lombok.Getter;
 
 /**
  * 고정 상태 효과를 처리하는 클래스.
  */
-public final class Grounding implements StatusEffect {
-    @Getter
-    private static final Grounding instance = new Grounding();
+public class Grounding implements StatusEffect {
+    @Override
+    public StatusEffectType getStatusEffectType() {
+        return StatusEffectType.GROUNDING;
+    }
 
     @Override
     public void onStart(CombatEntity<?> combatEntity) {

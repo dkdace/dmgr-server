@@ -6,7 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.statuseffect.Silence;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Player;
 
@@ -21,7 +21,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketAdapter {
         Player player = event.getPlayer();
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
 
-        if (combatUser != null && combatUser.hasStatusEffect(Silence.getInstance()))
+        if (combatUser != null && combatUser.hasStatusEffect(StatusEffectType.SILENCE))
             event.setCancelled(true);
     }
 }

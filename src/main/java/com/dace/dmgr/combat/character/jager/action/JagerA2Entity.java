@@ -90,7 +90,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     private void onCatchEnemy(CombatEntity<?> target) {
         playCatchSound();
         target.damage(this, JagerA2Info.DAMAGE, "", false, true);
-        target.applyStatusEffect(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
+        target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
         skill.getSummonEntities().clear();

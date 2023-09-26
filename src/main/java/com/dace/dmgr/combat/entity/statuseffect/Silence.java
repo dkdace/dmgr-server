@@ -2,14 +2,15 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import lombok.Getter;
 
 /**
  * 침묵 상태 효과를 처리하는 클래스.
  */
-public final class Silence implements StatusEffect {
-    @Getter
-    private static final Silence instance = new Silence();
+public class Silence implements StatusEffect {
+    @Override
+    public StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SILENCE;
+    }
 
     @Override
     public void onStart(CombatEntity<?> combatEntity) {

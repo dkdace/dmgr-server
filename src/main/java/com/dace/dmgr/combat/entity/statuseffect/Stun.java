@@ -2,14 +2,15 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import lombok.Getter;
 
 /**
  * 기절 상태 효과를 처리하는 클래스.
  */
-public final class Stun implements StatusEffect {
-    @Getter
-    private static final Stun instance = new Stun();
+public class Stun implements StatusEffect {
+    @Override
+    public StatusEffectType getStatusEffectType() {
+        return StatusEffectType.STUN;
+    }
 
     @Override
     public void onStart(CombatEntity<?> combatEntity) {
