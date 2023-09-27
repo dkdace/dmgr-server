@@ -37,12 +37,8 @@ public final class OnCombatUserAction implements Listener {
                 return;
             if (combatUser.hasStatusEffect(StatusEffectType.SILENCE))
                 return;
-            if (action.getActionInfo() instanceof ActiveSkillInfo) {
-                if (!((Skill) action).isGlobalCooldownFinished())
-                    return;
-                if (weapon instanceof Reloadable)
-                    ((Reloadable) weapon).cancelReloading();
-            }
+            if (action.getActionInfo() instanceof ActiveSkillInfo && weapon instanceof Reloadable)
+                ((Reloadable) weapon).cancelReloading();
 
             action.onUse(actionKey);
         }

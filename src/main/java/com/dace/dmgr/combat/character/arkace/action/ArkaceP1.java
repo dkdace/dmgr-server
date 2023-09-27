@@ -10,7 +10,7 @@ import java.util.List;
 
 public final class ArkaceP1 extends Skill {
     public ArkaceP1(CombatUser combatUser) {
-        super(1, combatUser, ArkaceP1Info.getInstance(), -1);
+        super(1, combatUser, ArkaceP1Info.getInstance());
     }
 
     @Override

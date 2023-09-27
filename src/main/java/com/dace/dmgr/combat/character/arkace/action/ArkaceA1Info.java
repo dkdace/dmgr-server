@@ -16,7 +16,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     /** 투사체 속력 */
     public static final int VELOCITY = 60;
     /** 피해 범위 */
-    public static final float RADIUS = 3;
+    public static final int RADIUS = 3;
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 

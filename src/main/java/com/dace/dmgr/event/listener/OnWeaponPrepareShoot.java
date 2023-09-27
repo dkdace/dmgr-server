@@ -19,7 +19,7 @@ public final class OnWeaponPrepareShoot implements Listener {
         if (combatUser != null && combatUser.getCharacter() != null) {
             Weapon weapon = combatUser.getWeapon();
 
-            if (!weapon.isCooldownFinished())
+            if (!weapon.canUse())
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_PRE_USE);

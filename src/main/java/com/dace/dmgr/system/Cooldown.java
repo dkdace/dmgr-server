@@ -31,6 +31,8 @@ public enum Cooldown {
     WEAPON_RELOAD(0),
     /** 달리기 금지 */
     NO_SPRINT(0),
+    /** 전역 쿨타임 */
+    GLOBAL_COOLDOWN(0),
     /** 스킬 쿨타임 */
     SKILL_COOLDOWN(0),
     /** 스킬 스택 충전 쿨타임 */

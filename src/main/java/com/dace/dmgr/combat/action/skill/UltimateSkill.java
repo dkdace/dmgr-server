@@ -10,7 +10,7 @@ import org.bukkit.Sound;
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class UltimateSkill extends Skill {
+public abstract class UltimateSkill extends ActiveSkill {
     protected UltimateSkill(int number, CombatUser combatUser, UltimateSkillInfo ultimateSkillInfo) {
         super(number, combatUser, ultimateSkillInfo, 3);
     }

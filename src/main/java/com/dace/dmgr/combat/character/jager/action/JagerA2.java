@@ -4,8 +4,8 @@ import com.dace.dmgr.combat.BouncingProjectile;
 import com.dace.dmgr.combat.BouncingProjectileOption;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasEntity;
-import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class JagerA2 extends Skill implements HasEntity {
+public final class JagerA2 extends ActiveSkill implements HasEntity {
     /** 소환된 엔티티 목록 */
     @Getter
     private final List<JagerA2Entity> summonEntities = new ArrayList<>();
@@ -62,11 +62,11 @@ public final class JagerA2 extends Skill implements HasEntity {
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 
+        combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
         Location location = combatUser.getEntity().getLocation();
         SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
         summonEntities.forEach(SummonEntity::remove);
         summonEntities.clear();
-        setGlobalCooldown((int) JagerA2Info.READY_DURATION);
         setDuration();
 
         new TaskTimer(1, JagerA2Info.READY_DURATION) {

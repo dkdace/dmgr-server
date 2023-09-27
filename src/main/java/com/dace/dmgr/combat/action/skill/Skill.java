@@ -6,18 +6,13 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import org.bukkit.Sound;
-import org.bukkit.enchantments.Enchantment;
 
 /**
  * 스킬의 상태를 관리하는 클래스.
  */
 @Getter
 public abstract class Skill extends Action {
-    /** 스킬 슬롯 */
-    protected final int slot;
     /** 번호 */
     protected final int number;
 
@@ -27,12 +22,10 @@ public abstract class Skill extends Action {
      * @param number     번호
      * @param combatUser 대상 플레이어
      * @param skillInfo  스킬 정보 객체
-     * @param slot       슬롯 번호
      */
-    protected Skill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
+    protected Skill(int number, CombatUser combatUser, SkillInfo skillInfo) {
         super(combatUser, skillInfo);
         this.number = number;
-        this.slot = slot;
         setCooldown(getDefaultCooldown());
     }
 
@@ -40,26 +33,6 @@ public abstract class Skill extends Action {
     protected void onCooldownSet() {
         if (!isDurationFinished())
             setDuration(0);
-    }
-
-    @Override
-    protected void onCooldownTick() {
-        long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
-
-        displayCooldown((int) Math.ceil((float) cooldown / 20));
-    }
-
-    @Override
-    protected void onCooldownFinished() {
-        displayReady(1);
-        playCooldownFinishSound();
-    }
-
-    /**
-     * 쿨타임이 끝났을 때 효과음을 재생한다.
-     */
-    protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
     /**
@@ -135,9 +108,6 @@ public abstract class Skill extends Action {
      * 지속시간이 진행할 때 (매 tick마다) 실행할 작업.
      */
     protected void onDurationTick() {
-        long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
-
-        displayUsing((int) Math.ceil((float) duration / 20));
     }
 
     /**
@@ -155,71 +125,5 @@ public abstract class Skill extends Action {
      */
     public final boolean isDurationFinished() {
         return getDuration() == 0;
-    }
-
-    /**
-     * 스킬 전역 쿨타임이 끝났는 지 확인한다.
-     *
-     * @return 전역 쿨타임 종료 여부
-     */
-    public final boolean isGlobalCooldownFinished() {
-        return combatUser.getEntity().getCooldown(SkillInfo.MATERIAL) == 0;
-    }
-
-    /**
-     * 스킬 전역 쿨타임을 설정한다.
-     *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
-     */
-    public final void setGlobalCooldown(int cooldown) {
-        if (cooldown == -1)
-            cooldown = 9999;
-        combatUser.getEntity().setCooldown(SkillInfo.MATERIAL, cooldown);
-    }
-
-    /**
-     * 스킬 설명 아이템을 쿨타임 상태로 표시한다.
-     *
-     * @param amount 아이템 수량
-     */
-    protected final void displayCooldown(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
-        itemStack.setDurability((short) 15);
-        itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
-        display(amount);
-    }
-
-    /**
-     * 스킬 설명 아이템을 준비 상태로 표시한다.
-     *
-     * @param amount 아이템 수량
-     */
-    protected final void displayReady(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
-        display(amount);
-    }
-
-    /**
-     * 스킬 설명 아이템을 사용 중인 상태로 표시한다.
-     *
-     * @param amount 아이템 수량
-     */
-    protected final void displayUsing(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
-        itemStack.setDurability((short) 5);
-        display(amount);
-    }
-
-    /**
-     * 스킬 설명 아이템을 적용한다.
-     *
-     * @param amount 아이템 수량
-     */
-    private void display(int amount) {
-        if (slot == -1)
-            return;
-
-        itemStack.setAmount(amount <= 127 ? amount : 1);
-        combatUser.getEntity().getInventory().setItem(slot, itemStack);
     }
 }

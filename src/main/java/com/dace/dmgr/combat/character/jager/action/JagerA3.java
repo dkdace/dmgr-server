@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.BouncingProjectileOption;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -27,7 +27,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-public final class JagerA3 extends Skill {
+public final class JagerA3 extends ActiveSkill {
     public JagerA3(CombatUser combatUser) {
         super(3, combatUser, JagerA3Info.getInstance(), 2);
     }
@@ -49,8 +49,7 @@ public final class JagerA3 extends Skill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming() &&
-                combatUser.getSkill(JagerA2Info.getInstance()).isDurationFinished();
+        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming();
     }
 
     @Override
@@ -61,9 +60,9 @@ public final class JagerA3 extends Skill {
         }
 
         if (isDurationFinished()) {
+            combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             Location location = combatUser.getEntity().getLocation();
             SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
-            setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             setDuration();
 
             new TaskTimer(1, JagerA3Info.READY_DURATION) {
@@ -161,9 +160,9 @@ public final class JagerA3 extends Skill {
 
         CombatUtil.getNearEnemies(combatUser, location, JagerA3Info.RADIUS, true).forEach(target -> {
             int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
-                    JagerA3Info.RADIUS / 2, true);
+                    JagerA3Info.RADIUS / 2F, true);
             int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
-                    JagerA3Info.RADIUS / 2, true);
+                    JagerA3Info.RADIUS / 2F, true);
             target.damage(combatUser, damage, "", false, true);
             JagerTrait.addFreezeValue(target, freeze);
 

@@ -105,8 +105,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
 
     @Override
     public boolean canUse() {
-        return super.canUse() && getWeaponState() != SwapModule.WeaponState.SWAPPING &&
-                combatUser.getSkill(JagerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse() && getWeaponState() != SwapModule.WeaponState.SWAPPING && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -251,7 +250,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
 
     @Override
     public void aim() {
-        combatUser.getSkill(JagerA1Info.getInstance()).setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
+        combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
         if (!isAiming())
             combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("JagerWeaponL", -JagerWeaponInfo.AIM_SPEED);
         else

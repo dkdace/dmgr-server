@@ -19,7 +19,7 @@ public final class JagerA3Info extends ActiveSkillInfo {
     /** 투사체 속력 */
     public static final int VELOCITY = 30;
     /** 피해 범위 */
-    public static final float RADIUS = 6;
+    public static final int RADIUS = 6;
     /** 빙결량 */
     public static final int FREEZE = 100;
     /** 속박 시간 */

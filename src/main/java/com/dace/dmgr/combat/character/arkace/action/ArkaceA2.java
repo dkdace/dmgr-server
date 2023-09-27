@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArkaceA2 extends Skill {
+public final class ArkaceA2 extends ActiveSkill {
     public ArkaceA2(CombatUser combatUser) {
         super(2, combatUser, ArkaceA2Info.getInstance(), 2);
     }

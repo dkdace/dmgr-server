@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.*;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
@@ -124,6 +125,26 @@ public final class CombatUser extends CombatEntity<Player> {
             packet.setFood(2);
 
         packet.sendPacket(this.getEntity());
+    }
+
+    /**
+     * 플레이어의 전역 쿨타임이 끝났는 지 확인한다.
+     *
+     * @return 전역 쿨타임 종료 여부
+     */
+    public boolean isGlobalCooldownFinished() {
+        return CooldownManager.getCooldown(this, Cooldown.GLOBAL_COOLDOWN) == 0;
+    }
+
+    /**
+     * 플레이어의 전역 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    public void setGlobalCooldown(int cooldown) {
+        CooldownManager.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, cooldown == -1 ? 9999 : cooldown);
+        entity.setCooldown(SkillInfo.MATERIAL, cooldown);
+        entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
     }
 
     /**

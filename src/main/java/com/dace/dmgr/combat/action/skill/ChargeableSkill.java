@@ -9,12 +9,12 @@ import lombok.Getter;
  * 상태 변수를 가지고 있는 충전형 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class ChargeableSkill extends Skill {
+public abstract class ChargeableSkill extends ActiveSkill {
     /** 상태 변수 */
     private float stateValue = 0;
 
-    protected ChargeableSkill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
-        super(number, combatUser, skillInfo, slot);
+    protected ChargeableSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+        super(number, combatUser, activeSkillInfo, slot);
     }
 
     @Override
