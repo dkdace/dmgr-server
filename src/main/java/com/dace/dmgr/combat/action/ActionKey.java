@@ -30,7 +30,13 @@ public enum ActionKey {
     /** 달리기 */
     SPRINT(""),
     /** 웅크리기(SHIFT) */
-    SNEAK("SHIFT");
+    SNEAK("SHIFT"),
+    /** 자동 사용 1번 */
+    PERIODIC_1(""),
+    /** 자동 사용 2번 */
+    PERIODIC_2(""),
+    /** 자동 사용 3번 */
+    PERIODIC_3("");
 
     /** 키 이름 */
     private final String name;

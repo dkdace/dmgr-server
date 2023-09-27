@@ -359,6 +359,7 @@ public final class CombatUser extends CombatEntity<Player> {
     public void onTick(int i) {
         super.onTick(i);
 
+        character.onTick(this, i);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                 99999, 0, false, false), true);
 

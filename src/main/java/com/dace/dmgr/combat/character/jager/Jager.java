@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
@@ -10,9 +11,11 @@ import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 import java.util.StringJoiner;
 
@@ -21,6 +24,7 @@ import java.util.StringJoiner;
  *
  * @see JagerWeaponL
  * @see JagerWeaponR
+ * @see JagerP1
  * @see JagerA1
  * @see JagerA2
  * @see JagerA3
@@ -64,6 +68,15 @@ public final class Jager extends Character {
     }
 
     @Override
+    public void onTick(CombatUser combatUser, int i) {
+        if (i % 5 == 0) {
+            CombatUserActionEvent event = new CombatUserActionEvent(combatUser, ActionKey.PERIODIC_1);
+
+            Bukkit.getServer().getPluginManager().callEvent(event);
+        }
+    }
+
+    @Override
     public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
 
@@ -79,6 +92,8 @@ public final class Jager extends Character {
     @Override
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return JagerP1Info.getInstance();
             default:
                 return null;
         }

@@ -35,6 +35,15 @@ public abstract class Character {
     public abstract String getActionbarString(CombatUser combatUser);
 
     /**
+     * 전투원으로 매 틱마다 실행할 작업.
+     *
+     * @param combatUser 대상 플레이어
+     * @param i          인덱스
+     */
+    public void onTick(CombatUser combatUser, int i) {
+    }
+
+    /**
      * 전투원으로 다른 엔티티를 공격했을 때 실행할 작업.
      *
      * @param attacker 공격자
