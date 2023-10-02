@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -28,6 +27,7 @@ import java.util.StringJoiner;
  * @see JagerA1
  * @see JagerA2
  * @see JagerA3
+ * @see JagerUlt
  */
 public final class Jager extends Character {
     @Getter
@@ -108,6 +108,8 @@ public final class Jager extends Character {
                 return JagerA2Info.getInstance();
             case 3:
                 return JagerA3Info.getInstance();
+            case 4:
+                return JagerUltInfo.getInstance();
             default:
                 return null;
         }
@@ -115,6 +117,6 @@ public final class Jager extends Character {
 
     @Override
     public UltimateSkillInfo getUltimateSkillInfo() {
-        return null;
+        return JagerUltInfo.getInstance();
     }
 }
