@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.DyeColor;
@@ -48,6 +49,11 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
             if (target != null)
                 entity.setTarget(target.getEntity());
         }
+    }
+
+    @Override
+    public void onDefaultAttack(CombatEntity<?> victim) {
+        victim.damage(this, JagerA1Info.DAMAGE, "", victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override

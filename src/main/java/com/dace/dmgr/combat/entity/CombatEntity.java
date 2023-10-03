@@ -384,6 +384,14 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
+     * 엔티티가 기본 공격을 했을 때 실행될 작업.
+     *
+     * @param victim 피격자
+     */
+    public void onDefaultAttack(CombatEntity<?> victim) {
+    }
+
+    /**
      * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.
      *
      * @param victim 피격자
