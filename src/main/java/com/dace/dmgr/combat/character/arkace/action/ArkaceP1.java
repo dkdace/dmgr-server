@@ -1,51 +1,43 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.HasDuration;
-import com.dace.dmgr.combat.action.PassiveSkill;
-import com.dace.dmgr.combat.action.SkillController;
+import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.TextIcon;
 
-public class ArkaceP1 extends PassiveSkill implements HasDuration {
-    /** 이동속도 증가량 */
-    public static final int SPRINT_SPEED = 30;
-    private static final ArkaceP1 instance = new ArkaceP1();
+import java.util.Arrays;
+import java.util.List;
 
-    public ArkaceP1() {
-        super(1, "강화된 신체",
-                "",
-                "§f달리기의 §b" + TextIcon.WALK_SPEED_INCREASE + " 속도§f가 빨라집니다.",
-                "",
-                "§b" + TextIcon.WALK_SPEED_INCREASE + "§f 30%");
-    }
-
-    public static ArkaceP1 getInstance() {
-        return instance;
+public final class ArkaceP1 extends Skill {
+    public ArkaceP1(CombatUser combatUser) {
+        super(1, combatUser, ArkaceP1Info.getInstance());
     }
 
     @Override
-    public long getCooldown() {
+    public List<ActionKey> getDefaultActionKeys() {
+        return Arrays.asList(ActionKey.SPRINT);
+    }
+
+    @Override
+    public long getDefaultCooldown() {
         return 0;
     }
 
     @Override
-    public long getDuration() {
+    public long getDefaultDuration() {
         return -1;
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
-        if (!skillController.isUsing()) {
-            skillController.setDuration();
-            combatUser.addSpeedIncrement(SPRINT_SPEED);
-            combatUser.getEntity().getEquipment().getItemInMainHand()
-                    .setDurability((short) (combatUser.getCharacter().getWeapon().getItemStack().getDurability() + 1000));
+    public void onUse(ActionKey actionKey) {
+        if (isDurationFinished()) {
+            setDuration();
+            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("ArkaceP1", ArkaceP1Info.SPRINT_SPEED);
+            combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
         } else {
-            skillController.setDuration(0);
-            combatUser.addSpeedIncrement(-SPRINT_SPEED);
-            combatUser.getEntity().getEquipment().getItemInMainHand()
-                    .setDurability(combatUser.getCharacter().getWeapon().getItemStack().getDurability());
+            setDuration(0);
+            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("ArkaceP1");
+            combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
         }
     }
 }

@@ -4,7 +4,6 @@ import com.dace.dmgr.gui.ItemBuilder;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -14,40 +13,33 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
-
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 public class Dummy extends TemporalEntity<Zombie> {
     /**
-     * 더미 인스턴스를 생성하고 지정한 위치에 소환한다.
+     * 더미 인스턴스를 생성한다.
      *
-     * @param location 대상 위치
-     * @param health   체력
+     * @param entity    대상 엔티티
+     * @param maxHealth 최대 체력
      */
-    public Dummy(Location location, int health) {
+    public Dummy(Zombie entity, int maxHealth) {
         super(
-                EntityType.ZOMBIE,
+                entity,
                 "§7§lDummy",
-                location,
-                new Hitbox(location, 0, 0.9, 0, 0.65, 2.1, 0.5),
-                new Hitbox(location, 0, 2, 0, 0.3, 0.1, 0.3)
+                new Hitbox(0.65, 2.1, 0.5, 0, 0.9, 0),
+                new Hitbox(0.3, 0.1, 0.3, 0, 2, 0),
+                true,
+                maxHealth
         );
-        setMaxHealth(health);
-        setHealth(health);
-        setTeam("DUMMY");
-        init();
     }
 
-    /**
-     * 더미의 상태를 초기화한다. 소환 시 호출해야 한다.
-     */
-    private void init() {
+    @Override
+    protected void onInitTemporalEntity(Location location) {
+        setTeam("DUMMY");
         entity.setBaby(false);
         entity.leaveVehicle();
         entity.setAI(false);
-        combatEntityMap.put(getEntity(), this);
 
         List<ItemStack> equipment = new ArrayList<>();
         equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());

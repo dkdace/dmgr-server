@@ -1,14 +1,12 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.Combat;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
+import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActiveSkill;
-import com.dace.dmgr.combat.action.SkillController;
-import com.dace.dmgr.combat.action.WeaponController;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
@@ -17,91 +15,88 @@ import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
-public class ArkaceA1 extends ActiveSkill {
-    /** 쿨타임 */
-    public static final long COOLDOWN = 7 * 20;
-    /** 피해량 (폭발) */
-    public static final int DAMAGE_EXPLODE = 100;
-    /** 피해량 (직격) */
-    public static final int DAMAGE_DIRECT = 50;
-    /** 투사체 속력 */
-    public static final int VELOCITY = 60;
-    /** 피해 범위 */
-    public static final float RADIUS = 3;
-    private static final ArkaceA1 instance = new ArkaceA1();
+import java.util.Arrays;
+import java.util.List;
 
-    public ArkaceA1() {
-        super(1, "다이아코어 미사일",
-                "",
-                "§f소형 미사일을 3회 연속으로 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
-                "§f를 입힙니다.",
-                "",
-                "§c" + TextIcon.DAMAGE + "§f 폭발 " + DAMAGE_EXPLODE + " + 직격 " + DAMAGE_DIRECT + "  §c" + TextIcon.RADIUS + "§f 3m",
-                "§f" + TextIcon.COOLDOWN + "§f 7초",
-                "",
-                "§7§l[2] [좌클릭] §f사용");
-    }
-
-    public static ArkaceA1 getInstance() {
-        return instance;
+public final class ArkaceA1 extends ActiveSkill {
+    public ArkaceA1(CombatUser combatUser) {
+        super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }
 
     @Override
-    public long getCooldown() {
-        return COOLDOWN;
+    public List<ActionKey> getDefaultActionKeys() {
+        return Arrays.asList(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
     }
 
     @Override
-    public void use(CombatUser combatUser, SkillController skillController, ActionKey actionKey) {
-        if (!skillController.isUsing()) {
-            WeaponController weaponController = combatUser.getWeaponController();
+    public long getDefaultCooldown() {
+        return ArkaceA1Info.COOLDOWN;
+    }
 
-            weaponController.setCooldown(10);
-            skillController.setGlobalCooldown(10);
-            skillController.setDuration(-1);
+    @Override
+    public long getDefaultDuration() {
+        return -1;
+    }
 
-            new TaskTimer(5, 3) {
-                @Override
-                public boolean run(int i) {
-                    Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
-                            combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
-                    SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
-                    SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
+    @Override
+    public boolean canUse() {
+        return super.canUse() && isDurationFinished();
+    }
 
-                    new Projectile(combatUser, 5, VELOCITY) {
-                        @Override
-                        public void trail(Location location) {
-                            ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
-                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
-                                    0, 0, 0, 32, 250, 225);
-                        }
+    @Override
+    public void onUse(ActionKey actionKey) {
+        combatUser.setGlobalCooldown(10);
+        setDuration();
 
-                        @Override
-                        public void onHit(Location location) {
-                            explode(combatUser, location);
-                        }
+        new TaskTimer(5, 3) {
+            @Override
+            public boolean run(int i) {
+                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
+                        combatUser.getEntity().getLocation().getDirection(), -0.2, -0.4, 0);
+                SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
+                SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                        @Override
-                        public void onHitEntity(Location location, ICombatEntity target, boolean isCrit) {
-                            Combat.attack(combatUser, target, DAMAGE_DIRECT, "", false, true);
-                        }
-                    }.shoot(location);
+                new Projectile(combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(5).build()) {
+                    @Override
+                    public void trail(Location location) {
+                        ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
+                                0, 0, 0, 32, 250, 225);
+                    }
 
-                    return true;
-                }
+                    @Override
+                    public void onHit(Location location) {
+                        explode(combatUser, location);
+                    }
 
-                @Override
-                public void onEnd(boolean cancelled) {
-                    new TaskWait(4) {
-                        @Override
-                        public void run() {
-                            skillController.setCooldown();
-                        }
-                    };
-                }
-            };
-        }
+                    @Override
+                    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                        target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
+                        return false;
+                    }
+                }.shoot(location);
+
+                return true;
+            }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                new TaskWait(4) {
+                    @Override
+                    public void run() {
+                        setDuration(0);
+                    }
+                };
+            }
+        };
     }
 
     private void explode(CombatUser combatUser, Location location) {
@@ -112,9 +107,7 @@ public class ArkaceA1 extends ActiveSkill {
                 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
-        if (location.distance(combatUser.getEntity().getLocation()) < RADIUS)
-            Combat.attack(combatUser, combatUser, DAMAGE_EXPLODE, "", false, true);
-        Combat.getNearEnemies(combatUser, location, RADIUS).forEach(target ->
-                Combat.attack(combatUser, target, DAMAGE_EXPLODE, "", false, true));
+        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS, true).forEach(target ->
+                target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
     }
 }

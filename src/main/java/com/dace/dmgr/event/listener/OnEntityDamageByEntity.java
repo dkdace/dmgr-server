@@ -1,26 +1,29 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-
-public class OnEntityDamageByEntity implements Listener {
+public final class OnEntityDamageByEntity implements Listener {
     @EventHandler
     public static void event(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity victim = event.getEntity();
+        CombatEntity<?> attCombatEntity = null;
+        CombatEntity<?> vicCombatEntity = null;
+        if (attacker instanceof LivingEntity)
+            attCombatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) attacker);
+        if (victim instanceof LivingEntity)
+            vicCombatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) victim);
 
-        if (attacker instanceof Player) {
-            CombatUser attCombatUser = combatUserMap.get(attacker);
-
-            if (attCombatUser != null && attCombatUser.getCharacter() != null)
-                event.setCancelled(true);
-        }
+        if (attCombatEntity != null || vicCombatEntity != null)
+            event.setCancelled(true);
+        if (attCombatEntity != null && vicCombatEntity != null)
+            attCombatEntity.onDefaultAttack(vicCombatEntity);
     }
 }
 

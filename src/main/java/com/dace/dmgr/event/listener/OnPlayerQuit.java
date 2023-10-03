@@ -2,6 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.SoundUtil;
@@ -12,20 +13,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
-
-public class OnPlayerQuit implements Listener {
+public final class OnPlayerQuit implements Listener {
     /** 퇴장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
 
     @EventHandler
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         user.reset();
 
         event.setQuitMessage(PREFIX + player.getName());
-        userMap.remove(player);
+        EntityInfoRegistry.removeUser(player);
 
         new TaskWait(1) {
             @Override
@@ -46,10 +45,10 @@ public class OnPlayerQuit implements Listener {
                 switch (i) {
                     case 0:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);
-                        return true;
+                        break;
                     case 3:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
-                        return true;
+                        break;
                 }
 
                 return true;

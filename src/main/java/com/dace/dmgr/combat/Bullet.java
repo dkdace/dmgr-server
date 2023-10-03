@@ -1,7 +1,8 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.AllArgsConstructor;
@@ -11,8 +12,11 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
- * 총알. 원거리 공격(투사체, 히트박스) 등을 관리하기 위한 클래스.
+ * 총알. 원거리 공격(투사체, 히트스캔) 등을 관리하기 위한 클래스.
  *
  * @see Hitscan
  * @see Projectile
@@ -20,19 +24,19 @@ import org.bukkit.util.Vector;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public abstract class Bullet {
-    /** 총알의 최대 사거리 */
-    protected static final int MAX_RANGE = 70;
+    /** 총알의 최소 사거리 */
+    protected static final float MIN_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.25F;
-    /** {@code trailInterval} 기본값. 단위: 판정점 개수 */
-    protected static final int TRAIL_INTERVAL = 7;
     /** 총알을 발사하는 엔티티 */
-    protected final ICombatEntity shooter;
+    protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
-    protected final int trailInterval;
+    protected int trailInterval;
+    /** 총알의 최대 사거리 */
+    protected int maxDistance;
     /** 관통 여부 */
     protected boolean penetrating;
-    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침). 기본값: 1 */
+    /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */
     protected float hitboxMultiplier;
 
     /**
@@ -64,9 +68,9 @@ public abstract class Bullet {
      * 엔티티가 보는 방향으로 총알을 발사한다.
      *
      * @param origin 발화점
-     * @param spread 탄퍼짐 정도
+     * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
-    public void shoot(Location origin, float spread) {
+    public final void shoot(Location origin, float spread) {
         shoot(origin, shooter.getEntity().getLocation().getDirection(), spread);
     }
 
@@ -75,16 +79,16 @@ public abstract class Bullet {
      *
      * @param origin 발화점
      */
-    public void shoot(Location origin) {
+    public final void shoot(Location origin) {
         shoot(origin, 0);
     }
 
     /**
      * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
      *
-     * @param spread 탄퍼짐 정도
+     * @param spread 탄퍼짐 정도. 단위: ×0.02블록/블록
      */
-    public void shoot(float spread) {
+    public final void shoot(float spread) {
         if (shooter instanceof CombatUser)
             shoot(((CombatUser) shooter).getEntity().getEyeLocation(), spread);
         else
@@ -94,7 +98,7 @@ public abstract class Bullet {
     /**
      * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 탄퍼짐 없이 총알을 발사한다.
      */
-    public void shoot() {
+    public final void shoot() {
         if (shooter instanceof CombatUser)
             shoot(((CombatUser) shooter).getEntity().getEyeLocation());
         else
@@ -102,43 +106,96 @@ public abstract class Bullet {
     }
 
     /**
-     * 주어진 위치에 트레일을 남긴다.
+     * 총알의 블록 충돌 로직을 처리한다.
+     *
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @return {@link Bullet#onHitBlock(Location, Vector, Block)}의 반환값
+     */
+    protected final boolean handleBlockCollision(Location location, Vector direction) {
+        Vector subDir = direction.clone().multiply(0.25);
+        Block hitBlock = location.getBlock();
+
+        if (direction.length() > 0.01)
+            while (!LocationUtil.isNonSolid(location))
+                location.subtract(subDir);
+
+        onHit(location.clone());
+        return onHitBlock(location.clone(), direction, hitBlock);
+    }
+
+    /**
+     * 총알 주변의 적을 찾고 피격 로직을 처리한다.
+     *
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param targets   피격자 목록
+     * @param size      기본 판정 범위
+     * @return {@link Bullet#onHitEntity(Location, Vector, CombatEntity, boolean)}의 반환값
+     */
+    protected final boolean findEnemyAndHandleCollision(Location location, Vector direction, Set<CombatEntity<?>> targets, float size) {
+        Map.Entry<CombatEntity<?>, Boolean> targetEntry
+                = CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier);
+        CombatEntity<?> target = targetEntry.getKey();
+        boolean isCrit = targetEntry.getValue();
+
+        if (target != null && targets.add(target)) {
+            onHit(location.clone());
+            return onHitEntity(location.clone(), direction, target, isCrit);
+        }
+
+        return true;
+    }
+
+    /**
+     * {@link Bullet#trailInterval} 주기마다 실행될 작업
+     *
+     * <p>주로 파티클을 남길 때 사용한다.</p>
      *
      * @param location 위치
      */
     public abstract void trail(Location location);
 
     /**
-     * 총알이 블록에 맞았을 때 실행될 작업
+     * 총알이 블록에 맞았을 때 실행될 작업.
      *
-     * @param location 총알이 맞힌 위치
-     * @param hitBlock 총알이 맞힌 블록
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param hitBlock  맞은 블록
+     * @return 관통 여부. {@code true} 반환 시 블록 관통
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
-    public void onHitBlock(Location location, Block hitBlock) {
-        Bullet.bulletHitEffect(location, hitBlock, true);
-    }
+    public abstract boolean onHitBlock(Location location, Vector direction, Block hitBlock);
 
     /**
-     * 총알이 엔티티에 맞았을 때 실행될 작업
+     * 총알이 엔티티에 맞았을 때 실행될 작업.
      *
-     * @param location 총알이 맞힌 위치
-     * @param target   총알이 맞힌 엔티티
-     * @param isCrit   치명타 여부
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param target    맞은 엔티티
+     * @param isCrit    치명타 여부
+     * @return 관통 여부. {@code true} 반환 시 엔티티 관통
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    public abstract void onHitEntity(Location location, ICombatEntity target, boolean isCrit);
+    public abstract boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit);
 
     /**
-     * 총알이 (블록이든 엔티티든) 맞았을 때 실행될 작업
+     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업.
      *
-     * @param location 총알이 맞힌 위치
+     * @param location 맞은 위치
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
     public void onHit(Location location) {
     }
 
+    /**
+     * 총알이 소멸했을 때 실행될 작업.
+     *
+     * @param location 소멸한 위치
+     */
+    public void onDestroy(Location location) {
+    }
 }

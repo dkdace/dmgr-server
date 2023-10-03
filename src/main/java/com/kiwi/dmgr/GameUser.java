@@ -1,11 +1,7 @@
 package com.kiwi.dmgr;
 
-import com.dace.dmgr.system.HashMapList;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GameUser {

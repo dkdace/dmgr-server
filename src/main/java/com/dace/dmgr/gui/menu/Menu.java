@@ -13,7 +13,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 
-public class Menu extends Gui {
+/**
+ * 메뉴 GUI 클래스.
+ */
+public final class Menu extends Gui {
     @Getter
     private static final Menu instance = new Menu();
 

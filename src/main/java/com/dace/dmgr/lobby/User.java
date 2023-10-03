@@ -1,7 +1,7 @@
 package com.dace.dmgr.lobby;
 
-import com.dace.dmgr.combat.CombatTick;
-import com.dace.dmgr.system.HashMapList;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SkinManager;
 import com.dace.dmgr.util.YamlFile;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
@@ -11,48 +11,53 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-import static com.dace.dmgr.system.HashMapList.userMap;
-
 /**
  * 유저 정보를 관리하는 클래스.
  */
-@Getter
-public class User {
-    /** 로비 사이드바 */
-    private final BPlayerBoard lobbySidebar;
+public final class User {
     /** 플레이어 객체 */
+    @Getter
     private final Player player;
+    /** 로비 사이드바 */
+    @Getter
+    private final BPlayerBoard lobbySidebar;
     /** 유저 설정 정보 관리를 위한 객체 */
+    @Getter
     private final UserConfig userConfig;
     /** 설정파일 관리를 위한 객체 */
     private final YamlFile yamlFile;
     /** 경험치 */
+    @Getter
     private int xp = 0;
     /** 레벨 */
+    @Getter
     private int level = 1;
     /** 돈 */
+    @Getter
     private int money = 0;
     /** 랭크 점수 */
+    @Getter
     private int rank = 100;
     /** 랭크게임 플레이 판 수 */
+    @Getter
     private int rankPlay = 0;
     /** 랭크게임 플레이 여부 */
+    @Getter
     private boolean isRanked = false;
     /** 매치메이킹 점수 */
+    @Getter
     private int MMR = 100;
     /** 리소스팩 적용 여부 */
+    @Getter
     @Setter
     private boolean resourcePack = false;
     /** 리소스팩 적용 상태 */
+    @Getter
     @Setter
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
     /**
-     * 유저 인스턴스를 생성하고 {@link HashMapList#userMap}에 추가한다.
-     *
-     * <p>플레이어가 서버에 접속할 때 호출해야 하며, 퇴장 시 {@link HashMapList#userMap}에서
-     * 제거해야 한다.</p>
+     * 유저 인스턴스를 생성한다.
      *
      * @param player 대상 플레이어
      */
@@ -68,7 +73,14 @@ public class User {
         this.rankPlay = yamlFile.get("rankPlay", rankPlay);
         this.isRanked = yamlFile.get("isRanked", isRanked);
         this.MMR = yamlFile.get("mmr", MMR);
-        userMap.put(player, this);
+    }
+
+    /**
+     * 유저를 초기화한다.
+     */
+    public void init() {
+        EntityInfoRegistry.addUser(player, this);
+        Lobby.lobbyTick(this);
     }
 
     public void setXp(int xp) {
@@ -104,17 +116,9 @@ public class User {
         yamlFile.set("mmr", this.MMR);
     }
 
-    public boolean isRanked() {
-        return isRanked;
-    }
-
     public void setRanked(boolean ranked) {
         this.isRanked = ranked;
         yamlFile.set("isRanked", this.isRanked);
-    }
-
-    public boolean isResourcePack() {
-        return resourcePack;
     }
 
     /**
@@ -130,8 +134,12 @@ public class User {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        combatUserMap.remove(player);
-        CombatTick.playLowHealthScreenEffect(player, false);
+
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
+        if (combatUser != null) {
+            combatUser.reset();
+            EntityInfoRegistry.removeCombatUser(player);
+        }
     }
 
     /**

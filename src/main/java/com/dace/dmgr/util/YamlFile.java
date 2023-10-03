@@ -18,7 +18,7 @@ import java.io.File;
  *   key2: 1234
  * </pre>
  */
-public class YamlFile {
+public final class YamlFile {
     /** Yaml 설정 객체 */
     private final YamlConfiguration config;
     /** 파일 저장을 위한 객체 */

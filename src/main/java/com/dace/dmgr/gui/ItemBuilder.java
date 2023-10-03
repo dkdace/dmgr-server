@@ -3,6 +3,7 @@ package com.dace.dmgr.gui;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.shampaggon.crackshot.CSUtility;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -17,14 +18,15 @@ import java.util.UUID;
 /**
  * 아이템 생성 기능을 제공하는 빌더 클래스.
  */
-public class ItemBuilder {
+public final class ItemBuilder {
     /** 크랙샷 아이템을 생성하기 위한 크랙샷 객체 */
-    public static final CSUtility csUtility = new CSUtility();
+    private static final CSUtility csUtility = new CSUtility();
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
     private static Field profileField;
     /** 생성할 아이템 객체 */
     private final ItemStack itemStack;
     /** 생성할 아이템의 정보 객체 */
+    @Getter
     private final ItemMeta itemMeta;
 
     /**
@@ -67,6 +69,7 @@ public class ItemBuilder {
      *
      * @param playerSkull 플레이어 머리 아이템
      * @return ItemBuilder
+     * @see PlayerSkull
      */
     public static ItemBuilder fromPlayerSkull(PlayerSkull playerSkull) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
@@ -81,8 +84,8 @@ public class ItemBuilder {
                 profileField.setAccessible(true);
             }
             profileField.set(skullMeta, gameProfile);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         return itemBuilder;
@@ -99,10 +102,6 @@ public class ItemBuilder {
         ItemBuilder itemBuilder = new ItemBuilder(weapon).addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
         itemBuilder.getItemMeta().setUnbreakable(true);
         return itemBuilder;
-    }
-
-    public ItemMeta getItemMeta() {
-        return itemMeta;
     }
 
     /**

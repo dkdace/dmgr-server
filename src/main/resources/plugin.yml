@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.dace.dmgr.DMGR
 prefix: DMGR
 database: false
-depend: [ CrackShot, WorldEdit, WorldGuard, ProtocolLib, PacketWrapper, SkinsRestorer, Netherboard ]
+depend: [ CrackShot, WorldEdit, WorldGuard, ProtocolLib, PacketWrapper, SkinsRestorer, Netherboard, GlowAPI ]
 authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:
@@ -30,6 +30,15 @@ commands:
       - config
   선택:
     permission: admin
-    description: DMGR Command
-  test:
+    description: DMGR Test command
+    aliases:
+      - tjsxor
+      - select
+  소환:
     permission: admin
+    description: DMGR Test command
+    aliases:
+      - thghks
+      - dummy
+      - 더미
+      - ejal

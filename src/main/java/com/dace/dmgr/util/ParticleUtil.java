@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 /**
  * 입자 생성 기능을 제공하는 클래스.
  */
-public class ParticleUtil {
+public final class ParticleUtil {
     /**
      * 지정한 위치에 입자를 생성한다.
      *
@@ -23,7 +23,7 @@ public class ParticleUtil {
      * @param speed    입자의 속도
      */
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
-        WrapperPlayServerWorldParticles packet = getNormalPacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
+        WrapperPlayServerWorldParticles packet = getParticlePacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.broadcastPacket();
     }
@@ -41,7 +41,7 @@ public class ParticleUtil {
      * @param player   대상 플레이어
      */
     public static void play(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
-        WrapperPlayServerWorldParticles packet = getNormalPacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
+        WrapperPlayServerWorldParticles packet = getParticlePacket(particle, location, count, offsetX, offsetY, offsetZ, speed);
 
         packet.sendPacket(player);
     }
@@ -61,7 +61,8 @@ public class ParticleUtil {
      */
     public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         for (int i = 0; i < count; i++) {
-            WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
+            WrapperPlayServerWorldParticles packet = getRGBParticlePacket(particle, location, offsetX, offsetY, offsetZ,
+                    red, green, blue);
 
             packet.broadcastPacket();
         }
@@ -83,7 +84,8 @@ public class ParticleUtil {
      */
     public static void playRGB(ColoredParticle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, int red, int green, int blue, Player player) {
         for (int i = 0; i < count; i++) {
-            WrapperPlayServerWorldParticles packet = getColoredPacket(particle, location, offsetX, offsetY, offsetZ, red, green, blue);
+            WrapperPlayServerWorldParticles packet = getRGBParticlePacket(particle, location, offsetX, offsetY, offsetZ,
+                    red, green, blue);
 
             packet.sendPacket(player);
         }
@@ -103,7 +105,8 @@ public class ParticleUtil {
      * @param speed    입자의 속도
      */
     public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
-        WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
+        WrapperPlayServerWorldParticles packet = getBlockParticlePacket(particle, material, data, location, count, offsetX,
+                offsetY, offsetZ, speed);
 
         packet.broadcastPacket();
     }
@@ -123,7 +126,8 @@ public class ParticleUtil {
      * @param player   대상 플레이어
      */
     public static void playBlock(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed, Player player) {
-        WrapperPlayServerWorldParticles packet = getBlockPacket(particle, material, data, location, count, offsetX, offsetY, offsetZ, speed);
+        WrapperPlayServerWorldParticles packet = getBlockParticlePacket(particle, material, data, location, count, offsetX,
+                offsetY, offsetZ, speed);
 
         packet.sendPacket(player);
     }
@@ -140,7 +144,7 @@ public class ParticleUtil {
      * @param speed    입자의 속도
      * @return 입자 패킷
      */
-    private static WrapperPlayServerWorldParticles getNormalPacket(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
+    private static WrapperPlayServerWorldParticles getParticlePacket(Particle particle, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
         packet.setParticleType(EnumWrappers.Particle.valueOf(particle.toString()));
@@ -170,7 +174,7 @@ public class ParticleUtil {
      * @param blue     파랑. {@code 0 ~ 255} 사이의 값
      * @return 입자 패킷
      */
-    private static WrapperPlayServerWorldParticles getColoredPacket(ColoredParticle particle, Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
+    private static WrapperPlayServerWorldParticles getRGBParticlePacket(ColoredParticle particle, Location location, float offsetX, float offsetY, float offsetZ, int red, int green, int blue) {
         if (red == 0) red = 1;
         if (green == 0) green = 1;
         if (blue == 0) blue = 1;
@@ -208,7 +212,7 @@ public class ParticleUtil {
      * @param speed    입자의 속도
      * @return 입자 패킷
      */
-    private static WrapperPlayServerWorldParticles getBlockPacket(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
+    private static WrapperPlayServerWorldParticles getBlockParticlePacket(BlockParticle particle, Material material, int data, Location location, int count, float offsetX, float offsetY, float offsetZ, float speed) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
         packet.setParticleType(EnumWrappers.Particle.valueOf(particle.toString()));

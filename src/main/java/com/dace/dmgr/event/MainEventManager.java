@@ -8,7 +8,7 @@ import com.dace.dmgr.gui.menu.PlayerOption;
 /**
  * 메인 이벤트를 등록하는 클래스.
  */
-public class MainEventManager {
+public final class MainEventManager {
     public static void init() {
         EventUtil.registerListener(new OnPlayerJoin());
         EventUtil.registerListener(new OnPlayerQuit());
@@ -24,6 +24,7 @@ public class MainEventManager {
         EventUtil.registerListener(new OnEntityDamage());
         EventUtil.registerListener(new OnEntityDamageByEntity());
         EventUtil.registerListener(new OnEntityDeath());
+        EventUtil.registerListener(new OnEntityTarget());
         EventUtil.registerListener(new OnPlayerSwapHandItems());
         EventUtil.registerListener(new OnPlayerToggleSprint());
         EventUtil.registerListener(new OnPlayerDropItem());
