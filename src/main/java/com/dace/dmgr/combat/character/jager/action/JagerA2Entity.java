@@ -93,7 +93,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
         target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
-        skill.getSummonEntities().clear();
+        skill.setSummonEntity(null);
     }
 
     /**
@@ -109,8 +109,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished() && skill1.getSummonEntities().get(0).getEntity().getTarget() == null)
-            skill1.getSummonEntities().get(0).getEntity().setTarget(victim.getEntity());
+        if (!skill1.isDurationFinished() && skill1.getSummonEntity().getEntity().getTarget() == null)
+            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
     }
 
     @Override
@@ -132,7 +132,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
         super.onDeath(attacker);
 
         playDeathEffect();
-        skill.getSummonEntities().clear();
+        skill.setSummonEntity(null);
     }
 
     /**

@@ -72,7 +72,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
         playDeathSound();
         skill.setStateValue(0);
         skill.setCooldown(JagerA1Info.COOLDOWN_DEATH);
-        skill.getSummonEntities().clear();
+        skill.setSummonEntity(null);
     }
 
     /**

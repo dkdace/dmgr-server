@@ -7,22 +7,22 @@ import com.dace.dmgr.combat.action.skill.LocationConfirmModule;
 import com.dace.dmgr.combat.action.skill.LocationConfirmable;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Sound;
 import org.bukkit.entity.Wolf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class JagerA1 extends ChargeableSkill implements HasEntity, LocationConfirmable {
+public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, LocationConfirmable {
     /** 위치 확인 모듈 객체 */
     private final LocationConfirmModule locationConfirmModule;
-    /** 소환된 엔티티 목록 */
+    /** 소환된 엔티티 */
     @Getter
-    private final List<JagerA1Entity> summonEntities = new ArrayList<>();
+    @Setter
+    private JagerA1Entity summonEntity = null;
 
     public JagerA1(CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
@@ -80,8 +80,10 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity, Locatio
             locationConfirmModule.toggle();
         } else {
             setDuration(0);
-            summonEntities.forEach(SummonEntity::remove);
-            summonEntities.clear();
+            if (summonEntity != null) {
+                summonEntity.remove();
+                summonEntity = null;
+            }
         }
     }
 
@@ -98,6 +100,6 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity, Locatio
         Wolf wolf = CombatEntityUtil.spawn(Wolf.class, locationConfirmModule.getLocation());
         JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);
         jagerA1Entity.init();
-        summonEntities.add(jagerA1Entity);
+        summonEntity = jagerA1Entity;
     }
 }

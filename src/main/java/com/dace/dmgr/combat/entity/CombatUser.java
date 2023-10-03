@@ -258,8 +258,10 @@ public final class CombatUser extends CombatEntity<Player> {
         setLowHealthScreenEffect(false);
         entity.setFlying(false);
         skillMap.forEach((skillInfo, skill) -> {
-            if (skill instanceof HasEntity)
-                ((HasEntity) skill).getSummonEntities().forEach(SummonEntity::remove);
+            if (skill instanceof HasEntities)
+                ((HasEntities<?>) skill).getSummonEntities().forEach(SummonEntity::remove);
+            if (skill instanceof HasEntity && ((HasEntity<?>) skill).getSummonEntity() != null)
+                ((HasEntity<?>) skill).getSummonEntity().remove();
         });
     }
 

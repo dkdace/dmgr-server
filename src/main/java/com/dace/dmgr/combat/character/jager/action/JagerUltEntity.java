@@ -62,7 +62,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
                 });
             if (i >= JagerUltInfo.DURATION) {
                 remove();
-                skill.getSummonEntities().clear();
+                skill.setSummonEntity(null);
             }
         }
 
@@ -144,7 +144,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
         super.onDeath(attacker);
 
         playDeathEffect();
-        skill.getSummonEntities().clear();
+        skill.setSummonEntity(null);
     }
 
     /**

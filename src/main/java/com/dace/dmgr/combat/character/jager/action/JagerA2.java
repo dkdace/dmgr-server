@@ -9,26 +9,26 @@ import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class JagerA2 extends ActiveSkill implements HasEntity {
+public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entity> {
     /** 소환된 엔티티 목록 */
     @Getter
-    private final List<JagerA2Entity> summonEntities = new ArrayList<>();
+    @Setter
+    private JagerA2Entity summonEntity = null;
 
     public JagerA2(CombatUser combatUser) {
         super(2, combatUser, JagerA2Info.getInstance(), 1);
@@ -65,9 +65,11 @@ public final class JagerA2 extends ActiveSkill implements HasEntity {
         combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
         Location location = combatUser.getEntity().getLocation();
         SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
-        summonEntities.forEach(SummonEntity::remove);
-        summonEntities.clear();
         setDuration();
+        if (summonEntity != null) {
+            summonEntity.remove();
+            summonEntity = null;
+        }
 
         new TaskTimer(1, JagerA2Info.READY_DURATION) {
             @Override
@@ -112,7 +114,7 @@ public final class JagerA2 extends ActiveSkill implements HasEntity {
                         MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
                         JagerA2Entity jagerA2Entity = new JagerA2Entity(magmaCube, combatUser);
                         jagerA2Entity.init();
-                        summonEntities.add(jagerA2Entity);
+                        summonEntity = jagerA2Entity;
                     }
                 }.shoot(location);
             }

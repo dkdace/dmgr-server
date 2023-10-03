@@ -81,7 +81,7 @@ public final class Jager extends Character {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished())
-            skill1.getSummonEntities().get(0).getEntity().setTarget(victim.getEntity());
+            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
     }
 
     @Override
