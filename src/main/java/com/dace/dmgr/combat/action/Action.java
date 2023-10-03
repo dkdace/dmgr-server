@@ -22,7 +22,7 @@ import java.util.List;
 public abstract class Action {
     /** 플레이어 객체 */
     protected final CombatUser combatUser;
-    /** 상호작용 정보 객체 */
+    /** 동작 정보 객체 */
     protected final ActionInfo actionInfo;
     /** 아이템 */
     protected ItemStack itemStack;
@@ -136,6 +136,15 @@ public abstract class Action {
      */
     public final boolean isCooldownFinished() {
         return getCooldown() == 0;
+    }
+
+    /**
+     * 동작을 사용할 수 있는 지 확인한다.
+     *
+     * @return 사용 가능 여부
+     */
+    public boolean canUse() {
+        return isCooldownFinished();
     }
 
     /**

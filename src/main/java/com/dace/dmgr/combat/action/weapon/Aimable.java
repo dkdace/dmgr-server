@@ -10,6 +10,11 @@ public interface Aimable {
     boolean isAiming();
 
     /**
+     * @return 확대 레벨
+     */
+    AimModule.ZoomLevel getZoomLevel();
+
+    /**
      * 정조준 이벤트를 호출한다.
      */
     void aim();

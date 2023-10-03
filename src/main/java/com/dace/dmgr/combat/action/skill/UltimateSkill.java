@@ -10,9 +10,14 @@ import org.bukkit.Sound;
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class UltimateSkill extends Skill {
-    protected UltimateSkill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
-        super(number, combatUser, skillInfo, slot);
+public abstract class UltimateSkill extends ActiveSkill {
+    protected UltimateSkill(int number, CombatUser combatUser, UltimateSkillInfo ultimateSkillInfo) {
+        super(number, combatUser, ultimateSkillInfo, 3);
+    }
+
+    @Override
+    public final long getDefaultCooldown() {
+        return -1;
     }
 
     /**
@@ -21,6 +26,11 @@ public abstract class UltimateSkill extends Skill {
      * @return 필요 충전량
      */
     public abstract int getCost();
+
+    @Override
+    protected void playCooldownFinishSound() {
+        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
+    }
 
     @Override
     public final void onUse(ActionKey actionKey) {

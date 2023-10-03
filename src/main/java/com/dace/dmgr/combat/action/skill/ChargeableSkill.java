@@ -9,12 +9,12 @@ import lombok.Getter;
  * 상태 변수를 가지고 있는 충전형 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class ChargeableSkill extends Skill {
+public abstract class ChargeableSkill extends ActiveSkill {
     /** 상태 변수 */
     private float stateValue = 0;
 
-    protected ChargeableSkill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
-        super(number, combatUser, skillInfo, slot);
+    protected ChargeableSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+        super(number, combatUser, activeSkillInfo, slot);
     }
 
     @Override
@@ -30,6 +30,7 @@ public abstract class ChargeableSkill extends Skill {
 
     @Override
     protected void onDurationTick() {
+        super.onDurationTick();
         addStateValue(-(getStateValueDecrement() / 20F));
     }
 
@@ -57,17 +58,21 @@ public abstract class ChargeableSkill extends Skill {
      */
     public abstract int getMaxStateValue();
 
+
+    /**
+     * @param stateValue 상태 변수
+     */
+    public final void setStateValue(float stateValue) {
+        this.stateValue = Math.min(Math.max(0, stateValue), getMaxStateValue());
+    }
+
     /**
      * 지정한 양만큼 스킬의 상태 변수를 증가시킨다.
      *
      * @param increment 증가량
      */
     public final void addStateValue(float increment) {
-        stateValue += increment;
-        if (stateValue < 0)
-            stateValue = 0;
-        if (stateValue > getMaxStateValue())
-            stateValue = getMaxStateValue();
+        setStateValue(stateValue + increment);
     }
 
     /**

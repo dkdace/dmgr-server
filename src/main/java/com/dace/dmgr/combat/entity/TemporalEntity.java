@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 /**
@@ -37,6 +38,8 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
         EntityInfoRegistry.addTemporalEntity(getEntity(), this);
         setMaxHealth(maxHealth);
         setHealth(maxHealth);
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+                .getBaseValue());
         onInitTemporalEntity(entity.getLocation());
     }
 
@@ -46,6 +49,19 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     public void remove() {
         EntityInfoRegistry.removeTemporalEntity(entity);
         entity.remove();
+    }
+
+    @Override
+    public void onTick(int i) {
+        super.onTick(i);
+
+        if (!isFixed()) {
+            double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
+            if (!canMove())
+                speed = 0.0001F;
+
+            entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
+        }
     }
 
     @Override

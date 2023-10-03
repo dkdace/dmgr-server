@@ -6,6 +6,9 @@ import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.action.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.TextIcon;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 
 /**
@@ -23,6 +26,16 @@ public final class Arkace extends Character {
 
     private Arkace() {
         super("아케이스", "DVArkace", 1000, 1.0F, 1.0F);
+    }
+
+    @Override
+    public String getActionbarString(CombatUser combatUser) {
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
+
+        int capacity = weapon.getRemainingAmmo();
+        int maxCapacity = weapon.getCapacity();
+
+        return StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
     }
 
     @Override

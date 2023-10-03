@@ -24,6 +24,7 @@ public final class MainEventManager {
         EventUtil.registerListener(new OnEntityDamage());
         EventUtil.registerListener(new OnEntityDamageByEntity());
         EventUtil.registerListener(new OnEntityDeath());
+        EventUtil.registerListener(new OnEntityTarget());
         EventUtil.registerListener(new OnPlayerSwapHandItems());
         EventUtil.registerListener(new OnPlayerToggleSprint());
         EventUtil.registerListener(new OnPlayerDropItem());

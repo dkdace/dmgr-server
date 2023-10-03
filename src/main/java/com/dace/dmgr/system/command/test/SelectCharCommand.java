@@ -1,6 +1,5 @@
 package com.dace.dmgr.system.command.test;
 
-import com.dace.dmgr.combat.CombatTick;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.jager.Jager;
@@ -27,11 +26,9 @@ public class SelectCharCommand implements CommandExecutor {
         String character = args[2];
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
-        boolean first = false;
         if (combatUser == null) {
             combatUser = new CombatUser(player);
             combatUser.init();
-            first = true;
         }
         combatUser.setTeam(team);
 
@@ -40,9 +37,11 @@ public class SelectCharCommand implements CommandExecutor {
             case "arkace":
                 combatUser.setCharacter(Arkace.getInstance());
                 break;
+            case "예거":
+            case "jager":
+                combatUser.setCharacter(Jager.getInstance());
+                break;
         }
-        if (first)
-            CombatTick.run(combatUser);
 
         return true;
     }

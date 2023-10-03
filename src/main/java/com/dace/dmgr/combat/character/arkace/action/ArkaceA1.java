@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
@@ -15,11 +15,13 @@ import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArkaceA1 extends Skill {
+public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(CombatUser combatUser) {
         super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }
@@ -46,8 +48,7 @@ public final class ArkaceA1 extends Skill {
 
     @Override
     public void onUse(ActionKey actionKey) {
-        combatUser.getWeapon().setCooldown(10);
-        setGlobalCooldown(10);
+        combatUser.setGlobalCooldown(10);
         setDuration();
 
         new TaskTimer(5, 3) {
@@ -72,8 +73,14 @@ public final class ArkaceA1 extends Skill {
                     }
 
                     @Override
-                    public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
+                        return false;
                     }
                 }.shoot(location);
 
@@ -100,9 +107,7 @@ public final class ArkaceA1 extends Skill {
                 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
-        if (location.distance(combatUser.getEntity().getLocation()) < ArkaceA1Info.RADIUS)
-            combatUser.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true);
-        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS).forEach(target ->
+        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS, true).forEach(target ->
                 target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
     }
 }

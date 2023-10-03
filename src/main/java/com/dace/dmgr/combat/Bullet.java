@@ -25,15 +25,15 @@ import java.util.Set;
 @AllArgsConstructor
 public abstract class Bullet {
     /** 총알의 최소 사거리 */
-    protected static final float MIN_RANGE = 0.5F;
-    /** 총알의 최대 사거리 */
-    protected static final int MAX_RANGE = 70;
+    protected static final float MIN_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.25F;
     /** 총알을 발사하는 엔티티 */
     protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     protected int trailInterval;
+    /** 총알의 최대 사거리 */
+    protected int maxDistance;
     /** 관통 여부 */
     protected boolean penetrating;
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */
@@ -108,44 +108,43 @@ public abstract class Bullet {
     /**
      * 총알의 블록 충돌 로직을 처리한다.
      *
-     * @param location  위치
+     * @param location  맞은 위치
      * @param direction 발사 방향
+     * @return {@link Bullet#onHitBlock(Location, Vector, Block)}의 반환값
      */
-    protected final void handleBlockCollision(Location location, Vector direction) {
-        Location loc = location.clone();
+    protected final boolean handleBlockCollision(Location location, Vector direction) {
         Vector subDir = direction.clone().multiply(0.25);
         Block hitBlock = location.getBlock();
 
-        while (!LocationUtil.isNonSolid(loc))
-            loc.subtract(subDir);
+        if (direction.length() > 0.01)
+            while (!LocationUtil.isNonSolid(location))
+                location.subtract(subDir);
 
-        loc.subtract(subDir);
-        onHit(loc);
-        onHitBlock(loc, hitBlock);
+        onHit(location.clone());
+        return onHitBlock(location.clone(), direction, hitBlock);
     }
 
     /**
      * 총알 주변의 적을 찾고 피격 로직을 처리한다.
      *
-     * @param location 위치
-     * @param targets  피격자 목록
-     * @param size     기본 판정 범위
-     * @return 적 피격 시 {@code penetrating}이 {@code false}이면 {@code true} 반환
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param targets   피격자 목록
+     * @param size      기본 판정 범위
+     * @return {@link Bullet#onHitEntity(Location, Vector, CombatEntity, boolean)}의 반환값
      */
-    protected final boolean findEnemyAndHandleCollision(Location location, Set<CombatEntity<?>> targets, float size) {
+    protected final boolean findEnemyAndHandleCollision(Location location, Vector direction, Set<CombatEntity<?>> targets, float size) {
         Map.Entry<CombatEntity<?>, Boolean> targetEntry
-                = CombatUtil.getNearEnemy(shooter, location, size * hitboxMultiplier);
+                = CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier);
         CombatEntity<?> target = targetEntry.getKey();
         boolean isCrit = targetEntry.getValue();
 
         if (target != null && targets.add(target)) {
-            onHit(location);
-            onHitEntity(location, target, isCrit);
-
-            return !penetrating;
+            onHit(location.clone());
+            return onHitEntity(location.clone(), direction, target, isCrit);
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -158,35 +157,45 @@ public abstract class Bullet {
     public abstract void trail(Location location);
 
     /**
-     * 총알이 블록에 맞았을 때 실행될 작업
+     * 총알이 블록에 맞았을 때 실행될 작업.
      *
-     * @param location 맞은 위치
-     * @param hitBlock 맞은 블록
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param hitBlock  맞은 블록
+     * @return 관통 여부. {@code true} 반환 시 블록 관통
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
-    public void onHitBlock(Location location, Block hitBlock) {
-        Bullet.bulletHitEffect(location, hitBlock, true);
-    }
+    public abstract boolean onHitBlock(Location location, Vector direction, Block hitBlock);
 
     /**
-     * 총알이 엔티티에 맞았을 때 실행될 작업
+     * 총알이 엔티티에 맞았을 때 실행될 작업.
      *
-     * @param location 맞은 위치
-     * @param target   맞은 엔티티
-     * @param isCrit   치명타 여부
+     * @param location  맞은 위치
+     * @param direction 발사 방향
+     * @param target    맞은 엔티티
+     * @param isCrit    치명타 여부
+     * @return 관통 여부. {@code true} 반환 시 엔티티 관통
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    public abstract void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit);
+    public abstract boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit);
 
     /**
-     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업
+     * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업.
      *
      * @param location 맞은 위치
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
     public void onHit(Location location) {
+    }
+
+    /**
+     * 총알이 소멸했을 때 실행될 작업.
+     *
+     * @param location 소멸한 위치
+     */
+    public void onDestroy(Location location) {
     }
 }

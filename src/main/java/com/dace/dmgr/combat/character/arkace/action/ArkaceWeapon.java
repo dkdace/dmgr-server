@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.Hitscan;
+import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
@@ -17,6 +17,7 @@ import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,7 +74,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
     @Override
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
-            case CS_PRE_USE:
+            case CS_PRE_USE: {
                 if (getRemainingAmmo() == 0) {
                     reload();
                     return;
@@ -85,7 +86,8 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
 
                 break;
-            case CS_USE:
+            }
+            case CS_USE: {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location location = combatUser.getEntity().getLocation();
@@ -103,7 +105,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     reloadModule.consume(1);
                 }
 
-                new Hitscan(combatUser) {
+                new GunHitscan(combatUser) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
@@ -115,16 +117,26 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     }
 
                     @Override
-                    public void onHitEntity(Location location, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                        if (isUlt)
+                            target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, true);
+                        else {
+                            int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
+                                    ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
+                            target.damage(combatUser, damage, "", isCrit, true);
+                        }
+
+                        return false;
                     }
                 }.shoot(combatUser.getBulletSpread());
 
                 break;
-            case DROP:
+            }
+            case DROP: {
                 reload();
 
                 break;
+            }
         }
     }
 

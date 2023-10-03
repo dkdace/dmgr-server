@@ -1,25 +1,19 @@
 package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.SwapModule;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.StringFormUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -38,23 +32,61 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
      *
-     * @param attacker 공격자 (기준 엔티티)
-     * @param location 위치
-     * @param range    범위 (반지름)
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 최종 피해량 : 10 (20m) ~ 5 (40m)
+     * int damage = getDistantDamage(loc1, loc2, 10, 20, true)
+     * // 최종 피해량 : 20 (10m) ~ 10 (20m) ~ 0 (30m)
+     * int damage = getDistantDamage(loc1, loc2, 20, 10, false)
+     * }</pre>
+     *
+     * @param start             시작 위치
+     * @param end               끝 위치
+     * @param damage            피해량
+     * @param weakeningDistance 피해 감소가 시작하는 거리
+     * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소하며,
+     *                          {@code false}면 최소 피해량이 0이 될 때까지 감소한다.
+     * @return 최종 피해량
+     */
+    public static int getDistantDamage(Location start, Location end, int damage, double weakeningDistance, boolean isHalf) {
+        double distance = start.distance(end);
+
+        if (distance > weakeningDistance) {
+            distance = distance - weakeningDistance;
+            int finalDamage = (int) ((damage / 2) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2);
+
+            if (isHalf && finalDamage < damage / 2) {
+                finalDamage = damage / 2;
+            } else if (finalDamage < 0)
+                finalDamage = 0;
+
+            return finalDamage;
+        } else
+            return damage;
+    }
+
+    /**
+     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적과 치명타 여부를 반환한다.
+     *
+     * @param attacker  공격자 (기준 엔티티)
+     * @param location  위치
+     * @param range     범위 (반지름)
+     * @param predicate 조건
      * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
      * 안에 있으면 {@code true})
      * @see Hitbox
      */
-    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
         CombatEntity<?> entity = EntityInfoRegistry.getAllCombatEntities().stream()
+                .filter(predicate.and(combatEntity ->
+                        combatEntity != attacker && isEnemy(attacker, combatEntity)))
                 .min(Comparator.comparing(combatEntity -> Math.min(
                         location.distance(combatEntity.getHitbox().getCenter()),
                         location.distance(combatEntity.getCritHitbox().getCenter())
                 )))
-                .filter(combatEntity ->
-                        combatEntity != attacker && isEnemy(attacker, combatEntity))
                 .orElse(null);
 
         if (entity == null)
@@ -68,6 +100,40 @@ public final class CombatUtil {
     }
 
     /**
+     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     *
+     * @param attacker 공격자 (기준 엔티티)
+     * @param location 위치
+     * @param range    범위 (반지름)
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
+     * 안에 있으면 {@code true})
+     * @see Hitbox
+     */
+    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+        return getNearEnemy(attacker, location, range, combatEntity -> true);
+    }
+
+    /**
+     * 지정한 위치를 기준으로 범위 안에 있는 모든 적을 반환한다.
+     *
+     * @param attacker       공격자 (기준 엔티티)
+     * @param location       위치
+     * @param range          범위 (반지름)
+     * @param canContainSelf 자가 포함 여부. {@code true}로 지정하면 공격자도 포함된다.
+     * @return 범위 내 모든 적
+     * @see Hitbox
+     */
+    public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range, boolean canContainSelf) {
+        return EntityInfoRegistry.getAllCombatEntities().stream()
+                .filter(entity ->
+                        (entity != attacker && isEnemy(attacker, entity)) || (canContainSelf && (attacker == entity)))
+                .filter(entity ->
+                        LocationUtil.isInHitbox(location, entity.getHitbox(), range) ||
+                                LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
+                .collect(Collectors.toSet());
+    }
+
+    /**
      * 지정한 위치를 기준으로 범위 안에 있는 모든 적을 반환한다.
      *
      * @param attacker 공격자 (기준 엔티티)
@@ -77,32 +143,7 @@ public final class CombatUtil {
      * @see Hitbox
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range) {
-        return EntityInfoRegistry.getAllCombatEntities().stream()
-                .filter(entity ->
-                        entity != attacker && isEnemy(attacker, entity))
-                .filter(entity ->
-                        LocationUtil.isInHitbox(location, entity.getHitbox(), range) ||
-                                LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
-                .collect(Collectors.toSet());
-    }
-
-    /**
-     * 각종 변수를 계산하여 최종 피해량을 반환한다.
-     *
-     * @param attacker 공격자
-     * @param victim   피격자
-     * @param damage   피해량
-     * @param isCrit   치명타 여부
-     * @return 최종 피해량
-     */
-    public static int getFinalDamage(CombatEntity<?> attacker, CombatEntity<?> victim, int damage, boolean isCrit) {
-        if (isCrit)
-            damage *= 1.5;
-
-        int atkBonus = 0;
-        int defBonus = 0;
-
-        return damage * (100 + atkBonus - defBonus) / 100;
+        return getNearEnemies(attacker, location, range, false);
     }
 
     /**
@@ -193,74 +234,5 @@ public final class CombatUtil {
             };
         } else
             combatUser.addBulletSpread(increment, max);
-    }
-
-    /**
-     * 플레이어에게 전체 액션바를 표시한다.
-     *
-     * @param combatUser 대상 플레이어
-     */
-    public static void showActionbar(CombatUser combatUser) {
-        Weapon weapon = combatUser.getWeapon();
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
-            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
-
-        if (weapon instanceof Reloadable &&
-                CooldownManager.getCooldown(combatUser, Cooldown.ACTION_BAR) == 0) {
-            int capacity = ((Reloadable) weapon).getRemainingAmmo();
-            int maxCapacity = ((Reloadable) weapon).getCapacity();
-
-            StringJoiner text = new StringJoiner("    ");
-
-            String ammo = null;
-            switch (combatUser.getCharacter().getName()) {
-                case "아케이스":
-                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
-                    break;
-                case "예거":
-                    ammo = getActionbarProgressBar(TextIcon.CAPACITY, capacity, maxCapacity, maxCapacity, '|');
-                    break;
-            }
-
-            text.add(ammo);
-
-            combatUser.sendActionBar(text.toString());
-        }
-    }
-
-    /**
-     * 액션바에 사용되는 진행 막대를 반환한다.
-     *
-     * <p>Example:</p>
-     *
-     * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
-     *
-     * @param icon    아이콘
-     * @param current 현재 값
-     * @param max     최대 값
-     * @param length  막대 길이 (글자 수)
-     * @param symbol  막대 기호
-     * @return 액션바 진행 막대 문자열
-     */
-    private static String getActionbarProgressBar(char icon, int current, int max, int length, char symbol) {
-        ChatColor color;
-        if (current <= max / 4)
-            color = ChatColor.RED;
-        else if (current <= max / 2)
-            color = ChatColor.YELLOW;
-        else
-            color = ChatColor.WHITE;
-
-        String currentDisplay = String.format("%" + (int) (Math.log10(max) + 1) + "d", current);
-        String maxDisplay = Integer.toString(max);
-
-        return new StringJoiner(" §f")
-                .add(String.valueOf(icon))
-                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
-                .add(new StringJoiner("§f/", "[", "]")
-                        .add(color + currentDisplay)
-                        .add(maxDisplay)
-                        .toString())
-                .toString();
     }
 }

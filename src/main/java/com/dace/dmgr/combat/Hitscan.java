@@ -26,7 +26,7 @@ public abstract class Hitscan extends Bullet {
      * @see HitscanOption
      */
     protected Hitscan(CombatEntity<?> shooter, HitscanOption option) {
-        super(shooter, option.trailInterval, option.penetrating, option.hitboxMultiplier);
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
     }
 
     /**
@@ -38,6 +38,7 @@ public abstract class Hitscan extends Bullet {
         super(shooter);
         HitscanOption hitscanOption = HitscanOption.builder().build();
         this.trailInterval = hitscanOption.trailInterval;
+        this.maxDistance = hitscanOption.maxDistance;
         this.penetrating = hitscanOption.penetrating;
         this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
     }
@@ -50,24 +51,24 @@ public abstract class Hitscan extends Bullet {
      * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     @Override
-    public void shoot(Location origin, Vector direction, float spread) {
+    public final void shoot(Location origin, Vector direction, float spread) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
-        for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
-            if (!LocationUtil.isNonSolid(loc)) {
-                handleBlockCollision(loc, direction);
-                return;
-            }
+        for (int i = 0; loc.distance(origin) < maxDistance; i++) {
+            if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
+                break;
 
-            if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE))
-                return;
+            if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, direction, targets, SIZE))
+                break;
 
             loc.add(direction);
             if (i % trailInterval == 0)
                 trail(loc.clone());
         }
+
+        onDestroy(loc.clone());
     }
 }

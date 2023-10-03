@@ -1,7 +1,9 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -24,8 +26,10 @@ import org.bukkit.potion.PotionEffectType;
 public abstract class CombatEntity<T extends LivingEntity> {
     /** 엔티티 객체 */
     protected final T entity;
-    /** 속성 관리 객체 */
-    private final AttributeManager attributeManager = new AttributeManager();
+    /** 능력치 목록 관리 객체 */
+    protected final AbilityStatusManager abilityStatusManager = new AbilityStatusManager();
+    /** 속성 목록 관리 객체 */
+    protected final PropertyManager propertyManager = new PropertyManager();
     /** 히트박스 객체 */
     private final Hitbox hitbox;
     /** 치명타 히트박스 객체 */
@@ -37,8 +41,6 @@ public abstract class CombatEntity<T extends LivingEntity> {
     /** 팀 */
     @Setter
     protected String team = "";
-    /** 이동속도 증가량 */
-    protected int speedIncrement = 0;
 
     /**
      * 전투 시스템의 엔티티 인스턴스를 생성한다.
@@ -65,6 +67,9 @@ public abstract class CombatEntity<T extends LivingEntity> {
     public final void init() {
         hitbox.setCenter(entity.getLocation());
         critHitbox.setCenter(entity.getLocation());
+        abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
+        abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
+        setName(name);
         onInit();
 
         new TaskTimer(1) {
@@ -130,14 +135,12 @@ public abstract class CombatEntity<T extends LivingEntity> {
     }
 
     /**
-     * 엔티티의 이동속도 증가량을 설정한다.
+     * 엔티티가 치명상인 지 확인한다.
      *
-     * @param speedIncrement 이동속도 증가량. 최소 값은 {@code -100}, 최대 값은 {@code 100}
+     * @return 체력이 25% 이하이면 {@code true} 반환
      */
-    public final void addSpeedIncrement(int speedIncrement) {
-        this.speedIncrement += speedIncrement;
-        if (this.speedIncrement < -100) this.speedIncrement = -100;
-        if (this.speedIncrement > 100) this.speedIncrement = 100;
+    public final boolean isLowHealth() {
+        return getHealth() <= getMaxHealth() / 4;
     }
 
     /**
@@ -156,7 +159,11 @@ public abstract class CombatEntity<T extends LivingEntity> {
         if (!canTakeDamage())
             return;
 
-        damage = CombatUtil.getFinalDamage(attacker, this, damage, isCrit);
+        double damageMultiplier = attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
+        double defenseMultiplier = abilityStatusManager.getAbilityStatus(Ability.DEFENSE).getValue();
+        damage *= (int) (1 + damageMultiplier - defenseMultiplier);
+        if (isCrit)
+            damage *= 2;
 
         attacker.onAttack(this, damage, type, isCrit, isUlt);
         onDamage(attacker, damage, type, isCrit, isUlt);
@@ -194,7 +201,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param attacker 공격자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
-     * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
+     * @see CombatEntity#damage(CombatEntity, int, String, boolean, boolean)
      */
     public final void heal(CombatEntity<?> attacker, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
@@ -205,6 +212,70 @@ public abstract class CombatEntity<T extends LivingEntity> {
         attacker.onGiveHeal(this, amount, isUlt);
 
         setHealth(getHealth() + amount);
+    }
+
+    /**
+     * 엔티티에게 상태 효과를 적용한다.
+     *
+     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
+     * 남은 시간보다 길 경우에만 적용한다.</p>
+     *
+     * @param statusEffect 적용할 상태 효과
+     * @param duration     지속시간 (tick)
+     */
+    public final void applyStatusEffect(StatusEffect statusEffect, long duration) {
+        if (!hasStatusEffect(statusEffect.getStatusEffectType())) {
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getStatusEffectType(), duration);
+
+            statusEffect.onStart(this);
+
+            new TaskTimer(1) {
+                @Override
+                public boolean run(int i) {
+                    if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect.getStatusEffectType()))
+                        return false;
+
+                    statusEffect.onTick(CombatEntity.this, i);
+
+                    return true;
+                }
+
+                @Override
+                public void onEnd(boolean cancelled) {
+                    statusEffect.onEnd(CombatEntity.this);
+                }
+            };
+        } else if (getStatusEffectDuration(statusEffect.getStatusEffectType()) < duration)
+            CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getStatusEffectType(), duration);
+    }
+
+    /**
+     * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
+     *
+     * @param statusEffectType 확인할 상태 효과 종류
+     * @return 남은 시간 (tick)
+     */
+    public final long getStatusEffectDuration(StatusEffectType statusEffectType) {
+        return CooldownManager.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType);
+    }
+
+    /**
+     * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
+     *
+     * @param statusEffectType 확인할 상태 효과 종류
+     * @return 상태 효과를 가지고 있으면 {@code true} 반환
+     */
+    public final boolean hasStatusEffect(StatusEffectType statusEffectType) {
+        return getStatusEffectDuration(statusEffectType) > 0;
+    }
+
+    /**
+     * 엔티티의 상태 효과를 제거한다.
+     *
+     * @param statusEffectType 제거할 상태 효과 종류
+     */
+    public final void removeStatusEffect(StatusEffectType statusEffectType) {
+        CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType);
     }
 
     /**
@@ -257,7 +328,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 이동 가능 여부
      */
     public final boolean canMove() {
-        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0)
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE))
             return false;
 
         return true;
@@ -269,8 +340,9 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @return 점프 가능  여부
      */
     public final boolean canJump() {
-        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0 ||
-                CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) || hasStatusEffect(StatusEffectType.GROUNDING))
+            return false;
+        if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_JUMP)
             return false;
 
         return true;
@@ -281,7 +353,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      *
      * @param i 인덱스
      */
-    public void onTick(int i) {
+    protected void onTick(int i) {
         if (!isFixed)
             updateHitboxTick();
 
@@ -290,6 +362,10 @@ public abstract class CombatEntity<T extends LivingEntity> {
         else
             entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                     9999, -6, false, false), true);
+
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).addModifier("JagerT1", -propertyManager.getValue(Property.FREEZE));
+        if (CooldownManager.getCooldown(this, Cooldown.JAGER_FREEZE_VALUE_DURATION) == 0)
+            propertyManager.setValue(Property.FREEZE, 0);
     }
 
     /**
@@ -305,6 +381,14 @@ public abstract class CombatEntity<T extends LivingEntity> {
                 critHitbox.setCenter(oldLoc);
             }
         };
+    }
+
+    /**
+     * 엔티티가 기본 공격을 했을 때 실행될 작업.
+     *
+     * @param victim 피격자
+     */
+    public void onDefaultAttack(CombatEntity<?> victim) {
     }
 
     /**

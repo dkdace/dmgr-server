@@ -23,6 +23,11 @@ public abstract class Weapon extends Action {
         combatUser.getEntity().setCooldown(WeaponInfo.MATERIAL, (int) getCooldown());
     }
 
+    @Override
+    public boolean canUse() {
+        return super.canUse() && combatUser.isGlobalCooldownFinished();
+    }
+
     /**
      * 스킬 설명 아이템의 내구도를 변경한다.
      *

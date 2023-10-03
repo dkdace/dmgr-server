@@ -9,9 +9,8 @@ import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -29,21 +28,17 @@ public final class OnCombatUserAction implements Listener {
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof Weapon) {
-            if (!weapon.isCooldownFinished())
+            if (!weapon.canUse())
                 return;
 
             weapon.onUse(actionKey);
         } else if (action instanceof Skill) {
-            if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
+            if (!action.canUse())
                 return;
-            if (!((Skill) action).canUse())
+            if (combatUser.hasStatusEffect(StatusEffectType.SILENCE))
                 return;
-            if (action.getActionInfo() instanceof ActiveSkillInfo) {
-                if (!((Skill) action).isGlobalCooldownFinished())
-                    return;
-                if (weapon instanceof Reloadable)
-                    ((Reloadable) weapon).cancelReloading();
-            }
+            if (action.getActionInfo() instanceof ActiveSkillInfo && weapon instanceof Reloadable)
+                ((Reloadable) weapon).cancelReloading();
 
             action.onUse(actionKey);
         }

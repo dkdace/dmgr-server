@@ -11,12 +11,12 @@ import lombok.Getter;
  * 여러 번 사용할 수 있는 스택형 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class StackableSkill extends Skill {
+public abstract class StackableSkill extends ActiveSkill {
     /** 스킬 스택 수 */
     protected int stack = 0;
 
-    protected StackableSkill(int number, CombatUser combatUser, SkillInfo skillInfo, int slot) {
-        super(number, combatUser, skillInfo, slot);
+    protected StackableSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+        super(number, combatUser, activeSkillInfo, slot);
         setStackCooldown(getDefaultStackCooldown());
     }
 

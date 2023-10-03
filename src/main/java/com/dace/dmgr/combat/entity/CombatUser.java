@@ -3,13 +3,15 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.*;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.*;
@@ -27,10 +29,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -92,6 +91,7 @@ public final class CombatUser extends CombatEntity<Player> {
         EntityInfoRegistry.addCombatUser(entity, this);
         setMaxHealth(1000);
         setHealth(1000);
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED);
     }
 
     public Skill getSkill(SkillInfo skillInfo) {
@@ -125,6 +125,26 @@ public final class CombatUser extends CombatEntity<Player> {
             packet.setFood(2);
 
         packet.sendPacket(this.getEntity());
+    }
+
+    /**
+     * 플레이어의 전역 쿨타임이 끝났는 지 확인한다.
+     *
+     * @return 전역 쿨타임 종료 여부
+     */
+    public boolean isGlobalCooldownFinished() {
+        return CooldownManager.getCooldown(this, Cooldown.GLOBAL_COOLDOWN) == 0;
+    }
+
+    /**
+     * 플레이어의 전역 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    public void setGlobalCooldown(int cooldown) {
+        CooldownManager.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, cooldown == -1 ? 9999 : cooldown);
+        entity.setCooldown(SkillInfo.MATERIAL, cooldown);
+        entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
     }
 
     /**
@@ -218,6 +238,7 @@ public final class CombatUser extends CombatEntity<Player> {
         SkinManager.applySkin(entity, character.getSkinName());
         setMaxHealth(character.getHealth());
         setHealth(character.getHealth());
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * character.getSpeedMultiplier());
         entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
         entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
         entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
@@ -236,6 +257,12 @@ public final class CombatUser extends CombatEntity<Player> {
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
         entity.setFlying(false);
+        skillMap.forEach((skillInfo, skill) -> {
+            if (skill instanceof HasEntities)
+                ((HasEntities<?>) skill).getSummonEntities().forEach(SummonEntity::remove);
+            if (skill instanceof HasEntity && ((HasEntity<?>) skill).getSummonEntity() != null)
+                ((HasEntity<?>) skill).getSummonEntity().remove();
+        });
     }
 
     /**
@@ -318,10 +345,13 @@ public final class CombatUser extends CombatEntity<Player> {
      * @return 달리기 가능 여부
      */
     public boolean canSprint() {
-        if (CooldownManager.getCooldown(this, Cooldown.STUN) > 0 || CooldownManager.getCooldown(this, Cooldown.SNARE) > 0 ||
-                CooldownManager.getCooldown(this, Cooldown.GROUNDING) > 0)
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) || hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
         if (CooldownManager.getCooldown(this, Cooldown.NO_SPRINT) > 0)
+            return false;
+        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
+            return false;
+        if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
 
         return true;
@@ -331,30 +361,23 @@ public final class CombatUser extends CombatEntity<Player> {
     public void onTick(int i) {
         super.onTick(i);
 
+        character.onTick(this, i);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                 99999, 0, false, false), true);
 
         setCanSprint(canSprint());
 
-        if (canJump())
-            entity.removePotionEffect(PotionEffectType.JUMP);
-        else
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
-                    9999, -6, false, false), true);
-
         if (i % 10 == 0) {
             addUltGauge((float) IDLE_ULT_CHARGE / 2);
         }
 
-        if (getHealth() <= getMaxHealth() / 4) {
+        if (isLowHealth()) {
             playBleedingEffect(1);
             setLowHealthScreenEffect(true);
         } else
             setLowHealthScreenEffect(false);
 
-        float speedMultiplier = character.getSpeedMultiplier() * (100 + speedIncrement) / 100;
-        float speed = BASE_SPEED * speedMultiplier;
-
+        double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
         if (entity.isSprinting())
             speed *= 0.88F;
         else
@@ -362,21 +385,30 @@ public final class CombatUser extends CombatEntity<Player> {
         if (!canMove())
             speed = 0.0001F;
 
-        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,
-                    99999, 5, false, false), true);
-        else
-            entity.removePotionEffect(PotionEffectType.SLOW);
+        entity.setWalkSpeed((float) speed);
 
-        entity.setWalkSpeed(speed);
+        onTickActionbar();
+    }
 
-        CombatUtil.showActionbar(this);
+    /**
+     * {@link CombatUser#onTick(int)}에서 사용하며, 액션바 전송 작업을 실행한다.
+     */
+    private void onTickActionbar() {
+        StringJoiner text = new StringJoiner("    ");
+
+        text.add(character.getActionbarString(this));
+
+        sendActionBar(text.toString());
     }
 
     @Override
     public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
         if (this == victim)
             return;
+        if (character == null)
+            return;
+
+        character.onAttack(this, victim, damage, type, isCrit, isUlt);
 
         if (isCrit) {
             playCritAttackEffect();
@@ -410,6 +442,10 @@ public final class CombatUser extends CombatEntity<Player> {
     public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
+        if (character == null)
+            return;
+
+        character.onDamage(this, attacker, damage, type, isCrit, isUlt);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
@@ -422,7 +458,7 @@ public final class CombatUser extends CombatEntity<Player> {
             if (getHealth() - damage <= 0)
                 damage = getHealth();
             float sumDamage = damageMap.getOrDefault(attacker, 0F);
-            damageMap.put(this, sumDamage + (float) damage / getMaxHealth());
+            damageMap.put((CombatUser) attacker, sumDamage + (float) damage / getMaxHealth());
             if (sumDamage > 1)
                 damageMap.put(this, 1F);
         }
@@ -430,12 +466,22 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onGiveHeal(CombatEntity<?> victim, int amount, boolean isUlt) {
+        if (character == null)
+            return;
+
+        character.onGiveHeal(this, victim, amount, isUlt);
+
         if (victim.isUltProvider() && isUlt)
             addUltGauge(amount);
     }
 
     @Override
     public void onTakeHeal(CombatEntity<?> attacker, int amount, boolean isUlt) {
+        if (character == null)
+            return;
+
+        character.onTakeHeal(this, attacker, amount, isUlt);
+
         playTakeHealEffect(amount);
     }
 
@@ -457,6 +503,11 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onKill(CombatEntity<?> victim) {
+        if (character == null)
+            return;
+
+        character.onKill(this, victim);
+
         if (victim instanceof CombatUser) {
             victim.setHealth(victim.getMaxHealth());
 
@@ -537,6 +588,11 @@ public final class CombatUser extends CombatEntity<Player> {
 
     @Override
     public void onDeath(CombatEntity<?> attacker) {
+        if (character == null)
+            return;
+
+        character.onDeath(this, attacker);
+
         Location deadLocation = entity.getLocation().add(0, 0.5, 0);
         deadLocation.setPitch(90);
 

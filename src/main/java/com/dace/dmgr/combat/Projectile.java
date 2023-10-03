@@ -18,10 +18,10 @@ public abstract class Projectile extends Bullet {
     private static final float SIZE = 0.3F;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
+    /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
+    protected long duration;
     /** 중력 작용 여부 */
     protected boolean hasGravity;
-    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
-    protected int bouncing;
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -29,32 +29,33 @@ public abstract class Projectile extends Bullet {
      * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
      * @param option   선택적 옵션
      * @see ProjectileOption
      */
     protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
-        super(shooter, option.trailInterval, option.penetrating, option.hitboxMultiplier);
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
     }
 
     /**
      * 투사체 인스턴스를 생성한다.
      *
      * @param shooter  발사하는 엔티티
-     * @param velocity 속력
+     * @param velocity 투사체의 속력. 단위: 블록/s
      */
     protected Projectile(CombatEntity<?> shooter, int velocity) {
         super(shooter);
         ProjectileOption option = ProjectileOption.builder().build();
         this.trailInterval = option.trailInterval;
+        this.maxDistance = option.maxDistance;
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
     }
 
     /**
@@ -86,49 +87,31 @@ public abstract class Projectile extends Bullet {
             @Override
             public boolean run(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= MAX_RANGE)
+                    if (loc.distance(origin) >= maxDistance || (duration != -1 && _i >= duration))
                         return false;
 
-                    if (!LocationUtil.isNonSolid(loc)) {
-                        handleBlockCollision(loc, finalDirection);
-                        if (bouncing-- > 0)
-                            handleBounce(loc, finalDirection);
-                        else
-                            return false;
-                    }
-
-                    if (loc.distance(origin) > MIN_RANGE && findEnemyAndHandleCollision(loc, targets, SIZE))
+                    if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (hasGravity) {
+                    if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                        return false;
+
+                    if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
-                    }
-                    loc.add(finalDirection);
+
+                    if (finalDirection.length() > 0.01)
+                        loc.add(finalDirection);
                     if (count++ % trailInterval == 0)
                         trail(loc.clone());
                 }
 
                 return true;
             }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                onDestroy(loc.clone());
+            }
         };
-    }
-
-    /**
-     * 투사체의 도탄 로직을 처리한다.
-     *
-     * @param location  위치
-     * @param direction 발사 방향
-     */
-    private void handleBounce(Location location, Vector direction) {
-        Location hitBlockLocation = location.getBlock().getLocation();
-        Location beforeHitBlockLocation = location.clone().subtract(direction).getBlock().getLocation();
-        Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
-
-        if (Math.abs(hitDir.getX()) > 0.5)
-            direction.setX(-direction.getX());
-        else if (Math.abs(hitDir.getY()) > 0.5)
-            direction.setY(-direction.getY());
-        else if (Math.abs(hitDir.getZ()) > 0.5)
-            direction.setZ(-direction.getZ());
     }
 }
