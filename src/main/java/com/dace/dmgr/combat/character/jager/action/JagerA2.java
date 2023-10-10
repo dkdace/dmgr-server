@@ -87,7 +87,7 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
                         combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
-                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),
+                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true).build(),
                         BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).destroyOnHitFloor(true).build()) {
                     @Override
                     public void trail(Location location) {

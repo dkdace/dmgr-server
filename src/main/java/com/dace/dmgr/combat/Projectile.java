@@ -14,8 +14,8 @@ import java.util.Set;
  * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
  */
 public abstract class Projectile extends Bullet {
-    /** 투사체의 기본 판정 범위. 단위: 블록 */
-    private static final float SIZE = 0.3F;
+    /** 투사체의 기본 판정 범위. 단위: 반지름 */
+    private static final float SIZE = 0.13F;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
     /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
@@ -72,7 +72,7 @@ public abstract class Projectile extends Bullet {
         direction = VectorUtil.getSpreadedVector(direction, spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
-        int loopCount = velocity / 5;
+        int loopCount = (int) (velocity / 2.5);
         int sum = 0;
         for (int i = 0; i <= loopCount; i++) {
             sum += i;

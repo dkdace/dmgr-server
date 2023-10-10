@@ -21,15 +21,14 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
      *
      * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
      *
-     * @param entity     대상 엔티티
-     * @param name       이름
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @param isFixed    위치 고정 여부
-     * @param maxHealth  최대 체력
+     * @param entity    대상 엔티티
+     * @param name      이름
+     * @param isFixed   위치 고정 여부
+     * @param maxHealth 최대 체력
+     * @param hitbox    히트박스
      */
-    protected TemporalEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed, int maxHealth) {
-        super(entity, name, hitbox, critHitbox, isFixed);
+    protected TemporalEntity(T entity, String name, boolean isFixed, int maxHealth, Hitbox... hitbox) {
+        super(entity, name, isFixed, hitbox);
         this.maxHealth = maxHealth;
     }
 

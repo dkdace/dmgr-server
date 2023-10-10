@@ -1,6 +1,5 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.combat.entity.Hitbox;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
@@ -142,54 +141,5 @@ public final class LocationUtil {
      */
     public static Location getLocationFromOffset(Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
-    }
-
-    /**
-     * 지정한 위치가 특정 히트박스의 내부에 있는 지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @param hitbox   히트박스
-     * @param margin   마진. 히트박스 크기에 margin을 더해 계산
-     * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
-     * @see Hitbox
-     */
-    public static boolean isInHitbox(Location location, Hitbox hitbox, float margin) {
-        Location[] points = new Location[4];
-        Location center = hitbox.getCenter();
-        double sizeX = hitbox.getSizeX() + margin * 2;
-        double sizeY = hitbox.getSizeY() + margin * 2;
-        double sizeZ = hitbox.getSizeZ() + margin * 2;
-
-        if (location.getY() < center.getY() - sizeY / 2 || location.getY() > center.getY() + sizeY / 2)
-            return false;
-
-        points[0] = LocationUtil.getLocationFromOffset(center, -sizeX / 2, 0, sizeZ / 2);
-        points[1] = LocationUtil.getLocationFromOffset(center, -sizeX / 2, 0, -sizeZ / 2);
-        points[2] = LocationUtil.getLocationFromOffset(center, sizeX / 2, 0, -sizeZ / 2);
-        points[3] = LocationUtil.getLocationFromOffset(center, sizeX / 2, 0, sizeZ / 2);
-
-        boolean inside = false;
-
-        for (int i = 0, j = 3; i < 4; j = i++) {
-            if (((points[i].getZ() > location.getZ()) != (points[j].getZ() > location.getZ())) &&
-                    (location.getX() < (points[j].getX() - points[i].getX()) *
-                            (location.getZ() - points[i].getZ()) / (points[j].getZ() - points[i].getZ()) + points[i].getX())) {
-                inside = !inside;
-            }
-        }
-
-        return inside;
-    }
-
-    /**
-     * 지정한 위치가 특정 히트박스의 내부에 있는 지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @param hitbox   히트박스
-     * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
-     * @see Hitbox
-     */
-    public static boolean isInHitbox(Location location, Hitbox hitbox) {
-        return isInHitbox(location, hitbox, 0);
     }
 }

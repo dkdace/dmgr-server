@@ -31,11 +31,10 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
         super(
                 entity,
                 "§f" + owner.getName() + "의 눈폭풍 발생기",
-                new Hitbox(0.7, 0.2, 0.7, 0, 0.1, 0),
-                new Hitbox(0, 0, 0, 0, 0, 0),
                 false,
                 JagerUltInfo.HEALTH,
-                owner
+                owner,
+                new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
     }
@@ -57,7 +56,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
 
             if (i % 4 == 0)
                 CombatUtil.getNearEnemies(this, entity.getLocation(), range).forEach(target -> {
-                    if (target.getHitbox().getCenter().getY() < entity.getLocation().getY())
+                    if (target.getEntity().getEyeLocation().getY() < entity.getLocation().getY())
                         onFindEnemy(target);
                 });
             if (i >= JagerUltInfo.DURATION) {

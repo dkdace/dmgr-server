@@ -116,7 +116,7 @@ public final class JagerA3 extends ActiveSkill {
                     combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0);
             SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.8F);
 
-            new BouncingProjectile(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(4)
+            new BouncingProjectile(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
                     .duration(CooldownManager.getCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true).build(),
                     BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).build()) {
                 @Override

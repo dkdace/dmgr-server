@@ -23,11 +23,10 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
         super(
                 entity,
                 "§f" + owner.getName() + "의 설랑",
-                new Hitbox(0.4, 0.8, 1.2, 0, 0.4, 0),
-                new Hitbox(0, 0, 0, 0, 0, 0),
                 false,
                 JagerA1Info.HEALTH,
-                owner
+                owner,
+                new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
     }
@@ -45,7 +44,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
 
         if (i % 10 == 0 && entity.getTarget() == null) {
             CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                    CombatEntity::isLowHealth).getKey();
+                    CombatEntity::isLowHealth);
             if (target != null)
                 entity.setTarget(target.getEntity());
         }

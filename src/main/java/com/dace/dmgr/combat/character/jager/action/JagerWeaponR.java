@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.GunHitscan;
+import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
@@ -100,7 +101,7 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
                 setCooldown();
                 reloadModule.consume(1);
 
-                new GunHitscan(combatUser) {
+                new GunHitscan(combatUser, HitscanOption.builder().trailInterval(12).build()) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);

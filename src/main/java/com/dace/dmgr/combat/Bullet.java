@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.HasCritHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -12,7 +13,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,7 +27,7 @@ public abstract class Bullet {
     /** 총알의 최소 사거리 */
     protected static final float MIN_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
-    protected static final float HITBOX_INTERVAL = 0.25F;
+    protected static final float HITBOX_INTERVAL = 0.125F;
     /** 총알을 발사하는 엔티티 */
     protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
@@ -113,7 +113,7 @@ public abstract class Bullet {
      * @return {@link Bullet#onHitBlock(Location, Vector, Block)}의 반환값
      */
     protected final boolean handleBlockCollision(Location location, Vector direction) {
-        Vector subDir = direction.clone().multiply(0.25);
+        Vector subDir = direction.clone().multiply(0.5);
         Block hitBlock = location.getBlock();
 
         if (direction.length() > 0.01)
@@ -134,13 +134,13 @@ public abstract class Bullet {
      * @return {@link Bullet#onHitEntity(Location, Vector, CombatEntity, boolean)}의 반환값
      */
     protected final boolean findEnemyAndHandleCollision(Location location, Vector direction, Set<CombatEntity<?>> targets, float size) {
-        Map.Entry<CombatEntity<?>, Boolean> targetEntry
-                = CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier);
-        CombatEntity<?> target = targetEntry.getKey();
-        boolean isCrit = targetEntry.getValue();
+        CombatEntity<?> target = CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier);
+        boolean isCrit = false;
 
         if (target != null && targets.add(target)) {
             onHit(location.clone());
+            if (target instanceof HasCritHitbox)
+                isCrit = ((HasCritHitbox) target).getCritHitbox().isInHitbox(location, size);
             return onHitEntity(location.clone(), direction, target, isCrit);
         }
 

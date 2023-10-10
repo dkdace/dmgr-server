@@ -11,7 +11,7 @@ import lombok.Builder;
 public class ProjectileOption {
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     @Builder.Default
-    final int trailInterval = 7;
+    final int trailInterval = 14;
     /** 총알의 최대 사거리. 단위: 블록 */
     @Builder.Default
     final int maxDistance = 70;

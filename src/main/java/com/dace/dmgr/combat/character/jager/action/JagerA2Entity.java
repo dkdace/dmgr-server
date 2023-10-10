@@ -28,11 +28,10 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
         super(
                 entity,
                 "§f" + owner.getName() + "의 곰덫",
-                new Hitbox(0.8, 0.3, 0.8, 0, 0.15, 0),
-                new Hitbox(0, 0, 0, 0, 0, 0),
                 true,
                 JagerA2Info.HEALTH,
-                owner
+                owner,
+                new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
     }
@@ -47,7 +46,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
             playReadySound();
         else if (i > JagerA2Info.SUMMON_DURATION) {
             CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8F,
-                    combatEntity -> !combatEntity.isFixed()).getKey();
+                    combatEntity -> !combatEntity.isFixed());
             if (target != null)
                 onCatchEnemy(target);
         }
