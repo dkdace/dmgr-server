@@ -4,7 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Hitbox;
+import com.dace.dmgr.combat.entity.FixedPitchHitbox;
 import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.system.EntityInfoRegistry;

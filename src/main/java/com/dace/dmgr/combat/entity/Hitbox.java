@@ -128,23 +128,13 @@ public class Hitbox {
     }
 
     /**
-     * 지정한 위치가 히트박스의 내부에 있는 지 확인한다.
+     * 지정한 위치의 구체가 히트박스와 접하고 있는 지 확인한다.
      *
      * @param location 확인할 위치
-     * @param radius   판정 구체의 반지름. {@code 0} 초과로 지정 시 판정점 대신 지정한 반지름의 구체로 계산함
+     * @param radius   판정 구체의 반지름
      * @return {@code location}이 히트박스의 내부에 있으면 {@code true} 반환
      */
     public final boolean isInHitbox(Location location, float radius) {
         return getDistance(location) <= radius;
-    }
-
-    /**
-     * 지정한 위치가 히트박스의 내부에 있는 지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @return {@code location}이 히트박스의 내부에 있으면 {@code true} 반환
-     */
-    public final boolean isInHitbox(Location location) {
-        return isInHitbox(location, 0);
     }
 }
