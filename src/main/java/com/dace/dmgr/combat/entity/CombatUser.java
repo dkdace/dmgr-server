@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends CombatEntity<Player> {
+public final class CombatUser extends CombatEntity<Player> implements HasCritHitbox {
     /** 초당 궁극기 충전량 */
     public static final int IDLE_ULT_CHARGE = 10;
     /** 기본 이동속도 */
@@ -47,6 +47,9 @@ public final class CombatUser extends CombatEntity<Player> {
     /** 리스폰 시간 */
     public static final int RESPAWN_TIME = 10 * 20;
 
+    /** 치명타 히트박스 객체 */
+    @Getter
+    private final Hitbox critHitbox;
     /** 보호막 (노란 체력) 목록 (보호막 이름 : 보호막의 양) */
     private final HashMap<String, Integer> shield = new HashMap<>();
     /** 킬 기여자 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 기여도) */
@@ -77,13 +80,13 @@ public final class CombatUser extends CombatEntity<Player> {
      * @param entity 대상 플레이어
      */
     public CombatUser(Player entity) {
-        super(
-                entity,
-                entity.getName(),
-                new Hitbox(0.65, 2.1, 0.5, 0, entity.getHeight() / 2, 0),
-                new Hitbox(0.15, 0.05, 0.15, 0, 2.05, 0),
-                false
+        super(entity, entity.getName(), false,
+                new FixedPitchHitbox(entity.getLocation(), 0.5, 0.7, 0.3, 0, 0, 0, 0, 0.35, 0),
+                new FixedPitchHitbox(entity.getLocation(), 0.8, 0.7, 0.45, 0, 0, 0, 0, 1.05, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.4, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
         );
+        critHitbox = hitboxes[3];
     }
 
     @Override

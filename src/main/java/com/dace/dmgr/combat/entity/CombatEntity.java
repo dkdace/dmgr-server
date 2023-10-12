@@ -17,6 +17,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
+
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 클래스.
  *
@@ -30,45 +32,47 @@ public abstract class CombatEntity<T extends LivingEntity> {
     protected final AbilityStatusManager abilityStatusManager = new AbilityStatusManager();
     /** 속성 목록 관리 객체 */
     protected final PropertyManager propertyManager = new PropertyManager();
-    /** 히트박스 객체 */
-    private final Hitbox hitbox;
-    /** 치명타 히트박스 객체 */
-    private final Hitbox critHitbox;
+    /** 히트박스 객체 목록 */
+    protected final Hitbox[] hitboxes;
     /** 고정 여부 */
     private final boolean isFixed;
     /** 이름 */
     protected String name;
-    /** 팀 */
     @Setter
     protected String team = "";
+    /** 히트박스의 가능한 최대 크기 */
+    private double maxHitboxSize = 0;
 
     /**
      * 전투 시스템의 엔티티 인스턴스를 생성한다.
      *
      * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
      *
-     * @param entity     대상 엔티티
-     * @param name       이름
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @param isFixed    위치 고정 여부
+     * @param entity  대상 엔티티
+     * @param name    이름
+     * @param isFixed 위치 고정 여부
+     * @param hitbox  히트박스 목록
      */
-    protected CombatEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed) {
+    protected CombatEntity(T entity, String name, boolean isFixed, Hitbox... hitbox) {
         this.entity = entity;
         this.name = name;
-        this.hitbox = hitbox;
-        this.critHitbox = critHitbox;
         this.isFixed = isFixed;
+        this.hitboxes = hitbox;
     }
 
     /**
      * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
     public final void init() {
-        hitbox.setCenter(entity.getLocation());
-        critHitbox.setCenter(entity.getLocation());
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
+
+        maxHitboxSize = 0;
+        Arrays.stream(hitboxes).forEach(hitbox -> {
+            double hitboxMaxSize = Math.max(hitbox.getSizeX(), Math.max(hitbox.getSizeY(), hitbox.getSizeZ()));
+            maxHitboxSize = Math.max(maxHitboxSize, hitboxMaxSize + Math.max(hitbox.getOffsetX() + hitbox.getAxisOffsetX(),
+                    Math.max(hitbox.getOffsetY() + hitbox.getAxisOffsetY(), hitbox.getOffsetZ() + hitbox.getAxisOffsetZ())));
+        });
         setName(name);
         onInit();
 
@@ -374,11 +378,12 @@ public abstract class CombatEntity<T extends LivingEntity> {
     private void updateHitboxTick() {
         Location oldLoc = entity.getLocation();
 
-        new TaskWait(2) {
+        new TaskWait(3) {
             @Override
             public void run() {
-                hitbox.setCenter(oldLoc);
-                critHitbox.setCenter(oldLoc);
+                for (Hitbox hitbox : hitboxes) {
+                    hitbox.setCenter(oldLoc);
+                }
             }
         };
     }

@@ -132,7 +132,7 @@ public abstract class BouncingProjectile extends Projectile {
      */
     private boolean handleBounce(Location location, Vector direction) {
         Location beforeHitBlockLocation = location.getBlock().getLocation();
-        Location hitBlockLocation = location.add(direction.clone().multiply(0.25)).getBlock().getLocation();
+        Location hitBlockLocation = location.add(direction.clone().multiply(0.5)).getBlock().getLocation();
         Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
         if (destroyOnHitFloor && !LocationUtil.isNonSolid(beforeHitBlockLocation.subtract(0, 0.1, 0)))
             return false;

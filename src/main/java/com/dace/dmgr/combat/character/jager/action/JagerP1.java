@@ -5,13 +5,12 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.LocationUtil;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class JagerP1 extends Skill {
-    protected JagerP1(CombatUser combatUser) {
+public final class JagerP1 extends Skill {
+    public JagerP1(CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
 
@@ -41,7 +40,7 @@ public class JagerP1 extends Skill {
         if (!skill1.isDurationFinished() && skill1.getSummonEntity() != null) {
             JagerA1Entity jagerA1Entity = skill1.getSummonEntity();
 
-            return LocationUtil.isInHitbox(combatUser.getHitbox().getCenter(), jagerA1Entity.getHitbox(), JagerP1Info.DETECT_RADIUS);
+            return jagerA1Entity.getHitboxes()[0].isInHitbox(combatUser.getEntity().getLocation(), JagerP1Info.DETECT_RADIUS);
         }
 
         return false;

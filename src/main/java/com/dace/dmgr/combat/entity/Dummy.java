@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.gui.ItemBuilder;
+import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +17,11 @@ import java.util.List;
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public class Dummy extends TemporalEntity<Zombie> {
+public final class Dummy extends TemporalEntity<Zombie> implements HasCritHitbox {
+    /** 치명타 히트박스 객체 */
+    @Getter
+    private final Hitbox critHitbox;
+
     /**
      * 더미 인스턴스를 생성한다.
      *
@@ -24,14 +29,13 @@ public class Dummy extends TemporalEntity<Zombie> {
      * @param maxHealth 최대 체력
      */
     public Dummy(Zombie entity, int maxHealth) {
-        super(
-                entity,
-                "§7§lDummy",
-                new Hitbox(0.65, 2.1, 0.5, 0, 0.9, 0),
-                new Hitbox(0.3, 0.1, 0.3, 0, 2, 0),
-                true,
-                maxHealth
+        super(entity, "§7§lDummy", false, maxHealth,
+                new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
+                new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
+        critHitbox = hitboxes[3];
     }
 
     @Override

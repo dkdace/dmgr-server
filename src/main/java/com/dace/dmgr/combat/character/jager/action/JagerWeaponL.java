@@ -131,7 +131,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                 setCooldown();
                 reloadModule.consume(1);
 
-                new Projectile(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(5).maxDistance(JagerWeaponInfo.DISTANCE).build()) {
+                new Projectile(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).maxDistance(JagerWeaponInfo.DISTANCE).build()) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);

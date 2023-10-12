@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public abstract class Hitscan extends Bullet {
     /** 히트스캔의 기본 판정 범위. 단위: 블록 */
-    private static final float SIZE = 0.15F;
+    private static final float SIZE = 0.05F;
 
     /**
      * 히트스캔 인스턴스를 생성한다.

@@ -12,16 +12,15 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
     protected CombatUser owner;
 
     /**
-     * @param entity     대상 엔티티
-     * @param name       이름
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @param isFixed    위치 고정 여부
-     * @param maxHealth  최대 체력
-     * @param owner      엔티티를 소환한 플레이어
+     * @param entity    대상 엔티티
+     * @param name      이름
+     * @param isFixed   위치 고정 여부
+     * @param maxHealth 최대 체력
+     * @param owner     엔티티를 소환한 플레이어
+     * @param hitbox    히트박스
      */
-    protected SummonEntity(T entity, String name, Hitbox hitbox, Hitbox critHitbox, boolean isFixed, int maxHealth, CombatUser owner) {
-        super(entity, name, hitbox, critHitbox, isFixed, maxHealth);
+    protected SummonEntity(T entity, String name, boolean isFixed, int maxHealth, CombatUser owner, Hitbox... hitbox) {
+        super(entity, name, isFixed, maxHealth, hitbox);
         this.owner = owner;
     }
 }

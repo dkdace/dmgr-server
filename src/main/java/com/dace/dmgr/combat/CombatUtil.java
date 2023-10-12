@@ -3,16 +3,18 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.HasCritHitbox;
 import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -75,28 +77,21 @@ public final class CombatUtil {
      * @param location  위치
      * @param range     범위 (반지름)
      * @param predicate 조건
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
-     * 안에 있으면 {@code true})
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link HasCritHitbox}을 상속받고 지정한 위치가
+     * {@link HasCritHitbox#getCritHitbox()} 안에 있으면 {@code true})
      * @see Hitbox
      */
-    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
-        CombatEntity<?> entity = EntityInfoRegistry.getAllCombatEntities().stream()
-                .filter(predicate.and(combatEntity ->
-                        combatEntity != attacker && isEnemy(attacker, combatEntity)))
-                .min(Comparator.comparing(combatEntity -> Math.min(
-                        location.distance(combatEntity.getHitbox().getCenter()),
-                        location.distance(combatEntity.getCritHitbox().getCenter())
-                )))
+    public static CombatEntity<?> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
+        return EntityInfoRegistry.getAllCombatEntities().stream()
+                .filter(predicate)
+                .filter(combatEntity ->
+                        combatEntity != attacker && isEnemy(attacker, combatEntity) &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                .filter(combatEntity ->
+                        Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
+                                hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
+                .findFirst()
                 .orElse(null);
-
-        if (entity == null)
-            return new AbstractMap.SimpleEntry<>(null, false);
-
-        if (LocationUtil.isInHitbox(location, entity.getCritHitbox(), range)) {
-            return new AbstractMap.SimpleEntry<>(entity, true);
-        } else if (LocationUtil.isInHitbox(location, entity.getHitbox(), range)) {
-            return new AbstractMap.SimpleEntry<>(entity, false);
-        } else return new AbstractMap.SimpleEntry<>(null, false);
     }
 
     /**
@@ -105,11 +100,11 @@ public final class CombatUtil {
      * @param attacker 공격자 (기준 엔티티)
      * @param location 위치
      * @param range    범위 (반지름)
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link CombatEntity#getCritHitbox()}
-     * 안에 있으면 {@code true})
+     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link HasCritHitbox}을 상속받고 지정한 위치가
+     * {@link HasCritHitbox#getCritHitbox()} 안에 있으면 {@code true})
      * @see Hitbox
      */
-    public static Map.Entry<CombatEntity<?>, Boolean> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
+    public static CombatEntity<?> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
         return getNearEnemy(attacker, location, range, combatEntity -> true);
     }
 
@@ -125,11 +120,10 @@ public final class CombatUtil {
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range, boolean canContainSelf) {
         return EntityInfoRegistry.getAllCombatEntities().stream()
-                .filter(entity ->
-                        (entity != attacker && isEnemy(attacker, entity)) || (canContainSelf && (attacker == entity)))
-                .filter(entity ->
-                        LocationUtil.isInHitbox(location, entity.getHitbox(), range) ||
-                                LocationUtil.isInHitbox(location, entity.getCritHitbox(), range))
+                .filter(combatEntity ->
+                        ((combatEntity != attacker && isEnemy(attacker, combatEntity)) || (canContainSelf && (attacker == combatEntity))) &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                .filter(combatEntity -> Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .collect(Collectors.toSet());
     }
 
