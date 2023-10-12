@@ -13,7 +13,7 @@ import java.util.Set;
  * 히트스캔. 광선과 같이 탄속이 무한한 총알을 관리하는 클래스.
  */
 public abstract class Hitscan extends Bullet {
-    /** 히트스캔의 기본 판정 범위. 단위: 반지름 */
+    /** 히트스캔의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.05F;
 
     /**

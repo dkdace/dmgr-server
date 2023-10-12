@@ -14,7 +14,7 @@ import java.util.Set;
  * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
  */
 public abstract class Projectile extends Bullet {
-    /** 투사체의 기본 판정 범위. 단위: 반지름 */
+    /** 투사체의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.13F;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
