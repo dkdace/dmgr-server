@@ -83,9 +83,10 @@ public final class CombatUtil {
      */
     public static CombatEntity<?> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
         return EntityInfoRegistry.getAllCombatEntities().stream()
-                .filter(predicate.and(combatEntity ->
+                .filter(predicate)
+                .filter(combatEntity ->
                         combatEntity != attacker && isEnemy(attacker, combatEntity) &&
-                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range))
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
                                 hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
