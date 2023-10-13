@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-public class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
+public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
     /** 소환된 엔티티 목록 */
     @Getter
     @Setter

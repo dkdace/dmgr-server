@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
-public class JagerP1Info extends PassiveSkillInfo {
+public final class JagerP1Info extends PassiveSkillInfo {
     /** 이동속도 증가량 */
     public static final int SPEED = 15;
     /** 감지 범위 */
