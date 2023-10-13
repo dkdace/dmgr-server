@@ -64,7 +64,7 @@ public abstract class Gui implements Listener {
      * @return 클릭 가능 여부
      */
     private boolean isClickable(ItemStack item) {
-        return item.getType() != Material.AIR && !getItemName(item).isEmpty();
+        return item != null && item.getType() != Material.AIR && !getItemName(item).isEmpty();
     }
 
     @EventHandler
