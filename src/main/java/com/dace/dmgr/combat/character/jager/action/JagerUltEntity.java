@@ -1,20 +1,20 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.FixedPitchHitbox;
 import com.dace.dmgr.combat.entity.SummonEntity;
-import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -170,13 +170,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
         setMaxHealth(JagerUltInfo.HEALTH);
         setHealth(JagerUltInfo.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
-
-        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
-        packet.setEntityIds(new int[]{entity.getEntityId()});
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
-            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
-                packet.sendPacket(player2);
-        });
+        hideForOthers();
     }
 }
