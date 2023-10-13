@@ -381,10 +381,11 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
             setLowHealthScreenEffect(false);
 
         double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-        if (entity.isSprinting())
+        if (entity.isSprinting()) {
             speed *= 0.88F;
-        else
-            speed *= speed / BASE_SPEED;
+            if (!entity.isOnGround())
+                speed *= speed / BASE_SPEED;
+        }
         if (!canMove())
             speed = 0.0001F;
 
