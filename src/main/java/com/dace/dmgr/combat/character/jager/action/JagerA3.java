@@ -134,7 +134,8 @@ public final class JagerA3 extends ActiveSkill {
 
                 @Override
                 public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                    target.damage(combatUser, JagerA3Info.DAMAGE_DIRECT, "", false, true);
+                    if (direction.length() > 0.05)
+                        target.damage(combatUser, JagerA3Info.DAMAGE_DIRECT, "", false, true);
                     return false;
                 }
 
