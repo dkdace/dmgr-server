@@ -114,7 +114,7 @@ public abstract class BouncingProjectile extends Projectile {
     }
 
     /**
-     * 총알이 블록에 맞았을 때 실행할 작업.
+     * 총알이 엔티티에 맞았을 때 실행할 작업.
      *
      * @param location  맞은 위치
      * @param direction 발사 방향
