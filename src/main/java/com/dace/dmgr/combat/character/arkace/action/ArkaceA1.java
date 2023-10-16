@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -79,7 +80,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, "", false, true);
+                        target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                         return false;
                     }
                 }.shoot(location);
@@ -108,6 +109,6 @@ public final class ArkaceA1 extends ActiveSkill {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
         CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS, true).forEach(target ->
-                target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, "", false, true));
+                target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true));
     }
 }

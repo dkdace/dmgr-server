@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
@@ -150,14 +151,14 @@ public abstract class CombatEntity<T extends LivingEntity> {
     /**
      * 엔티티에게 피해를 입힌다.
      *
-     * @param attacker 공격자
-     * @param damage   피해량
-     * @param type     타입
-     * @param isCrit   치명타 여부
-     * @param isUlt    궁극기 충전 여부
+     * @param attacker   공격자
+     * @param damage     피해량
+     * @param damageType 피해 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
      * @see CombatEntity#heal(CombatEntity, int, boolean)
      */
-    public final void damage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public final void damage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (entity.isDead())
             return;
         if (!canTakeDamage())
@@ -169,8 +170,8 @@ public abstract class CombatEntity<T extends LivingEntity> {
         if (isCrit)
             damage *= 2;
 
-        attacker.onAttack(this, damage, type, isCrit, isUlt);
-        onDamage(attacker, damage, type, isCrit, isUlt);
+        attacker.onAttack(this, damage, damageType, isCrit, isUlt);
+        onDamage(attacker, damage, damageType, isCrit, isUlt);
         playDamageEffect();
 
         if (getHealth() - damage > 0)
@@ -205,7 +206,7 @@ public abstract class CombatEntity<T extends LivingEntity> {
      * @param attacker 공격자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
-     * @see CombatEntity#damage(CombatEntity, int, String, boolean, boolean)
+     * @see CombatEntity#damage(CombatEntity, int, DamageType, boolean, boolean)
      */
     public final void heal(CombatEntity<?> attacker, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
@@ -399,27 +400,27 @@ public abstract class CombatEntity<T extends LivingEntity> {
     /**
      * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.
      *
-     * @param victim 피격자
-     * @param damage 피해량
-     * @param type   타입
-     * @param isCrit 치명타 여부
-     * @param isUlt  궁극기 충전 여부
-     * @see CombatEntity#onDamage(CombatEntity, int, String, boolean, boolean)
+     * @param victim     피격자
+     * @param damage     피해량
+     * @param damageType 피해 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
+     * @see CombatEntity#onDamage(CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**
      * 엔티티가 피해를 입었을 때 실행될 작업.
      *
-     * @param attacker 공격자
-     * @param damage   피해량
-     * @param type     타입
-     * @param isCrit   치명타 여부
-     * @param isUlt    궁극기 충전 여부
-     * @see CombatEntity#onAttack(CombatEntity, int, String, boolean, boolean)
+     * @param attacker   공격자
+     * @param damage     피해량
+     * @param damageType 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
+     * @see CombatEntity#onAttack(CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**

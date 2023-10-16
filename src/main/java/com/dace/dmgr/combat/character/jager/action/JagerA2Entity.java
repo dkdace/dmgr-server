@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.FixedPitchHitbox;
@@ -88,7 +89,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
      */
     private void onCatchEnemy(CombatEntity<?> target) {
         playCatchSound();
-        target.damage(this, JagerA2Info.DAMAGE, "", false, true);
+        target.damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
         target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
@@ -105,7 +106,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     }
 
     @Override
-    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished() && skill1.getSummonEntity().getEntity().getTarget() == null)
@@ -113,7 +114,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     }
 
     @Override
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
     }
 

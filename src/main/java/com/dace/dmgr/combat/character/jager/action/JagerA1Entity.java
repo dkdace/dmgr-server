@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
@@ -52,11 +53,11 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
 
     @Override
     public void onDefaultAttack(CombatEntity<?> victim) {
-        victim.damage(this, JagerA1Info.DAMAGE, "", victim.hasStatusEffect(StatusEffectType.SNARE), true);
+        victim.damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
         skill.addStateValue(-damage);
     }

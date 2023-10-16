@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
@@ -46,29 +47,29 @@ public abstract class Character {
     /**
      * 전투원으로 다른 엔티티를 공격했을 때 실행할 작업.
      *
-     * @param attacker 공격자
-     * @param victim   피격자
-     * @param damage   피해량
-     * @param type     타입
-     * @param isCrit   치명타 여부
-     * @param isUlt    궁극기 충전 여부
-     * @see Character#onDamage(CombatUser, CombatEntity, int, String, boolean, boolean)
+     * @param attacker   공격자
+     * @param victim     피격자
+     * @param damage     피해량
+     * @param damageType 피해 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
+     * @see Character#onDamage(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**
      * 전투원으로 피해를 입었을 때 실행될 작업.
      *
-     * @param victim   피격자
-     * @param attacker 공격자
-     * @param damage   피해량
-     * @param type     타입
-     * @param isCrit   치명타 여부
-     * @param isUlt    궁극기 충전 여부
-     * @see Character#onAttack(CombatUser, CombatEntity, int, String, boolean, boolean)
+     * @param victim     피격자
+     * @param attacker   공격자
+     * @param damage     피해량
+     * @param damageType 피해 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
+     * @see Character#onAttack(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onDamage(CombatUser victim, CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatUser victim, CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**

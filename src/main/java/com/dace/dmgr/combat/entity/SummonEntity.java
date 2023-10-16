@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -27,6 +28,16 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
     protected SummonEntity(T entity, String name, boolean isFixed, int maxHealth, CombatUser owner, Hitbox... hitbox) {
         super(entity, name, isFixed, maxHealth, hitbox);
         this.owner = owner;
+    }
+
+    @Override
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+        owner.onAttack(victim, damage, damageType, isCrit, isUlt);
+    }
+
+    @Override
+    public void onKill(CombatEntity<?> victim) {
+        owner.onKill(victim);
     }
 
     /**

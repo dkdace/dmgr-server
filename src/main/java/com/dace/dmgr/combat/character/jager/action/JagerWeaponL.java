@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -145,7 +146,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
 
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, JagerWeaponInfo.DAMAGE, "", false, true);
+                        target.damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
                         JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
                         return false;
                     }

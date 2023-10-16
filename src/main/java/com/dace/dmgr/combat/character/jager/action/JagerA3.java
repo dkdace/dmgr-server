@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.BouncingProjectile;
-import com.dace.dmgr.combat.BouncingProjectileOption;
-import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.ProjectileOption;
+import com.dace.dmgr.combat.*;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
@@ -135,7 +132,7 @@ public final class JagerA3 extends ActiveSkill {
                 @Override
                 public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                     if (direction.length() > 0.05)
-                        target.damage(combatUser, JagerA3Info.DAMAGE_DIRECT, "", false, true);
+                        target.damage(combatUser, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                     return false;
                 }
 
@@ -164,7 +161,7 @@ public final class JagerA3 extends ActiveSkill {
                     JagerA3Info.RADIUS / 2F, true);
             int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
                     JagerA3Info.RADIUS / 2F, true);
-            target.damage(combatUser, damage, "", false, true);
+            target.damage(combatUser, damage, DamageType.NORMAL, false, true);
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= 100) {
