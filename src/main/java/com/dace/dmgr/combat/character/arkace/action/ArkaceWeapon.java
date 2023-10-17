@@ -143,6 +143,8 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
 
     @Override
     public void reload() {
+        if (getRemainingAmmo() >= getCapacity())
+            return;
         if (isReloading())
             return;
 
