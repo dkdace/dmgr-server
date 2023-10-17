@@ -80,7 +80,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        target.damage(combatUser, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+                        target.damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                         return false;
                     }
                 }.shoot(location);

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
@@ -170,6 +171,44 @@ public abstract class CombatEntity<T extends LivingEntity> {
         if (isCrit)
             damage *= 2;
 
+        attacker.onAttack(this, damage, damageType, isCrit, isUlt);
+        onDamage(attacker, damage, damageType, isCrit, isUlt);
+        playDamageEffect();
+
+        if (getHealth() - damage > 0)
+            setHealth(getHealth() - damage);
+        else {
+            if (canDie()) {
+                attacker.onKill(this);
+                onDeath(attacker);
+            } else
+                setHealth(1);
+        }
+    }
+
+    /**
+     * 엔티티에게 피해를 입힌다.
+     *
+     * @param projectile 공격자가 발사한 투사체
+     * @param damage     피해량
+     * @param damageType 피해 타입
+     * @param isCrit     치명타 여부
+     * @param isUlt      궁극기 충전 여부
+     * @see CombatEntity#heal(CombatEntity, int, boolean)
+     */
+    public final void damage(Projectile projectile, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+        if (entity.isDead())
+            return;
+        if (!canTakeDamage())
+            return;
+
+        double damageMultiplier = projectile.getDamageIncrement();
+        double defenseMultiplier = abilityStatusManager.getAbilityStatus(Ability.DEFENSE).getValue();
+        damage *= (int) (1 + damageMultiplier - defenseMultiplier);
+        if (isCrit)
+            damage *= 2;
+
+        CombatEntity<?> attacker = projectile.getShooter();
         attacker.onAttack(this, damage, damageType, isCrit, isUlt);
         onDamage(attacker, damage, damageType, isCrit, isUlt);
         playDamageEffect();

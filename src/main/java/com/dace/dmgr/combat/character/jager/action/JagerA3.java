@@ -99,11 +99,9 @@ public final class JagerA3 extends ActiveSkill {
                             if (!cancelled) {
                                 setDuration(0);
 
-                                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
-                                        combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0.3);
-                                explode(combatUser, loc);
                                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                                         combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
+                                explode(combatUser, loc, null);
                             }
                         }
                     };
@@ -134,19 +132,19 @@ public final class JagerA3 extends ActiveSkill {
                 @Override
                 public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                     if (direction.length() > 0.05)
-                        target.damage(combatUser, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+                        target.damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                     return false;
                 }
 
                 @Override
                 public void onDestroy(Location location) {
-                    explode(combatUser, location);
+                    explode(combatUser, location, this);
                 }
             }.shoot(location);
         }
     }
 
-    private void explode(CombatUser combatUser, Location location) {
+    private void explode(CombatUser combatUser, Location location, Projectile projectile) {
         SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.6F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.2F);
         SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, location, 4F, 1.5F);
@@ -159,18 +157,15 @@ public final class JagerA3 extends ActiveSkill {
         ParticleUtil.play(Particle.FIREWORKS_SPARK, location, 200, 0, 0, 0, 0.3F);
 
         CombatUtil.getNearEnemies(combatUser, location, JagerA3Info.RADIUS, true).forEach(target -> {
-            int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
-                    JagerA3Info.RADIUS / 2F, true);
-            int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
-                    JagerA3Info.RADIUS / 2F, true);
-            target.damage(combatUser, damage, DamageType.NORMAL, false, true);
-            JagerTrait.addFreezeValue(target, freeze);
             if (LocationUtil.canPass(location, target.getEntity().getLocation().add(0, 0.1, 0))) {
                 int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
                         JagerA3Info.RADIUS / 2F, true);
                 int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
                         JagerA3Info.RADIUS / 2F, true);
+                if (projectile == null)
                     target.damage(combatUser, damage, DamageType.NORMAL, false, true);
+                else
+                    target.damage(projectile, damage, DamageType.NORMAL, false, true);
                 JagerTrait.addFreezeValue(target, freeze);
 
                 if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
