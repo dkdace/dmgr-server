@@ -24,8 +24,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public abstract class Bullet {
-    /** 총알의 최소 사거리 */
-    protected static final float MIN_DISTANCE = 0.5F;
+    /** 총알이 발사되는 거리 */
+    protected static final float START_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.125F;
     /** 총알을 발사하는 엔티티 */

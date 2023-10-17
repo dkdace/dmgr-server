@@ -83,8 +83,8 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
                 if (cancelled)
                     return;
 
-                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
-                        combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0);
+                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                        combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
                 new BouncingProjectile(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),

@@ -67,9 +67,10 @@ public abstract class Projectile extends Bullet {
      */
     @Override
     public final void shoot(Location origin, Vector direction, float spread) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
+        direction.normalize();
         Location loc = origin.clone();
-        direction = VectorUtil.getSpreadedVector(direction, spread);
+        loc.add(direction.clone().multiply(START_DISTANCE));
+        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
         int loopCount = (int) (velocity / 2.5);
@@ -87,13 +88,13 @@ public abstract class Projectile extends Bullet {
             @Override
             public boolean run(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= maxDistance || (duration != -1 && _i >= duration))
+                    if ((duration != -1 && _i >= duration))
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))

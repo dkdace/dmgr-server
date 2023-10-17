@@ -57,7 +57,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
 
             if (i % 4 == 0)
                 CombatUtil.getNearEnemies(this, entity.getLocation(), range).forEach(target -> {
-                    if (target.getEntity().getEyeLocation().getY() < entity.getLocation().getY())
+                    if (LocationUtil.canPass(entity.getLocation(), target.getEntity().getLocation().add(0, 0.1, 0)) &&
+                            target.getEntity().getEyeLocation().getY() < entity.getLocation().getY())
                         onFindEnemy(target);
                 });
             if (i >= JagerUltInfo.DURATION) {

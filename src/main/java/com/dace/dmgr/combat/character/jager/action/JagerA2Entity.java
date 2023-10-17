@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.FixedPitchHitbox;
 import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
@@ -47,7 +48,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
             playReadySound();
         else if (i > JagerA2Info.SUMMON_DURATION) {
             CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8F,
-                    combatEntity -> !combatEntity.isFixed());
+                    combatEntity -> !combatEntity.isFixed() && LocationUtil.canPass(entity.getLocation().add(0, 0.1, 0),
+                            combatEntity.getEntity().getLocation().add(0, 0.1, 0)));
             if (target != null)
                 onCatchEnemy(target);
         }
