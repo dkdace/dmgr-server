@@ -15,7 +15,7 @@ public final class LocationUtil {
      * @param block 확인할 블록
      * @return 통과 가능하면 {@code true} 반환
      */
-    private static boolean canPassThrough(Block block) {
+    private static boolean canPassBlock(Block block) {
         if (!block.getType().isSolid())
             return true;
 
@@ -34,6 +34,8 @@ public final class LocationUtil {
             case ACACIA_FENCE_GATE:
             case DARK_OAK_FENCE:
             case COBBLE_WALL:
+            case SIGN_POST:
+            case WALL_SIGN:
                 return true;
             default:
                 return false;
@@ -43,7 +45,7 @@ public final class LocationUtil {
     /**
      * 지정한 위치를 통과할 수 있는지 확인한다.
      *
-     * <p>통과 가능한 블록은 {@link LocationUtil#canPassThrough(Block)}에서 판단한다.</p>
+     * <p>통과 가능한 블록은 {@link LocationUtil#canPassBlock(Block)}에서 판단한다.</p>
      *
      * <p>각종 스킬의 판정에 사용한다.</p>
      *
@@ -53,7 +55,7 @@ public final class LocationUtil {
     public static boolean isNonSolid(Location location) {
         Block block = location.getBlock();
 
-        if (canPassThrough(block)) {
+        if (canPassBlock(block)) {
             MaterialData materialData = block.getState().getData();
 
             if (materialData instanceof Step) {
