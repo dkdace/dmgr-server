@@ -275,6 +275,10 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
     private void initActions() {
         actionMap.clear();
         skillMap.clear();
+        for (int i = 0; i < 4; i++) {
+            entity.getInventory().clear(i);
+        }
+
         weapon = character.getWeaponInfo().createWeapon(this);
         weapon.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, weapon));
 
@@ -368,6 +372,9 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
         character.onTick(this, i);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                 99999, 0, false, false), true);
+
+        hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
+        hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
 
         setCanSprint(canSprint());
 
