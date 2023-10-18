@@ -14,7 +14,7 @@ public interface Swappable {
     /**
      * @return 무기 전환 상태
      */
-    SwapModule.WeaponState getWeaponState();
+    WeaponState getWeaponState();
 
     /**
      * 무기 교체시간을 반환한다.
@@ -27,4 +27,16 @@ public interface Swappable {
      * 무기 교체 이벤트를 호출한다.
      */
     void swap();
+
+    /**
+     * 무기 전환 상태 목록.
+     */
+    enum WeaponState {
+        /** 주무기 사용 중 */
+        PRIMARY,
+        /** 보조무기 사용 중 */
+        SECONDARY,
+        /** 교체 중 */
+        SWAPPING,
+    }
 }

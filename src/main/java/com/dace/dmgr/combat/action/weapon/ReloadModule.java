@@ -58,7 +58,7 @@ public final class ReloadModule {
     public void reload() {
         if (reloading)
             return;
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SWAPPING)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SWAPPING)
             return;
 
         reloading = true;

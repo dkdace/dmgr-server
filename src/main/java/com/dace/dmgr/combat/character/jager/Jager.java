@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
-import com.dace.dmgr.combat.action.weapon.SwapModule;
+import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.*;
@@ -56,9 +56,9 @@ public final class Jager extends Character {
         String weapon1Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon1Ammo, weapon1Capacity, weapon1Capacity, '*');
         String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, weapon2Capacity, weapon2Capacity, '┃');
         String skill1Display = StringFormUtil.getActionbarProgressBar("§e[설랑]", (int) skill1Health, skill1MaxHealth, 10, '■');
-        if (weapon1.getWeaponState() == SwapModule.WeaponState.PRIMARY)
+        if (weapon1.getWeaponState() == Swappable.WeaponState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
-        else if (weapon1.getWeaponState() == SwapModule.WeaponState.SECONDARY)
+        else if (weapon1.getWeaponState() == Swappable.WeaponState.SECONDARY)
             weapon2Display = "§a" + weapon2Display;
         text.add(weapon1Display);
         text.add(weapon2Display);

@@ -85,7 +85,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
     }
 
     @Override
-    public SwapModule.WeaponState getWeaponState() {
+    public WeaponState getWeaponState() {
         return swapModule.getWeaponState();
     }
 
@@ -100,13 +100,13 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
     }
 
     @Override
-    public AimModule.ZoomLevel getZoomLevel() {
-        return AimModule.ZoomLevel.L4;
+    public ZoomLevel getZoomLevel() {
+        return ZoomLevel.L4;
     }
 
     @Override
     public boolean canUse() {
-        return super.canUse() && getWeaponState() != SwapModule.WeaponState.SWAPPING && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse() && getWeaponState() != WeaponState.SWAPPING && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -264,9 +264,9 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
     public void swap() {
         Location location = combatUser.getEntity().getLocation();
 
-        if (getWeaponState() == SwapModule.WeaponState.PRIMARY)
+        if (getWeaponState() == WeaponState.PRIMARY)
             SoundUtil.play(Sound.ENTITY_WOLF_HOWL, location, 0.6F, 1.9F);
-        else if (getWeaponState() == SwapModule.WeaponState.SECONDARY)
+        else if (getWeaponState() == WeaponState.SECONDARY)
             SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, location, 0.6F, 1.9F);
 
         setCooldown(JagerWeaponInfo.SWAP_DURATION);

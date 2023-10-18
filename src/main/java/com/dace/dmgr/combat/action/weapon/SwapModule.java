@@ -21,7 +21,7 @@ public final class SwapModule {
 
     /** 무기 전환 상태 */
     @Getter
-    private WeaponState weaponState = WeaponState.PRIMARY;
+    private Swappable.WeaponState weaponState = Swappable.WeaponState.PRIMARY;
 
     public SwapModule(Weapon weapon) {
         this.weapon = weapon;
@@ -32,16 +32,16 @@ public final class SwapModule {
      *
      * @param targetState 변경할 상태
      */
-    private void swapTo(WeaponState targetState) {
-        if (weaponState == targetState || weaponState == WeaponState.SWAPPING)
+    private void swapTo(Swappable.WeaponState targetState) {
+        if (weaponState == targetState || weaponState == Swappable.WeaponState.SWAPPING)
             return;
-        if (targetState == WeaponState.SWAPPING)
+        if (targetState == Swappable.WeaponState.SWAPPING)
             return;
 
         ((Reloadable) weapon).cancelReloading();
-        if (weaponState == WeaponState.SECONDARY)
+        if (weaponState == Swappable.WeaponState.SECONDARY)
             ((Reloadable) ((Swappable) weapon).getSubweapon()).cancelReloading();
-        weaponState = WeaponState.SWAPPING;
+        weaponState = Swappable.WeaponState.SWAPPING;
 
         long duration = ((Swappable) weapon).getSwapDuration();
         CooldownManager.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, duration);
@@ -51,7 +51,7 @@ public final class SwapModule {
             public boolean run(int i) {
                 if (EntityInfoRegistry.getCombatUser(weapon.getCombatUser().getEntity()) == null)
                     return false;
-                if (weaponState != WeaponState.SWAPPING)
+                if (weaponState != Swappable.WeaponState.SWAPPING)
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
@@ -81,21 +81,9 @@ public final class SwapModule {
      * @see Swappable
      */
     public void swap() {
-        if (weaponState == WeaponState.PRIMARY)
-            swapTo(WeaponState.SECONDARY);
-        else if (weaponState == WeaponState.SECONDARY)
-            swapTo(WeaponState.PRIMARY);
-    }
-
-    /**
-     * 무기 전환 상태 목록.
-     */
-    public enum WeaponState {
-        /** 주무기 사용 중 */
-        PRIMARY,
-        /** 보조무기 사용 중 */
-        SECONDARY,
-        /** 교체 중 */
-        SWAPPING,
+        if (weaponState == Swappable.WeaponState.PRIMARY)
+            swapTo(Swappable.WeaponState.SECONDARY);
+        else if (weaponState == Swappable.WeaponState.SECONDARY)
+            swapTo(Swappable.WeaponState.PRIMARY);
     }
 }
