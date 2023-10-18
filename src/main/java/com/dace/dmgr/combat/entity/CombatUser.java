@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.*;
@@ -274,6 +275,10 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
     private void initActions() {
         actionMap.clear();
         skillMap.clear();
+        for (int i = 0; i < 4; i++) {
+            entity.getInventory().clear(i);
+        }
+
         weapon = character.getWeaponInfo().createWeapon(this);
         weapon.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, weapon));
 
@@ -368,6 +373,9 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                 99999, 0, false, false), true);
 
+        hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
+        hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
+
         setCanSprint(canSprint());
 
         if (i % 10 == 0) {
@@ -381,10 +389,11 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
             setLowHealthScreenEffect(false);
 
         double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-        if (entity.isSprinting())
+        if (entity.isSprinting()) {
             speed *= 0.88F;
-        else
-            speed *= speed / BASE_SPEED;
+            if (!entity.isOnGround())
+                speed *= speed / BASE_SPEED;
+        }
         if (!canMove())
             speed = 0.0001F;
 
@@ -405,18 +414,19 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
     }
 
     @Override
-    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == victim)
             return;
         if (character == null)
             return;
 
-        character.onAttack(this, victim, damage, type, isCrit, isUlt);
+        character.onAttack(this, victim, damage, damageType, isCrit, isUlt);
 
-        if (isCrit) {
-            playCritAttackEffect();
-        } else {
-            playAttackEffect();
+        if (damageType == DamageType.NORMAL) {
+            if (isCrit)
+                playCritAttackEffect();
+            else
+                playAttackEffect();
         }
 
         if (victim.isUltProvider() && isUlt)
@@ -442,28 +452,25 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
     }
 
     @Override
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
         if (character == null)
             return;
 
-        character.onDamage(this, attacker, damage, type, isCrit, isUlt);
+        character.onDamage(this, attacker, damage, damageType, isCrit, isUlt);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
         if (attacker instanceof CombatUser) {
-            if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId()) == 0) {
+            if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId()) == 0)
                 CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, entity.getEntityId());
-            }
             CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId());
 
             if (getHealth() - damage <= 0)
                 damage = getHealth();
             float sumDamage = damageMap.getOrDefault(attacker, 0F);
-            damageMap.put((CombatUser) attacker, sumDamage + (float) damage / getMaxHealth());
-            if (sumDamage > 1)
-                damageMap.put(this, 1F);
+            damageMap.put((CombatUser) attacker, Math.min(sumDamage + (float) damage / getMaxHealth(), 1));
         }
     }
 
@@ -512,37 +519,12 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
         character.onKill(this, victim);
 
         if (victim instanceof CombatUser) {
-            victim.setHealth(victim.getMaxHealth());
+            float damage = ((CombatUser) victim).getDamageMap().getOrDefault(this, 0F);
+            int score = Math.round(damage * 100);
 
-            if (CooldownManager.getCooldown(victim, Cooldown.RESPAWN_TIME) == 0) {
-                Map<CombatUser, Float> damageList = ((CombatUser) victim).getDamageMap();
-
-                damageList.forEach((CombatUser attacker2, Float damage) -> {
-                    int score = Math.round(damage * 100);
-
-                    if (attacker2 == this)
-                        playPlayerKillEffect((CombatUser) victim, score);
-                    else
-                        attacker2.onAssist(victim, score);
-                });
-
-                broadcastPlayerKillMessage(victim);
-                damageList.clear();
-            }
-        } else {
-            playEntityKillEffect();
-        }
-    }
-
-    /**
-     * 플레이어가 다른 엔티티의 처치를 도왔을 때 실행될 작업.
-     *
-     * @param victim 피격자
-     * @param score  점수
-     */
-    private void onAssist(CombatEntity<?> victim, int score) {
-        if (victim instanceof CombatUser)
             playPlayerKillEffect((CombatUser) victim, score);
+        } else
+            playEntityKillEffect();
     }
 
     /**
@@ -553,11 +535,20 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
      */
     private void playPlayerKillEffect(CombatUser victim, int score) {
         entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
-        if (score > 30) {
-            entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
-        } else {
-            entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
-        }
+        entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
+    }
+
+    /**
+     * 다른 플레이어 처치를 도왔을 때 효과를 재생한다.
+     *
+     * @param victim 피격자
+     * @param score  처치 점수
+     */
+    private void playPlayerAssistEffect(CombatUser victim, int score) {
+        entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
+        entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
     }
@@ -596,34 +587,49 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
 
         character.onDeath(this, attacker);
 
-        Location deadLocation = entity.getLocation().add(0, 0.5, 0);
-        deadLocation.setPitch(90);
+        if (CooldownManager.getCooldown(this, Cooldown.RESPAWN_TIME) == 0) {
+            setHealth(getMaxHealth());
 
-        CooldownManager.setCooldown(this, Cooldown.RESPAWN_TIME);
-        entity.setGameMode(GameMode.SPECTATOR);
-        entity.setVelocity(new Vector());
+            damageMap.forEach((CombatUser attacker2, Float damage) -> {
+                if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
+                    int score = Math.round(damage * 100);
 
-        new TaskTimer(1) {
-            @Override
-            public boolean run(int i) {
-                long cooldown = CooldownManager.getCooldown(CombatUser.this, Cooldown.RESPAWN_TIME);
-                if (EntityInfoRegistry.getCombatUser(entity) == null || cooldown <= 0)
-                    return false;
+                    attacker2.playPlayerAssistEffect(this, score);
+                }
+            });
 
-                entity.sendTitle("§c§l죽었습니다!",
-                        String.format("%.1f", cooldown / 20F) + "초 후 부활합니다.", 0, 20, 10);
-                entity.teleport(deadLocation);
+            broadcastPlayerKillMessage(this);
+            damageMap.clear();
 
-                return true;
-            }
+            Location deadLocation = entity.getLocation().add(0, 0.5, 0);
+            deadLocation.setPitch(90);
 
-            @Override
-            public void onEnd(boolean cancelled) {
-                setHealth(getMaxHealth());
-                entity.teleport(Lobby.lobbyLocation);
-                entity.setGameMode(GameMode.SURVIVAL);
-            }
-        };
+            CooldownManager.setCooldown(this, Cooldown.RESPAWN_TIME);
+            entity.setGameMode(GameMode.SPECTATOR);
+            entity.setVelocity(new Vector());
+
+            new TaskTimer(1) {
+                @Override
+                public boolean run(int i) {
+                    long cooldown = CooldownManager.getCooldown(CombatUser.this, Cooldown.RESPAWN_TIME);
+                    if (EntityInfoRegistry.getCombatUser(entity) == null || cooldown <= 0)
+                        return false;
+
+                    entity.sendTitle("§c§l죽었습니다!",
+                            String.format("%.1f", cooldown / 20F) + "초 후 부활합니다.", 0, 20, 10);
+                    entity.teleport(deadLocation);
+
+                    return true;
+                }
+
+                @Override
+                public void onEnd(boolean cancelled) {
+                    setHealth(getMaxHealth());
+                    entity.teleport(Lobby.lobbyLocation);
+                    entity.setGameMode(GameMode.SURVIVAL);
+                }
+            };
+        }
     }
 
     /**

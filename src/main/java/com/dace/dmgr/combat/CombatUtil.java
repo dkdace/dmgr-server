@@ -3,8 +3,6 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.HasCritHitbox;
-import com.dace.dmgr.combat.entity.Hitbox;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -71,15 +69,13 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적과 치명타 여부를 반환한다.
+     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적을 반환한다.
      *
      * @param attacker  공격자 (기준 엔티티)
      * @param location  위치
      * @param range     범위 (반지름)
      * @param predicate 조건
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link HasCritHitbox}을 상속받고 지정한 위치가
-     * {@link HasCritHitbox#getCritHitbox()} 안에 있으면 {@code true})
-     * @see Hitbox
+     * @return 범위 내 가장 가까운 적
      */
     public static CombatEntity<?> getNearEnemy(CombatEntity<?> attacker, Location location, float range, Predicate<CombatEntity<?>> predicate) {
         return EntityInfoRegistry.getAllCombatEntities().stream()
@@ -95,14 +91,12 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적과 치명타 여부를 반환한다.
+     * 지정한 위치를 기준으로 범위 안에 있는 가장 가까운 적을 반환한다.
      *
      * @param attacker 공격자 (기준 엔티티)
      * @param location 위치
      * @param range    범위 (반지름)
-     * @return 범위 내 가장 가까운 적과 치명타 여부 (해당 적이 {@link HasCritHitbox}을 상속받고 지정한 위치가
-     * {@link HasCritHitbox#getCritHitbox()} 안에 있으면 {@code true})
-     * @see Hitbox
+     * @return 범위 내 가장 가까운 적
      */
     public static CombatEntity<?> getNearEnemy(CombatEntity<?> attacker, Location location, float range) {
         return getNearEnemy(attacker, location, range, combatEntity -> true);
@@ -116,7 +110,6 @@ public final class CombatUtil {
      * @param range          범위 (반지름)
      * @param canContainSelf 자가 포함 여부. {@code true}로 지정하면 공격자도 포함된다.
      * @return 범위 내 모든 적
-     * @see Hitbox
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range, boolean canContainSelf) {
         return EntityInfoRegistry.getAllCombatEntities().stream()
@@ -134,7 +127,6 @@ public final class CombatUtil {
      * @param location 위치
      * @param range    범위 (반지름)
      * @return 범위 내 모든 적
-     * @see Hitbox
      */
     public static Set<CombatEntity<?>> getNearEnemies(CombatEntity<?> attacker, Location location, float range) {
         return getNearEnemies(attacker, location, range, false);

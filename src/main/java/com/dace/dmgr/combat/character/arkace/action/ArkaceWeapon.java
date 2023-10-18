@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
@@ -119,11 +120,11 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     @Override
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         if (isUlt)
-                            target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, "", isCrit, false);
+                            target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
                         else {
                             int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
                                     ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
-                            target.damage(combatUser, damage, "", isCrit, true);
+                            target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
                         }
 
                         return false;
@@ -142,6 +143,8 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
 
     @Override
     public void reload() {
+        if (getRemainingAmmo() >= getCapacity())
+            return;
         if (isReloading())
             return;
 

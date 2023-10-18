@@ -1,18 +1,20 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.FixedPitchHitbox;
 import com.dace.dmgr.combat.entity.SummonEntity;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.inventivetalent.glow.GlowAPI;
@@ -46,7 +48,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
             playReadySound();
         else if (i > JagerA2Info.SUMMON_DURATION) {
             CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8F,
-                    combatEntity -> !combatEntity.isFixed());
+                    combatEntity -> !combatEntity.isFixed() && LocationUtil.canPass(entity.getLocation().add(0, 0.1, 0),
+                            combatEntity.getEntity().getLocation().add(0, 0.1, 0)));
             if (target != null)
                 onCatchEnemy(target);
         }
@@ -88,7 +91,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
      */
     private void onCatchEnemy(CombatEntity<?> target) {
         playCatchSound();
-        target.damage(this, JagerA2Info.DAMAGE, "", false, true);
+        target.damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
         target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
@@ -105,7 +108,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     }
 
     @Override
-    public void onAttack(CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished() && skill1.getSummonEntity().getEntity().getTarget() == null)
@@ -113,7 +116,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
     }
 
     @Override
-    public void onDamage(CombatEntity<?> attacker, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
     }
 
@@ -153,18 +156,11 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> {
         entity.setSilent(true);
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
-        entity.teleport(location.add(0, 0.2, 0));
+        entity.teleport(location.add(0, 0.05, 0));
         setMaxHealth(JagerA2Info.HEALTH);
         setHealth(JagerA2Info.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
-
-        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
-        packet.setEntityIds(new int[]{entity.getEntityId()});
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
-            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
-                packet.sendPacket(player2);
-        });
+        hideForOthers();
     }
 
     /**

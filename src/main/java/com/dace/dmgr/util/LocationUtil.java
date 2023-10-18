@@ -2,22 +2,50 @@ package com.dace.dmgr.util;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Stairs;
-import org.bukkit.material.Step;
+import org.bukkit.material.*;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 위치 관련 기능을 제공하는 클래스.
  */
 public final class LocationUtil {
     /**
+     * 지정한 블록이 통과할 수 있는 블록인 지 확인한다.
+     *
+     * @param block 확인할 블록
+     * @return 통과 가능하면 {@code true} 반환
+     */
+    private static boolean canPassBlock(Block block) {
+        if (!block.getType().isSolid())
+            return true;
+
+        MaterialData materialData = block.getState().getData();
+        if (materialData instanceof Step || materialData instanceof Stairs || materialData instanceof Gate ||
+                materialData instanceof Door || materialData instanceof TrapDoor)
+            return true;
+
+        switch (block.getType()) {
+            case THIN_GLASS:
+            case STAINED_GLASS_PANE:
+            case FENCE:
+            case SPRUCE_FENCE:
+            case BIRCH_FENCE:
+            case JUNGLE_FENCE:
+            case ACACIA_FENCE_GATE:
+            case DARK_OAK_FENCE:
+            case COBBLE_WALL:
+            case SIGN_POST:
+            case WALL_SIGN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
      * 지정한 위치를 통과할 수 있는지 확인한다.
      *
-     * <p>통과 가능한 블록이란 유리판, 울타리, 물 등을 말한다.</p>
+     * <p>통과 가능한 블록은 {@link LocationUtil#canPassBlock(Block)}에서 판단한다.</p>
      *
      * <p>각종 스킬의 판정에 사용한다.</p>
      *
@@ -27,22 +55,9 @@ public final class LocationUtil {
     public static boolean isNonSolid(Location location) {
         Block block = location.getBlock();
 
-        if (block.isEmpty())
-            return true;
-
-        if (!block.getType().isOccluding()) {
-            switch (block.getType()) {
-                case GLASS:
-                case STAINED_GLASS:
-                case GLOWSTONE:
-                case BEACON:
-                case SEA_LANTERN:
-                case CAULDRON:
-                case ANVIL:
-                    return false;
-            }
-
+        if (canPassBlock(block)) {
             MaterialData materialData = block.getState().getData();
+
             if (materialData instanceof Step) {
                 if (((Step) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
@@ -54,8 +69,10 @@ public final class LocationUtil {
                 else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -69,30 +86,16 @@ public final class LocationUtil {
      * @return 통과 가능하면 {@code true} 반환
      */
     public static boolean canPass(Location start, Location end) {
-        for (Location loc : getLine(start, end)) {
-            if (isNonSolid(loc)) return false;
-        }
-        return true;
-    }
-
-    /**
-     * 두 위치 사이에 있는 1m 간격의 모든 위치를 반환한다.
-     *
-     * @param start 시작 위치
-     * @param end   끝 위치
-     * @return 해당 위치 목록
-     */
-    public static List<Location> getLine(Location start, Location end) {
-        Vector direction = end.toVector().subtract(start.toVector());
+        Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.2);
         Location loc = start.clone();
-        List<Location> locList = new ArrayList<>();
+        double distance = start.distance(end);
 
-        while (loc.distance(start) < start.distance(end)) {
-            loc.add(direction);
-            locList.add(loc);
+        while (loc.distance(start) < distance) {
+            if (!isNonSolid(loc.add(direction)))
+                return false;
         }
 
-        return locList;
+        return true;
     }
 
     /**

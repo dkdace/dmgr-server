@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager;
 
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
@@ -77,7 +78,7 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, String type, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished())

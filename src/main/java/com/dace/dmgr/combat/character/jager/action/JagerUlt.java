@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-public class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
+public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
     /** 소환된 엔티티 목록 */
     @Getter
     @Setter
@@ -83,8 +83,8 @@ public class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity>
                 if (cancelled)
                     return;
 
-                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(),
-                        combatUser.getEntity().getLocation().getDirection(), 0.2, -0.4, 0);
+                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                        combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
                 new BouncingProjectile(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),

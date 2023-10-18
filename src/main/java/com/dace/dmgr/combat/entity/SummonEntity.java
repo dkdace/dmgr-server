@@ -1,7 +1,13 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
@@ -22,5 +28,29 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
     protected SummonEntity(T entity, String name, boolean isFixed, int maxHealth, CombatUser owner, Hitbox... hitbox) {
         super(entity, name, isFixed, maxHealth, hitbox);
         this.owner = owner;
+    }
+
+    @Override
+    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+        owner.onAttack(victim, damage, damageType, isCrit, isUlt);
+    }
+
+    @Override
+    public void onKill(CombatEntity<?> victim) {
+        owner.onKill(victim);
+    }
+
+    /**
+     * 엔티티를 소환한 플레이어를 제외한 모든 플레이어에게 엔티티를 보이지 않게 한다.
+     */
+    protected void hideForOthers() {
+        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
+        packet.setEntityIds(new int[]{entity.getEntityId()});
+
+        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
+            CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
+            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
+                packet.sendPacket(player2);
+        });
     }
 }

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -23,53 +24,50 @@ public class Hitbox {
     protected final double sizeZ;
     /** 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+) */
     @Getter
-    protected final double offsetX;
+    @Setter
+    protected double offsetX;
     /** 중앙 위치 오프셋. 아래(-) / 위(+) */
     @Getter
-    protected final double offsetY;
+    @Setter
+    protected double offsetY;
     /** 중앙 위치 오프셋. 뒤(-) / 앞(+) */
     @Getter
-    protected final double offsetZ;
+    @Setter
+    protected double offsetZ;
     /** 축 기준 중앙 위치 오프셋. -X / +X */
     @Getter
-    protected final double axisOffsetX;
+    @Setter
+    protected double axisOffsetX;
     /** 축 기준 중앙 위치 오프셋. -Y / +Y */
     @Getter
-    protected final double axisOffsetY;
+    @Setter
+    protected double axisOffsetY;
     /** 축 기준 중앙 위치 오프셋. -Z / +Z */
     @Getter
-    protected final double axisOffsetZ;
+    @Setter
+    protected double axisOffsetZ;
     /** 중앙 위치 */
     protected Location center;
 
     /**
      * 히트박스 인스턴스를 생성한다.
      *
-     * @param center  중앙 위치
-     * @param sizeX   가로. 단위: 블록
-     * @param sizeY   높이. 단위: 블록
-     * @param sizeZ   세로. 단위: 블록
-     * @param offsetX 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+)
-     * @param offsetY 중앙 위치 오프셋. 아래(-) / 위(+)
-     * @param offsetZ 중앙 위치 오프셋. 뒤(-) / 앞(+)
+     * @param location 기준 위치
+     * @param sizeX    가로. 단위: 블록
+     * @param sizeY    높이. 단위: 블록
+     * @param sizeZ    세로. 단위: 블록
+     * @param offsetX  중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+)
+     * @param offsetY  중앙 위치 오프셋. 아래(-) / 위(+)
+     * @param offsetZ  중앙 위치 오프셋. 뒤(-) / 앞(+)
      */
-    public Hitbox(Location center, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ) {
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.sizeZ = sizeZ;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-        axisOffsetX = 0;
-        axisOffsetY = 0;
-        axisOffsetZ = 0;
-        setCenter(center);
+    public Hitbox(Location location, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ) {
+        this(location, sizeX, sizeY, sizeZ, offsetX, offsetY, offsetZ, 0, 0, 0);
     }
 
     /**
      * 히트박스 인스턴스를 생성한다.
      *
-     * @param center      중앙 위치
+     * @param location    기존 위치
      * @param sizeX       가로. 단위: 블록
      * @param sizeY       높이. 단위: 블록
      * @param sizeZ       세로. 단위: 블록
@@ -80,7 +78,7 @@ public class Hitbox {
      * @param axisOffsetY 축 기준 중앙 위치 오프셋. 아래(-) / 위(+)
      * @param axisOffsetZ 축 기준 중앙 위치 오프셋. 뒤(-) / 앞(+)
      */
-    public Hitbox(Location center, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ, double axisOffsetX, double axisOffsetY, double axisOffsetZ) {
+    public Hitbox(Location location, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ, double axisOffsetX, double axisOffsetY, double axisOffsetZ) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
@@ -90,7 +88,7 @@ public class Hitbox {
         this.axisOffsetX = axisOffsetX;
         this.axisOffsetY = axisOffsetY;
         this.axisOffsetZ = axisOffsetZ;
-        setCenter(center);
+        setCenter(location);
     }
 
     public final Location getCenter() {
@@ -100,7 +98,7 @@ public class Hitbox {
     /**
      * 히트박스의 중앙 위치를 설정한다.
      *
-     * @param location 중앙 위치
+     * @param location 기준 위치
      */
     public void setCenter(Location location) {
         center = LocationUtil.getLocationFromOffset(location.clone(), offsetX, offsetY, offsetZ)

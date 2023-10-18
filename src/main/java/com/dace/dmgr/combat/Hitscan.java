@@ -52,16 +52,17 @@ public abstract class Hitscan extends Bullet {
      */
     @Override
     public final void shoot(Location origin, Vector direction, float spread) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
+        direction.normalize();
         Location loc = origin.clone();
-        direction = VectorUtil.getSpreadedVector(direction, spread);
+        loc.add(direction.clone().multiply(START_DISTANCE));
+        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < maxDistance; i++) {
             if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
                 break;
 
-            if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, direction, targets, SIZE))
+            if (!findEnemyAndHandleCollision(loc, direction, targets, SIZE))
                 break;
 
             loc.add(direction);

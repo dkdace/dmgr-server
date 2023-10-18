@@ -1,9 +1,11 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -16,6 +18,9 @@ import java.util.Set;
 public abstract class Projectile extends Bullet {
     /** 투사체의 기본 판정 범위. 단위: 블록 */
     private static final float SIZE = 0.13F;
+    /** 피해 증가량 */
+    @Getter
+    private final double damageIncrement;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
     /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
@@ -35,6 +40,7 @@ public abstract class Projectile extends Bullet {
      */
     protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
         super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
+        this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         this.velocity = velocity;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
@@ -48,6 +54,7 @@ public abstract class Projectile extends Bullet {
      */
     protected Projectile(CombatEntity<?> shooter, int velocity) {
         super(shooter);
+        this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         ProjectileOption option = ProjectileOption.builder().build();
         this.trailInterval = option.trailInterval;
         this.maxDistance = option.maxDistance;
@@ -67,9 +74,10 @@ public abstract class Projectile extends Bullet {
      */
     @Override
     public final void shoot(Location origin, Vector direction, float spread) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
+        direction.normalize();
         Location loc = origin.clone();
-        direction = VectorUtil.getSpreadedVector(direction, spread);
+        loc.add(direction.clone().multiply(START_DISTANCE));
+        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
         Set<CombatEntity<?>> targets = new HashSet<>();
 
         int loopCount = (int) (velocity / 2.5);
@@ -87,13 +95,13 @@ public abstract class Projectile extends Bullet {
             @Override
             public boolean run(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= maxDistance || (duration != -1 && _i >= duration))
+                    if ((duration != -1 && _i >= duration))
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (loc.distance(origin) > MIN_DISTANCE && !findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))

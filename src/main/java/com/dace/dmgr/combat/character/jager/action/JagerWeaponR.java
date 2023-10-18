@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -112,7 +113,7 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
                     public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
                         int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                                 JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
-                        target.damage(combatUser, damage, "", isCrit, true);
+                        target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
                         return false;
                     }
                 }.shoot(0F);

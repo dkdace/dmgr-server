@@ -7,6 +7,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,11 +25,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public abstract class Bullet {
-    /** 총알의 최소 사거리 */
-    protected static final float MIN_DISTANCE = 0.5F;
+    /** 총알이 발사되는 거리 */
+    protected static final float START_DISTANCE = 0.5F;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. 단위: 블록 */
     protected static final float HITBOX_INTERVAL = 0.125F;
     /** 총알을 발사하는 엔티티 */
+    @Getter
     protected final CombatEntity<?> shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     protected int trailInterval;
