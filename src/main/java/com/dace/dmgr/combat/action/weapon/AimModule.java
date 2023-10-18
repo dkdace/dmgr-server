@@ -41,7 +41,7 @@ public final class AimModule<T extends Weapon & Aimable> {
      * 무기를 정조준한다.
      */
     public void aim() {
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SWAPPING)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SWAPPING)
             return;
 
         aiming = !aiming;
@@ -67,30 +67,6 @@ public final class AimModule<T extends Weapon & Aimable> {
                     aiming = false;
                 }
             };
-        }
-    }
-
-    /**
-     * 조준 시 확대 레벨(화면이 확대되는 정도) 목록.
-     */
-    @Getter
-    public enum ZoomLevel {
-        L1(1.2F),
-        L2(6F),
-        L3(-4.2F),
-        L4(-1.8F),
-        L5(-1.2F),
-        L6(-0.93F),
-        L7(-0.8F),
-        L8(-0.73F),
-        L9(-0.68F),
-        L10(-0.64F);
-
-        /** 실제 값 */
-        private final float value;
-
-        ZoomLevel(float value) {
-            this.value = value;
         }
     }
 }

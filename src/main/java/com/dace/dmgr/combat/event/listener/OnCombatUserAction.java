@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -24,7 +23,7 @@ public final class OnCombatUserAction implements Listener {
             return;
 
         Weapon weapon = combatUser.getWeapon();
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SECONDARY)
+        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SECONDARY)
             weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof Weapon) {
