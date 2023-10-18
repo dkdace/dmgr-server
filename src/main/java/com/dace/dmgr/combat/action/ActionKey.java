@@ -13,10 +13,6 @@ public enum ActionKey {
     LEFT_CLICK("좌클릭"),
     /** 우클릭 */
     RIGHT_CLICK("우클릭"),
-    /** 크랙샷 무기 상호작용 */
-    CS_PRE_USE(""),
-    /** 크랙샷 무기 사격 */
-    CS_USE(""),
     /** 1번 슬롯 */
     SLOT_1("1"),
     /** 2번 슬롯 */

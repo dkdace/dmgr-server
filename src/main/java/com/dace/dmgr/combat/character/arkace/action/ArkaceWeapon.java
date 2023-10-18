@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
@@ -23,7 +24,7 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ArkaceWeapon extends Weapon implements Reloadable {
+public final class ArkaceWeapon extends Weapon implements Reloadable, FullAuto {
     /** 재장전 모듈 객체 */
     private final ReloadModule reloadModule;
 
@@ -34,12 +35,17 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
 
     @Override
     public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.CS_PRE_USE, ActionKey.CS_USE, ActionKey.DROP);
+        return Arrays.asList(ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    }
+
+    @Override
+    public ActionKey getKey() {
+        return ActionKey.RIGHT_CLICK;
     }
 
     @Override
     public long getDefaultCooldown() {
-        return ArkaceWeaponInfo.COOLDOWN;
+        return 0;
     }
 
     @Override
@@ -73,22 +79,24 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
     }
 
     @Override
+    public FireRate getFireRate() {
+        return FireRate.RPM_600;
+    }
+
+    @Override
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
-            case CS_PRE_USE: {
+            case RIGHT_CLICK: {
                 if (getRemainingAmmo() == 0) {
                     reload();
                     return;
                 }
-                if (combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished())
+                if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
+                    setCooldown(4);
+                    CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                     return;
+                }
 
-                setCooldown(4);
-                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
-
-                break;
-            }
-            case CS_USE: {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location location = combatUser.getEntity().getLocation();

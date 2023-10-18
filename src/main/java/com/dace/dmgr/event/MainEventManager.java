@@ -30,8 +30,6 @@ public final class MainEventManager {
         EventUtil.registerListener(new OnPlayerDropItem());
         EventUtil.registerListener(new OnTabComplete());
         EventUtil.registerListener(new OnPlayerCommandPreprocess());
-        EventUtil.registerListener(new OnWeaponPreShoot());
-        EventUtil.registerListener(new OnWeaponPrepareShoot());
         EventUtil.registerListener(new OnPlayerItemHeld());
         EventUtil.registerListener(new OnPlayerInteract());
         EventUtil.registerListener(new Menu());
