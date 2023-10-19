@@ -2,7 +2,6 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.SwapModule;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -22,7 +21,7 @@ public final class OnWeaponPreShoot implements Listener {
             Weapon weapon = combatUser.getWeapon();
 
             if ((weapon instanceof Reloadable && (((Reloadable) weapon).getRemainingAmmo() == 0 || ((Reloadable) weapon).isReloading())) ||
-                    (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == SwapModule.WeaponState.SWAPPING))
+                    (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SWAPPING))
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);

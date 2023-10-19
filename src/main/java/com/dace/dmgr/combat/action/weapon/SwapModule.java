@@ -38,7 +38,7 @@ public final class SwapModule<T extends Weapon & Swappable> {
 
         ((Reloadable) weapon).cancelReloading();
         if (weaponState == Swappable.WeaponState.SECONDARY)
-            ((Reloadable) ((Swappable) weapon).getSubweapon()).cancelReloading();
+            ((Reloadable) weapon.getSubweapon()).cancelReloading();
         weaponState = Swappable.WeaponState.SWAPPING;
 
         long duration = weapon.getSwapDuration();
