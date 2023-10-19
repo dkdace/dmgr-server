@@ -6,6 +6,7 @@ import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 
 /**
@@ -15,17 +16,14 @@ import org.bukkit.ChatColor;
  *
  * @see Swappable
  */
-public final class SwapModule {
+@RequiredArgsConstructor
+public final class SwapModule<T extends Weapon & Swappable> {
     /** 무기 객체 */
-    private final Weapon weapon;
+    private final T weapon;
 
     /** 무기 전환 상태 */
     @Getter
     private WeaponState weaponState = WeaponState.PRIMARY;
-
-    public SwapModule(Weapon weapon) {
-        this.weapon = weapon;
-    }
 
     /**
      * 이중 무기의 상태를 변경한다.
@@ -40,10 +38,10 @@ public final class SwapModule {
 
         ((Reloadable) weapon).cancelReloading();
         if (weaponState == WeaponState.SECONDARY)
-            ((Reloadable) ((Swappable) weapon).getSubweapon()).cancelReloading();
+            ((Reloadable) weapon.getSubweapon()).cancelReloading();
         weaponState = WeaponState.SWAPPING;
 
-        long duration = ((Swappable) weapon).getSwapDuration();
+        long duration = weapon.getSwapDuration();
         CooldownManager.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, duration);
 
         new TaskTimer(1, duration) {

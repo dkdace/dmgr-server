@@ -1,6 +1,6 @@
-package com.dace.dmgr.combat.action.weapon;
+package com.dace.dmgr.combat.action.info;
 
-import com.dace.dmgr.combat.action.ActionInfo;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

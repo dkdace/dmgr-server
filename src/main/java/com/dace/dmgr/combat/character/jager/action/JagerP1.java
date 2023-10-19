@@ -6,17 +6,14 @@ import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerP1 extends Skill {
     public JagerP1(CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.PERIODIC_1);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.PERIODIC_1};
     }
 
     @Override

@@ -21,17 +21,14 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerA3 extends ActiveSkill {
     public JagerA3(CombatUser combatUser) {
         super(3, combatUser, JagerA3Info.getInstance(), 2);
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_3);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_3};
     }
 
     @Override

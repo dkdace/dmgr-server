@@ -16,9 +16,9 @@ import org.bukkit.ChatColor;
  *
  * @see Reloadable
  */
-public final class ReloadModule {
+public final class ReloadModule<T extends Weapon & Reloadable> {
     /** 무기 객체 */
-    private final Weapon weapon;
+    private final T weapon;
 
     /** 남은 탄약 수 */
     @Getter
@@ -29,9 +29,9 @@ public final class ReloadModule {
     @Setter
     private boolean reloading = false;
 
-    public ReloadModule(Weapon weapon) {
+    public ReloadModule(T weapon) {
         this.weapon = weapon;
-        this.remainingAmmo = ((Reloadable) weapon).getCapacity();
+        this.remainingAmmo = weapon.getCapacity();
     }
 
     /**
@@ -49,7 +49,7 @@ public final class ReloadModule {
         if (reloading)
             reloading = false;
         else if (remainingAmmo == 0)
-            ((Reloadable) weapon).reload();
+            weapon.reload();
     }
 
     /**
@@ -63,7 +63,7 @@ public final class ReloadModule {
 
         reloading = true;
 
-        long duration = ((Reloadable) weapon).getReloadDuration();
+        long duration = weapon.getReloadDuration();
         CooldownManager.setCooldown(weapon, Cooldown.WEAPON_RELOAD, duration);
 
         new TaskTimer(1, duration) {
@@ -91,7 +91,7 @@ public final class ReloadModule {
 
                 weapon.getCombatUser().sendActionBar("§a§l재장전 완료", 8);
 
-                remainingAmmo = ((Reloadable) weapon).getCapacity();
+                remainingAmmo = weapon.getCapacity();
                 reloading = false;
             }
         };

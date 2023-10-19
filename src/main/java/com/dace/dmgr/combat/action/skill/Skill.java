@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;

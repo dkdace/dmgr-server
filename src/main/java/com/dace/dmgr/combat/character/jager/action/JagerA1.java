@@ -13,12 +13,9 @@ import lombok.Setter;
 import org.bukkit.Sound;
 import org.bukkit.entity.Wolf;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, LocationConfirmable {
     /** 위치 확인 모듈 객체 */
-    private final LocationConfirmModule locationConfirmModule;
+    private final LocationConfirmModule<JagerA1> locationConfirmModule;
     /** 소환된 엔티티 */
     @Getter
     @Setter
@@ -26,12 +23,12 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
 
     public JagerA1(CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
-        locationConfirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1);
+        locationConfirmModule = new LocationConfirmModule<>(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1);
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_1);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_1};
     }
 
     @Override

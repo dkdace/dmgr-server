@@ -6,10 +6,16 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.*;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.SkillInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.skill.HasEntities;
+import com.dace.dmgr.combat.action.skill.HasEntity;
+import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
@@ -280,14 +286,17 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
         }
 
         weapon = character.getWeaponInfo().createWeapon(this);
-        weapon.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, weapon));
-
+        for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
+            actionMap.put(actionKey, weapon);
+        }
         for (int i = 1; i <= 4; i++) {
             ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
             if (activeSkillInfo != null) {
                 Skill skill = activeSkillInfo.createSkill(this);
                 skillMap.put(activeSkillInfo, skill);
-                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
+                for (ActionKey actionKey : skill.getDefaultActionKeys()) {
+                    actionMap.put(actionKey, skill);
+                }
             }
         }
         for (int i = 1; i <= 4; i++) {
@@ -295,7 +304,9 @@ public final class CombatUser extends CombatEntity<Player> implements HasCritHit
             if (passiveSkillInfo != null) {
                 Skill skill = passiveSkillInfo.createSkill(this);
                 skillMap.put(passiveSkillInfo, skill);
-                skill.getDefaultActionKeys().forEach(actionKey -> actionMap.put(actionKey, skill));
+                for (ActionKey actionKey : skill.getDefaultActionKeys()) {
+                    actionMap.put(actionKey, skill);
+                }
             }
         }
     }

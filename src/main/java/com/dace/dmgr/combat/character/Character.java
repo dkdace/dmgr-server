@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.AllArgsConstructor;

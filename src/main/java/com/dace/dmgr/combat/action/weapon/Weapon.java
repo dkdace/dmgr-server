@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 
 /**

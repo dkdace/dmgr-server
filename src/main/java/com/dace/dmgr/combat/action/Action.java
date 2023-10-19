@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action;
 
+import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -9,8 +10,6 @@ import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 클래스.
@@ -38,7 +37,7 @@ public abstract class Action {
      *
      * @return 기본 사용 키 목록
      */
-    public abstract List<ActionKey> getDefaultActionKeys();
+    public abstract ActionKey[] getDefaultActionKeys();
 
     /**
      * 기본 쿨타임을 반환한다.

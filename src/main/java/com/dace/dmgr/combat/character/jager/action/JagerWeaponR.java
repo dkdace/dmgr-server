@@ -19,26 +19,23 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerWeaponR extends Weapon implements Reloadable {
     /** 주무기 객체 */
     private final JagerWeaponL mainWeapon;
     /** 재장전 모듈 객체 */
-    private final ReloadModule reloadModule;
+    private final ReloadModule<JagerWeaponR> reloadModule;
 
     /** 주무기 객체 */
 
     public JagerWeaponR(CombatUser combatUser, JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
-        reloadModule = new ReloadModule(this);
+        reloadModule = new ReloadModule<>(this);
         this.mainWeapon = mainWeapon;
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
     }
 
     @Override

@@ -21,9 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
     /** 소환된 엔티티 목록 */
     @Getter
@@ -32,11 +29,6 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
     public JagerUlt(CombatUser combatUser) {
         super(4, combatUser, JagerUltInfo.getInstance());
-    }
-
-    @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_4);
     }
 
     @Override

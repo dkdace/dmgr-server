@@ -17,8 +17,10 @@ import org.inventivetalent.glow.GlowAPI;
  * 스킬의 위치 확인 모듈 클래스.
  *
  * <p>스킬이 {@link LocationConfirmModule}을 상속받는 클래스여야 한다.</p>
+ *
+ * @see LocationConfirmable
  */
-public final class LocationConfirmModule extends ConfirmModule {
+public final class LocationConfirmModule<T extends Skill & LocationConfirmable> extends ConfirmModule<T> {
     /** 현재 위치 */
     @Getter
     private Location location;
@@ -28,7 +30,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     @Getter
     private boolean valid = false;
 
-    public LocationConfirmModule(Skill skill, ActionKey confirmKey, ActionKey cancelKey) {
+    public LocationConfirmModule(T skill, ActionKey confirmKey, ActionKey cancelKey) {
         super(skill, confirmKey, cancelKey);
     }
 
@@ -58,7 +60,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     protected void onTick(int i) {
         Player player = skill.getCombatUser().getEntity();
 
-        location = player.getTargetBlock(null, ((LocationConfirmable) skill).getMaxDistance()).getLocation().add(0.5, 1, 0.5);
+        location = player.getTargetBlock(null, skill.getMaxDistance()).getLocation().add(0.5, 1, 0.5);
         location.setYaw(i * 10);
         location.setPitch(0);
 

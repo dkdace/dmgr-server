@@ -2,11 +2,9 @@ package com.dace.dmgr.combat.character.jager;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.SwapModule;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -86,7 +84,7 @@ public final class Jager extends Character {
     }
 
     @Override
-    public WeaponInfo getWeaponInfo() {
+    public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();
     }
 
@@ -117,7 +115,7 @@ public final class Jager extends Character {
     }
 
     @Override
-    public UltimateSkillInfo getUltimateSkillInfo() {
+    public JagerUltInfo getUltimateSkillInfo() {
         return JagerUltInfo.getInstance();
     }
 }

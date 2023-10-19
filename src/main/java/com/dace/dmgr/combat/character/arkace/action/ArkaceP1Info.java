@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
@@ -21,7 +20,7 @@ public final class ArkaceP1Info extends PassiveSkillInfo {
     }
 
     @Override
-    public Skill createSkill(CombatUser combatUser) {
+    public ArkaceP1 createSkill(CombatUser combatUser) {
         return new ArkaceP1(combatUser);
     }
 }

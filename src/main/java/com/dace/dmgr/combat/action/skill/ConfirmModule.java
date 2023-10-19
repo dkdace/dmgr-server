@@ -4,17 +4,19 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 스킬의 확인 모듈 클래스.
  *
  * <p>스킬이 {@link Confirmable}을 상속받는 클래스여야 한다.</p>
  *
- * @see LocationConfirmModule
+ * @see Confirmable
  */
-public class ConfirmModule {
+@RequiredArgsConstructor
+public class ConfirmModule<T extends Skill & Confirmable> {
     /** 스킬 객체 */
-    protected final Skill skill;
+    protected final T skill;
     /** 확인 키 */
     protected final ActionKey confirmKey;
     /** 취소 키 */
@@ -23,12 +25,6 @@ public class ConfirmModule {
     /** 활성화 상태 */
     @Getter
     protected boolean toggled = false;
-
-    public ConfirmModule(Skill skill, ActionKey confirmKey, ActionKey cancelKey) {
-        this.skill = skill;
-        this.confirmKey = confirmKey;
-        this.cancelKey = cancelKey;
-    }
 
     /**
      * 스킬의 위치 지정 모드를 활성화한다.

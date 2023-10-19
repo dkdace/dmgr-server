@@ -19,17 +19,14 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(CombatUser combatUser) {
         super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_2, ActionKey.LEFT_CLICK};
     }
 
     @Override

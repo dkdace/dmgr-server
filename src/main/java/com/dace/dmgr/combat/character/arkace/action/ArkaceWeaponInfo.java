@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.TextIcon;
@@ -37,7 +36,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public Weapon createWeapon(CombatUser combatUser) {
+    public ArkaceWeapon createWeapon(CombatUser combatUser) {
         return new ArkaceWeapon(combatUser);
     }
 

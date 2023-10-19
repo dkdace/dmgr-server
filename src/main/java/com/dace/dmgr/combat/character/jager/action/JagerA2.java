@@ -21,9 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entity> {
     /** 소환된 엔티티 목록 */
     @Getter
@@ -35,8 +32,8 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_2);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_2};
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.action.skill;
+package com.dace.dmgr.combat.action.info;
 
 /**
  * 패시브 스킬 정보를 관리하는 클래스.

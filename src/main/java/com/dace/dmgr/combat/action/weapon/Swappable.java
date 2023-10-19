@@ -9,7 +9,7 @@ public interface Swappable {
      *
      * @return 보조무기 객체
      */
-    <T extends Weapon> T getSubweapon();
+    Weapon getSubweapon();
 
     /**
      * @return 무기 전환 상태

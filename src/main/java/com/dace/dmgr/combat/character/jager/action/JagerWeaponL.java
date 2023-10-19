@@ -22,31 +22,28 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class JagerWeaponL extends Weapon implements Reloadable, Swappable, Aimable {
     /** 재장전 모듈 객체 */
-    private final ReloadModule reloadModule;
+    private final ReloadModule<JagerWeaponL> reloadModule;
     /** 2중 무기 모듈 객체 */
-    private final SwapModule swapModule;
+    private final SwapModule<JagerWeaponL> swapModule;
     /** 정조준 모듈 객체 */
-    private final AimModule aimModule;
+    private final AimModule<JagerWeaponL> aimModule;
     /** 보조무기 객체 */
     @Getter
     private final JagerWeaponR subweapon;
 
     public JagerWeaponL(CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
-        reloadModule = new ReloadModule(this);
-        swapModule = new SwapModule(this);
-        aimModule = new AimModule(this);
+        reloadModule = new ReloadModule<>(this);
+        swapModule = new SwapModule<>(this);
+        aimModule = new AimModule<>(this);
         subweapon = new JagerWeaponR(combatUser, this);
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
     }
 
     @Override
@@ -126,7 +123,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                 Location location = combatUser.getEntity().getLocation();
 
                 SoundUtil.play("random.gun2.m16_1", location, 0.8F, 1.2F);
-                SoundUtil.play("block.lava.extinguish", location, 0.8F, 1.7F);
+                SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, location, 0.8F, 1.7F);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1F);
                 setCooldown();

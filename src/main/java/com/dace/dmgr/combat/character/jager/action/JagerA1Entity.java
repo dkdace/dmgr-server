@@ -24,7 +24,6 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
         super(
                 entity,
                 "§f" + owner.getName() + "의 설랑",
-                false,
                 JagerA1Info.HEALTH,
                 owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)

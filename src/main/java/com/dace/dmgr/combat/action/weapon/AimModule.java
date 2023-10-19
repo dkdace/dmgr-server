@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
@@ -13,17 +14,14 @@ import org.bukkit.entity.Player;
  *
  * @see Aimable
  */
-public final class AimModule {
+@RequiredArgsConstructor
+public final class AimModule<T extends Weapon & Aimable> {
     /** 무기 객체 */
-    private final Weapon weapon;
+    private final T weapon;
 
     /** 정조준 상태 */
     @Getter
     private boolean aiming = false;
-
-    public AimModule(Weapon weapon) {
-        this.weapon = weapon;
-    }
 
     /**
      * 지정한 플레이어에게 화면 확대 효과를 재생한다.
@@ -59,7 +57,7 @@ public final class AimModule {
                     if (weapon instanceof Reloadable && ((Reloadable) weapon).isReloading())
                         return false;
 
-                    playZoomEffect(weapon.getCombatUser().getEntity(), ((Aimable) weapon).getZoomLevel().getValue());
+                    playZoomEffect(weapon.getCombatUser().getEntity(), weapon.getZoomLevel().getValue());
 
                     return true;
                 }

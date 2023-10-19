@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
@@ -13,6 +14,11 @@ import org.bukkit.Sound;
 public abstract class UltimateSkill extends ActiveSkill {
     protected UltimateSkill(int number, CombatUser combatUser, UltimateSkillInfo ultimateSkillInfo) {
         super(number, combatUser, ultimateSkillInfo, 3);
+    }
+
+    @Override
+    public final ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_4};
     }
 
     @Override

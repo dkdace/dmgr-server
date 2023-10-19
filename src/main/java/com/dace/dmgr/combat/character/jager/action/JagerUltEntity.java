@@ -32,7 +32,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> {
         super(
                 entity,
                 "§f" + owner.getName() + "의 눈폭풍 발생기",
-                false,
                 JagerUltInfo.HEALTH,
                 owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
