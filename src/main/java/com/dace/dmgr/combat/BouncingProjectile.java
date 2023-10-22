@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -31,7 +32,7 @@ public abstract class BouncingProjectile extends Projectile {
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
      * @see BouncingProjectileOption
      */
-    protected BouncingProjectile(CombatEntity<?> shooter, int velocity, int bouncing, ProjectileOption option, BouncingProjectileOption bouncingOption) {
+    protected BouncingProjectile(CombatEntity shooter, int velocity, int bouncing, ProjectileOption option, BouncingProjectileOption bouncingOption) {
         super(shooter, velocity, option);
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
@@ -49,7 +50,7 @@ public abstract class BouncingProjectile extends Projectile {
      * @param option   투사체의 선택적 옵션
      * @see ProjectileOption
      */
-    protected BouncingProjectile(CombatEntity<?> shooter, int velocity, int bouncing, ProjectileOption option) {
+    protected BouncingProjectile(CombatEntity shooter, int velocity, int bouncing, ProjectileOption option) {
         super(shooter, velocity, option);
         BouncingProjectileOption bouncingOption = BouncingProjectileOption.builder().build();
         this.bouncing = bouncing;
@@ -64,15 +65,8 @@ public abstract class BouncingProjectile extends Projectile {
      * @param velocity 투사체의 속력. 단위: 블록/s
      * @param bouncing 투사체가 튕기는 횟수. {@code -1}로 설정 시 계속 튕김
      */
-    protected BouncingProjectile(CombatEntity<?> shooter, int velocity, int bouncing) {
+    protected BouncingProjectile(CombatEntity shooter, int velocity, int bouncing) {
         super(shooter, velocity);
-        ProjectileOption option = ProjectileOption.builder().build();
-        this.trailInterval = option.trailInterval;
-        this.maxDistance = option.maxDistance;
-        this.penetrating = option.penetrating;
-        this.hitboxMultiplier = option.hitboxMultiplier;
-        this.duration = option.duration;
-        this.hasGravity = option.hasGravity;
         BouncingProjectileOption bouncingOption = BouncingProjectileOption.builder().build();
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
@@ -101,7 +95,7 @@ public abstract class BouncingProjectile extends Projectile {
     public abstract boolean onHitBlockBouncing(Location location, Vector direction, Block hitBlock);
 
     @Override
-    public final boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+    public final boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
         if (onHitEntityBouncing(location, direction, target, isCrit))
             return true;
 
@@ -122,7 +116,7 @@ public abstract class BouncingProjectile extends Projectile {
      * @param isCrit    치명타 여부
      * @return 관통 여부. {@code true} 반환 시 엔티티 관통, {@code false} 반환 시 도탄됨
      */
-    public abstract boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit);
+    public abstract boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit);
 
     /**
      * 투사체의 도탄 로직을 처리한다.

@@ -38,8 +38,8 @@ public abstract class Projectile extends Bullet {
      * @param option   선택적 옵션
      * @see ProjectileOption
      */
-    protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
+    protected Projectile(CombatEntity shooter, int velocity, ProjectileOption option) {
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
         this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         this.velocity = velocity;
         this.duration = option.duration;
@@ -52,7 +52,7 @@ public abstract class Projectile extends Bullet {
      * @param shooter  발사하는 엔티티
      * @param velocity 투사체의 속력. 단위: 블록/s
      */
-    protected Projectile(CombatEntity<?> shooter, int velocity) {
+    protected Projectile(CombatEntity shooter, int velocity) {
         super(shooter);
         this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         ProjectileOption option = ProjectileOption.builder().build();
@@ -60,6 +60,7 @@ public abstract class Projectile extends Bullet {
         this.maxDistance = option.maxDistance;
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
+        this.condition = option.condition;
         this.velocity = velocity;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
@@ -78,7 +79,7 @@ public abstract class Projectile extends Bullet {
         Location loc = origin.clone();
         loc.add(direction.clone().multiply(START_DISTANCE));
         direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
-        Set<CombatEntity<?>> targets = new HashSet<>();
+        Set<CombatEntity> targets = new HashSet<>();
 
         int loopCount = (int) (velocity / 2.5);
         int sum = 0;
@@ -101,7 +102,7 @@ public abstract class Projectile extends Bullet {
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))

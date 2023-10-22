@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.system.Cooldown;
@@ -111,8 +112,8 @@ public final class JagerA3 extends ActiveSkill {
             SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.8F);
 
             new BouncingProjectile(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownManager.getCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true).build(),
-                    BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).build()) {
+                    .duration(CooldownManager.getCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true)
+                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).build()) {
                 @Override
                 public void trail(Location location) {
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3,
@@ -127,7 +128,7 @@ public final class JagerA3 extends ActiveSkill {
                 }
 
                 @Override
-                public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                public boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit) {
                     if (direction.length() > 0.05)
                         target.damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                     return false;
@@ -153,32 +154,32 @@ public final class JagerA3 extends ActiveSkill {
         ParticleUtil.play(Particle.EXPLOSION_LARGE, location, 1, 0, 0, 0, 0);
         ParticleUtil.play(Particle.FIREWORKS_SPARK, location, 200, 0, 0, 0, 0.3F);
 
-        CombatUtil.getNearEnemies(combatUser, location, JagerA3Info.RADIUS, true).forEach(target -> {
-            if (LocationUtil.canPass(location, target.getEntity().getLocation().add(0, 0.1, 0))) {
-                int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
-                        JagerA3Info.RADIUS / 2F, true);
-                int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
-                        JagerA3Info.RADIUS / 2F, true);
-                if (projectile == null)
-                    target.damage(combatUser, damage, DamageType.NORMAL, false, true);
-                else
-                    target.damage(projectile, damage, DamageType.NORMAL, false, true);
-                JagerTrait.addFreezeValue(target, freeze);
+        CombatEntity[] targets = CombatUtil.getNearEnemies(combatUser, location, JagerA3Info.RADIUS,
+                combatEntity -> combatEntity instanceof Damageable && combatEntity.canPass(location), true);
+        for (CombatEntity target : targets) {
+            int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
+                    JagerA3Info.RADIUS / 2F, true);
+            int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
+                    JagerA3Info.RADIUS / 2F, true);
+            if (projectile == null)
+                ((Damageable) target).damage(combatUser, damage, DamageType.NORMAL, false, true);
+            else
+                ((Damageable) target).damage(projectile, damage, DamageType.NORMAL, false, true);
+            JagerTrait.addFreezeValue(target, freeze);
 
-                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
-                    target.applyStatusEffect(new Snare() {
-                        @Override
-                        public void onTick(CombatEntity<?> combatEntity, int i) {
-                            if (combatEntity instanceof CombatUser)
-                                ((CombatUser) combatEntity).getEntity().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
+            if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
+                target.applyStatusEffect(new Snare() {
+                    @Override
+                    public void onTick(CombatEntity combatEntity, int i) {
+                        if (combatEntity instanceof CombatUser)
+                            ((CombatUser) combatEntity).getEntity().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
-                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
-                                    0.4F, 0.8F, 0.4F, 120, 220, 240);
-                        }
-                    }, JagerA3Info.SNARE_DURATION);
-                }
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
+                                combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
+                                0.4F, 0.8F, 0.4F, 120, 220, 240);
+                    }
+                }, JagerA3Info.SNARE_DURATION);
             }
-        });
+        }
     }
 }

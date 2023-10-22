@@ -13,11 +13,11 @@ import org.bukkit.util.Vector;
  * 실탄을 발사하는 화기의 총알을 관리하는 클래스.
  */
 public abstract class GunHitscan extends Hitscan {
-    protected GunHitscan(CombatEntity<?> shooter, HitscanOption option) {
+    protected GunHitscan(CombatEntity shooter, HitscanOption option) {
         super(shooter, option);
     }
 
-    protected GunHitscan(CombatEntity<?> shooter) {
+    protected GunHitscan(CombatEntity shooter) {
         super(shooter);
     }
 

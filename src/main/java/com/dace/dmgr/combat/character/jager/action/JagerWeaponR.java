@@ -8,8 +8,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
@@ -99,7 +99,7 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
                 setCooldown();
                 reloadModule.consume(1);
 
-                new GunHitscan(combatUser, HitscanOption.builder().trailInterval(12).build()) {
+                new GunHitscan(combatUser, HitscanOption.builder().trailInterval(12).condition(combatUser::isEnemy).build()) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
@@ -107,7 +107,7 @@ public final class JagerWeaponR extends Weapon implements Reloadable {
                     }
 
                     @Override
-                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
                         int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                                 JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
                         target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);

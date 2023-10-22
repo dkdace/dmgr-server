@@ -1,0 +1,43 @@
+package com.dace.dmgr.combat.entity;
+
+public interface Healable extends Damageable {
+    /**
+     * 엔티티를 치유한다.
+     *
+     * @param provider 제공자
+     * @param amount   치유량
+     * @param isUlt    궁극기 충전 여부
+     */
+    default void heal(CombatEntity provider, int amount, boolean isUlt) {
+        if (getHealth() == getMaxHealth())
+            return;
+        if (!canTakeHeal())
+            return;
+
+        provider.onGiveHeal(this, amount, isUlt);
+        onTakeHeal(this, amount, isUlt);
+
+        setHealth(getHealth() + amount);
+    }
+
+    /**
+     * 엔티티가 치유를 받을 수 있는 지 확인한다.
+     *
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 치유 가능 여부
+     */
+    default boolean canTakeHeal() {
+        return true;
+    }
+
+    /**
+     * 엔티티가 치유를 받았을 때 실행될 작업.
+     *
+     * @param provider 제공자
+     * @param amount   치유량
+     * @param isUlt    궁극기 충전 여부
+     * @see CombatEntity#onGiveHeal(Healable, int, boolean)
+     */
+    void onTakeHeal(CombatEntity provider, int amount, boolean isUlt);
+}

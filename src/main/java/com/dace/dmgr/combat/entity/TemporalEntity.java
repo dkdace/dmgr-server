@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.system.EntityInfoRegistry;
-import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
@@ -12,34 +11,32 @@ import org.bukkit.entity.LivingEntity;
  *
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
  */
-public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntity<T> {
+public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntityBase<T> {
     /** 최대 체력 */
     protected final int maxHealth;
 
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
-     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
+     * <p>{@link CombatEntityBase#init()}을 호출하여 초기화해야 한다.</p>
      *
      * @param entity    대상 엔티티
      * @param name      이름
-     * @param isFixed   위치 고정 여부
      * @param maxHealth 최대 체력
      * @param hitbox    히트박스
      */
-    protected TemporalEntity(T entity, String name, boolean isFixed, int maxHealth, Hitbox... hitbox) {
-        super(entity, name, isFixed, hitbox);
+    protected TemporalEntity(T entity, String name, int maxHealth, Hitbox... hitbox) {
+        super(entity, name, hitbox);
         this.maxHealth = maxHealth;
     }
 
     @Override
-    protected final void onInit() {
+    public void init() {
+        super.init();
+
         EntityInfoRegistry.addTemporalEntity(getEntity(), this);
-        setMaxHealth(maxHealth);
-        setHealth(maxHealth);
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
                 .getBaseValue());
-        onInitTemporalEntity(entity.getLocation());
     }
 
     /**
@@ -51,27 +48,7 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     }
 
     @Override
-    public void onTick(int i) {
-        super.onTick(i);
-
-        if (!isFixed()) {
-            double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-            if (!canMove())
-                speed = 0.0001F;
-
-            entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
-        }
-    }
-
-    @Override
-    public void onDeath(CombatEntity<?> attacker) {
+    public void onDeath(CombatEntity attacker) {
         remove();
     }
-
-    /**
-     * {@link TemporalEntity#init()} 호출 시 실행할 작업.
-     *
-     * @param location 소환된 위치
-     */
-    protected abstract void onInitTemporalEntity(Location location);
 }

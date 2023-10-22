@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.util.StringFormUtil;
@@ -76,10 +77,10 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatUser attacker, CombatEntity victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished())
+        if (!skill1.isDurationFinished() && victim instanceof Living)
             skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
     }
 

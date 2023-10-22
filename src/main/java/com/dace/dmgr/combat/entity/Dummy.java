@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public final class Dummy extends TemporalEntity<Zombie> implements HasCritHitbox {
+public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
     /** 치명타 히트박스 객체 */
     @Getter
     private final Hitbox critHitbox;
@@ -29,7 +29,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements HasCritHitbox
      * @param maxHealth 최대 체력
      */
     public Dummy(Zombie entity, int maxHealth) {
-        super(entity, "§7§lDummy", false, maxHealth,
+        super(entity, "§7§lDummy", maxHealth,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
@@ -39,7 +39,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements HasCritHitbox
     }
 
     @Override
-    protected void onInitTemporalEntity(Location location) {
+    public void onInitDamageable() {
         setTeam("DUMMY");
         entity.setBaby(false);
         entity.leaveVehicle();
@@ -61,6 +61,14 @@ public final class Dummy extends TemporalEntity<Zombie> implements HasCritHitbox
         entity.getEquipment().setBoots(equipment.get(2));
         entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOW, 99999, 5, false, false));
+    }
+
+    @Override
+    public void onTick(int i) {
+    }
+
+    @Override
+    public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     @Override

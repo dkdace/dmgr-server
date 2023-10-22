@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
@@ -57,7 +58,8 @@ public final class ArkaceA1 extends ActiveSkill {
                 SoundUtil.play("random.gun.grenade", location, 3F, 1.5F);
                 SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3F, 1.2F);
 
-                new Projectile(combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(10).build()) {
+                new Projectile(combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(10)
+                        .condition(combatUser::isEnemy).build()) {
                     @Override
                     public void trail(Location location) {
                         ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
@@ -76,7 +78,7 @@ public final class ArkaceA1 extends ActiveSkill {
                     }
 
                     @Override
-                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
                         target.damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
                         return false;
                     }
@@ -105,9 +107,10 @@ public final class ArkaceA1 extends ActiveSkill {
                 2.5F, 2.5F, 2.5F, 32, 250, 225);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2F, 0.2F, 0.2F, 0.2F);
 
-        CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS, true).forEach(target -> {
-            if (LocationUtil.canPass(location, target.getEntity().getLocation().add(0, 0.1, 0)))
-                target.damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
-        });
+        CombatEntity[] targets = CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS,
+                combatEntity -> combatEntity instanceof Damageable && combatEntity.canPass(location), true);
+        for (CombatEntity target : targets) {
+            ((Damageable) target).damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+        }
     }
 }

@@ -8,8 +8,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.Ability;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
@@ -129,7 +129,8 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                 setCooldown();
                 reloadModule.consume(1);
 
-                new Projectile(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).maxDistance(JagerWeaponInfo.DISTANCE).build()) {
+                new Projectile(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
+                        .maxDistance(JagerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build()) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
@@ -142,7 +143,7 @@ public final class JagerWeaponL extends Weapon implements Reloadable, Swappable,
                     }
 
                     @Override
-                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
                         target.damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
                         JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
                         return false;

@@ -3,12 +3,13 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
+import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
@@ -103,7 +104,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     reloadModule.consume(1);
                 }
 
-                new GunHitscan(combatUser) {
+                new GunHitscan(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build()) {
                     @Override
                     public void trail(Location location) {
                         Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
@@ -115,7 +116,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     }
 
                     @Override
-                    public boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
                         if (isUlt)
                             target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
                         else {

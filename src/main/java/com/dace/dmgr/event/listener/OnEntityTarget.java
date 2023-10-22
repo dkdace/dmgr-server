@@ -16,7 +16,7 @@ public final class OnEntityTarget implements Listener {
         if (!(entity instanceof LivingEntity))
             return;
 
-        CombatEntity<?> combatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) entity);
+        CombatEntity combatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) entity);
 
         if (combatEntity != null) {
             if (combatEntity instanceof JagerA1Entity) {

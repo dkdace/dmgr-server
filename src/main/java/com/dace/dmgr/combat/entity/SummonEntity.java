@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
@@ -20,36 +19,35 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
     /**
      * @param entity    대상 엔티티
      * @param name      이름
-     * @param isFixed   위치 고정 여부
      * @param maxHealth 최대 체력
      * @param owner     엔티티를 소환한 플레이어
      * @param hitbox    히트박스
      */
-    protected SummonEntity(T entity, String name, boolean isFixed, int maxHealth, CombatUser owner, Hitbox... hitbox) {
-        super(entity, name, isFixed, maxHealth, hitbox);
+    protected SummonEntity(T entity, String name, int maxHealth, CombatUser owner, Hitbox... hitbox) {
+        super(entity, name, maxHealth, hitbox);
         this.owner = owner;
     }
 
     @Override
-    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         owner.onAttack(victim, damage, damageType, isCrit, isUlt);
     }
 
     @Override
-    public void onKill(CombatEntity<?> victim) {
+    public void onKill(CombatEntity victim) {
         owner.onKill(victim);
     }
 
     /**
-     * 엔티티를 소환한 플레이어를 제외한 모든 플레이어에게 엔티티를 보이지 않게 한다.
+     * 엔티티를 모든 적에게 보이지 않게 한다.
      */
-    protected void hideForOthers() {
+    protected final void hideForEnemies() {
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{entity.getEntityId()});
 
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
-            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
+            if (combatUser2 != null && owner.isEnemy(combatUser2))
                 packet.sendPacket(player2);
         });
     }

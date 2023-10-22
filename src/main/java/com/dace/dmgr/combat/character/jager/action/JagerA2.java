@@ -6,9 +6,9 @@ import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasEntity;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -84,8 +84,9 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
                         combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
-                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true).build(),
-                        BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).destroyOnHitFloor(true).build()) {
+                new BouncingProjectile(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
+                        .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F)
+                        .destroyOnHitFloor(true).build()) {
                     @Override
                     public void trail(Location location) {
                         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
@@ -98,7 +99,7 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
                     }
 
                     @Override
-                    public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
+                    public boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit) {
                         return false;
                     }
 

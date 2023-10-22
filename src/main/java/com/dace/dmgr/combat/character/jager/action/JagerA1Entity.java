@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.DyeColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
@@ -16,7 +15,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 설랑 클래스.
  */
-public final class JagerA1Entity extends SummonEntity<Wolf> {
+public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
 
@@ -32,8 +31,24 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
     }
 
     @Override
-    public void onTick(int i) {
-        super.onTick(i);
+    public void onInitDamageable() {
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
+        setTeam(owner.getTeam());
+        setHealth((int) skill.getStateValue());
+        entity.setAI(false);
+        entity.setCollarColor(DyeColor.CYAN);
+        entity.setTamed(true);
+        entity.setOwner(owner.getEntity());
+        entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
+        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+    }
+
+    @Override
+    public void onTickMovable(int i) {
+        double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
+        if (!canMove())
+            speed = 0.0001F;
+        entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
 
         if (i < JagerA1Info.SUMMON_DURATION)
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2F, 0.2F, 0.2F, 255, 255, 255);
@@ -43,20 +58,32 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
         }
 
         if (i % 10 == 0 && entity.getTarget() == null) {
-            CombatEntity<?> target = CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                    CombatEntity::isLowHealth);
+            Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLowHealth());
             if (target != null)
                 entity.setTarget(target.getEntity());
         }
     }
 
+    /**
+     * 준비 시 효과음을 재생한다.
+     */
+    private void playReadySound() {
+        SoundUtil.play(Sound.ENTITY_WOLF_GROWL, entity.getLocation(), 1F, 1F);
+    }
+
     @Override
-    public void onDefaultAttack(CombatEntity<?> victim) {
+    public int getMaxHealth() {
+        return JagerA1Info.HEALTH;
+    }
+
+    @Override
+    public void onDefaultAttack(Damageable victim) {
         victim.damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override
-    public void onDamage(CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
         skill.addStateValue(-damage);
     }
@@ -71,7 +98,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
     }
 
     @Override
-    public void onDeath(CombatEntity<?> attacker) {
+    public void onDeath(CombatEntity attacker) {
         super.onDeath(attacker);
 
         playDeathSound();
@@ -85,25 +112,5 @@ public final class JagerA1Entity extends SummonEntity<Wolf> {
      */
     private void playDeathSound() {
         SoundUtil.play(Sound.ENTITY_WOLF_DEATH, entity.getLocation(), 1F, 1F);
-    }
-
-    @Override
-    protected void onInitTemporalEntity(Location location) {
-        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
-        setTeam(owner.getTeam());
-        setHealth((int) skill.getStateValue());
-        entity.setAI(false);
-        entity.setCollarColor(DyeColor.CYAN);
-        entity.setTamed(true);
-        entity.setOwner(owner.getEntity());
-        entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
-    }
-
-    /**
-     * 준비 시 효과음을 재생한다.
-     */
-    private void playReadySound() {
-        SoundUtil.play(Sound.ENTITY_WOLF_GROWL, entity.getLocation(), 1F, 1F);
     }
 }

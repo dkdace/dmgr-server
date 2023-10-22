@@ -15,7 +15,7 @@ public final class JagerTrait {
      * @param victim 피격자
      * @param amount 증가량
      */
-    public static void addFreezeValue(CombatEntity<?> victim, int amount) {
+    public static void addFreezeValue(CombatEntity victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
         CooldownManager.setCooldown(victim, Cooldown.JAGER_FREEZE_VALUE_DURATION);
     }
