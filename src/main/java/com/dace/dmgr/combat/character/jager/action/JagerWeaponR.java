@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -26,7 +27,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
     /** 남은 탄약 수 */
     @Getter
     @Setter
-    private int remainingAmmo;
+    private int remainingAmmo = getCapacity();
     /** 재장전 상태 */
     @Getter
     @Setter
@@ -117,7 +118,22 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
 
     @Override
     public void reload() {
-        mainWeapon.reload();
+        if (mainWeapon.isAiming()) {
+            mainWeapon.toggleAim();
+            mainWeapon.swap();
+
+            new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
+                @Override
+                public boolean run(int i) {
+                    return true;
+                }
+
+                @Override
+                public void onEnd(boolean cancelled) {
+                    mainWeapon.reload();
+                }
+            };
+        }
     }
 
     @Override

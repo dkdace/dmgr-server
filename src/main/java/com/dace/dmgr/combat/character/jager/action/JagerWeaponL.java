@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -143,23 +142,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                 if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking())
                     return;
 
-                if (isAiming()) {
-                    toggleAim();
-                    swap();
-
-                    new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
-                        @Override
-                        public boolean run(int i) {
-                            return true;
-                        }
-
-                        @Override
-                        public void onEnd(boolean cancelled) {
-                            reload();
-                        }
-                    };
-                } else
-                    reload();
+                reload();
 
                 break;
             }
@@ -168,7 +151,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
 
     @Override
     public boolean canReload() {
-        return Reloadable.super.canReload() && subweapon.getRemainingAmmo() >= subweapon.getCapacity();
+        return Reloadable.super.canReload() || subweapon.getRemainingAmmo() < subweapon.getCapacity();
     }
 
     /**
@@ -205,6 +188,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
 
     @Override
     public void onReloadFinished() {
+        subweapon.setRemainingAmmo(subweapon.getCapacity());
     }
 
     @Override
