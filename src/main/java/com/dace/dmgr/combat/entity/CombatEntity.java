@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
  */
 public interface CombatEntity {
     /**
+     * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
      * @return 엔티티 객체
      */
     <T extends LivingEntity> T getEntity();
@@ -123,7 +124,9 @@ public interface CombatEntity {
      *
      * @return 궁극기 제공 여부
      */
-    boolean isUltProvider();
+    default boolean isUltProvider() {
+        return false;
+    }
 
     /**
      * 엔티티가 죽을 수 있는 지 확인한다.

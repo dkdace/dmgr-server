@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.SkillBase;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskTimer;
 
-public final class JagerP1 extends Skill {
+public final class JagerP1 extends SkillBase {
     public JagerP1(CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
@@ -26,6 +26,11 @@ public final class JagerP1 extends Skill {
         return -1;
     }
 
+    @Override
+    public boolean canUse() {
+        return super.canUse() && isDurationFinished() && canActivate();
+    }
+
     /**
      * 스킬 활성화 조건을 확인한다.
      *
@@ -41,11 +46,6 @@ public final class JagerP1 extends Skill {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && canActivate();
     }
 
     @Override

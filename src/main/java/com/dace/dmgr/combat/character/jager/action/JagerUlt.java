@@ -43,14 +43,14 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming() &&
+        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     protected void onUseUltimateSkill(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).aim();
+            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 

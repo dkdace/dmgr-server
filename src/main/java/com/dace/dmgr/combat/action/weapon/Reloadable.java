@@ -1,9 +1,16 @@
 package com.dace.dmgr.combat.action.weapon;
 
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.StringFormUtil;
+import org.bukkit.ChatColor;
+
 /**
  * 재장전 가능한 무기의 인터페이스.
  */
-public interface Reloadable {
+public interface Reloadable extends Weapon {
     /**
      * @return 남은 탄약 수
      */
@@ -20,9 +27,25 @@ public interface Reloadable {
     boolean isReloading();
 
     /**
-     * 무기의 재장전을 취소한다.
+     * @param isReloading 재장전 상태
      */
-    void cancelReloading();
+    void setReloading(boolean isReloading);
+
+    /**
+     * 지정한 양만큼 무기의 탄약을 소모한다.
+     *
+     * <p>탄약을 전부 소진하면 {@link Reloadable#reload()}를 호출한다.</p>
+     *
+     * @param amount 탄약 소모량
+     */
+    default void consume(int amount) {
+        setRemainingAmmo(Math.max(0, getRemainingAmmo() - amount));
+
+        if (isReloading())
+            setReloading(false);
+        else if (getRemainingAmmo() == 0)
+            reload();
+    }
 
     /**
      * 무기의 장탄수를 반환한다.
@@ -39,7 +62,68 @@ public interface Reloadable {
     long getReloadDuration();
 
     /**
-     * 무기 장전 이벤트를 호출한다.
+     * 재장전을 할 수 있는 지 확인한다.
+     *
+     * @return 재장전 가능 여부
      */
-    void reload();
+    default boolean canReload() {
+        return getRemainingAmmo() < getCapacity();
+    }
+
+    /**
+     * 무기를 재장전한다.
+     */
+    default void reload() {
+        if (!canReload() || isReloading())
+            return;
+        if (this instanceof Swappable && ((Swappable<?>) this).getSwapState() == Swappable.SwapState.SWAPPING)
+            return;
+
+        setReloading(true);
+        CooldownManager.setCooldown(this, Cooldown.WEAPON_RELOAD, getReloadDuration());
+
+        new TaskTimer(1, getReloadDuration()) {
+            @Override
+            public boolean run(int i) {
+                if (EntityInfoRegistry.getCombatUser(getCombatUser().getEntity()) == null)
+                    return false;
+                if (!isReloading())
+                    return false;
+                if (Reloadable.this instanceof Aimable && ((Aimable) Reloadable.this).isAiming())
+                    return false;
+
+                String time = String.format("%.1f", (float) (repeat - i) / 20);
+                getCombatUser().sendActionBar("§c§l재장전... " + StringFormUtil.getProgressBar(i, getReloadDuration(),
+                        ChatColor.WHITE) + " §f[" + time + "초]", 2);
+                onReloadTick(i);
+
+                return true;
+            }
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                CooldownManager.setCooldown(getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
+                if (cancelled)
+                    return;
+
+                getCombatUser().sendActionBar("§a§l재장전 완료", 8);
+
+                setRemainingAmmo(getCapacity());
+                setReloading(false);
+                onReloadFinished();
+            }
+        };
+    }
+
+    /**
+     * {@link Reloadable#reload()}에서 재장전을 진행할 때 (매 tick마다) 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    void onReloadTick(int i);
+
+    /**
+     * {@link Reloadable#reload()}에서 재장전이 끝났을 때 실행할 작업.
+     */
+    void onReloadFinished();
 }

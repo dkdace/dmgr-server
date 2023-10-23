@@ -52,12 +52,15 @@ public final class Jager extends Character {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String weapon1Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon1Ammo, weapon1Capacity, weapon1Capacity, '*');
-        String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, weapon2Capacity, weapon2Capacity, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar("§e[설랑]", (int) skill1Health, skill1MaxHealth, 10, '■');
-        if (weapon1.getWeaponState() == Swappable.WeaponState.PRIMARY)
+        String weapon1Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon1Ammo, weapon1Capacity,
+                weapon1Capacity, '*');
+        String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, weapon2Capacity,
+                weapon2Capacity, '┃');
+        String skill1Display = StringFormUtil.getActionbarProgressBar("§e[설랑]", (int) skill1Health, skill1MaxHealth,
+                10, '■');
+        if (weapon1.getSwapState() == Swappable.SwapState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
-        else if (weapon1.getWeaponState() == Swappable.WeaponState.SECONDARY)
+        else if (weapon1.getSwapState() == Swappable.SwapState.SECONDARY)
             weapon2Display = "§a" + weapon2Display;
         text.add(weapon1Display);
         text.add(weapon2Display);

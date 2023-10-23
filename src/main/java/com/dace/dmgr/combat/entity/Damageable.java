@@ -15,6 +15,7 @@ import org.bukkit.attribute.Attribute;
 public interface Damageable extends CombatEntity {
     @Override
     default void onInit() {
+        setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
         onInitDamageable();
     }
@@ -44,6 +45,8 @@ public interface Damageable extends CombatEntity {
 
     /**
      * 엔티티의 최대 체력을 반환한다.
+     *
+     * <p>오버라이딩하여 엔티티 생성 시의 최대 체력을 설정할 수 있다.</p>
      *
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */

@@ -68,6 +68,12 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+
+    @Override
     public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 

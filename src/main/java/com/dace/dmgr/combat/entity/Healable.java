@@ -1,5 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
+/**
+ * 다른 엔티티로부터 치유를 받을 수 있는 엔티티의 인터페이스.
+ */
 public interface Healable extends Damageable {
     /**
      * 엔티티를 치유한다.

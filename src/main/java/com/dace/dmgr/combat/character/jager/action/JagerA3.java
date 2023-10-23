@@ -44,13 +44,13 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming();
+        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking();
     }
 
     @Override
     public void onUse(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).aim();
+            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 

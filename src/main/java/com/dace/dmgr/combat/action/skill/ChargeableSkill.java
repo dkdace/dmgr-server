@@ -19,7 +19,13 @@ public abstract class ChargeableSkill extends ActiveSkill {
     }
 
     @Override
-    protected void onCooldownFinished() {
+    public void onDurationTick() {
+        super.onDurationTick();
+        addStateValue(-getStateValueDecrement());
+    }
+
+    @Override
+    public void onCooldownFinished() {
         super.onCooldownFinished();
         runStateValueCharge();
     }
@@ -27,12 +33,6 @@ public abstract class ChargeableSkill extends ActiveSkill {
     @Override
     public final long getDefaultDuration() {
         return -1;
-    }
-
-    @Override
-    protected void onDurationTick() {
-        super.onDurationTick();
-        addStateValue(-(getStateValueDecrement() / 20F));
     }
 
     /**
@@ -45,7 +45,7 @@ public abstract class ChargeableSkill extends ActiveSkill {
                 if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
                     return false;
 
-                addStateValue(getStateValueIncrement() / 20F);
+                addStateValue(getStateValueIncrement());
 
                 return (stateValue < getMaxStateValue()) && isDurationFinished() && isCooldownFinished();
             }
@@ -77,16 +77,16 @@ public abstract class ChargeableSkill extends ActiveSkill {
     }
 
     /**
-     * 상태 변수의 초당 충전량을 반환한다.
+     * 상태 변수의 틱당 충전량을 반환한다.
      *
-     * @return 상태 변수의 초당 충전량
+     * @return 상태 변수의 틱당 충전량
      */
-    public abstract int getStateValueIncrement();
+    public abstract long getStateValueIncrement();
 
     /**
-     * 상태 변수의 초당 소모량을 반환한다.
+     * 상태 변수의 틱당 소모량을 반환한다.
      *
-     * @return 상태 변수의 초당 소모량
+     * @return 상태 변수의 틱당 소모량
      */
-    public abstract int getStateValueDecrement();
+    public abstract long getStateValueDecrement();
 }

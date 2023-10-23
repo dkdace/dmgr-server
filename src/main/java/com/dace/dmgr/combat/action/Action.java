@@ -1,155 +1,105 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.action.info.ActionInfo;
-import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
-import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 클래스.
  *
- * @see Weapon
- * @see Skill
+ * @see ActionBase
  */
-@Getter
-public abstract class Action {
-    /** 플레이어 객체 */
-    protected final CombatUser combatUser;
-    /** 동작 정보 객체 */
-    protected final ActionInfo actionInfo;
-    /** 아이템 */
-    protected ItemStack itemStack;
+public interface Action {
+    /**
+     * @return 플레이어 객체
+     */
+    CombatUser getCombatUser();
 
-    protected Action(CombatUser combatUser, ActionInfo actionInfo) {
-        this.combatUser = combatUser;
-        this.actionInfo = actionInfo;
-        this.itemStack = actionInfo.getItemStack().clone();
-    }
+    /**
+     * @return 동작 정보 객체
+     */
+    ActionInfo getActionInfo();
+
+    /**
+     * @return 아이템 객체
+     */
+    ItemStack getItemStack();
 
     /**
      * 기본 사용 키를 반환한다.
      *
      * @return 기본 사용 키 목록
      */
-    public abstract ActionKey[] getDefaultActionKeys();
+    ActionKey[] getDefaultActionKeys();
 
     /**
      * 기본 쿨타임을 반환한다.
      *
      * @return 기본 쿨타임 (tick)
      */
-    public abstract long getDefaultCooldown();
+    long getDefaultCooldown();
 
     /**
      * 쿨타임의 남은 시간을 반환한다.
      *
      * @return 쿨타임 (tick)
      */
-    public final long getCooldown() {
-        return CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
-    }
+    long getCooldown();
 
     /**
      * 쿨타임을 설정한다.
      *
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
-    public final void setCooldown(long cooldown) {
-        if (isCooldownFinished()) {
-            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-            runCooldown();
-        } else
-            CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-
-        onCooldownSet();
-    }
+    void setCooldown(long cooldown);
 
     /**
      * 쿨타임을 기본 쿨타임으로 설정한다.
      *
      * @see Action#getDefaultCooldown()
      */
-    public final void setCooldown() {
-        setCooldown(getDefaultCooldown());
-    }
+    void setCooldown();
 
     /**
      * 쿨타임을 증가시킨다.
      *
      * @param cooldown 추가할 쿨타임 (tick)
      */
-    public final void addCooldown(long cooldown) {
-        setCooldown(getCooldown() + cooldown);
-    }
-
-    /**
-     * 쿨타임 스케쥴러를 실행한다.
-     */
-    protected final void runCooldown() {
-        new TaskTimer(1) {
-            @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                    return false;
-
-                onCooldownTick();
-
-                if (isCooldownFinished()) {
-                    onCooldownFinished();
-                    return false;
-                }
-
-                return true;
-            }
-        };
-    }
+    void addCooldown(long cooldown);
 
     /**
      * 쿨타임을 설정했을 때 실행할 작업.
      */
-    protected void onCooldownSet() {
-    }
+    void onCooldownSet();
 
     /**
      * 쿨타임이 진행할 때 (매 tick마다) 실행할 작업.
      */
-    protected void onCooldownTick() {
-    }
+    void onCooldownTick();
 
     /**
      * 쿨타임이 끝났을 때 실행할 작업.
      */
-    protected void onCooldownFinished() {
-    }
+    void onCooldownFinished();
 
     /**
      * 쿨타임이 끝났는 지 확인한다.
      *
      * @return 쿨타임 종료 여부
      */
-    public final boolean isCooldownFinished() {
-        return getCooldown() == 0;
-    }
+    boolean isCooldownFinished();
 
     /**
      * 동작을 사용할 수 있는 지 확인한다.
      *
      * @return 사용 가능 여부
      */
-    public boolean canUse() {
-        return isCooldownFinished();
-    }
+    boolean canUse();
 
     /**
      * 사용 시 호출되는 이벤트.
      *
      * @param actionKey 사용 키
      */
-    public abstract void onUse(ActionKey actionKey);
+    void onUse(ActionKey actionKey);
 }

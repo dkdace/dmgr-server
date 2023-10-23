@@ -21,14 +21,14 @@ public final class OnWeaponPreShoot implements Listener {
             Weapon weapon = combatUser.getWeapon();
 
             if ((weapon instanceof Reloadable && (((Reloadable) weapon).getRemainingAmmo() == 0 || ((Reloadable) weapon).isReloading())) ||
-                    (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SWAPPING))
+                    (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapState() == Swappable.SwapState.SWAPPING))
                 event.setCancelled(true);
             else {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
                 if (weapon instanceof Reloadable)
-                    ((Reloadable) weapon).cancelReloading();
+                    ((Reloadable) weapon).setReloading(false);
             }
         }
     }

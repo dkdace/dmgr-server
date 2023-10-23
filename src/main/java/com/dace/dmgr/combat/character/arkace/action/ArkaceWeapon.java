@@ -5,29 +5,32 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-public final class ArkaceWeapon extends Weapon implements Reloadable {
-    /** 재장전 모듈 객체 */
-    private final ReloadModule<ArkaceWeapon> reloadModule;
+@Getter
+@Setter
+public final class ArkaceWeapon extends WeaponBase implements Reloadable {
+    /** 남은 탄약 수 */
+    private int remainingAmmo = getCapacity();
+    /** 재장전 상태 */
+    private boolean reloading;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
-        reloadModule = new ReloadModule<>(this);
     }
 
     @Override
@@ -38,26 +41,6 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
     @Override
     public long getDefaultCooldown() {
         return ArkaceWeaponInfo.COOLDOWN;
-    }
-
-    @Override
-    public int getRemainingAmmo() {
-        return reloadModule.getRemainingAmmo();
-    }
-
-    @Override
-    public void setRemainingAmmo(int remainingAmmo) {
-        reloadModule.setRemainingAmmo(remainingAmmo);
-    }
-
-    @Override
-    public boolean isReloading() {
-        return reloadModule.isReloading();
-    }
-
-    @Override
-    public void cancelReloading() {
-        reloadModule.setReloading(false);
     }
 
     @Override
@@ -101,7 +84,7 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
                     CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
-                    reloadModule.consume(1);
+                    consume(1);
                 }
 
                 new GunHitscan(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build()) {
@@ -140,48 +123,35 @@ public final class ArkaceWeapon extends Weapon implements Reloadable {
     }
 
     @Override
-    public void reload() {
-        if (getRemainingAmmo() >= getCapacity())
-            return;
-        if (isReloading())
-            return;
+    public void onReloadTick(int i) {
+        CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
 
-        reloadModule.reload();
+        switch (i) {
+            case 3:
+                SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
+                break;
+            case 4:
+                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
+                break;
+            case 18:
+                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
+                break;
+            case 19:
+                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
+                break;
+            case 20:
+                SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                break;
+            case 26:
+                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
+                break;
+            case 27:
+                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                break;
+        }
+    }
 
-        new TaskTimer(1, ArkaceWeaponInfo.RELOAD_DURATION) {
-            @Override
-            public boolean run(int i) {
-                if (!isReloading())
-                    return false;
-
-                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
-
-                switch (i) {
-                    case 3:
-                        SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
-                        break;
-                    case 4:
-                        SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
-                        break;
-                    case 18:
-                        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
-                        break;
-                    case 19:
-                        SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
-                        break;
-                    case 20:
-                        SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
-                        break;
-                    case 26:
-                        SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
-                        break;
-                    case 27:
-                        SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
-                        break;
-                }
-
-                return true;
-            }
-        };
+    @Override
+    public void onReloadFinished() {
     }
 }

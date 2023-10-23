@@ -10,7 +10,7 @@ import java.util.List;
  * @param <T> {@link SummonEntity}를 상속받는 타입
  * @see HasEntity
  */
-public interface HasEntities<T extends SummonEntity<?>> {
+public interface HasEntities<T extends SummonEntity<?>> extends Skill {
     /**
      * 소환된 엔티티 목록을 반환한다.
      *

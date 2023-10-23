@@ -26,7 +26,7 @@ public final class OnWeaponPrepareShoot implements Listener {
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
                 if (weapon instanceof Reloadable && ((Reloadable) weapon).getRemainingAmmo() > 0)
-                    ((Reloadable) weapon).cancelReloading();
+                    ((Reloadable) weapon).setReloading(false);
             }
         }
     }

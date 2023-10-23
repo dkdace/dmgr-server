@@ -121,6 +121,11 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
+    public int getMaxHealth() {
+        return JagerA2Info.HEALTH;
+    }
+
+    @Override
     public void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 

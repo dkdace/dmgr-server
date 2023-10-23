@@ -99,19 +99,19 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     }
 
     @Override
-    public boolean isEnemy(CombatEntity combatEntity) {
+    public final boolean isEnemy(CombatEntity combatEntity) {
         return !getTeam().equals(combatEntity.getTeam());
     }
 
     @Override
     public boolean canPass(Location location) {
-        return LocationUtil.canPass(getEntity().getLocation().add(0, 0.1, 0), location);
+        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0));
     }
 
     @Override
     public boolean canPass(CombatEntity combatEntity) {
-        return LocationUtil.canPass(getEntity().getLocation().add(0, 0.1, 0),
-                combatEntity.getEntity().getLocation().add(0, 0.1, 0));
+        return LocationUtil.canPass(combatEntity.getEntity().getLocation().add(0, 0.1, 0),
+                getEntity().getLocation().add(0, 0.1, 0));
     }
 
     @Override
@@ -154,10 +154,5 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     @Override
     public final void removeStatusEffect(StatusEffectType statusEffectType) {
         CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType);
-    }
-
-    @Override
-    public boolean isUltProvider() {
-        return false;
     }
 }

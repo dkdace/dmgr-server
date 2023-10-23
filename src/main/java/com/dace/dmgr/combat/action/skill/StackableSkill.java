@@ -22,20 +22,17 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    protected void onCooldownSet() {
+    public void onCooldownSet() {
         addStack(-1);
     }
 
     @Override
-    protected void onCooldownTick() {
+    public boolean canUse() {
+        return isCooldownFinished() && stack > 0;
     }
 
     @Override
-    protected void onCooldownFinished() {
-    }
-
-    @Override
-    protected void onDurationTick() {
+    public void onDurationTick() {
         displayUsing(stack);
     }
 
@@ -45,7 +42,6 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 최대 스택 충전량
      */
     public abstract long getDefaultStackCooldown();
-
 
     /**
      * 스킬의 남은 스택 충전 쿨타임을 반환한다.
@@ -121,14 +117,9 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param amount 스택 증가량
      */
     public final void addStack(int amount) {
-        int max = getMaxStack();
-
-        stack += amount;
+        stack = Math.min(Math.max(0, stack + amount), getMaxStack());
 
         if (stack > 0) {
-            if (stack > max)
-                stack = max;
-
             if (isStackCooldownFinished())
                 setStackCooldown(getDefaultStackCooldown());
 
@@ -136,10 +127,8 @@ public abstract class StackableSkill extends ActiveSkill {
                 displayReady(stack);
             else
                 displayUsing(stack);
-        } else {
-            stack = 0;
+        } else
             displayCooldown(1);
-        }
     }
 
     /**
@@ -149,10 +138,5 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     public final boolean isStackCooldownFinished() {
         return getStackCooldown() == 0;
-    }
-
-    @Override
-    public boolean canUse() {
-        return isCooldownFinished() && stack > 0;
     }
 }
