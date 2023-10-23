@@ -105,7 +105,8 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
     @Override
     public boolean canPass(Location location) {
-        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0));
+        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0)) ||
+                LocationUtil.canPass(location, getEntity().getEyeLocation());
     }
 
     @Override
