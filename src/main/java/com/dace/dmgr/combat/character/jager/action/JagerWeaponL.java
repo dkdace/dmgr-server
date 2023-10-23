@@ -195,9 +195,9 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     public void onSwapStart(SwapState swapState) {
         Location location = combatUser.getEntity().getLocation();
         if (swapState == SwapState.PRIMARY)
-            SoundUtil.play(Sound.ENTITY_WOLF_HOWL, location, 0.6F, 1.9F);
-        else if (swapState == SwapState.SECONDARY)
             SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, location, 0.6F, 1.9F);
+        else if (swapState == SwapState.SECONDARY)
+            SoundUtil.play(Sound.ENTITY_WOLF_HOWL, location, 0.6F, 1.9F);
 
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
     }

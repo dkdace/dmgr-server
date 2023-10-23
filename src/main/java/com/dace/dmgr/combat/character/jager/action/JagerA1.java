@@ -82,9 +82,9 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 
-        toggleCheck();
-
-        if (!isDurationFinished()) {
+        if (isDurationFinished())
+            toggleCheck();
+        else {
             setDuration(0);
             if (summonEntity != null) {
                 summonEntity.remove();
@@ -94,10 +94,11 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     }
 
     @Override
-    public void onAccept() {
+    public void onAcceptLocationConfirmable() {
         SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, getCurrentLocation(), 0.8F, 1F);
         combatUser.getWeapon().setCooldown(2);
         setDuration();
+        toggleCheck();
 
         Wolf wolf = CombatEntityUtil.spawn(Wolf.class, getCurrentLocation());
         JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);

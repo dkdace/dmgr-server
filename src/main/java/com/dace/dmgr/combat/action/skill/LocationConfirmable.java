@@ -99,4 +99,15 @@ public interface LocationConfirmable extends Confirmable {
     default void onCheckDisable() {
         getPointer().remove();
     }
+
+    @Override
+    default void onAccept() {
+        if (isValid())
+            onAcceptLocationConfirmable();
+    }
+
+    /**
+     * @see Confirmable#onAccept()
+     */
+    void onAcceptLocationConfirmable();
 }
