@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import org.bukkit.Location;
@@ -58,6 +57,16 @@ public interface CombatEntity {
      * @param i 인덱스
      */
     void onTick(int i);
+
+    /**
+     * 엔티티를 제거한다.
+     */
+    void remove();
+
+    /**
+     * {@link CombatEntity#remove()} 호출 시 실행할 작업.
+     */
+    void onRemove();
 
     /**
      * 지정한 엔티티가 적인 지 확인한다.
@@ -126,66 +135,5 @@ public interface CombatEntity {
      */
     default boolean isUltProvider() {
         return false;
-    }
-
-    /**
-     * 엔티티가 죽을 수 있는 지 확인한다.
-     *
-     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
-     *
-     * @return 죽을 수 있으면 {@code true} 반환
-     */
-    default boolean canDie() {
-        return true;
-    }
-
-    /**
-     * 엔티티가 기본 공격을 했을 때 실행될 작업.
-     *
-     * @param victim 피격자
-     */
-    default void onDefaultAttack(Damageable victim) {
-    }
-
-    /**
-     * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.
-     *
-     * @param victim     피격자
-     * @param damage     피해량
-     * @param damageType 피해 타입
-     * @param isCrit     치명타 여부
-     * @param isUlt      궁극기 충전 여부
-     * @see Damageable#onDamage(CombatEntity, int, DamageType, boolean, boolean)
-     */
-    default void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
-    }
-
-    /**
-     * 엔티티가 다른 엔티티를 치유했을 때 실행될 작업.
-     *
-     * @param target 수급자
-     * @param amount 치유량
-     * @param isUlt  궁극기 충전 여부
-     * @see Healable#onTakeHeal(CombatEntity, int, boolean)
-     */
-    default void onGiveHeal(Healable target, int amount, boolean isUlt) {
-    }
-
-    /**
-     * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업.
-     *
-     * @param victim 피격자
-     * @see CombatEntity#onDeath(CombatEntity)
-     */
-    default void onKill(CombatEntity victim) {
-    }
-
-    /**
-     * 엔티티가 죽었을 때 실행될 작업.
-     *
-     * @param attacker 공격자
-     * @see CombatEntity#onKill(CombatEntity)
-     */
-    default void onDeath(CombatEntity attacker) {
     }
 }

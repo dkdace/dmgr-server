@@ -12,7 +12,7 @@ import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
@@ -41,7 +41,6 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     /** 정조준 상태 */
     @Setter
     private boolean aiming;
-
 
     public JagerWeaponL(CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
@@ -96,36 +95,12 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                     return;
                 }
 
-                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
-                Location location = combatUser.getEntity().getLocation();
+                new JagerWeaponProjectile().shoot(2.5F);
 
-                SoundUtil.play("random.gun2.m16_1", location, 0.8F, 1.2F);
-                SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, location, 0.8F, 1.7F);
-                CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
-                        JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1F);
+                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 setCooldown();
                 consume(1);
-
-                new Projectile(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
-                        .maxDistance(JagerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build()) {
-                    @Override
-                    public void trail(Location location) {
-                        Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
-                    }
-
-                    @Override
-                    public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
-                        target.damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
-                        JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
-                        return false;
-                    }
-                }.shoot(2.5F);
+                playShootSound(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -147,6 +122,18 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                 break;
             }
         }
+    }
+
+    /**
+     * 발사 시 효과음을 재생한다.
+     *
+     * @param location 사용 위치
+     */
+    private void playShootSound(Location location) {
+        SoundUtil.play("random.gun2.m16_1", location, 0.8F, 1.2F);
+        SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, location, 0.8F, 1.7F);
+        CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
+                JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1F);
     }
 
     @Override
@@ -216,5 +203,30 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     public void onAimDisable() {
         combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
         combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("JagerWeaponL");
+    }
+
+    private class JagerWeaponProjectile extends Projectile {
+        public JagerWeaponProjectile() {
+            super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
+                    .maxDistance(JagerWeaponInfo.DISTANCE).condition(JagerWeaponL.this.combatUser::isEnemy).build());
+        }
+
+        @Override
+        public void trail(Location location) {
+            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
+        }
+
+        @Override
+        public boolean onHitBlock(Location location, Vector direction, Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
+            target.damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
+            JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+            return false;
+        }
     }
 }

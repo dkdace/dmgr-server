@@ -1,6 +1,5 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.character.jager.action.JagerA1Entity;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Entity;
@@ -18,10 +17,7 @@ public final class OnEntityTarget implements Listener {
 
         CombatEntity combatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) entity);
 
-        if (combatEntity != null) {
-            if (combatEntity instanceof JagerA1Entity) {
-                event.setCancelled(true);
-            }
-        }
+        if (combatEntity != null)
+            event.setCancelled(true);
     }
 }

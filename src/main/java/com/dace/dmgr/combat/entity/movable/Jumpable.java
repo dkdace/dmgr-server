@@ -1,6 +1,8 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.movable;
 
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -10,15 +12,20 @@ import org.bukkit.potion.PotionEffectType;
  */
 public interface Jumpable extends Movable {
     @Override
-    default void onTick(int i) {
-        Movable.super.onTick(i);
-
+    default void onTickMovable(int i) {
         if (canJump())
             getEntity().removePotionEffect(PotionEffectType.JUMP);
         else
             getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                     9999, -6, false, false), true);
+
+        onTickJumpable(i);
     }
+
+    /**
+     * @see CombatEntity#onTick(int)
+     */
+    void onTickJumpable(int i);
 
     /**
      * 엔티티가 점프할 수 있는 지 확인한다.

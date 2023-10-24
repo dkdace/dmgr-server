@@ -1,4 +1,7 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.damageable;
+
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Healer;
 
 /**
  * 다른 엔티티로부터 치유를 받을 수 있는 엔티티의 인터페이스.
@@ -11,7 +14,7 @@ public interface Healable extends Damageable {
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
      */
-    default void heal(CombatEntity provider, int amount, boolean isUlt) {
+    default void heal(Healer provider, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
             return;
         if (!canTakeHeal())
@@ -40,7 +43,7 @@ public interface Healable extends Damageable {
      * @param provider 제공자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
-     * @see CombatEntity#onGiveHeal(Healable, int, boolean)
+     * @see Healer#onGiveHeal(Healable, int, boolean)
      */
     void onTakeHeal(CombatEntity provider, int amount, boolean isUlt);
 }

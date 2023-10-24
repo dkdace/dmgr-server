@@ -138,7 +138,7 @@ public final class User {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser != null) {
             combatUser.reset();
-            EntityInfoRegistry.removeCombatUser(player);
+            combatUser.remove();
         }
     }
 

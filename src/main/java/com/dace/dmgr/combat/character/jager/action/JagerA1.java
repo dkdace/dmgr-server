@@ -6,11 +6,9 @@ import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.action.skill.LocationConfirmable;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Wolf;
 
@@ -86,16 +84,12 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
             toggleCheck();
         else {
             setDuration(0);
-            if (summonEntity != null) {
-                summonEntity.remove();
-                summonEntity = null;
-            }
+            removeSummonEntity();
         }
     }
 
     @Override
     public void onAcceptLocationConfirmable() {
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, getCurrentLocation(), 0.8F, 1F);
         combatUser.getWeapon().setCooldown(2);
         setDuration();
         toggleCheck();
@@ -103,6 +97,6 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
         Wolf wolf = CombatEntityUtil.spawn(Wolf.class, getCurrentLocation());
         JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);
         jagerA1Entity.init();
-        summonEntity = jagerA1Entity;
+        setSummonEntity(jagerA1Entity);
     }
 }

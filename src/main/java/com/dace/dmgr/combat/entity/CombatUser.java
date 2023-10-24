@@ -18,7 +18,12 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.damageable.Healable;
+import com.dace.dmgr.combat.entity.movable.Jumpable;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.temporal.Summonable;
+import com.dace.dmgr.combat.entity.temporal.Temporal;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.*;
@@ -42,7 +47,7 @@ import java.util.stream.Collectors;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends CombatEntityBase<Player> implements Healable, Living, Jumpable, HasCritHitbox {
+public final class CombatUser extends CombatEntityBase<Player> implements Healable, Attacker, Healer, Living, Jumpable, HasCritHitbox {
     /** 초당 궁극기 충전량 */
     public static final int IDLE_ULT_CHARGE = 10;
     /** 기본 이동속도 */
@@ -102,7 +107,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onTickMovable(int i) {
+    public void onTickJumpable(int i) {
         character.onTick(this, i);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
                 99999, 0, false, false), true);
@@ -134,6 +139,12 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         entity.setWalkSpeed((float) speed);
 
         onTickActionbar();
+    }
+
+    @Override
+    public void onRemove() {
+        TaskManager.clearTask(this);
+        EntityInfoRegistry.removeCombatUser(entity);
     }
 
     @Override
@@ -240,7 +251,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
         if (character == null)
@@ -248,8 +259,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         character.onDamage(this, attacker, damage, damageType, isCrit, isUlt);
 
-        if (attacker instanceof SummonEntity)
-            attacker = ((SummonEntity<?>) attacker).getOwner();
+        if (attacker instanceof Summonable)
+            attacker = ((Summonable) attacker).getOwner();
         if (attacker instanceof CombatUser) {
             if (CooldownManager.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId()) == 0)
                 CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, entity.getEntityId());
@@ -369,7 +380,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onDeath(CombatEntity attacker) {
+    public void onDeath(Attacker attacker) {
         if (character == null)
             return;
 
@@ -379,7 +390,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             setHealth(getMaxHealth());
 
             damageMap.forEach((CombatUser attacker2, Float damage) -> {
-                if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
+                if (attacker2 != ((attacker instanceof Summonable) ? ((Summonable) attacker).getOwner() : attacker)) {
                     int score = Math.round(damage * 100);
 
                     attacker2.playPlayerAssistEffect(this, score);
@@ -543,7 +554,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         entity.setFlying(false);
         skillMap.forEach((skillInfo, skill) -> {
             if (skill instanceof HasEntities)
-                ((HasEntities<?>) skill).getSummonEntities().forEach(SummonEntity::remove);
+                ((HasEntities<?>) skill).getSummonEntities().forEach(Temporal::remove);
             if (skill instanceof HasEntity && ((HasEntity<?>) skill).getSummonEntity() != null)
                 ((HasEntity<?>) skill).getSummonEntity().remove();
         });

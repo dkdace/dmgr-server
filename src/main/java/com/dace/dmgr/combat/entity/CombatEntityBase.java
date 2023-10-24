@@ -55,7 +55,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     /**
      * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
-    public void init() {
+    public final void init() {
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
         entity.setCustomName(name);
@@ -96,6 +96,9 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
                 }
             }
         };
+    @Override
+    public final void remove() {
+        onRemove();
     }
 
     @Override

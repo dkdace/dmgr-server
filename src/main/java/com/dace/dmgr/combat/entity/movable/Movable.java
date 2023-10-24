@@ -1,5 +1,8 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.movable;
 
+import com.dace.dmgr.combat.entity.Ability;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;

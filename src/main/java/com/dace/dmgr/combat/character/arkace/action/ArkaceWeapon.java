@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
@@ -72,45 +72,19 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
             case CS_USE: {
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
-                Location location = combatUser.getEntity().getLocation();
 
-                if (isUlt) {
-                    SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
-                    SoundUtil.play("random.energy", location, 4F, 1.6F);
-                    SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
-                } else {
-                    SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
-                    SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+                new ArkaceWeaponHitscan(isUlt).shoot(combatUser.getBulletSpread());
+
+                Location loc = combatUser.getEntity().getLocation();
+                if (isUlt)
+                    playUltShootSound(loc);
+                else {
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
                     CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
                     consume(1);
+                    playShootSound(loc);
                 }
-
-                new GunHitscan(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build()) {
-                    @Override
-                    public void trail(Location location) {
-                        Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                        if (isUlt)
-                            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
-                                    0, 0, 0, 0, 230, 255);
-                        else
-                            ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
-                    }
-
-                    @Override
-                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
-                        if (isUlt)
-                            target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
-                        else {
-                            int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
-                                    ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
-                            target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
-                        }
-
-                        return false;
-                    }
-                }.shoot(combatUser.getBulletSpread());
 
                 break;
             }
@@ -120,6 +94,27 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
                 break;
             }
         }
+    }
+
+    /**
+     * 발사 시 효과음을 재생한다.
+     *
+     * @param location 발사 위치
+     */
+    private void playShootSound(Location location) {
+        SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
+        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+    }
+
+    /**
+     * 발사 시 효과음을 재생한다. (궁극기)
+     *
+     * @param location 발사 위치
+     */
+    private void playUltShootSound(Location location) {
+        SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
+        SoundUtil.play("random.energy", location, 4F, 1.6F);
+        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
     }
 
     @Override
@@ -153,5 +148,37 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
 
     @Override
     public void onReloadFinished() {
+    }
+
+    private class ArkaceWeaponHitscan extends GunHitscan {
+        private final boolean isUlt;
+
+        public ArkaceWeaponHitscan(boolean isUlt) {
+            super(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build());
+            this.isUlt = isUlt;
+        }
+
+        @Override
+        public void trail(Location location) {
+            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            if (isUlt)
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
+                        0, 0, 0, 0, 230, 255);
+            else
+                ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+        }
+
+        @Override
+        public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
+            if (isUlt)
+                target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
+            else {
+                int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
+                        ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
+                target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+            }
+
+            return false;
+        }
     }
 }

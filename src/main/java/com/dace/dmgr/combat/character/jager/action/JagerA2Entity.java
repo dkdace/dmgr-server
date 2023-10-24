@@ -3,9 +3,12 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
+import com.dace.dmgr.combat.entity.temporal.Summonable;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -17,7 +20,10 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 곰덫 클래스.
  */
-public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Damageable {
+public final class JagerA2Entity extends CombatEntityBase<MagmaCube> implements Damageable, Attacker, Summonable {
+    /** 엔티티를 소환한 플레이어 */
+    @Getter
+    private final CombatUser owner;
     /** 스킬 객체 */
     private final JagerA2 skill;
 
@@ -25,15 +31,24 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         super(
                 entity,
                 "§f" + owner.getName() + "의 곰덫",
-                JagerA2Info.HEALTH,
-                owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
+        this.owner = owner;
+    }
+
+    @Override
+    public void onInit() {
+        Damageable.super.onInit();
+        Summonable.super.onInit();
     }
 
     @Override
     public void onInitDamageable() {
+    }
+
+    @Override
+    public void onInitTemporal() {
         setTeam(owner.getTeam());
         entity.setAI(false);
         entity.setSize(1);
@@ -45,12 +60,22 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         setHealth(JagerA2Info.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
         hideForEnemies();
+        playInitSound();
+    }
+
+    /**
+     * 소환 시 효과음을 재생한다.
+     */
+    private void playInitSound() {
+        SoundUtil.play(Sound.ENTITY_HORSE_ARMOR, entity.getLocation(), 0.5F, 1.6F);
+        SoundUtil.play("random.craft", entity.getLocation(), 0.5F, 1.3F);
+        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5F, 0.5F);
     }
 
     @Override
     public void onTick(int i) {
         if (i < JagerA2Info.SUMMON_DURATION)
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2F, 0.2F, 0.2F, 120, 120, 135);
+            playSummonEffect();
         else if (i == JagerA2Info.SUMMON_DURATION)
             playReadySound();
         else if (i > JagerA2Info.SUMMON_DURATION) {
@@ -64,7 +89,21 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     /**
-     * {@link JagerA2Entity#onTick(int)}에서 덫 표시 효과를 재생한다.
+     * 준비 대기 시간의 효과를 재생한다.
+     */
+    private void playSummonEffect() {
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2F, 0.2F, 0.2F, 120, 120, 135);
+    }
+
+    /**
+     * 준비 시 효과음을 재생한다.
+     */
+    private void playReadySound() {
+        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5F, 0.5F);
+    }
+
+    /**
+     * 덫 표시 효과를 재생한다.
      */
     private void playTickEffect() {
         ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.4, 0, 0.6), 1, 0, 0, 0, 0);
@@ -91,14 +130,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     /**
-     * 준비 시 효과음을 재생한다.
-     */
-    private void playReadySound() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5F, 0.5F);
-    }
-
-    /**
-     * {@link JagerA2Entity#onTick(int)}에서 덫 발동 시 실행할 작업.
+     * 덫 발동 시 실행할 작업.
      *
      * @param target 대상 엔티티
      */
@@ -108,7 +140,6 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
-        skill.setSummonEntity(null);
     }
 
     /**
@@ -121,12 +152,18 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
+    public void onRemoveTemporal() {
+        skill.setSummonEntity(null);
+    }
+
+    @Override
     public int getMaxHealth() {
         return JagerA2Info.HEALTH;
     }
 
     @Override
     public void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+        owner.onAttack(victim, damage, damageType, isCrit, isUlt);
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished() && skill1.getSummonEntity().getEntity().getTarget() == null)
@@ -134,7 +171,12 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onKill(CombatEntity victim) {
+        owner.onKill(victim);
+    }
+
+    @Override
+    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
     }
 
@@ -148,11 +190,9 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    public void onDeath(CombatEntity attacker) {
-        super.onDeath(attacker);
-
+    public void onDeath(Attacker attacker) {
+        remove();
         playDeathEffect();
-        skill.setSummonEntity(null);
     }
 
     /**

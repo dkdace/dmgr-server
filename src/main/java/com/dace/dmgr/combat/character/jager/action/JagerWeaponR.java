@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskTimer;
@@ -72,33 +72,14 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
                     return;
                 }
 
+                new JagerWeaponProjectile().shoot(0F);
+
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
-                Location location = combatUser.getEntity().getLocation();
-
-                SoundUtil.play("random.gun2.psg_1_1", location, 3.5F, 1F);
-                SoundUtil.play("random.gun2.m16_1", location, 3.5F, 1F);
-                SoundUtil.play("random.gun.reverb", location, 5.5F, 0.95F);
-
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1F);
                 setCooldown();
                 consume(1);
-
-                new GunHitscan(combatUser, HitscanOption.builder().trailInterval(12).condition(combatUser::isEnemy).build()) {
-                    @Override
-                    public void trail(Location location) {
-                        Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
-                        ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
-                    }
-
-                    @Override
-                    public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
-                        int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
-                                JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
-                        target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
-                        return false;
-                    }
-                }.shoot(0F);
+                playShootSound(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -114,6 +95,17 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
                 break;
             }
         }
+    }
+
+    /**
+     * 발사 시 효과음을 재생한다.
+     *
+     * @param location 사용 위치
+     */
+    private void playShootSound(Location location) {
+        SoundUtil.play("random.gun2.psg_1_1", location, 3.5F, 1F);
+        SoundUtil.play("random.gun2.m16_1", location, 3.5F, 1F);
+        SoundUtil.play("random.gun.reverb", location, 5.5F, 0.95F);
     }
 
     @Override
@@ -142,5 +134,25 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
 
     @Override
     public void onReloadFinished() {
+    }
+
+    private class JagerWeaponProjectile extends GunHitscan {
+        public JagerWeaponProjectile() {
+            super(JagerWeaponR.this.combatUser, HitscanOption.builder().trailInterval(12).condition(JagerWeaponR.this.combatUser::isEnemy).build());
+        }
+
+        @Override
+        public void trail(Location location) {
+            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
+            ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+        }
+
+        @Override
+        public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
+            int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
+                    JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
+            target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+            return false;
+        }
     }
 }

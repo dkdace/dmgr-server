@@ -14,6 +14,6 @@ public final class OnEntityDeath implements Listener {
         CombatEntity combatEntity = EntityInfoRegistry.getCombatEntity(entity);
 
         if (combatEntity != null)
-            combatEntity.onDeath(null);
+            combatEntity.remove();
     }
 }

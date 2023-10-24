@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.temporal.Temporal;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -17,9 +19,11 @@ import java.util.List;
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
+@Getter
+public final class Dummy extends CombatEntityBase<Zombie> implements Damageable, Living, HasCritHitbox, Temporal {
+    /** 최대 체력 */
+    private final int maxHealth;
     /** 치명타 히트박스 객체 */
-    @Getter
     private final Hitbox critHitbox;
 
     /**
@@ -29,13 +33,20 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
      * @param maxHealth 최대 체력
      */
     public Dummy(Zombie entity, int maxHealth) {
-        super(entity, "§7§lDummy", maxHealth,
+        super(entity, "§7§lDummy",
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
+        this.maxHealth = maxHealth;
         critHitbox = hitboxes[3];
+    }
+
+    @Override
+    public void onInit() {
+        Damageable.super.onInit();
+        Temporal.super.onInit();
     }
 
     @Override
@@ -64,21 +75,28 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
+    public void onInitTemporal() {
+    }
+
+    @Override
     public void onTick(int i) {
     }
 
     @Override
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-
-    @Override
-    public void onDamage(CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onRemoveTemporal() {
     }
 
     @Override
     public boolean isUltProvider() {
         return true;
+    }
+
+    @Override
+    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    }
+
+    @Override
+    public void onDeath(Attacker attacker) {
+        remove();
     }
 }

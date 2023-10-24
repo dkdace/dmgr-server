@@ -1,7 +1,8 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -23,8 +24,8 @@ public final class OnEntityDamageByEntity implements Listener {
 
         if (attCombatEntity != null || vicCombatEntity != null)
             event.setCancelled(true);
-        if (attCombatEntity != null && vicCombatEntity instanceof Damageable)
-            attCombatEntity.onDefaultAttack((Damageable) vicCombatEntity);
+        if (attCombatEntity instanceof Attacker && vicCombatEntity instanceof Damageable)
+            ((Attacker) attCombatEntity).onDefaultAttack((Damageable) vicCombatEntity);
     }
 }
 
