@@ -24,6 +24,7 @@ public final class OnPlayerQuit implements Listener {
         user.reset();
 
         event.setQuitMessage(PREFIX + player.getName());
+        TaskManager.clearTask(user);
         EntityInfoRegistry.removeUser(player);
 
         new TaskWait(1) {

@@ -2,6 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.SoundUtil;
@@ -39,7 +40,7 @@ public final class OnPlayerJoin implements Listener {
             }
         };
 
-        new TaskWait(10) {
+        TaskManager.addTask(user, new TaskWait(10) {
             @Override
             public void run() {
                 for (int i = 0; i < 100; i++) {
@@ -47,7 +48,7 @@ public final class OnPlayerJoin implements Listener {
                 }
                 OnPlayerResourcePackStatus.sendResourcePack(player);
             }
-        };
+        });
     }
 
     /**

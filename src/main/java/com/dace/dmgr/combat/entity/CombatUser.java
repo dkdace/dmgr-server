@@ -27,6 +27,7 @@ import com.dace.dmgr.combat.entity.temporal.Temporal;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.*;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -175,6 +176,11 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             return false;
 
         return true;
+    }
+
+    @Override
+    public String getTaskIdentifier() {
+        return "CombatUser@" + entity.getName();
     }
 
     /**

@@ -28,6 +28,11 @@ public interface Temporal extends CombatEntity {
     void onInitTemporal();
 
     @Override
+    default String getTaskIdentifier() {
+        return toString();
+    }
+
+    @Override
     default void onRemove() {
         EntityInfoRegistry.removeTemporalEntity(getEntity());
         TaskManager.clearTask(this);

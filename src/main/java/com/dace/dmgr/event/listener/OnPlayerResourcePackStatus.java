@@ -4,6 +4,7 @@ import com.dace.dmgr.config.GeneralConfig;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskWait;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,13 +49,13 @@ public final class OnPlayerResourcePackStatus implements Listener {
             user.setResourcePack(true);
             user.getPlayer().setResourcePack(GeneralConfig.getInstance().getResourcePackUrl());
 
-            new TaskWait(160) {
+            TaskManager.addTask(user, new TaskWait(160) {
                 @Override
                 public void run() {
-                    if (player.isOnline() && (user.getResourcePackStatus() == null || user.getResourcePackStatus() == PlayerResourcePackStatusEvent.Status.DECLINED))
+                    if (user.getResourcePackStatus() == null || user.getResourcePackStatus() == PlayerResourcePackStatusEvent.Status.DECLINED)
                         user.getPlayer().kickPlayer(DENY_KICK_MESSAGE);
                 }
-            };
+            });
         }
     }
 }

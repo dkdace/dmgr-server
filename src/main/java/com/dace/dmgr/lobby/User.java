@@ -3,6 +3,7 @@ package com.dace.dmgr.lobby;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.util.YamlFile;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 /**
  * 유저 정보를 관리하는 클래스.
  */
-public final class User {
+public final class User implements HasTask {
     /** 플레이어 객체 */
     @Getter
     private final Player player;
@@ -81,6 +82,11 @@ public final class User {
     public void init() {
         EntityInfoRegistry.addUser(player, this);
         Lobby.lobbyTick(this);
+    }
+
+    @Override
+    public String getTaskIdentifier() {
+        return "User@" + player.getName();
     }
 
     public void setXp(int xp) {

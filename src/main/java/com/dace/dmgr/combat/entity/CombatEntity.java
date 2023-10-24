@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
@@ -10,7 +11,7 @@ import org.bukkit.entity.LivingEntity;
  *
  * @see CombatEntityBase
  */
-public interface CombatEntity {
+public interface CombatEntity extends HasTask {
     /**
      * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
      * @return 엔티티 객체

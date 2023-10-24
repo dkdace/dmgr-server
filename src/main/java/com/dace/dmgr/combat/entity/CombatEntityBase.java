@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
@@ -68,18 +69,15 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
         });
         onInit();
 
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
             public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatEntity(entity) == null)
-                    return false;
-
                 onTick(i);
                 updateHitboxTick();
 
                 return true;
             }
-        };
+        });
     }
 
     /**
@@ -88,14 +86,16 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     private void updateHitboxTick() {
         Location oldLoc = entity.getLocation();
 
-        new TaskWait(3) {
+        TaskManager.addTask(this, new TaskWait(3) {
             @Override
             public void run() {
                 for (Hitbox hitbox : hitboxes) {
                     hitbox.setCenter(oldLoc);
                 }
             }
-        };
+        });
+    }
+
     @Override
     public final void remove() {
         onRemove();
@@ -125,7 +125,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
             statusEffect.onStart(this);
 
-            new TaskTimer(1) {
+            TaskManager.addTask(this, new TaskTimer(1) {
                 @Override
                 public boolean run(int i) {
                     if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect.getStatusEffectType()))
@@ -140,7 +140,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
                 public void onEnd(boolean cancelled) {
                     statusEffect.onEnd(CombatEntityBase.this);
                 }
-            };
+            });
         } else if (getStatusEffectDuration(statusEffect.getStatusEffectType()) < duration)
             CooldownManager.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getStatusEffectType(), duration);
     }
