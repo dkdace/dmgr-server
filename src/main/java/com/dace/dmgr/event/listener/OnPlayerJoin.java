@@ -13,11 +13,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.text.MessageFormat;
+
 public final class OnPlayerJoin implements Listener {
     /** 입장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§a§l+§f§l] §b";
     /** 입장 시 타이틀 메시지 */
     private static final String TITLE = "§3Welcome to §b§lDMGR";
+    /** 입장 시 현재 인원 표시 */
+    private static final String CURRENT_PLAYERS = PREFIX + "현재 인원수는 §3§l{0}명§b입니다.";
 
     @EventHandler
     public static void event(PlayerJoinEvent event) {
@@ -33,7 +37,7 @@ public final class OnPlayerJoin implements Listener {
         new TaskWait(1) {
             @Override
             public void run() {
-                DMGR.getPlugin().getServer().broadcastMessage(PREFIX + "현재 인원수는 §3§l" + Bukkit.getOnlinePlayers().size() + "명§b입니다.");
+                DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
 
                 player.sendTitle(TITLE, "", 0, 100, 40);
                 playJoinSound();
