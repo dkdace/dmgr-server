@@ -49,16 +49,6 @@ public interface Skill extends Action {
     void addDuration(long duration);
 
     /**
-     * 지속시간이 진행할 때 (매 tick마다) 실행할 작업.
-     */
-    void onDurationTick();
-
-    /**
-     * 지속시간이 끝났을 때 실행할 작업.
-     */
-    void onDurationFinished();
-
-    /**
      * 스킬의 지속시간이 끝났는 지 확인한다.
      *
      * @return 지속시간 종료 여부

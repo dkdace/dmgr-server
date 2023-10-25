@@ -7,10 +7,17 @@ import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 
+import java.text.MessageFormat;
+
 /**
  * 재장전 가능한 무기의 인터페이스.
  */
 public interface Reloadable extends Weapon {
+    /** 재장전 중 메시지 */
+    String RELOADING = "§c§l재장전... {0} §f[{1}초]";
+    /** 재장전 완료 메시지 */
+    String RELOAD_COMPLETE = "§a§l재장전 완료";
+
     /**
      * @return 남은 탄약 수
      */
@@ -91,8 +98,8 @@ public interface Reloadable extends Weapon {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                getCombatUser().sendActionBar("§c§l재장전... " + StringFormUtil.getProgressBar(i, getReloadDuration(),
-                        ChatColor.WHITE) + " §f[" + time + "초]", 2);
+                getCombatUser().sendActionBar(MessageFormat.format(RELOADING, StringFormUtil.getProgressBar(i, getReloadDuration(),
+                        ChatColor.WHITE), time), 2);
                 onReloadTick(i);
 
                 return true;
@@ -104,7 +111,7 @@ public interface Reloadable extends Weapon {
                 if (cancelled)
                     return;
 
-                getCombatUser().sendActionBar("§a§l재장전 완료", 8);
+                getCombatUser().sendActionBar(RELOAD_COMPLETE, 8);
 
                 setRemainingAmmo(getCapacity());
                 setReloading(false);

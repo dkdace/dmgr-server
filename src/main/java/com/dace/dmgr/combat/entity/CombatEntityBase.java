@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.Arrays;
 
@@ -55,7 +56,8 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     /**
      * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
-    public final void init() {
+    @MustBeInvokedByOverriders
+    public void init() {
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
         entity.setCustomName(name);
@@ -81,6 +83,15 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     }
 
     /**
+     * {@link CombatEntityBase#init()}에서 매 틱마다 실행될 작업.
+     *
+     * @param i 인덱스
+     */
+    @MustBeInvokedByOverriders
+    protected void tick(int i) {
+    }
+
+    /**
      * 엔티티의 히트박스를 업데이트한다.
      */
     private void updateHitboxTick() {
@@ -97,7 +108,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     }
 
     @Override
-    public final void remove() {
+    @MustBeInvokedByOverriders
     public void remove() {
         TaskManager.clearTask(this);
         onRemove();

@@ -8,6 +8,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
@@ -31,14 +32,14 @@ public abstract class ActiveSkill extends SkillBase {
     }
 
     @Override
-    public void onCooldownTick() {
+    protected void onCooldownTick() {
         long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
 
         displayCooldown((int) Math.ceil((float) cooldown / 20));
     }
 
     @Override
-    public void onCooldownFinished() {
+    protected void onCooldownFinished() {
         displayReady(1);
         playCooldownFinishSound();
     }
@@ -49,10 +50,18 @@ public abstract class ActiveSkill extends SkillBase {
     }
 
     @Override
-    public void onDurationTick() {
+    protected void onDurationTick() {
         long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
 
         displayUsing((int) Math.ceil((float) duration / 20));
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void remove() {
+        super.remove();
+
+        combatUser.getEntity().getInventory().clear(slot);
     }
 
     /**

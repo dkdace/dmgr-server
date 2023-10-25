@@ -12,6 +12,9 @@ import java.text.MessageFormat;
  * @see LocationConfirmable
  */
 public interface Confirmable extends Skill {
+    /** 확인 중 메시지 */
+    String CHECKING = "§7§l[{0}] §f사용     §7§l[{1}] §f취소";
+
     /**
      * @return 수락 키
      */
@@ -73,8 +76,8 @@ public interface Confirmable extends Skill {
      * @param i 인덱스
      */
     default void onCheckTick(int i) {
-        getCombatUser().getEntity().sendTitle("", "§7§l[" + getAcceptKey().getName() + "] §f사용     " +
-                "§7§l[" + getCancelKey().getName() + "] §f취소", 0, 5, 5);
+        getCombatUser().getEntity().sendTitle("", MessageFormat.format(CHECKING, getAcceptKey().getName(), getCancelKey().getName()),
+                0, 5, 5);
     }
 
     /**

@@ -20,7 +20,7 @@ public final class OnCombatUserAction implements Listener {
         CombatUser combatUser = event.getCombatUser();
         ActionKey actionKey = event.getActionKey();
         Action action = combatUser.getActionMap().get(actionKey);
-        if (action == null)
+        if (combatUser.isDead() || action == null)
             return;
 
         Weapon weapon = combatUser.getWeapon();

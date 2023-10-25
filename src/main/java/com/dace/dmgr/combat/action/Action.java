@@ -69,21 +69,6 @@ public interface Action extends HasTask {
     void addCooldown(long cooldown);
 
     /**
-     * 쿨타임을 설정했을 때 실행할 작업.
-     */
-    void onCooldownSet();
-
-    /**
-     * 쿨타임이 진행할 때 (매 tick마다) 실행할 작업.
-     */
-    void onCooldownTick();
-
-    /**
-     * 쿨타임이 끝났을 때 실행할 작업.
-     */
-    void onCooldownFinished();
-
-    /**
      * 쿨타임이 끝났는 지 확인한다.
      *
      * @return 쿨타임 종료 여부
@@ -103,4 +88,34 @@ public interface Action extends HasTask {
      * @param actionKey 사용 키
      */
     void onUse(ActionKey actionKey);
+
+    /**
+     * 동작을 제거하고 작동을 중지시킨다.
+     *
+     * <p>클래스에서 상속받아야 한다.</p>
+     */
+    void remove();
+
+    /**
+     * {@link ActionBase#remove()} 호출 시 실행할 작업.
+     *
+     * <p>인터페이스에서 상속받아야 한다.</p>
+     */
+    default void onRemove() {
+    }
+
+    /**
+     * 동작의 상태를 초기화한다.
+     *
+     * <p>클래스에서 상속받아야 한다.</p>
+     */
+    void reset();
+
+    /**
+     * {@link ActionBase#reset()} 호출 시 실행할 작업.
+     *
+     * <p>인터페이스에서 상속받아야 한다.</p>
+     */
+    default void onReset() {
+    }
 }

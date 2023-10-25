@@ -49,25 +49,36 @@ public interface CombatEntity extends HasTask {
 
     /**
      * {@link CombatEntityBase#init()} 호출 시 실행할 작업.
+     *
+     * <p>인터페이스에서 상속받아야 한다.</p>
      */
-    void onInit();
+    default void onInit() {
+    }
 
     /**
      * {@link CombatEntityBase#init()}에서 매 틱마다 실행될 작업.
      *
+     * <p>인터페이스에서 상속받아야 한다.</p>
+     *
      * @param i 인덱스
      */
-    void onTick(int i);
+    default void onTick(int i) {
+    }
 
     /**
      * 엔티티를 제거한다.
+     *
+     * <p>클래스에서 상속받아야 한다.</p>
      */
     void remove();
 
     /**
-     * {@link CombatEntity#remove()} 호출 시 실행할 작업.
+     * {@link CombatEntityBase#remove()} 호출 시 실행할 작업.
+     *
+     * <p>인터페이스에서 상속받아야 한다.</p>
      */
-    void onRemove();
+    default void onRemove() {
+    }
 
     /**
      * 지정한 엔티티가 적인 지 확인한다.
@@ -128,13 +139,9 @@ public interface CombatEntity extends HasTask {
     void removeStatusEffect(StatusEffectType statusEffectType);
 
     /**
-     * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
+     * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.
      *
-     * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
-     *
-     * @return 궁극기 제공 여부
+     * @return 지정할 수 있으면 {@code true} 반환
      */
-    default boolean isUltProvider() {
-        return false;
-    }
+    boolean canBeTargeted();
 }

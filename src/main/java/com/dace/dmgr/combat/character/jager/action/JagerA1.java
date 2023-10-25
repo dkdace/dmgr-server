@@ -74,6 +74,18 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     }
 
     @Override
+    public void onRemove() {
+        HasEntity.super.onRemove();
+        LocationConfirmable.super.onRemove();
+    }
+
+    @Override
+    public void onReset() {
+        HasEntity.super.onReset();
+        LocationConfirmable.super.onReset();
+    }
+
+    @Override
     public void onUse(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
             ((JagerWeaponL) combatUser.getWeapon()).toggleAim();

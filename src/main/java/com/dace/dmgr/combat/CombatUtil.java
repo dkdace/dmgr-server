@@ -68,7 +68,8 @@ public final class CombatUtil {
         return EntityInfoRegistry.getAllCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
-                        location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted() &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
                                 hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
@@ -101,7 +102,8 @@ public final class CombatUtil {
         return EntityInfoRegistry.getAllCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
-                        location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted() &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .toArray(CombatEntity[]::new);

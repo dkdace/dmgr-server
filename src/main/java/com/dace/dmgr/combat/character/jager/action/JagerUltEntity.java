@@ -5,12 +5,10 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Summonable;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -24,10 +22,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 눈폭풍 발생기 클래스.
  */
-public final class JagerUltEntity extends CombatEntityBase<MagmaCube> implements Damageable, Attacker, Summonable {
-    /** 엔티티를 소환한 플레이어 */
-    @Getter
-    private final CombatUser owner;
+public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
 
@@ -35,25 +30,16 @@ public final class JagerUltEntity extends CombatEntityBase<MagmaCube> implements
         super(
                 entity,
                 "§f" + owner.getName() + "의 눈폭풍 발생기",
+                owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
-        this.owner = owner;
     }
 
     @Override
-    public void onInit() {
-        Damageable.super.onInit();
-        Summonable.super.onInit();
-    }
+    public void init() {
+        super.init();
 
-    @Override
-    public void onInitDamageable() {
-    }
-
-    @Override
-    public void onInitTemporal() {
-        setTeam(owner.getTeam());
         entity.setAI(false);
         entity.setSize(1);
         entity.setSilent(true);
@@ -72,7 +58,9 @@ public final class JagerUltEntity extends CombatEntityBase<MagmaCube> implements
     }
 
     @Override
-    public void onTick(int i) {
+    protected void tick(int i) {
+        super.tick(i);
+
         if (i < JagerUltInfo.SUMMON_DURATION) {
             if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
                 entity.teleport(entity.getLocation().add(0, 0.2, 0));
@@ -164,7 +152,9 @@ public final class JagerUltEntity extends CombatEntityBase<MagmaCube> implements
     }
 
     @Override
-    public void onRemoveTemporal() {
+    public void remove() {
+        super.remove();
+
         skill.setSummonEntity(null);
     }
 

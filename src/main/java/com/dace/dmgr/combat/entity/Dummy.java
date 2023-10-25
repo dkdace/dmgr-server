@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Temporal;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -20,7 +19,7 @@ import java.util.List;
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 @Getter
-public final class Dummy extends CombatEntityBase<Zombie> implements Damageable, Living, HasCritHitbox, Temporal {
+public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
     /** 최대 체력 */
     private final int maxHealth;
     /** 치명타 히트박스 객체 */
@@ -44,16 +43,11 @@ public final class Dummy extends CombatEntityBase<Zombie> implements Damageable,
     }
 
     @Override
-    public void onInit() {
-        Damageable.super.onInit();
-        Temporal.super.onInit();
-    }
+    public void init() {
+        super.init();
 
-    @Override
-    public void onInitDamageable() {
         setTeam("DUMMY");
         entity.setBaby(false);
-        entity.leaveVehicle();
         entity.setAI(false);
 
         List<ItemStack> equipment = new ArrayList<>();
@@ -72,18 +66,6 @@ public final class Dummy extends CombatEntityBase<Zombie> implements Damageable,
         entity.getEquipment().setBoots(equipment.get(2));
         entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOW, 99999, 5, false, false));
-    }
-
-    @Override
-    public void onInitTemporal() {
-    }
-
-    @Override
-    public void onTick(int i) {
-    }
-
-    @Override
-    public void onRemoveTemporal() {
     }
 
     @Override

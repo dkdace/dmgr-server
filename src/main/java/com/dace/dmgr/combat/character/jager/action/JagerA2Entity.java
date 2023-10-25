@@ -5,10 +5,8 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.Summonable;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -20,10 +18,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 곰덫 클래스.
  */
-public final class JagerA2Entity extends CombatEntityBase<MagmaCube> implements Damageable, Attacker, Summonable {
-    /** 엔티티를 소환한 플레이어 */
-    @Getter
-    private final CombatUser owner;
+public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerA2 skill;
 
@@ -31,25 +26,16 @@ public final class JagerA2Entity extends CombatEntityBase<MagmaCube> implements 
         super(
                 entity,
                 "§f" + owner.getName() + "의 곰덫",
+                owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
-        this.owner = owner;
     }
 
     @Override
-    public void onInit() {
-        Damageable.super.onInit();
-        Summonable.super.onInit();
-    }
+    public void init() {
+        super.init();
 
-    @Override
-    public void onInitDamageable() {
-    }
-
-    @Override
-    public void onInitTemporal() {
-        setTeam(owner.getTeam());
         entity.setAI(false);
         entity.setSize(1);
         entity.setSilent(true);
@@ -73,7 +59,9 @@ public final class JagerA2Entity extends CombatEntityBase<MagmaCube> implements 
     }
 
     @Override
-    public void onTick(int i) {
+    protected void tick(int i) {
+        super.tick(i);
+
         if (i < JagerA2Info.SUMMON_DURATION)
             playSummonEffect();
         else if (i == JagerA2Info.SUMMON_DURATION)
@@ -152,7 +140,9 @@ public final class JagerA2Entity extends CombatEntityBase<MagmaCube> implements 
     }
 
     @Override
-    public void onRemoveTemporal() {
+    public void remove() {
+        super.remove();
+
         skill.setSummonEntity(null);
     }
 

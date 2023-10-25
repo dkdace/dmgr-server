@@ -10,6 +10,7 @@ import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 모든 동작(무기, 스킬)의 기반 클래스.
@@ -47,10 +48,9 @@ public abstract class ActionBase implements Action {
         if (isCooldownFinished()) {
             CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
             runCooldown();
+            onCooldownSet();
         } else
             CooldownManager.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
-
-        onCooldownSet();
     }
 
     @Override
@@ -82,6 +82,21 @@ public abstract class ActionBase implements Action {
         });
     }
 
+    /**
+     * 쿨타임을 설정했을 때 실행할 작업.
+     */
+    protected abstract void onCooldownSet();
+
+    /**
+     * 쿨타임이 진행할 때 (매 tick마다) 실행할 작업.
+     */
+    protected abstract void onCooldownTick();
+
+    /**
+     * 쿨타임이 끝났을 때 실행할 작업.
+     */
+    protected abstract void onCooldownFinished();
+
     @Override
     public final boolean isCooldownFinished() {
         return getCooldown() == 0;
@@ -90,5 +105,19 @@ public abstract class ActionBase implements Action {
     @Override
     public boolean canUse() {
         return isCooldownFinished();
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void remove() {
+        TaskManager.clearTask(this);
+        onRemove();
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void reset() {
+        setCooldown(0);
+        onReset();
     }
 }

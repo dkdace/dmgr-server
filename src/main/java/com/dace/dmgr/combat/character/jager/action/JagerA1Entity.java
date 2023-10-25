@@ -6,10 +6,8 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.movable.Jumpable;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.Summonable;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import org.bukkit.DyeColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -19,10 +17,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 설랑 클래스.
  */
-public final class JagerA1Entity extends CombatEntityBase<Wolf> implements Damageable, Attacker, Living, Jumpable, Summonable {
-    /** 엔티티를 소환한 플레이어 */
-    @Getter
-    private final CombatUser owner;
+public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
 
@@ -30,26 +25,17 @@ public final class JagerA1Entity extends CombatEntityBase<Wolf> implements Damag
         super(
                 entity,
                 "§f" + owner.getName() + "의 설랑",
+                owner,
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
-        this.owner = owner;
     }
 
     @Override
-    public void onInit() {
-        Damageable.super.onInit();
-        Summonable.super.onInit();
-    }
+    public void init() {
+        super.init();
 
-    @Override
-    public void onInitDamageable() {
-    }
-
-    @Override
-    public void onInitTemporal() {
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
-        setTeam(owner.getTeam());
         setHealth((int) skill.getStateValue());
         entity.setAI(false);
         entity.setCollarColor(DyeColor.CYAN);
@@ -68,7 +54,9 @@ public final class JagerA1Entity extends CombatEntityBase<Wolf> implements Damag
     }
 
     @Override
-    public void onTickJumpable(int i) {
+    protected void tick(int i) {
+        super.tick(i);
+
         double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
         if (!canMove())
             speed = 0.0001F;
@@ -104,7 +92,9 @@ public final class JagerA1Entity extends CombatEntityBase<Wolf> implements Damag
     }
 
     @Override
-    public void onRemoveTemporal() {
+    public void remove() {
+        super.remove();
+
         skill.setSummonEntity(null);
     }
 

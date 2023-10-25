@@ -7,6 +7,7 @@ import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 여러 번 사용할 수 있는 스택형 스킬의 상태를 관리하는 클래스.
@@ -22,7 +23,7 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    public void onCooldownSet() {
+    protected void onCooldownSet() {
         addStack(-1);
     }
 
@@ -32,8 +33,17 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    public void onDurationTick() {
+    protected void onDurationTick() {
         displayUsing(stack);
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void reset() {
+        super.reset();
+
+        setStackCooldown(0);
+        addStack(getMaxStack());
     }
 
     /**

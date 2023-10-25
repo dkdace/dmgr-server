@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action.weapon;
 import com.dace.dmgr.combat.action.ActionBase;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 모든 무기의 기반 클래스.
@@ -20,16 +21,16 @@ public abstract class WeaponBase extends ActionBase implements Weapon {
     }
 
     @Override
-    public void onCooldownSet() {
+    protected void onCooldownSet() {
         combatUser.getEntity().setCooldown(WeaponInfo.MATERIAL, (int) getCooldown());
     }
 
     @Override
-    public void onCooldownTick() {
+    protected void onCooldownTick() {
     }
 
     @Override
-    public void onCooldownFinished() {
+    protected void onCooldownFinished() {
     }
 
     @Override
@@ -41,5 +42,13 @@ public abstract class WeaponBase extends ActionBase implements Weapon {
     public final void displayDurability(short durability) {
         itemStack.setDurability(durability);
         combatUser.getEntity().getInventory().setItem(4, itemStack);
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void remove() {
+        super.remove();
+
+        combatUser.getEntity().getInventory().clear(4);
     }
 }

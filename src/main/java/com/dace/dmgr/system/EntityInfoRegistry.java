@@ -2,7 +2,7 @@ package com.dace.dmgr.system;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.temporal.Temporal;
+import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ public final class EntityInfoRegistry {
     private static final Map<Player, User> userMap = new HashMap<>();
     private static final Map<LivingEntity, CombatEntity> combatEntityMap = new HashMap<>();
     private static final Map<Player, CombatUser> combatUserMap = new HashMap<>();
-    private static final Map<LivingEntity, Temporal> temporalEntityMap = new HashMap<>();
+    private static final Map<LivingEntity, TemporalEntity<?>> temporalEntityMap = new HashMap<>();
 
     /**
      * @param player 플레이어
@@ -87,7 +87,7 @@ public final class EntityInfoRegistry {
      * @param entity 엔티티
      * @return 전투 시스템의 일시적 엔티티 객체
      */
-    public static Temporal getTemporalEntity(LivingEntity entity) {
+    public static TemporalEntity<?> getTemporalEntity(LivingEntity entity) {
         return temporalEntityMap.get(entity);
     }
 
@@ -95,7 +95,7 @@ public final class EntityInfoRegistry {
      * @param entity         엔티티
      * @param temporalEntity 전투 시스템의 일시적 엔티티 객체
      */
-    public static void addTemporalEntity(LivingEntity entity, Temporal temporalEntity) {
+    public static void addTemporalEntity(LivingEntity entity, TemporalEntity<?> temporalEntity) {
         temporalEntityMap.put(entity, temporalEntity);
         combatEntityMap.put(entity, temporalEntity);
     }

@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 상태 변수를 가지고 있는 충전형 스킬의 상태를 관리하는 클래스.
@@ -19,13 +20,13 @@ public abstract class ChargeableSkill extends ActiveSkill {
     }
 
     @Override
-    public void onDurationTick() {
+    protected void onDurationTick() {
         super.onDurationTick();
         addStateValue(-getStateValueDecrement());
     }
 
     @Override
-    public void onCooldownFinished() {
+    protected void onCooldownFinished() {
         super.onCooldownFinished();
         runStateValueCharge();
     }
@@ -33,6 +34,14 @@ public abstract class ChargeableSkill extends ActiveSkill {
     @Override
     public final long getDefaultDuration() {
         return -1;
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void reset() {
+        super.reset();
+
+        setStateValue(getMaxStateValue());
     }
 
     /**

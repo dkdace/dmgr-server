@@ -34,17 +34,17 @@ public abstract class SkillBase extends ActionBase implements Skill {
     }
 
     @Override
-    public void onCooldownSet() {
+    protected void onCooldownSet() {
         if (!isDurationFinished())
             setDuration(0);
     }
 
     @Override
-    public void onCooldownTick() {
+    protected void onCooldownTick() {
     }
 
     @Override
-    public void onCooldownFinished() {
+    protected void onCooldownFinished() {
     }
 
     @Override
@@ -93,15 +93,13 @@ public abstract class SkillBase extends ActionBase implements Skill {
     /**
      * 지속시간이 진행할 때 (매 tick마다) 실행할 작업.
      */
-    @Override
-    public void onDurationTick() {
+    protected void onDurationTick() {
     }
 
     /**
      * 지속시간이 끝났을 때 실행할 작업.
      */
-    @Override
-    public void onDurationFinished() {
+    protected void onDurationFinished() {
         if (isCooldownFinished())
             setCooldown();
     }

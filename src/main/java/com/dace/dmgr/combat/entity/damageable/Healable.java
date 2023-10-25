@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.damageable;
 
+import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healer;
 
@@ -21,6 +22,28 @@ public interface Healable extends Damageable {
             return;
 
         provider.onGiveHeal(this, amount, isUlt);
+        onTakeHeal(this, amount, isUlt);
+
+        setHealth(getHealth() + amount);
+    }
+
+    /**
+     * 엔티티를 치유한다.
+     *
+     * @param projectile 제공자가 발사한 투사체
+     * @param amount     치유량
+     * @param isUlt      궁극기 충전 여부
+     */
+    default void heal(Projectile projectile, int amount, boolean isUlt) {
+        CombatEntity provider = projectile.getShooter();
+        if (!(provider instanceof Healer))
+            return;
+        if (getHealth() == getMaxHealth())
+            return;
+        if (!canTakeHeal())
+            return;
+
+        ((Healer) provider).onGiveHeal(this, amount, isUlt);
         onTakeHeal(this, amount, isUlt);
 
         setHealth(getHealth() + amount);

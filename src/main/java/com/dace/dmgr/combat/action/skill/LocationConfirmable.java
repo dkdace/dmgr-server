@@ -10,11 +10,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.inventivetalent.glow.GlowAPI;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+
+import java.text.MessageFormat;
 
 /**
  * 사용 전 위치 확인이 필요한 스킬의 인터페이스.
  */
 public interface LocationConfirmable extends Confirmable {
+    /** 확인 중 메시지 (사용 가능) */
+    String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
+    /** 확인 중 메시지 (사용 불가능) */
+    String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
+
     /**
      * @return 현재 지정 위치
      */
@@ -83,13 +91,11 @@ public interface LocationConfirmable extends Confirmable {
         getPointer().teleport(getCurrentLocation().clone().add(0, -1.75, 0).add(getCurrentLocation().getDirection().multiply(0.25)));
         if (isValid()) {
             GlowAPI.setGlowing(getPointer(), GlowAPI.Color.GREEN, player);
-            getCombatUser().getEntity().sendTitle("", "§7§l[" + getAcceptKey().getName() + "] §f설치     " + "§7§l[" +
-                            getCancelKey().getName() + "] §f취소",
+            getCombatUser().getEntity().sendTitle("", MessageFormat.format(CHECKING_VALID, getAcceptKey().getName(), getCancelKey().getName()),
                     0, 5, 5);
         } else {
             GlowAPI.setGlowing(getPointer(), GlowAPI.Color.RED, player);
-            getCombatUser().getEntity().sendTitle("", "§7§l[" + getAcceptKey().getName() + "] §c설치     " + "§7§l[" +
-                            getCancelKey().getName() + "] §f취소",
+            getCombatUser().getEntity().sendTitle("", MessageFormat.format(CHECKING_INVALID, getAcceptKey().getName(), getCancelKey().getName()),
                     0, 5, 5);
         }
         getPointer().setAI(false);
@@ -110,4 +116,18 @@ public interface LocationConfirmable extends Confirmable {
      * @see Confirmable#onAccept()
      */
     void onAcceptLocationConfirmable();
+
+    @Override
+    @MustBeInvokedByOverriders
+    default void onRemove() {
+        if (getPointer() != null)
+            getPointer().remove();
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    default void onReset() {
+        if (getPointer() != null)
+            getPointer().remove();
+    }
 }

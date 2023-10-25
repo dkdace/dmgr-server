@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import org.bukkit.attribute.Attribute;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 생명력 수치를 조정하고 피해를 입을 수 있는 엔티티의 인터페이스.
@@ -17,16 +18,11 @@ import org.bukkit.attribute.Attribute;
  */
 public interface Damageable extends CombatEntity {
     @Override
+    @MustBeInvokedByOverriders
     default void onInit() {
         setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
-        onInitDamageable();
     }
-
-    /**
-     * @see CombatEntity#onInit()
-     */
-    void onInitDamageable();
 
     /**
      * 엔티티의 체력을 반환한다.
@@ -205,5 +201,16 @@ public interface Damageable extends CombatEntity {
      */
     default boolean canDie() {
         return true;
+    }
+
+    /**
+     * 엔티티가 공격당했을 때 공격자에게 궁극기 게이지를 제공하는 지 확인한다.
+     *
+     * <p>기본값은 {@code false}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 궁극기 제공 여부
+     */
+    default boolean isUltProvider() {
+        return false;
     }
 }

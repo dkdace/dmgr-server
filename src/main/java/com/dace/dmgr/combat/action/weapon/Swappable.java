@@ -7,12 +7,17 @@ import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 
+import java.text.MessageFormat;
+
 /**
  * 주무기와 보조무기의 전환이 가능한 2중 무기의 인터페이스.
  *
  * @param <T> {@link Weapon}을 상속받는 보조무기
  */
 public interface Swappable<T extends Weapon> extends Weapon {
+    String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
+    String SWAP_COMPLETE = "§a§l무기 교체 완료";
+
     /**
      * 보조무기를 반환한다.
      *
@@ -63,8 +68,8 @@ public interface Swappable<T extends Weapon> extends Weapon {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                getCombatUser().sendActionBar("§c§l무기 교체 중... " + StringFormUtil.getProgressBar(i, getSwapDuration(),
-                        ChatColor.WHITE) + " §f[" + time + "초]", 2);
+                getCombatUser().sendActionBar(MessageFormat.format(SWAPPING, StringFormUtil.getProgressBar(i, getSwapDuration(),
+                        ChatColor.WHITE), time), 2);
 
                 return true;
             }
@@ -75,7 +80,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
                 if (cancelled)
                     return;
 
-                getCombatUser().sendActionBar("§a§l무기 교체 완료", 8);
+                getCombatUser().sendActionBar(SWAP_COMPLETE, 8);
                 setSwapState(targetState);
                 onSwapFinished(targetState);
             }
