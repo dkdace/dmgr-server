@@ -59,11 +59,11 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
      */
     public static class SPREAD {
         /** 탄퍼짐 증가량 */
-        static final float INCREMENT = 0.15F;
+        static final float INCREMENT = 0.3F;
         /** 탄퍼짐 회복량 */
-        static final float RECOVERY = 1F;
+        static final float RECOVERY = 2F;
         /** 탄퍼짐 최대치 */
-        static final float MAX = 2.3F;
+        static final float MAX = 4.6F;
     }
 
     /**

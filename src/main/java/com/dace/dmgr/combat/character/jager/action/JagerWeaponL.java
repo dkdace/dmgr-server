@@ -95,7 +95,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                     return;
                 }
 
-                new JagerWeaponProjectile().shoot(2.5F);
+                new JagerWeaponProjectile().shoot(JagerWeaponInfo.SPREAD);
 
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 setCooldown();

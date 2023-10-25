@@ -12,6 +12,8 @@ public final class JagerWeaponInfo extends WeaponInfo {
     public static final int DISTANCE = 20;
     /** 투사체 속력 */
     public static final int VELOCITY = 80;
+    /** 탄퍼짐 */
+    public static final float SPREAD = 5F;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 쿨타임 */
