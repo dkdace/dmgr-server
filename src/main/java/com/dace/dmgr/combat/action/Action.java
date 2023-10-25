@@ -6,7 +6,7 @@ import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * 동작(무기, 스킬)의 상태를 관리하는 클래스.
+ * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
  *
  * @see ActionBase
  */
