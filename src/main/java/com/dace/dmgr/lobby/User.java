@@ -131,7 +131,7 @@ public final class User implements HasTask {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
-        SkinManager.resetSkin(player);
+        SkinUtil.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getInventory().clear();

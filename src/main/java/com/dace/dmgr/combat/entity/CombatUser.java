@@ -533,7 +533,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      */
     public void setCharacter(Character character) {
         reset();
-        SkinManager.applySkin(entity, character.getSkinName());
+        SkinUtil.applySkin(entity, character.getSkinName());
         setMaxHealth(character.getHealth());
         setHealth(character.getHealth());
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * character.getSpeedMultiplier());

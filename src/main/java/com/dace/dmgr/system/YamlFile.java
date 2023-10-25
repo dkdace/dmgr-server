@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.system;
 
 import com.dace.dmgr.DMGR;
 import org.bukkit.configuration.file.YamlConfiguration;
