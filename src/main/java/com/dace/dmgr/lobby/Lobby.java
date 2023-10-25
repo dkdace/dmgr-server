@@ -1,6 +1,7 @@
 package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.Bukkit;
@@ -41,12 +42,9 @@ public final class Lobby {
     public static void lobbyTick(User user) {
         Player player = user.getPlayer();
 
-        new TaskTimer(20) {
+        TaskManager.addTask(user, new TaskTimer(20) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getUser(player) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 if (user.getUserConfig().isNightVision())
                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 0, false, false));
                 else
@@ -71,6 +69,6 @@ public final class Lobby {
 
                 return true;
             }
-        };
+        });
     }
 }

@@ -11,7 +11,8 @@ import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -59,9 +60,9 @@ public final class JagerA3 extends ActiveSkill {
             setDuration();
             playUseSound(combatUser.getEntity().getLocation());
 
-            new TaskTimer(1, JagerA3Info.READY_DURATION) {
+            TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerA3Info.READY_DURATION) {
                 @Override
-                public boolean run(int i) {
+                public boolean onTickAction(int i) {
                     return true;
                 }
 
@@ -75,9 +76,9 @@ public final class JagerA3 extends ActiveSkill {
                     CooldownManager.setCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION);
                     playReadySound(combatUser.getEntity().getLocation());
 
-                    new TaskTimer(1, JagerA3Info.EXPLODE_DURATION) {
+                    TaskManager.addTask(JagerA3.this, new ActionTaskTimer(combatUser, 1, JagerA3Info.EXPLODE_DURATION) {
                         @Override
-                        public boolean run(int i) {
+                        public boolean onTickAction(int i) {
                             if (isDurationFinished())
                                 return false;
 
@@ -90,17 +91,18 @@ public final class JagerA3 extends ActiveSkill {
 
                         @Override
                         public void onEnd(boolean cancelled) {
-                            if (!cancelled) {
-                                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                                        combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
-                                setDuration(0);
+                            if (cancelled)
+                                return;
 
-                                explode(loc, null);
-                            }
+                            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                                    combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
+                            setDuration(0);
+
+                            explode(loc, null);
                         }
-                    };
+                    });
                 }
-            };
+            });
         } else {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);

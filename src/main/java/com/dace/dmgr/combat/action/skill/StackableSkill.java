@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
 
@@ -74,12 +74,9 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param cooldown 스택 충전 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     private void runStackCooldown(long cooldown) {
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 onCooldownTick();
 
                 if (isStackCooldownFinished()) {
@@ -94,7 +91,7 @@ public abstract class StackableSkill extends ActiveSkill {
 
                 return true;
             }
-        };
+        });
     }
 
     /**

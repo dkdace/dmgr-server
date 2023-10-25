@@ -36,7 +36,7 @@ public final class OnPlayerJoin implements Listener {
 
         new TaskWait(1) {
             @Override
-            public void run() {
+            public void onEnd() {
                 DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
 
                 player.sendTitle(TITLE, "", 0, 100, 40);
@@ -46,7 +46,7 @@ public final class OnPlayerJoin implements Listener {
 
         TaskManager.addTask(user, new TaskWait(10) {
             @Override
-            public void run() {
+            public void onEnd() {
                 for (int i = 0; i < 100; i++) {
                     player.sendMessage("§f");
                 }
@@ -61,7 +61,7 @@ public final class OnPlayerJoin implements Listener {
     private static void playJoinSound() {
         new TaskTimer(1, 4) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 switch (i) {
                     case 0:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.7F);

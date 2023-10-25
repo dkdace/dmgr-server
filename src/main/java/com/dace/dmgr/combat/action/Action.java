@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -9,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @see ActionBase
  */
-public interface Action {
+public interface Action extends HasTask {
     /**
      * @return 플레이어 객체
      */

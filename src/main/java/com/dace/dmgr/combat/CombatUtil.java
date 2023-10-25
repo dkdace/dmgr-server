@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -178,9 +179,9 @@ public final class CombatUtil {
 
         final int finalSum = sum;
 
-        new TaskTimer(1, ticks) {
+        TaskManager.addTask(combatUser, new TaskTimer(1, ticks) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 float finalUp = (up + finalUpSpread) / ((float) finalSum / (ticks - i));
                 float finalSide = (side + finalSideSpread) / ((float) finalSum / (ticks - i));
                 if (first) {
@@ -191,7 +192,7 @@ public final class CombatUtil {
 
                 return true;
             }
-        };
+        });
     }
 
     /**
@@ -206,12 +207,9 @@ public final class CombatUtil {
         if (combatUser.getBulletSpread() == 0) {
             combatUser.addBulletSpread(increment, max);
 
-            new TaskTimer(1) {
+            TaskManager.addTask(combatUser, new TaskTimer(1) {
                 @Override
-                public boolean run(int i) {
-                    if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                        return false;
-
+                public boolean onTimerTick(int i) {
                     if (CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0) {
                         if (combatUser.getBulletSpread() == 0)
                             return false;
@@ -219,7 +217,7 @@ public final class CombatUtil {
                     }
                     return true;
                 }
-            };
+            });
         } else
             combatUser.addBulletSpread(increment, max);
     }

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -41,9 +42,9 @@ public final class ArkaceA2 extends ActiveSkill {
         setDuration();
         playUseSound(combatUser.getEntity().getLocation());
 
-        new TaskTimer(1, ArkaceA2Info.DURATION) {
+        TaskManager.addTask(this, new TaskTimer(1, ArkaceA2Info.DURATION) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
                 loc.setPitch(0);
                 playTickEffect(i, loc);
@@ -61,7 +62,7 @@ public final class ArkaceA2 extends ActiveSkill {
                 if (cancelled)
                     setDuration(0);
             }
-        };
+        });
     }
 
     /**

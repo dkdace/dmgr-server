@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -71,7 +70,8 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
         TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
+                tick(i);
                 onTick(i);
                 updateHitboxTick();
 
@@ -88,7 +88,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
         TaskManager.addTask(this, new TaskWait(3) {
             @Override
-            public void run() {
+            public void onEnd() {
                 for (Hitbox hitbox : hitboxes) {
                     hitbox.setCenter(oldLoc);
                 }
@@ -98,6 +98,8 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
     @Override
     public final void remove() {
+    public void remove() {
+        TaskManager.clearTask(this);
         onRemove();
     }
 
@@ -127,8 +129,8 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
 
             TaskManager.addTask(this, new TaskTimer(1) {
                 @Override
-                public boolean run(int i) {
-                    if (EntityInfoRegistry.getCombatEntity(entity) == null || !hasStatusEffect(statusEffect.getStatusEffectType()))
+                public boolean onTimerTick(int i) {
+                    if (!hasStatusEffect(statusEffect.getStatusEffectType()))
                         return false;
 
                     statusEffect.onTick(CombatEntityBase.this, i);

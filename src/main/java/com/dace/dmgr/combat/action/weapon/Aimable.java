@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.action.weapon;
 
 import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import lombok.Getter;
 
 /**
@@ -49,11 +49,9 @@ public interface Aimable extends Weapon {
         if (isAiming()) {
             onAimEnable();
 
-            new TaskTimer(1) {
+            TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1) {
                 @Override
-                public boolean run(int i) {
-                    if (EntityInfoRegistry.getCombatUser(getCombatUser().getEntity()) == null)
-                        return false;
+                public boolean onTickAction(int i) {
                     if (!isAiming())
                         return false;
                     if (Aimable.this instanceof Reloadable && ((Reloadable) Aimable.this).isReloading())
@@ -69,7 +67,7 @@ public interface Aimable extends Weapon {
                     setAiming(false);
                     onAimDisable();
                 }
-            };
+            });
         }
     }
 

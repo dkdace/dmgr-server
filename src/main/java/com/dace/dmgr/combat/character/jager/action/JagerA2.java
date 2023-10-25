@@ -9,7 +9,8 @@ import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -24,7 +25,7 @@ import org.bukkit.util.Vector;
 @Getter
 @Setter
 public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entity> {
-    /** 소환된 엔티티 목록 */
+    /** 소환된 엔티티 */
     private JagerA2Entity summonEntity = null;
 
     public JagerA2(CombatUser combatUser) {
@@ -65,9 +66,9 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
         playUseSound(location);
         removeSummonEntity();
 
-        new TaskTimer(1, JagerA2Info.READY_DURATION) {
+        TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerA2Info.READY_DURATION) {
             @Override
-            public boolean run(int i) {
+            public boolean onTickAction(int i) {
                 return true;
             }
 
@@ -83,7 +84,7 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
 
                 playThrowSound(loc);
             }
-        };
+        });
     }
 
     /**

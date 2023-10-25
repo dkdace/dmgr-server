@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
 
@@ -39,17 +39,14 @@ public abstract class ChargeableSkill extends ActiveSkill {
      * 스킬의 상태 변수 충전을 실행한다.
      */
     private void runStateValueCharge() {
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 addStateValue(getStateValueIncrement());
 
                 return (stateValue < getMaxStateValue()) && isDurationFinished() && isCooldownFinished();
             }
-        };
+        });
     }
 
     /**
@@ -58,7 +55,6 @@ public abstract class ChargeableSkill extends ActiveSkill {
      * @return 상태 변수의 최댓값
      */
     public abstract int getMaxStateValue();
-
 
     /**
      * @param stateValue 상태 변수
@@ -81,12 +77,12 @@ public abstract class ChargeableSkill extends ActiveSkill {
      *
      * @return 상태 변수의 틱당 충전량
      */
-    public abstract long getStateValueIncrement();
+    protected abstract long getStateValueIncrement();
 
     /**
      * 상태 변수의 틱당 소모량을 반환한다.
      *
      * @return 상태 변수의 틱당 소모량
      */
-    public abstract long getStateValueDecrement();
+    protected abstract long getStateValueDecrement();
 }

@@ -9,7 +9,8 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -50,9 +51,9 @@ public final class ArkaceA1 extends ActiveSkill {
         combatUser.setGlobalCooldown(10);
         setDuration();
 
-        new TaskTimer(5, 3) {
+        TaskManager.addTask(this, new ActionTaskTimer(combatUser, 5, 3) {
             @Override
-            public boolean run(int i) {
+            public boolean onTickAction(int i) {
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                         combatUser.getEntity().getLocation().getDirection(), -0.2, 0, 0);
                 new ArkaceA1Projectile().shoot(loc);
@@ -63,14 +64,14 @@ public final class ArkaceA1 extends ActiveSkill {
 
             @Override
             public void onEnd(boolean cancelled) {
-                new TaskWait(4) {
+                TaskManager.addTask(ArkaceA1.this, new TaskWait(4) {
                     @Override
-                    public void run() {
+                    public void onEnd() {
                         setDuration(0);
                     }
-                };
+                });
             }
-        };
+        });
     }
 
     /**

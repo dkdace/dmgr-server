@@ -116,7 +116,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
 
             new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
                 @Override
-                public boolean run(int i) {
+                public boolean onTimerTick(int i) {
                     return true;
                 }
 

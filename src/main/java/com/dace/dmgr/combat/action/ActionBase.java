@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +30,11 @@ public abstract class ActionBase implements Action {
         this.combatUser = combatUser;
         this.actionInfo = actionInfo;
         this.itemStack = actionInfo.getItemStack().clone();
+    }
+
+    @Override
+    public String getTaskIdentifier() {
+        return toString();
     }
 
     @Override
@@ -62,12 +67,9 @@ public abstract class ActionBase implements Action {
      * 쿨타임 스케쥴러를 실행한다.
      */
     private void runCooldown() {
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 onCooldownTick();
 
                 if (isCooldownFinished()) {
@@ -77,7 +79,7 @@ public abstract class ActionBase implements Action {
 
                 return true;
             }
-        };
+        });
     }
 
     @Override

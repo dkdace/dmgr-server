@@ -2,9 +2,9 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.SkinManager;
+import com.dace.dmgr.system.YamlFile;
 import com.dace.dmgr.system.task.HasTask;
-import com.dace.dmgr.util.YamlFile;
+import com.dace.dmgr.util.SkinUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.Setter;

@@ -34,7 +34,7 @@ public abstract class TaskWait implements Task {
     private List<Task> taskList = null;
 
     /**
-     * 지정한 딜레이만큼 기다린 후 {@link TaskWait#run()}을 호출한다.
+     * 지정한 딜레이만큼 기다린 후 {@link TaskWait#onEnd()}을 호출한다.
      *
      * @param delay 딜레이 (tick)
      */
@@ -44,19 +44,22 @@ public abstract class TaskWait implements Task {
         bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                preRun();
+                preEnd();
             }
         }.runTaskLater(DMGR.getPlugin(), delay);
     }
 
     /**
-     * @see TaskWait#run()
+     * @see TaskWait#onEnd()
      */
-    private void preRun() {
+    private void preEnd() {
         if (taskList != null)
             taskList.remove(this);
-        run();
+        onEnd();
     }
 
-    public abstract void run();
+    /**
+     * 딜레이가 끝났을 때 호출된다.
+     */
+    protected abstract void onEnd();
 }

@@ -9,7 +9,8 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -24,7 +25,7 @@ import org.bukkit.util.Vector;
 @Getter
 @Setter
 public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
-    /** 소환된 엔티티 목록 */
+    /** 소환된 엔티티 */
     private JagerUltEntity summonEntity = null;
 
     public JagerUlt(CombatUser combatUser) {
@@ -60,9 +61,9 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
         setDuration();
         removeSummonEntity();
 
-        new TaskTimer(1, JagerUltInfo.READY_DURATION) {
+        TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerUltInfo.READY_DURATION) {
             @Override
-            public boolean run(int i) {
+            public boolean onTickAction(int i) {
                 return true;
             }
 
@@ -78,7 +79,7 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
                 new JagerUltProjectile().shoot(location);
             }
-        };
+        });
     }
 
     /**

@@ -84,7 +84,7 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>[아이콘] ■■■■■□□□□□ [5/10]</pre>
+     * <pre>[접두사] ■■■■■□□□□□ [5/10]</pre>
      *
      * @param prefix  접두사
      * @param current 현재 값

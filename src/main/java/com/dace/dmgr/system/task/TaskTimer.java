@@ -50,7 +50,7 @@ public abstract class TaskTimer implements Task {
     private List<Task> taskList = null;
 
     /**
-     * 지정한 횟수만큼 {@link TaskTimer#run(int)}을 반복하여 호출한다.
+     * 지정한 횟수만큼 {@link TaskTimer#onTimerTick(int)}을 반복하여 호출한다.
      *
      * @param period 실행 주기 (tick)
      * @param repeat 반복 횟수. {@code 0}으로 설정 시 무한 반복
@@ -64,22 +64,22 @@ public abstract class TaskTimer implements Task {
 
             @Override
             public void run() {
-                if (!TaskTimer.this.run(i++)) {
+                if (!TaskTimer.this.onTimerTick(i++)) {
                     cancel();
-                    onPreEnd(true);
+                    preEnd(true);
                     return;
                 }
 
                 if (repeat > 0 && (i >= repeat)) {
                     cancel();
-                    onPreEnd(false);
+                    preEnd(false);
                 }
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
     }
 
     /**
-     * {@link TaskTimer#run(int)}을 무한 반복하여 호출한다.
+     * {@link TaskTimer#onTimerTick(int)}을 무한 반복하여 호출한다.
      *
      * @param period 실행 주기 (tick)
      */
@@ -88,9 +88,17 @@ public abstract class TaskTimer implements Task {
     }
 
     /**
+     * 타이머에서 매 틱마다 호출된다.
+     *
+     * @param i 인덱스 (0부터 시작)
+     * @return 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환
+     */
+    protected abstract boolean onTimerTick(int i);
+
+    /**
      * @see TaskTimer#onEnd(boolean)
      */
-    public void onPreEnd(boolean cancelled) {
+    private void preEnd(boolean cancelled) {
         if (taskList != null)
             taskList.remove(this);
         onEnd(cancelled);
@@ -99,14 +107,8 @@ public abstract class TaskTimer implements Task {
     /**
      * 타이머가 끝났을 때 호출된다.
      *
-     * @param cancelled 취소 여부. {@link TaskTimer#run(int)}에서 {@code false}를 반환하여 끝낸 경우 {@code true}이다.
+     * @param cancelled 취소 여부. {@link TaskTimer#onTimerTick(int)}에서 {@code false}를 반환하여 끝낸 경우 {@code true}이다.
      */
-    public void onEnd(boolean cancelled) {
+    protected void onEnd(boolean cancelled) {
     }
-
-    /**
-     * @param i 인덱스 (0부터 시작)
-     * @return 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환
-     */
-    public abstract boolean run(int i);
 }

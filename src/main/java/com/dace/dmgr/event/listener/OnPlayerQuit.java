@@ -34,7 +34,7 @@ public final class OnPlayerQuit implements Listener {
 
         new TaskWait(1) {
             @Override
-            public void run() {
+            public void onEnd() {
                 DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
                 playQuitSound();
             }
@@ -47,7 +47,7 @@ public final class OnPlayerQuit implements Listener {
     private static void playQuitSound() {
         new TaskTimer(1, 4) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 switch (i) {
                     case 0:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);

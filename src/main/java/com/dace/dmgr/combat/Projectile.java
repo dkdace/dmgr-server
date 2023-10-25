@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -90,13 +91,13 @@ public abstract class Projectile extends Bullet {
         final Vector finalDirection = direction;
         final int finalSum = sum;
 
-        new TaskTimer(1) {
+        TaskManager.addTask(getShooter(), new TaskTimer(1) {
             int count = 0;
 
             @Override
-            public boolean run(int _i) {
+            public boolean onTimerTick(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if ((duration != -1 && _i >= duration))
+                    if ((duration != -1 && _i >= duration) || loc.distance(origin) > maxDistance)
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
@@ -121,6 +122,6 @@ public abstract class Projectile extends Bullet {
             public void onEnd(boolean cancelled) {
                 onDestroy(loc.clone());
             }
-        };
+        });
     }
 }

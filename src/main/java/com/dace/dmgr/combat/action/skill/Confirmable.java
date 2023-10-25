@@ -1,11 +1,15 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
+
+import java.text.MessageFormat;
 
 /**
  * 사용 전 확인이 필요한 스킬의 인터페이스.
+ *
+ * @see LocationConfirmable
  */
 public interface Confirmable extends Skill {
     /**
@@ -38,11 +42,9 @@ public interface Confirmable extends Skill {
         if (isChecking()) {
             onCheckEnable();
 
-            new TaskTimer(1) {
+            TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1) {
                 @Override
-                public boolean run(int i) {
-                    if (EntityInfoRegistry.getCombatUser(getCombatUser().getEntity()) == null)
-                        return false;
+                public boolean onTickAction(int i) {
                     if (!isChecking())
                         return false;
 
@@ -56,7 +58,7 @@ public interface Confirmable extends Skill {
                     setChecking(false);
                     onCheckDisable();
                 }
-            };
+            });
         }
     }
 

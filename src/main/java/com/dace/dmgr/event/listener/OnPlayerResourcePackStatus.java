@@ -51,7 +51,7 @@ public final class OnPlayerResourcePackStatus implements Listener {
 
             TaskManager.addTask(user, new TaskWait(160) {
                 @Override
-                public void run() {
+                public void onEnd() {
                     if (user.getResourcePackStatus() == null || user.getResourcePackStatus() == PlayerResourcePackStatusEvent.Status.DECLINED)
                         user.getPlayer().kickPlayer(DENY_KICK_MESSAGE);
                 }

@@ -29,10 +29,7 @@ import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.*;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.RegionUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -42,6 +39,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,8 +108,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     @Override
     public void onTickJumpable(int i) {
         character.onTick(this, i);
-        entity.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,
-                99999, 0, false, false), true);
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                99999, 10, false, false), true);
 
         hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
         hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
@@ -139,7 +137,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         entity.setWalkSpeed((float) speed);
 
-        onTickActionbar();
+        if (CooldownManager.getCooldown(this, Cooldown.ACTION_BAR) == 0)
+            onTickActionbar();
     }
 
     @Override
@@ -413,11 +412,11 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             entity.setGameMode(GameMode.SPECTATOR);
             entity.setVelocity(new Vector());
 
-            new TaskTimer(1) {
+            TaskManager.addTask(this, new TaskTimer(1) {
                 @Override
-                public boolean run(int i) {
+                public boolean onTimerTick(int i) {
                     long cooldown = CooldownManager.getCooldown(CombatUser.this, Cooldown.RESPAWN_TIME);
-                    if (EntityInfoRegistry.getCombatUser(entity) == null || cooldown <= 0)
+                    if (cooldown <= 0)
                         return false;
 
                     entity.sendTitle("§c§l죽었습니다!",
@@ -433,7 +432,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                     entity.teleport(Lobby.lobbyLocation);
                     entity.setGameMode(GameMode.SURVIVAL);
                 }
-            };
+            });
         }
     }
 
@@ -448,9 +447,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      * @param max          무기 탄퍼짐 최대치
      */
     public void addBulletSpread(float bulletSpread, float max) {
-        this.bulletSpread += bulletSpread;
-        if (this.bulletSpread < 0) this.bulletSpread = 0;
-        if (this.bulletSpread > max) this.bulletSpread = max;
+        this.bulletSpread = Math.min(Math.max(0, this.bulletSpread + bulletSpread), max);
     }
 
     /**

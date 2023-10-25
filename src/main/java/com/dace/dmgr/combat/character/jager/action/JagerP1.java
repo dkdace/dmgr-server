@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.SkillBase;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 
 public final class JagerP1 extends SkillBase {
@@ -53,9 +54,9 @@ public final class JagerP1 extends SkillBase {
         setDuration();
         combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("JagerP1", JagerP1Info.SPEED);
 
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 return canActivate();
             }
 
@@ -64,6 +65,6 @@ public final class JagerP1 extends SkillBase {
                 setDuration(0);
                 combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("JagerP1");
             }
-        };
+        });
     }
 }

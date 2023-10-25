@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 
@@ -82,11 +82,9 @@ public interface Reloadable extends Weapon {
         setReloading(true);
         CooldownManager.setCooldown(this, Cooldown.WEAPON_RELOAD, getReloadDuration());
 
-        new TaskTimer(1, getReloadDuration()) {
+        TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1, getReloadDuration()) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(getCombatUser().getEntity()) == null)
-                    return false;
+            public boolean onTickAction(int i) {
                 if (!isReloading())
                     return false;
                 if (Reloadable.this instanceof Aimable && ((Aimable) Reloadable.this).isAiming())
@@ -112,7 +110,7 @@ public interface Reloadable extends Weapon {
                 setReloading(false);
                 onReloadFinished();
             }
-        };
+        });
     }
 
     /**

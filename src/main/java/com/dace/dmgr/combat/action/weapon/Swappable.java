@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.ChatColor;
 
@@ -56,11 +56,9 @@ public interface Swappable<T extends Weapon> extends Weapon {
         CooldownManager.setCooldown(getCombatUser(), Cooldown.WEAPON_SWAP, getSwapDuration());
         onSwapStart(targetState);
 
-        new TaskTimer(1, getSwapDuration()) {
+        TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1, getSwapDuration()) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(getCombatUser().getEntity()) == null)
-                    return false;
+            public boolean onTickAction(int i) {
                 if (getSwapState() != SwapState.SWAPPING)
                     return false;
 
@@ -81,7 +79,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
                 setSwapState(targetState);
                 onSwapFinished(targetState);
             }
-        };
+        });
     }
 
     /**
