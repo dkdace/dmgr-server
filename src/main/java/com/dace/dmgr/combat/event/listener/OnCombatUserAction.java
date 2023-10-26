@@ -14,6 +14,7 @@ import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -62,11 +63,11 @@ public final class OnCombatUserAction implements Listener {
 
         CooldownManager.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
 
-        new TaskTimer(1, 4) {
+        TaskManager.addTask(weapon, new TaskTimer(1, 4) {
             int j = 0;
 
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).isReloading())
                     return true;
                 if (weapon.canUse() && FullAuto.isFireTick(((FullAuto) weapon).getFireRate(), combatUser.getEntity().getTicksLived())) {
@@ -76,6 +77,6 @@ public final class OnCombatUserAction implements Listener {
 
                 return true;
             }
-        };
+        });
     }
 }

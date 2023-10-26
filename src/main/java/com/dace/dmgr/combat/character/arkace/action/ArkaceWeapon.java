@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -37,7 +36,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
 
     @Override
     public ActionKey[] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.CS_PRE_USE, ActionKey.CS_USE, ActionKey.DROP};
+        return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.DROP};
     }
 
     @Override
