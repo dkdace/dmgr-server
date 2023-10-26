@@ -1,9 +1,7 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -39,7 +37,7 @@ public final class Arkace extends Character {
     }
 
     @Override
-    public WeaponInfo getWeaponInfo() {
+    public ArkaceWeaponInfo getWeaponInfo() {
         return ArkaceWeaponInfo.getInstance();
     }
 
@@ -68,7 +66,7 @@ public final class Arkace extends Character {
     }
 
     @Override
-    public UltimateSkillInfo getUltimateSkillInfo() {
+    public ArkaceUltInfo getUltimateSkillInfo() {
         return ArkaceUltInfo.getInstance();
     }
 }

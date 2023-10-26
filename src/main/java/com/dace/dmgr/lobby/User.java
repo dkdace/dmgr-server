@@ -2,8 +2,9 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.SkinManager;
-import com.dace.dmgr.util.YamlFile;
+import com.dace.dmgr.system.YamlFile;
+import com.dace.dmgr.system.task.HasTask;
+import com.dace.dmgr.util.SkinUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 /**
  * 유저 정보를 관리하는 클래스.
  */
-public final class User {
+public final class User implements HasTask {
     /** 플레이어 객체 */
     @Getter
     private final Player player;
@@ -83,6 +84,11 @@ public final class User {
         Lobby.lobbyTick(this);
     }
 
+    @Override
+    public String getTaskIdentifier() {
+        return "User@" + player.getName();
+    }
+
     public void setXp(int xp) {
         if (xp < 0) xp = 0;
         this.xp = xp;
@@ -125,7 +131,7 @@ public final class User {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
-        SkinManager.resetSkin(player);
+        SkinUtil.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getInventory().clear();
@@ -138,7 +144,7 @@ public final class User {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser != null) {
             combatUser.reset();
-            EntityInfoRegistry.removeCombatUser(player);
+            combatUser.remove();
         }
     }
 

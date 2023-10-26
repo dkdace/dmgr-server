@@ -1,6 +1,9 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.combat.entity.CombatEntity;
 import lombok.Builder;
+
+import java.util.function.Predicate;
 
 /**
  * 투사체의 선택적 옵션을 관리하는 빌더 클래스.
@@ -27,4 +30,7 @@ public class ProjectileOption {
     /** 중력 작용 여부 */
     @Builder.Default
     final boolean hasGravity = false;
+    /** 대상 엔티티를 찾는 조건 */
+    @Builder.Default
+    final Predicate<CombatEntity> condition = combatEntity -> true;
 }

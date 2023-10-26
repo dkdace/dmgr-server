@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
@@ -34,7 +33,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public Weapon createWeapon(CombatUser combatUser) {
+    public ArkaceWeapon createWeapon(CombatUser combatUser) {
         return new ArkaceWeapon(combatUser);
     }
 
@@ -57,11 +56,11 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
      */
     public static class SPREAD {
         /** 탄퍼짐 증가량 */
-        static final float INCREMENT = 0.15F;
+        static final float INCREMENT = 0.3F;
         /** 탄퍼짐 회복량 */
-        static final float RECOVERY = 1F;
+        static final float RECOVERY = 2F;
         /** 탄퍼짐 최대치 */
-        static final float MAX = 2.3F;
+        static final float MAX = 4.6F;
     }
 
     /**

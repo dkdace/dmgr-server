@@ -6,10 +6,11 @@ import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.system.task.ActionTaskTimer;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -21,22 +22,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.List;
-
+@Getter
+@Setter
 public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
-    /** 소환된 엔티티 목록 */
-    @Getter
-    @Setter
+    /** 소환된 엔티티 */
     private JagerUltEntity summonEntity = null;
 
     public JagerUlt(CombatUser combatUser) {
         super(4, combatUser, JagerUltInfo.getInstance());
-    }
-
-    @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_4);
     }
 
     @Override
@@ -51,29 +44,26 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isConfirming() &&
+        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     protected void onUseUltimateSkill(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).aim();
+            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
 
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
         Location location = combatUser.getEntity().getLocation();
-        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
+        playUseSound(location);
         setDuration();
-        if (summonEntity != null) {
-            summonEntity.remove();
-            summonEntity = null;
-        }
+        removeSummonEntity();
 
-        new TaskTimer(1, JagerUltInfo.READY_DURATION) {
+        TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerUltInfo.READY_DURATION) {
             @Override
-            public boolean run(int i) {
+            public boolean onTickAction(int i) {
                 return true;
             }
 
@@ -87,35 +77,49 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
                         combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
                 SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
 
-                new BouncingProjectile(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true).build(),
-                        BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).destroyOnHitFloor(true).build()) {
-                    @Override
-                    public void trail(Location location) {
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
-                                0.6F, 0.02F, 0.6F, 96, 220, 255);
-                    }
-
-                    @Override
-                    public boolean onHitBlockBouncing(Location location, Vector direction, Block hitBlock) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onHitEntityBouncing(Location location, Vector direction, CombatEntity<?> target, boolean isCrit) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onDestroy(Location location) {
-                        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, location, 0.5F, 0.5F);
-
-                        MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
-                        JagerUltEntity jagerUltEntity = new JagerUltEntity(magmaCube, combatUser);
-                        jagerUltEntity.init();
-                        summonEntity = jagerUltEntity;
-                    }
-                }.shoot(location);
+                new JagerUltProjectile().shoot(location);
             }
-        };
+        });
+    }
+
+    /**
+     * 사용 시 효과음을 재생한다.
+     *
+     * @param location 사용 위치
+     */
+    private void playUseSound(Location location) {
+        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
+    }
+
+    private class JagerUltProjectile extends BouncingProjectile {
+        public JagerUltProjectile() {
+            super(JagerUlt.this.combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true)
+                    .condition(JagerUlt.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F)
+                    .destroyOnHitFloor(true).build());
+        }
+
+        @Override
+        public void trail(Location location) {
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
+                    0.6F, 0.02F, 0.6F, 96, 220, 255);
+        }
+
+        @Override
+        public boolean onHitBlockBouncing(Location location, Vector direction, Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        public boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit) {
+            return false;
+        }
+
+        @Override
+        public void onDestroy(Location location) {
+            MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
+            JagerUltEntity jagerUltEntity = new JagerUltEntity(magmaCube, combatUser);
+            jagerUltEntity.init();
+            setSummonEntity(jagerUltEntity);
+        }
     }
 }

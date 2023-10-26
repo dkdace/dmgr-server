@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
@@ -27,7 +26,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public Skill createSkill(CombatUser combatUser) {
+    public ArkaceUlt createSkill(CombatUser combatUser) {
         return new ArkaceUlt(combatUser);
     }
 }

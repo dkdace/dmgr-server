@@ -13,16 +13,16 @@ public class Snare implements StatusEffect {
     }
 
     @Override
-    public void onStart(CombatEntity<?> combatEntity) {
+    public void onStart(CombatEntity combatEntity) {
     }
 
     @Override
-    public void onTick(CombatEntity<?> combatEntity, int i) {
+    public void onTick(CombatEntity combatEntity, int i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getEntity().sendTitle("§c§l속박당함!", "", 0, 2, 10);
     }
 
     @Override
-    public void onEnd(CombatEntity<?> combatEntity) {
+    public void onEnd(CombatEntity combatEntity) {
     }
 }

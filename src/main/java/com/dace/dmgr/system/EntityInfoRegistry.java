@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public final class EntityInfoRegistry {
     private static final Map<Player, User> userMap = new HashMap<>();
-    private static final Map<LivingEntity, CombatEntity<?>> combatEntityMap = new HashMap<>();
+    private static final Map<LivingEntity, CombatEntity> combatEntityMap = new HashMap<>();
     private static final Map<Player, CombatUser> combatUserMap = new HashMap<>();
     private static final Map<LivingEntity, TemporalEntity<?>> temporalEntityMap = new HashMap<>();
 
@@ -46,7 +46,7 @@ public final class EntityInfoRegistry {
     /**
      * @return 모든 전투 시스템의 엔티티
      */
-    public static Collection<CombatEntity<?>> getAllCombatEntities() {
+    public static Collection<CombatEntity> getAllCombatEntities() {
         return combatEntityMap.values();
     }
 
@@ -54,7 +54,7 @@ public final class EntityInfoRegistry {
      * @param entity 엔티티
      * @return 전투 시스템의 엔티티 객체
      */
-    public static CombatEntity<?> getCombatEntity(LivingEntity entity) {
+    public static CombatEntity getCombatEntity(LivingEntity entity) {
         return combatEntityMap.get(entity);
     }
 

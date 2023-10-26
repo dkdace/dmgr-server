@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
@@ -12,6 +11,8 @@ public final class JagerWeaponInfo extends WeaponInfo {
     public static final int DISTANCE = 20;
     /** 투사체 속력 */
     public static final int VELOCITY = 80;
+    /** 탄퍼짐 */
+    public static final float SPREAD = 5F;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 쿨타임 */
@@ -32,7 +33,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public Weapon createWeapon(CombatUser combatUser) {
+    public JagerWeaponL createWeapon(CombatUser combatUser) {
         return new JagerWeaponL(combatUser);
     }
 

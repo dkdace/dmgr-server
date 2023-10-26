@@ -1,4 +1,4 @@
-package com.dace.dmgr.system;
+package com.dace.dmgr.util;
 
 import com.dace.dmgr.DMGR;
 import net.skinsrestorer.api.PlayerWrapper;
@@ -9,7 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * 플레이어 스킨 관리 기능을 제공하는 클래스.
  */
-public final class SkinManager {
+public final class SkinUtil {
     /** API 객체 */
     private static final SkinsRestorerAPI api = SkinsRestorerAPI.getApi();
 

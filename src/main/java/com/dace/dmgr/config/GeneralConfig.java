@@ -1,6 +1,6 @@
 package com.dace.dmgr.config;
 
-import com.dace.dmgr.util.YamlFile;
+import com.dace.dmgr.system.YamlFile;
 import lombok.Getter;
 
 /**

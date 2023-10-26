@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.action.skill.TraitInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import lombok.Getter;
 
 public final class JagerT1Info extends TraitInfo {

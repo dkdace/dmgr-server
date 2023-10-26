@@ -1,22 +1,20 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.SkillBase;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 
-import java.util.Arrays;
-import java.util.List;
-
-public final class JagerP1 extends Skill {
+public final class JagerP1 extends SkillBase {
     public JagerP1(CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.PERIODIC_1);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.PERIODIC_1};
     }
 
     @Override
@@ -27,6 +25,11 @@ public final class JagerP1 extends Skill {
     @Override
     public long getDefaultDuration() {
         return -1;
+    }
+
+    @Override
+    public boolean canUse() {
+        return super.canUse() && isDurationFinished() && canActivate();
     }
 
     /**
@@ -47,18 +50,13 @@ public final class JagerP1 extends Skill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && canActivate();
-    }
-
-    @Override
     public void onUse(ActionKey actionKey) {
         setDuration();
         combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("JagerP1", JagerP1Info.SPEED);
 
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 return canActivate();
             }
 
@@ -67,6 +65,6 @@ public final class JagerP1 extends Skill {
                 setDuration(0);
                 combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("JagerP1");
             }
-        };
+        });
     }
 }

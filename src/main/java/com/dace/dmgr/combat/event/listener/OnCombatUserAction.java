@@ -2,12 +2,13 @@ package com.dace.dmgr.combat.event.listener;
 
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.SkillBase;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
@@ -23,26 +24,26 @@ public final class OnCombatUserAction implements Listener {
         CombatUser combatUser = event.getCombatUser();
         ActionKey actionKey = event.getActionKey();
         Action action = combatUser.getActionMap().get(actionKey);
-        if (action == null)
+        if (combatUser.isDead() || action == null)
             return;
 
         Weapon weapon = combatUser.getWeapon();
-        if (weapon instanceof Swappable && ((Swappable) weapon).getWeaponState() == Swappable.WeaponState.SECONDARY)
-            weapon = ((Swappable) combatUser.getWeapon()).getSubweapon();
+        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapState() == Swappable.SwapState.SECONDARY)
+            weapon = ((Swappable<?>) combatUser.getWeapon()).getSubweapon();
 
-        if (action instanceof Weapon) {
+        if (action instanceof WeaponBase) {
             if (weapon instanceof FullAuto && (((FullAuto) weapon).getKey() == actionKey))
                 handleUseFullAutoWeapon(weapon, actionKey, combatUser);
             else
                 handleUseWeapon(weapon, actionKey);
 
-        } else if (action instanceof Skill) {
+        } else if (action instanceof SkillBase) {
             if (!action.canUse())
                 return;
             if (combatUser.hasStatusEffect(StatusEffectType.SILENCE))
                 return;
             if (action.getActionInfo() instanceof ActiveSkillInfo && weapon instanceof Reloadable)
-                ((Reloadable) weapon).cancelReloading();
+                ((Reloadable) weapon).setReloading(false);
 
             action.onUse(actionKey);
         }

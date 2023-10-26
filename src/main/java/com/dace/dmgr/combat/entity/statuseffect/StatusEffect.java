@@ -16,7 +16,7 @@ public interface StatusEffect {
      *
      * @param combatEntity 대상 엔티티
      */
-    void onStart(CombatEntity<?> combatEntity);
+    void onStart(CombatEntity combatEntity);
 
     /**
      * 상태 효과 적용 중 매 틱마다 실행할 작업.
@@ -24,12 +24,12 @@ public interface StatusEffect {
      * @param combatEntity 대상 엔티티
      * @param i            인덱스
      */
-    void onTick(CombatEntity<?> combatEntity, int i);
+    void onTick(CombatEntity combatEntity, int i);
 
     /**
      * 상태 효과가 끝났을 때 실행할 작업.
      *
      * @param combatEntity 대상 엔티티
      */
-    void onEnd(CombatEntity<?> combatEntity);
+    void onEnd(CombatEntity combatEntity);
 }

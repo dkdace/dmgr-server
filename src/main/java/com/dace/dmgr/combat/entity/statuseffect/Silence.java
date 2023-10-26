@@ -13,11 +13,11 @@ public class Silence implements StatusEffect {
     }
 
     @Override
-    public void onStart(CombatEntity<?> combatEntity) {
+    public void onStart(CombatEntity combatEntity) {
     }
 
     @Override
-    public void onTick(CombatEntity<?> combatEntity, int i) {
+    public void onTick(CombatEntity combatEntity, int i) {
         if (combatEntity instanceof CombatUser) {
             ((CombatUser) combatEntity).getEntity().sendTitle("§5§l침묵당함!", "", 0, 2, 10);
             ((CombatUser) combatEntity).getEntity().stopSound("");
@@ -25,6 +25,6 @@ public class Silence implements StatusEffect {
     }
 
     @Override
-    public void onEnd(CombatEntity<?> combatEntity) {
+    public void onEnd(CombatEntity combatEntity) {
     }
 }

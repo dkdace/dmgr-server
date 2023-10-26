@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
@@ -18,7 +17,7 @@ public final class JagerP1Info extends PassiveSkillInfo {
     }
 
     @Override
-    public Skill createSkill(CombatUser combatUser) {
+    public JagerP1 createSkill(CombatUser combatUser) {
         return new JagerP1(combatUser);
     }
 }

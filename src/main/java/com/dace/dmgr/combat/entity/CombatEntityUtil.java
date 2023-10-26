@@ -6,7 +6,7 @@ import org.bukkit.entity.LivingEntity;
 /**
  * 엔티티의 소환 및 제거 기능을 제공하는 클래스.
  */
-public class CombatEntityUtil {
+public final class CombatEntityUtil {
     /**
      * 엔티티를 지정한 위치에 소환한다.
      *
@@ -16,6 +16,13 @@ public class CombatEntityUtil {
      * @return 엔티티
      */
     public static <T extends LivingEntity> T spawn(Class<T> entityClass, Location location) {
-        return location.getWorld().spawn(location, entityClass);
+        T entity = location.getWorld().spawn(location, entityClass);
+        if (entity.getVehicle() != null) {
+            entity.getVehicle().remove();
+            entity.leaveVehicle();
+        }
+        entity.getEquipment().clear();
+
+        return entity;
     }
 }

@@ -25,8 +25,8 @@ public abstract class Hitscan extends Bullet {
      * @param option  선택적 옵션
      * @see HitscanOption
      */
-    protected Hitscan(CombatEntity<?> shooter, HitscanOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
+    protected Hitscan(CombatEntity shooter, HitscanOption option) {
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
     }
 
     /**
@@ -34,13 +34,14 @@ public abstract class Hitscan extends Bullet {
      *
      * @param shooter 발사하는 엔티티
      */
-    protected Hitscan(CombatEntity<?> shooter) {
+    protected Hitscan(CombatEntity shooter) {
         super(shooter);
         HitscanOption hitscanOption = HitscanOption.builder().build();
         this.trailInterval = hitscanOption.trailInterval;
         this.maxDistance = hitscanOption.maxDistance;
         this.penetrating = hitscanOption.penetrating;
         this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
+        this.condition = hitscanOption.condition;
     }
 
     /**
@@ -56,13 +57,13 @@ public abstract class Hitscan extends Bullet {
         Location loc = origin.clone();
         loc.add(direction.clone().multiply(START_DISTANCE));
         direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
-        Set<CombatEntity<?>> targets = new HashSet<>();
+        Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < maxDistance; i++) {
             if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
                 break;
 
-            if (!findEnemyAndHandleCollision(loc, direction, targets, SIZE))
+            if (!findEnemyAndHandleCollision(loc, direction, targets, SIZE, condition))
                 break;
 
             loc.add(direction);

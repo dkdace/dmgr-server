@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.HasCritHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -15,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * 총알. 원거리 공격(투사체, 히트스캔) 등을 관리하기 위한 클래스.
@@ -31,7 +33,7 @@ public abstract class Bullet {
     protected static final float HITBOX_INTERVAL = 0.125F;
     /** 총알을 발사하는 엔티티 */
     @Getter
-    protected final CombatEntity<?> shooter;
+    protected final CombatEntity shooter;
     /** 트레일 파티클을 남기는 주기. 단위: 판정점 개수 */
     protected int trailInterval;
     /** 총알의 최대 사거리 */
@@ -40,6 +42,8 @@ public abstract class Bullet {
     protected boolean penetrating;
     /** 판정 반경의 배수 (판정의 엄격함에 영향을 미침) */
     protected float hitboxMultiplier;
+    /** 대상 엔티티를 찾는 조건 */
+    protected Predicate<CombatEntity> condition;
 
     /**
      * 총알이 맞았을 때의 파티클, 소리 효과를 재생한다.
@@ -127,16 +131,18 @@ public abstract class Bullet {
     }
 
     /**
-     * 총알 주변의 적을 찾고 피격 로직을 처리한다.
+     * 총알 주변의 지정한 조건을 만족하는 엔티티를 찾고 피격 로직을 처리한다.
      *
      * @param location  맞은 위치
      * @param direction 발사 방향
      * @param targets   피격자 목록
      * @param size      기본 판정 범위
-     * @return {@link Bullet#onHitEntity(Location, Vector, CombatEntity, boolean)}의 반환값
+     * @param condition 대상 엔티티를 찾는 조건
+     * @return {@link Bullet#onHitEntity(Location, Vector, Damageable, boolean)}의 반환값
      */
-    protected final boolean findEnemyAndHandleCollision(Location location, Vector direction, Set<CombatEntity<?>> targets, float size) {
-        CombatEntity<?> target = CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier);
+    protected final boolean findEnemyAndHandleCollision(Location location, Vector direction, Set<CombatEntity> targets, float size, Predicate<CombatEntity> condition) {
+        Damageable target = (Damageable) CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier,
+                condition.and(Damageable.class::isInstance));
         boolean isCrit = false;
 
         if (target != null && targets.add(target)) {
@@ -181,7 +187,7 @@ public abstract class Bullet {
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    public abstract boolean onHitEntity(Location location, Vector direction, CombatEntity<?> target, boolean isCrit);
+    public abstract boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit);
 
     /**
      * 총알이 어느 곳이든(블록, 엔티티) 맞았을 때 실행될 작업.

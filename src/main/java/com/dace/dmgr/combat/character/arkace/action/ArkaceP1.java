@@ -1,21 +1,18 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.SkillBase;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
 
-import java.util.Arrays;
-import java.util.List;
-
-public final class ArkaceP1 extends Skill {
+public final class ArkaceP1 extends SkillBase {
     public ArkaceP1(CombatUser combatUser) {
         super(1, combatUser, ArkaceP1Info.getInstance());
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SPRINT);
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SPRINT};
     }
 
     @Override
