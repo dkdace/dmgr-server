@@ -27,7 +27,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
     /** 남은 탄약 수 */
     private int remainingAmmo = getCapacity();
     /** 재장전 상태 */
-    private boolean reloading;
+    private boolean reloading = false;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
