@@ -40,7 +40,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public ActionKey getKey() {
+    public ActionKey getFullAutoKey() {
         return ActionKey.RIGHT_CLICK;
     }
 

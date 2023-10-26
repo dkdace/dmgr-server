@@ -5,11 +5,17 @@ import com.dace.dmgr.combat.action.ActionKey;
 /**
  * 쿨타임이 5틱 이하인 연사가 가능한 무기의 인터페이스.
  */
-public interface FullAuto {
-    static boolean isFireTick(FireRate fireRate, int tick) {
+public interface FullAuto extends Weapon {
+    /**
+     * 틱을 기준으로 발사할 수 있는 시점을 확인한다.
+     *
+     * @param tick 기준 틱
+     * @return 발사 가능 여부
+     */
+    default boolean isFireTick(int tick) {
         tick = tick % 20 + 1;
 
-        switch (fireRate) {
+        switch (getFireRate()) {
             case RPM_300:
                 return tick % 4 == 1;
             case RPM_360:
@@ -59,7 +65,7 @@ public interface FullAuto {
     /**
      * @return 연사 기능을 적용할 동작 사용 키
      */
-    ActionKey getKey();
+    ActionKey getFullAutoKey();
 
     /**
      * 지정할 수 있는 연사속도의 목록.

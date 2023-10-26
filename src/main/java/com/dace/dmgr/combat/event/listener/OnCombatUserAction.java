@@ -4,11 +4,7 @@ import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.SkillBase;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
@@ -33,7 +29,7 @@ public final class OnCombatUserAction implements Listener {
             weapon = ((Swappable<?>) combatUser.getWeapon()).getSubweapon();
 
         if (action instanceof WeaponBase) {
-            if (weapon instanceof FullAuto && (((FullAuto) weapon).getKey() == actionKey))
+            if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoKey() == actionKey))
                 handleUseFullAutoWeapon(weapon, actionKey, combatUser);
             else
                 handleUseWeapon(weapon, actionKey);
@@ -70,7 +66,7 @@ public final class OnCombatUserAction implements Listener {
             public boolean onTimerTick(int i) {
                 if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).isReloading())
                     return true;
-                if (weapon.canUse() && FullAuto.isFireTick(((FullAuto) weapon).getFireRate(), combatUser.getEntity().getTicksLived())) {
+                if (weapon.canUse() && ((FullAuto) weapon).isFireTick(combatUser.getEntity().getTicksLived())) {
                     j++;
                     weapon.onUse(actionKey);
                 }
