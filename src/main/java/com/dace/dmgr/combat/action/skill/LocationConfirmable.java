@@ -18,11 +18,6 @@ import java.text.MessageFormat;
  * 사용 전 위치 확인이 필요한 스킬의 인터페이스.
  */
 public interface LocationConfirmable extends Confirmable {
-    /** 확인 중 메시지 (사용 가능) */
-    String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
-    /** 확인 중 메시지 (사용 불가능) */
-    String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
-
     /**
      * @return 현재 지정 위치
      */
@@ -91,12 +86,12 @@ public interface LocationConfirmable extends Confirmable {
         getPointer().teleport(getCurrentLocation().clone().add(0, -1.75, 0).add(getCurrentLocation().getDirection().multiply(0.25)));
         if (isValid()) {
             GlowAPI.setGlowing(getPointer(), GlowAPI.Color.GREEN, player);
-            getCombatUser().getEntity().sendTitle("", MessageFormat.format(CHECKING_VALID, getAcceptKey().getName(), getCancelKey().getName()),
-                    0, 5, 5);
+            getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_VALID, getAcceptKey().getName(),
+                    getCancelKey().getName()), 0, 5, 5);
         } else {
             GlowAPI.setGlowing(getPointer(), GlowAPI.Color.RED, player);
-            getCombatUser().getEntity().sendTitle("", MessageFormat.format(CHECKING_INVALID, getAcceptKey().getName(), getCancelKey().getName()),
-                    0, 5, 5);
+            getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_INVALID, getAcceptKey().getName(),
+                    getCancelKey().getName()), 0, 5, 5);
         }
         getPointer().setAI(false);
     }
@@ -129,5 +124,15 @@ public interface LocationConfirmable extends Confirmable {
     default void onReset() {
         if (getPointer() != null)
             getPointer().remove();
+    }
+
+    /**
+     * 메시지 목록.
+     */
+    class MESSAGES {
+        /** 확인 중 메시지 (사용 가능) */
+        static final String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
+        /** 확인 중 메시지 (사용 불가능) */
+        static final String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
     }
 }

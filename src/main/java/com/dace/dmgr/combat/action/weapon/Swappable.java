@@ -15,9 +15,6 @@ import java.text.MessageFormat;
  * @param <T> {@link Weapon}을 상속받는 보조무기
  */
 public interface Swappable<T extends Weapon> extends Weapon {
-    String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
-    String SWAP_COMPLETE = "§a§l무기 교체 완료";
-
     /**
      * 보조무기를 반환한다.
      *
@@ -68,7 +65,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                getCombatUser().sendActionBar(MessageFormat.format(SWAPPING, StringFormUtil.getProgressBar(i, getSwapDuration(),
+                getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.SWAPPING, StringFormUtil.getProgressBar(i, getSwapDuration(),
                         ChatColor.WHITE), time), 2);
 
                 return true;
@@ -80,7 +77,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
                 if (cancelled)
                     return;
 
-                getCombatUser().sendActionBar(SWAP_COMPLETE, 8);
+                getCombatUser().sendActionBar(MESSAGES.SWAP_COMPLETE, 8);
                 setSwapState(targetState);
                 onSwapFinished(targetState);
             }
@@ -121,5 +118,15 @@ public interface Swappable<T extends Weapon> extends Weapon {
         SECONDARY,
         /** 교체 중 */
         SWAPPING,
+    }
+
+    /**
+     * 메시지 목록.
+     */
+    class MESSAGES {
+        /** 교체 중 메시지 */
+        static final String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
+        /** 교체 완료 메시지 */
+        static final String SWAP_COMPLETE = "§a§l무기 교체 완료";
     }
 }

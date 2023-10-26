@@ -13,11 +13,6 @@ import java.text.MessageFormat;
  * 재장전 가능한 무기의 인터페이스.
  */
 public interface Reloadable extends Weapon {
-    /** 재장전 중 메시지 */
-    String RELOADING = "§c§l재장전... {0} §f[{1}초]";
-    /** 재장전 완료 메시지 */
-    String RELOAD_COMPLETE = "§a§l재장전 완료";
-
     /**
      * @return 남은 탄약 수
      */
@@ -98,7 +93,7 @@ public interface Reloadable extends Weapon {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                getCombatUser().sendActionBar(MessageFormat.format(RELOADING, StringFormUtil.getProgressBar(i, getReloadDuration(),
+                getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.RELOADING, StringFormUtil.getProgressBar(i, getReloadDuration(),
                         ChatColor.WHITE), time), 2);
                 onReloadTick(i);
 
@@ -111,7 +106,7 @@ public interface Reloadable extends Weapon {
                 if (cancelled)
                     return;
 
-                getCombatUser().sendActionBar(RELOAD_COMPLETE, 8);
+                getCombatUser().sendActionBar(MESSAGES.RELOAD_COMPLETE, 8);
 
                 setRemainingAmmo(getCapacity());
                 setReloading(false);
@@ -131,4 +126,14 @@ public interface Reloadable extends Weapon {
      * {@link Reloadable#reload()}에서 재장전이 끝났을 때 실행할 작업.
      */
     void onReloadFinished();
+
+    /**
+     * 메시지 목록.
+     */
+    class MESSAGES {
+        /** 재장전 중 메시지 */
+        static final String RELOADING = "§c§l재장전... {0} §f[{1}초]";
+        /** 재장전 완료 메시지 */
+        static final String RELOAD_COMPLETE = "§a§l재장전 완료";
+    }
 }
