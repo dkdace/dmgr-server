@@ -34,13 +34,13 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     private int remainingAmmo = getCapacity();
     /** 재장전 상태 */
     @Setter
-    private boolean reloading;
+    private boolean reloading = false;
     /** 무기 전환 상태 */
     @Setter
     private SwapState swapState = SwapState.PRIMARY;
     /** 정조준 상태 */
     @Setter
-    private boolean aiming;
+    private boolean aiming = false;
 
     public JagerWeaponL(CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());

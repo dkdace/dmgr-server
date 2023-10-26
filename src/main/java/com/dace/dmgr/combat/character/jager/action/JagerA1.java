@@ -18,7 +18,7 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     /** 소환된 엔티티 */
     private JagerA1Entity summonEntity = null;
     /** 확인 중 상태 */
-    private boolean checking;
+    private boolean checking = false;
     /** 현재 지정 위치 */
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */

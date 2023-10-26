@@ -31,7 +31,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
     /** 재장전 상태 */
     @Getter
     @Setter
-    private boolean reloading;
+    private boolean reloading = false;
 
     public JagerWeaponR(CombatUser combatUser, JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
