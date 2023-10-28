@@ -25,8 +25,8 @@ public final class OnWeaponPrepareShoot implements Listener {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.CS_PRE_USE);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
-                if (weapon instanceof Reloadable && ((Reloadable) weapon).getRemainingAmmo() > 0)
-                    ((Reloadable) weapon).setReloading(false);
+                if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().getRemainingAmmo() > 0)
+                    ((Reloadable) weapon).getReloadModule().setReloading(false);
             }
         }
     }

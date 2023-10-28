@@ -31,13 +31,13 @@ public interface HasEntity<T extends SummonEntity<?>> extends Skill {
 
     @Override
     @MustBeInvokedByOverriders
-    default void onRemove() {
+    default void reset() {
         removeSummonEntity();
     }
 
     @Override
     @MustBeInvokedByOverriders
-    default void onReset() {
+    default void remove() {
         removeSummonEntity();
     }
 }

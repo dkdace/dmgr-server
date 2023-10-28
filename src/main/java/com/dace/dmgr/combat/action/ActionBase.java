@@ -109,15 +109,13 @@ public abstract class ActionBase implements Action {
 
     @Override
     @MustBeInvokedByOverriders
-    public void remove() {
-        TaskManager.clearTask(this);
-        onRemove();
+    public void reset() {
+        setCooldown(0);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void reset() {
-        setCooldown(0);
-        onReset();
+    public void remove() {
+        TaskManager.clearTask(this);
     }
 }

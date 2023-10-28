@@ -234,7 +234,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             return false;
         if (CooldownManager.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
-        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
+        if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;

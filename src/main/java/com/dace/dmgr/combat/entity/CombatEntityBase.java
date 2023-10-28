@@ -111,7 +111,6 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     @MustBeInvokedByOverriders
     public void remove() {
         TaskManager.clearTask(this);
-        onRemove();
     }
 
     @Override

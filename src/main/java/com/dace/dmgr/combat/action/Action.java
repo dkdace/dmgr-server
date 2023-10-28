@@ -90,32 +90,12 @@ public interface Action extends HasTask {
     void onUse(ActionKey actionKey);
 
     /**
-     * 동작을 제거하고 작동을 중지시킨다.
-     *
-     * <p>클래스에서 상속받아야 한다.</p>
-     */
-    void remove();
-
-    /**
-     * {@link ActionBase#remove()} 호출 시 실행할 작업.
-     *
-     * <p>인터페이스에서 상속받아야 한다.</p>
-     */
-    default void onRemove() {
-    }
-
-    /**
      * 동작의 상태를 초기화한다.
-     *
-     * <p>클래스에서 상속받아야 한다.</p>
      */
     void reset();
 
     /**
-     * {@link ActionBase#reset()} 호출 시 실행할 작업.
-     *
-     * <p>인터페이스에서 상속받아야 한다.</p>
+     * 동작을 제거하고 작동을 중지시킨다.
      */
-    default void onReset() {
-    }
+    void remove();
 }

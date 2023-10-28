@@ -1,8 +1,7 @@
 package com.dace.dmgr.combat.action.weapon;
 
-import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.combat.action.weapon.module.AimModule;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -10,80 +9,33 @@ import lombok.Getter;
  */
 public interface Aimable extends Weapon {
     /**
-     * @return 정조준 상태
+     * @return 정조준 모듈
      */
-    boolean isAiming();
-
-    /**
-     * @param aiming 정조준 상태
-     */
-    void setAiming(boolean aiming);
-
-    /**
-     * @return 확대 레벨
-     */
-    ZoomLevel getZoomLevel();
-
-    /**
-     * 플레이어에게 화면 확대 효과를 재생한다.
-     *
-     * @param value 값
-     */
-    default void playZoomEffect(float value) {
-        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
-
-        packet.setWalkingSpeed(getCombatUser().getEntity().getWalkSpeed() * value);
-
-        packet.sendPacket(getCombatUser().getEntity());
-    }
+    AimModule getAimModule();
 
     /**
      * 무기 정조준을 활성화 또는 비활성화한다.
+     *
+     * @implSpec {@link AimModule#toggleAim()}
      */
-    default void toggleAim() {
-        if (this instanceof Swappable && ((Swappable<?>) this).getSwapState() == Swappable.SwapState.SWAPPING)
-            return;
+    void toggleAim();
 
-        setAiming(!isAiming());
-
-        if (isAiming()) {
-            onAimEnable();
-
-            TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1) {
-                @Override
-                public boolean onTickAction(int i) {
-                    if (!isAiming())
-                        return false;
-                    if (Aimable.this instanceof Reloadable && ((Reloadable) Aimable.this).isReloading())
-                        return false;
-
-                    playZoomEffect(getZoomLevel().getValue());
-
-                    return true;
-                }
-
-                @Override
-                public void onEnd(boolean cancelled) {
-                    setAiming(false);
-                    onAimDisable();
-                }
-            });
-        }
+    /**
+     * 정조준 활성화 시 실행할 작업.
+     */
+    default void onAimEnable() {
     }
 
     /**
-     * {@link Aimable#toggleAim()}에서 정조준 활성화 시 실행할 작업.
+     * 정조준 비활성화 시 실행할 작업.
      */
-    void onAimEnable();
-
-    /**
-     * {@link Aimable#toggleAim()}에서 정조준 비활성화 시 실행할 작업.
-     */
-    void onAimDisable();
+    default void onAimDisable() {
+    }
 
     /**
      * 조준 시 확대 레벨(화면이 확대되는 정도) 목록.
      */
+    @AllArgsConstructor
     @Getter
     enum ZoomLevel {
         L1(1.2F),
@@ -99,9 +51,5 @@ public interface Aimable extends Weapon {
 
         /** 실제 값 */
         private final float value;
-
-        ZoomLevel(float value) {
-            this.value = value;
-        }
     }
 }

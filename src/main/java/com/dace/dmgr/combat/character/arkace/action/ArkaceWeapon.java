@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.system.Cooldown;
@@ -15,22 +16,19 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 @Getter
-@Setter
 public final class ArkaceWeapon extends WeaponBase implements Reloadable {
-    /** 남은 탄약 수 */
-    private int remainingAmmo = getCapacity();
-    /** 재장전 상태 */
-    private boolean reloading = false;
+    /** 재장전 모듈 */
+    private final ReloadModule reloadModule;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
+        reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
     }
 
     @Override
@@ -44,20 +42,10 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
     }
 
     @Override
-    public int getCapacity() {
-        return ArkaceWeaponInfo.CAPACITY;
-    }
-
-    @Override
-    public long getReloadDuration() {
-        return ArkaceWeaponInfo.RELOAD_DURATION;
-    }
-
-    @Override
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
             case CS_PRE_USE: {
-                if (getRemainingAmmo() == 0) {
+                if (reloadModule.getRemainingAmmo() == 0) {
                     reload();
                     return;
                 }
@@ -82,7 +70,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
                     CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
-                    consume(1);
+                    reloadModule.consume(1);
                     playShootSound(loc);
                 }
 
@@ -118,6 +106,11 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
     }
 
     @Override
+    public void reload() {
+        reloadModule.reload();
+    }
+
+    @Override
     public void onReloadTick(int i) {
         CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
 
@@ -144,10 +137,6 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
                 SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
                 break;
         }
-    }
-
-    @Override
-    public void onReloadFinished() {
     }
 
     private class ArkaceWeaponHitscan extends GunHitscan {

@@ -1,13 +1,6 @@
 package com.dace.dmgr.combat.action.weapon;
 
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.util.StringFormUtil;
-import org.bukkit.ChatColor;
-
-import java.text.MessageFormat;
+import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 
 /**
  * 주무기와 보조무기의 전환이 가능한 2중 무기의 인터페이스.
@@ -16,97 +9,32 @@ import java.text.MessageFormat;
  */
 public interface Swappable<T extends Weapon> extends Weapon {
     /**
-     * 보조무기를 반환한다.
-     *
-     * @return 보조무기 객체
+     * @return 2중 무기 모듈
      */
-    T getSubweapon();
-
-    /**
-     * 무기 교체시간을 반환한다.
-     *
-     * @return 무기 교체시간 (tick)
-     */
-    long getSwapDuration();
-
-    /**
-     * @return 무기 전환 상태
-     */
-    SwapState getSwapState();
-
-    /**
-     * @param swapState 무기 전환 상태
-     */
-    void setSwapState(SwapState swapState);
-
-    /**
-     * 이중 무기의 전환 상태를 변경한다.
-     *
-     * @param targetState 변경할 상태
-     */
-    default void swapTo(SwapState targetState) {
-        if (getSwapState() == targetState || getSwapState() == SwapState.SWAPPING)
-            return;
-        if (targetState == SwapState.SWAPPING)
-            return;
-
-        if (this instanceof Reloadable)
-            ((Reloadable) this).setReloading(false);
-        if (getSwapState() == SwapState.SECONDARY)
-            ((Reloadable) this.getSubweapon()).setReloading(false);
-        setSwapState(SwapState.SWAPPING);
-        CooldownManager.setCooldown(getCombatUser(), Cooldown.WEAPON_SWAP, getSwapDuration());
-        onSwapStart(targetState);
-
-        TaskManager.addTask(this, new ActionTaskTimer(getCombatUser(), 1, getSwapDuration()) {
-            @Override
-            public boolean onTickAction(int i) {
-                if (getSwapState() != SwapState.SWAPPING)
-                    return false;
-
-                String time = String.format("%.1f", (float) (repeat - i) / 20);
-                getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.SWAPPING, StringFormUtil.getProgressBar(i, getSwapDuration(),
-                        ChatColor.WHITE), time), 2);
-
-                return true;
-            }
-
-            @Override
-            public void onEnd(boolean cancelled) {
-                CooldownManager.setCooldown(getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
-                if (cancelled)
-                    return;
-
-                getCombatUser().sendActionBar(MESSAGES.SWAP_COMPLETE, 8);
-                setSwapState(targetState);
-                onSwapFinished(targetState);
-            }
-        });
-    }
+    SwapModule<T> getSwapModule();
 
     /**
      * 이중 무기의 모드를 반대 무기로 교체한다.
+     *
+     * @implSpec {@link SwapModule#swap()}
      */
-    default void swap() {
-        if (getSwapState() == SwapState.PRIMARY)
-            swapTo(SwapState.SECONDARY);
-        else if (getSwapState() == SwapState.SECONDARY)
-            swapTo(SwapState.PRIMARY);
+    void swap();
+
+    /**
+     * 무기 전환을 시작할 때 실행할 작업.
+     *
+     * @param swapState 변경할 상태
+     */
+    default void onSwapStart(SwapState swapState) {
     }
 
     /**
-     * {@link Swappable#swap()}에서 전환을 시작할 때 실행할 작업.
+     * 무기 전환이 끝났을 때 실행할 작업.
      *
      * @param swapState 변경할 상태
      */
-    void onSwapStart(SwapState swapState);
-
-    /**
-     * {@link Swappable#swap()}에서 전환이 끝났을 때 실행할 작업.
-     *
-     * @param swapState 변경할 상태
-     */
-    void onSwapFinished(SwapState swapState);
+    default void onSwapFinished(SwapState swapState) {
+    }
 
     /**
      * 무기 전환 상태 목록.
@@ -118,15 +46,5 @@ public interface Swappable<T extends Weapon> extends Weapon {
         SECONDARY,
         /** 교체 중 */
         SWAPPING,
-    }
-
-    /**
-     * 메시지 목록.
-     */
-    class MESSAGES {
-        /** 교체 중 메시지 */
-        static final String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
-        /** 교체 완료 메시지 */
-        static final String SWAP_COMPLETE = "§a§l무기 교체 완료";
     }
 }

@@ -39,16 +39,16 @@ public abstract class WeaponBase extends ActionBase implements Weapon {
     }
 
     @Override
-    public final void displayDurability(short durability) {
-        itemStack.setDurability(durability);
-        combatUser.getEntity().getInventory().setItem(4, itemStack);
-    }
-
-    @Override
     @MustBeInvokedByOverriders
     public void remove() {
         super.remove();
 
         combatUser.getEntity().getInventory().clear(4);
+    }
+
+    @Override
+    public final void displayDurability(short durability) {
+        itemStack.setDurability(durability);
+        combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 }

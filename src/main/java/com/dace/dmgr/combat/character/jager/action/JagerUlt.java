@@ -44,13 +44,13 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking() &&
+        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     protected void onUseUltimateSkill(ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
+        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
             ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).swap();
         }
@@ -73,11 +73,11 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
                 if (cancelled)
                     return;
 
-                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                         combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
-                SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.7F);
+                SoundUtil.play(Sound.ENTITY_WITCH_THROW, loc, 0.8F, 0.7F);
 
-                new JagerUltProjectile().shoot(location);
+                new JagerUltProjectile().shoot(loc);
             }
         });
     }

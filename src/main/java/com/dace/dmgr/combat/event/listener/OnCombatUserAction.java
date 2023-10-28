@@ -24,8 +24,8 @@ public final class OnCombatUserAction implements Listener {
             return;
 
         Weapon weapon = combatUser.getWeapon();
-        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapState() == Swappable.SwapState.SECONDARY)
-            weapon = ((Swappable<?>) combatUser.getWeapon()).getSubweapon();
+        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+            weapon = ((Swappable<?>) combatUser.getWeapon()).getSwapModule().getSubweapon();
 
         if (action instanceof WeaponBase) {
             if (!weapon.canUse())
@@ -38,7 +38,7 @@ public final class OnCombatUserAction implements Listener {
             if (combatUser.hasStatusEffect(StatusEffectType.SILENCE))
                 return;
             if (action.getActionInfo() instanceof ActiveSkillInfo && weapon instanceof Reloadable)
-                ((Reloadable) weapon).setReloading(false);
+                ((Reloadable) weapon).getReloadModule().setReloading(false);
 
             action.onUse(actionKey);
         }
