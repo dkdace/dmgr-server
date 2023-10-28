@@ -5,11 +5,12 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
@@ -32,6 +33,11 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
     }
 
     @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{reloadModule};
+    }
+
+    @Override
     public ActionKey[] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.CS_PRE_USE, ActionKey.CS_USE, ActionKey.DROP};
     }
@@ -46,7 +52,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
         switch (actionKey) {
             case CS_PRE_USE: {
                 if (reloadModule.getRemainingAmmo() == 0) {
-                    reload();
+                    reloadModule.reload();
                     return;
                 }
                 if (combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished())
@@ -77,7 +83,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
                 break;
             }
             case DROP: {
-                reload();
+                reloadModule.reload();
 
                 break;
             }
@@ -106,7 +112,12 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
     }
 
     @Override
-    public void reload() {
+    public boolean canReload() {
+        return reloadModule.getRemainingAmmo() < ArkaceWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    public void onAmmoEmpty() {
         reloadModule.reload();
     }
 
@@ -160,11 +171,11 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable {
         @Override
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
             if (isUlt)
-                target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
+                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
             else {
                 int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
                         ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
-                target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
             }
 
             return false;

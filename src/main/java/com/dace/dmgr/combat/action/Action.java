@@ -34,6 +34,11 @@ public interface Action extends HasTask {
     ActionKey[] getDefaultActionKeys();
 
     /**
+     * 동작을 초기화한다.
+     */
+    void init();
+
+    /**
      * 기본 쿨타임을 반환한다.
      *
      * @return 기본 쿨타임 (tick)

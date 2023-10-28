@@ -12,11 +12,19 @@ public abstract class WeaponBase extends ActionBase implements Weapon {
     /**
      * 무기 인스턴스를 생성한다.
      *
+     * <p>{@link WeaponBase#init()}을 호출하여 초기화해야 한다.</p>
+     *
      * @param combatUser 대상 플레이어
      * @param weaponInfo 무기 정보 객체
      */
     protected WeaponBase(CombatUser combatUser, WeaponInfo weaponInfo) {
         super(combatUser, weaponInfo);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 

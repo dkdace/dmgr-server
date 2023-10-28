@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.entity.SummonEntity;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 엔티티를 소환할 수 있는 스킬의 인터페이스.
@@ -11,33 +11,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public interface HasEntity<T extends SummonEntity<?>> extends Skill {
     /**
-     * @return 소환된 엔티티
+     * @return 엔티티 소환 모듈
      */
-    T getSummonEntity();
-
-    /**
-     * @param summonEntity 소환된 엔티티
-     */
-    void setSummonEntity(T summonEntity);
-
-    /**
-     * 소환된 엔티티를 제거한다.
-     */
-    default void removeSummonEntity() {
-        if (getSummonEntity() != null)
-            getSummonEntity().remove();
-        setSummonEntity(null);
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    default void reset() {
-        removeSummonEntity();
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    default void remove() {
-        removeSummonEntity();
-    }
+    HasEntityModule<T> getHasEntityModule();
 }

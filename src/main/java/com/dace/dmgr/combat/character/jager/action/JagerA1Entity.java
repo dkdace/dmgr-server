@@ -3,11 +3,13 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.combat.entity.movable.Jumpable;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.DyeColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -20,6 +22,12 @@ import org.inventivetalent.glow.GlowAPI;
 public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
+    /** 피해 모듈 */
+    @Getter
+    private final DamageModule damageModule;
+    /** 이동 모듈 */
+    @Getter
+    private final JumpModule moveModule;
 
     public JagerA1Entity(Wolf entity, CombatUser owner) {
         super(
@@ -29,6 +37,13 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
+        damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
+        moveModule = new JumpModule(this);
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule, moveModule};
     }
 
     @Override
@@ -36,7 +51,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
         super.init();
 
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
-        setHealth((int) skill.getStateValue());
+        damageModule.setHealth((int) skill.getStateValue());
         entity.setAI(false);
         entity.setCollarColor(DyeColor.CYAN);
         entity.setTamed(true);
@@ -54,11 +69,11 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
     }
 
     @Override
-    protected void tick(int i) {
-        super.tick(i);
+    public void onTick(int i) {
+        super.onTick(i);
 
         double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-        if (!canMove())
+        if (!moveModule.canMove())
             speed = 0.0001F;
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
 
@@ -71,7 +86,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
 
         if (i % 10 == 0 && entity.getTarget() == null) {
             Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLowHealth());
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLowHealth());
             if (target != null)
                 entity.setTarget(target.getEntity());
         }
@@ -95,12 +110,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
     public void remove() {
         super.remove();
 
-        skill.setSummonEntity(null);
-    }
-
-    @Override
-    public int getMaxHealth() {
-        return JagerA1Info.HEALTH;
+        skill.getHasEntityModule().setSummonEntity(null);
     }
 
     @Override
@@ -115,7 +125,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
 
     @Override
     public void onDefaultAttack(Damageable victim) {
-        victim.damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
+        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override

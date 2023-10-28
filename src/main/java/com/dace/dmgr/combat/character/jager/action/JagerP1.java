@@ -40,8 +40,8 @@ public final class JagerP1 extends SkillBase {
     private boolean canActivate() {
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished() && skill1.getSummonEntity() != null) {
-            JagerA1Entity jagerA1Entity = skill1.getSummonEntity();
+        if (!skill1.isDurationFinished() && skill1.getHasEntityModule().getSummonEntity() != null) {
+            JagerA1Entity jagerA1Entity = skill1.getHasEntityModule().getSummonEntity();
 
             return jagerA1Entity.getHitboxes()[0].isInHitbox(combatUser.getEntity().getLocation(), JagerP1Info.DETECT_RADIUS);
         }

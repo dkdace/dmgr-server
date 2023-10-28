@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -18,7 +19,7 @@ import lombok.Setter;
  * @see Aimable
  */
 @RequiredArgsConstructor
-public final class AimModule {
+public final class AimModule implements ActionModule {
     /** 무기 객체 */
     private final Aimable weapon;
     /** 확대 레벨 */

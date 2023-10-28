@@ -52,7 +52,7 @@ public final class ArkaceA2 extends ActiveSkill {
                 int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
                 if (i == 0)
                     amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
-                combatUser.heal(combatUser, amount, true);
+                combatUser.getDamageModule().heal(combatUser, amount, true);
 
                 return true;
             }

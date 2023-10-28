@@ -14,13 +14,6 @@ public interface Swappable<T extends Weapon> extends Weapon {
     SwapModule<T> getSwapModule();
 
     /**
-     * 이중 무기의 모드를 반대 무기로 교체한다.
-     *
-     * @implSpec {@link SwapModule#swap()}
-     */
-    void swap();
-
-    /**
      * 무기 전환을 시작할 때 실행할 작업.
      *
      * @param swapState 변경할 상태

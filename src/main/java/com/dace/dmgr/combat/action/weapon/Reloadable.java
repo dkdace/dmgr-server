@@ -12,11 +12,21 @@ public interface Reloadable extends Weapon {
     ReloadModule getReloadModule();
 
     /**
-     * 무기를 재장전한다.
+     * 무기를 재장전할 수 있는 지 확인한다.
      *
-     * @implSpec {@link ReloadModule#reload()}
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 재장전 가능 여부
      */
-    void reload();
+    default boolean canReload() {
+        return true;
+    }
+
+    /**
+     * 모든 탄약을 소모했을 때 실행할 작업.
+     */
+    default void onAmmoEmpty() {
+    }
 
     /**
      * 재장전을 진행할 때 (매 tick마다) 실행할 작업.

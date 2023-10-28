@@ -26,11 +26,27 @@ public abstract class ActionBase implements Action {
     protected final ActionInfo actionInfo;
     /** 아이템 */
     protected ItemStack itemStack;
+    /** 모듈 목록 */
+    private ActionModule[] modules = new ActionModule[0];
 
+    /**
+     * 동작 인스턴스를 생성한다.
+     *
+     * <p>{@link ActionBase#init()}을 호출하여 초기화해야 한다. </p>
+     *
+     * @param combatUser 대상 플레이어
+     * @param actionInfo 동작 정보
+     */
     protected ActionBase(CombatUser combatUser, ActionInfo actionInfo) {
         this.combatUser = combatUser;
         this.actionInfo = actionInfo;
         this.itemStack = actionInfo.getItemStack().clone();
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void init() {
+        modules = getModules();
     }
 
     @Override
@@ -111,11 +127,17 @@ public abstract class ActionBase implements Action {
     @MustBeInvokedByOverriders
     public void reset() {
         setCooldown(0);
+        for (ActionModule module : modules) {
+            module.onReset();
+        }
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void remove() {
         TaskManager.clearTask(this);
+        for (ActionModule module : modules) {
+            module.onRemove();
+        }
     }
 }

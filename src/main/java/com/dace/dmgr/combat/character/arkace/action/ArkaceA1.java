@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskWait;
@@ -109,7 +109,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
-            target.damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+            target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
 
@@ -117,7 +117,7 @@ public final class ArkaceA1 extends ActiveSkill {
             CombatEntity[] targets = CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS,
                     combatEntity -> combatEntity instanceof Damageable && combatEntity.canPass(location), true);
             for (CombatEntity target : targets) {
-                ((Damageable) target).damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+                ((Damageable) target).getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
             }
 
             playExplodeEffect(location);

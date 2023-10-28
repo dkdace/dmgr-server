@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -15,7 +16,7 @@ import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
@@ -44,6 +45,11 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     }
 
     @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{reloadModule, swapModule, aimModule};
+    }
+
+    @Override
     public ActionKey[] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
     }
@@ -67,7 +73,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                     return;
                 }
                 if (reloadModule.getRemainingAmmo() == 0) {
-                    reload();
+                    reloadModule.reload();
                     return;
                 }
 
@@ -84,8 +90,8 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                 if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
                     return;
 
-                toggleAim();
-                swap();
+                aimModule.toggleAim();
+                swapModule.swap();
 
                 break;
             }
@@ -93,7 +99,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
                 if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
                     return;
 
-                reload();
+                reloadModule.reload();
 
                 break;
             }
@@ -113,14 +119,16 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     }
 
     @Override
-    public void reload() {
-        if (swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < JagerWeaponInfo.SCOPE.CAPACITY)
-            reload();
+    public boolean canReload() {
+        return reloadModule.getRemainingAmmo() < JagerWeaponInfo.CAPACITY ||
+                swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < JagerWeaponInfo.SCOPE.CAPACITY;
     }
 
-    /**
-     * 재장전 작업을 실행한다.
-     */
+    @Override
+    public void onAmmoEmpty() {
+        reloadModule.reload();
+    }
+
     @Override
     public void onReloadTick(int i) {
         CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
@@ -156,11 +164,6 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
     }
 
     @Override
-    public void swap() {
-        swapModule.swap();
-    }
-
-    @Override
     public void onSwapStart(SwapState swapState) {
         Location location = combatUser.getEntity().getLocation();
         if (swapState == SwapState.PRIMARY)
@@ -169,11 +172,6 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
             SoundUtil.play(Sound.ENTITY_WOLF_HOWL, location, 0.6F, 1.9F);
 
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
-    }
-
-    @Override
-    public void toggleAim() {
-        aimModule.toggleAim();
     }
 
     @Override
@@ -207,7 +205,7 @@ public final class JagerWeaponL extends WeaponBase implements Reloadable, Swappa
 
         @Override
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
-            target.damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
+            target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
             JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
             return false;
         }

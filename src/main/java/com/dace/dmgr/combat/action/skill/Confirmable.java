@@ -14,13 +14,6 @@ public interface Confirmable extends Skill {
     ConfirmModule getConfirmModule();
 
     /**
-     * 스킬 확인 모드를 활성화 또는 비활성화한다.
-     *
-     * @implSpec {@link ConfirmModule#toggleCheck()}
-     */
-    void toggleCheck();
-
-    /**
      * 확인 모드 활성화 시 실행할 작업.
      */
     default void onCheckEnable() {

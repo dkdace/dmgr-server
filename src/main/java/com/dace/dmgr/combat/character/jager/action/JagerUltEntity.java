@@ -4,11 +4,13 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,6 +27,9 @@ import org.inventivetalent.glow.GlowAPI;
 public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
+    /** 피해 모듈 */
+    @Getter
+    private final DamageModule damageModule;
 
     public JagerUltEntity(MagmaCube entity, CombatUser owner) {
         super(
@@ -34,6 +39,12 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
+        damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule};
     }
 
     @Override
@@ -58,8 +69,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     }
 
     @Override
-    protected void tick(int i) {
-        super.tick(i);
+    public void onTick(int i) {
+        super.onTick(i);
 
         if (i < JagerUltInfo.SUMMON_DURATION) {
             if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
@@ -99,7 +110,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
      * @param target 대상 엔티티
      */
     private void onFindEnemy(Damageable target) {
-        target.damage(this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
+        target.getDamageModule().damage(this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
         JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
     }
 
@@ -155,12 +166,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     public void remove() {
         super.remove();
 
-        skill.setSummonEntity(null);
-    }
-
-    @Override
-    public int getMaxHealth() {
-        return JagerUltInfo.HEALTH;
+        skill.getHasEntityModule().setSummonEntity(null);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
@@ -22,7 +23,7 @@ import java.text.MessageFormat;
  * @see Swappable
  */
 @RequiredArgsConstructor
-public final class SwapModule<T extends Weapon> {
+public final class SwapModule<T extends Weapon> implements ActionModule {
     /** 무기 객체 */
     private final Swappable<T> weapon;
     /** 보조무기 객체 */

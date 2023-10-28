@@ -3,10 +3,12 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -21,6 +23,9 @@ import org.inventivetalent.glow.GlowAPI;
 public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerA2 skill;
+    /** 피해 모듈 */
+    @Getter
+    private final DamageModule damageModule;
 
     public JagerA2Entity(MagmaCube entity, CombatUser owner) {
         super(
@@ -30,6 +35,12 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
+        damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule};
     }
 
     @Override
@@ -42,8 +53,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         entity.teleport(entity.getLocation().add(0, 0.05, 0));
-        setMaxHealth(JagerA2Info.HEALTH);
-        setHealth(JagerA2Info.HEALTH);
+        damageModule.setMaxHealth(JagerA2Info.HEALTH);
+        damageModule.setHealth(JagerA2Info.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
         hideForEnemies();
         playInitSound();
@@ -59,8 +70,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    protected void tick(int i) {
-        super.tick(i);
+    public void onTick(int i) {
+        super.onTick(i);
 
         if (i < JagerA2Info.SUMMON_DURATION)
             playSummonEffect();
@@ -124,7 +135,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
      */
     private void onCatchEnemy(Damageable target) {
         playCatchSound();
-        target.damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
+        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
         target.applyStatusEffect(new Snare(), JagerA2Info.SNARE_DURATION);
 
         remove();
@@ -143,12 +154,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     public void remove() {
         super.remove();
 
-        skill.setSummonEntity(null);
-    }
-
-    @Override
-    public int getMaxHealth() {
-        return JagerA2Info.HEALTH;
+        skill.getHasEntityModule().setSummonEntity(null);
     }
 
     @Override
@@ -156,8 +162,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         owner.onAttack(victim, damage, damageType, isCrit, isUlt);
         JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished() && skill1.getSummonEntity().getEntity().getTarget() == null)
-            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
+        if (!skill1.isDurationFinished() && skill1.getHasEntityModule().getSummonEntity().getEntity().getTarget() == null)
+            skill1.getHasEntityModule().getSummonEntity().getEntity().setTarget(victim.getEntity());
     }
 
     @Override

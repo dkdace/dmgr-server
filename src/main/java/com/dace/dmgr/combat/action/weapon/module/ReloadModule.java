@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -21,7 +22,7 @@ import java.text.MessageFormat;
  *
  * @see Reloadable
  */
-public final class ReloadModule {
+public final class ReloadModule implements ActionModule {
     /** 무기 객체 */
     private final Reloadable weapon;
     /** 장탄수 */
@@ -38,13 +39,6 @@ public final class ReloadModule {
     @Setter
     private boolean isReloading = false;
 
-    /**
-     * 재장전 모듈 인스턴스를 생성한다.
-     *
-     * @param weapon         무기 객체
-     * @param capacity       장탄수
-     * @param reloadDuration 장전 시간 (tick)
-     */
     public ReloadModule(Reloadable weapon, int capacity, long reloadDuration) {
         this.weapon = weapon;
         this.remainingAmmo = capacity;
@@ -65,14 +59,14 @@ public final class ReloadModule {
         if (isReloading)
             isReloading = false;
         else if (remainingAmmo == 0)
-            reload();
+            weapon.onAmmoEmpty();
     }
 
     /**
      * 무기를 재장전한다.
      */
     public void reload() {
-        if ((remainingAmmo >= capacity) || isReloading)
+        if (!weapon.canReload() || isReloading)
             return;
         if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapModule().getSwapState() == Swappable.SwapState.SWAPPING)
             return;

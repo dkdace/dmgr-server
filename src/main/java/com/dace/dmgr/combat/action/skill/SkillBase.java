@@ -8,6 +8,7 @@ import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 모든 스킬의 기반 클래스.
@@ -23,6 +24,8 @@ public abstract class SkillBase extends ActionBase implements Skill {
     /**
      * 스킬 인스턴스를 생성한다.
      *
+     * <p>{@link SkillBase#init()}을 호출하여 초기화해야 한다.</p>
+     *
      * @param number     번호
      * @param combatUser 대상 플레이어
      * @param skillInfo  스킬 정보 객체
@@ -30,6 +33,13 @@ public abstract class SkillBase extends ActionBase implements Skill {
     protected SkillBase(int number, CombatUser combatUser, SkillInfo skillInfo) {
         super(combatUser, skillInfo);
         this.number = number;
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void init() {
+        super.init();
+
         setCooldown(getDefaultCooldown());
     }
 

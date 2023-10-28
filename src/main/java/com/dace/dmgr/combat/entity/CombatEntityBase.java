@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.system.Cooldown;
@@ -29,12 +30,14 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     protected final AbilityStatusManager abilityStatusManager = new AbilityStatusManager();
     /** 속성 목록 관리 객체 */
     protected final PropertyManager propertyManager = new PropertyManager();
-    /** 히트박스 객체 목록 */
-    protected final Hitbox[] hitboxes;
     /** 이름 */
     protected final String name;
+    /** 히트박스 객체 목록 */
+    protected final Hitbox[] hitboxes;
     @Setter
     protected String team = "";
+    /** 모듈 목록 */
+    private CombatEntityModule[] modules = new CombatEntityModule[0];
     /** 히트박스의 가능한 최대 크기 */
     private double maxHitboxSize = 0;
 
@@ -54,10 +57,17 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     }
 
     /**
+     * @return 모듈 목록
+     */
+    protected abstract CombatEntityModule[] getModules();
+
+    /**
      * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
+    @Override
     @MustBeInvokedByOverriders
     public void init() {
+        modules = getModules();
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
         entity.setCustomName(name);
@@ -68,27 +78,23 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
             maxHitboxSize = Math.max(maxHitboxSize, hitboxMaxSize + Math.max(hitbox.getOffsetX() + hitbox.getAxisOffsetX(),
                     Math.max(hitbox.getOffsetY() + hitbox.getAxisOffsetY(), hitbox.getOffsetZ() + hitbox.getAxisOffsetZ())));
         });
-        onInit();
+
+        for (CombatEntityModule module : modules) {
+            module.onInit();
+        }
 
         TaskManager.addTask(this, new TaskTimer(1) {
             @Override
             public boolean onTimerTick(int i) {
-                tick(i);
                 onTick(i);
+                for (CombatEntityModule module : modules) {
+                    module.onTick(i);
+                }
                 updateHitboxTick();
 
                 return true;
             }
         });
-    }
-
-    /**
-     * {@link CombatEntityBase#init()}에서 매 틱마다 실행될 작업.
-     *
-     * @param i 인덱스
-     */
-    @MustBeInvokedByOverriders
-    protected void tick(int i) {
     }
 
     /**
@@ -107,10 +113,21 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
         });
     }
 
+    /**
+     * 매 tick마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    protected void onTick(int i) {
+    }
+
     @Override
     @MustBeInvokedByOverriders
     public void remove() {
         TaskManager.clearTask(this);
+        for (CombatEntityModule module : modules) {
+            module.onRemove();
+        }
     }
 
     @Override

@@ -14,13 +14,6 @@ public interface Aimable extends Weapon {
     AimModule getAimModule();
 
     /**
-     * 무기 정조준을 활성화 또는 비활성화한다.
-     *
-     * @implSpec {@link AimModule#toggleAim()}
-     */
-    void toggleAim();
-
-    /**
      * 정조준 활성화 시 실행할 작업.
      */
     default void onAimEnable() {

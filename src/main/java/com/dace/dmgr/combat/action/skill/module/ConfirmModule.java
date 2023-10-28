@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
@@ -17,7 +18,7 @@ import java.text.MessageFormat;
  * @see Confirmable
  */
 @RequiredArgsConstructor
-public class ConfirmModule {
+public class ConfirmModule implements ActionModule {
     /** 스킬 객체 */
     protected final Confirmable skill;
     /** 수락 키 */

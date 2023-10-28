@@ -5,11 +5,12 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.TaskManager;
@@ -33,6 +34,11 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
         super(combatUser, JagerWeaponInfo.getInstance());
         this.mainWeapon = mainWeapon;
         reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{reloadModule};
     }
 
     @Override
@@ -71,8 +77,8 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
                 break;
             }
             case RIGHT_CLICK: {
-                mainWeapon.toggleAim();
-                mainWeapon.swap();
+                mainWeapon.getAimModule().toggleAim();
+                mainWeapon.getSwapModule().swap();
 
                 break;
             }
@@ -95,11 +101,10 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
         SoundUtil.play("random.gun.reverb", location, 5.5F, 0.95F);
     }
 
-    @Override
-    public void reload() {
+    private void reload() {
         if (mainWeapon.getAimModule().isAiming()) {
-            mainWeapon.toggleAim();
-            mainWeapon.swap();
+            mainWeapon.getAimModule().toggleAim();
+            mainWeapon.getSwapModule().swap();
 
             TaskManager.addTask(this, new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
                 @Override
@@ -109,10 +114,20 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    mainWeapon.reload();
+                    mainWeapon.getReloadModule().reload();
                 }
             });
         }
+    }
+
+    @Override
+    public boolean canReload() {
+        return false;
+    }
+
+    @Override
+    public void onAmmoEmpty() {
+        reload();
     }
 
     private class JagerWeaponProjectile extends GunHitscan {
@@ -130,7 +145,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
             int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                     JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
-            target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
             return false;
         }
     }

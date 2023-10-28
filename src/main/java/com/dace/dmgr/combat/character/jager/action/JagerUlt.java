@@ -4,18 +4,19 @@ import com.dace.dmgr.combat.BouncingProjectile;
 import com.dace.dmgr.combat.BouncingProjectileOption;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -23,13 +24,18 @@ import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
 @Getter
-@Setter
 public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltEntity> {
     /** 소환된 엔티티 */
-    private JagerUltEntity summonEntity = null;
+    private final HasEntityModule<JagerUltEntity> hasEntityModule;
 
     public JagerUlt(CombatUser combatUser) {
         super(4, combatUser, JagerUltInfo.getInstance());
+        hasEntityModule = new HasEntityModule<>(this);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{hasEntityModule};
     }
 
     @Override
@@ -51,15 +57,15 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
     @Override
     protected void onUseUltimateSkill(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).swap();
+            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
+            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
         }
 
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
         Location location = combatUser.getEntity().getLocation();
         playUseSound(location);
         setDuration();
-        removeSummonEntity();
+        hasEntityModule.removeSummonEntity();
 
         TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerUltInfo.READY_DURATION) {
             @Override
@@ -93,7 +99,7 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
 
     private class JagerUltProjectile extends BouncingProjectile {
         public JagerUltProjectile() {
-            super(JagerUlt.this.combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(5).hasGravity(true)
+            super(JagerUlt.this.combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
                     .condition(JagerUlt.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F)
                     .destroyOnHitFloor(true).build());
         }
@@ -119,7 +125,7 @@ public final class JagerUlt extends UltimateSkill implements HasEntity<JagerUltE
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             JagerUltEntity jagerUltEntity = new JagerUltEntity(magmaCube, combatUser);
             jagerUltEntity.init();
-            setSummonEntity(jagerUltEntity);
+            hasEntityModule.setSummonEntity(jagerUltEntity);
         }
     }
 }

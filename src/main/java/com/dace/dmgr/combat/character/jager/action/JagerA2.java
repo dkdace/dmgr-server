@@ -4,18 +4,19 @@ import com.dace.dmgr.combat.BouncingProjectile;
 import com.dace.dmgr.combat.BouncingProjectileOption;
 import com.dace.dmgr.combat.ProjectileOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasEntity;
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -23,13 +24,18 @@ import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
 
 @Getter
-@Setter
 public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entity> {
-    /** 소환된 엔티티 */
-    private JagerA2Entity summonEntity = null;
+    /** 엔티티 소환 모듈 */
+    private final HasEntityModule<JagerA2Entity> hasEntityModule;
 
     public JagerA2(CombatUser combatUser) {
         super(2, combatUser, JagerA2Info.getInstance(), 1);
+        hasEntityModule = new HasEntityModule<>(this);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{hasEntityModule};
     }
 
     @Override
@@ -56,15 +62,15 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
     @Override
     public void onUse(ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).swap();
+            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
+            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
         }
 
         combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
         Location location = combatUser.getEntity().getLocation();
         setDuration();
         playUseSound(location);
-        removeSummonEntity();
+        hasEntityModule.removeSummonEntity();
 
         TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerA2Info.READY_DURATION) {
             @Override
@@ -133,7 +139,7 @@ public final class JagerA2 extends ActiveSkill implements HasEntity<JagerA2Entit
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             JagerA2Entity jagerA2Entity = new JagerA2Entity(magmaCube, combatUser);
             jagerA2Entity.init();
-            setSummonEntity(jagerA2Entity);
+            hasEntityModule.setSummonEntity(jagerA2Entity);
         }
     }
 }

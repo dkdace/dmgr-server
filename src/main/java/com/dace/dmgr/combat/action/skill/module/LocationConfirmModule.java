@@ -43,10 +43,10 @@ public final class LocationConfirmModule extends ConfirmModule {
      *
      * @return 위치 지정 가능 여부
      */
-    private boolean isValid() {
+    public boolean isValid() {
         if (!isChecking)
             return false;
-        return currentLocation.getBlock().isEmpty() && currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
+        return currentLocation.getBlock().isEmpty() && !currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
     }
 
     @Override
@@ -98,11 +98,13 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.remove();
     }
 
-    public void reset() {
+    @Override
+    public void onReset() {
         pointer.remove();
     }
 
-    public void remove() {
+    @Override
+    public void onRemove() {
         pointer.remove();
     }
 
