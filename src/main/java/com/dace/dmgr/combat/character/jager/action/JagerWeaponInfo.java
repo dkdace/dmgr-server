@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
@@ -40,43 +41,45 @@ public final class JagerWeaponInfo extends WeaponInfo {
     /**
      * 정조준 상태의 정보.
      */
-    public static class SCOPE {
+    public interface SCOPE {
         /** 피해량 */
-        static final int DAMAGE = 250;
+        int DAMAGE = 250;
         /** 피해량 감소 시작 거리 */
-        static final int DAMAGE_DISTANCE = 30;
+        int DAMAGE_DISTANCE = 30;
         /** 쿨타임 */
-        static final long COOLDOWN = (long) (0.25 * 20);
+        long COOLDOWN = (long) (0.25 * 20);
         /** 장탄수 */
-        static final int CAPACITY = 6;
+        int CAPACITY = 6;
+        /** 확대 레벨 */
+        Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L4;
 
         /**
          * 반동 정보.
          */
-        public static class RECOIL {
+        interface RECOIL {
             /** 수직 반동 */
-            static final float UP = 2.8F;
+            float UP = 2.8F;
             /** 수평 반동 */
-            static final float SIDE = 0F;
+            float SIDE = 0F;
             /** 수직 반동 분산도 */
-            static final float UP_SPREAD = 0.3F;
+            float UP_SPREAD = 0.3F;
             /** 수평 반동 분산도 */
-            static final float SIDE_SPREAD = 0.4F;
+            float SIDE_SPREAD = 0.4F;
         }
     }
 
     /**
      * 반동 정보.
      */
-    public static class RECOIL {
+    public interface RECOIL {
         /** 수직 반동 */
-        static final float UP = 0.8F;
+        float UP = 0.8F;
         /** 수평 반동 */
-        static final float SIDE = 0F;
+        float SIDE = 0F;
         /** 수직 반동 분산도 */
-        static final float UP_SPREAD = 0.1F;
+        float UP_SPREAD = 0.1F;
         /** 수평 반동 분산도 */
-        static final float SIDE_SPREAD = 0.05F;
+        float SIDE_SPREAD = 0.05F;
     }
 
     /**

@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
@@ -45,14 +45,14 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).isChecking();
+        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking();
     }
 
     @Override
     public void onUse(ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).swap();
+        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
+            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
+            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
         }
 
         if (isDurationFinished()) {
@@ -165,9 +165,9 @@ public final class JagerA3 extends ActiveSkill {
             int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
                     JagerA3Info.RADIUS / 2F, true);
             if (projectile == null)
-                ((Damageable) target).damage(combatUser, damage, DamageType.NORMAL, false, true);
+                ((Damageable) target).getDamageModule().damage(combatUser, damage, DamageType.NORMAL, false, true);
             else
-                ((Damageable) target).damage(projectile, damage, DamageType.NORMAL, false, true);
+                ((Damageable) target).getDamageModule().damage(projectile, damage, DamageType.NORMAL, false, true);
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
@@ -233,7 +233,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         public boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit) {
             if (direction.length() > 0.05)
-                target.damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
 

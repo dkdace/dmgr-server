@@ -48,37 +48,14 @@ public interface CombatEntity extends HasTask {
     double getMaxHitboxSize();
 
     /**
-     * {@link CombatEntityBase#init()} 호출 시 실행할 작업.
-     *
-     * <p>인터페이스에서 상속받아야 한다.</p>
+     * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
      */
-    default void onInit() {
-    }
-
-    /**
-     * {@link CombatEntityBase#init()}에서 매 틱마다 실행될 작업.
-     *
-     * <p>인터페이스에서 상속받아야 한다.</p>
-     *
-     * @param i 인덱스
-     */
-    default void onTick(int i) {
-    }
+    void init();
 
     /**
      * 엔티티를 제거한다.
-     *
-     * <p>클래스에서 상속받아야 한다.</p>
      */
     void remove();
-
-    /**
-     * {@link CombatEntityBase#remove()} 호출 시 실행할 작업.
-     *
-     * <p>인터페이스에서 상속받아야 한다.</p>
-     */
-    default void onRemove() {
-    }
 
     /**
      * 지정한 엔티티가 적인 지 확인한다.

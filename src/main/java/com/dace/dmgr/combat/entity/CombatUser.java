@@ -16,9 +16,9 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
-import com.dace.dmgr.combat.entity.damageable.Healable;
-import com.dace.dmgr.combat.entity.movable.Jumpable;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.HealModule;
+import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
@@ -56,6 +56,13 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
     /** 리스폰 시간 */
     public static final int RESPAWN_TIME = 10 * 20;
+
+    /** 피해 모듈 */
+    @Getter
+    private final HealModule damageModule;
+    /** 이동 모듈 */
+    @Getter
+    private final JumpModule moveModule;
 
     /** 치명타 히트박스 객체 */
     @Getter
@@ -96,7 +103,14 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.4, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
         );
+        damageModule = new HealModule(this, true, 1000);
+        moveModule = new JumpModule(this);
         critHitbox = hitboxes[3];
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule, moveModule};
     }
 
     @Override
@@ -108,9 +122,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    protected void tick(int i) {
-        super.tick(i);
-
+    public void onTick(int i) {
         character.onTick(this, i);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                 99999, 10, false, false), true);
@@ -124,7 +136,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             if (i % 10 == 0)
                 addUltGauge((float) IDLE_ULT_CHARGE / 2);
 
-            if (isLowHealth()) {
+            if (damageModule.isLowHealth()) {
                 playBleedingEffect(1);
                 setLowHealthScreenEffect(true);
             } else
@@ -137,7 +149,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             if (!entity.isOnGround())
                 speed *= speed / BASE_SPEED;
         }
-        if (!canMove())
+        if (!moveModule.canMove())
             speed = 0.0001F;
 
         entity.setWalkSpeed((float) speed);
@@ -168,36 +180,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public int getMaxHealth() {
-        return character == null ? 1000 : Healable.super.getMaxHealth();
-    }
-
-    @Override
-    public boolean isUltProvider() {
-        return true;
-    }
-
-    @Override
-    public boolean canTakeDamage() {
-        if (character == null)
-            return false;
-        if (entity.getGameMode() != GameMode.SURVIVAL)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public boolean canDie() {
-        if (character == null)
-            return false;
-        if (RegionUtil.isInRegion(entity, "BattleTrain"))
-            return false;
-
-        return true;
-    }
-
-    @Override
     public boolean canBeTargeted() {
         return !isDead();
     }
@@ -215,13 +197,13 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void setCanSprint(boolean canSprint) {
         WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
 
-        packet.setHealth((float) this.getEntity().getHealth());
+        packet.setHealth((float) entity.getHealth());
         if (canSprint)
             packet.setFood(19);
         else
             packet.setFood(2);
 
-        packet.sendPacket(this.getEntity());
+        packet.sendPacket(entity);
     }
 
     /**
@@ -234,7 +216,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             return false;
         if (CooldownManager.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
-        if (weapon instanceof Aimable && ((Aimable) weapon).isAiming())
+        if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
@@ -258,7 +240,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                 playAttackEffect();
         }
 
-        if (victim.isUltProvider() && isUlt)
+        if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
     }
 
@@ -284,8 +266,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
-        if (character == null)
-            return;
 
         character.onDamage(this, attacker, damage, damageType, isCrit, isUlt);
 
@@ -296,29 +276,43 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                 CooldownManager.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, entity.getEntityId());
             CooldownManager.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, entity.getEntityId());
 
-            if (getHealth() - damage <= 0)
-                damage = getHealth();
+            if (damageModule.getHealth() - damage <= 0)
+                damage = damageModule.getHealth();
             float sumDamage = damageMap.getOrDefault(attacker, 0F);
-            damageMap.put((CombatUser) attacker, Math.min(sumDamage + (float) damage / getMaxHealth(), 1));
+            damageMap.put((CombatUser) attacker, Math.min(sumDamage + (float) damage / damageModule.getMaxHealth(), 1));
         }
     }
 
     @Override
-    public void onGiveHeal(Healable target, int amount, boolean isUlt) {
+    public boolean canTakeDamage() {
         if (character == null)
-            return;
+            return false;
+        if (entity.getGameMode() != GameMode.SURVIVAL)
+            return false;
 
+        return true;
+    }
+
+    @Override
+    public boolean canDie() {
+        if (character == null)
+            return false;
+        if (RegionUtil.isInRegion(entity, "BattleTrain"))
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public void onGiveHeal(Healable target, int amount, boolean isUlt) {
         character.onGiveHeal(this, target, amount, isUlt);
 
-        if (target.isUltProvider() && isUlt)
+        if (damageModule.isUltProvider() && isUlt)
             addUltGauge(amount);
     }
 
     @Override
     public void onTakeHeal(CombatEntity provider, int amount, boolean isUlt) {
-        if (character == null)
-            return;
-
         character.onTakeHeal(this, provider, amount, isUlt);
 
         playTakeHealEffect(amount);
@@ -417,7 +411,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         character.onDeath(this, attacker);
 
         if (CooldownManager.getCooldown(this, Cooldown.RESPAWN_TIME) == 0) {
-            setHealth(getMaxHealth());
+            damageModule.setHealth(damageModule.getMaxHealth());
 
             damageMap.forEach((CombatUser attacker2, Float damage) -> {
                 if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
@@ -453,7 +447,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    setHealth(getMaxHealth());
+                    damageModule.setHealth(damageModule.getMaxHealth());
                     entity.teleport(Lobby.lobbyLocation);
                     entity.setGameMode(GameMode.SURVIVAL);
 
@@ -571,8 +565,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void setCharacter(Character character) {
         reset();
         SkinUtil.applySkin(entity, character.getSkinName());
-        setMaxHealth(character.getHealth());
-        setHealth(character.getHealth());
+        damageModule.setMaxHealth(character.getHealth());
+        damageModule.setHealth(character.getHealth());
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * character.getSpeedMultiplier());
         entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
         entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
@@ -607,6 +601,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         skillMap.clear();
 
         weapon = character.getWeaponInfo().createWeapon(this);
+        weapon.init();
         for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
             actionMap.put(actionKey, weapon);
         }
@@ -614,6 +609,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
             if (activeSkillInfo != null) {
                 Skill skill = activeSkillInfo.createSkill(this);
+                skill.init();
                 skillMap.put(activeSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
                     actionMap.put(actionKey, skill);
@@ -624,6 +620,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
             if (passiveSkillInfo != null) {
                 Skill skill = passiveSkillInfo.createSkill(this);
+                skill.init();
                 skillMap.put(passiveSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
                     actionMap.put(actionKey, skill);

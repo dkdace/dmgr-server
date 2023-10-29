@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

@@ -6,32 +6,36 @@ import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 @Getter
-@Setter
 public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAuto {
-    /** 남은 탄약 수 */
-    private int remainingAmmo = getCapacity();
-    /** 재장전 상태 */
-    private boolean reloading = false;
+    /** 재장전 모듈 */
+    private final ReloadModule reloadModule;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
+        reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{reloadModule};
     }
 
     @Override
@@ -50,16 +54,6 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public int getCapacity() {
-        return ArkaceWeaponInfo.CAPACITY;
-    }
-
-    @Override
-    public long getReloadDuration() {
-        return ArkaceWeaponInfo.RELOAD_DURATION;
-    }
-
-    @Override
     public FireRate getFireRate() {
         return FireRate.RPM_600;
     }
@@ -68,8 +62,8 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                if (getRemainingAmmo() == 0) {
-                    reload();
+                if (reloadModule.getRemainingAmmo() == 0) {
+                    reloadModule.reload();
                     return;
                 }
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
@@ -90,14 +84,14 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
                     CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
-                    consume(1);
+                    reloadModule.consume(1);
                     playShootSound(loc);
                 }
 
                 break;
             }
             case DROP: {
-                reload();
+                reloadModule.reload();
 
                 break;
             }
@@ -123,6 +117,16 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
         SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
         SoundUtil.play("random.energy", location, 4F, 1.6F);
         SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+    }
+
+    @Override
+    public boolean canReload() {
+        return reloadModule.getRemainingAmmo() < ArkaceWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    public void onAmmoEmpty() {
+        reloadModule.reload();
     }
 
     @Override
@@ -154,10 +158,6 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
         }
     }
 
-    @Override
-    public void onReloadFinished() {
-    }
-
     private class ArkaceWeaponHitscan extends GunHitscan {
         private final boolean isUlt;
 
@@ -179,11 +179,11 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
         @Override
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
             if (isUlt)
-                target.damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
+                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
             else {
                 int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, ArkaceWeaponInfo.DAMAGE,
                         ArkaceWeaponInfo.DAMAGE_DISTANCE, true);
-                target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
             }
 
             return false;

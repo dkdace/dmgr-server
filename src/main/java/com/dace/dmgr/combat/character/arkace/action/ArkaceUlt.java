@@ -29,7 +29,7 @@ public final class ArkaceUlt extends UltimateSkill {
 
     @Override
     protected void onUseUltimateSkill(ActionKey actionKey) {
-        ((Reloadable) combatUser.getWeapon()).setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
+        ((Reloadable) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
         setDuration();
 
         TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, ArkaceUltInfo.DURATION) {

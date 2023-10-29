@@ -2,7 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

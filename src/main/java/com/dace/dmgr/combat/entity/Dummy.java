@@ -1,7 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -20,8 +21,8 @@ import java.util.List;
  */
 @Getter
 public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
-    /** 최대 체력 */
-    private final int maxHealth;
+    /** 피해 모듈 */
+    private final DamageModule damageModule;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
 
@@ -38,8 +39,13 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
-        this.maxHealth = maxHealth;
+        damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule};
     }
 
     @Override
@@ -66,11 +72,6 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         entity.getEquipment().setBoots(equipment.get(2));
         entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOW, 99999, 5, false, false));
-    }
-
-    @Override
-    public boolean isUltProvider() {
-        return true;
     }
 
     @Override

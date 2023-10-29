@@ -5,18 +5,20 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.GunHitscan;
 import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
@@ -24,18 +26,19 @@ import org.bukkit.util.Vector;
 public final class JagerWeaponR extends WeaponBase implements Reloadable {
     /** 주무기 객체 */
     private final JagerWeaponL mainWeapon;
-    /** 남은 탄약 수 */
+    /** 재장전 모듈 */
     @Getter
-    @Setter
-    private int remainingAmmo = getCapacity();
-    /** 재장전 상태 */
-    @Getter
-    @Setter
-    private boolean reloading = false;
+    private final ReloadModule reloadModule;
 
     public JagerWeaponR(CombatUser combatUser, JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
         this.mainWeapon = mainWeapon;
+        reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{reloadModule};
     }
 
     @Override
@@ -49,16 +52,6 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
     }
 
     @Override
-    public int getCapacity() {
-        return JagerWeaponInfo.SCOPE.CAPACITY;
-    }
-
-    @Override
-    public long getReloadDuration() {
-        return 0;
-    }
-
-    @Override
     public boolean canUse() {
         return super.canUse() && mainWeapon.canUse();
     }
@@ -67,7 +60,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
     public void onUse(ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (getRemainingAmmo() == 0) {
+                if (reloadModule.getRemainingAmmo() == 0) {
                     reload();
                     return;
                 }
@@ -78,14 +71,14 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1F);
                 setCooldown();
-                consume(1);
+                reloadModule.consume(1);
                 playShootSound(combatUser.getEntity().getLocation());
 
                 break;
             }
             case RIGHT_CLICK: {
-                mainWeapon.toggleAim();
-                mainWeapon.swap();
+                mainWeapon.getAimModule().toggleAim();
+                mainWeapon.getSwapModule().swap();
 
                 break;
             }
@@ -108,13 +101,12 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
         SoundUtil.play("random.gun.reverb", location, 5.5F, 0.95F);
     }
 
-    @Override
-    public void reload() {
-        if (mainWeapon.isAiming()) {
-            mainWeapon.toggleAim();
-            mainWeapon.swap();
+    private void reload() {
+        if (mainWeapon.getAimModule().isAiming()) {
+            mainWeapon.getAimModule().toggleAim();
+            mainWeapon.getSwapModule().swap();
 
-            new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
+            TaskManager.addTask(this, new TaskTimer(1, JagerWeaponInfo.SWAP_DURATION) {
                 @Override
                 public boolean onTimerTick(int i) {
                     return true;
@@ -122,18 +114,20 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    mainWeapon.reload();
+                    mainWeapon.getReloadModule().reload();
                 }
-            };
+            });
         }
     }
 
     @Override
-    public void onReloadTick(int i) {
+    public boolean canReload() {
+        return false;
     }
 
     @Override
-    public void onReloadFinished() {
+    public void onAmmoEmpty() {
+        reload();
     }
 
     private class JagerWeaponProjectile extends GunHitscan {
@@ -151,7 +145,7 @@ public final class JagerWeaponR extends WeaponBase implements Reloadable {
         public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
             int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                     JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
-            target.damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
             return false;
         }
     }

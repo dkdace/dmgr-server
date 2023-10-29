@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.entity.damageable.Damageable;
 
 /**
  * 다른 엔티티를 공격할 수 있는 엔티티의 인터페이스.

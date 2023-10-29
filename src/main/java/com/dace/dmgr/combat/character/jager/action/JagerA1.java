@@ -1,31 +1,33 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.HasEntity;
 import com.dace.dmgr.combat.action.skill.LocationConfirmable;
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
+import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Wolf;
 
 @Getter
-@Setter
 public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, LocationConfirmable {
-    /** 소환된 엔티티 */
-    private JagerA1Entity summonEntity = null;
-    /** 확인 중 상태 */
-    private boolean checking = false;
-    /** 현재 지정 위치 */
-    private Location currentLocation;
-    /** 위치 표시용 갑옷 거치대 객체 */
-    private ArmorStand pointer;
+    /** 엔티티 소환 모듈 */
+    private final HasEntityModule<JagerA1Entity> hasEntityModule;
+    /** 위치 확인 모듈 */
+    private final LocationConfirmModule confirmModule;
 
     public JagerA1(CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
+        hasEntityModule = new HasEntityModule<>(this);
+        confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
+    }
+
+    @Override
+    public ActionModule[] getModules() {
+        return new ActionModule[]{hasEntityModule, confirmModule};
     }
 
     @Override
@@ -54,61 +56,37 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     }
 
     @Override
-    public ActionKey getAcceptKey() {
-        return ActionKey.LEFT_CLICK;
-    }
-
-    @Override
-    public ActionKey getCancelKey() {
-        return ActionKey.SLOT_1;
-    }
-
-    @Override
-    public int getMaxDistance() {
-        return JagerA1Info.SUMMON_MAX_DISTANCE;
-    }
-
-    @Override
     public boolean canUse() {
         return super.canUse() && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onRemove() {
-        HasEntity.super.onRemove();
-        LocationConfirmable.super.onRemove();
-    }
-
-    @Override
-    public void onReset() {
-        HasEntity.super.onReset();
-        LocationConfirmable.super.onReset();
-    }
-
-    @Override
     public void onUse(ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).swap();
+        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
+            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
+            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
         }
 
         if (isDurationFinished())
-            toggleCheck();
+            confirmModule.toggleCheck();
         else {
             setDuration(0);
-            removeSummonEntity();
+            hasEntityModule.removeSummonEntity();
         }
     }
 
     @Override
-    public void onAcceptLocationConfirmable() {
+    public void onAccept() {
+        if (!confirmModule.isValid())
+            return;
+
         combatUser.getWeapon().setCooldown(2);
         setDuration();
-        toggleCheck();
+        confirmModule.toggleCheck();
 
-        Wolf wolf = CombatEntityUtil.spawn(Wolf.class, getCurrentLocation());
+        Wolf wolf = CombatEntityUtil.spawn(Wolf.class, confirmModule.getCurrentLocation());
         JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);
         jagerA1Entity.init();
-        setSummonEntity(jagerA1Entity);
+        hasEntityModule.setSummonEntity(jagerA1Entity);
     }
 }

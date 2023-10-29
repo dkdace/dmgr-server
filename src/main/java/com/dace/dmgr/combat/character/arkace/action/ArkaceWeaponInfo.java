@@ -40,36 +40,36 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     /**
      * 반동 정보.
      */
-    public static class RECOIL {
+    public interface RECOIL {
         /** 수직 반동 */
-        static final float UP = 0.6F;
+        float UP = 0.6F;
         /** 수평 반동 */
-        static final float SIDE = 0.04F;
+        float SIDE = 0.04F;
         /** 수직 반동 분산도 */
-        static final float UP_SPREAD = 0.1F;
+        float UP_SPREAD = 0.1F;
         /** 수평 반동 분산도 */
-        static final float SIDE_SPREAD = 0.06F;
+        float SIDE_SPREAD = 0.06F;
     }
 
     /**
      * 탄퍼짐 정보.
      */
-    public static class SPREAD {
+    public interface SPREAD {
         /** 탄퍼짐 증가량 */
-        static final float INCREMENT = 0.3F;
+        float INCREMENT = 0.3F;
         /** 탄퍼짐 회복량 */
-        static final float RECOVERY = 2F;
+        float RECOVERY = 2F;
         /** 탄퍼짐 최대치 */
-        static final float MAX = 4.6F;
+        float MAX = 4.6F;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public static class RESOURCE {
+    public interface RESOURCE {
         /** 기본 */
-        static final short DEFAULT = 1;
+        short DEFAULT = 1;
         /** 달리기 */
-        static final short SPRINT = DEFAULT + 1000;
+        short SPRINT = DEFAULT + 1000;
     }
 }
