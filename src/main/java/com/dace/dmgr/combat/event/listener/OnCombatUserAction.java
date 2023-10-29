@@ -64,7 +64,7 @@ public final class OnCombatUserAction implements Listener {
 
             @Override
             public boolean onTimerTick(int i) {
-                if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).isReloading())
+                if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return true;
                 if (weapon.canUse() && ((FullAuto) weapon).isFireTick(combatUser.getEntity().getTicksLived())) {
                     j++;
