@@ -36,7 +36,6 @@ public final class MainEventManager {
         EventUtil.registerListener(new PlayerOption());
         EventUtil.registerListener(new ChatSoundOption());
         EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
-        EventUtil.registerPacketListener(new OnPlayClientArmAnimation());
         EventUtil.registerPacketListener(new OnPlayServerNamedSoundEffect());
     }
 }
