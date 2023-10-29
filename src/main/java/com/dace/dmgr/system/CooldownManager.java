@@ -23,8 +23,8 @@ public final class CooldownManager {
         else {
             if (duration == -1)
                 duration = 99999;
-            long time = System.currentTimeMillis();
-            time += duration * 50;
+            long time = System.currentTimeMillis() / 50;
+            time += duration;
             cooldownMap.put(id, time);
         }
     }
@@ -101,12 +101,12 @@ public final class CooldownManager {
         Long time = cooldownMap.get(id);
         if (time == null)
             return 0;
-        else if (time - System.currentTimeMillis() <= 0) {
+        else if (time - System.currentTimeMillis() / 50 <= 0) {
             cooldownMap.remove(id);
             return 0;
         }
 
-        return (time - System.currentTimeMillis()) / 50;
+        return (time - System.currentTimeMillis() / 50);
     }
 
     /**

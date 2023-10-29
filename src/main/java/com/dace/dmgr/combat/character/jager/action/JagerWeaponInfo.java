@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 
 public final class JagerWeaponInfo extends WeaponInfo {
@@ -31,7 +30,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
     public JagerWeaponInfo() {
-        super("MK.73 ELNR", ItemBuilder.fromCSItem("MK73ELNR").build());
+        super(RESOURCE.DEFAULT, "MK.73 ELNR");
     }
 
     @Override
@@ -81,5 +80,13 @@ public final class JagerWeaponInfo extends WeaponInfo {
         float UP_SPREAD = 0.1F;
         /** 수평 반동 분산도 */
         float SIDE_SPREAD = 0.05F;
+    }
+
+    /**
+     * 리소스별 아이템 내구도 정보.
+     */
+    public static class RESOURCE {
+        /** 기본 */
+        static final short DEFAULT = 2;
     }
 }

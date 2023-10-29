@@ -4,13 +4,14 @@ import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.skill.SkillBase;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
+import com.dace.dmgr.system.Cooldown;
+import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -28,10 +29,11 @@ public final class OnCombatUserAction implements Listener {
             weapon = ((Swappable<?>) combatUser.getWeapon()).getSwapModule().getSubweapon();
 
         if (action instanceof WeaponBase) {
-            if (!weapon.canUse())
-                return;
+            if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
+                handleUseFullAutoWeapon(weapon, actionKey, combatUser);
+            else
+                handleUseWeapon(weapon, actionKey);
 
-            weapon.onUse(actionKey);
         } else if (action instanceof SkillBase) {
             if (!action.canUse())
                 return;
@@ -42,5 +44,35 @@ public final class OnCombatUserAction implements Listener {
 
             action.onUse(actionKey);
         }
+    }
+
+    private static void handleUseWeapon(Weapon weapon, ActionKey actionKey) {
+        if (!weapon.canUse())
+            return;
+
+        weapon.onUse(actionKey);
+    }
+
+    private static void handleUseFullAutoWeapon(Weapon weapon, ActionKey actionKey, CombatUser combatUser) {
+        if (CooldownManager.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0)
+            return;
+
+        CooldownManager.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
+
+        TaskManager.addTask(weapon, new TaskTimer(1, 4) {
+            int j = 0;
+
+            @Override
+            public boolean onTimerTick(int i) {
+                if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
+                    return true;
+                if (weapon.canUse() && ((FullAuto) weapon).getFullAutoModule().isFireTick(combatUser.getEntity().getTicksLived())) {
+                    j++;
+                    weapon.onUse(actionKey);
+                }
+
+                return true;
+            }
+        });
     }
 }

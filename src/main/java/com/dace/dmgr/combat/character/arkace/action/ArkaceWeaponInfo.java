@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
 
@@ -21,18 +20,16 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
     public ArkaceWeaponInfo() {
-        super("HLN-12", ItemBuilder.fromCSItem("HLN-12")
-                .setLore(
-                        "",
-                        "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
-                        "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                        "",
-                        "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
-                        "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
-                        "§f" + TextIcon.CAPACITY + "§f 30발",
-                        "",
-                        "§7§l[우클릭] §f사격 §7§l[Q] §f재장전")
-                .build());
+        super(RESOURCE.DEFAULT, "HLN-12",
+                "",
+                "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
+                "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
+                "",
+                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
+                "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
+                "§f" + TextIcon.CAPACITY + "§f 30발",
+                "",
+                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
     }
 
     @Override
