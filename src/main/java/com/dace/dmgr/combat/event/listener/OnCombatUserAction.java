@@ -29,7 +29,7 @@ public final class OnCombatUserAction implements Listener {
             weapon = ((Swappable<?>) combatUser.getWeapon()).getSwapModule().getSubweapon();
 
         if (action instanceof WeaponBase) {
-            if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoKey() == actionKey))
+            if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
                 handleUseFullAutoWeapon(weapon, actionKey, combatUser);
             else
                 handleUseWeapon(weapon, actionKey);
@@ -66,7 +66,7 @@ public final class OnCombatUserAction implements Listener {
             public boolean onTimerTick(int i) {
                 if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return true;
-                if (weapon.canUse() && ((FullAuto) weapon).isFireTick(combatUser.getEntity().getTicksLived())) {
+                if (weapon.canUse() && ((FullAuto) weapon).getFullAutoModule().isFireTick(combatUser.getEntity().getTicksLived())) {
                     j++;
                     weapon.onUse(actionKey);
                 }

@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
+import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -27,15 +28,18 @@ import org.bukkit.util.Vector;
 public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAuto {
     /** 재장전 모듈 */
     private final ReloadModule reloadModule;
+    /** 연사 모듈 */
+    private final FullAutoModule fullAutoModule;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
+        fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600);
     }
 
     @Override
     public ActionModule[] getModules() {
-        return new ActionModule[]{reloadModule};
+        return new ActionModule[]{reloadModule, fullAutoModule};
     }
 
     @Override
@@ -44,18 +48,8 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public ActionKey getFullAutoKey() {
-        return ActionKey.RIGHT_CLICK;
-    }
-
-    @Override
     public long getDefaultCooldown() {
         return 0;
-    }
-
-    @Override
-    public FireRate getFireRate() {
-        return FireRate.RPM_600;
     }
 
     @Override
