@@ -56,6 +56,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
         entity.setSilent(true);
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
+        damageModule.setMaxHealth(JagerUltInfo.HEALTH);
+        damageModule.setHealth(JagerUltInfo.HEALTH);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
         hideForEnemies();
         playInitSound();
