@@ -1,37 +1,38 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.HasEntity;
-import com.dace.dmgr.combat.action.skill.LocationConfirmModule;
 import com.dace.dmgr.combat.action.skill.LocationConfirmable;
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
+import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Sound;
 import org.bukkit.entity.Wolf;
 
-import java.util.Arrays;
-import java.util.List;
-
+@Getter
 public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, LocationConfirmable {
-    /** 위치 확인 모듈 객체 */
-    private final LocationConfirmModule locationConfirmModule;
-    /** 소환된 엔티티 */
-    @Getter
-    @Setter
-    private JagerA1Entity summonEntity = null;
+    /** 엔티티 소환 모듈 */
+    private final HasEntityModule<JagerA1Entity> hasEntityModule;
+    /** 위치 확인 모듈 */
+    private final LocationConfirmModule confirmModule;
 
     public JagerA1(CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
-        locationConfirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1);
+        hasEntityModule = new HasEntityModule<>(this);
+        confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }
 
     @Override
-    public List<ActionKey> getDefaultActionKeys() {
-        return Arrays.asList(ActionKey.SLOT_1);
+    public ActionModule[] getModules() {
+        return new ActionModule[]{hasEntityModule, confirmModule};
+    }
+
+    @Override
+    public ActionKey[] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.SLOT_1};
     }
 
     @Override
@@ -45,23 +46,13 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     }
 
     @Override
-    public int getStateValueDecrement() {
+    public long getStateValueDecrement() {
         return 0;
     }
 
     @Override
-    public int getStateValueIncrement() {
-        return JagerA1Info.HEALTH / JagerA1Info.RECOVER_DURATION;
-    }
-
-    @Override
-    public boolean isConfirming() {
-        return locationConfirmModule.isToggled();
-    }
-
-    @Override
-    public int getMaxDistance() {
-        return JagerA1Info.SUMMON_MAX_DISTANCE;
+    public long getStateValueIncrement() {
+        return JagerA1Info.HEALTH / JagerA1Info.RECOVER_DURATION / 20;
     }
 
     @Override
@@ -71,35 +62,31 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
 
     @Override
     public void onUse(ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).aim();
-            ((JagerWeaponL) combatUser.getWeapon()).swap();
+        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
+            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
+            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
         }
 
-        if (isDurationFinished()) {
-            locationConfirmModule.toggle();
-        } else {
+        if (isDurationFinished())
+            confirmModule.toggleCheck();
+        else {
             setDuration(0);
-            if (summonEntity != null) {
-                summonEntity.remove();
-                summonEntity = null;
-            }
+            hasEntityModule.removeSummonEntity();
         }
     }
 
     @Override
-    public void confirm() {
-        if (!locationConfirmModule.isValid())
+    public void onAccept() {
+        if (!confirmModule.isValid())
             return;
 
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, locationConfirmModule.getLocation(), 0.8F, 1F);
         combatUser.getWeapon().setCooldown(2);
         setDuration();
-        locationConfirmModule.toggle();
+        confirmModule.toggleCheck();
 
-        Wolf wolf = CombatEntityUtil.spawn(Wolf.class, locationConfirmModule.getLocation());
+        Wolf wolf = CombatEntityUtil.spawn(Wolf.class, confirmModule.getCurrentLocation());
         JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);
         jagerA1Entity.init();
-        summonEntity = jagerA1Entity;
+        hasEntityModule.setSummonEntity(jagerA1Entity);
     }
 }

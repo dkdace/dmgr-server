@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.Ability;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -38,8 +39,8 @@ public abstract class Projectile extends Bullet {
      * @param option   선택적 옵션
      * @see ProjectileOption
      */
-    protected Projectile(CombatEntity<?> shooter, int velocity, ProjectileOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier);
+    protected Projectile(CombatEntity shooter, int velocity, ProjectileOption option) {
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
         this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         this.velocity = velocity;
         this.duration = option.duration;
@@ -52,7 +53,7 @@ public abstract class Projectile extends Bullet {
      * @param shooter  발사하는 엔티티
      * @param velocity 투사체의 속력. 단위: 블록/s
      */
-    protected Projectile(CombatEntity<?> shooter, int velocity) {
+    protected Projectile(CombatEntity shooter, int velocity) {
         super(shooter);
         this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         ProjectileOption option = ProjectileOption.builder().build();
@@ -60,6 +61,7 @@ public abstract class Projectile extends Bullet {
         this.maxDistance = option.maxDistance;
         this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
+        this.condition = option.condition;
         this.velocity = velocity;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
@@ -78,7 +80,7 @@ public abstract class Projectile extends Bullet {
         Location loc = origin.clone();
         loc.add(direction.clone().multiply(START_DISTANCE));
         direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
-        Set<CombatEntity<?>> targets = new HashSet<>();
+        Set<CombatEntity> targets = new HashSet<>();
 
         int loopCount = (int) (velocity / 2.5);
         int sum = 0;
@@ -89,19 +91,19 @@ public abstract class Projectile extends Bullet {
         final Vector finalDirection = direction;
         final int finalSum = sum;
 
-        new TaskTimer(1) {
+        TaskManager.addTask(getShooter(), new TaskTimer(1) {
             int count = 0;
 
             @Override
-            public boolean run(int _i) {
+            public boolean onTimerTick(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if ((duration != -1 && _i >= duration))
+                    if ((duration != -1 && _i >= duration) || loc.distance(origin) > maxDistance)
                         return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE))
+                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))
@@ -120,6 +122,6 @@ public abstract class Projectile extends Bullet {
             public void onEnd(boolean cancelled) {
                 onDestroy(loc.clone());
             }
-        };
+        });
     }
 }

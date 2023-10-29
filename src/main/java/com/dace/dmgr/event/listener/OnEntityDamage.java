@@ -15,7 +15,7 @@ public final class OnEntityDamage implements Listener {
         if (!(entity instanceof LivingEntity))
             return;
 
-        CombatEntity<?> combatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) entity);
+        CombatEntity combatEntity = EntityInfoRegistry.getCombatEntity((LivingEntity) entity);
 
         if (combatEntity != null) {
             switch (event.getCause()) {

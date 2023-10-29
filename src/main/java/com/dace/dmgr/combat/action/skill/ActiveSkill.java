@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
@@ -7,12 +8,13 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
- * 스킬의 상태를 관리하는 클래스.
+ * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class ActiveSkill extends Skill {
+public abstract class ActiveSkill extends SkillBase {
     /** 스킬 슬롯 */
     protected final int slot;
 
@@ -47,18 +49,26 @@ public abstract class ActiveSkill extends Skill {
         return super.canUse() && combatUser.isGlobalCooldownFinished();
     }
 
-    /**
-     * 쿨타임이 끝났을 때 효과음을 재생한다.
-     */
-    protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
-    }
-
     @Override
     protected void onDurationTick() {
         long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
 
         displayUsing((int) Math.ceil((float) duration / 20));
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void remove() {
+        super.remove();
+
+        combatUser.getEntity().getInventory().clear(slot);
+    }
+
+    /**
+     * 쿨타임이 끝났을 때 효과음을 재생한다.
+     */
+    protected void playCooldownFinishSound() {
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
     }
 
     /**

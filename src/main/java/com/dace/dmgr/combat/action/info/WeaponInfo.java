@@ -1,9 +1,10 @@
-package com.dace.dmgr.combat.action.weapon;
+package com.dace.dmgr.combat.action.info;
 
-import com.dace.dmgr.combat.action.ActionInfo;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.gui.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * 무기 정보를 관리하는 클래스.
@@ -14,8 +15,16 @@ public abstract class WeaponInfo extends ActionInfo {
     /** 무기 이름의 접두사 */
     private static final String PREFIX = "§e§l[기본무기] §f";
 
-    protected WeaponInfo(String name, ItemStack itemStack) {
-        super(name, itemStack);
+    protected WeaponInfo(short resource, String name, String... lore) {
+        super(name, new ItemBuilder(MATERIAL)
+                .setName(PREFIX + name)
+                .setDamage(resource)
+                .setLore(lore)
+                .build());
+
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setUnbreakable(true);
+        itemStack.setItemMeta(itemMeta);
     }
 
     /**

@@ -1,45 +1,44 @@
 package com.dace.dmgr.combat.action.weapon;
 
+import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+
 /**
  * 재장전 가능한 무기의 인터페이스.
  */
-public interface Reloadable {
+public interface Reloadable extends Weapon {
     /**
-     * @return 남은 탄약 수
+     * @return 재장전 모듈
      */
-    int getRemainingAmmo();
+    ReloadModule getReloadModule();
 
     /**
-     * @param remainingAmmo 남은 탄약 수
-     */
-    void setRemainingAmmo(int remainingAmmo);
-
-    /**
-     * @return 재장전 상태
-     */
-    boolean isReloading();
-
-    /**
-     * 무기의 재장전을 취소한다.
-     */
-    void cancelReloading();
-
-    /**
-     * 무기의 장탄수를 반환한다.
+     * 무기를 재장전할 수 있는 지 확인한다.
      *
-     * @return 장탄수
-     */
-    int getCapacity();
-
-    /**
-     * 무기의 장전 시간을 반환한다.
+     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
      *
-     * @return 장전 시간 (tick)
+     * @return 재장전 가능 여부
      */
-    long getReloadDuration();
+    default boolean canReload() {
+        return true;
+    }
 
     /**
-     * 무기 장전 이벤트를 호출한다.
+     * 모든 탄약을 소모했을 때 실행할 작업.
      */
-    void reload();
+    default void onAmmoEmpty() {
+    }
+
+    /**
+     * 재장전을 진행할 때 (매 tick마다) 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    default void onReloadTick(int i) {
+    }
+
+    /**
+     * 재장전이 끝났을 때 실행할 작업.
+     */
+    default void onReloadFinished() {
+    }
 }

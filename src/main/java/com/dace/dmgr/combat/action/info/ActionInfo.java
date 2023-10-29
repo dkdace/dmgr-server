@@ -1,8 +1,5 @@
-package com.dace.dmgr.combat.action;
+package com.dace.dmgr.combat.action.info;
 
-import com.dace.dmgr.combat.action.skill.SkillInfo;
-import com.dace.dmgr.combat.action.skill.TraitInfo;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;

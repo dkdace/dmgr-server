@@ -1,55 +1,54 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
+ *
+ * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
  */
+@Getter
 public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntity<T> {
     /** 엔티티를 소환한 플레이어 */
-    @Getter
-    protected CombatUser owner;
+    protected final CombatUser owner;
 
     /**
-     * @param entity    대상 엔티티
-     * @param name      이름
-     * @param isFixed   위치 고정 여부
-     * @param maxHealth 최대 체력
-     * @param owner     엔티티를 소환한 플레이어
-     * @param hitbox    히트박스
+     * 소환 가능한 엔티티 인스턴스를 생성한다.
+     *
+     * @param entity 대상 엔티티
+     * @param name   이름
+     * @param owner  엔티티를 소환한 플레이어
+     * @param hitbox 히트박스 목록
      */
-    protected SummonEntity(T entity, String name, boolean isFixed, int maxHealth, CombatUser owner, Hitbox... hitbox) {
-        super(entity, name, isFixed, maxHealth, hitbox);
+    protected SummonEntity(T entity, String name, CombatUser owner, Hitbox... hitbox) {
+        super(entity, name, hitbox);
         this.owner = owner;
     }
 
     @Override
-    public void onAttack(CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
-        owner.onAttack(victim, damage, damageType, isCrit, isUlt);
-    }
+    @MustBeInvokedByOverriders
+    public void init() {
+        super.init();
 
-    @Override
-    public void onKill(CombatEntity<?> victim) {
-        owner.onKill(victim);
+        setTeam(owner.getTeam());
     }
 
     /**
-     * 엔티티를 소환한 플레이어를 제외한 모든 플레이어에게 엔티티를 보이지 않게 한다.
+     * 엔티티를 모든 적에게 보이지 않게 한다.
      */
-    protected void hideForOthers() {
+    protected final void hideForEnemies() {
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
-        packet.setEntityIds(new int[]{entity.getEntityId()});
+        packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
-            if (combatUser2 != null && CombatUtil.isEnemy(owner, combatUser2))
+            if (combatUser2 != null && getOwner().isEnemy(combatUser2))
                 packet.sendPacket(player2);
         });
     }

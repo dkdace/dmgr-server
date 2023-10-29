@@ -1,6 +1,6 @@
 package com.dace.dmgr.lobby;
 
-import com.dace.dmgr.util.YamlFile;
+import com.dace.dmgr.system.YamlFile;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 

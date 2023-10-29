@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.entity.SummonEntity;
 
 /**
@@ -8,14 +9,9 @@ import com.dace.dmgr.combat.entity.SummonEntity;
  * @param <T> {@link SummonEntity}를 상속받는 타입
  * @see HasEntities
  */
-public interface HasEntity<T extends SummonEntity<?>> {
+public interface HasEntity<T extends SummonEntity<?>> extends Skill {
     /**
-     * @return 소환된 엔티티
+     * @return 엔티티 소환 모듈
      */
-    T getSummonEntity();
-
-    /**
-     * @param summonEntity 소환된 엔티티
-     */
-    void setSummonEntity(T summonEntity);
+    HasEntityModule<T> getHasEntityModule();
 }

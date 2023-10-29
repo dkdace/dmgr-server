@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.TextIcon;
 import lombok.Getter;
@@ -33,7 +32,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     }
 
     @Override
-    public Skill createSkill(CombatUser combatUser) {
+    public ArkaceA1 createSkill(CombatUser combatUser) {
         return new ArkaceA1(combatUser);
     }
 }

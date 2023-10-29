@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
@@ -36,7 +35,7 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public Skill createSkill(CombatUser combatUser) {
+    public JagerUlt createSkill(CombatUser combatUser) {
         return new JagerUlt(combatUser);
     }
 }

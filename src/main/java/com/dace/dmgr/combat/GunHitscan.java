@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -13,11 +14,11 @@ import org.bukkit.util.Vector;
  * 실탄을 발사하는 화기의 총알을 관리하는 클래스.
  */
 public abstract class GunHitscan extends Hitscan {
-    protected GunHitscan(CombatEntity<?> shooter, HitscanOption option) {
+    protected GunHitscan(CombatEntity shooter, HitscanOption option) {
         super(shooter, option);
     }
 
-    protected GunHitscan(CombatEntity<?> shooter) {
+    protected GunHitscan(CombatEntity shooter) {
         super(shooter);
     }
 
@@ -40,20 +41,51 @@ public abstract class GunHitscan extends Hitscan {
                 3, 0, 0, 0, 0.1F);
         ParticleUtil.play(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
 
-        switch (hitBlock.getType()) {
+        switch (getBlockTexture(hitBlock.getType())) {
+            case GRASS:
+                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
+                break;
+            case DIRT:
+                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
+                break;
+            case STONE:
+                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1F, (float) (0.9 + Math.random() * 0.1));
+                break;
+            case METAL:
+                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5F, (float) (1.95 + Math.random() * 0.05));
+                SoundUtil.play("random.metalhit", location, 0.8F, (float) (1.95 + Math.random() * 0.05));
+                break;
+            case WOOD:
+                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8F, (float) (0.8 + Math.random() * 0.1));
+                SoundUtil.play("random.stab", location, 0.8F, (float) (1.95 + Math.random() * 0.05));
+                break;
+            case GLASS:
+                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
+                break;
+            case WOOL:
+                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1F, (float) (0.8 + Math.random() * 0.1));
+                break;
+        }
+    }
+
+    /**
+     * 블록의 재질을 반환한다.
+     *
+     * @param material 아이템 타입
+     */
+    private Texture getBlockTexture(Material material) {
+        switch (material) {
             case GRASS:
             case LEAVES:
             case LEAVES_2:
             case SPONGE:
             case HAY_BLOCK:
-                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
-                break;
+                return Texture.GRASS;
             case DIRT:
             case GRAVEL:
             case SAND:
             case CLAY:
-                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
-                break;
+                return Texture.DIRT;
             case STONE:
             case COBBLESTONE:
             case COBBLESTONE_STAIRS:
@@ -80,8 +112,7 @@ public abstract class GunHitscan extends Hitscan {
             case STONE_SLAB2:
             case DOUBLE_STONE_SLAB2:
             case CONCRETE:
-                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1F, (float) (0.9 + Math.random() * 0.1));
-                break;
+                return Texture.STONE;
             case IRON_BLOCK:
             case GOLD_BLOCK:
             case IRON_DOOR_BLOCK:
@@ -89,9 +120,7 @@ public abstract class GunHitscan extends Hitscan {
             case IRON_TRAPDOOR:
             case CAULDRON:
             case HOPPER:
-                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5F, (float) (1.95 + Math.random() * 0.05));
-                SoundUtil.play("random.metalhit", location, 0.8F, (float) (1.95 + Math.random() * 0.05));
-                break;
+                return Texture.METAL;
             case WOOD:
             case LOG:
             case LOG_2:
@@ -125,9 +154,7 @@ public abstract class GunHitscan extends Hitscan {
             case ACACIA_DOOR:
             case CHEST:
             case BOOKSHELF:
-                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8F, (float) (0.8 + Math.random() * 0.1));
-                SoundUtil.play("random.stab", location, 0.8F, (float) (1.95 + Math.random() * 0.05));
-                break;
+                return Texture.WOOD;
             case GLASS:
             case THIN_GLASS:
             case STAINED_GLASS:
@@ -138,12 +165,34 @@ public abstract class GunHitscan extends Hitscan {
             case REDSTONE_LAMP_OFF:
             case REDSTONE_LAMP_ON:
             case SEA_LANTERN:
-                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8F, (float) (0.7 + Math.random() * 0.1));
-                break;
+                return Texture.GLASS;
             case WOOL:
             case CARPET:
-                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1F, (float) (0.8 + Math.random() * 0.1));
-                break;
+                return Texture.WOOL;
+            default:
+                return Texture.NONE;
         }
+    }
+
+    /**
+     * 블록 재질의 종류.
+     */
+    private enum Texture {
+        /** 미지정 */
+        NONE,
+        /** 풀 */
+        GRASS,
+        /** 흙 */
+        DIRT,
+        /** 석재 */
+        STONE,
+        /** 금속 */
+        METAL,
+        /** 목재 */
+        WOOD,
+        /** 유리 */
+        GLASS,
+        /** 양털 */
+        WOOL
     }
 }

@@ -20,6 +20,8 @@ public final class LocationUtil {
             return true;
 
         MaterialData materialData = block.getState().getData();
+        if (materialData instanceof Step && block.getType().isOccluding())
+            return false;
         if (materialData instanceof Step || materialData instanceof Stairs || materialData instanceof Gate ||
                 materialData instanceof Door || materialData instanceof TrapDoor)
             return true;
@@ -33,6 +35,7 @@ public final class LocationUtil {
             case JUNGLE_FENCE:
             case ACACIA_FENCE_GATE:
             case DARK_OAK_FENCE:
+            case IRON_FENCE:
             case COBBLE_WALL:
             case SIGN_POST:
             case WALL_SIGN:
@@ -86,7 +89,7 @@ public final class LocationUtil {
      * @return 통과 가능하면 {@code true} 반환
      */
     public static boolean canPass(Location start, Location end) {
-        Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.2);
+        Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.25);
         Location loc = start.clone();
         double distance = start.distance(end);
 

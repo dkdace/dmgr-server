@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.action.skill;
+package com.dace.dmgr.combat.action.info;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;

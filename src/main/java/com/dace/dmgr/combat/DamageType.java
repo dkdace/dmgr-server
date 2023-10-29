@@ -11,4 +11,3 @@ public enum DamageType {
     /** {@link SummonEntity}를 이용한 공격 */
     ENTITY
 }
-

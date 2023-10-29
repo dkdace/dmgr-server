@@ -1,77 +1,61 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.system.EntityInfoRegistry;
-import org.bukkit.Location;
+import com.dace.dmgr.system.task.TaskManager;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
- * 일시적인 엔티티 클래스.
+ * 전투 시스템의 일시적인 엔티티 클래스.
  *
  * <p>설랑, 포탈 등 전투에서 일시적으로 사용하는 엔티티를 말한다.</p>
  *
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
+ * @see SummonEntity
  */
-public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntity<T> {
-    /** 최대 체력 */
-    protected final int maxHealth;
-
+public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntityBase<T> {
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
-     * <p>{@link CombatEntity#init()}을 호출하여 초기화해야 한다.</p>
+     * <p>{@link CombatEntityBase#init()}을 호출하여 초기화해야 한다.</p>
      *
-     * @param entity    대상 엔티티
-     * @param name      이름
-     * @param isFixed   위치 고정 여부
-     * @param maxHealth 최대 체력
-     * @param hitbox    히트박스
+     * @param entity 대상 엔티티
+     * @param name   이름
+     * @param hitbox 히트박스 목록
      */
-    protected TemporalEntity(T entity, String name, boolean isFixed, int maxHealth, Hitbox... hitbox) {
-        super(entity, name, isFixed, hitbox);
-        this.maxHealth = maxHealth;
+    protected TemporalEntity(T entity, String name, Hitbox... hitbox) {
+        super(entity, name, hitbox);
     }
 
     @Override
-    protected final void onInit() {
+    @MustBeInvokedByOverriders
+    public void init() {
+        super.init();
+
         EntityInfoRegistry.addTemporalEntity(getEntity(), this);
-        setMaxHealth(maxHealth);
-        setHealth(maxHealth);
-        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
-                .getBaseValue());
-        onInitTemporalEntity(entity.getLocation());
+        if (getAbilityStatusManager().getAbilityStatus(Ability.SPEED).getBaseValue() == 0)
+            getAbilityStatusManager().getAbilityStatus(Ability.SPEED).setBaseValue(getEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+                    .getBaseValue());
     }
 
-    /**
-     * 엔티티를 제거한다.
-     */
+    @Override
+    @MustBeInvokedByOverriders
     public void remove() {
-        EntityInfoRegistry.removeTemporalEntity(entity);
-        entity.remove();
+        super.remove();
+
+        EntityInfoRegistry.removeTemporalEntity(getEntity());
+        TaskManager.clearTask(this);
+        getEntity().remove();
     }
 
     @Override
-    public void onTick(int i) {
-        super.onTick(i);
-
-        if (!isFixed()) {
-            double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
-            if (!canMove())
-                speed = 0.0001F;
-
-            entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
-        }
+    public boolean canBeTargeted() {
+        return true;
     }
 
     @Override
-    public void onDeath(CombatEntity<?> attacker) {
-        remove();
+    public String getTaskIdentifier() {
+        return toString();
     }
-
-    /**
-     * {@link TemporalEntity#init()} 호출 시 실행할 작업.
-     *
-     * @param location 소환된 위치
-     */
-    protected abstract void onInitTemporalEntity(Location location);
 }

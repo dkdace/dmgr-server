@@ -1,11 +1,13 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import lombok.Getter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 여러 번 사용할 수 있는 스택형 스킬의 상태를 관리하는 클래스.
@@ -26,16 +28,22 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    protected void onCooldownTick() {
-    }
-
-    @Override
-    protected void onCooldownFinished() {
+    public boolean canUse() {
+        return isCooldownFinished() && stack > 0;
     }
 
     @Override
     protected void onDurationTick() {
         displayUsing(stack);
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void reset() {
+        super.reset();
+
+        setStackCooldown(0);
+        addStack(getMaxStack());
     }
 
     /**
@@ -44,7 +52,6 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 최대 스택 충전량
      */
     public abstract long getDefaultStackCooldown();
-
 
     /**
      * 스킬의 남은 스택 충전 쿨타임을 반환한다.
@@ -77,12 +84,9 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param cooldown 스택 충전 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     private void runStackCooldown(long cooldown) {
-        new TaskTimer(1) {
+        TaskManager.addTask(this, new TaskTimer(1) {
             @Override
-            public boolean run(int i) {
-                if (EntityInfoRegistry.getCombatUser(combatUser.getEntity()) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 onCooldownTick();
 
                 if (isStackCooldownFinished()) {
@@ -97,7 +101,7 @@ public abstract class StackableSkill extends ActiveSkill {
 
                 return true;
             }
-        };
+        });
     }
 
     /**
@@ -120,14 +124,9 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param amount 스택 증가량
      */
     public final void addStack(int amount) {
-        int max = getMaxStack();
-
-        stack += amount;
+        stack = Math.min(Math.max(0, stack + amount), getMaxStack());
 
         if (stack > 0) {
-            if (stack > max)
-                stack = max;
-
             if (isStackCooldownFinished())
                 setStackCooldown(getDefaultStackCooldown());
 
@@ -135,10 +134,8 @@ public abstract class StackableSkill extends ActiveSkill {
                 displayReady(stack);
             else
                 displayUsing(stack);
-        } else {
-            stack = 0;
+        } else
             displayCooldown(1);
-        }
     }
 
     /**
@@ -148,10 +145,5 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     public final boolean isStackCooldownFinished() {
         return getStackCooldown() == 0;
-    }
-
-    @Override
-    public boolean canUse() {
-        return isCooldownFinished() && stack > 0;
     }
 }

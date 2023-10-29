@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.action.skill.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.skill.UltimateSkillInfo;
-import com.dace.dmgr.combat.action.weapon.WeaponInfo;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.AllArgsConstructor;
@@ -55,7 +55,7 @@ public abstract class Character {
      * @param isUlt      궁극기 충전 여부
      * @see Character#onDamage(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onAttack(CombatUser attacker, CombatEntity<?> victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(CombatUser attacker, CombatEntity victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class Character {
      * @param isUlt      궁극기 충전 여부
      * @see Character#onAttack(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
      */
-    public void onDamage(CombatUser victim, CombatEntity<?> attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatUser victim, CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class Character {
      * @param isUlt    궁극기 충전 여부
      * @see Character#onTakeHeal(CombatUser, CombatEntity, int, boolean)
      */
-    public void onGiveHeal(CombatUser attacker, CombatEntity<?> victim, int amount, boolean isUlt) {
+    public void onGiveHeal(CombatUser attacker, CombatEntity victim, int amount, boolean isUlt) {
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class Character {
      * @param isUlt    궁극기 충전 여부
      * @see Character#onGiveHeal(CombatUser, CombatEntity, int, boolean)
      */
-    public void onTakeHeal(CombatUser victim, CombatEntity<?> attacker, int amount, boolean isUlt) {
+    public void onTakeHeal(CombatUser victim, CombatEntity attacker, int amount, boolean isUlt) {
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class Character {
      * @param victim   피격자
      * @see Character#onDeath(CombatUser, CombatEntity)
      */
-    public void onKill(CombatUser attacker, CombatEntity<?> victim) {
+    public void onKill(CombatUser attacker, CombatEntity victim) {
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class Character {
      * @param attacker 공격자
      * @see Character#onKill(CombatUser, CombatEntity)
      */
-    public void onDeath(CombatUser victim, CombatEntity<?> attacker) {
+    public void onDeath(CombatUser victim, CombatEntity attacker) {
     }
 
     /**
