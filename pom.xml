@@ -131,7 +131,7 @@
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
-            <artifactId>crackshot</artifactId>
+            <artifactId>WorldGuard</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/worldguard-bukkit-6.2.2.jar</systemPath>
