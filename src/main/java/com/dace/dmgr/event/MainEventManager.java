@@ -20,6 +20,7 @@ public final class MainEventManager {
         EventUtil.registerListener(new OnBlockFade());
         EventUtil.registerListener(new OnBlockBurn());
         EventUtil.registerListener(new OnWeatherChange());
+        EventUtil.registerListener(new OnChunkUnload());
         EventUtil.registerListener(new OnFoodLevelChange());
         EventUtil.registerListener(new OnEntityDamage());
         EventUtil.registerListener(new OnEntityDamageByEntity());
