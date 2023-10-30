@@ -29,6 +29,8 @@ public enum Cooldown {
     WEAPON_FIRST_RECOIL_DELAY(4),
     /** 연사가 가능한 총기류의 쿨타임 */
     WEAPON_FULLAUTO_COOLDOWN(4),
+    /** 연사가 가능한 총기류의 탄퍼짐 회복 시간 */
+    WEAPON_FULLAUTO_RECOVERY_DELAY(4),
     /** 재장전 */
     WEAPON_RELOAD(0),
     /** 달리기 금지 */

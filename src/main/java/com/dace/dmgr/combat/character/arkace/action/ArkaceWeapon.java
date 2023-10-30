@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.WeaponBase;
-import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.action.weapon.module.GradualSpreadModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -29,12 +29,13 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     /** 재장전 모듈 */
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
-    private final FullAutoModule fullAutoModule;
+    private final GradualSpreadModule fullAutoModule;
 
     public ArkaceWeapon(CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600);
+        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600, ArkaceWeaponInfo.SPREAD.INCREMENT,
+                ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
     }
 
     @Override
@@ -68,16 +69,15 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
 
                 CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
-
-                new ArkaceWeaponHitscan(isUlt).shoot(combatUser.getBulletSpread());
-
                 Location loc = combatUser.getEntity().getLocation();
-                if (isUlt)
+
+                if (isUlt) {
+                    new ArkaceWeaponHitscan(true).shoot(0);
                     playUltShootSound(loc);
-                else {
+                } else {
+                    new ArkaceWeaponHitscan(false).shoot(fullAutoModule.increaseSpread());
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
-                    CombatUtil.setBulletSpread(combatUser, ArkaceWeaponInfo.SPREAD.INCREMENT, ArkaceWeaponInfo.SPREAD.RECOVERY, ArkaceWeaponInfo.SPREAD.MAX);
                     reloadModule.consume(1);
                     playShootSound(loc);
                 }

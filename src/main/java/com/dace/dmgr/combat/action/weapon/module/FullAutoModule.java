@@ -8,16 +8,20 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 무기의 연사 모듈 클래스.
+ *
+ * <p>무기가 {@link FullAuto}를 상속받는 클래스여야 한다.</p>
+ *
+ * @see FullAuto
  */
 @RequiredArgsConstructor
-public final class FullAutoModule implements ActionModule {
+public class FullAutoModule implements ActionModule {
     /** 무기 객체 */
-    private final FullAuto weapon;
+    protected final FullAuto weapon;
     /** 연사 기능을 적용할 동작 사용 키 */
     @Getter
-    private final ActionKey fullAutoKey;
+    protected final ActionKey fullAutoKey;
     /** 연사속도 */
-    private final FullAuto.FireRate fireRate;
+    protected final FullAuto.FireRate fireRate;
 
     /**
      * 틱을 기준으로 발사할 수 있는 시점을 확인한다.
@@ -25,7 +29,7 @@ public final class FullAutoModule implements ActionModule {
      * @param tick 기준 틱
      * @return 발사 가능 여부
      */
-    public boolean isFireTick(int tick) {
+    public final boolean isFireTick(int tick) {
         tick = tick % 20 + 1;
 
         switch (fireRate) {
