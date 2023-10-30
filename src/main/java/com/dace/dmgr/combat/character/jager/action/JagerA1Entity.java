@@ -119,7 +119,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         owner.onKill(victim);
     }
 

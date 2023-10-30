@@ -5,8 +5,7 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -52,10 +51,11 @@ public abstract class Character {
      * @param damage     피해량
      * @param damageType 피해 타입
      * @param isCrit     치명타 여부
-     * @param isUlt      궁극기 충전 여부
-     * @see Character#onDamage(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
+     * @return 궁극기 충전 여부
+     * @see Character#onDamage(CombatUser, Attacker, int, DamageType, boolean)
      */
-    public void onAttack(CombatUser attacker, CombatEntity victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public boolean onAttack(CombatUser attacker, Damageable victim, int damage, DamageType damageType, boolean isCrit) {
+        return true;
     }
 
     /**
@@ -66,34 +66,33 @@ public abstract class Character {
      * @param damage     피해량
      * @param damageType 피해 타입
      * @param isCrit     치명타 여부
-     * @param isUlt      궁극기 충전 여부
-     * @see Character#onAttack(CombatUser, CombatEntity, int, DamageType, boolean, boolean)
+     * @see Character#onAttack(CombatUser, Damageable, int, DamageType, boolean)
      */
-    public void onDamage(CombatUser victim, CombatEntity attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(CombatUser victim, Attacker attacker, int damage, DamageType damageType, boolean isCrit) {
     }
 
     /**
      * 전투원으로 다른 엔티티를 치유했을 때 실행될 작업.
      *
-     * @param attacker 공격자
-     * @param victim   피격자
+     * @param provider 제공자
+     * @param target   수급자
      * @param amount   치유량
-     * @param isUlt    궁극기 충전 여부
-     * @see Character#onTakeHeal(CombatUser, CombatEntity, int, boolean)
+     * @return 궁극기 충전 여부
+     * @see Character#onTakeHeal(CombatUser, Healer, int)
      */
-    public void onGiveHeal(CombatUser attacker, CombatEntity victim, int amount, boolean isUlt) {
+    public boolean onGiveHeal(CombatUser provider, Healable target, int amount) {
+        return true;
     }
 
     /**
      * 전투원으로 치유를 받았을 때 실행될 작업.
      *
-     * @param victim   피격자
-     * @param attacker 공격자
+     * @param target   수급자
+     * @param provider 제공자
      * @param amount   치유량
-     * @param isUlt    궁극기 충전 여부
-     * @see Character#onGiveHeal(CombatUser, CombatEntity, int, boolean)
+     * @see Character#onGiveHeal(CombatUser, Healable, int)
      */
-    public void onTakeHeal(CombatUser victim, CombatEntity attacker, int amount, boolean isUlt) {
+    public void onTakeHeal(CombatUser target, Healer provider, int amount) {
     }
 
     /**
@@ -101,9 +100,9 @@ public abstract class Character {
      *
      * @param attacker 공격자
      * @param victim   피격자
-     * @see Character#onDeath(CombatUser, CombatEntity)
+     * @see Character#onDeath(CombatUser, Attacker)
      */
-    public void onKill(CombatUser attacker, CombatEntity victim) {
+    public void onKill(CombatUser attacker, Damageable victim) {
     }
 
     /**
@@ -111,9 +110,9 @@ public abstract class Character {
      *
      * @param victim   피격자
      * @param attacker 공격자
-     * @see Character#onKill(CombatUser, CombatEntity)
+     * @see Character#onKill(CombatUser, Damageable)
      */
-    public void onDeath(CombatUser victim, CombatEntity attacker) {
+    public void onDeath(CombatUser victim, Attacker attacker) {
     }
 
     /**

@@ -231,7 +231,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         if (character == null)
             return;
 
-        character.onAttack(this, victim, damage, damageType, isCrit, isUlt);
+        isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
 
         if (damageType == DamageType.NORMAL) {
             if (isCrit)
@@ -267,7 +267,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         if (this == attacker)
             return;
 
-        character.onDamage(this, attacker, damage, damageType, isCrit, isUlt);
+        character.onDamage(this, attacker, damage, damageType, isCrit);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
@@ -305,15 +305,15 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     @Override
     public void onGiveHeal(Healable target, int amount, boolean isUlt) {
-        character.onGiveHeal(this, target, amount, isUlt);
+        isUlt = isUlt && character.onGiveHeal(this, target, amount);
 
-        if (damageModule.isUltProvider() && isUlt)
+        if (target.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(amount);
     }
 
     @Override
-    public void onTakeHeal(CombatEntity provider, int amount, boolean isUlt) {
-        character.onTakeHeal(this, provider, amount, isUlt);
+    public void onTakeHeal(Healer provider, int amount, boolean isUlt) {
+        character.onTakeHeal(this, provider, amount);
 
         playTakeHealEffect(amount);
     }
@@ -335,7 +335,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         if (character == null)
             return;
 
@@ -521,10 +521,16 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void setUltGaugePercent(float value) {
         if (character == null)
             value = 0;
+        else {
+            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            if (!skill.isDurationFinished())
+                value = 0;
+        }
         if (value >= 1) {
             onUltReady();
             value = 0.999F;
         }
+
         entity.setExp(value);
         entity.setLevel(Math.round(value * 100));
     }

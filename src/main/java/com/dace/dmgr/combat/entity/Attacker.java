@@ -24,7 +24,7 @@ public interface Attacker extends CombatEntity {
      * @param victim 피격자
      * @see Damageable#onDeath(Attacker)
      */
-    void onKill(CombatEntity victim);
+    void onKill(Damageable victim);
 
     /**
      * 엔티티가 기본 공격을 했을 때 실행될 작업.

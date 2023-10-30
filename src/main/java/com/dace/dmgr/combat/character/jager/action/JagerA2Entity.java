@@ -167,7 +167,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         owner.onKill(victim);
     }
 

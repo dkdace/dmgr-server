@@ -177,7 +177,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         owner.onKill(victim);
     }
 
