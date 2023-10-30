@@ -76,8 +76,8 @@ public class ConfirmModule implements ActionModule {
     /**
      * 메시지 목록.
      */
-    private static class MESSAGES {
+    private interface MESSAGES {
         /** 확인 중 메시지 */
-        static final String CHECKING = "§7§l[{0}] §f사용     §7§l[{1}] §f취소";
+        String CHECKING = "§7§l[{0}] §f사용     §7§l[{1}] §f취소";
     }
 }

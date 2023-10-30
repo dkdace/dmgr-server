@@ -108,10 +108,10 @@ public final class ReloadModule implements ActionModule {
     /**
      * 메시지 목록.
      */
-    private static class MESSAGES {
+    private interface MESSAGES {
         /** 재장전 중 메시지 */
-        static final String RELOADING = "§c§l재장전... {0} §f[{1}초]";
+        String RELOADING = "§c§l재장전... {0} §f[{1}초]";
         /** 재장전 완료 메시지 */
-        static final String RELOAD_COMPLETE = "§a§l재장전 완료";
+        String RELOAD_COMPLETE = "§a§l재장전 완료";
     }
 }

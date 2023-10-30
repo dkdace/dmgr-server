@@ -85,8 +85,8 @@ public final class JagerWeaponInfo extends WeaponInfo {
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public static class RESOURCE {
+    public interface RESOURCE {
         /** 기본 */
-        static final short DEFAULT = 2;
+        short DEFAULT = 2;
     }
 }

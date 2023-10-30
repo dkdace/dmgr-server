@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends CombatEntityBase<Player> implements Healable, Attacker, Healer, Living, Jumpable, HasCritHitbox {
+public final class CombatUser extends CombatEntityBase<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Movable {
     /** 초당 궁극기 충전량 */
     public static final int IDLE_ULT_CHARGE = 10;
     /** 기본 이동속도 */
@@ -231,7 +231,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         if (character == null)
             return;
 
-        character.onAttack(this, victim, damage, damageType, isCrit, isUlt);
+        isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
 
         if (damageType == DamageType.NORMAL) {
             if (isCrit)
@@ -267,7 +267,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         if (this == attacker)
             return;
 
-        character.onDamage(this, attacker, damage, damageType, isCrit, isUlt);
+        character.onDamage(this, attacker, damage, damageType, isCrit);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
@@ -305,15 +305,15 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     @Override
     public void onGiveHeal(Healable target, int amount, boolean isUlt) {
-        character.onGiveHeal(this, target, amount, isUlt);
+        isUlt = isUlt && character.onGiveHeal(this, target, amount);
 
-        if (damageModule.isUltProvider() && isUlt)
+        if (target.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(amount);
     }
 
     @Override
-    public void onTakeHeal(CombatEntity provider, int amount, boolean isUlt) {
-        character.onTakeHeal(this, provider, amount, isUlt);
+    public void onTakeHeal(Healer provider, int amount, boolean isUlt) {
+        character.onTakeHeal(this, provider, amount);
 
         playTakeHealEffect(amount);
     }
@@ -335,7 +335,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         if (character == null)
             return;
 
@@ -521,10 +521,16 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void setUltGaugePercent(float value) {
         if (character == null)
             value = 0;
+        else {
+            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            if (!skill.isDurationFinished())
+                value = 0;
+        }
         if (value >= 1) {
             onUltReady();
             value = 0.999F;
         }
+
         entity.setExp(value);
         entity.setLevel(Math.round(value * 100));
     }
@@ -679,18 +685,18 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /**
      * 전투에 사용되는 자막(Subtitle) 종류.
      */
-    private static class SUBTITLES {
+    private interface SUBTITLES {
         /** 공격 */
-        static final String HIT = "§f×";
+        String HIT = "§f×";
         /** 공격 (치명타) */
-        static final String CRIT = "§c§l×";
+        String CRIT = "§c§l×";
         /** 처치 (플레이어) */
-        static final String KILL_PLAYER = "§c§lKILL";
+        String KILL_PLAYER = "§c§lKILL";
         /** 처치 (엔티티) */
-        static final String KILL_ENTITY = "§c✔";
+        String KILL_ENTITY = "§c✔";
         /** 사망 */
-        static final String DEATH = "§c§l죽었습니다!";
+        String DEATH = "§c§l죽었습니다!";
         /** 리스폰 시간 */
-        static final String RESPAWN_COOLDOWN = "{0}초 후 부활합니다.";
+        String RESPAWN_COOLDOWN = "{0}초 후 부활합니다.";
     }
 }

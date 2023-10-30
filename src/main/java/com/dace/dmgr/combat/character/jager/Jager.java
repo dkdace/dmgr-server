@@ -7,8 +7,8 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.jager.action.*;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.TextIcon;
@@ -78,11 +78,14 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onAttack(CombatUser attacker, CombatEntity victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public boolean onAttack(CombatUser attacker, Damageable victim, int damage, DamageType damageType, boolean isCrit) {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
+        JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
         if (!skill1.isDurationFinished() && victim instanceof Living)
             skill1.getHasEntityModule().getSummonEntity().getEntity().setTarget(victim.getEntity());
+
+        return skillUlt.getHasEntityModule().getSummonEntity() == null;
     }
 
     @Override
