@@ -31,7 +31,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     @Getter
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */
-    private ArmorStand pointer;
+    private ArmorStand pointer = null;
 
     public LocationConfirmModule(Confirmable skill, ActionKey acceptKey, ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
@@ -100,12 +100,14 @@ public final class LocationConfirmModule extends ConfirmModule {
 
     @Override
     public void onReset() {
-        pointer.remove();
+        if (pointer != null)
+            pointer.remove();
     }
 
     @Override
     public void onRemove() {
-        pointer.remove();
+        if (pointer != null)
+            pointer.remove();
     }
 
     /**
