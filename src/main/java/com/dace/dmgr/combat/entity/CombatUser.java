@@ -85,9 +85,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /** 무기 객체 */
     @Getter
     private Weapon weapon;
-    /** 현재 무기 탄퍼짐 */
-    @Getter
-    private float bulletSpread = 0;
 
     /**
      * 전투 시스템의 플레이어 인스턴스를 생성한다.
@@ -469,16 +466,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     public Skill getSkill(SkillInfo skillInfo) {
         return skillMap.get(skillInfo);
-    }
-
-    /**
-     * 현재 무기 탄퍼짐을 증가시킨다.
-     *
-     * @param bulletSpread 무기 탄퍼짐. 최소 값은 {@code 0}, 최대 값은 {@code max}
-     * @param max          무기 탄퍼짐 최대치
-     */
-    public void addBulletSpread(float bulletSpread, float max) {
-        this.bulletSpread = Math.min(Math.max(0, this.bulletSpread + bulletSpread), max);
     }
 
     /**
