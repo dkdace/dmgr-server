@@ -95,10 +95,10 @@ public final class SwapModule<T extends Weapon> implements ActionModule {
     /**
      * 메시지 목록.
      */
-    private static class MESSAGES {
+    private interface MESSAGES {
         /** 교체 중 메시지 */
-        static final String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
+        String SWAPPING = "§c§l무기 교체 중... {0} §f[{1}초]";
         /** 교체 완료 메시지 */
-        static final String SWAP_COMPLETE = "§a§l무기 교체 완료";
+        String SWAP_COMPLETE = "§a§l무기 교체 완료";
     }
 }

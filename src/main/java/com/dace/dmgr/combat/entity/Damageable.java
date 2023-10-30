@@ -5,8 +5,6 @@ import com.dace.dmgr.combat.entity.module.DamageModule;
 
 /**
  * 생명력 수치를 조정하고 피해를 입을 수 있는 엔티티의 인터페이스.
- *
- * @see Healable
  */
 public interface Damageable extends CombatEntity {
     /**

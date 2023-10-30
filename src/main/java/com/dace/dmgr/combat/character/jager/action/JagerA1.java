@@ -3,8 +3,8 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
+import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.HasEntity;
-import com.dace.dmgr.combat.action.skill.LocationConfirmable;
 import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
@@ -13,7 +13,7 @@ import lombok.Getter;
 import org.bukkit.entity.Wolf;
 
 @Getter
-public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, LocationConfirmable {
+public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, Confirmable {
     /** 엔티티 소환 모듈 */
     private final HasEntityModule<JagerA1Entity> hasEntityModule;
     /** 위치 확인 모듈 */

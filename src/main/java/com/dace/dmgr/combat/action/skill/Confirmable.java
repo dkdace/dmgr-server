@@ -4,8 +4,6 @@ import com.dace.dmgr.combat.action.skill.module.ConfirmModule;
 
 /**
  * 사용 전 확인이 필요한 스킬의 인터페이스.
- *
- * @see LocationConfirmable
  */
 public interface Confirmable extends Skill {
     /**

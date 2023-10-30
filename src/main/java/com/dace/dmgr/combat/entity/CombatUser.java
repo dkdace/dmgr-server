@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends CombatEntityBase<Player> implements Healable, Attacker, Healer, Living, Jumpable, HasCritHitbox {
+public final class CombatUser extends CombatEntityBase<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Movable {
     /** 초당 궁극기 충전량 */
     public static final int IDLE_ULT_CHARGE = 10;
     /** 기본 이동속도 */
@@ -679,18 +679,18 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /**
      * 전투에 사용되는 자막(Subtitle) 종류.
      */
-    private static class SUBTITLES {
+    private interface SUBTITLES {
         /** 공격 */
-        static final String HIT = "§f×";
+        String HIT = "§f×";
         /** 공격 (치명타) */
-        static final String CRIT = "§c§l×";
+        String CRIT = "§c§l×";
         /** 처치 (플레이어) */
-        static final String KILL_PLAYER = "§c§lKILL";
+        String KILL_PLAYER = "§c§lKILL";
         /** 처치 (엔티티) */
-        static final String KILL_ENTITY = "§c✔";
+        String KILL_ENTITY = "§c✔";
         /** 사망 */
-        static final String DEATH = "§c§l죽었습니다!";
+        String DEATH = "§c§l죽었습니다!";
         /** 리스폰 시간 */
-        static final String RESPAWN_COOLDOWN = "{0}초 후 부활합니다.";
+        String RESPAWN_COOLDOWN = "{0}초 후 부활합니다.";
     }
 }
