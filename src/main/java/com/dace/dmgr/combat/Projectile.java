@@ -1,14 +1,16 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.combat.entity.Ability;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,45 +18,53 @@ import java.util.Set;
  */
 public abstract class Projectile extends Bullet {
     /** 투사체의 기본 판정 범위. 단위: 블록 */
-    private static final float SIZE = 0.3F;
+    private static final float SIZE = 0.13F;
+    /** 피해 증가량 */
+    @Getter
+    private final double damageIncrement;
     /** 투사체의 속력. 단위: 블록/s */
     protected int velocity;
+    /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
+    protected long duration;
     /** 중력 작용 여부 */
     protected boolean hasGravity;
-    /** 투사체가 튕기는 횟수. {@code 0}으로 설정 시 튕기지 않음 */
-    protected int bouncing;
 
     /**
      * 투사체 인스턴스를 생성한다.
      *
      * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
-     * @param velocity      속력
-     * @param option        선택적 옵션
+     * @param shooter  발사하는 엔티티
+     * @param velocity 투사체의 속력. 단위: 블록/s
+     * @param option   선택적 옵션
      * @see ProjectileOption
      */
-    public Projectile(ICombatEntity shooter, int trailInterval, int velocity, ProjectileOption option) {
-        super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
+    protected Projectile(CombatEntity shooter, int velocity, ProjectileOption option) {
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
+        this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
     }
 
     /**
      * 투사체 인스턴스를 생성한다.
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
-     * @param velocity      속력
+     * @param shooter  발사하는 엔티티
+     * @param velocity 투사체의 속력. 단위: 블록/s
      */
-    public Projectile(ICombatEntity shooter, int trailInterval, int velocity) {
-        super(shooter, trailInterval);
+    protected Projectile(CombatEntity shooter, int velocity) {
+        super(shooter);
+        this.damageIncrement = shooter.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         ProjectileOption option = ProjectileOption.builder().build();
+        this.trailInterval = option.trailInterval;
+        this.maxDistance = option.maxDistance;
+        this.penetrating = option.penetrating;
+        this.hitboxMultiplier = option.hitboxMultiplier;
+        this.condition = option.condition;
         this.velocity = velocity;
+        this.duration = option.duration;
         this.hasGravity = option.hasGravity;
-        this.bouncing = option.bouncing;
     }
 
     /**
@@ -65,13 +75,14 @@ public abstract class Projectile extends Bullet {
      * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
     @Override
-    public void shoot(Location origin, Vector direction, float spread) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
+    public final void shoot(Location origin, Vector direction, float spread) {
+        direction.normalize();
         Location loc = origin.clone();
-        direction = VectorUtil.getSpreadedVector(direction, spread);
-        Set<ICombatEntity> targetList = new HashSet<>();
+        loc.add(direction.clone().multiply(START_DISTANCE));
+        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
+        Set<CombatEntity> targets = new HashSet<>();
 
-        int loopCount = velocity / 5;
+        int loopCount = (int) (velocity / 2.5);
         int sum = 0;
         for (int i = 0; i <= loopCount; i++) {
             sum += i;
@@ -80,66 +91,37 @@ public abstract class Projectile extends Bullet {
         final Vector finalDirection = direction;
         final int finalSum = sum;
 
-        new TaskTimer(1) {
+        TaskManager.addTask(getShooter(), new TaskTimer(1) {
             int count = 0;
 
             @Override
-            public boolean run(int _i) {
+            public boolean onTimerTick(int _i) {
                 for (int i = 0; i < loopCount; i++) {
-                    if (loc.distance(origin) >= MAX_RANGE)
+                    if ((duration != -1 && _i >= duration) || loc.distance(origin) > maxDistance)
                         return false;
 
-                    Location hitLoc = loc.clone().add(finalDirection);
-                    if (!LocationUtil.isNonSolid(hitLoc)) {
-                        Vector subDir = finalDirection.clone().multiply(0.25);
+                    if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, finalDirection))
+                        return false;
 
-                        while (LocationUtil.isNonSolid(loc))
-                            loc.add(subDir);
+                    if (!findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
+                        return false;
 
-                        loc.subtract(subDir);
-                        onHit(loc);
-                        onHitBlock(loc, hitLoc.getBlock());
-
-                        if (bouncing-- > 0) {
-                            Vector hitDir = hitLoc.getBlock().getLocation().subtract(loc.getBlock().getLocation()).toVector();
-
-                            if (Math.abs(hitDir.getX()) > 0.5)
-                                finalDirection.setX(-finalDirection.getX());
-                            else if (Math.abs(hitDir.getY()) > 0.5)
-                                finalDirection.setY(-finalDirection.getY());
-                            else if (Math.abs(hitDir.getZ()) > 0.5)
-                                finalDirection.setZ(-finalDirection.getZ());
-
-                            return true;
-                        } else
-                            return false;
-                    }
-
-                    if (loc.distance(origin) > 0.5) {
-                        Map.Entry<ICombatEntity, Boolean> targetEntry
-                                = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                        ICombatEntity target = targetEntry.getKey();
-                        boolean isCrit = targetEntry.getValue();
-
-                        if (target != null) {
-                            if (targetList.add(target)) {
-                                onHit(hitLoc);
-                                onHitEntity(hitLoc, target, isCrit);
-
-                                if (!penetrating)
-                                    return false;
-                            }
-                        }
-                    }
-                    if (hasGravity) {
+                    if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))
                         finalDirection.subtract(new Vector(0, 0.045 * ((float) loopCount / finalSum) / loopCount, 0));
-                    }
-                    loc.add(finalDirection);
-                    if (count++ % trailInterval == 0) trail(loc.clone());
+
+                    if (finalDirection.length() > 0.01)
+                        loc.add(finalDirection);
+                    if (count++ % trailInterval == 0)
+                        trail(loc.clone());
                 }
 
                 return true;
             }
-        };
+
+            @Override
+            public void onEnd(boolean cancelled) {
+                onDestroy(loc.clone());
+            }
+        });
     }
 }

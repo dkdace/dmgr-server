@@ -1,24 +1,54 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.combat.entity.Hitbox;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Stairs;
-import org.bukkit.material.Step;
+import org.bukkit.material.*;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 위치 관련 기능을 제공하는 클래스.
  */
-public class LocationUtil {
+public final class LocationUtil {
+    /**
+     * 지정한 블록이 통과할 수 있는 블록인 지 확인한다.
+     *
+     * @param block 확인할 블록
+     * @return 통과 가능하면 {@code true} 반환
+     */
+    private static boolean canPassBlock(Block block) {
+        if (!block.getType().isSolid())
+            return true;
+
+        MaterialData materialData = block.getState().getData();
+        if (materialData instanceof Step && block.getType().isOccluding())
+            return false;
+        if (materialData instanceof Step || materialData instanceof Stairs || materialData instanceof Gate ||
+                materialData instanceof Door || materialData instanceof TrapDoor)
+            return true;
+
+        switch (block.getType()) {
+            case THIN_GLASS:
+            case STAINED_GLASS_PANE:
+            case FENCE:
+            case SPRUCE_FENCE:
+            case BIRCH_FENCE:
+            case JUNGLE_FENCE:
+            case ACACIA_FENCE_GATE:
+            case DARK_OAK_FENCE:
+            case IRON_FENCE:
+            case COBBLE_WALL:
+            case SIGN_POST:
+            case WALL_SIGN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     /**
      * 지정한 위치를 통과할 수 있는지 확인한다.
      *
-     * <p>통과 가능한 블록이란 유리판, 울타리, 물 등을 말한다.</p>
+     * <p>통과 가능한 블록은 {@link LocationUtil#canPassBlock(Block)}에서 판단한다.</p>
      *
      * <p>각종 스킬의 판정에 사용한다.</p>
      *
@@ -28,37 +58,24 @@ public class LocationUtil {
     public static boolean isNonSolid(Location location) {
         Block block = location.getBlock();
 
-        if (block.isEmpty())
-            return true;
-
-        if (!block.getType().isOccluding()) {
-            switch (block.getType()) {
-                case GLASS:
-                case STAINED_GLASS:
-                case GLOWSTONE:
-                case BEACON:
-                case SEA_LANTERN:
-                case CAULDRON:
-                case ANVIL:
-                    return false;
-            }
-
+        if (canPassBlock(block)) {
             MaterialData materialData = block.getState().getData();
+
             if (materialData instanceof Step) {
-                if (((Step) materialData).isInverted()) {
+                if (((Step) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
-                } else {
+                else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
-                }
             } else if (materialData instanceof Stairs) {
-                if (((Stairs) materialData).isInverted()) {
+                if (((Stairs) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
-                } else {
+                else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
-                }
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -72,30 +89,16 @@ public class LocationUtil {
      * @return 통과 가능하면 {@code true} 반환
      */
     public static boolean canPass(Location start, Location end) {
-        for (Location loc : getLine(start, end)) {
-            if (isNonSolid(loc)) return false;
-        }
-        return true;
-    }
-
-    /**
-     * 두 위치 사이에 있는 1m 간격의 모든 위치를 반환한다.
-     *
-     * @param start 시작 위치
-     * @param end   끝 위치
-     * @return 해당 위치 목록
-     */
-    public static List<Location> getLine(Location start, Location end) {
-        Vector direction = end.toVector().subtract(start.toVector());
+        Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.25);
         Location loc = start.clone();
-        List<Location> locList = new ArrayList<>();
+        double distance = start.distance(end);
 
-        while (loc.distance(start) < start.distance(end)) {
-            loc.add(direction);
-            locList.add(loc);
+        while (loc.distance(start) < distance) {
+            if (!isNonSolid(loc.add(direction)))
+                return false;
         }
 
-        return locList;
+        return true;
     }
 
     /**
@@ -104,8 +107,8 @@ public class LocationUtil {
      * <p>Example:</p>
      *
      * <pre>{@code
-     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * // loc과 dir을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
+     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * }</pre>
      *
      * @param location  기준 위치
@@ -132,8 +135,8 @@ public class LocationUtil {
      * <p>Example:</p>
      *
      * <pre>{@code
-     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * // loc의 방향을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
+     * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
      * }</pre>
      *
      * @param location 기준 위치
@@ -144,54 +147,5 @@ public class LocationUtil {
      */
     public static Location getLocationFromOffset(Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
-    }
-
-    /**
-     * 지정한 위치가 특정 히트박스의 내부에 있는 지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @param hitbox   히트박스
-     * @param margin   마진. 히트박스 크기에 margin을 더해 계산
-     * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
-     * @see Hitbox
-     */
-    public static boolean isInHitbox(Location location, Hitbox hitbox, float margin) {
-        Location[] points = new Location[4];
-        Location center = hitbox.getCenter();
-        double sizeX = hitbox.getSizeX() + margin * 2;
-        double sizeY = hitbox.getSizeY() + margin * 2;
-        double sizeZ = hitbox.getSizeZ() + margin * 2;
-
-        if (location.getY() < center.getY() - sizeY / 2 || location.getY() > center.getY() + sizeY / 2)
-            return false;
-
-        points[0] = LocationUtil.getLocationFromOffset(center, -sizeX / 2, 0, sizeZ / 2);
-        points[1] = LocationUtil.getLocationFromOffset(center, -sizeX / 2, 0, -sizeZ / 2);
-        points[2] = LocationUtil.getLocationFromOffset(center, sizeX / 2, 0, -sizeZ / 2);
-        points[3] = LocationUtil.getLocationFromOffset(center, sizeX / 2, 0, sizeZ / 2);
-
-        boolean inside = false;
-
-        for (int i = 0, j = 3; i < 4; j = i++) {
-            if (((points[i].getZ() > location.getZ()) != (points[j].getZ() > location.getZ())) &&
-                    (location.getX() < (points[j].getX() - points[i].getX()) *
-                            (location.getZ() - points[i].getZ()) / (points[j].getZ() - points[i].getZ()) + points[i].getX())) {
-                inside = !inside;
-            }
-        }
-
-        return inside;
-    }
-
-    /**
-     * 지정한 위치가 특정 히트박스의 내부에 있는 지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @param hitbox   히트박스
-     * @return {@code location}이 {@code hitbox}의 내부에 있으면 {@code true} 반환
-     * @see Hitbox
-     */
-    public static boolean isInHitbox(Location location, Hitbox hitbox) {
-        return isInHitbox(location, hitbox, 0);
     }
 }

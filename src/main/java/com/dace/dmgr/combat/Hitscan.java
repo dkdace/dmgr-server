@@ -1,13 +1,12 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.combat.entity.ICombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,30 +14,34 @@ import java.util.Set;
  */
 public abstract class Hitscan extends Bullet {
     /** 히트스캔의 기본 판정 범위. 단위: 블록 */
-    private static final float SIZE = 0.15F;
+    private static final float SIZE = 0.05F;
 
     /**
      * 히트스캔 인스턴스를 생성한다.
      *
      * <p>히트스캔의 선택적 옵션은 {@link HitscanOption} 객체를 통해 전달받는다.</p>
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
-     * @param option        선택적 옵션
+     * @param shooter 발사하는 엔티티
+     * @param option  선택적 옵션
      * @see HitscanOption
      */
-    public Hitscan(ICombatEntity shooter, int trailInterval, HitscanOption option) {
-        super(shooter, trailInterval, option.penetrating, option.hitboxMultiplier);
+    protected Hitscan(CombatEntity shooter, HitscanOption option) {
+        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
     }
 
     /**
      * 히트스캔 인스턴스를 생성한다.
      *
-     * @param shooter       발사하는 엔티티
-     * @param trailInterval 트레일 실행 주기
+     * @param shooter 발사하는 엔티티
      */
-    public Hitscan(ICombatEntity shooter, int trailInterval) {
-        super(shooter, trailInterval);
+    protected Hitscan(CombatEntity shooter) {
+        super(shooter);
+        HitscanOption hitscanOption = HitscanOption.builder().build();
+        this.trailInterval = hitscanOption.trailInterval;
+        this.maxDistance = hitscanOption.maxDistance;
+        this.penetrating = hitscanOption.penetrating;
+        this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
+        this.condition = hitscanOption.condition;
     }
 
     /**
@@ -48,44 +51,26 @@ public abstract class Hitscan extends Bullet {
      * @param direction 발사 방향
      * @param spread    탄퍼짐 정도. 단위: ×0.02블록/블록
      */
-    public void shoot(Location origin, Vector direction, float spread) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
+    @Override
+    public final void shoot(Location origin, Vector direction, float spread) {
+        direction.normalize();
         Location loc = origin.clone();
-        direction = VectorUtil.getSpreadedVector(direction, spread);
-        Set<ICombatEntity> targetSet = new HashSet<>();
+        loc.add(direction.clone().multiply(START_DISTANCE));
+        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
+        Set<CombatEntity> targets = new HashSet<>();
 
-        for (int i = 0; loc.distance(origin) < MAX_RANGE; i++) {
-            Location hitLoc = loc.clone().add(direction);
-            if (!LocationUtil.isNonSolid(hitLoc)) {
-                Vector subDir = direction.clone().multiply(0.5);
-
-                while (LocationUtil.isNonSolid(loc))
-                    loc.add(subDir);
-
-                loc.subtract(subDir);
-                onHit(loc);
-                onHitBlock(loc, hitLoc.getBlock());
+        for (int i = 0; loc.distance(origin) < maxDistance; i++) {
+            if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
                 break;
-            }
 
-            if (loc.distance(origin) > 0.5) {
-                Map.Entry<ICombatEntity, Boolean> targetEntry
-                        = Combat.getNearEnemy(shooter, loc, SIZE * hitboxMultiplier);
-                ICombatEntity target = targetEntry.getKey();
-                boolean isCrit = targetEntry.getValue();
+            if (!findEnemyAndHandleCollision(loc, direction, targets, SIZE, condition))
+                break;
 
-                if (target != null) {
-                    if (!targetSet.add(target)) {
-                        onHit(hitLoc);
-                        onHitEntity(hitLoc, target, isCrit);
-
-                        if (!penetrating)
-                            break;
-                    }
-                }
-            }
             loc.add(direction);
-            if (i % trailInterval == 0) trail(loc.clone());
+            if (i % trailInterval == 0)
+                trail(loc.clone());
         }
+
+        onDestroy(loc.clone());
     }
 }

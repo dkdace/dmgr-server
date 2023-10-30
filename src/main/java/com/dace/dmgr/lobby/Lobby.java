@@ -1,5 +1,7 @@
 package com.dace.dmgr.lobby;
 
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.Bukkit;
@@ -9,14 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
-
 /**
  * 로비에서 사용하는 기능을 제공하는 클래스.
  */
-public class Lobby {
+public final class Lobby {
     /** 스폰 위치 */
-    public static Location lobby = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
+    public static final Location lobbyLocation = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
 
     /**
      * 로비 이동 이벤트.
@@ -26,9 +26,9 @@ public class Lobby {
      * @param player 대상 플레이어
      */
     public static void spawn(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
 
-        player.teleport(lobby);
+        player.teleport(lobbyLocation);
         user.reset();
     }
 
@@ -37,17 +37,14 @@ public class Lobby {
      *
      * <p>플레이어가 로비에 있을 때 실행해야 한다.</p>
      *
-     * @param player 대상 플레이어
+     * @param user 대상 플레이어
      */
-    public static void lobbyTick(Player player) {
-        User user = userMap.get(player);
+    public static void lobbyTick(User user) {
+        Player player = user.getPlayer();
 
-        new TaskTimer(20) {
+        TaskManager.addTask(user, new TaskTimer(20) {
             @Override
-            public boolean run(int i) {
-                if (userMap.get(player) == null)
-                    return false;
-
+            public boolean onTimerTick(int i) {
                 if (user.getUserConfig().isNightVision())
                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 0, false, false));
                 else
@@ -72,6 +69,6 @@ public class Lobby {
 
                 return true;
             }
-        };
+        });
     }
 }

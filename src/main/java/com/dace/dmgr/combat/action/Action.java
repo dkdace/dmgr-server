@@ -1,22 +1,106 @@
 package com.dace.dmgr.combat.action;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.dace.dmgr.combat.action.info.ActionInfo;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * 상호작용(무기, 패시브 스킬, 액티브 스킬 등) 정보를 관리하는 클래스.
+ * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
  *
- * @see Weapon
- * @see PassiveSkill
- * @see ActiveSkill
- * @see UltimateSkill
+ * @see ActionBase
  */
-@AllArgsConstructor
-@Getter
-public class Action {
-    /** 이름 */
-    protected final String name;
-    /** 설명 아이템 객체 */
-    protected final ItemStack itemStack;
+public interface Action extends HasTask {
+    /**
+     * @return 플레이어 객체
+     */
+    CombatUser getCombatUser();
+
+    /**
+     * @return 동작 정보 객체
+     */
+    ActionInfo getActionInfo();
+
+    /**
+     * @return 아이템 객체
+     */
+    ItemStack getItemStack();
+
+    /**
+     * 기본 사용 키를 반환한다.
+     *
+     * @return 기본 사용 키 목록
+     */
+    ActionKey[] getDefaultActionKeys();
+
+    /**
+     * 동작을 초기화한다.
+     */
+    void init();
+
+    /**
+     * 기본 쿨타임을 반환한다.
+     *
+     * @return 기본 쿨타임 (tick)
+     */
+    long getDefaultCooldown();
+
+    /**
+     * 쿨타임의 남은 시간을 반환한다.
+     *
+     * @return 쿨타임 (tick)
+     */
+    long getCooldown();
+
+    /**
+     * 쿨타임을 설정한다.
+     *
+     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     */
+    void setCooldown(long cooldown);
+
+    /**
+     * 쿨타임을 기본 쿨타임으로 설정한다.
+     *
+     * @see Action#getDefaultCooldown()
+     */
+    void setCooldown();
+
+    /**
+     * 쿨타임을 증가시킨다.
+     *
+     * @param cooldown 추가할 쿨타임 (tick)
+     */
+    void addCooldown(long cooldown);
+
+    /**
+     * 쿨타임이 끝났는 지 확인한다.
+     *
+     * @return 쿨타임 종료 여부
+     */
+    boolean isCooldownFinished();
+
+    /**
+     * 동작을 사용할 수 있는 지 확인한다.
+     *
+     * @return 사용 가능 여부
+     */
+    boolean canUse();
+
+    /**
+     * 사용 시 호출되는 이벤트.
+     *
+     * @param actionKey 사용 키
+     */
+    void onUse(ActionKey actionKey);
+
+    /**
+     * 동작의 상태를 초기화한다.
+     */
+    void reset();
+
+    /**
+     * 동작을 제거하고 작동을 중지시킨다.
+     */
+    void remove();
 }

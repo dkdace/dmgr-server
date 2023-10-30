@@ -29,7 +29,7 @@ public abstract class Gui implements Listener {
      * @param rowSize 행 크기. {@code 1 ~ 6} 사이의 값
      * @param name    GUI 이름
      */
-    public Gui(int rowSize, String name) {
+    protected Gui(int rowSize, String name) {
         if (rowSize > 6) rowSize = 6;
         if (rowSize < 1) rowSize = 1;
         this.rowSize = rowSize;
@@ -41,7 +41,7 @@ public abstract class Gui implements Listener {
      *
      * @param player 대상 플레이어
      */
-    public void open(Player player) {
+    public final void open(Player player) {
         Inventory inventory = Bukkit.createInventory(player, rowSize * 9, name);
         player.openInventory(inventory);
         onOpen(player, inventory);
@@ -64,11 +64,11 @@ public abstract class Gui implements Listener {
      * @return 클릭 가능 여부
      */
     private boolean isClickable(ItemStack item) {
-        return item.getType() != Material.AIR && !getItemName(item).isEmpty();
+        return item != null && item.getType() != Material.AIR && !getItemName(item).isEmpty();
     }
 
     @EventHandler
-    public void event(InventoryClickEvent event) {
+    public final void event(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
         if (event.getInventory().getTitle().equals(name)) {

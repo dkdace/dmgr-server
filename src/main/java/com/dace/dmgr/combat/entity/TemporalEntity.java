@@ -1,53 +1,61 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.system.HashMapList;
-import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
-
-import static com.dace.dmgr.system.HashMapList.temporalEntityMap;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
- * 일시적인 엔티티 클래스.
+ * 전투 시스템의 일시적인 엔티티 클래스.
  *
  * <p>설랑, 포탈 등 전투에서 일시적으로 사용하는 엔티티를 말한다.</p>
  *
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
+ * @see SummonEntity
  */
-public class TemporalEntity<T extends LivingEntity> extends CombatEntity<T> {
+public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntityBase<T> {
     /**
-     * 엔티티를 지정한 위치에 소환하고 {@link HashMapList#temporalEntityMap}에 추가한다.
+     * 일시적 엔티티 인스턴스를 생성한다.
      *
-     * @param entityType 엔티티 타입
-     * @param name       이름
-     * @param location   대상 위치
-     * @param hitbox     히트박스
-     * @see HashMapList#temporalEntityMap
+     * <p>{@link CombatEntityBase#init()}을 호출하여 초기화해야 한다.</p>
+     *
+     * @param entity 대상 엔티티
+     * @param name   이름
+     * @param hitbox 히트박스 목록
      */
-    protected TemporalEntity(EntityType entityType, String name, Location location, Hitbox hitbox) {
-        this(entityType, name, location, hitbox, null);
+    protected TemporalEntity(T entity, String name, Hitbox... hitbox) {
+        super(entity, name, hitbox);
     }
 
-    /**
-     * 엔티티를 지정한 위치에 소환하고 {@link HashMapList#temporalEntityMap}에 추가한다.
-     *
-     * @param entityType 엔티티 타입
-     * @param name       이름
-     * @param location   대상 위치
-     * @param hitbox     히트박스
-     * @param critHitbox 치명타 히트박스
-     * @see HashMapList#temporalEntityMap
-     */
-    protected TemporalEntity(EntityType entityType, String name, Location location, Hitbox hitbox, Hitbox critHitbox) {
-        super((T) location.getWorld().spawnEntity(location, entityType), name, hitbox, critHitbox);
-        temporalEntityMap.put(getEntity(), this);
+    @Override
+    @MustBeInvokedByOverriders
+    public void init() {
+        super.init();
+
+        EntityInfoRegistry.addTemporalEntity(getEntity(), this);
+        if (getAbilityStatusManager().getAbilityStatus(Ability.SPEED).getBaseValue() == 0)
+            getAbilityStatusManager().getAbilityStatus(Ability.SPEED).setBaseValue(getEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+                    .getBaseValue());
     }
 
-    /**
-     * 엔티티를 제거한다.
-     */
+    @Override
+    @MustBeInvokedByOverriders
     public void remove() {
-        entity.setHealth(0);
-        entity.remove();
+        super.remove();
+
+        EntityInfoRegistry.removeTemporalEntity(getEntity());
+        TaskManager.clearTask(this);
+        getEntity().remove();
+    }
+
+    @Override
+    public boolean canBeTargeted() {
+        return true;
+    }
+
+    @Override
+    public String getTaskIdentifier() {
+        return toString();
     }
 }

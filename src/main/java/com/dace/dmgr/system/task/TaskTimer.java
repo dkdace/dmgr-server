@@ -1,7 +1,12 @@
 package com.dace.dmgr.system.task;
 
 import com.dace.dmgr.DMGR;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.List;
 
 /**
  * 타이머 기능을 제공하는 클래스.
@@ -32,65 +37,78 @@ import org.bukkit.scheduler.BukkitRunnable;
  * }
  * }</pre>
  */
-public abstract class TaskTimer {
+public abstract class TaskTimer implements Task {
     /** 실행 주기 */
     protected final long period;
     /** 반복 횟수 */
     protected final long repeat;
+    /** 스케쥴러 객체 */
+    @Getter
+    private final BukkitTask bukkitTask;
+    /** 태스크 목록 */
+    @Setter
+    private List<Task> taskList = null;
 
     /**
-     * 지정한 횟수만큼 {@link TaskTimer#run(int)}을 반복하여 호출한다.
+     * 지정한 횟수만큼 {@link TaskTimer#onTimerTick(int)}을 반복하여 호출한다.
      *
      * @param period 실행 주기 (tick)
-     * @param repeat 반복 횟수(0: 무한 반복)
+     * @param repeat 반복 횟수. {@code 0}으로 설정 시 무한 반복
      */
-    public TaskTimer(long period, long repeat) {
+    protected TaskTimer(long period, long repeat) {
         this.period = period;
         this.repeat = repeat;
-        execute();
-    }
 
-    /**
-     * {@link TaskTimer#run(int)}을 무한 반복하여 호출한다.
-     *
-     * @param period 실행 주기 (tick)
-     */
-    public TaskTimer(long period) {
-        this(period, 0);
-    }
-
-    private void execute() {
-        new BukkitRunnable() {
+        bukkitTask = new BukkitRunnable() {
             int i = 0;
 
             @Override
             public void run() {
-                if (!TaskTimer.this.run(i++)) {
+                if (!TaskTimer.this.onTimerTick(i++)) {
                     cancel();
-                    onEnd(true);
+                    preEnd(true);
                     return;
                 }
 
-                if (repeat > 0)
-                    if (i >= repeat) {
-                        cancel();
-                        onEnd(false);
-                    }
+                if (repeat > 0 && (i >= repeat)) {
+                    cancel();
+                    preEnd(false);
+                }
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
     }
 
     /**
-     * 타이머가 끝났을 때 호출된다.
+     * {@link TaskTimer#onTimerTick(int)}을 무한 반복하여 호출한다.
      *
-     * @param cancelled 취소 여부. {@link TaskTimer#run(int)}에서 {@code false}를 반환하여 끝낸 경우 {@code true}이다.
+     * @param period 실행 주기 (tick)
      */
-    public void onEnd(boolean cancelled) {
+    protected TaskTimer(long period) {
+        this(period, 0);
     }
 
     /**
+     * 타이머에서 매 틱마다 호출된다.
+     *
      * @param i 인덱스 (0부터 시작)
      * @return 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환
      */
-    public abstract boolean run(int i);
+    protected abstract boolean onTimerTick(int i);
+
+    /**
+     * @see TaskTimer#onEnd(boolean)
+     */
+    private void preEnd(boolean cancelled) {
+        if (taskList != null)
+            taskList.remove(this);
+        onEnd(cancelled);
+    }
+
+    /**
+     * 타이머가 끝났을 때 호출된다.
+     *
+     * @param cancelled 취소 여부. {@link TaskTimer#onTimerTick(int)}에서 {@code false}를 반환하여 끝낸 경우 {@code true}이다.
+     */
+    protected void onEnd(boolean cancelled) {
+    }
 }

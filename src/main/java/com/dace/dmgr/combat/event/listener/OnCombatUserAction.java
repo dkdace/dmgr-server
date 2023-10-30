@@ -1,43 +1,78 @@
 package com.dace.dmgr.combat.event.listener;
 
-import com.dace.dmgr.combat.action.*;
+import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.SkillBase;
+import com.dace.dmgr.combat.action.weapon.*;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.system.task.TaskTimer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class OnCombatUserAction implements Listener {
+public final class OnCombatUserAction implements Listener {
     @EventHandler
     public static void event(CombatUserActionEvent event) {
         CombatUser combatUser = event.getCombatUser();
         ActionKey actionKey = event.getActionKey();
-        Action action = combatUser.getCharacter().getActionKeyMap().get(actionKey);
-        WeaponController weaponController = combatUser.getWeaponController();
+        Action action = combatUser.getActionMap().get(actionKey);
+        if (combatUser.isDead() || action == null)
+            return;
 
-        if (action instanceof Weapon) {
-            if (!weaponController.isCooldownFinished())
+        Weapon weapon = combatUser.getWeapon();
+        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+            weapon = ((Swappable<?>) combatUser.getWeapon()).getSwapModule().getSubweapon();
+
+        if (action instanceof WeaponBase) {
+            if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
+                handleUseFullAutoWeapon(weapon, actionKey, combatUser);
+            else
+                handleUseWeapon(weapon, actionKey);
+
+        } else if (action instanceof SkillBase) {
+            if (!action.canUse())
                 return;
-
-            ((Weapon) action).use(combatUser, weaponController, actionKey);
-
-        } else if (action instanceof Skill) {
-            SkillController skillController = combatUser.getSkillController((Skill) action);
-
-            if (CooldownManager.getCooldown(combatUser, Cooldown.SILENCE) > 0)
+            if (combatUser.hasStatusEffect(StatusEffectType.SILENCE))
                 return;
-            if (!skillController.isCooldownFinished())
-                return;
-            if (action instanceof ActiveSkill) {
-                if (!skillController.isGlobalCooldownFinished())
-                    return;
-                weaponController.setReloading(false);
-            }
-            if (action instanceof UltimateSkill && !skillController.isUsing())
-                combatUser.useUlt();
+            if (action.getActionInfo() instanceof ActiveSkillInfo && weapon instanceof Reloadable)
+                ((Reloadable) weapon).getReloadModule().setReloading(false);
 
-            ((Skill) action).use(combatUser, skillController, actionKey);
+            action.onUse(actionKey);
         }
+    }
+
+    private static void handleUseWeapon(Weapon weapon, ActionKey actionKey) {
+        if (!weapon.canUse())
+            return;
+
+        weapon.onUse(actionKey);
+    }
+
+    private static void handleUseFullAutoWeapon(Weapon weapon, ActionKey actionKey, CombatUser combatUser) {
+        if (CooldownManager.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0)
+            return;
+
+        CooldownManager.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
+
+        TaskManager.addTask(weapon, new TaskTimer(1, 4) {
+            int j = 0;
+
+            @Override
+            public boolean onTimerTick(int i) {
+                if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
+                    return true;
+                if (weapon.canUse() && ((FullAuto) weapon).getFullAutoModule().isFireTick(combatUser.getEntity().getTicksLived())) {
+                    j++;
+                    weapon.onUse(actionKey);
+                }
+
+                return true;
+            }
+        });
     }
 }

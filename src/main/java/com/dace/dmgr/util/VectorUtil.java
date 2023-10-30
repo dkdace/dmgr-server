@@ -6,7 +6,7 @@ import org.bukkit.util.Vector;
 /**
  * 벡터 관련 기능을 제공하는 클래스.
  */
-public class VectorUtil {
+public final class VectorUtil {
     /**
      * 위치의 방향을 기준으로 Roll 축을 반환한다.
      *
@@ -99,11 +99,11 @@ public class VectorUtil {
      * 벡터의 성분을 지정한 값만큼 무작위로 분산시킨 벡터를 반환한다.
      *
      * @param vector 대상 벡터
-     * @param amount 분산값. 단위: ×0.02블록/블록
+     * @param amount 분산값. 단위: ×0.01블록/블록
      * @return 최종 벡터
      */
     public static Vector getSpreadedVector(Vector vector, float amount) {
-        Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.02);
+        Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.01);
         return vector.clone().add(spread);
     }
 }

@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: 버그 발생에 대한 내용을 작성해주세요.
-title: "[Bug]"
-labels: "\U0001F41E Bug, ⚠ Priority: High"
+title: ''
+labels: "\U0001F41E Bug"
 assignees: ''
 
 ---

@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.gui.ItemBuilder;
+import lombok.Getter;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -14,40 +16,45 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dace.dmgr.system.HashMapList.combatEntityMap;
-
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public class Dummy extends TemporalEntity<Zombie> {
-    /**
-     * 더미 인스턴스를 생성하고 지정한 위치에 소환한다.
-     *
-     * @param location 대상 위치
-     * @param health   체력
-     */
-    public Dummy(Location location, int health) {
-        super(
-                EntityType.ZOMBIE,
-                "§7§lDummy",
-                location,
-                new Hitbox(location, 0, 0.9, 0, 0.65, 2.1, 0.5),
-                new Hitbox(location, 0, 2, 0, 0.3, 0.1, 0.3)
-        );
-        setMaxHealth(health);
-        setHealth(health);
-        setTeam("DUMMY");
-        init();
-    }
+@Getter
+public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
+    /** 피해 모듈 */
+    private final DamageModule damageModule;
+    /** 치명타 히트박스 객체 */
+    private final Hitbox critHitbox;
 
     /**
-     * 더미의 상태를 초기화한다. 소환 시 호출해야 한다.
+     * 더미 인스턴스를 생성한다.
+     *
+     * @param entity    대상 엔티티
+     * @param maxHealth 최대 체력
      */
-    private void init() {
+    public Dummy(Zombie entity, int maxHealth) {
+        super(entity, "§7§lDummy",
+                new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
+                new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
+        );
+        damageModule = new DamageModule(this, true, maxHealth);
+        critHitbox = hitboxes[3];
+    }
+
+    @Override
+    protected CombatEntityModule[] getModules() {
+        return new CombatEntityModule[]{damageModule};
+    }
+
+    @Override
+    public void init() {
+        super.init();
+
+        setTeam("DUMMY");
         entity.setBaby(false);
-        entity.leaveVehicle();
         entity.setAI(false);
-        combatEntityMap.put(getEntity(), this);
 
         List<ItemStack> equipment = new ArrayList<>();
         equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());
@@ -68,7 +75,11 @@ public class Dummy extends TemporalEntity<Zombie> {
     }
 
     @Override
-    public boolean isUltProvider() {
-        return true;
+    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    }
+
+    @Override
+    public void onDeath(Attacker attacker) {
+        remove();
     }
 }

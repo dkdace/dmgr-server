@@ -2,6 +2,8 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.SoundUtil;
@@ -14,24 +16,28 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import static com.dace.dmgr.system.HashMapList.userMap;
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
+import java.text.MessageFormat;
 
-public class OnPlayerQuit implements Listener {
+public final class OnPlayerQuit implements Listener {
     /** 퇴장 메시지의 접두사 */
     private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
+    /** 퇴장 시 현재 인원 표시 */
+    private static final String CURRENT_PLAYERS = PREFIX + "현재 인원수는 §3§l{0}명§b입니다.";
 
     @EventHandler
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         user.reset();
 
         event.setQuitMessage(PREFIX + player.getName());
-        userMap.remove(player);
+        TaskManager.clearTask(user);
+        EntityInfoRegistry.removeUser(player);
 
         new TaskWait(1) {
             @Override
-            public void run() {
-                DMGR.getPlugin().getServer().broadcastMessage(PREFIX + "현재 인원수는 §3§l" + Bukkit.getOnlinePlayers().size() + "명§b입니다.");
+            public void onEnd() {
+                DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
                 playQuitSound();
             }
         };
@@ -43,14 +49,14 @@ public class OnPlayerQuit implements Listener {
     private static void playQuitSound() {
         new TaskTimer(1, 4) {
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 switch (i) {
                     case 0:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);
-                        return true;
+                        break;
                     case 3:
                         SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
-                        return true;
+                        break;
                 }
 
                 return true;

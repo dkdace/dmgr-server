@@ -6,6 +6,7 @@ import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.lobby.ChatSound;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.InventoryUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
@@ -14,12 +15,10 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
-
 /**
  * 메뉴 - 채팅 효과음 설정 GUI 클래스.
  */
-public class ChatSoundOption extends Gui {
+public final class ChatSoundOption extends Gui {
     @Getter
     private static final ChatSoundOption instance = new ChatSoundOption();
 
@@ -29,7 +28,7 @@ public class ChatSoundOption extends Gui {
 
     @Override
     public void onOpen(Player player, Inventory inventory) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
 
         ChatSound[] chatSounds = ChatSound.values();
 
@@ -47,15 +46,15 @@ public class ChatSoundOption extends Gui {
     @Override
     public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = userMap.get(player);
+            User user = EntityInfoRegistry.getUser(player);
 
             if (clickItemName.equals("이전")) {
                 player.performCommand("설정");
                 return;
             }
 
-            String[] _clickItemName = clickItemName.split(" ");
-            ChatSound chatSound = ChatSound.valueOf(_clickItemName[_clickItemName.length - 1]);
+            String[] splittedClickItemName = clickItemName.split(" ");
+            ChatSound chatSound = ChatSound.valueOf(splittedClickItemName[splittedClickItemName.length - 1]);
 
             SoundUtil.play(chatSound.getSound(), 1F, 1.414F, player);
             user.getUserConfig().setChatSound(chatSound);

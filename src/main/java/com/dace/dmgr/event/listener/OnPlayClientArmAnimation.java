@@ -7,19 +7,18 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import static com.dace.dmgr.system.HashMapList.combatUserMap;
-
-public class OnPlayClientArmAnimation extends PacketAdapter {
+public final class OnPlayClientArmAnimation extends PacketAdapter {
     public OnPlayClientArmAnimation() {
         super(DMGR.getPlugin(), PacketType.Play.Client.ARM_ANIMATION);
     }
 
     @Override
     public void onPacketReceiving(PacketEvent event) {
-        CombatUser combatUser = combatUserMap.get(event.getPlayer());
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
 
         if (combatUser != null) {
             event.setCancelled(true);

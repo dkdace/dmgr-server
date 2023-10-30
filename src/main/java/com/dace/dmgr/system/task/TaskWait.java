@@ -1,7 +1,12 @@
 package com.dace.dmgr.system.task;
 
 import com.dace.dmgr.DMGR;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.List;
 
 /**
  * 딜레이 기능을 제공하는 클래스.
@@ -18,29 +23,43 @@ import org.bukkit.scheduler.BukkitRunnable;
  * }
  * }</pre>
  */
-public abstract class TaskWait {
+public abstract class TaskWait implements Task {
     /** 딜레이 */
     protected final long delay;
+    /** 스케쥴러 객체 */
+    @Getter
+    private final BukkitTask bukkitTask;
+    /** 태스크 목록 */
+    @Setter
+    private List<Task> taskList = null;
 
     /**
-     * 지정한 딜레이만큼 기다린 후 {@link TaskWait#run()}을 호출한다.
+     * 지정한 딜레이만큼 기다린 후 {@link TaskWait#onEnd()}을 호출한다.
      *
      * @param delay 딜레이 (tick)
      */
-    public TaskWait(long delay) {
+    protected TaskWait(long delay) {
         this.delay = delay;
-        execute();
-    }
 
-    private void execute() {
-        new BukkitRunnable() {
+        bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                TaskWait.this.run();
-
+                preEnd();
             }
         }.runTaskLater(DMGR.getPlugin(), delay);
     }
 
-    public abstract void run();
+    /**
+     * @see TaskWait#onEnd()
+     */
+    private void preEnd() {
+        if (taskList != null)
+            taskList.remove(this);
+        onEnd();
+    }
+
+    /**
+     * 딜레이가 끝났을 때 호출된다.
+     */
+    protected abstract void onEnd();
 }

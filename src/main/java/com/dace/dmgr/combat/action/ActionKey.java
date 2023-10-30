@@ -1,29 +1,39 @@
 package com.dace.dmgr.combat.action;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
- * 상호작용 종류.
+ * 동작 사용 키 목록.
  */
+@AllArgsConstructor
+@Getter
 public enum ActionKey {
     /** 좌클릭 */
-    LEFT_CLICK,
+    LEFT_CLICK("좌클릭"),
     /** 우클릭 */
-    RIGHT_CLICK,
-    /** 크랙샷 무기 상호작용 */
-    CS_PRE_USE,
-    /** 크랙샷 무기 사격 */
-    CS_USE,
-    /** 1번 키 */
-    SLOT_1,
-    /** 2번 키 */
-    SLOT_2,
-    /** 3번 키 */
-    SLOT_3,
-    /** 4번 키 */
-    SLOT_4,
+    RIGHT_CLICK("우클릭"),
+    /** 1번 슬롯 */
+    SLOT_1("1"),
+    /** 2번 슬롯 */
+    SLOT_2("2"),
+    /** 3번 슬롯 */
+    SLOT_3("3"),
+    /** 4번 슬롯 */
+    SLOT_4("4"),
     /** 버리기(Q) */
-    DROP,
+    DROP("Q"),
     /** 달리기 */
-    SPRINT,
+    SPRINT(""),
     /** 웅크리기(SHIFT) */
-    SNEAK;
+    SNEAK("SHIFT"),
+    /** 자동 사용 1번 */
+    PERIODIC_1(""),
+    /** 자동 사용 2번 */
+    PERIODIC_2(""),
+    /** 자동 사용 3번 */
+    PERIODIC_3("");
+
+    /** 키 이름 */
+    private final String name;
 }
