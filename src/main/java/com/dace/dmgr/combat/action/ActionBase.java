@@ -126,7 +126,7 @@ public abstract class ActionBase implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void reset() {
-        setCooldown(0);
+        setCooldown(getDefaultCooldown());
         for (ActionModule module : modules) {
             module.onReset();
         }
