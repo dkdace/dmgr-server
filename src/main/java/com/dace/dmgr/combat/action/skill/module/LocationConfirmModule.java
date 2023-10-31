@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.LocationConfirmable;
+import com.dace.dmgr.combat.action.skill.Confirmable;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,9 +19,9 @@ import java.text.MessageFormat;
 /**
  * 스킬의 위치 확인 모듈 클래스.
  *
- * <p>스킬이 {@link LocationConfirmable}을 상속받는 클래스여야 한다.</p>
+ * <p>스킬이 {@link Confirmable}을 상속받는 클래스여야 한다.</p>
  *
- * @see LocationConfirmable
+ * @see Confirmable
  */
 public final class LocationConfirmModule extends ConfirmModule {
     /** 최대 거리 */
@@ -31,9 +31,9 @@ public final class LocationConfirmModule extends ConfirmModule {
     @Getter
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */
-    private ArmorStand pointer;
+    private ArmorStand pointer = null;
 
-    public LocationConfirmModule(LocationConfirmable skill, ActionKey acceptKey, ActionKey cancelKey, int maxDistance) {
+    public LocationConfirmModule(Confirmable skill, ActionKey acceptKey, ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
         this.maxDistance = maxDistance;
     }
@@ -100,21 +100,23 @@ public final class LocationConfirmModule extends ConfirmModule {
 
     @Override
     public void onReset() {
-        pointer.remove();
+        if (pointer != null)
+            pointer.remove();
     }
 
     @Override
     public void onRemove() {
-        pointer.remove();
+        if (pointer != null)
+            pointer.remove();
     }
 
     /**
      * 메시지 목록.
      */
-    private static class MESSAGES {
+    private interface MESSAGES {
         /** 확인 중 메시지 (사용 가능) */
-        static final String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
+        String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
         /** 확인 중 메시지 (사용 불가능) */
-        static final String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
+        String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
     }
 }

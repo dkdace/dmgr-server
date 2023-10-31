@@ -7,7 +7,6 @@ import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public final class OnPlayerInteract implements Listener {
@@ -18,11 +17,24 @@ public final class OnPlayerInteract implements Listener {
         if (combatUser != null) {
             if (event.hasBlock())
                 event.setCancelled(true);
+            if (combatUser.getCharacter() == null)
+                return;
 
-            if (combatUser.getCharacter() != null && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-                CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.RIGHT_CLICK);
+            switch (event.getAction()) {
+                case LEFT_CLICK_AIR:
+                case LEFT_CLICK_BLOCK: {
+                    CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.LEFT_CLICK);
 
-                Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                    Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                    break;
+                }
+                case RIGHT_CLICK_AIR:
+                case RIGHT_CLICK_BLOCK: {
+                    CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.RIGHT_CLICK);
+
+                    Bukkit.getServer().getPluginManager().callEvent(newEvent);
+                    break;
+                }
             }
         }
     }

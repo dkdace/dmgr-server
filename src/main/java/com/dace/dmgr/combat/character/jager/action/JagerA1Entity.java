@@ -19,7 +19,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 설랑 클래스.
  */
-public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Living, Jumpable {
+public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Living, Movable {
     /** 스킬 객체 */
     private final JagerA1 skill;
     /** 피해 모듈 */
@@ -119,7 +119,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
     }
 
     @Override
-    public void onKill(CombatEntity victim) {
+    public void onKill(Damageable victim) {
         owner.onKill(victim);
     }
 

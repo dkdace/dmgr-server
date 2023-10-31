@@ -196,31 +196,4 @@ public final class CombatUtil {
             }
         });
     }
-
-    /**
-     * 지정한 플레이어에게 총기 탄퍼짐 시스템을 적용한다.
-     *
-     * @param combatUser 대상 플레이어
-     * @param increment  탄퍼짐 증가량
-     * @param recovery   탄퍼짐 회복량
-     * @param max        탄퍼짐 최대치
-     */
-    public static void setBulletSpread(CombatUser combatUser, float increment, float recovery, float max) {
-        if (combatUser.getBulletSpread() == 0) {
-            combatUser.addBulletSpread(increment, max);
-
-            TaskManager.addTask(combatUser, new TaskTimer(1) {
-                @Override
-                public boolean onTimerTick(int i) {
-                    if (CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0) {
-                        if (combatUser.getBulletSpread() == 0)
-                            return false;
-                        combatUser.addBulletSpread(-recovery, max);
-                    }
-                    return true;
-                }
-            });
-        } else
-            combatUser.addBulletSpread(increment, max);
-    }
 }

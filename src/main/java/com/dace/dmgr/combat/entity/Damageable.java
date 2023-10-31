@@ -5,8 +5,6 @@ import com.dace.dmgr.combat.entity.module.DamageModule;
 
 /**
  * 생명력 수치를 조정하고 피해를 입을 수 있는 엔티티의 인터페이스.
- *
- * @see Healable
  */
 public interface Damageable extends CombatEntity {
     /**
@@ -52,7 +50,7 @@ public interface Damageable extends CombatEntity {
      * 엔티티가 죽었을 때 실행될 작업.
      *
      * @param attacker 공격자
-     * @see Attacker#onKill(CombatEntity)
+     * @see Attacker#onKill(Damageable)
      */
     void onDeath(Attacker attacker);
 }

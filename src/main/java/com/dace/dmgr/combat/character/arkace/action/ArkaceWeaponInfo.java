@@ -57,10 +57,10 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     public interface SPREAD {
         /** 탄퍼짐 증가량 */
         float INCREMENT = 0.3F;
-        /** 탄퍼짐 회복량 */
-        float RECOVERY = 2F;
-        /** 탄퍼짐 최대치 */
-        float MAX = 4.6F;
+        /** 탄퍼짐 시작 시점 */
+        int START = 5;
+        /** 탄퍼짐 최대 시점 */
+        int MAX = 20;
     }
 
     /**

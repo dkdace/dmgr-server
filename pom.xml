@@ -6,7 +6,7 @@
 
     <groupId>com.dace.dmgr</groupId>
     <artifactId>DMGR</artifactId>
-    <version>0.3.3</version>
+    <version>0.3.4</version>
     <packaging>jar</packaging>
 
     <name>DMGR</name>
@@ -114,6 +114,27 @@
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.inventivetalent.glow</groupId>
+            <artifactId>GlowAPI</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/GlowAPI_v1.4.6-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/worldedit-bukkit-6.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>WorldGuard</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/worldguard-bukkit-6.2.2.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
