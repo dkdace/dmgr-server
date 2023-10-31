@@ -12,5 +12,5 @@ public interface Healable extends Damageable {
      * @param isUlt    궁극기 충전 여부
      * @see Healer#onGiveHeal(Healable, int, boolean)
      */
-    void onTakeHeal(CombatEntity provider, int amount, boolean isUlt);
+    void onTakeHeal(Healer provider, int amount, boolean isUlt);
 }

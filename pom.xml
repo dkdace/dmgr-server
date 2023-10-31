@@ -6,7 +6,7 @@
 
     <groupId>com.dace.dmgr</groupId>
     <artifactId>DMGR</artifactId>
-    <version>0.3.3</version>
+    <version>0.3.4</version>
     <packaging>jar</packaging>
 
     <name>DMGR</name>
