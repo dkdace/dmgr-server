@@ -2,7 +2,6 @@ package com.kiwi.dmgr.game.mode;
 
 import com.dace.dmgr.system.task.TaskTimer;
 import com.kiwi.dmgr.game.Game;
-import com.kiwi.dmgr.game.GameMapList;
 import com.kiwi.dmgr.game.GameUser;
 import com.kiwi.dmgr.game.Team;
 import org.bukkit.entity.Player;
@@ -30,7 +29,7 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
             int startTimer = 30;
 
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
                 if (startTimer <= 5) {
                     if (startTimer == 0)
                         return false;
@@ -47,7 +46,7 @@ public class TeamDeathMatch extends GameMode implements IGameMode {
                 /* 게임 모드 진행 스케쥴러 */
                 new TaskTimer(20) {
                     @Override
-                    public boolean run(int i) {
+                    public boolean onTimerTick(int i) {
                         if (!vaildGame(game)) {
                             return false;
                         }

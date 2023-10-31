@@ -78,7 +78,6 @@ public final class User implements HasTask {
         this.isRanked = yamlFile.get("isRanked", isRanked);
         this.MMR = yamlFile.get("mmr", MMR);
         this.MMRPlay = yamlFile.get("mmrPlay", MMRPlay);
-        userMap.put(player, this);
     }
 
     /**

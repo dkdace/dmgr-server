@@ -14,8 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
-import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 import java.text.MessageFormat;
 
 public final class OnPlayerQuit implements Listener {

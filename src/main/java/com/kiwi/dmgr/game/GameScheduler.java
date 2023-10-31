@@ -11,7 +11,7 @@ public class GameScheduler {
      * 게임 스케쥴러를 실행한다.
      *
      * <p> 게임 인원이 시작 가능 인원이 되면 시작 카운트가 시작된다.
-     *     인원이 0명이면 방이 삭제된다. </p>
+     * 인원이 0명이면 방이 삭제된다. </p>
      */
     public static void run(Game game) {
         new TaskTimer(20) {
@@ -20,7 +20,7 @@ public class GameScheduler {
             int startTimer = 3;
 
             @Override
-            public boolean run(int i) {
+            public boolean onTimerTick(int i) {
 
                 playerCount = game.getPlayerList().size();
 
@@ -43,8 +43,7 @@ public class GameScheduler {
                     else if (startTimer == 3) {
                         game.loadWorld();
                         game.sendAlertMessage("게임이 3초 뒤에 시작합니다.");
-                    }
-                    else if (startTimer == 2)
+                    } else if (startTimer == 2)
                         game.sendAlertMessage("게임이 2초 뒤에 시작합니다.");
                     else if (startTimer == 1)
                         game.sendAlertMessage("게임이 1초 뒤에 시작합니다.");

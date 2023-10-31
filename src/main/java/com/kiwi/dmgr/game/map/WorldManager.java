@@ -1,6 +1,7 @@
 package com.kiwi.dmgr.game.map;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.system.SystemPrefix;
 import com.grinderwolf.swm.api.exceptions.*;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeWorld;
@@ -41,14 +42,15 @@ public class WorldManager {
                 String name = FilenameUtils.removeExtension(file.getName());
                 String[] names = name.split("_");
                 if (Arrays.stream(names).count() >= 2) {
-                    try{
+                    try {
                         UUID uuid = UUID.fromString(names[1]);
                         if (file.delete())
-                            DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 완료 (" + file.getName() + ")");
+                            DMGR.getPlugin().getLogger().info(SystemPrefix.LOG + "복제 월드 삭제 완료 (" + file.getName() + ")");
                         else
-                            DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "복제 월드 삭제 실패 (" + file.getName() + ")");
+                            DMGR.getPlugin().getLogger().info(SystemPrefix.LOG + "복제 월드 삭제 실패 (" + file.getName() + ")");
 
-                    } catch (IllegalArgumentException ignored) { }
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
             }
         }
@@ -58,7 +60,7 @@ public class WorldManager {
      * 특정 맵의 슬라임 월드를 복제한다.
      *
      * @param loadWorld 복제할 월드
-     * @param name 복제본 맵 이름
+     * @param name      복제본 맵 이름
      * @return 복제 성공 여부
      */
     public static boolean generateWorld(String loadWorld, String name) {
@@ -121,10 +123,9 @@ public class WorldManager {
                 });
                 world = Bukkit.getWorld(name);
                 if (world != null) {
-                    DMGR.getPlugin().getLogger().info(DMGR.PREFIX.LOG + "월드 복제 완료 (" + world.getName() + ")");
+                    DMGR.getPlugin().getLogger().info(SystemPrefix.LOG + "월드 복제 완료 (" + world.getName() + ")");
                     return true;
-                }
-                else return false;
+                } else return false;
             }
         }
     }

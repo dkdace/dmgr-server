@@ -1,14 +1,12 @@
 package com.kiwi.dmgr.match;
 
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.kiwi.dmgr.game.GameUser;
 import com.kiwi.dmgr.game.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
-
-import static com.dace.dmgr.system.HashMapList.userMap;
 import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
 /**
@@ -31,59 +29,6 @@ public class RankRating {
     private static final int MAX_PLACEMENT_PLAY = 5;
 
     /**
-     * 플레이어의 랭크 등수를 반환
-     *
-     * @return 랭크 등수
-     */
-    public int getPlayerankankPlace(Player player) {
-        return 10;
-    }
-
-    /**
-     * 플레이어의 랭크 접두사(칭호)를 반환
-     *
-     * @param player 플레이어
-     * @return 플레이어 랭크 접두사
-     */
-    public String getPlayerTierPrefix(Player player) {
-        User user = userMap.get(player);
-        int rank = user.getRank();
-        String ret = "§f없음";
-        if (rank >= 1000) {
-            if (getPlayerankankPlace(player) <= 5) {
-                ret = "§5네더라이트";
-            } else {
-                ret = "§b다이아몬드";
-            }
-        } else {
-            if (rank >= 750) return "&a에메랄드";
-            if (rank >= 500) return "&c레드스톤";
-            if (rank >= 250) return "&e골드";
-            if (rank >= 0) return "&7아이언";
-            return "&8스톤";
-        }
-
-        return ret;
-    }
-
-    /**
-     * 플레이어의 표시되는 랭크 레이팅을 반환
-     * 0 미만이면 <0 으로 표시됨
-     *
-     * @param player 플레이어
-     * @return 표시되는 랭크 레이팅
-     */
-    public String getPlayerankankDisplay(Player player) {
-        User user = userMap.get(player);
-        int rank = user.getRank();
-        if (rank < 0) {
-            return "<0";
-        } else {
-            return String.valueOf(rank);
-        }
-    }
-
-    /**
      * 랭크 매치 종료후 플레이어의 랭크와 MMR 을 변동시킨다.
      *
      * <p>
@@ -94,7 +39,7 @@ public class RankRating {
      * @param player 플레이어
      */
     public static void updateRankAfterGame(Player player, Team winTeam) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         GameUser gameUser = gameUserMap.get(player);
 
         int rank = user.getRank();
@@ -132,7 +77,7 @@ public class RankRating {
      * @param player 플레이어
      */
     public static void updateMMRAfterGame(Player player) {
-        User user = userMap.get(player);
+        User user = EntityInfoRegistry.getUser(player);
         GameUser gameUser = gameUserMap.get(player);
 
         int mmr = user.getMMR();
@@ -144,7 +89,7 @@ public class RankRating {
         int gameAverageMMR = (int) gameUser.getGame().getAverageIndicator("MMR");
 
         user.setMMR(getFinalMMR(mmr, getExtractedMMR(kda, score, playTime, gameAverageMMR), play));
-        user.setMMRPlay(play+1);
+        user.setMMRPlay(play + 1);
         Bukkit.getConsoleSender().sendMessage("[RankSystem] 유저 MMR 변동됨: (" + player.getName() + ") " + mmr + " -> " + user.getMMR() + " MMR PLAY: " + play);
     }
 
@@ -153,16 +98,16 @@ public class RankRating {
      *
      * @param preMMR 기존 MMR
      * @param addMMR 추가 MMR
-     * @param play 플레이 횟수
+     * @param play   플레이 횟수
      * @return MMR
      */
     private static int getFinalMMR(int preMMR, int addMMR, int play) {
         double finalMMR;
         if (play < MAX_MMR_PLAY) {
-            finalMMR = (preMMR * play / (play+1F)) + addMMR * (1F / (play+1));
+            finalMMR = (preMMR * play / (play + 1F)) + addMMR * (1F / (play + 1));
         } else {
             play = MAX_MMR_PLAY;
-            finalMMR = (preMMR * (play-1F) / (play)) + addMMR * (1F / (play));
+            finalMMR = (preMMR * (play - 1F) / (play)) + addMMR * (1F / (play));
         }
 
         return (int) finalMMR;
@@ -181,7 +126,7 @@ public class RankRating {
     /**
      * 게임 점수 랭크 레이팅을 반환한다.
      *
-     * @param score 점수
+     * @param score    점수
      * @param playTime 플레이 시간
      * @return 게임 점수 RR
      */
@@ -192,7 +137,7 @@ public class RankRating {
     /**
      * 게임 결과 랭크 레이팅을 반환한다.
      *
-     * @param team 팀
+     * @param team    팀
      * @param winTeam 승리한 팀
      * @return 게임 결과 RR
      */
@@ -205,27 +150,27 @@ public class RankRating {
     /**
      * 게임 보정치 레이팅을 반환한다.
      *
-     * @param mmr MMR
-     * @param rank RR
+     * @param mmr       MMR
+     * @param rank      RR
      * @param averageRR 평균 RR
      * @return 보정치 RR
      */
     private static float getCorrectRating(int mmr, int rank, int averageRR) {
         float averageDiffValue = (float) (AVERAGE_RANK + averageRR) / 2 - rank;
-        float weightValue = mmr-rank;
+        float weightValue = mmr - rank;
         return (float) (averageDiffValue * 0.04 + weightValue * 0.1);
     }
 
     /**
      * 결과 레이팅을 반환한다.
      *
-     * @param kda KDA
-     * @param score 점수
-     * @param playTime 플레이 시간
-     * @param team 팀
-     * @param winTeam 승리한 팀
-     * @param mmr MMR
-     * @param rank RR
+     * @param kda       KDA
+     * @param score     점수
+     * @param playTime  플레이 시간
+     * @param team      팀
+     * @param winTeam   승리한 팀
+     * @param mmr       MMR
+     * @param rank      RR
      * @param averageRR 평균 RR
      * @return 결과 RR
      */
@@ -238,9 +183,9 @@ public class RankRating {
     /**
      * 게임 성적으로 추정되는 MMR을 반환한다.
      *
-     * @param kda KDA
-     * @param score 점수
-     * @param playTime 플레이 시간
+     * @param kda        KDA
+     * @param score      점수
+     * @param playTime   플레이 시간
      * @param averageMMR 평균 MMR
      * @return 추정 MMR
      */
@@ -248,5 +193,58 @@ public class RankRating {
         float midValue = (getKDARating(kda) + getScoreRating(score, playTime)) * 10;
         int returnValue = (int) (midValue + averageMMR);
         return (Math.min(returnValue, 1000));
+    }
+
+    /**
+     * 플레이어의 랭크 등수를 반환
+     *
+     * @return 랭크 등수
+     */
+    public int getPlayerankankPlace(Player player) {
+        return 10;
+    }
+
+    /**
+     * 플레이어의 랭크 접두사(칭호)를 반환
+     *
+     * @param player 플레이어
+     * @return 플레이어 랭크 접두사
+     */
+    public String getPlayerTierPrefix(Player player) {
+        User user = EntityInfoRegistry.getUser(player);
+        int rank = user.getRank();
+        String ret = "§f없음";
+        if (rank >= 1000) {
+            if (getPlayerankankPlace(player) <= 5) {
+                ret = "§5네더라이트";
+            } else {
+                ret = "§b다이아몬드";
+            }
+        } else {
+            if (rank >= 750) return "&a에메랄드";
+            if (rank >= 500) return "&c레드스톤";
+            if (rank >= 250) return "&e골드";
+            if (rank >= 0) return "&7아이언";
+            return "&8스톤";
+        }
+
+        return ret;
+    }
+
+    /**
+     * 플레이어의 표시되는 랭크 레이팅을 반환
+     * 0 미만이면 <0 으로 표시됨
+     *
+     * @param player 플레이어
+     * @return 표시되는 랭크 레이팅
+     */
+    public String getPlayerankankDisplay(Player player) {
+        User user = EntityInfoRegistry.getUser(player);
+        int rank = user.getRank();
+        if (rank < 0) {
+            return "<0";
+        } else {
+            return String.valueOf(rank);
+        }
     }
 }

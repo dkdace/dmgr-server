@@ -1,8 +1,9 @@
 package com.kiwi.dmgr.game;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.util.SoundUtil;
 import com.kiwi.dmgr.game.map.GameMap;
 import com.kiwi.dmgr.game.map.Point;
@@ -21,15 +22,12 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-import static com.dace.dmgr.system.HashMapList.userMap;
-
 /**
  * 게임의 정보를 담고 관리하는 클래스
  */
 @Getter
 @Setter
 public class Game {
-
     /** 플레이어 목록 */
     private ArrayList<Player> playerList;
     /** 게임 유저 맵 */
@@ -62,7 +60,7 @@ public class Game {
         this.playerList = new ArrayList<>();
         this.gameUserMap = new HashMap<>();
         this.waitPlayerList = new ArrayList<>();
-        this.teamPlayerMapList = new HashMap<>() ;
+        this.teamPlayerMapList = new HashMap<>();
         this.teamScore = new HashMap<>();
         this.remainTime = 0;
         this.playTime = 0;
@@ -124,20 +122,18 @@ public class Game {
     public void finish(boolean force) {
         this.play = false;
 
-        for (int i=0; i<20; i++)
+        for (int i = 0; i < 20; i++)
             this.sendAlertMessage("");
 
         Team winner = teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)) ? Team.NONE :
-                      teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
+                teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
 
         if (!force) {
             if (this.matchType == MatchType.COMPETITIVE) {
                 for (Player player : this.playerList) {
                     RankRating.updateRankAfterGame(player, winner);
                 }
-            }
-
-            else if (this.matchType == MatchType.UNRANKED) {
+            } else if (this.matchType == MatchType.UNRANKED) {
                 for (Player player : this.playerList) {
                     RankRating.updateMMRAfterGame(player);
                 }
@@ -166,7 +162,7 @@ public class Game {
 
         for (Player player : this.playerList) {
             GameMapList.gameUserMap.remove(player);
-            player.teleport(Lobby.lobby);
+            player.teleport(Lobby.lobbyLocation);
             SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F, player);
         }
         this.unloadWorld();
@@ -182,7 +178,7 @@ public class Game {
     private ArrayList<Player> getPlayerListMMRSort(ArrayList<Player> playerList) {
         HashMap<Player, Integer> playerMap = new HashMap<>();
         for (Player player : playerList) {
-            User user = userMap.get(player);
+            User user = EntityInfoRegistry.getUser(player);
             playerMap.put(player, user.getMMR());
         }
 
@@ -208,12 +204,12 @@ public class Game {
         ArrayList<Player> team2 = new ArrayList<>();
 
         int size = this.playerList.size();
-        for (int i=0; i<size/4; i++) {
+        for (int i = 0; i < size / 4; i++) {
             team1.add(playerList.get(0));
             playerList.remove(0);
         }
 
-        for (int i=0; i<size/2; i++) {
+        for (int i = 0; i < size / 2; i++) {
             team2.add(playerList.get(0));
             playerList.remove(0);
         }
@@ -249,7 +245,7 @@ public class Game {
     public double getAverageIndicator(String fieldName) {
         return playerList.stream()
                 .mapToDouble(player -> {
-                    User user = userMap.get(player);
+                    User user = EntityInfoRegistry.getUser(player);
                     GameUser gameUser = gameUserMap.get(player);
                     switch (fieldName) {
                         case "MMR":
@@ -312,9 +308,7 @@ public class Game {
         if (!play) {
             initPlayer(player);
             sendAlertMessage(player.getName() + "게임 추가");
-        }
-
-        else {
+        } else {
             int redAmount = teamPlayerMapList.get(Team.RED).size();
             int blueAmount = teamPlayerMapList.get(Team.BLUE).size();
 
@@ -326,8 +320,8 @@ public class Game {
 
             else {
                 if (waitPlayerList.size() == 1) {
-                    int user1MMR = userMap.get(waitPlayerList.get(0)).getMMR();
-                    int user2MMR = userMap.get(player).getMMR();
+                    int user1MMR = EntityInfoRegistry.getUser(waitPlayerList.get(0)).getMMR();
+                    int user2MMR = EntityInfoRegistry.getUser(player).getMMR();
 
                     Player player1 = user1MMR >= user2MMR ? waitPlayerList.get(0) : player;
                     Player player2 = user1MMR < user2MMR ? waitPlayerList.get(0) : player;
@@ -336,12 +330,12 @@ public class Game {
                     int blueMMR = 0;
 
                     for (Player tempPlayer : teamPlayerMapList.get(Team.RED)) {
-                        User tempUser = userMap.get(tempPlayer);
+                        User tempUser = EntityInfoRegistry.getUser(tempPlayer);
                         redMMR += tempUser.getMMR();
                     }
 
                     for (Player tempPlayer : teamPlayerMapList.get(Team.BLUE)) {
-                        User tempUser = userMap.get(tempPlayer);
+                        User tempUser = EntityInfoRegistry.getUser(tempPlayer);
                         blueMMR += tempUser.getMMR();
                     }
 
@@ -353,9 +347,7 @@ public class Game {
                         initPlayer(player2, Team.RED);
                     }
                     waitPlayerList.remove(0);
-                }
-
-                else
+                } else
                     waitPlayerList.add(player);
             }
 
@@ -365,8 +357,8 @@ public class Game {
     /**
      * 게임 월드의 포인트 위치를 리턴한다.
      *
-     * @see Point
      * @param point 주요 위치 이름
+     * @see Point
      */
     public Location getPointLocation(Point point) {
         World world = Bukkit.getWorld(this.world);
@@ -377,7 +369,7 @@ public class Game {
     public Location getPointLocation(Team team) {
         if (team == Team.RED) return getPointLocation(Point.RED_SPAWN);
         else if (team == Team.BLUE) return getPointLocation(Point.BLUE_SPAWN);
-        else return Lobby.lobby;
+        else return Lobby.lobbyLocation;
     }
 
     /**
@@ -387,10 +379,11 @@ public class Game {
      */
     public void sendAlertMessage(String message) {
         for (Player player : playerList)
-            player.sendMessage(DMGR.PREFIX.CHAT + message);
+            player.sendMessage(SystemPrefix.CHAT + message);
     }
+
     public void sendAlertMessage(Player player, String message) {
-        player.sendMessage(DMGR.PREFIX.CHAT + message);
+        player.sendMessage(SystemPrefix.CHAT + message);
     }
 
 
