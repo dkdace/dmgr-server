@@ -52,7 +52,6 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     public void init() {
         super.init();
 
-        setTeam("DUMMY");
         entity.setBaby(false);
         entity.setAI(false);
 

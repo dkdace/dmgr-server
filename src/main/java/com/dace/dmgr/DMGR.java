@@ -2,8 +2,10 @@ package com.dace.dmgr;
 
 import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.event.MainEventManager;
+import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.GameInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
@@ -12,8 +14,7 @@ import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
 import com.dace.dmgr.system.command.test.StatCommand;
-import com.kiwi.dmgr.game.map.MapUtil;
-import com.kiwi.dmgr.game.map.WorldManager;
+import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,14 +37,14 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        getLogger().info(SystemPrefix.LOG + "플러그인 활성화 완료");
+        getLogger().info("플러그인 활성화 완료");
         MainEventManager.init();
         CombatEventManager.init();
+        WorldUtil.init();
+        GameInfoRegistry.init();
+        RankUtil.RankUpdater.init();
         registerCommands();
         registerTestCommands();
-
-        WorldManager.init();
-        MapUtil.mapLoad();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
@@ -59,7 +60,7 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        getLogger().info(SystemPrefix.LOG + "플러그인 비활성화 완료");
+        getLogger().info("플러그인 비활성화 완료");
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = EntityInfoRegistry.getUser(player);
@@ -84,7 +85,7 @@ public class DMGR extends JavaPlugin {
     private void registerTestCommands() {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
-        getCommand("게임테스트").setExecutor(new GameTestCommand());
+        getCommand("게임").setExecutor(new GameTestCommand());
         getCommand("스텟").setExecutor(new StatCommand());
     }
 }

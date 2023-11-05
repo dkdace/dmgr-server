@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -38,9 +39,9 @@ public interface CombatEntity extends HasTask {
      */
     String getName();
 
-    String getTeam();
+    Team getTeam();
 
-    void setTeam(String team);
+    void setTeam(Team team);
 
     /**
      * @return 히트박스의 가능한 최대 크기

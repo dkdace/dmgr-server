@@ -20,6 +20,7 @@ import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.Cooldown;
@@ -120,7 +121,11 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     @Override
     public void onTick(int i) {
+        if (character == null)
+            return;
+
         character.onTick(this, i);
+
         entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                 99999, 10, false, false), true);
 
@@ -444,9 +449,14 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
                 @Override
                 public void onEnd(boolean cancelled) {
+                    GameUser gameUser = EntityInfoRegistry.getGameUser(entity);
                     damageModule.setHealth(damageModule.getMaxHealth());
-                    entity.teleport(Lobby.lobbyLocation);
                     entity.setGameMode(GameMode.SURVIVAL);
+
+                    if (gameUser == null)
+                        entity.teleport(Lobby.lobbyLocation);
+                    else
+                        entity.teleport(gameUser.getRespawnLocation());
 
                     weapon.reset();
                     skillMap.forEach((skillInfo, skill) -> skill.reset());

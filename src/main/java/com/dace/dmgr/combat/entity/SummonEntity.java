@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -37,6 +38,17 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
         super.init();
 
         setTeam(owner.getTeam());
+    }
+
+    @Override
+    public boolean isEnemy(CombatEntity combatEntity) {
+        if (combatEntity == this || owner == combatEntity)
+            return false;
+        if (combatEntity instanceof SummonEntity && ((SummonEntity<?>) combatEntity).owner == owner)
+            return false;
+        if (team == Team.NONE || combatEntity.getTeam() == Team.NONE)
+            return true;
+        return !getTeam().equals(combatEntity.getTeam());
     }
 
     /**

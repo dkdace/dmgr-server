@@ -1,15 +1,13 @@
 package com.dace.dmgr.system.command.test;
 
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.kiwi.dmgr.game.GameUser;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import static com.kiwi.dmgr.game.GameMapList.gameUserMap;
 
 public class StatCommand implements CommandExecutor {
     @Override
@@ -17,12 +15,13 @@ public class StatCommand implements CommandExecutor {
         Player player = Bukkit.getServer().getPlayer(args[0]);
         if (player.isOnline()) {
             User user = EntityInfoRegistry.getUser(player);
-            GameUser gameUser = gameUserMap.get(player);
+            GameUser gameUser = EntityInfoRegistry.getGameUser(player);
+
             if (args[1].equals("get")) {
                 if (args[2].equals("mmr"))
-                    sender.sendMessage(String.valueOf(user.getMMR()));
+                    sender.sendMessage(String.valueOf(user.getMatchMakingRate()));
                 if (args[2].equals("rank"))
-                    sender.sendMessage(String.valueOf(user.getRank()));
+                    sender.sendMessage(String.valueOf(user.getRankRate()));
                 if (args[2].equals("kill"))
                     sender.sendMessage(String.valueOf(gameUser.getKill()));
                 if (args[2].equals("death"))
@@ -31,9 +30,9 @@ public class StatCommand implements CommandExecutor {
                     sender.sendMessage(String.valueOf(gameUser.getScore()));
             } else if (args[1].equals("set")) {
                 if (args[2].equals("mmr"))
-                    user.setMMR(Integer.parseInt(args[3]));
+                    user.setMatchMakingRate(Integer.parseInt(args[3]));
                 if (args[2].equals("rank"))
-                    user.setRank(Integer.parseInt(args[3]));
+                    user.setRankRate(Integer.parseInt(args[3]));
                 if (args[2].equals("kill"))
                     gameUser.setKill(Integer.parseInt(args[3]));
                 if (args[2].equals("death"))

@@ -51,8 +51,9 @@ public final class Lobby {
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
                 int reqXp = user.getNextLevelXp();
-                int reqRank = user.getNextTierScore();
-                int curRank = user.getCurrentTierScore();
+                int rank = user.isRanked() ? user.getRankRate() : 0;
+                int reqRank = user.isRanked() ? user.getTier().getMaxScore() : 1;
+                int curRank = user.isRanked() ? user.getTier().getMinScore() : 0;
                 user.getLobbySidebar().clear();
                 user.getLobbySidebar().setName("§b§n" + player.getName());
                 user.getLobbySidebar().setAll(
@@ -60,11 +61,11 @@ public final class Lobby {
                         "§e보유 중인 돈",
                         "§6" + String.format("%,d", user.getMoney()),
                         "§f§f",
-                        "§f레벨 : " + user.getLevelPrefix(),
+                        "§f레벨 : " + StringFormUtil.getLevelPrefix(user.getLevel()),
                         StringFormUtil.getProgressBar(user.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + user.getXp() + "/" + reqXp + "]",
                         "§f§f§f",
-                        "§f랭크 : " + user.getTierPrefix(),
-                        StringFormUtil.getProgressBar(user.getRank() - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + user.getRank() + "/" + reqRank + "]"
+                        "§f랭크 : " + user.getTier().getPrefix(),
+                        StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + rank + "/" + reqRank + "]"
                 );
 
                 return true;

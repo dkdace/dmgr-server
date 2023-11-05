@@ -3,6 +3,7 @@ package com.dace.dmgr.system;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.lobby.User;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ public final class EntityInfoRegistry {
     private static final Map<LivingEntity, CombatEntity> combatEntityMap = new HashMap<>();
     private static final Map<Player, CombatUser> combatUserMap = new HashMap<>();
     private static final Map<LivingEntity, TemporalEntity<?>> temporalEntityMap = new HashMap<>();
+    private static final Map<Player, GameUser> gameUserMap = new HashMap<>();
 
     /**
      * @param player 플레이어
@@ -106,5 +108,28 @@ public final class EntityInfoRegistry {
     public static void removeTemporalEntity(LivingEntity entity) {
         temporalEntityMap.remove(entity);
         combatEntityMap.remove(entity);
+    }
+
+    /**
+     * @param player 플레이어
+     * @return 유저 정보 객체
+     */
+    public static GameUser getGameUser(Player player) {
+        return gameUserMap.get(player);
+    }
+
+    /**
+     * @param player   플레이어
+     * @param gameUser 게임 시스템의 플레이어 객체
+     */
+    public static void addGameUser(Player player, GameUser gameUser) {
+        gameUserMap.put(player, gameUser);
+    }
+
+    /**
+     * @param player 플레이어
+     */
+    public static void removeGameUser(Player player) {
+        gameUserMap.remove(player);
     }
 }

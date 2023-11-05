@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -22,7 +23,11 @@ public class SelectCharCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = Bukkit.getPlayer(args[0]);
-        String team = args[1];
+        Team team = Team.NONE;
+        if (args[1].equalsIgnoreCase("red"))
+            team = Team.RED;
+        else if (args[1].equalsIgnoreCase("blue"))
+            team = Team.BLUE;
         String character = args[2];
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
