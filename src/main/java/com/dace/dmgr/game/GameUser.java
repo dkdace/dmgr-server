@@ -4,6 +4,7 @@ import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -81,12 +82,18 @@ public final class GameUser {
      * @return 리스폰 위치
      */
     public Location getRespawnLocation() {
-        if (team == Team.RED)
-            return game.getMap().getRedTeamSpawns()[game.getGameMode().getGameModeScheduler().getRedTeamSpawnIndex()];
-        else if (team == Team.BLUE)
-            return game.getMap().getBlueTeamSpawns()[game.getGameMode().getGameModeScheduler().getBlueTeamSpawnIndex()];
-        else
-            return Lobby.lobbyLocation;
+        Location loc;
+
+        if (team == Team.RED) {
+            loc = game.getMap().getRedTeamSpawns()[game.getGameMode().getGameModeScheduler().getRedTeamSpawnIndex()];
+            loc.setWorld(Bukkit.getWorld(game.getWorldName()));
+        } else if (team == Team.BLUE) {
+            loc = game.getMap().getBlueTeamSpawns()[game.getGameMode().getGameModeScheduler().getBlueTeamSpawnIndex()];
+            loc.setWorld(Bukkit.getWorld(game.getWorldName()));
+        } else
+            loc = Lobby.lobbyLocation;
+
+        return loc;
     }
 
     /**

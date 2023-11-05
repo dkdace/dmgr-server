@@ -193,16 +193,13 @@ public final class Game implements HasTask {
     private void onStart() {
         startTime = System.currentTimeMillis();
         gameUsers.forEach(gameUser -> {
-            gameUser.getPlayer().sendTitle(gameMode.getName(), "", 10, gameMode.getReadyDuration(), 0);
+            gameUser.getPlayer().sendTitle(gameMode.getName(), "", 10, gameMode.getReadyDuration() * 20, 0);
             CombatUser combatUser = new CombatUser(gameUser.getPlayer());
             combatUser.init();
         });
         divideTeam();
 
-        teamUserMap.get(Team.RED).forEach(gameUser ->
-                gameUser.getPlayer().teleport(map.getRedTeamSpawns()[0]));
-        teamUserMap.get(Team.BLUE).forEach(gameUser ->
-                gameUser.getPlayer().teleport(map.getBlueTeamSpawns()[0]));
+        gameUsers.forEach(gameUser -> gameUser.getPlayer().teleport(gameUser.getRespawnLocation()));
     }
 
     /**

@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum GameMode {
-    TEAM_DEATHMATCH("팀 데스매치", 4, 10, false, 20, 10,
+    TEAM_DEATHMATCH("팀 데스매치", 4, 10, false, 20, 600,
             TeamDeathmatchScheduler.getInstance());
 
     /** 이름 */

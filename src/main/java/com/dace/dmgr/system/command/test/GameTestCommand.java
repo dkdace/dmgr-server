@@ -33,6 +33,7 @@ public class GameTestCommand implements CommandExecutor {
                 Game game = GameInfoRegistry.getGame(GameMode.TEAM_DEATHMATCH, number);
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     GameUser gameUser = new GameUser(player, game);
+                    gameUser.init();
                     game.addPlayer(gameUser);
                 }
 
