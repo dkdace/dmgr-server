@@ -3,6 +3,7 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.task.TaskTimer;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -183,11 +184,11 @@ public final class RankUtil {
                     File[] userDataFiles = dir.listFiles();
 
                     rankRateRanking = Arrays.stream(userDataFiles)
-                            .map(file -> new UserData(UUID.fromString(file.getName().substring(0, 36))))
+                            .map(file -> new UserData(UUID.fromString(FilenameUtils.removeExtension(file.getName()))))
                             .sorted(Comparator.comparing(UserData::getRankRate).reversed())
                             .toArray(UserData[]::new);
                     levelRanking = Arrays.stream(userDataFiles)
-                            .map(file -> new UserData(UUID.fromString(file.getName().substring(0, 36))))
+                            .map(file -> new UserData(UUID.fromString(FilenameUtils.removeExtension(file.getName()))))
                             .sorted(Comparator.comparing(UserData::getLevel).reversed())
                             .toArray(UserData[]::new);
 

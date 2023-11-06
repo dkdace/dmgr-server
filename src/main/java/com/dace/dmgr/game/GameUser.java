@@ -82,18 +82,14 @@ public final class GameUser {
      * @return 리스폰 위치
      */
     public Location getRespawnLocation() {
-        Location loc;
+        if (team == Team.RED)
+            return game.getMap().getRedTeamSpawns()[game.getGameMode().getGameModeScheduler().getRedTeamSpawnIndex()]
+                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+        else if (team == Team.BLUE)
+            return game.getMap().getBlueTeamSpawns()[game.getGameMode().getGameModeScheduler().getBlueTeamSpawnIndex()]
+                    .toLocation(Bukkit.getWorld(game.getWorldName()));
 
-        if (team == Team.RED) {
-            loc = game.getMap().getRedTeamSpawns()[game.getGameMode().getGameModeScheduler().getRedTeamSpawnIndex()];
-            loc.setWorld(Bukkit.getWorld(game.getWorldName()));
-        } else if (team == Team.BLUE) {
-            loc = game.getMap().getBlueTeamSpawns()[game.getGameMode().getGameModeScheduler().getBlueTeamSpawnIndex()];
-            loc.setWorld(Bukkit.getWorld(game.getWorldName()));
-        } else
-            loc = Lobby.lobbyLocation;
-
-        return loc;
+        return Lobby.lobbyLocation;
     }
 
     /**

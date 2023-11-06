@@ -3,7 +3,6 @@ package com.dace.dmgr.game.map;
 import com.dace.dmgr.game.GameMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.Location;
 
 /**
  * 팀 데스매치의 맵 목록.
@@ -12,8 +11,8 @@ import org.bukkit.Location;
 @Getter
 public enum TeamDeathmatchMap implements GameMap {
     TESTMAP(GameMode.TEAM_DEATHMATCH, "테스트맵", "TestMap",
-            new Location[]{new Location(null, 19.5, 63, 52.5, 180, 0)},
-            new Location[]{new Location(null, -114.5, 64, 53.5, -90, 0)});
+            new GlobalLocation[]{new GlobalLocation(19.5, 63, 52.5, 180, 0)},
+            new GlobalLocation[]{new GlobalLocation(-114.5, 64, 53.5, -90, 0)});
 
     /** 게임 모드 */
     private final GameMode gameMode;
@@ -22,7 +21,7 @@ public enum TeamDeathmatchMap implements GameMap {
     /** 맵 월드 이름 */
     private final String worldName;
     /** 레드 팀 스폰 위치 목록 */
-    private final Location[] redTeamSpawns;
+    private final GlobalLocation[] redTeamSpawns;
     /** 블루 팀 스폰 위치 목록 */
-    private final Location[] blueTeamSpawns;
+    private final GlobalLocation[] blueTeamSpawns;
 }

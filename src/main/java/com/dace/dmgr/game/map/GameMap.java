@@ -1,7 +1,6 @@
 package com.dace.dmgr.game.map;
 
 import com.dace.dmgr.game.GameMode;
-import org.bukkit.Location;
 
 /**
  * 게임에 사용되는 맵을 관리하는 인터페이스.
@@ -25,10 +24,10 @@ public interface GameMap {
     /**
      * @return 레드 팀 스폰 위치 목록
      */
-    Location[] getRedTeamSpawns();
+    GlobalLocation[] getRedTeamSpawns();
 
     /**
      * @return 블루 팀 스폰 위치 목록
      */
-    Location[] getBlueTeamSpawns();
+    GlobalLocation[] getBlueTeamSpawns();
 }
