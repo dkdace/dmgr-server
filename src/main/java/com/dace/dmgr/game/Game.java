@@ -75,7 +75,7 @@ public final class Game implements HasTask {
      * 게임 정보를 초기화하고 스케쥴러를 실행한다.
      */
     public void init() {
-        GameInfoRegistry.addGame(number, this);
+        GameInfoRegistry.addGame(this);
 
         TaskManager.addTask(this, new TaskTimer(20) {
             @Override
@@ -93,7 +93,7 @@ public final class Game implements HasTask {
         gameUsers.forEach(gameUser -> Lobby.spawn(gameUser.getPlayer()));
 
         unloadWorld();
-        GameInfoRegistry.removeGame(this.gameMode, number);
+        GameInfoRegistry.removeGame(this);
         TaskManager.clearTask(this);
     }
 

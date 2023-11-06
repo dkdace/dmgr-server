@@ -22,7 +22,7 @@ public final class GameInfoRegistry {
     /**
      * 게임 모드별 맵을 저장한다.
      */
-    public static void init() {
+    private static void init() {
         gameMapListMap.put(GameMode.TEAM_DEATHMATCH, TeamDeathmatchMap.values());
     }
 
@@ -33,6 +33,9 @@ public final class GameInfoRegistry {
      * @return 무작위 맵
      */
     public static GameMap getRandomMap(GameMode gameMode) {
+        if (gameMapListMap.isEmpty())
+            init();
+
         int index = random.nextInt(gameMapListMap.get(gameMode).length);
         return gameMapListMap.get(gameMode)[index];
     }
@@ -48,20 +51,18 @@ public final class GameInfoRegistry {
     }
 
     /**
-     * @param number 방 번호
-     * @param game   게임 정보 객체
+     * @param game 게임 정보 객체
      */
-    public static void addGame(int number, Game game) {
+    public static void addGame(Game game) {
         gameListMap.putIfAbsent(game.getGameMode(), new Game[MAX_ROOM]);
-        gameListMap.get(game.getGameMode())[number] = game;
+        gameListMap.get(game.getGameMode())[game.getNumber()] = game;
     }
 
     /**
-     * @param gameMode 게임 모드
-     * @param number   방 번호
+     * @param game 게임 정보 객체
      */
-    public static void removeGame(GameMode gameMode, int number) {
-        gameListMap.putIfAbsent(gameMode, new Game[MAX_ROOM]);
-        gameListMap.get(gameMode)[number] = null;
+    public static void removeGame(Game game) {
+        gameListMap.putIfAbsent(game.getGameMode(), new Game[MAX_ROOM]);
+        gameListMap.get(game.getGameMode())[game.getNumber()] = null;
     }
 }

@@ -5,7 +5,6 @@ import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.GameInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
@@ -41,7 +40,6 @@ public class DMGR extends JavaPlugin {
         MainEventManager.init();
         CombatEventManager.init();
         WorldUtil.init();
-        GameInfoRegistry.init();
         RankUtil.RankUpdater.init();
         registerCommands();
         registerTestCommands();
