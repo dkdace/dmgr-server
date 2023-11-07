@@ -39,8 +39,8 @@ public class DMGR extends JavaPlugin {
         getLogger().info("플러그인 활성화 완료");
         MainEventManager.init();
         CombatEventManager.init();
-        WorldUtil.init();
         RankUtil.RankUpdater.init();
+        WorldUtil.clearDuplicatedWorlds();
         registerCommands();
         registerTestCommands();
 

@@ -64,7 +64,7 @@ public final class Game implements HasTask {
         this.number = number;
         this.gameMode = gameMode;
         this.map = GameInfoRegistry.getRandomMap(gameMode);
-        this.worldName = WorldUtil.getRandomWorldName(map.getWorldName());
+        this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gameMode, number);
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
