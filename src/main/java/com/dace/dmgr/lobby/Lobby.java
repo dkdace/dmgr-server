@@ -50,23 +50,25 @@ public final class Lobby {
                 else
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-                int reqXp = user.getNextLevelXp();
-                int rank = user.isRanked() ? user.getRankRate() : 0;
-                int reqRank = user.isRanked() ? user.getTier().getMaxScore() : 1;
-                int curRank = user.isRanked() ? user.getTier().getMinScore() : 0;
-                user.getLobbySidebar().clear();
-                user.getLobbySidebar().setName("§b§n" + player.getName());
-                user.getLobbySidebar().setAll(
-                        "§f",
-                        "§e보유 중인 돈",
-                        "§6" + String.format("%,d", user.getMoney()),
-                        "§f§f",
-                        "§f레벨 : " + StringFormUtil.getLevelPrefix(user.getLevel()),
-                        StringFormUtil.getProgressBar(user.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + user.getXp() + "/" + reqXp + "]",
-                        "§f§f§f",
-                        "§f랭크 : " + user.getTier().getPrefix(),
-                        StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + rank + "/" + reqRank + "]"
-                );
+                if (EntityInfoRegistry.getCombatUser(player) == null) {
+                    int reqXp = user.getNextLevelXp();
+                    int rank = user.isRanked() ? user.getRankRate() : 0;
+                    int reqRank = user.isRanked() ? user.getTier().getMaxScore() : 1;
+                    int curRank = user.isRanked() ? user.getTier().getMinScore() : 0;
+                    user.getSidebar().clear();
+                    user.getSidebar().setName("§b§n" + player.getName());
+                    user.getSidebar().setAll(
+                            "§f",
+                            "§e보유 중인 돈",
+                            "§6" + String.format("%,d", user.getMoney()),
+                            "§f§f",
+                            "§f레벨 : " + StringFormUtil.getLevelPrefix(user.getLevel()),
+                            StringFormUtil.getProgressBar(user.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + user.getXp() + "/" + reqXp + "]",
+                            "§f§f§f",
+                            "§f랭크 : " + user.getTier().getPrefix(),
+                            StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + rank + "/" + reqRank + "]"
+                    );
+                }
 
                 return true;
             }

@@ -37,14 +37,15 @@ public interface Damageable extends CombatEntity {
     /**
      * 엔티티가 피해를 입었을 때 실행될 작업.
      *
-     * @param attacker   공격자
-     * @param damage     피해량
-     * @param damageType 타입
-     * @param isCrit     치명타 여부
-     * @param isUlt      궁극기 충전 여부
+     * @param attacker      공격자
+     * @param damage        피해량
+     * @param reducedDamage 방어력에 의해 경감된 피해량
+     * @param damageType    타입
+     * @param isCrit        치명타 여부
+     * @param isUlt         궁극기 충전 여부
      * @see Attacker#onAttack(Damageable, int, DamageType, boolean, boolean)
      */
-    void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt);
+    void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt);
 
     /**
      * 엔티티가 죽었을 때 실행될 작업.

@@ -22,7 +22,7 @@ public final class GameUser {
     private Team team;
     /** 점수 */
     @Setter
-    private int score = 0;
+    private double score = 0;
     /** 킬 */
     @Setter
     private int kill = 0;
@@ -32,18 +32,15 @@ public final class GameUser {
     /** 어시스트 */
     @Setter
     private int assist = 0;
-    /** 준 피해량 */
+    /** 입힌 피해량 */
     @Setter
-    private long damageDealt = 0;
-    /** 받은 피해량 */
-    @Setter
-    private long damageTaken = 0;
-    /** 힐량 */
-    @Setter
-    private long heal = 0;
+    private int damage = 0;
     /** 막은 피해량 */
     @Setter
-    private long damageBlocked = 0;
+    private int defend = 0;
+    /** 치유량 */
+    @Setter
+    private long heal = 0;
 
     /**
      * 게임 시스템의 플레이어 인스턴스를 생성한다.
@@ -61,6 +58,7 @@ public final class GameUser {
      * 게임 유저를 초기화한다.
      */
     public void init() {
+        game.addPlayer(this);
         EntityInfoRegistry.addGameUser(player, this);
     }
 
@@ -68,6 +66,7 @@ public final class GameUser {
      * 게임 유저를 제거한다.
      */
     public void remove() {
+        game.removePlayer(this);
         EntityInfoRegistry.removeGameUser(player);
     }
 
@@ -77,16 +76,26 @@ public final class GameUser {
     }
 
     /**
+     * 플레이어가 속한 팀의 팀 점수를 증가시킨다.
+     *
+     * @param increment 증가량
+     */
+    public void addTeamScore(int increment) {
+        if (team != Team.NONE)
+            game.getTeamScore().put(team, game.getTeamScore().get(team) + increment);
+    }
+
+    /**
      * 리스폰 위치를 반환한다.
      *
      * @return 리스폰 위치
      */
     public Location getRespawnLocation() {
         if (team == Team.RED)
-            return game.getMap().getRedTeamSpawns()[game.getGameMode().getGameModeScheduler().getRedTeamSpawnIndex()]
+            return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
                     .toLocation(Bukkit.getWorld(game.getWorldName()));
         else if (team == Team.BLUE)
-            return game.getMap().getBlueTeamSpawns()[game.getGameMode().getGameModeScheduler().getBlueTeamSpawnIndex()]
+            return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
                     .toLocation(Bukkit.getWorld(game.getWorldName()));
 
         return Lobby.lobbyLocation;

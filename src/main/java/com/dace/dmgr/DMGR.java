@@ -63,7 +63,7 @@ public class DMGR extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = EntityInfoRegistry.getUser(player);
             if (user != null)
-                user.getLobbySidebar().delete();
+                user.getSidebar().delete();
             player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 중...");
         });
     }

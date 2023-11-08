@@ -81,7 +81,7 @@ public final class RankUtil {
      * @param averageMMR 게임 참여자들의 MMR 평균
      * @return 최종 MMR
      */
-    public static int getFinalMMR(int mmr, int playCount, float kda, int score, int playTime, int averageMMR) {
+    public static int getFinalMMR(int mmr, int playCount, float kda, double score, int playTime, int averageMMR) {
         int value = (int) Math.min(((getKDARatioCorrection(kda) + getScoreCorrection(score, playTime)) * 10 + averageMMR), 1000);
 
         double finalMMR;
@@ -117,9 +117,9 @@ public final class RankUtil {
      * @param isWinner  승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 랭크 점수
      */
-    public static int getFinalRankRateRanked(int mmr, int rr, float kda, int score, int playTime, int averageRR, Boolean isWinner) {
-        return rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime) +
-                getWinCorrection(isWinner) + getPointCorrection(mmr, rr, averageRR));
+    public static int getFinalRankRateRanked(int mmr, int rr, float kda, double score, int playTime, int averageRR, Boolean isWinner) {
+        return (int) (rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime) +
+                getWinCorrection(isWinner) + getPointCorrection(mmr, rr, averageRR)));
     }
 
     /**
@@ -128,7 +128,7 @@ public final class RankUtil {
      * @param kda 킬/데스
      * @return 킬/데스 보정치
      */
-    private static float getKDARatioCorrection(float kda) {
+    private static double getKDARatioCorrection(float kda) {
         return (kda / EXPECTED_AVERAGE_KDA) * 20;
     }
 
@@ -139,7 +139,7 @@ public final class RankUtil {
      * @param playTime 플레이 시간 (초)
      * @return 게임 점수 보정치
      */
-    private static float getScoreCorrection(int score, long playTime) {
+    private static double getScoreCorrection(double score, long playTime) {
         return ((score / EXPECTED_AVERAGE_SCORE_PER_MIN) / playTime / 60) * 20;
     }
 
@@ -149,7 +149,7 @@ public final class RankUtil {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 승패 보정치
      */
-    private static float getWinCorrection(Boolean isWinner) {
+    private static double getWinCorrection(Boolean isWinner) {
         if (isWinner == null)
             return 0;
         return isWinner ? 10 : -8;
@@ -163,10 +163,10 @@ public final class RankUtil {
      * @param averageRR 게임 참여자들의 랭크 점수 평균
      * @return MMR, 랭크 점수 보정치
      */
-    private static float getPointCorrection(int mmr, int rr, int averageRR) {
-        float averageDiffValue = (float) (EXPECTED_AVERAGE_RANK + averageRR) / 2 - rr;
+    private static double getPointCorrection(int mmr, int rr, int averageRR) {
+        double averageDiffValue = (EXPECTED_AVERAGE_RANK + averageRR) / 2F - rr;
         int weightValue = mmr - rr;
-        return (float) (averageDiffValue * 0.04 + weightValue * 0.1);
+        return averageDiffValue * 0.04 + weightValue * 0.1;
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.dace.dmgr.game;
 
-import com.dace.dmgr.game.scheduler.GameModeScheduler;
+import com.dace.dmgr.game.scheduler.GamePlayModeScheduler;
 import com.dace.dmgr.game.scheduler.TeamDeathmatchScheduler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum GameMode {
+public enum GamePlayMode {
     TEAM_DEATHMATCH("팀 데스매치", 4, 10, false, 20, 600,
             TeamDeathmatchScheduler.getInstance());
 
@@ -27,5 +27,5 @@ public enum GameMode {
     /** 게임 진행 시간 */
     private final int playDuration;
     /** 게임 모드 스케쥴러 */
-    private final GameModeScheduler gameModeScheduler;
+    private final GamePlayModeScheduler gamePlayModeScheduler;
 }

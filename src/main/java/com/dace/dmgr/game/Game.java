@@ -40,7 +40,7 @@ public final class Game implements HasTask {
     /** 팀 점수 (팀 : 점수) */
     private final EnumMap<Team, Integer> teamScore = new EnumMap<>(Team.class);
     /** 게임 모드 */
-    private final GameMode gameMode;
+    private final GamePlayMode gamePlayMode;
     /** 전장 월드 이름 */
     private final String worldName;
     /** 맵 */
@@ -57,14 +57,14 @@ public final class Game implements HasTask {
     /**
      * 게임 인스턴스를 생성한다.
      *
-     * @param number   방 번호
-     * @param gameMode 게임 모드
+     * @param number       방 번호
+     * @param gamePlayMode 게임 모드
      */
-    public Game(int number, GameMode gameMode) {
+    public Game(int number, GamePlayMode gamePlayMode) {
         this.number = number;
-        this.gameMode = gameMode;
-        this.map = GameInfoRegistry.getRandomMap(gameMode);
-        this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gameMode, number);
+        this.gamePlayMode = gamePlayMode;
+        this.map = GameInfoRegistry.getRandomMap(gamePlayMode);
+        this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gamePlayMode, number);
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
@@ -99,7 +99,7 @@ public final class Game implements HasTask {
 
     @Override
     public String getTaskIdentifier() {
-        return "Game@" + gameMode.toString() + hashCode();
+        return "Game@" + gamePlayMode.toString() + hashCode();
     }
 
     /**
@@ -124,10 +124,10 @@ public final class Game implements HasTask {
 
         switch (phase) {
             case WAITING: {
-                if (gameMode.getMinPlayer() > gameUsers.size()) {
+                if (gamePlayMode.getMinPlayer() > gameUsers.size()) {
                     if (remainingTime == 0) {
                         phase = Phase.READY;
-                        remainingTime = gameMode.getReadyDuration();
+                        remainingTime = gamePlayMode.getReadyDuration();
 
                         onStart();
 
@@ -146,7 +146,7 @@ public final class Game implements HasTask {
             case READY: {
                 if (remainingTime == 0) {
                     phase = Phase.PLAYING;
-                    remainingTime = gameMode.getPlayDuration();
+                    remainingTime = gamePlayMode.getPlayDuration();
 
                     gameUsers.forEach(gameUser -> {
                         SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
@@ -165,7 +165,7 @@ public final class Game implements HasTask {
                 break;
             }
             case PLAYING: {
-                gameMode.getGameModeScheduler().onSecond(this);
+                gamePlayMode.getGamePlayModeScheduler().onSecond(this);
 
                 if (remainingTime == 0) {
                     phase = Phase.END;
@@ -193,8 +193,8 @@ public final class Game implements HasTask {
     private void onStart() {
         startTime = System.currentTimeMillis();
         gameUsers.forEach(gameUser -> {
-            gameUser.getPlayer().sendTitle(gameMode.getName(), "", 10, gameMode.getReadyDuration() * 20, 0);
-            CombatUser combatUser = new CombatUser(gameUser.getPlayer());
+            gameUser.getPlayer().sendTitle(gamePlayMode.getName(), "", 10, gamePlayMode.getReadyDuration() * 20, 0);
+            CombatUser combatUser = new CombatUser(gameUser.getPlayer(), gameUser);
             combatUser.init();
         });
         divideTeam();
@@ -267,7 +267,7 @@ public final class Game implements HasTask {
         if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
             winnerTeam = Team.NONE;
 
-        if (gameMode.isRanked()) {
+        if (gamePlayMode.isRanked()) {
             for (GameUser gameUser : gameUsers) {
                 Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
                 updateRankRate(gameUser, isWinner);
@@ -278,7 +278,7 @@ public final class Game implements HasTask {
         }
 
         for (GameUser gameUser : gameUsers) {
-            sendMessage(gameUser, gameMode.getName() + " 게임 결과");
+            sendMessage(gameUser, gamePlayMode.getName() + " 게임 결과");
 
             if (winnerTeam == Team.NONE)
                 sendMessage(gameUser, "* " + winnerTeam.getColor() + "무승부");
@@ -290,7 +290,7 @@ public final class Game implements HasTask {
             sendMessage(gameUser, "* 점수: " + gameUser.getScore());
             sendMessage(gameUser, "* K/D/A: " + gameUser.getKill() + "/" + gameUser.getDeath() + "/" + gameUser.getAssist() +
                     " (" + (gameUser.getKDARatio()) + ")");
-            sendMessage(gameUser, "* 입힌 데미지: " + gameUser.getDamageDealt());
+            sendMessage(gameUser, "* 입힌 데미지: " + gameUser.getDamage());
         }
     }
 
@@ -305,7 +305,7 @@ public final class Game implements HasTask {
         int mmr = user.getMatchMakingRate();
         int normalPlayCount = user.getNormalPlayCount();
         float kda = gameUser.getKDARatio();
-        int score = gameUser.getScore();
+        double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - gameUser.getGame().getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
@@ -329,7 +329,7 @@ public final class Game implements HasTask {
         int rr = user.getRankRate();
         int rankPlayCount = user.getRankPlayCount();
         float kda = gameUser.getKDARatio();
-        int score = gameUser.getScore();
+        double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - gameUser.getGame().getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
@@ -380,7 +380,11 @@ public final class Game implements HasTask {
     public void removePlayer(GameUser gameUser) {
         gameUsers.forEach(gameUser2 -> sendMessage(gameUser2, MESSAGES.QUIT_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
-        teamUserMap.get(gameUser.getTeam()).remove(gameUser);
+        if (teamUserMap.get(gameUser.getTeam()) != null)
+            teamUserMap.get(gameUser.getTeam()).remove(gameUser);
+
+        if (gameUsers.isEmpty())
+            remove();
     }
 
     /**

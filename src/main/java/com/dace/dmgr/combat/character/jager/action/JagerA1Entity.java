@@ -129,7 +129,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
         skill.addStateValue(-damage);
     }

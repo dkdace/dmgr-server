@@ -2,7 +2,7 @@ package com.dace.dmgr.system.command.test;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GameMode;
+import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.system.GameInfoRegistry;
 import org.bukkit.Bukkit;
@@ -23,24 +23,23 @@ public class GameTestCommand implements CommandExecutor {
 
         switch (args[0]) {
             case "생성": {
-                Game game = new Game(number, GameMode.TEAM_DEATHMATCH);
+                Game game = new Game(number, GamePlayMode.TEAM_DEATHMATCH);
                 game.init();
                 DMGR.getPlugin().getLogger().info(MessageFormat.format("팀 데스매치 게임 생성됨 : [{0}]", number));
 
                 break;
             }
             case "전체추가": {
-                Game game = GameInfoRegistry.getGame(GameMode.TEAM_DEATHMATCH, number);
+                Game game = GameInfoRegistry.getGame(GamePlayMode.TEAM_DEATHMATCH, number);
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     GameUser gameUser = new GameUser(player, game);
                     gameUser.init();
-                    game.addPlayer(gameUser);
                 }
 
                 break;
             }
             case "삭제": {
-                Game game = GameInfoRegistry.getGame(GameMode.TEAM_DEATHMATCH, number);
+                Game game = GameInfoRegistry.getGame(GamePlayMode.TEAM_DEATHMATCH, number);
                 game.remove();
                 DMGR.getPlugin().getLogger().info(MessageFormat.format("팀 데스매치 게임 제거됨 : [{0}]", number));
 

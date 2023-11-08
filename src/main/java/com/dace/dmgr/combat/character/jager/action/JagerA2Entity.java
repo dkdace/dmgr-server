@@ -172,7 +172,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt) {
         playDamageSound(damage);
     }
 

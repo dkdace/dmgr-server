@@ -22,8 +22,9 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 public final class User extends UserData implements HasTask {
     /** 플레이어 객체 */
     private final Player player;
-    /** 로비 사이드바 */
-    private final BPlayerBoard lobbySidebar;
+    /** 플레이어 사이드바 */
+    @Setter
+    private BPlayerBoard sidebar;
     /** 리소스팩 적용 여부 */
     @Setter
     private boolean resourcePack = false;
@@ -39,7 +40,7 @@ public final class User extends UserData implements HasTask {
     public User(Player player) {
         super(player.getUniqueId());
         this.player = player;
-        this.lobbySidebar = new BPlayerBoard(player, "lobbySidebar");
+        this.sidebar = new BPlayerBoard(player, "lobby");
     }
 
     /**
@@ -76,6 +77,9 @@ public final class User extends UserData implements HasTask {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
+
+        sidebar.delete();
+        sidebar = new BPlayerBoard(player, "lobby");
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser != null) {

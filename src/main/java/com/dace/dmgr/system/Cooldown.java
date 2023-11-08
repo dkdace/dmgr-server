@@ -43,6 +43,8 @@ public enum Cooldown {
     SKILL_STACK_COOLDOWN(0),
     /** 스킬 지속시간 */
     SKILL_DURATION(0),
+    /** 획득 점수 표시 유지시간 */
+    SCORE_DISPLAY_DURATION(CombatUser.SCORE_DISPLAY_DURATION),
     /** 액션바 지속시간 */
     ACTION_BAR(0),
     /** 상태 효과 지속시간 */

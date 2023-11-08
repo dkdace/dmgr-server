@@ -1,6 +1,6 @@
 package com.dace.dmgr.game.map;
 
-import com.dace.dmgr.game.GameMode;
+import com.dace.dmgr.game.GamePlayMode;
 
 /**
  * 게임에 사용되는 맵을 관리하는 인터페이스.
@@ -9,7 +9,7 @@ public interface GameMap {
     /**
      * @return 게임 모드
      */
-    GameMode getGameMode();
+    GamePlayMode getGamePlayMode();
 
     /**
      * @return 맵 이름

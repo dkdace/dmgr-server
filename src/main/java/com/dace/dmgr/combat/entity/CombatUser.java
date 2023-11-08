@@ -20,9 +20,12 @@ import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.gui.item.CombatItem;
 import com.dace.dmgr.lobby.Lobby;
+import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -30,9 +33,12 @@ import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.*;
+import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -52,11 +58,13 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /** 기본 이동속도 */
     public static final float BASE_SPEED = 0.24F;
     /** 적 처치 기여 (데미지 누적) 제한시간 */
-    public static final int DAMAGE_SUM_TIME_LIMIT = 10 * 20;
+    public static final long DAMAGE_SUM_TIME_LIMIT = 10 * 20;
     /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
-    public static final int FASTKILL_TIME_LIMIT = (int) 2.5 * 20;
+    public static final long FASTKILL_TIME_LIMIT = (long) (2.5 * 20);
     /** 리스폰 시간 */
     public static final int RESPAWN_TIME = 10 * 20;
+    /** 획득 점수 표시 유지시간 */
+    public static final long SCORE_DISPLAY_DURATION = 100;
 
     /** 피해 모듈 */
     @Getter
@@ -64,7 +72,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /** 이동 모듈 */
     @Getter
     private final JumpModule moveModule;
-
     /** 치명타 히트박스 객체 */
     @Getter
     private final Hitbox critHitbox;
@@ -80,6 +87,16 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
     private final HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
+    /** 획득 점수 목록 (항목 : 획득 점수) */
+    private final HashMap<String, Double> scoreMap = new LinkedHashMap<>();
+    /** 연속으로 획득한 점수의 합 */
+    private double scoreStreakSum = 0;
+    /** 플레이어 사이드바 */
+    @Setter
+    private BPlayerBoard sidebar;
+    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Getter
+    private GameUser gameUser = null;
     /** 선택한 전투원 */
     @Getter
     private Character character = null;
@@ -106,9 +123,35 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         critHitbox = hitboxes[3];
     }
 
+    /**
+     * 게임에 참여중인 전투 시스템의 플레이어 인스턴스를 생성한다.
+     *
+     * <p>{@link CombatEntityBase#init()}을 호출하여 초기화해야 한다.</p>
+     *
+     * @param entity   대상 플레이어
+     * @param gameUser 게임 유저 객체
+     */
+    public CombatUser(Player entity, GameUser gameUser) {
+        this(entity);
+        this.gameUser = gameUser;
+    }
+
     @Override
     protected CombatEntityModule[] getModules() {
         return new CombatEntityModule[]{damageModule, moveModule};
+    }
+
+    @Override
+    public Team getTeam() {
+        if (gameUser == null)
+            return Team.NONE;
+        return gameUser.getTeam();
+    }
+
+    @Override
+    public void setTeam(Team team) {
+        if (gameUser != null)
+            gameUser.setTeam(team);
     }
 
     @Override
@@ -117,6 +160,11 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         EntityInfoRegistry.addCombatUser(entity, this);
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED);
+
+        User user = EntityInfoRegistry.getUser(entity);
+        user.getSidebar().delete();
+        user.setSidebar(new BPlayerBoard(entity, "combat"));
+        sidebar = user.getSidebar();
     }
 
     @Override
@@ -158,6 +206,10 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         if (CooldownManager.getCooldown(this, Cooldown.ACTION_BAR) == 0)
             onTickActionbar();
+
+        sidebar.clear();
+        if (CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > 0)
+            sendScoreSidebar();
     }
 
     @Override
@@ -179,6 +231,22 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         text.add(character.getActionbarString(this));
 
         sendActionBar(text.toString());
+    }
+
+    /**
+     * {@link CombatUser#onTick(int)}에서 사용하며, 사이드바에 획득 점수 목록을 출력한다.
+     */
+    private void sendScoreSidebar() {
+        if (scoreMap.isEmpty())
+            return;
+
+        int i = 14;
+        boolean fresh = CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > SCORE_DISPLAY_DURATION - 10;
+
+        sidebar.setName(MessageFormat.format("{0}+{1}", fresh ? "§d" : "§a", scoreStreakSum));
+        sidebar.set("§f", i--);
+        for (Map.Entry<String, Double> entry : scoreMap.entrySet())
+            sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue()), 30), i--);
     }
 
     @Override
@@ -244,6 +312,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
+
+        if (gameUser != null && victim instanceof CombatUser)
+            gameUser.setDamage(gameUser.getDamage() + damage);
     }
 
     /**
@@ -265,7 +336,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == attacker)
             return;
 
@@ -283,6 +354,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             float sumDamage = damageMap.getOrDefault(attacker, 0F);
             damageMap.put((CombatUser) attacker, Math.min(sumDamage + (float) damage / damageModule.getMaxHealth(), 1));
         }
+
+        if (gameUser != null)
+            gameUser.setDefend(gameUser.getDefend() + reducedDamage);
     }
 
     @Override
@@ -311,6 +385,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         if (target.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(amount);
+
+        if (gameUser != null && target instanceof CombatUser)
+            gameUser.setHeal(gameUser.getHeal() + amount);
     }
 
     @Override
@@ -347,33 +424,35 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
             float damage = ((CombatUser) victim).getDamageMap().getOrDefault(this, 0F);
             int score = Math.round(damage * 100);
 
-            playPlayerKillEffect((CombatUser) victim, score);
-        } else
+            addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
+            playPlayerKillEffect();
+
+            if (gameUser != null) {
+                gameUser.setKill(gameUser.getKill() + 1);
+                if (gameUser.getGame().getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
+                    gameUser.addTeamScore(1);
+            }
+        } else {
+            if (victim instanceof Dummy)
+                addScore("§e훈련용 봇§f 처치", 100);
             playEntityKillEffect();
+        }
     }
 
     /**
      * 다른 플레이어를 처치했을 때 효과를 재생한다.
-     *
-     * @param victim 피격자
-     * @param score  처치 점수
      */
-    private void playPlayerKillEffect(CombatUser victim, int score) {
+    private void playPlayerKillEffect() {
         entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
-        entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 §a§l[+" + score + "]");
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
     }
 
     /**
      * 다른 플레이어 처치를 도왔을 때 효과를 재생한다.
-     *
-     * @param victim 피격자
-     * @param score  처치 점수
      */
-    private void playPlayerAssistEffect(CombatUser victim, int score) {
+    private void playPlayerAssistEffect() {
         entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
-        entity.sendMessage(SystemPrefix.CHAT + "§e§n" + victim.getName() + "§f 처치 도움 §a§l[+" + score + "]");
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
     }
@@ -419,12 +498,19 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                 if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
                     int score = Math.round(damage * 100);
 
-                    attacker2.playPlayerAssistEffect(this, score);
+                    addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
+                    attacker2.playPlayerAssistEffect();
+
+                    if (attacker2.getGameUser() != null)
+                        attacker2.getGameUser().setAssist(attacker2.getGameUser().getAssist() + 1);
                 }
             });
 
             broadcastPlayerKillMessage(this);
             damageMap.clear();
+
+            if (gameUser != null)
+                gameUser.setDeath(gameUser.getDeath() + 1);
 
             Location deadLocation = entity.getLocation().add(0, 0.5, 0);
             deadLocation.setPitch(90);
@@ -496,6 +582,37 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         CooldownManager.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, cooldown == -1 ? 9999 : cooldown);
         entity.setCooldown(SkillInfo.MATERIAL, cooldown);
         entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
+    }
+
+    /**
+     * 지정한 양만큼 플레이어의 점수를 증가시킨다.
+     *
+     * <p>게임 참여 중이 아니면 점수 획득 표시만 한다.</p>
+     *
+     * @param context 항목
+     * @param score   점수 증가량
+     */
+    private void addScore(String context, double score) {
+        if (gameUser != null)
+            gameUser.setScore(gameUser.getScore() + score);
+
+        if (CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) == 0) {
+            scoreStreakSum = 0;
+            scoreMap.clear();
+        }
+
+        CooldownManager.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION);
+        if (scoreMap.size() > 5)
+            scoreMap.remove(scoreMap.keySet().iterator().next());
+
+        TaskManager.addTask(this, new TaskTimer(1, 10) {
+            @Override
+            protected boolean onTimerTick(int i) {
+                scoreStreakSum += score / 10;
+                scoreMap.put(context, scoreMap.getOrDefault(context, 0.0) + score / 10);
+                return true;
+            }
+        });
     }
 
     /**

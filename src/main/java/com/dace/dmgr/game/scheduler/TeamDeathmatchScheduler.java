@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 /**
  * 팀 데스매치 스케쥴러 클래스.
  */
-public final class TeamDeathmatchScheduler implements GameModeScheduler {
+public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
     @Getter
     private static final TeamDeathmatchScheduler instance = new TeamDeathmatchScheduler();
 

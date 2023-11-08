@@ -1,7 +1,7 @@
 package com.dace.dmgr.system;
 
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GameMode;
+import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.game.map.TeamDeathmatchMap;
 
@@ -15,54 +15,54 @@ public final class GameInfoRegistry {
     /** 게임 모드별 최대 방 갯수 */
     private static final int MAX_ROOM = 3;
 
-    private static final EnumMap<GameMode, Game[]> gameListMap = new EnumMap<>(GameMode.class);
-    private static final EnumMap<GameMode, GameMap[]> gameMapListMap = new EnumMap<>(GameMode.class);
+    private static final EnumMap<GamePlayMode, Game[]> gameListMap = new EnumMap<>(GamePlayMode.class);
+    private static final EnumMap<GamePlayMode, GameMap[]> gameMapListMap = new EnumMap<>(GamePlayMode.class);
     private static final Random random = new Random();
 
     /**
      * 게임 모드별 맵을 저장한다.
      */
     private static void init() {
-        gameMapListMap.put(GameMode.TEAM_DEATHMATCH, TeamDeathmatchMap.values());
+        gameMapListMap.put(GamePlayMode.TEAM_DEATHMATCH, TeamDeathmatchMap.values());
     }
 
     /**
      * 지정한 게임 모드에 해당하는 무작위 맵을 반환한다.
      *
-     * @param gameMode 게임 모드
+     * @param gamePlayMode 게임 모드
      * @return 무작위 맵
      */
-    public static GameMap getRandomMap(GameMode gameMode) {
+    public static GameMap getRandomMap(GamePlayMode gamePlayMode) {
         if (gameMapListMap.isEmpty())
             init();
 
-        int index = random.nextInt(gameMapListMap.get(gameMode).length);
-        return gameMapListMap.get(gameMode)[index];
+        int index = random.nextInt(gameMapListMap.get(gamePlayMode).length);
+        return gameMapListMap.get(gamePlayMode)[index];
     }
 
     /**
-     * @param gameMode 게임 모드
+     * @param gamePlayMode 게임 모드
      * @param number   방 번호
      * @return 게임 정보 객체
      */
-    public static Game getGame(GameMode gameMode, int number) {
-        gameListMap.putIfAbsent(gameMode, new Game[MAX_ROOM]);
-        return gameListMap.get(gameMode)[number];
+    public static Game getGame(GamePlayMode gamePlayMode, int number) {
+        gameListMap.putIfAbsent(gamePlayMode, new Game[MAX_ROOM]);
+        return gameListMap.get(gamePlayMode)[number];
     }
 
     /**
      * @param game 게임 정보 객체
      */
     public static void addGame(Game game) {
-        gameListMap.putIfAbsent(game.getGameMode(), new Game[MAX_ROOM]);
-        gameListMap.get(game.getGameMode())[game.getNumber()] = game;
+        gameListMap.putIfAbsent(game.getGamePlayMode(), new Game[MAX_ROOM]);
+        gameListMap.get(game.getGamePlayMode())[game.getNumber()] = game;
     }
 
     /**
      * @param game 게임 정보 객체
      */
     public static void removeGame(Game game) {
-        gameListMap.putIfAbsent(game.getGameMode(), new Game[MAX_ROOM]);
-        gameListMap.get(game.getGameMode())[game.getNumber()] = null;
+        gameListMap.putIfAbsent(game.getGamePlayMode(), new Game[MAX_ROOM]);
+        gameListMap.get(game.getGamePlayMode())[game.getNumber()] = null;
     }
 }
