@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 public final class Game implements HasTask {
     /** 랭크가 결정되는 배치 판 수 */
     private static final int RANK_PLACEMENT_PLAY_COUNT = 5;
+    /** 게임 시작까지 필요한 대기 시간 (초) */
+    private static final int GAME_WAITING_TIME = 30;
+    private static final Random random = new Random();
 
     /** 방 번호 */
     private final int number;
@@ -49,7 +52,7 @@ public final class Game implements HasTask {
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 */
     @Setter
-    private int remainingTime = 30;
+    private int remainingTime = GAME_WAITING_TIME;
     /** 게임 진행 단계 */
     @Setter
     private Phase phase = Phase.WAITING;
@@ -124,7 +127,7 @@ public final class Game implements HasTask {
 
         switch (phase) {
             case WAITING: {
-                if (gamePlayMode.getMinPlayer() > gameUsers.size()) {
+                if (gamePlayMode.getMinPlayer() > gameUsers.size() && gameUsers.size() % 2 == 0) {
                     if (remainingTime == 0) {
                         phase = Phase.READY;
                         remainingTime = gamePlayMode.getReadyDuration();
@@ -139,7 +142,7 @@ public final class Game implements HasTask {
                         gameUsers.forEach(gameUser -> sendMessage(gameUser,
                                 MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingTime)));
                 } else
-                    remainingTime = 30;
+                    remainingTime = GAME_WAITING_TIME;
 
                 break;
             }
@@ -193,6 +196,7 @@ public final class Game implements HasTask {
     private void onStart() {
         startTime = System.currentTimeMillis();
         gameUsers.forEach(gameUser -> {
+            EntityInfoRegistry.getUser(gameUser.getPlayer()).clearChat();
             gameUser.getPlayer().sendTitle(gamePlayMode.getName(), "", 10, gamePlayMode.getReadyDuration() * 20, 0);
             CombatUser combatUser = new CombatUser(gameUser.getPlayer(), gameUser);
             combatUser.init();
@@ -236,7 +240,7 @@ public final class Game implements HasTask {
 
         Team team1Team;
         Team team2Team;
-        if (new Random().nextBoolean()) {
+        if (random.nextBoolean()) {
             team1Team = Team.RED;
             team2Team = Team.BLUE;
         } else {
@@ -258,10 +262,7 @@ public final class Game implements HasTask {
      * 게임 종료 시 실행할 작업.
      */
     private void onFinish() {
-        gameUsers.forEach(gameUser -> {
-            for (int i = 0; i < 100; i++)
-                sendMessage(gameUser, "");
-        });
+        gameUsers.forEach(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).clearChat());
 
         Team winnerTeam = teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
         if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
@@ -363,7 +364,7 @@ public final class Game implements HasTask {
             if (redAmount != blueAmount) {
                 if (redAmount < blueAmount)
                     gameUser.setTeam(Team.RED);
-                else if (redAmount > blueAmount)
+                else
                     gameUser.setTeam(Team.BLUE);
 
                 gameUsers.add(gameUser);

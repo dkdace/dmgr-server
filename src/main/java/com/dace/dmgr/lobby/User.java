@@ -65,6 +65,15 @@ public final class User extends UserData implements HasTask {
     }
 
     /**
+     * 플레이어의 채팅창을 청소한다.
+     */
+    public void clearChat() {
+        for (int i = 0; i < 100; i++) {
+            player.sendMessage("§f");
+        }
+    }
+
+    /**
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
