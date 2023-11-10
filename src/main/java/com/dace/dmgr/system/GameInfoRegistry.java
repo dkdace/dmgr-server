@@ -15,7 +15,9 @@ public final class GameInfoRegistry {
     /** 게임 모드별 최대 방 갯수 */
     private static final int MAX_ROOM = 3;
 
+    /** 게임 목록 (게임 모드 : 게임) */
     private static final EnumMap<GamePlayMode, Game[]> gameListMap = new EnumMap<>(GamePlayMode.class);
+    /** 게임 맵 목록 (게임 모드 : 게임 맵) */
     private static final EnumMap<GamePlayMode, GameMap[]> gameMapListMap = new EnumMap<>(GamePlayMode.class);
     private static final Random random = new Random();
 
@@ -42,7 +44,7 @@ public final class GameInfoRegistry {
 
     /**
      * @param gamePlayMode 게임 모드
-     * @param number   방 번호
+     * @param number       방 번호
      * @return 게임 정보 객체
      */
     public static Game getGame(GamePlayMode gamePlayMode, int number) {

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -66,6 +67,11 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     @Override
     @MustBeInvokedByOverriders
     public void init() {
+        EntityInfoRegistry.addCombatEntity(entity, this);
+        if (getGame() == null)
+            EntityInfoRegistry.addIndependentCombatEntity(this);
+        else
+            getGame().addCombatEntity(this);
         modules = getModules();
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
@@ -123,7 +129,14 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     @Override
     @MustBeInvokedByOverriders
     public void remove() {
+        EntityInfoRegistry.removeCombatEntity(entity);
+        if (getGame() == null)
+            EntityInfoRegistry.removeIndependentCombatEntity(this);
+        else
+            getGame().removeCombatEntity(this);
+
         TaskManager.clearTask(this);
+
         for (CombatEntityModule module : modules) {
             module.onRemove();
         }

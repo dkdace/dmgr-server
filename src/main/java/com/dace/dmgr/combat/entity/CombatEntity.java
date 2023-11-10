@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.task.HasTask;
 import org.bukkit.Location;
@@ -42,6 +43,11 @@ public interface CombatEntity extends HasTask {
     Team getTeam();
 
     void setTeam(Team team);
+
+    /**
+     * @return 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
+     */
+    Game getGame();
 
     /**
      * @return 히트박스의 가능한 최대 크기

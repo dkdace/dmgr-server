@@ -47,9 +47,7 @@ public final class OnPlayerJoin implements Listener {
         TaskManager.addTask(user, new TaskWait(10) {
             @Override
             public void onEnd() {
-                for (int i = 0; i < 100; i++) {
-                    player.sendMessage("§f");
-                }
+                user.clearChat();
                 OnPlayerResourcePackStatus.sendResourcePack(player);
             }
         });

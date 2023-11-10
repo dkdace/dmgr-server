@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
@@ -30,6 +31,11 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
     protected SummonEntity(T entity, String name, CombatUser owner, Hitbox... hitbox) {
         super(entity, name, hitbox);
         this.owner = owner;
+    }
+
+    @Override
+    public final Game getGame() {
+        return owner.getGame();
     }
 
     @Override

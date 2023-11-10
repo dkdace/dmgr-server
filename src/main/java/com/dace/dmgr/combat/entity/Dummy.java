@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -41,6 +42,11 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         );
         damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
+    }
+
+    @Override
+    public Game getGame() {
+        return null;
     }
 
     @Override

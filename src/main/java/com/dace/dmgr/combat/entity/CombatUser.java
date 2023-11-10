@@ -20,6 +20,7 @@ import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.game.Team;
@@ -155,10 +156,14 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     @Override
+    public Game getGame() {
+        return gameUser == null ? null : gameUser.getGame();
+    }
+
+    @Override
     public void init() {
         super.init();
 
-        EntityInfoRegistry.addCombatUser(entity, this);
         abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED);
 
         User user = EntityInfoRegistry.getUser(entity);
@@ -216,7 +221,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void remove() {
         super.remove();
 
-        EntityInfoRegistry.removeCombatUser(entity);
         if (weapon != null)
             weapon.remove();
         skillMap.forEach((skillInfo, skill) -> skill.remove());
@@ -243,10 +247,10 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         int i = 14;
         boolean fresh = CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > SCORE_DISPLAY_DURATION - 10;
 
-        sidebar.setName(MessageFormat.format("{0}+{1}", fresh ? "§d" : "§a", scoreStreakSum));
+        sidebar.setName(MessageFormat.format("{0}+{1}", fresh ? ChatColor.LIGHT_PURPLE : ChatColor.GREEN, (int) scoreStreakSum));
         sidebar.set("§f", i--);
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
-            sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue()), 30), i--);
+            sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30), i--);
     }
 
     @Override

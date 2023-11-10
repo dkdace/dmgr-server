@@ -15,9 +15,8 @@ import org.bukkit.entity.Player;
 public final class GameUser {
     /** 플레이어 객체 */
     private final Player player;
-    /** 플레이 중인 게임 (해당 게임유저가 적용 중인 게임) */
-    @Setter
-    private Game game;
+    /** 입장한 게임 */
+    private final Game game;
     /** 팀 */
     private Team team;
     /** 점수 */
@@ -40,7 +39,7 @@ public final class GameUser {
     private int defend = 0;
     /** 치유량 */
     @Setter
-    private long heal = 0;
+    private int heal = 0;
 
     /**
      * 게임 시스템의 플레이어 인스턴스를 생성한다.
