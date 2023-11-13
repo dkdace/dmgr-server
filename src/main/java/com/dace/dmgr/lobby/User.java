@@ -2,6 +2,7 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;

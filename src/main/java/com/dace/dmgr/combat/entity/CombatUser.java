@@ -151,7 +151,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     @Override
     public void setTeam(Team team) {
-        if (gameUser != null)
+        if (gameUser != null && gameUser.getTeam() != team)
             gameUser.setTeam(team);
     }
 

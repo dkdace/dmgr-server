@@ -4,6 +4,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
+import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -17,8 +18,10 @@ import com.dace.dmgr.util.WorldUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -33,6 +36,9 @@ public final class Game implements HasTask {
     private static final int RANK_PLACEMENT_PLAY_COUNT = 5;
     /** 게임 시작까지 필요한 대기 시간 (초) */
     private static final int GAME_WAITING_TIME = 30;
+    /** 전투원 선택 아이템 객체 */
+    private static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
+            .setName("§a전투원 선택").build();
     private static final Random random = new Random();
 
     /** 방 번호 */
@@ -96,7 +102,8 @@ public final class Game implements HasTask {
      * 게임을 제거한다.
      */
     public void remove() {
-        gameUsers.forEach(gameUser -> Lobby.spawn(gameUser.getPlayer()));
+        for (GameUser gameUser : new ArrayList<>(gameUsers))
+            Lobby.spawn(gameUser.getPlayer());
 
         unloadWorld();
         GameInfoRegistry.removeGame(this);
@@ -227,7 +234,13 @@ public final class Game implements HasTask {
         });
         divideTeam();
 
-        gameUsers.forEach(gameUser -> gameUser.getPlayer().teleport(gameUser.getRespawnLocation()));
+        gameUsers.forEach(gameUser -> {
+            Player player = gameUser.getPlayer();
+
+            player.teleport(gameUser.getRespawnLocation());
+            player.getInventory().setHeldItemSlot(8);
+            player.getInventory().setItem(8, SELECT_CHARACTER_ITEM);
+        });
     }
 
     /**
@@ -427,7 +440,7 @@ public final class Game implements HasTask {
         if (teamUserMap.get(gameUser.getTeam()) != null)
             teamUserMap.get(gameUser.getTeam()).remove(gameUser);
 
-        if (gameUsers.isEmpty())
+        if (phase != Phase.END && gameUsers.isEmpty())
             phase = Phase.END;
     }
 
