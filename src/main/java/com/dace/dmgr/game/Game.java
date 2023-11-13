@@ -177,7 +177,7 @@ public final class Game implements HasTask {
 
                     gameUsers.forEach(gameUser -> {
                         SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
-                        gameUser.getPlayer().sendTitle(ChatColor.RED.toString() + "게임 시작", "", 0, 40, 20);
+                        gameUser.getPlayer().sendTitle(ChatColor.RED + "전투 시작", "", 0, 40, 20);
                     });
 
                     break;
@@ -292,13 +292,14 @@ public final class Game implements HasTask {
         if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
             winnerTeam = Team.NONE;
 
-        if (gamePlayMode.isRanked()) {
-            for (GameUser gameUser : gameUsers) {
-                Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
+        for (GameUser gameUser : gameUsers) {
+            Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
+
+            updateXpAndMoney(gameUser, isWinner);
+
+            if (gamePlayMode.isRanked())
                 updateRankRate(gameUser, isWinner);
-            }
-        } else {
-            for (GameUser gameUser : gameUsers)
+            else
                 updateMMR(gameUser);
         }
 
@@ -320,6 +321,23 @@ public final class Game implements HasTask {
     }
 
     /**
+     * 매치 종료 후 결과에 따라 플레이어의 경험치와 돈을 증가시킨다.
+     *
+     * @param gameUser 대상 플레이어
+     * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
+     */
+    private void updateXpAndMoney(GameUser gameUser, Boolean isWinner) {
+        User user = EntityInfoRegistry.getUser(gameUser.getPlayer());
+
+        int xp = user.getXp();
+        int money = user.getMoney();
+        double score = gameUser.getScore();
+
+        user.setXp(RewardUtil.getFinalXp(xp, score, isWinner));
+        user.setMoney(RewardUtil.getFinalMoney(xp, money, score, isWinner));
+    }
+
+    /**
      * 일반 매치 종료 후 결과에 따라 플레이어의 MMR을 조정한다.
      *
      * @param gameUser 대상 플레이어
@@ -334,11 +352,11 @@ public final class Game implements HasTask {
         int playTime = (int) ((System.currentTimeMillis() - gameUser.getGame().getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
-        user.setMatchMakingRate(RankUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
+        user.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
         user.setNormalPlayCount(normalPlayCount + 1);
 
         DMGR.getPlugin().getLogger().info(MessageFormat.format("유저 MMR 변동됨: ({0}) {1} -> {2} MMR PLAY: {3}",
-                gameUser.getPlayer().getName(), mmr, user.getMatchMakingRate(), normalPlayCount));
+                gameUser.getPlayer().getName(), mmr, user.getMatchMakingRate(), normalPlayCount + 1));
     }
 
     /**
@@ -359,15 +377,16 @@ public final class Game implements HasTask {
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 
-        user.setMatchMakingRate(RankUtil.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
+        user.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
+        user.setRankPlayCount(rankPlayCount + 1);
 
         if (!user.isRanked()) {
-            if (rankPlayCount >= RANK_PLACEMENT_PLAY_COUNT) {
-                user.setRankRate(RankUtil.getFinalRankRate(mmr));
+            if (rankPlayCount + 1 >= RANK_PLACEMENT_PLAY_COUNT) {
+                user.setRankRate(RewardUtil.getFinalRankRate(mmr));
                 user.setRanked(true);
             }
         } else
-            user.setRankRate(RankUtil.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
+            user.setRankRate(RewardUtil.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
     }
 
     /**
@@ -409,7 +428,7 @@ public final class Game implements HasTask {
             teamUserMap.get(gameUser.getTeam()).remove(gameUser);
 
         if (gameUsers.isEmpty())
-            remove();
+            phase = Phase.END;
     }
 
     /**

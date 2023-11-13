@@ -64,6 +64,50 @@ public final class User extends UserData implements HasTask {
         return "User@" + player.getName();
     }
 
+    @Override
+    public void setXp(int xp) {
+        boolean levelup = false;
+
+        while (xp >= getNextLevelXp()) {
+            xp -= getNextLevelXp();
+            setLevel(getLevel() + 1);
+            levelup = true;
+        }
+        if (levelup)
+            playLevelUpEffect();
+
+        super.setXp(xp);
+    }
+
+    /**
+     * 레벨 상승 시 효과를 재생한다.
+     */
+    private void playLevelUpEffect() {
+    }
+
+    @Override
+    public void setRankRate(int rankRate) {
+        Tier tier = getTier();
+        super.setRankRate(rankRate);
+
+        if (getTier().getMinScore() > tier.getMinScore())
+            playTierUpEffect();
+        else if (getTier().getMinScore() < tier.getMinScore())
+            playTierDownEffect();
+    }
+
+    /**
+     * 티어 승급 시 효과를 재생한다.
+     */
+    private void playTierUpEffect() {
+    }
+
+    /**
+     * 티어 강등 시 효과를 재생한다.
+     */
+    private void playTierDownEffect() {
+    }
+
     /**
      * 플레이어의 채팅창을 청소한다.
      */

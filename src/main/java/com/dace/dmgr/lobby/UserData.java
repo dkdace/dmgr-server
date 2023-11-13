@@ -126,7 +126,7 @@ public class UserData {
      *
      * @return 티어
      */
-    public Tier getTier() {
+    public final Tier getTier() {
         if (!isRanked)
             return Tier.NONE;
 
@@ -146,7 +146,7 @@ public class UserData {
      *
      * @return 레벨업에 필요한 경험치
      */
-    public int getNextLevelXp() {
+    public final int getNextLevelXp() {
         return 250 + (level * 50);
     }
 }
