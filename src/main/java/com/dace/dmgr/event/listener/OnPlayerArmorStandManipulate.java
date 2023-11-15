@@ -21,7 +21,7 @@ public final class OnPlayerArmorStandManipulate implements Listener {
 
         if (combatUser != null) {
             event.setCancelled(true);
-            if (combatUser.getCharacter() != null) {
+            if (combatUser.getCharacterType() != null) {
                 CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.RIGHT_CLICK);
 
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);

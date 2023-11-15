@@ -1,8 +1,6 @@
 package com.dace.dmgr.system.command.test;
 
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.arkace.Arkace;
-import com.dace.dmgr.combat.character.jager.Jager;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -17,7 +15,7 @@ import org.bukkit.entity.Player;
  *
  * <p>Usage: /선택 플레이어 팀 전투원</p>
  *
- * @see CombatUser#setCharacter(Character)
+ * @see CombatUser#setCharacterType(CharacterType)
  */
 public class SelectCharCommand implements CommandExecutor {
     @Override
@@ -36,17 +34,7 @@ public class SelectCharCommand implements CommandExecutor {
             combatUser.init();
         }
         combatUser.setTeam(team);
-
-        switch (character.toLowerCase()) {
-            case "아케이스":
-            case "arkace":
-                combatUser.setCharacter(Arkace.getInstance());
-                break;
-            case "예거":
-            case "jager":
-                combatUser.setCharacter(Jager.getInstance());
-                break;
-        }
+        combatUser.setCharacterType(CharacterType.valueOf(character));
 
         return true;
     }

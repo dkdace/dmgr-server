@@ -1,5 +1,6 @@
 package com.dace.dmgr.gui;
 
+import com.dace.dmgr.util.SkinUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
@@ -62,6 +63,17 @@ public final class ItemBuilder {
     }
 
     /**
+     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 스킨의 머리로 생성한다.
+     *
+     * @param skin 스킨
+     * @return ItemBuilder
+     * @see com.dace.dmgr.util.SkinUtil.Skin
+     */
+    public static ItemBuilder fromPlayerSkull(SkinUtil.Skin skin) {
+        return fromPlayerSkull(SkinUtil.getSkinUrl(skin));
+    }
+
+    /**
      * 아이템을 생성하기 위한 빌더 인스턴스를 {@link PlayerSkull}으로 생성한다.
      *
      * @param playerSkull 플레이어 머리 아이템
@@ -69,11 +81,21 @@ public final class ItemBuilder {
      * @see PlayerSkull
      */
     public static ItemBuilder fromPlayerSkull(PlayerSkull playerSkull) {
+        return fromPlayerSkull(playerSkull.getUrl());
+    }
+
+    /**
+     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 스킨 URL의 머리로 생성한다.
+     *
+     * @param skinUrl 스킨 URL
+     * @return ItemBuilder
+     */
+    private static ItemBuilder fromPlayerSkull(String skinUrl) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
         SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-        gameProfile.getProperties().put("textures", new Property("textures", playerSkull.getUrl()));
+        gameProfile.getProperties().put("textures", new Property("textures", skinUrl));
 
         try {
             if (profileField == null) {

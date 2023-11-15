@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
@@ -98,8 +99,10 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
     @Getter
     private GameUser gameUser = null;
-    /** 선택한 전투원 */
+    /** 선택한 전투원 종류 */
     @Getter
+    private CharacterType characterType = null;
+    /** 선택한 전투원 */
     private Character character = null;
     /** 무기 객체 */
     @Getter
@@ -684,19 +687,22 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /**
      * 플레이어의 전투원을 설정하고 무기와 스킬을 초기화한다.
      *
-     * @param character 전투원
+     * @param characterType 전투원
      */
-    public void setCharacter(Character character) {
+    public void setCharacterType(CharacterType characterType) {
         reset();
-        SkinUtil.applySkin(entity, character.getSkinName());
-        damageModule.setMaxHealth(character.getHealth());
-        damageModule.setHealth(character.getHealth());
-        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * character.getSpeedMultiplier());
+        Character _character = characterType.getCharacter();
+
+        SkinUtil.applySkin(entity, _character.getSkin());
+        damageModule.setMaxHealth(_character.getHealth());
+        damageModule.setHealth(_character.getHealth());
+        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(BASE_SPEED * _character.getSpeedMultiplier());
         entity.getInventory().setItem(9, CombatItem.REQ_HEAL.getItemStack());
         entity.getInventory().setItem(10, CombatItem.SHOW_ULT.getItemStack());
         entity.getInventory().setItem(11, CombatItem.REQ_RALLY.getItemStack());
 
-        this.character = character;
+        this.characterType = characterType;
+        this.character = _character;
         initActions();
     }
 

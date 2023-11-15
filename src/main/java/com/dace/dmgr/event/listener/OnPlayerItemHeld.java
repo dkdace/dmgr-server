@@ -25,7 +25,7 @@ public final class OnPlayerItemHeld implements Listener {
         if (combatUser != null) {
             event.setCancelled(true);
 
-            if (combatUser.getCharacter() != null && newSlot < 4) {
+            if (combatUser.getCharacterType() != null && newSlot < 4) {
                 ActionKey actionKey = null;
 
                 switch (newSlot) {

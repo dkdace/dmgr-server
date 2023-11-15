@@ -1,6 +1,8 @@
 package com.dace.dmgr.util;
 
 import com.dace.dmgr.DMGR;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.entity.Player;
@@ -16,15 +18,15 @@ public final class SkinUtil {
     /**
      * 플레이어의 스킨을 변경한다.
      *
-     * @param player   대상 플레이어
-     * @param skinName 스킨 이름
+     * @param player 대상 플레이어
+     * @param skin   스킨
      */
-    public static void applySkin(Player player, String skinName) {
+    public static void applySkin(Player player, Skin skin) {
         new BukkitRunnable() {
             @Override
             public void run() {
                 try {
-                    api.applySkin(new PlayerWrapper(player), skinName);
+                    api.applySkin(new PlayerWrapper(player), skin.getSkinName());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -48,5 +50,28 @@ public final class SkinUtil {
                 }
             }
         }.runTaskAsynchronously(DMGR.getPlugin());
+    }
+
+    /**
+     * 지정한 스킨의 URL를 반환한다.
+     *
+     * @param skin 스킨
+     * @return 스킨 전체 URL
+     */
+    public static String getSkinUrl(Skin skin) {
+        return api.getSkinData(skin.getSkinName()).getValue();
+    }
+
+    /**
+     * 지정할 수 있는 스킨의 목록.
+     */
+    @AllArgsConstructor
+    @Getter
+    public enum Skin {
+        ARKACE("DVArkace"),
+        JAGER("DVJager");
+
+        /** 스킨 이름 */
+        private final String skinName;
     }
 }

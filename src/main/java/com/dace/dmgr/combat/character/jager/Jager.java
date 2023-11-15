@@ -6,12 +6,14 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.character.Character;
+import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
 import com.dace.dmgr.system.TextIcon;
+import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -34,7 +36,7 @@ public final class Jager extends Character {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", 1000, 1.0F, 1.0F);
+        super("예거", SkinUtil.Skin.JAGER, Role.MARKSMAN, 1000, 1.0F, 1.0F);
     }
 
     @Override
