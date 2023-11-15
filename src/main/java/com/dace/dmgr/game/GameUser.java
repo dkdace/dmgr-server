@@ -1,5 +1,6 @@
 package com.dace.dmgr.game;
 
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
@@ -71,7 +72,10 @@ public final class GameUser {
 
     public void setTeam(Team team) {
         this.team = team;
-        EntityInfoRegistry.getCombatUser(player).setTeam(team);
+
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
+        if (combatUser != null && combatUser.getTeam() != team)
+            combatUser.setTeam(team);
     }
 
     /**
