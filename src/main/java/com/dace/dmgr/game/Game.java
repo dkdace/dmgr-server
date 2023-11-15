@@ -150,7 +150,7 @@ public final class Game implements HasTask {
      * 월드를 언로드한다.
      */
     private void unloadWorld() {
-        WorldUtil.unloadWorld(worldName);
+        WorldUtil.removeWorld(worldName);
     }
 
     /**

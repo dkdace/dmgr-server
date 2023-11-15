@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 
@@ -24,27 +25,6 @@ import java.text.MessageFormat;
 public final class WorldUtil {
     /** 월드 저장 디렉토리 이름 */
     private static final String WORLD_DIRECTORY = "slime_worlds";
-
-    /**
-     * 모든 복제 월드를 삭제한다.
-     */
-    public static void clearDuplicatedWorlds() {
-        File dir = new File(Bukkit.getWorldContainer(), WORLD_DIRECTORY);
-        File[] worlds = dir.listFiles();
-        if (worlds == null)
-            return;
-
-        for (File file : worlds) {
-            if (file.getName().startsWith("_")) {
-                try {
-                    Files.delete(Paths.get(file.getPath()));
-                    DMGR.getPlugin().getLogger().info(MessageFormat.format("복제된 월드 삭제 완료 : {0}", file.getName()));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
 
     /**
      * 지정한 월드와 똑같은 새로운 월드를 생성한다.
@@ -84,11 +64,11 @@ public final class WorldUtil {
     }
 
     /**
-     * 지정한 월드를 비활성화한다.
+     * 지정한 월드를 삭제한다.
      *
-     * @param worldName 월드 이름
+     * @param worldName 대상 월드 이름
      */
-    public static void unloadWorld(String worldName) {
+    public static void removeWorld(String worldName) {
         World world = Bukkit.getWorld(worldName);
         if (world == null)
             return;
@@ -97,8 +77,38 @@ public final class WorldUtil {
             player.teleport(Lobby.lobbyLocation);
 
         if (Bukkit.unloadWorld(world, true)) {
-            DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 비활성화 완료 ({0})", worldName));
+            DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 비활성화 완료 : {0}", worldName));
             CommandManager.getInstance().getWorldsInUse().remove(worldName);
+
+            Path path = Paths.get(Bukkit.getWorldContainer().getAbsolutePath(), WORLD_DIRECTORY, worldName + ".slime");
+            System.out.println(path);
+            try {
+                Files.delete(path);
+                DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 삭제 완료 : {0}", worldName));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 모든 복제 월드를 삭제한다.
+     */
+    public static void clearDuplicatedWorlds() {
+        File dir = new File(Bukkit.getWorldContainer(), WORLD_DIRECTORY);
+        File[] worlds = dir.listFiles();
+        if (worlds == null)
+            return;
+
+        for (File file : worlds) {
+            if (file.getName().startsWith("_")) {
+                try {
+                    Files.delete(Paths.get(file.getPath()));
+                    DMGR.getPlugin().getLogger().info(MessageFormat.format("복제된 월드 삭제 완료 : {0}", file.getName()));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 }
