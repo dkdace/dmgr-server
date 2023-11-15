@@ -29,4 +29,12 @@ public interface GamePlayModeScheduler {
      * @see GameMap#getBlueTeamSpawns()
      */
     int getBlueTeamSpawnIndex();
+
+    /**
+     * 게임에 사용되는 메시지 목록.
+     */
+    interface MESSAGES {
+        /** 게임 진행 타이머 보스바 메시지 */
+        String BOSSBAR_REMAINING_TIME = "§b남은 시간 : §l{0}";
+    }
 }

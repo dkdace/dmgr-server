@@ -1,8 +1,13 @@
 package com.dace.dmgr.game.scheduler;
 
+import com.comphenix.packetwrapper.WrapperPlayServerBoss;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.util.BossBarUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.bukkit.boss.BarColor;
+
+import java.text.MessageFormat;
 
 /**
  * 팀 데스매치 스케쥴러 클래스.
@@ -13,7 +18,7 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
 
     @Override
     public void onSecond(Game game) {
-        Bukkit.broadcastMessage("남은 시간 : " + game.getRemainingTime());
+        broadcastBossBar(game);
     }
 
     @Override
@@ -24,5 +29,16 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
     @Override
     public int getBlueTeamSpawnIndex() {
         return 0;
+    }
+
+    /**
+     * 모든 플레이어에게 게임 진행 타이머 보스바를 전송한다.
+     */
+    private void broadcastBossBar(Game game) {
+        String displayTime = DurationFormatUtils.formatDuration(game.getRemainingTime() * 1000L, "mm:ss", true);
+
+        game.getGameUsers().forEach(gameUser ->
+                BossBarUtil.addBossBar(gameUser.getPlayer(), "remainingTime", MessageFormat.format(MESSAGES.BOSSBAR_REMAINING_TIME, displayTime),
+                        BarColor.BLUE, WrapperPlayServerBoss.BarStyle.PROGRESS, (float) game.getRemainingTime() / game.getGamePlayMode().getPlayDuration()));
     }
 }

@@ -1,5 +1,6 @@
 package com.dace.dmgr.game;
 
+import com.comphenix.packetwrapper.WrapperPlayServerBoss;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -13,6 +14,7 @@ import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.WorldUtil;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,13 +35,13 @@ import java.util.stream.Collectors;
  */
 @Getter
 public final class Game implements HasTask {
+    /** 전투원 선택 아이템 객체 */
+    public static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
+            .setName("§a전투원 선택").build();
     /** 랭크가 결정되는 배치 판 수 */
     private static final int RANK_PLACEMENT_PLAY_COUNT = 5;
     /** 게임 시작까지 필요한 대기 시간 (초) */
     private static final int GAME_WAITING_TIME = 30;
-    /** 전투원 선택 아이템 객체 */
-    private static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
-            .setName("§a전투원 선택").build();
     private static final Random random = new Random();
 
     /** 방 번호 */
@@ -158,67 +161,116 @@ public final class Game implements HasTask {
 
         switch (phase) {
             case WAITING: {
-                if (gamePlayMode.getMinPlayer() > gameUsers.size() && gameUsers.size() % 2 == 0) {
-                    if (remainingTime == 0) {
-                        phase = Phase.READY;
-                        remainingTime = gamePlayMode.getReadyDuration();
-
-                        onStart();
-
-                        break;
-                    }
-                    if (remainingTime == 3)
-                        loadWorld();
-                    if (remainingTime <= 5 || remainingTime == 10)
-                        gameUsers.forEach(gameUser -> sendMessage(gameUser,
-                                MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingTime)));
-                } else
-                    remainingTime = GAME_WAITING_TIME;
+                onSecondWaiting();
 
                 break;
             }
             case READY: {
-                if (remainingTime == 0) {
-                    phase = Phase.PLAYING;
-                    remainingTime = gamePlayMode.getPlayDuration();
-
-                    gameUsers.forEach(gameUser -> {
-                        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
-                        gameUser.getPlayer().sendTitle(ChatColor.RED + "전투 시작", "", 0, 40, 20);
-                    });
-
-                    break;
-                }
-                if (remainingTime <= 5) {
-                    gameUsers.forEach(gameUser -> {
-                        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                        gameUser.getPlayer().sendTitle(ChatColor.WHITE.toString() + remainingTime, "", 0, 5, 10);
-                    });
-                }
+                onSecondReady();
 
                 break;
             }
             case PLAYING: {
-                gamePlayMode.getGamePlayModeScheduler().onSecond(this);
-
-                if (remainingTime == 0) {
-                    phase = Phase.END;
-                    onFinish();
-
-                    break;
-                }
-                if (remainingTime <= 10) {
-                    gameUsers.forEach(gameUser -> {
-                        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                        gameUser.getPlayer().sendTitle("", ChatColor.RED.toString() + remainingTime, 0, 5, 10);
-                    });
-                }
+                onSecondPlaying();
 
                 break;
             }
             case END:
                 remove();
         }
+    }
+
+    /**
+     * 진행 단계가 {@link Phase#WAITING}일 때 매 초마다 실행할 작업.
+     */
+    private void onSecondWaiting() {
+        gameUsers.forEach(this::sendBossBarWaiting);
+
+        if (canStart()) {
+            if (remainingTime == 3)
+                loadWorld();
+
+            if (remainingTime > 0 && (remainingTime <= 5 || remainingTime == 10))
+                gameUsers.forEach(gameUser -> sendMessage(gameUser, MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingTime)));
+
+            if (remainingTime == 0) {
+                phase = Phase.READY;
+                remainingTime = gamePlayMode.getReadyDuration();
+                gameUsers.forEach(gameUser -> BossBarUtil.clearBossBar(gameUser.getPlayer()));
+
+                onStart();
+            }
+        } else
+            remainingTime = GAME_WAITING_TIME;
+    }
+
+    /**
+     * 플레이어에게 게임 시작 대기 보스바를 전송한다.
+     *
+     * @param gameUser 대상 플레이어
+     */
+    private void sendBossBarWaiting(GameUser gameUser) {
+        BossBarUtil.addBossBar(gameUser.getPlayer(), "waitQuit", MESSAGES.BOSSBAR_WAIT_QUIT,
+                BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+        BossBarUtil.addBossBar(gameUser.getPlayer(), "cannotStart", MessageFormat.format(MESSAGES.BOSSBAR_CANNOT_START,
+                gamePlayMode.getMinPlayer()), BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+        BossBarUtil.addBossBar(gameUser.getPlayer(), "timer",
+                MessageFormat.format(MESSAGES.BOSSBAR_TIMER,
+                        gamePlayMode.getName(), (canStart() ? ChatColor.WHITE : ChatColor.RED).toString() + gameUsers.size(),
+                        gamePlayMode.getMaxPlayer()),
+                BarColor.GREEN,
+                WrapperPlayServerBoss.BarStyle.PROGRESS,
+                canStart() ? (float) remainingTime / GAME_WAITING_TIME : 1);
+    }
+
+    /**
+     * 진행 단계가 {@link Phase#READY}일 때 매 초마다 실행할 작업.
+     */
+    private void onSecondReady() {
+        if (remainingTime > 0 && remainingTime <= 5) {
+            gameUsers.forEach(gameUser -> {
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
+                gameUser.getPlayer().sendTitle(ChatColor.WHITE.toString() + remainingTime, "", 0, 5, 10);
+            });
+        }
+
+        if (remainingTime == 0) {
+            phase = Phase.PLAYING;
+            remainingTime = gamePlayMode.getPlayDuration();
+
+            gameUsers.forEach(gameUser -> {
+                SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
+                gameUser.getPlayer().sendTitle(ChatColor.RED + "전투 시작", "", 0, 40, 20);
+            });
+        }
+    }
+
+    /**
+     * 진행 단계가 {@link Phase#PLAYING}일 때 매 초마다 실행할 작업.
+     */
+    private void onSecondPlaying() {
+        gamePlayMode.getGamePlayModeScheduler().onSecond(this);
+
+        if (remainingTime > 0 && remainingTime <= 10) {
+            gameUsers.forEach(gameUser -> {
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
+                gameUser.getPlayer().sendTitle("", ChatColor.RED.toString() + remainingTime, 0, 5, 10);
+            });
+        }
+
+        if (remainingTime == 0) {
+            phase = Phase.END;
+            onFinish();
+        }
+    }
+
+    /**
+     * 게임을 시작할 조건이 충족되었는 지 확인한다.
+     *
+     * @return 게임을 시작할 수 있으면 {@code true} 반환
+     */
+    public boolean canStart() {
+        return gameUsers.size() >= gamePlayMode.getMinPlayer() && (gameUsers.size() % 2 == 0);
     }
 
     /**
@@ -500,5 +552,11 @@ public final class Game implements HasTask {
         String JOIN_PREFIX = "§f§l[§a§l+§f§l] §b";
         /** 퇴장 메시지의 접두사 */
         String QUIT_PREFIX = "§f§l[§6§l-§f§l] §b";
+        /** 대기열 나가기 보스바 메시지 */
+        String BOSSBAR_WAIT_QUIT = "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.";
+        /** 게임 시작 불가 보스바 메시지 */
+        String BOSSBAR_CANNOT_START = "§c게임을 시작하려면 최소 {0}명이 필요합니다.";
+        /** 게임 시작 타이머 보스바 메시지 */
+        String BOSSBAR_TIMER = "§a§l{0} §f[{1}§f/{2} 명]";
     }
 }

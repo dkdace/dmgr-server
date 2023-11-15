@@ -13,6 +13,7 @@ import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
 import com.dace.dmgr.system.command.test.StatCommand;
+import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -64,6 +65,7 @@ public class DMGR extends JavaPlugin {
             User user = EntityInfoRegistry.getUser(player);
             if (user != null)
                 user.getSidebar().delete();
+            BossBarUtil.clearBossBar(player);
             player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 중...");
         });
     }

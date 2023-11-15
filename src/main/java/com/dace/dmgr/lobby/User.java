@@ -6,6 +6,7 @@ import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.SkinUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.EqualsAndHashCode;
@@ -134,6 +135,8 @@ public final class User extends UserData implements HasTask {
 
         sidebar.delete();
         sidebar = new BPlayerBoard(player, "lobby");
+
+        BossBarUtil.clearBossBar(player);
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser != null) {
