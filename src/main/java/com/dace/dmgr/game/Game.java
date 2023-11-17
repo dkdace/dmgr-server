@@ -577,15 +577,19 @@ public final class Game implements HasTask {
     /**
      * 게임 진행 단계 목록.
      */
+    @AllArgsConstructor
+    @Getter
     public enum Phase {
         /** 인원 대기 */
-        WAITING,
+        WAITING("대기 중"),
         /** 준비 */
-        READY,
+        READY("게임 준비"),
         /** 진행 */
-        PLAYING,
+        PLAYING("게임 진행"),
         /** 종료 */
-        END
+        END("종료됨");
+
+        private final String name;
     }
 
     /**

@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -140,6 +141,19 @@ public final class ItemBuilder {
      */
     public ItemBuilder setLore(String... lores) {
         itemMeta.setLore(Arrays.asList(lores));
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 추가한다.
+     *
+     * @param lores 추가할 설명
+     * @return ItemBuilder
+     */
+    public ItemBuilder addLore(String... lores) {
+        List<String> lore = itemMeta.getLore();
+        lore.addAll(Arrays.asList(lores));
+        itemMeta.setLore(lore);
         return this;
     }
 
