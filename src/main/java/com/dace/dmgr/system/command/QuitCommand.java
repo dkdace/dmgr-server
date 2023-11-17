@@ -2,8 +2,8 @@ package com.dace.dmgr.system.command;
 
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.util.BossBarUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,8 +23,11 @@ public class QuitCommand implements CommandExecutor {
 
         GameUser gameUser = EntityInfoRegistry.getGameUser(player);
         if (gameUser != null) {
-            gameUser.getGame().removePlayer(player);
-            BossBarUtil.clearBossBar(player);
+            Game game = gameUser.getGame();
+            if (game.getPhase() == Game.Phase.READY || game.getPhase() == Game.Phase.PLAYING)
+                Lobby.spawn(player);
+
+            game.removePlayer(player);
         }
 
         return true;

@@ -68,6 +68,15 @@ public final class GameUser {
         EntityInfoRegistry.removeGameUser(player);
     }
 
+    /**
+     * 게임 시작 시 실행할 작업.
+     */
+    public void onStart() {
+        player.teleport(getRespawnLocation());
+        player.getInventory().setHeldItemSlot(8);
+        player.getInventory().setItem(8, Game.SELECT_CHARACTER_ITEM);
+    }
+
     public void setTeam(Team team) {
         this.team = team;
 

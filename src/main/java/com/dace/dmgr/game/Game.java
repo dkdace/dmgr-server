@@ -19,7 +19,6 @@ import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.WorldUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 /**
  * 게임의 정보와 진행을 관리하는 클래스.
  */
-@Getter
 public final class Game implements HasTask {
     /** 전투원 선택 아이템 객체 */
     public static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
@@ -42,32 +40,40 @@ public final class Game implements HasTask {
     private static final Random random = new Random();
 
     /** 방 번호 */
+    @Getter
     private final int number;
     /** 엔티티 목록 */
     private final HashSet<CombatEntity> combatEntitySet = new HashSet<>();
     /** 플레이어 목록 */
+    @Getter
     private final ArrayList<GameUser> gameUsers = new ArrayList<>();
     /** 게임을 시작하기 위한 최소 인원 수 */
     private final int minPlayerCount;
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
+    @Getter
     private final EnumMap<Team, ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
     /** 팀 점수 (팀 : 점수) */
+    @Getter
     private final EnumMap<Team, Integer> teamScore = new EnumMap<>(Team.class);
     /** 게임 모드 */
+    @Getter
     private final GamePlayMode gamePlayMode;
     /** 전장 월드 이름 */
+    @Getter
     private final String worldName;
     /** 맵 */
+    @Getter
     private final GameMap map;
     /** 게임 시작 시점 ({@link Phase#READY}가 된 시점) */
+    @Getter
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 */
-    @Setter
+    @Getter
     private int remainingTime = GameConfig.WAITING_TIME;
     /** 게임 진행 단계 */
-    @Setter
+    @Getter
     private Phase phase = Phase.WAITING;
 
     /**
@@ -108,10 +114,11 @@ public final class Game implements HasTask {
      * 게임을 제거한다.
      */
     public void remove() {
-        for (GameUser gameUser : new ArrayList<>(gameUsers)) {
-            Lobby.spawn(gameUser.getPlayer());
-            removePlayer(gameUser.getPlayer());
-        }
+        if (!gameUsers.isEmpty())
+            for (GameUser gameUser : new ArrayList<>(gameUsers)) {
+                Lobby.spawn(gameUser.getPlayer());
+                removePlayer(gameUser.getPlayer());
+            }
 
         unloadWorld();
         GameInfoRegistry.removeGame(this);
@@ -291,13 +298,7 @@ public final class Game implements HasTask {
         });
         divideTeam();
 
-        gameUsers.forEach(gameUser -> {
-            Player player = gameUser.getPlayer();
-
-            player.teleport(gameUser.getRespawnLocation());
-            player.getInventory().setHeldItemSlot(8);
-            player.getInventory().setItem(8, SELECT_CHARACTER_ITEM);
-        });
+        gameUsers.forEach(GameUser::onStart);
     }
 
     /**
@@ -501,6 +502,7 @@ public final class Game implements HasTask {
                 gameUser.setTeam(Team.BLUE);
 
             teamUserMap.get(gameUser.getTeam()).add(gameUser);
+            gameUser.onStart();
         }
 
         gameUsers.add(gameUser);

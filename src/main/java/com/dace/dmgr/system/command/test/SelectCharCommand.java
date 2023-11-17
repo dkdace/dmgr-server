@@ -2,6 +2,7 @@ package com.dace.dmgr.system.command.test;
 
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
@@ -30,7 +31,13 @@ public class SelectCharCommand implements CommandExecutor {
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null) {
-            combatUser = new CombatUser(player);
+            GameUser gameUser = EntityInfoRegistry.getGameUser(player);
+
+            if (gameUser == null)
+                combatUser = new CombatUser(player);
+            else
+                combatUser = new CombatUser(player, gameUser);
+
             combatUser.init();
         }
         combatUser.setTeam(team);
