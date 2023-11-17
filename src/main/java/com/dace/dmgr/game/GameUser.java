@@ -58,7 +58,6 @@ public final class GameUser {
      * 게임 유저를 초기화한다.
      */
     public void init() {
-        game.addPlayer(this);
         EntityInfoRegistry.addGameUser(player, this);
     }
 
@@ -66,7 +65,6 @@ public final class GameUser {
      * 게임 유저를 제거한다.
      */
     public void remove() {
-        game.removePlayer(this);
         EntityInfoRegistry.removeGameUser(player);
     }
 

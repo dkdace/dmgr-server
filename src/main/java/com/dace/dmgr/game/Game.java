@@ -17,9 +17,9 @@ import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.WorldUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -39,9 +39,18 @@ public final class Game implements HasTask {
     public static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
             .setName("§a전투원 선택").build();
     /** 랭크가 결정되는 배치 판 수 */
-    private static final int RANK_PLACEMENT_PLAY_COUNT = 5;
+    public static final int RANK_PLACEMENT_PLAY_COUNT = 5;
+    /** 게임을 시작하기 위한 최소 인원 수 (일반) */
+    public static final int NORMAL_MIN_PLAYER_COUNT = 2;
+    /** 최대 수용 가능한 인원 수 (일반) */
+    public static final int NORMAL_MAX_PLAYER_COUNT = 10;
+    /** 게임을 시작하기 위한 최소 인원 수 (랭크) */
+    public static final int RANK_MIN_PLAYER_COUNT = 6;
+    /** 최대 수용 가능한 인원 수 (랭크) */
+    public static final int RANK_MAX_PLAYER_COUNT = 12;
     /** 게임 시작까지 필요한 대기 시간 (초) */
     private static final int GAME_WAITING_TIME = 30;
+
     private static final Random random = new Random();
 
     /** 방 번호 */
@@ -50,6 +59,10 @@ public final class Game implements HasTask {
     private final HashSet<CombatEntity> combatEntitySet = new HashSet<>();
     /** 플레이어 목록 */
     private final ArrayList<GameUser> gameUsers = new ArrayList<>();
+    /** 게임을 시작하기 위한 최소 인원 수 */
+    private final int minPlayerCount;
+    /** 최대 수용 가능 인원 수 */
+    private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
     private final EnumMap<Team, ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
     /** 팀 점수 (팀 : 점수) */
@@ -72,14 +85,16 @@ public final class Game implements HasTask {
     /**
      * 게임 인스턴스를 생성한다.
      *
-     * @param number       방 번호
-     * @param gamePlayMode 게임 모드
+     * @param isRanked 랭크 여부
+     * @param number   방 번호
      */
-    public Game(int number, GamePlayMode gamePlayMode) {
+    public Game(boolean isRanked, int number) {
         this.number = number;
-        this.gamePlayMode = gamePlayMode;
+        this.gamePlayMode = GameInfoRegistry.getRandomGamePlayMode(isRanked);
         this.map = GameInfoRegistry.getRandomMap(gamePlayMode);
         this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gamePlayMode, number);
+        minPlayerCount = isRanked ? RANK_MIN_PLAYER_COUNT : NORMAL_MIN_PLAYER_COUNT;
+        maxPlayerCount = isRanked ? RANK_MAX_PLAYER_COUNT : NORMAL_MAX_PLAYER_COUNT;
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
@@ -213,11 +228,11 @@ public final class Game implements HasTask {
         BossBarUtil.addBossBar(gameUser.getPlayer(), "waitQuit", MESSAGES.BOSSBAR_WAIT_QUIT,
                 BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
         BossBarUtil.addBossBar(gameUser.getPlayer(), "cannotStart", MessageFormat.format(MESSAGES.BOSSBAR_CANNOT_START,
-                gamePlayMode.getMinPlayer()), BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+                minPlayerCount), BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
         BossBarUtil.addBossBar(gameUser.getPlayer(), "timer",
                 MessageFormat.format(MESSAGES.BOSSBAR_TIMER,
-                        gamePlayMode.getName(), (canStart() ? ChatColor.WHITE : ChatColor.RED).toString() + gameUsers.size(),
-                        gamePlayMode.getMaxPlayer()),
+                        (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"), (canStart() ? "§f" : "§c") + gameUsers.size(),
+                        maxPlayerCount),
                 BarColor.GREEN,
                 WrapperPlayServerBoss.BarStyle.PROGRESS,
                 canStart() ? (float) remainingTime / GAME_WAITING_TIME : 1);
@@ -230,7 +245,7 @@ public final class Game implements HasTask {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
                 SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                gameUser.getPlayer().sendTitle(ChatColor.WHITE.toString() + remainingTime, "", 0, 5, 10);
+                gameUser.getPlayer().sendTitle("§f" + remainingTime, "", 0, 5, 10);
             });
         }
 
@@ -240,7 +255,7 @@ public final class Game implements HasTask {
 
             gameUsers.forEach(gameUser -> {
                 SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
-                gameUser.getPlayer().sendTitle(ChatColor.RED + "전투 시작", "", 0, 40, 20);
+                gameUser.getPlayer().sendTitle("§c전투 시작", "", 0, 40, 20);
             });
         }
     }
@@ -254,7 +269,7 @@ public final class Game implements HasTask {
         if (remainingTime > 0 && remainingTime <= 10) {
             gameUsers.forEach(gameUser -> {
                 SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                gameUser.getPlayer().sendTitle("", ChatColor.RED.toString() + remainingTime, 0, 5, 10);
+                gameUser.getPlayer().sendTitle("", "§c" + remainingTime, 0, 5, 10);
             });
         }
 
@@ -270,7 +285,7 @@ public final class Game implements HasTask {
      * @return 게임을 시작할 수 있으면 {@code true} 반환
      */
     public boolean canStart() {
-        return gameUsers.size() >= gamePlayMode.getMinPlayer() && (gameUsers.size() % 2 == 0);
+        return gameUsers.size() >= minPlayerCount && (gameUsers.size() % 2 == 0);
     }
 
     /**
@@ -414,7 +429,7 @@ public final class Game implements HasTask {
         int normalPlayCount = user.getNormalPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
-        int playTime = (int) ((System.currentTimeMillis() - gameUser.getGame().getStartTime()) / 1000);
+        int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
         user.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
@@ -438,7 +453,7 @@ public final class Game implements HasTask {
         int rankPlayCount = user.getRankPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
-        int playTime = (int) ((System.currentTimeMillis() - gameUser.getGame().getStartTime()) / 1000);
+        int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 

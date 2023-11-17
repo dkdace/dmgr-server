@@ -35,7 +35,8 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
      * 모든 플레이어에게 게임 진행 타이머 보스바를 전송한다.
      */
     private void broadcastBossBar(Game game) {
-        String displayTime = DurationFormatUtils.formatDuration(game.getRemainingTime() * 1000L, "mm:ss", true);
+        String displayTime = (game.getRemainingTime() < 60 ? "§c§l" : "§l") +
+                DurationFormatUtils.formatDuration(game.getRemainingTime() * 1000L, "mm:ss", true);
 
         game.getGameUsers().forEach(gameUser ->
                 BossBarUtil.addBossBar(gameUser.getPlayer(), "remainingTime", MessageFormat.format(MESSAGES.BOSSBAR_REMAINING_TIME, displayTime),

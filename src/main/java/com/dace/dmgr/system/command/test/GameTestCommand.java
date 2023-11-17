@@ -23,25 +23,25 @@ public class GameTestCommand implements CommandExecutor {
 
         switch (args[0]) {
             case "생성": {
-                Game game = new Game(number, GamePlayMode.TEAM_DEATHMATCH);
+                Game game = new Game(false, number);
                 game.init();
-                DMGR.getPlugin().getLogger().info(MessageFormat.format("팀 데스매치 게임 생성됨 : [{0}]", number));
+                DMGR.getPlugin().getLogger().info(MessageFormat.format("일반 게임 생성됨 : [{0}]", number));
 
                 break;
             }
             case "전체추가": {
-                Game game = GameInfoRegistry.getGame(GamePlayMode.TEAM_DEATHMATCH, number);
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     GameUser gameUser = new GameUser(player, game);
                     gameUser.init();
                 }
+                Game game = GameInfoRegistry.getGame(false, number);
 
                 break;
             }
             case "삭제": {
-                Game game = GameInfoRegistry.getGame(GamePlayMode.TEAM_DEATHMATCH, number);
+                Game game = GameInfoRegistry.getGame(false, number);
                 game.remove();
-                DMGR.getPlugin().getLogger().info(MessageFormat.format("팀 데스매치 게임 제거됨 : [{0}]", number));
+                DMGR.getPlugin().getLogger().info(MessageFormat.format("일반 게임 제거됨 : [{0}]", number));
 
                 break;
             }
