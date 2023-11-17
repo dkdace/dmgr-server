@@ -250,7 +250,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
         int i = 14;
         boolean fresh = CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > SCORE_DISPLAY_DURATION - 10;
 
-        sidebar.setName(MessageFormat.format("{0}+{1}", fresh ? ChatColor.LIGHT_PURPLE : ChatColor.GREEN, (int) scoreStreakSum));
+        sidebar.setName(MessageFormat.format("{0}+{1}", fresh ? "§d" : "§a", (int) scoreStreakSum));
         sidebar.set("§f", i--);
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
             sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30), i--);
@@ -456,15 +456,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     /**
-     * 다른 플레이어 처치를 도왔을 때 효과를 재생한다.
-     */
-    private void playPlayerAssistEffect() {
-        entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
-    }
-
-    /**
      * 처치 시 킬로그를 표시한다.
      *
      * @param victim 피격자
@@ -506,7 +497,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                     int score = Math.round(damage * 100);
 
                     addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-                    attacker2.playPlayerAssistEffect();
+                    attacker2.playPlayerKillEffect();
 
                     if (attacker2.getGameUser() != null)
                         attacker2.getGameUser().setAssist(attacker2.getGameUser().getAssist() + 1);

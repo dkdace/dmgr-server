@@ -26,7 +26,7 @@ public class SelectCharCommand implements CommandExecutor {
             team = Team.RED;
         else if (args[1].equalsIgnoreCase("blue"))
             team = Team.BLUE;
-        String character = args[2];
+        String character = args[2].toUpperCase();
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null) {

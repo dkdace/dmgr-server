@@ -14,7 +14,7 @@ public enum Role {
     SCUFFLER("근접", ChatColor.YELLOW, new String[]{"§f역할군 설명"}),
     MARKSMAN("사격", ChatColor.GREEN, new String[]{"§f역할군 설명"}),
     VANGUARD("돌격", ChatColor.AQUA, new String[]{"§f역할군 설명"}),
-    WARDEN("수호", ChatColor.BLUE, new String[]{"§f역할군 설명"}),
+    GUARDIAN("수호", ChatColor.BLUE, new String[]{"§f역할군 설명"}),
     SUPPORTER("지원", ChatColor.LIGHT_PURPLE, new String[]{"§f역할군 설명"});
 
     /** 이름 */

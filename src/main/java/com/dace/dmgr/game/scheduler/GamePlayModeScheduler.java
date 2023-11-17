@@ -35,6 +35,6 @@ public interface GamePlayModeScheduler {
      */
     interface MESSAGES {
         /** 게임 진행 타이머 보스바 메시지 */
-        String BOSSBAR_REMAINING_TIME = "§b남은 시간 : §l{0}";
+        String BOSSBAR_REMAINING_TIME = "§b남은 시간 : {0}";
     }
 }

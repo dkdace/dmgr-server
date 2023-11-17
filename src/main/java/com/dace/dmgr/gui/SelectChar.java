@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import lombok.Getter;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -55,7 +54,7 @@ public final class SelectChar extends Gui {
                 case VANGUARD:
                     j = role4i++;
                     break;
-                case WARDEN:
+                case GUARDIAN:
                     j = role5i++;
                     break;
                 case SUPPORTER:
@@ -64,7 +63,7 @@ public final class SelectChar extends Gui {
             }
 
             inventory.setItem(j, ItemBuilder.fromPlayerSkull(characterType.getCharacter().getSkin())
-                    .setName(ChatColor.RED + characterType.getCharacter().getName())
+                    .setName("§c" + characterType.getCharacter().getName())
                     .setLore("§f전투원 설명", characterType.toString())
                     .build());
         }
@@ -77,6 +76,7 @@ public final class SelectChar extends Gui {
                         .setLore(Role.ASSASSIN.getDescription())
                         .setDamage((short) 4)
                         .addItemFlags(ItemFlag.HIDE_UNBREAKABLE)
+                        .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
                         .build());
         inventory.setItem(9,
                 new ItemBuilder(Material.IRON_SWORD).setName(Role.SCUFFLER.getColor() + "§l" + Role.SCUFFLER.getName())
@@ -93,8 +93,8 @@ public final class SelectChar extends Gui {
                         .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
                         .build());
         inventory.setItem(36,
-                new ItemBuilder(Material.SHIELD).setName(Role.WARDEN.getColor() + "§l" + Role.WARDEN.getName())
-                        .setLore(Role.WARDEN.getDescription())
+                new ItemBuilder(Material.SHIELD).setName(Role.GUARDIAN.getColor() + "§l" + Role.GUARDIAN.getName())
+                        .setLore(Role.GUARDIAN.getDescription())
                         .build());
         inventory.setItem(45,
                 new ItemBuilder(Material.END_CRYSTAL).setName(Role.SUPPORTER.getColor() + "§l" + Role.SUPPORTER.getName())
