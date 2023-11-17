@@ -9,6 +9,7 @@ import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
+import com.dace.dmgr.system.command.QuitCommand;
 import com.dace.dmgr.system.command.test.DummyCommand;
 import com.dace.dmgr.system.command.test.GameTestCommand;
 import com.dace.dmgr.system.command.test.SelectCharCommand;
@@ -77,6 +78,7 @@ public class DMGR extends JavaPlugin {
         getCommand("스폰").setExecutor(new LobbyCommand());
         getCommand("메뉴").setExecutor(new MenuCommand());
         getCommand("설정").setExecutor(new PlayerOptionCommand());
+        getCommand("퇴장").setExecutor(new QuitCommand());
     }
 
     /**

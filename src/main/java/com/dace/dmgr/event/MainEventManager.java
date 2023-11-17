@@ -2,6 +2,7 @@ package com.dace.dmgr.event;
 
 import com.dace.dmgr.event.listener.*;
 import com.dace.dmgr.gui.SelectChar;
+import com.dace.dmgr.gui.SelectGame;
 import com.dace.dmgr.gui.menu.ChatSoundOption;
 import com.dace.dmgr.gui.menu.Menu;
 import com.dace.dmgr.gui.menu.PlayerOption;
@@ -39,6 +40,7 @@ public final class MainEventManager {
         EventUtil.registerListener(new PlayerOption());
         EventUtil.registerListener(new ChatSoundOption());
         EventUtil.registerListener(new SelectChar());
+        EventUtil.registerListener(new SelectGame());
 
         EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
         EventUtil.registerPacketListener(new OnPlayServerNamedSoundEffect());
