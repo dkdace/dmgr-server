@@ -120,8 +120,10 @@ public final class Game implements HasTask {
      * 게임을 제거한다.
      */
     public void remove() {
-        for (GameUser gameUser : new ArrayList<>(gameUsers))
+        for (GameUser gameUser : new ArrayList<>(gameUsers)) {
             Lobby.spawn(gameUser.getPlayer());
+            removePlayer(gameUser.getPlayer());
+        }
 
         unloadWorld();
         GameInfoRegistry.removeGame(this);
@@ -470,38 +472,65 @@ public final class Game implements HasTask {
     }
 
     /**
+     * 플레이어가 게임에 참여할 수 있는 지 확인한다.
+     *
+     * @return 참여 가능 여부
+     */
+    public boolean canJoin() {
+        if (gameUsers.size() >= maxPlayerCount)
+            return false;
+
+        int redAmount = teamUserMap.get(Team.RED).size();
+        int blueAmount = teamUserMap.get(Team.BLUE).size();
+
+        if (phase != Phase.WAITING)
+            return !gamePlayMode.isRanked() && redAmount != blueAmount;
+
+        return true;
+    }
+
+    /**
      * 게임에 지정한 플레이어를 추가한다.
      *
      * <p>게임이 진행 중이면 인원이 부족한 팀이 있을 때만 난입이 가능하다.</p>
      *
-     * @param gameUser 대상 플레이어
+     * @param player 대상 플레이어
      */
-    public void addPlayer(GameUser gameUser) {
-        if (phase == Phase.WAITING) {
-            gameUsers.add(gameUser);
-            gameUsers.forEach(gameUser2 -> sendMessage(gameUser2, MESSAGES.JOIN_PREFIX + gameUser.getPlayer().getName()));
-        } else {
-            int redAmount = teamUserMap.get(Team.RED).size();
-            int blueAmount = teamUserMap.get(Team.BLUE).size();
+    public void addPlayer(Player player) {
+        if (!canJoin())
+            return;
 
-            if (redAmount != blueAmount) {
-                if (redAmount < blueAmount)
-                    gameUser.setTeam(Team.RED);
-                else
-                    gameUser.setTeam(Team.BLUE);
+        GameUser gameUser = new GameUser(player, this);
+        gameUser.init();
 
-                gameUsers.add(gameUser);
-                teamUserMap.get(gameUser.getTeam()).add(gameUser);
-            }
+        int redAmount = teamUserMap.get(Team.RED).size();
+        int blueAmount = teamUserMap.get(Team.BLUE).size();
+
+        if (phase != Phase.WAITING) {
+            if (redAmount < blueAmount)
+                gameUser.setTeam(Team.RED);
+            else
+                gameUser.setTeam(Team.BLUE);
+
+            teamUserMap.get(gameUser.getTeam()).add(gameUser);
         }
+
+        gameUsers.add(gameUser);
+        gameUsers.forEach(gameUser2 -> sendMessage(gameUser2, MESSAGES.JOIN_PREFIX + gameUser.getPlayer().getName()));
     }
 
     /**
      * 게임에서 지정한 플레이어를 제거한다.
      *
-     * @param gameUser 대상 플레이어
+     * @param player 대상 플레이어
      */
-    public void removePlayer(GameUser gameUser) {
+    public void removePlayer(Player player) {
+        GameUser gameUser = EntityInfoRegistry.getGameUser(player);
+        if (gameUser == null)
+            return;
+
+        gameUser.remove();
+
         gameUsers.forEach(gameUser2 -> sendMessage(gameUser2, MESSAGES.QUIT_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
         if (teamUserMap.get(gameUser.getTeam()) != null)

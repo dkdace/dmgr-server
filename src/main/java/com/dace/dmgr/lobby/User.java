@@ -59,6 +59,10 @@ public final class User extends UserData implements HasTask {
     public void remove() {
         EntityInfoRegistry.removeUser(player);
         TaskManager.clearTask(this);
+
+        GameUser gameUser = EntityInfoRegistry.getGameUser(player);
+        if (gameUser != null)
+            gameUser.getGame().removePlayer(player);
     }
 
     @Override
@@ -143,8 +147,5 @@ public final class User extends UserData implements HasTask {
             combatUser.reset();
             combatUser.remove();
         }
-        GameUser gameUser = EntityInfoRegistry.getGameUser(player);
-        if (gameUser != null)
-            gameUser.remove();
     }
 }

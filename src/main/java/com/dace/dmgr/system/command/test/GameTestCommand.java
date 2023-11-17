@@ -2,8 +2,6 @@ package com.dace.dmgr.system.command.test;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GamePlayMode;
-import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.system.GameInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -30,11 +28,9 @@ public class GameTestCommand implements CommandExecutor {
                 break;
             }
             case "전체추가": {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    GameUser gameUser = new GameUser(player, game);
-                    gameUser.init();
-                }
                 Game game = GameInfoRegistry.getGame(false, number);
+                for (Player player : Bukkit.getOnlinePlayers())
+                    game.addPlayer(player);
 
                 break;
             }
