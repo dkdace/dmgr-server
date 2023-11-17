@@ -38,18 +38,6 @@ public final class Game implements HasTask {
     /** 전투원 선택 아이템 객체 */
     public static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
             .setName("§a전투원 선택").build();
-    /** 랭크가 결정되는 배치 판 수 */
-    public static final int RANK_PLACEMENT_PLAY_COUNT = 5;
-    /** 게임을 시작하기 위한 최소 인원 수 (일반) */
-    public static final int NORMAL_MIN_PLAYER_COUNT = 2;
-    /** 최대 수용 가능한 인원 수 (일반) */
-    public static final int NORMAL_MAX_PLAYER_COUNT = 10;
-    /** 게임을 시작하기 위한 최소 인원 수 (랭크) */
-    public static final int RANK_MIN_PLAYER_COUNT = 6;
-    /** 최대 수용 가능한 인원 수 (랭크) */
-    public static final int RANK_MAX_PLAYER_COUNT = 12;
-    /** 게임 시작까지 필요한 대기 시간 (초) */
-    private static final int GAME_WAITING_TIME = 30;
 
     private static final Random random = new Random();
 
@@ -77,7 +65,7 @@ public final class Game implements HasTask {
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 */
     @Setter
-    private int remainingTime = GAME_WAITING_TIME;
+    private int remainingTime = GameConfig.WAITING_TIME;
     /** 게임 진행 단계 */
     @Setter
     private Phase phase = Phase.WAITING;
@@ -93,8 +81,8 @@ public final class Game implements HasTask {
         this.gamePlayMode = GameInfoRegistry.getRandomGamePlayMode(isRanked);
         this.map = GameInfoRegistry.getRandomMap(gamePlayMode);
         this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gamePlayMode, number);
-        minPlayerCount = isRanked ? RANK_MIN_PLAYER_COUNT : NORMAL_MIN_PLAYER_COUNT;
-        maxPlayerCount = isRanked ? RANK_MAX_PLAYER_COUNT : NORMAL_MAX_PLAYER_COUNT;
+        minPlayerCount = isRanked ? GameConfig.RANK_MIN_PLAYER_COUNT : GameConfig.NORMAL_MIN_PLAYER_COUNT;
+        maxPlayerCount = isRanked ? GameConfig.RANK_MAX_PLAYER_COUNT : GameConfig.NORMAL_MAX_PLAYER_COUNT;
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
@@ -218,7 +206,7 @@ public final class Game implements HasTask {
                 onStart();
             }
         } else
-            remainingTime = GAME_WAITING_TIME;
+            remainingTime = GameConfig.WAITING_TIME;
     }
 
     /**
@@ -237,7 +225,7 @@ public final class Game implements HasTask {
                         maxPlayerCount),
                 BarColor.GREEN,
                 WrapperPlayServerBoss.BarStyle.PROGRESS,
-                canStart() ? (float) remainingTime / GAME_WAITING_TIME : 1);
+                canStart() ? (float) remainingTime / GameConfig.WAITING_TIME : 1);
     }
 
     /**
@@ -463,7 +451,7 @@ public final class Game implements HasTask {
         user.setRankPlayCount(rankPlayCount + 1);
 
         if (!user.isRanked()) {
-            if (rankPlayCount + 1 >= RANK_PLACEMENT_PLAY_COUNT) {
+            if (rankPlayCount + 1 >= GameConfig.RANK_PLACEMENT_PLAY_COUNT) {
                 user.setRankRate(RewardUtil.getFinalRankRate(mmr));
                 user.setRanked(true);
             }

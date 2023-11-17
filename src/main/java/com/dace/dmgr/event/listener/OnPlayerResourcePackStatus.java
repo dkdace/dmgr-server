@@ -1,6 +1,6 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.config.GeneralConfig;
+import com.dace.dmgr.system.GeneralConfig;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
@@ -47,7 +47,7 @@ public final class OnPlayerResourcePackStatus implements Listener {
 
         if (!user.isResourcePack()) {
             user.setResourcePack(true);
-            user.getPlayer().setResourcePack(GeneralConfig.getInstance().getResourcePackUrl());
+            user.getPlayer().setResourcePack(GeneralConfig.RESOURCE_PACK_URL);
 
             TaskManager.addTask(user, new TaskWait(160) {
                 @Override

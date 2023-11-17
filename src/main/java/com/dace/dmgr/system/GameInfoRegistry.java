@@ -1,6 +1,7 @@
 package com.dace.dmgr.system;
 
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameConfig;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.game.map.TeamDeathmatchMap;
@@ -14,9 +15,6 @@ import java.util.Random;
  * 게임 관련 데이터를 저장하고 관리하는 클래스.
  */
 public final class GameInfoRegistry {
-    /** 일반 게임과 랭크 게임의 최대 방 갯수 */
-    public static final int MAX_ROOM_COUNT = 5;
-
     /** 게임 목록 (랭크 여부 : 게임 목록) */
     private static final HashMap<Boolean, Game[]> gameListMap = new HashMap<>();
     /** 게임 맵 목록 (게임 모드 : 게임 맵) */
@@ -71,7 +69,7 @@ public final class GameInfoRegistry {
      * @return 게임 정보 객체
      */
     public static Game getGame(boolean isRanked, int number) {
-        gameListMap.putIfAbsent(isRanked, new Game[MAX_ROOM_COUNT]);
+        gameListMap.putIfAbsent(isRanked, new Game[GameConfig.MAX_ROOM_COUNT]);
         return gameListMap.get(isRanked)[number];
     }
 
@@ -79,7 +77,7 @@ public final class GameInfoRegistry {
      * @param game 게임 정보 객체
      */
     public static void addGame(Game game) {
-        gameListMap.putIfAbsent(game.getGamePlayMode().isRanked(), new Game[MAX_ROOM_COUNT]);
+        gameListMap.putIfAbsent(game.getGamePlayMode().isRanked(), new Game[GameConfig.MAX_ROOM_COUNT]);
         gameListMap.get(game.getGamePlayMode().isRanked())[game.getNumber()] = game;
     }
 
@@ -87,7 +85,7 @@ public final class GameInfoRegistry {
      * @param game 게임 정보 객체
      */
     public static void removeGame(Game game) {
-        gameListMap.putIfAbsent(game.getGamePlayMode().isRanked(), new Game[MAX_ROOM_COUNT]);
+        gameListMap.putIfAbsent(game.getGamePlayMode().isRanked(), new Game[GameConfig.MAX_ROOM_COUNT]);
         gameListMap.get(game.getGamePlayMode().isRanked())[game.getNumber()] = null;
     }
 }

@@ -1,6 +1,7 @@
 package com.dace.dmgr.gui;
 
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameConfig;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -52,7 +53,7 @@ public final class SelectGame extends Gui {
                 new ItemBuilder(Material.DIAMOND_SWORD)
                         .setName("§6§l랭크")
                         .setLore("§f랭크 점수에 반영되는 랭크 게임입니다.",
-                                "§f랭크 게임 §e" + Game.RANK_PLACEMENT_PLAY_COUNT + "판§f을 플레이하면 첫 티어 및 랭크 점수가 결정됩니다.",
+                                "§f랭크 게임 §e" + GameConfig.RANK_PLACEMENT_PLAY_COUNT + "판§f을 플레이하면 첫 티어 및 랭크 점수가 결정됩니다.",
                                 "§f중간 난입이 불가능한 게임입니다.",
                                 "",
                                 "§f다음 게임 모드 중에서 무작위로 선택됨 :")
@@ -60,7 +61,7 @@ public final class SelectGame extends Gui {
                         .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
                         .build());
 
-        for (int i = 0; i < GameInfoRegistry.MAX_ROOM_COUNT; i++) {
+        for (int i = 0; i < GameConfig.MAX_ROOM_COUNT; i++) {
             ItemBuilder room;
 
             Game game = GameInfoRegistry.getGame(false, i);
@@ -74,8 +75,8 @@ public final class SelectGame extends Gui {
 
                 room = new ItemBuilder(game.canJoin() ? DisplayItem.ENABLED.getItemStack() : DisplayItem.DISABLED.getItemStack())
                         .setName("§a일반 게임 " + i)
-                        .setLore("§3인원 수 : §f[" + (game.getGameUsers().size() >= Game.NORMAL_MIN_PLAYER_COUNT ? "§f" : "§c") +
-                                        game.getGameUsers().size() + "§f/" + Game.NORMAL_MAX_PLAYER_COUNT + " 명]",
+                        .setLore("§3인원 수 : §f[" + (game.getGameUsers().size() >= GameConfig.NORMAL_MIN_PLAYER_COUNT ? "§f" : "§c") +
+                                        game.getGameUsers().size() + "§f/" + GameConfig.NORMAL_MAX_PLAYER_COUNT + " 명]",
                                 "§3상태 : " + (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
                                 "§3게임 모드 : §f" + (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),
                                 "§3경과 시간 : §f" + (game.getPhase() == Game.Phase.WAITING ? "§8--" : displayTime));
@@ -84,7 +85,7 @@ public final class SelectGame extends Gui {
             inventory.setItem(1 + i, room.build());
         }
 
-        for (int i = 0; i < GameInfoRegistry.MAX_ROOM_COUNT; i++) {
+        for (int i = 0; i < GameConfig.MAX_ROOM_COUNT; i++) {
             ItemBuilder room;
 
             Game game = GameInfoRegistry.getGame(true, i);
@@ -98,8 +99,8 @@ public final class SelectGame extends Gui {
 
                 room = new ItemBuilder(game.canJoin() ? DisplayItem.ENABLED.getItemStack() : DisplayItem.DISABLED.getItemStack())
                         .setName("§6랭크 게임 " + i)
-                        .setLore("§3인원 수 : §f[" + (game.getGameUsers().size() >= Game.RANK_MIN_PLAYER_COUNT ? "§f" : "§c") +
-                                        game.getGameUsers().size() + "§f/" + Game.RANK_MAX_PLAYER_COUNT + " 명]",
+                        .setLore("§3인원 수 : §f[" + (game.getGameUsers().size() >= GameConfig.RANK_MIN_PLAYER_COUNT ? "§f" : "§c") +
+                                        game.getGameUsers().size() + "§f/" + GameConfig.RANK_MAX_PLAYER_COUNT + " 명]",
                                 "§3상태 : " + (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
                                 "§3게임 모드 : §f" + (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),
                                 "§3경과 시간 : §f" + (game.getPhase() == Game.Phase.WAITING ? "§8--" : displayTime));

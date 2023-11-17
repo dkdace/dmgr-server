@@ -3,7 +3,6 @@ package com.dace.dmgr.system;
 import com.dace.dmgr.combat.character.jager.action.JagerA3Info;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.config.GeneralConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,9 +13,9 @@ import lombok.Getter;
 @Getter
 public enum Cooldown {
     /** 채팅 */
-    CHAT(GeneralConfig.getInstance().getChatCooldown()),
+    CHAT(GeneralConfig.CHAT_COOLDOWN),
     /** 명령어 */
-    COMMAND(GeneralConfig.getInstance().getCommandCooldown()),
+    COMMAND(GeneralConfig.COMMAND_COOLDOWN),
     /** 피격 시 애니메이션 */
     DAMAGE_ANIMATION(6),
     /** 적 처치 기여 (데미지 누적) 제한시간 */

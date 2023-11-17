@@ -533,7 +533,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
                 @Override
                 public void onEnd(boolean cancelled) {
-                    GameUser gameUser = EntityInfoRegistry.getGameUser(entity);
                     damageModule.setHealth(damageModule.getMaxHealth());
                     entity.setGameMode(GameMode.SURVIVAL);
 

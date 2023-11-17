@@ -16,9 +16,9 @@ public enum GamePlayMode {
 
     /** 이름 */
     private final String name;
-    /** 게임을 시작하기 위한 최소 플레이어 수 */
+    /** 최소 플레이어 수 */
     private final int minPlayer;
-    /** 최대 수용 가능한 플레이어 수 */
+    /** 최대 플레이어 수 */
     private final int maxPlayer;
     /** 랭크 여부 */
     private final boolean isRanked;
