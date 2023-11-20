@@ -76,19 +76,40 @@ public final class User implements HasTask {
     /**
      * 레벨 상승 시 효과를 재생한다.
      */
-    private void playLevelUpEffect() {
+    public void playLevelUpEffect() {
+        TaskManager.addTask(this, new TaskWait(100) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play("random.good", 10F, 1F, player);
+                player.sendTitle(StringFormUtil.getLevelPrefix(userData.getLevel()) + " §e§l달성!", "", 8, 40, 30);
+            }
+        });
     }
 
     /**
      * 티어 승급 시 효과를 재생한다.
      */
-    private void playTierUpEffect() {
+    public void playTierUpEffect() {
+        TaskManager.addTask(this, new TaskWait(80) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, 10F, 1.5F, player);
+                player.sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30);
+            }
+        });
     }
 
     /**
      * 티어 강등 시 효과를 재생한다.
      */
-    private void playTierDownEffect() {
+    public void playTierDownEffect() {
+        TaskManager.addTask(this, new TaskWait(80) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, 10F, 0F, player);
+                player.sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30);
+            }
+        });
     }
 
     /**
