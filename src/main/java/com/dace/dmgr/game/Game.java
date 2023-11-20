@@ -122,7 +122,6 @@ public final class Game implements HasTask {
                 removePlayer(gameUser.getPlayer());
             }
 
-        unloadWorld();
         GameInfoRegistry.removeGame(this);
         TaskManager.clearTask(this);
     }
@@ -158,13 +157,6 @@ public final class Game implements HasTask {
      */
     private void loadWorld() {
         WorldUtil.duplicateWorld(map.getWorldName(), worldName);
-    }
-
-    /**
-     * 월드를 언로드한다.
-     */
-    private void unloadWorld() {
-        WorldUtil.removeWorld(worldName);
     }
 
     /**
@@ -365,6 +357,18 @@ public final class Game implements HasTask {
         if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
             winnerTeam = Team.NONE;
 
+        List<GameUser> scoreRank = gameUsers.stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+                .collect(Collectors.toList());
+        List<GameUser> damageRank = gameUsers.stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
+                .collect(Collectors.toList());
+        List<GameUser> killRank = gameUsers.stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
+                .collect(Collectors.toList());
+        List<GameUser> defendRank = gameUsers.stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
+                .collect(Collectors.toList());
+        List<GameUser> healRank = gameUsers.stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
+                .collect(Collectors.toList());
+        ChatColor[] chatColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GRAY, ChatColor.GRAY};
+
         for (GameUser gameUser : gameUsers) {
             Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
 
@@ -376,23 +380,90 @@ public final class Game implements HasTask {
                 rankEarned = updateRankRate(gameUser, isWinner);
             else
                 updateMMR(gameUser);
-        }
 
-        for (GameUser gameUser : gameUsers) {
-            sendMessage(gameUser, gamePlayMode.getName() + " 게임 결과");
-
-            if (winnerTeam == Team.NONE)
-                sendMessage(gameUser, "* " + winnerTeam.getColor() + "무승부");
-            else
-                sendMessage(gameUser, "* " + winnerTeam.getColor() + winnerTeam.name() + "팀 승리");
+            sendMessage(gameUser, "§7==============================");
+            if (isWinner == null) {
+                sendMessage(gameUser, "§9§l플레이 정보 §e§l[무승부]");
+                playDrawEffect(gameUser);
+            } else if (isWinner) {
+                sendMessage(gameUser, "§9§l플레이 정보 §a§l[승리]");
+                playWinEffect(gameUser);
+            } else {
+                sendMessage(gameUser, "§9§l플레이 정보 §c§l[패배]");
+                playLoseEffect(gameUser);
+            }
             sendMessage(gameUser, "");
+            sendMessage(gameUser, MessageFormat.format("{0}§l■ {0}점수 : {1} §l[{2}위]",
+                    chatColors[scoreRank.indexOf(gameUser)], gameUser.getScore(), scoreRank.indexOf(gameUser) + 1));
+            sendMessage(gameUser, MessageFormat.format("{0}§l■ {0}입힌 피해 : {1} §l[{2}위]",
+                    chatColors[damageRank.indexOf(gameUser)], gameUser.getDamage(), damageRank.indexOf(gameUser) + 1));
+            sendMessage(gameUser, MessageFormat.format("{0}§l■ {0}적 처치 : {1} §l[{2}위]",
+                    chatColors[killRank.indexOf(gameUser)], gameUser.getKill(), killRank.indexOf(gameUser) + 1));
+            sendMessage(gameUser, MessageFormat.format("{0}§l■ {0}막은 피해 : {1} §l[{2}위]",
+                    chatColors[defendRank.indexOf(gameUser)], gameUser.getDefend(), defendRank.indexOf(gameUser) + 1));
+            sendMessage(gameUser, MessageFormat.format("{0}§l■ {0}치유 : {1} §l[{2}위]",
+                    chatColors[healRank.indexOf(gameUser)], gameUser.getDefend(), healRank.indexOf(gameUser) + 1));
+            sendMessage(gameUser, MessageFormat.format("§7§l■ §7사망 : {0}", gameUser.getDeath()));
+            sendMessage(gameUser, "");
+            sendMessage(gameUser, "§9§l보상 획득");
+            sendMessage(gameUser, "");
+            sendMessage(gameUser, MessageFormat.format("§e▶ CP 획득 §7:: §6+{0}", moneyEarned));
+            sendMessage(gameUser, MessageFormat.format("§e▶ 경험치 획득 §7:: §6+{0}", xpEarned));
 
-            sendMessage(gameUser, "내 게임 성적");
-            sendMessage(gameUser, "* 점수: " + gameUser.getScore());
-            sendMessage(gameUser, "* K/D/A: " + gameUser.getKill() + "/" + gameUser.getDeath() + "/" + gameUser.getAssist() +
-                    " (" + (gameUser.getKDARatio()) + ")");
-            sendMessage(gameUser, "* 입힌 데미지: " + gameUser.getDamage());
+            if (gamePlayMode.isRanked()) {
+                sendMessage(gameUser, "");
+                sendMessage(gameUser, "§9§l랭크");
+                sendMessage(gameUser, "");
+                sendMessage(gameUser, MessageFormat.format("§e▶ 랭크 점수 §7:: {0}{1}",
+                        rankEarned == 0 ? "§e+" : (rankEarned > 0 ? "§a+" : "§c-"), rankEarned));
+            }
+            sendMessage(gameUser, "§7==============================");
         }
+    }
+
+    /**
+     * 승리 시 효과를 재생한다.
+     *
+     * @param gameUser 대상 플레이어
+     */
+    private void playWinEffect(GameUser gameUser) {
+        new TaskWait(40) {
+            @Override
+            protected void onEnd() {
+                gameUser.getPlayer().sendTitle("§b§l승리", "", 8, 40, 30);
+                SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, 10F, 1.5F, gameUser.getPlayer());
+            }
+        };
+    }
+
+    /**
+     * 패배 시 효과를 재생한다.
+     *
+     * @param gameUser 대상 플레이어
+     */
+    private void playLoseEffect(GameUser gameUser) {
+        new TaskWait(40) {
+            @Override
+            protected void onEnd() {
+                gameUser.getPlayer().sendTitle("§c§l패배", "", 8, 40, 30);
+                SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, 10F, 0F, gameUser.getPlayer());
+            }
+        };
+    }
+
+    /**
+     * 무승부 시 효과를 재생한다.
+     *
+     * @param gameUser 대상 플레이어
+     */
+    private void playDrawEffect(GameUser gameUser) {
+        new TaskWait(40) {
+            @Override
+            protected void onEnd() {
+                gameUser.getPlayer().sendTitle("§e§l무승부", "", 8, 40, 30);
+                SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 10F, 1F, gameUser.getPlayer());
+            }
+        };
     }
 
     /**
