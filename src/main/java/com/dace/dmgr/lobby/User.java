@@ -2,16 +2,18 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.SkinUtil;
+import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
@@ -20,10 +22,11 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
  * 유저 정보를 관리하는 클래스.
  */
 @Getter
-@EqualsAndHashCode(callSuper = true)
-public final class User extends UserData implements HasTask {
+public final class User implements HasTask {
     /** 플레이어 객체 */
     private final Player player;
+    /** 유저 데이터 정보 객체 */
+    private final UserData userData;
     /** 플레이어 사이드바 */
     @Setter
     private BPlayerBoard sidebar;
@@ -40,8 +43,8 @@ public final class User extends UserData implements HasTask {
      * @param player 대상 플레이어
      */
     public User(Player player) {
-        super(player.getUniqueId());
         this.player = player;
+        this.userData = new UserData(player.getUniqueId());
         this.sidebar = new BPlayerBoard(player, "lobby");
     }
 
@@ -70,36 +73,10 @@ public final class User extends UserData implements HasTask {
         return "User@" + player.getName();
     }
 
-    @Override
-    public void setXp(int xp) {
-        boolean levelup = false;
-
-        while (xp >= getNextLevelXp()) {
-            xp -= getNextLevelXp();
-            setLevel(getLevel() + 1);
-            levelup = true;
-        }
-        if (levelup)
-            playLevelUpEffect();
-
-        super.setXp(xp);
-    }
-
     /**
      * 레벨 상승 시 효과를 재생한다.
      */
     private void playLevelUpEffect() {
-    }
-
-    @Override
-    public void setRankRate(int rankRate) {
-        Tier tier = getTier();
-        super.setRankRate(rankRate);
-
-        if (getTier().getMinScore() > tier.getMinScore())
-            playTierUpEffect();
-        else if (getTier().getMinScore() < tier.getMinScore())
-            playTierDownEffect();
     }
 
     /**

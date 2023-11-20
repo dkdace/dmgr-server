@@ -7,18 +7,20 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.lobby.Lobby;
-import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.GameInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.WorldUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -317,7 +319,7 @@ public final class Game implements HasTask {
     private void divideTeam() {
         List<GameUser> sortedGameUsers = gameUsers.stream()
                 .sorted(Comparator.comparing(gameUser ->
-                        EntityInfoRegistry.getUser(((GameUser) gameUser).getPlayer()).getMatchMakingRate()).reversed())
+                        EntityInfoRegistry.getUser(((GameUser) gameUser).getPlayer()).getUserData().getMatchMakingRate()).reversed())
                 .collect(Collectors.toList());
         ArrayList<GameUser> team1 = new ArrayList<>();
         ArrayList<GameUser> team2 = new ArrayList<>();
@@ -366,10 +368,12 @@ public final class Game implements HasTask {
         for (GameUser gameUser : gameUsers) {
             Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
 
-            updateXpAndMoney(gameUser, isWinner);
+            int moneyEarned = updateMoney(gameUser, isWinner);
+            int xpEarned = updateXp(gameUser, isWinner);
+            int rankEarned = 0;
 
             if (gamePlayMode.isRanked())
-                updateRankRate(gameUser, isWinner);
+                rankEarned = updateRankRate(gameUser, isWinner);
             else
                 updateMMR(gameUser);
         }
@@ -392,20 +396,40 @@ public final class Game implements HasTask {
     }
 
     /**
-     * 매치 종료 후 결과에 따라 플레이어의 경험치와 돈을 증가시킨다.
+     * 매치 종료 후 결과에 따라 플레이어의 경험치를 증가시킨다.
      *
      * @param gameUser 대상 플레이어
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
+     * @return 획득한 경험치
      */
-    private void updateXpAndMoney(GameUser gameUser, Boolean isWinner) {
-        User user = EntityInfoRegistry.getUser(gameUser.getPlayer());
+    private int updateXp(GameUser gameUser, Boolean isWinner) {
+        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
 
-        int xp = user.getXp();
-        int money = user.getMoney();
+        int xp = userData.getXp();
         double score = gameUser.getScore();
 
-        user.setXp(RewardUtil.getFinalXp(xp, score, isWinner));
-        user.setMoney(RewardUtil.getFinalMoney(xp, money, score, isWinner));
+        userData.setXp(RewardUtil.getFinalXp(xp, score, isWinner));
+
+        return userData.getXp() - xp;
+    }
+
+    /**
+     * 매치 종료 후 결과에 따라 플레이어의 돈을 증가시킨다.
+     *
+     * @param gameUser 대상 플레이어
+     * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
+     * @return 획득한 돈
+     */
+    private int updateMoney(GameUser gameUser, Boolean isWinner) {
+        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
+
+        int xp = userData.getXp();
+        int money = userData.getMoney();
+        double score = gameUser.getScore();
+
+        userData.setMoney(RewardUtil.getFinalMoney(xp, money, score, isWinner));
+
+        return userData.getMoney() - money;
     }
 
     /**
@@ -414,20 +438,20 @@ public final class Game implements HasTask {
      * @param gameUser 대상 플레이어
      */
     private void updateMMR(GameUser gameUser) {
-        User user = EntityInfoRegistry.getUser(gameUser.getPlayer());
+        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
 
-        int mmr = user.getMatchMakingRate();
-        int normalPlayCount = user.getNormalPlayCount();
+        int mmr = userData.getMatchMakingRate();
+        int normalPlayCount = userData.getNormalPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
-        user.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
-        user.setNormalPlayCount(normalPlayCount + 1);
+        userData.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
+        userData.setNormalPlayCount(normalPlayCount + 1);
 
         DMGR.getPlugin().getLogger().info(MessageFormat.format("유저 MMR 변동됨: ({0}) {1} -> {2} MMR PLAY: {3}",
-                gameUser.getPlayer().getName(), mmr, user.getMatchMakingRate(), normalPlayCount + 1));
+                gameUser.getPlayer().getName(), mmr, userData.getMatchMakingRate(), normalPlayCount + 1));
     }
 
     /**
@@ -435,29 +459,32 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
+     * @return 랭크 점수 획득량
      */
-    private void updateRankRate(GameUser gameUser, Boolean isWinner) {
-        User user = EntityInfoRegistry.getUser(gameUser.getPlayer());
+    private int updateRankRate(GameUser gameUser, Boolean isWinner) {
+        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
 
-        int mmr = user.getMatchMakingRate();
-        int rr = user.getRankRate();
-        int rankPlayCount = user.getRankPlayCount();
+        int mmr = userData.getMatchMakingRate();
+        int rr = userData.getRankRate();
+        int rankPlayCount = userData.getRankPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 
-        user.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
-        user.setRankPlayCount(rankPlayCount + 1);
+        userData.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
+        userData.setRankPlayCount(rankPlayCount + 1);
 
-        if (!user.isRanked()) {
+        if (!userData.isRanked()) {
             if (rankPlayCount + 1 >= GameConfig.RANK_PLACEMENT_PLAY_COUNT) {
-                user.setRankRate(RewardUtil.getFinalRankRate(mmr));
-                user.setRanked(true);
+                userData.setRankRate(RewardUtil.getFinalRankRate(mmr));
+                userData.setRanked(true);
             }
         } else
-            user.setRankRate(RewardUtil.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
+            userData.setRankRate(RewardUtil.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
+
+        return userData.getRankRate() - rr;
     }
 
     /**
@@ -520,6 +547,7 @@ public final class Game implements HasTask {
             return;
 
         gameUser.remove();
+        BossBarUtil.clearBossBar(player);
 
         gameUsers.forEach(gameUser2 -> sendMessage(gameUser2, MESSAGES.QUIT_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
@@ -547,7 +575,7 @@ public final class Game implements HasTask {
      */
     public double getAverageMMR() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getMatchMakingRate())
+                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData().getMatchMakingRate())
                 .average()
                 .orElse(0);
     }
@@ -559,7 +587,7 @@ public final class Game implements HasTask {
      */
     public double getAverageRankRate() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getRankRate())
+                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData().getRankRate())
                 .average()
                 .orElse(0);
     }

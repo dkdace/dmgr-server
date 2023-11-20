@@ -1,6 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -33,8 +34,8 @@ public final class OnAsyncPlayerChat implements Listener {
 
         Bukkit.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), event.getMessage()));
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            User user2 = EntityInfoRegistry.getUser(player2);
-            SoundUtil.play(user2.getUserConfig().getChatSound().getSound(), 1000F, 1.414F, player2);
+            UserData userData2 = EntityInfoRegistry.getUser(player2).getUserData();
+            SoundUtil.play(userData2.getUserConfig().getChatSound().getSound(), 1000F, 1.414F, player2);
         });
     }
 }

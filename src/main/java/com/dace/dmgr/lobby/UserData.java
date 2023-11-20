@@ -2,22 +2,27 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.YamlFile;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
  */
+@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserData {
+public final class UserData {
     /** 유저 설정 정보 관리를 위한 객체 */
     @Getter
-    protected final UserConfig userConfig;
+    private final UserConfig userConfig;
     /** 플레이어 UUID */
+    @ToString.Include
     @EqualsAndHashCode.Include
     @Getter
     private final UUID playerUUID;
@@ -28,28 +33,28 @@ public class UserData {
     private final YamlFile yamlFile;
     /** 경험치 */
     @Getter
-    protected int xp = 0;
+    private int xp = 0;
     /** 레벨 */
     @Getter
-    protected int level = 1;
+    private int level = 1;
     /** 돈 */
     @Getter
-    protected int money = 0;
+    private int money = 0;
     /** 랭크 점수 (RR) */
     @Getter
-    protected int rankRate = 100;
+    private int rankRate = 100;
     /** 랭크게임 배치 완료 여부 */
     @Getter
-    protected boolean isRanked = false;
+    private boolean isRanked = false;
     /** 매치메이킹 점수 (MMR) */
     @Getter
-    protected int matchMakingRate = 100;
+    private int matchMakingRate = 100;
     /** 일반게임 플레이 횟수 */
     @Getter
-    protected int normalPlayCount = 0;
+    private int normalPlayCount = 0;
     /** 랭크게임 플레이 판 수 */
     @Getter
-    protected int rankPlayCount = 0;
+    private int rankPlayCount = 0;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -82,8 +87,26 @@ public class UserData {
     }
 
     public void setXp(int xp) {
+        boolean levelup = false;
+
+        while (xp >= getNextLevelXp()) {
+            xp -= getNextLevelXp();
+            setLevel(level + 1);
+
+            levelup = true;
+        }
+
         this.xp = Math.max(0, xp);
         yamlFile.set("xp", this.xp);
+
+        if (levelup) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player == null)
+                return;
+
+            User user = EntityInfoRegistry.getUser(player);
+            user.playLevelUpEffect();
+        }
     }
 
     public void setLevel(int level) {
@@ -97,8 +120,20 @@ public class UserData {
     }
 
     public void setRankRate(int rankRate) {
+        Tier tier = getTier();
+        
         this.rankRate = rankRate;
         yamlFile.set("rankRate", this.rankRate);
+
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null)
+            return;
+
+        User user = EntityInfoRegistry.getUser(player);
+        if (getTier().getMinScore() > tier.getMinScore())
+            user.playTierUpEffect();
+        else if (getTier().getMinScore() < tier.getMinScore())
+            user.playTierDownEffect();
     }
 
     public void setRanked(boolean ranked) {
@@ -126,17 +161,21 @@ public class UserData {
      *
      * @return 티어
      */
-    public final Tier getTier() {
+    public Tier getTier() {
         if (!isRanked)
             return Tier.NONE;
+
+        int rank = RankUtil.getRankRateRank(this);
+
+        if (rankRate <= Tier.STONE.getMaxScore())
+            return Tier.STONE;
+        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= 5)
+            return Tier.NETHERITE;
 
         for (Tier tier : Tier.values()) {
             if (rankRate >= tier.getMinScore() && rankRate <= tier.getMaxScore())
                 return tier;
         }
-        int rank = RankUtil.getRankRateRank(this);
-        if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= 5)
-            return Tier.NETHERITE;
 
         return Tier.NONE;
     }
@@ -146,7 +185,7 @@ public class UserData {
      *
      * @return 레벨업에 필요한 경험치
      */
-    public final int getNextLevelXp() {
+    public int getNextLevelXp() {
         return 250 + (level * 50);
     }
 }

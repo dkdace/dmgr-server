@@ -5,7 +5,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.PlayerSkull;
 import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
-import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.InventoryUtil;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public final class PlayerOption extends Gui {
 
     @Override
     public void onOpen(Player player, Inventory inventory) {
-        User user = EntityInfoRegistry.getUser(player);
+        UserData userData = EntityInfoRegistry.getUser(player).getUserData();
 
         InventoryUtil.fillRow(inventory, 2, DisplayItem.EMPTY.getItemStack());
         InventoryUtil.setToggleButton(inventory, 0,
@@ -35,13 +35,13 @@ public final class PlayerOption extends Gui {
                         .setName("§e§l한글 자동 변환")
                         .setLore("§f채팅 자동 한글 변환을 활성화합니다.")
                         .build(),
-                user.getUserConfig().isKoreanChat(), 9);
+                userData.getUserConfig().isKoreanChat(), 9);
         InventoryUtil.setToggleButton(inventory, 1,
                 ItemBuilder.fromPlayerSkull(PlayerSkull.NIGHT_VISION)
                         .setName("§e§l야간 투시")
                         .setLore("§f야간 투시를 활성화합니다.")
                         .build(),
-                user.getUserConfig().isNightVision(), 10);
+                userData.getUserConfig().isNightVision(), 10);
         inventory.setItem(2,
                 ItemBuilder.fromPlayerSkull(PlayerSkull.CROSSHAIR)
                         .setName("§e§l조준선 설정")
@@ -59,19 +59,19 @@ public final class PlayerOption extends Gui {
     @Override
     public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = EntityInfoRegistry.getUser(player);
+            UserData userData = EntityInfoRegistry.getUser(player).getUserData();
 
             switch (clickItemName) {
                 case "한글 자동 변환":
-                    user.getUserConfig().setKoreanChat(!user.getUserConfig().isKoreanChat());
-                    if (user.getUserConfig().isKoreanChat())
+                    userData.getUserConfig().setKoreanChat(!userData.getUserConfig().isKoreanChat());
+                    if (userData.getUserConfig().isKoreanChat())
                         player.performCommand("kakc chmod 2");
                     else
                         player.performCommand("kakc chmod 0");
 
                     break;
                 case "야간 투시":
-                    user.getUserConfig().setNightVision(!user.getUserConfig().isNightVision());
+                    userData.getUserConfig().setNightVision(!userData.getUserConfig().isNightVision());
                     break;
                 case "채팅 효과음 설정":
                     ChatSoundOption.getInstance().open(player);

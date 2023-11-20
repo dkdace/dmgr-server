@@ -5,7 +5,7 @@ import com.dace.dmgr.gui.ItemBuilder;
 import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.lobby.ChatSound;
-import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.util.InventoryUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -28,7 +28,7 @@ public final class ChatSoundOption extends Gui {
 
     @Override
     public void onOpen(Player player, Inventory inventory) {
-        User user = EntityInfoRegistry.getUser(player);
+        UserData userData = EntityInfoRegistry.getUser(player).getUserData();
 
         ChatSound[] chatSounds = ChatSound.values();
 
@@ -37,7 +37,7 @@ public final class ChatSoundOption extends Gui {
             InventoryUtil.setSelectButton(inventory, i, new ItemBuilder(chatSounds[i].getMaterial())
                             .setName("§e§l" + chatSounds[i].getName() + " " + "§8§o" + chatSounds[i].toString())
                             .build(),
-                    user.getUserConfig().getChatSound() == chatSounds[i]);
+                    userData.getUserConfig().getChatSound() == chatSounds[i]);
         }
 
         inventory.setItem(17, ButtonItem.LEFT.getItemStack());
@@ -46,7 +46,7 @@ public final class ChatSoundOption extends Gui {
     @Override
     public void onClick(InventoryClickEvent event, Player player, String clickItemName) {
         if (event.getClick() == ClickType.LEFT) {
-            User user = EntityInfoRegistry.getUser(player);
+            UserData userData = EntityInfoRegistry.getUser(player).getUserData();
 
             if (clickItemName.equals("이전")) {
                 player.performCommand("설정");
@@ -57,7 +57,7 @@ public final class ChatSoundOption extends Gui {
             ChatSound chatSound = ChatSound.valueOf(splittedClickItemName[splittedClickItemName.length - 1]);
 
             SoundUtil.play(chatSound.getSound(), 1F, 1.414F, player);
-            user.getUserConfig().setChatSound(chatSound);
+            userData.getUserConfig().setChatSound(chatSound);
             open(player);
         }
     }

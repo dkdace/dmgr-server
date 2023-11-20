@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import java.text.MessageFormat;
 
 /**
- * 게임 테스트 명령어 클래스
+ * 게임 테스트 명령어 클래스.
  */
 public class GameTestCommand implements CommandExecutor {
     @Override

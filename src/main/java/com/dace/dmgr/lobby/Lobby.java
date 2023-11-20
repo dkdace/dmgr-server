@@ -41,31 +41,47 @@ public final class Lobby {
      */
     public static void lobbyTick(User user) {
         Player player = user.getPlayer();
+        UserData userData = user.getUserData();
 
         TaskManager.addTask(user, new TaskTimer(20) {
             @Override
             public boolean onTimerTick(int i) {
-                if (user.getUserConfig().isNightVision())
+                if (userData.getUserConfig().isNightVision())
                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 0, false, false));
                 else
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
                 if (EntityInfoRegistry.getCombatUser(player) == null) {
-                    int reqXp = user.getNextLevelXp();
-                    int rank = user.isRanked() ? user.getRankRate() : 0;
-                    int reqRank = user.isRanked() ? user.getTier().getMaxScore() : 1;
-                    int curRank = user.isRanked() ? user.getTier().getMinScore() : 0;
+                    int reqXp = userData.getNextLevelXp();
+                    int rank = userData.isRanked() ? userData.getRankRate() : 0;
+                    int reqRank = userData.getTier().getMaxScore();
+                    int curRank = userData.getTier().getMinScore();
+
+                    switch (userData.getTier()) {
+                        case STONE:
+                            curRank = userData.getTier().getMaxScore();
+                            break;
+                        case DIAMOND:
+                        case NETHERITE:
+                            reqRank = userData.getTier().getMinScore();
+                            break;
+                        case NONE:
+                            reqRank = 1;
+                            curRank = 0;
+                            break;
+                    }
+
                     user.getSidebar().clear();
                     user.getSidebar().setName("§b§n" + player.getName());
                     user.getSidebar().setAll(
                             "§f",
                             "§e보유 중인 돈",
-                            "§6" + String.format("%,d", user.getMoney()),
+                            "§6" + String.format("%,d", userData.getMoney()),
                             "§f§f",
-                            "§f레벨 : " + StringFormUtil.getLevelPrefix(user.getLevel()),
-                            StringFormUtil.getProgressBar(user.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + user.getXp() + "/" + reqXp + "]",
+                            "§f레벨 : " + StringFormUtil.getLevelPrefix(userData.getLevel()),
+                            StringFormUtil.getProgressBar(userData.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + userData.getXp() + "/" + reqXp + "]",
                             "§f§f§f",
-                            "§f랭크 : " + user.getTier().getPrefix(),
+                            "§f랭크 : " + userData.getTier().getPrefix(),
                             StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + rank + "/" + reqRank + "]"
                     );
                 }

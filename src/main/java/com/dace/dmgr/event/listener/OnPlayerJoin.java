@@ -31,7 +31,7 @@ public final class OnPlayerJoin implements Listener {
 
         event.setJoinMessage(PREFIX + player.getName());
 
-        if (!user.getUserConfig().isKoreanChat())
+        if (!user.getUserData().getUserConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
 
         new TaskWait(1) {
