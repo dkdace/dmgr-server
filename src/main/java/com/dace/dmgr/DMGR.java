@@ -2,7 +2,6 @@ package com.dace.dmgr;
 
 import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.event.MainEventManager;
-import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.SystemPrefix;
@@ -41,7 +40,6 @@ public class DMGR extends JavaPlugin {
         getLogger().info("플러그인 활성화 완료");
         MainEventManager.init();
         CombatEventManager.init();
-        RankUtil.RankUpdater.init();
         WorldUtil.clearDuplicatedWorlds();
         registerCommands();
         registerTestCommands();
