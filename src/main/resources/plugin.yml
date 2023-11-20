@@ -50,10 +50,9 @@ commands:
   게임:
     permission: admin
     description: DMGR Test command
-  스텟:
+  랭크설정:
     permission: admin
     description: DMGR Test command
-    aliases:
-      - stat
-      - tmxpt
-      - ㅅㅌ
+  경험치설정:
+    permission: admin
+    description: DMGR Test command

@@ -9,10 +9,7 @@ import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.QuitCommand;
-import com.dace.dmgr.system.command.test.DummyCommand;
-import com.dace.dmgr.system.command.test.GameTestCommand;
-import com.dace.dmgr.system.command.test.SelectCharCommand;
-import com.dace.dmgr.system.command.test.StatCommand;
+import com.dace.dmgr.system.command.test.*;
 import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
@@ -86,6 +83,7 @@ public class DMGR extends JavaPlugin {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
         getCommand("게임").setExecutor(new GameTestCommand());
-        getCommand("스텟").setExecutor(new StatCommand());
+        getCommand("랭크설정").setExecutor(new RankRateTestCommand());
+        getCommand("경험치설정").setExecutor(new XpTestCommand());
     }
 }
