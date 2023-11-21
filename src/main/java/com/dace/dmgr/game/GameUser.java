@@ -1,8 +1,14 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.game.map.GameMap;
+import com.dace.dmgr.gui.SelectChar;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.system.task.HasTask;
+import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.MessageUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +20,7 @@ import org.bukkit.entity.Player;
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
 @Getter
-public final class GameUser {
+public final class GameUser implements HasTask {
     /** 플레이어 객체 */
     private final Player player;
     /** 입장한 게임 */
@@ -55,11 +61,46 @@ public final class GameUser {
         this.game = game;
     }
 
+    @Override
+    public String getTaskIdentifier() {
+        return "GameUser@" + player.getName();
+    }
+
     /**
-     * 게임 유저를 초기화한다.
+     * 게임 유저를 초기화하고 틱 스케쥴러를 실행한다.
      */
     public void init() {
         EntityInfoRegistry.addGameUser(player, this);
+
+        TaskManager.addTask(this, new TaskTimer(1) {
+            @Override
+            public boolean onTimerTick(int i) {
+                onTick(i);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * 매 tick마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    private void onTick(int i) {
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
+        if (combatUser == null)
+            return;
+
+        if (isInSpawnRegion()) {
+            if (game.getPhase() == Game.Phase.PLAYING)
+                MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER : SelectChar.MESSAGES.CHANGE_CHARACTER,
+                        0, 10, 10);
+
+            player.getInventory().setHeldItemSlot(4);
+        } else {
+            if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
+                player.teleport(getRespawnLocation());
+        }
     }
 
     /**
@@ -74,11 +115,15 @@ public final class GameUser {
      */
     public void onStart() {
         player.teleport(getRespawnLocation());
-        player.getInventory().setHeldItemSlot(8);
-        player.getInventory().setItem(8, Game.SELECT_CHARACTER_ITEM);
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(4, Game.SELECT_CHARACTER_ITEM);
         MessageUtil.clearChat(player);
+
+        if (game.getPhase() == Game.Phase.READY)
+            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10,
+                    game.getGamePlayMode().getReadyDuration() * 20, 30, 80);
+        else
+            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10, 40, 30, 80);
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null) {
@@ -130,5 +175,19 @@ public final class GameUser {
      */
     public float getKDARatio() {
         return (float) (this.getKill() + this.getAssist()) / ((this.getDeath() == 0) ? 1 : this.getDeath());
+    }
+
+    /**
+     * 플레이어가 팀 스폰 지역에 있는 지 확인한다.
+     *
+     * @return 팀 스폰 지역에 있으면 {@code true} 반환
+     */
+    public boolean isInSpawnRegion() {
+        if (team == Team.RED)
+            return LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.RED_SPAWN_CHECK_BLOCK);
+        else if (team == Team.BLUE)
+            return LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.BLUE_SPAWN_CHECK_BLOCK);
+
+        return false;
     }
 }

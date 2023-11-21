@@ -126,4 +126,14 @@ public final class SelectChar extends Gui {
             player.closeInventory();
         }
     }
+
+    /**
+     * 전투원 선택 관련 메시지 목록.
+     */
+    public interface MESSAGES {
+        /** 전투원 선택 알림 */
+        String SELECT_CHARACTER = "§b§nF키§b를 눌러 전투원을 선택하십시오.";
+        /** 전투원 변경 알림 */
+        String CHANGE_CHARACTER = "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.";
+    }
 }

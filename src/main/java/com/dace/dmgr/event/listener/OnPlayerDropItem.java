@@ -3,9 +3,6 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
-import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.gui.SelectChar;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,15 +15,9 @@ public final class OnPlayerDropItem implements Listener {
     public static void event(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
-        GameUser gameUser = EntityInfoRegistry.getGameUser(event.getPlayer());
 
         if (!player.isOp())
             event.setCancelled(true);
-
-        if (gameUser != null && gameUser.getGame().getPhase() == Game.Phase.READY) {
-            event.setCancelled(true);
-            SelectChar.getInstance().open(player);
-        }
 
         if (combatUser != null) {
             event.setCancelled(true);
