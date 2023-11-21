@@ -95,7 +95,7 @@ public class DamageModule implements CombatEntityModule {
         double damageMultiplier = attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
         double defenseMultiplier = combatEntity.getAbilityStatusManager().getAbilityStatus(Ability.DEFENSE).getValue();
         int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
-        int reducedDamage = ((int) (damage * (1 + damageMultiplier))) - finalDamage;
+        int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
 
         attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, isCrit, isUlt);
