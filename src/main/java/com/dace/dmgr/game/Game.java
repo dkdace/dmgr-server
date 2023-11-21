@@ -415,7 +415,7 @@ public final class Game implements HasTask {
             winText = "무승부";
             playDrawEffect(gameUser);
         } else if (isWinner) {
-            winColor = ChatColor.AQUA;
+            winColor = ChatColor.GREEN;
             winText = "승리";
             playWinEffect(gameUser);
         } else {
@@ -509,11 +509,10 @@ public final class Game implements HasTask {
     private int updateMoney(GameUser gameUser, Boolean isWinner) {
         UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
 
-        int xp = userData.getXp();
         int money = userData.getMoney();
         double score = gameUser.getScore();
 
-        userData.setMoney(RewardUtil.getFinalMoney(xp, money, score, isWinner));
+        userData.setMoney(RewardUtil.getFinalMoney(money, score, isWinner));
 
         return userData.getMoney() - money;
     }

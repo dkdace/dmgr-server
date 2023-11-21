@@ -23,9 +23,9 @@ public final class RewardUtil {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 경험치
      */
-    public static int getFinalXp(int xp, double score, boolean isWinner) {
+    public static int getFinalXp(int xp, double score, Boolean isWinner) {
         int finalScore = (int) (xp + 50 + score * 0.2);
-        if (isWinner)
+        if (isWinner != null && isWinner)
             finalScore += 200;
 
         return finalScore;
@@ -34,14 +34,17 @@ public final class RewardUtil {
     /**
      * 게임 결과에 따른 최종 금액을 반환한다.
      *
-     * @param xp       현재 경험치
      * @param money    현재 보유 중인 돈
      * @param score    점수
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 금액
      */
-    public static int getFinalMoney(int xp, int money, double score, boolean isWinner) {
-        return money + getFinalXp(xp, score, isWinner);
+    public static int getFinalMoney(int money, double score, Boolean isWinner) {
+        int finalScore = (int) (money + 50 + score * 0.2);
+        if (isWinner != null && isWinner)
+            finalScore += 200;
+
+        return finalScore;
     }
 
     /**
