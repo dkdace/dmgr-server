@@ -6,10 +6,7 @@ import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.HasTask;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.util.BossBarUtil;
-import com.dace.dmgr.util.SkinUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.*;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.Setter;
@@ -81,7 +78,8 @@ public final class User implements HasTask {
             @Override
             protected void onEnd() {
                 SoundUtil.play("random.good", 10F, 1F, player);
-                player.sendTitle(StringFormUtil.getLevelPrefix(userData.getLevel()) + " §e§l달성!", "", 8, 40, 30);
+                MessageUtil.sendTitle(player, StringFormUtil.getLevelPrefix(userData.getLevel()) + " §e§l달성!", "", 8,
+                        40, 30, 40);
             }
         });
     }
@@ -94,7 +92,7 @@ public final class User implements HasTask {
             @Override
             protected void onEnd() {
                 SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, 10F, 1.5F, player);
-                player.sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30);
+                MessageUtil.sendTitle(player, "§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
             }
         });
     }
@@ -107,18 +105,9 @@ public final class User implements HasTask {
             @Override
             protected void onEnd() {
                 SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, 10F, 0F, player);
-                player.sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30);
+                MessageUtil.sendTitle(player, "§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
             }
         });
-    }
-
-    /**
-     * 플레이어의 채팅창을 청소한다.
-     */
-    public void clearChat() {
-        for (int i = 0; i < 100; i++) {
-            player.sendMessage("§f");
-        }
     }
 
     /**

@@ -4,13 +4,13 @@ import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.QuitCommand;
 import com.dace.dmgr.system.command.test.*;
 import com.dace.dmgr.util.BossBarUtil;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,10 +44,8 @@ public class DMGR extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
             user.init();
-            getServer().broadcastMessage(SystemPrefix.CHAT + "플레이어 등록 : §e§n" + player.getName());
+            MessageUtil.sendMessage(player, "시스템 재부팅 완료");
         });
-        Bukkit.getOnlinePlayers().forEach((Player player) ->
-                player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 완료"));
     }
 
     /**
@@ -62,7 +60,7 @@ public class DMGR extends JavaPlugin {
             if (user != null)
                 user.getSidebar().delete();
             BossBarUtil.clearBossBar(player);
-            player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 중...");
+            MessageUtil.sendMessage(player, "시스템 재부팅 중...");
         });
     }
 

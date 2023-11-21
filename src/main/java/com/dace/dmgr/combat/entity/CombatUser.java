@@ -38,8 +38,6 @@ import com.dace.dmgr.util.*;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.Setter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -82,8 +80,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     /** 킬 기여자 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 기여도) */
     @Getter
     private final HashMap<CombatUser, Float> damageMap = new HashMap<>();
-    /** 액션바 텍스트 객체 */
-    private final TextComponent actionBar = new TextComponent();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     @Getter
     private final EnumMap<ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
@@ -212,8 +208,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         entity.setWalkSpeed((float) speed);
 
-        if (CooldownManager.getCooldown(this, Cooldown.ACTION_BAR) == 0)
-            onTickActionbar();
+        onTickActionbar();
 
         sidebar.clear();
         if (CooldownManager.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > 0)
@@ -237,7 +232,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
         text.add(character.getActionbarString(this));
 
-        sendActionBar(text.toString());
+        MessageUtil.sendActionBar(entity, text.toString());
     }
 
     /**
@@ -328,7 +323,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      * 공격했을 때 효과를 재생한다.
      */
     private void playAttackEffect() {
-        entity.sendTitle("", SUBTITLES.HIT, 0, 2, 10);
+        MessageUtil.sendTitle(entity, "", TITLES.HIT, 0, 2, 10);
         SoundUtil.play("random.stab", 0.4F, 2F, entity);
         SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, 0.4F, 1.5F, entity);
     }
@@ -337,7 +332,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      * 공격했을 때 효과를 재생한다. (치명타)
      */
     private void playCritAttackEffect() {
-        entity.sendTitle("", SUBTITLES.CRIT, 0, 2, 10);
+        MessageUtil.sendTitle(entity, "", TITLES.CRIT, 0, 2, 10);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.9F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.35F, 0F, entity);
     }
@@ -450,7 +445,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      * 다른 플레이어를 처치했을 때 효과를 재생한다.
      */
     private void playPlayerKillEffect() {
-        entity.sendTitle("", SUBTITLES.KILL_PLAYER, 0, 2, 10);
+        MessageUtil.sendTitle(entity, "", TITLES.KILL_PLAYER, 0, 2, 10);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
     }
@@ -477,7 +472,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
      * 플레이어 외의 엔티티를 처치했을 때 효과를 재생한다.
      */
     private void playEntityKillEffect() {
-        entity.sendTitle("", SUBTITLES.KILL_ENTITY, 0, 2, 10);
+        MessageUtil.sendTitle(entity, "", TITLES.KILL_ENTITY, 0, 2, 10);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1.25F, entity);
         SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.25F, entity);
     }
@@ -524,8 +519,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                     if (cooldown <= 0)
                         return false;
 
-                    entity.sendTitle(SUBTITLES.DEATH,
-                            MessageFormat.format(SUBTITLES.RESPAWN_COOLDOWN, String.format("%.1f", cooldown / 20F)), 0, 20, 10);
+                    MessageUtil.sendTitle(entity, TITLES.DEATH, MessageFormat.format(TITLES.RESPAWN_COOLDOWN,
+                            String.format("%.1f", cooldown / 20F)), 0, 20, 10);
                     entity.teleport(deadLocation);
 
                     return true;
@@ -750,29 +745,6 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     /**
-     * 플레이어에게 액션바를 전송한다.
-     *
-     * @param message       메시지
-     * @param overrideTicks 지속시간 (tick)
-     */
-    public void sendActionBar(String message, long overrideTicks) {
-        if (overrideTicks > 0)
-            CooldownManager.setCooldown(this, Cooldown.ACTION_BAR, overrideTicks);
-
-        actionBar.setText(message);
-        entity.spigot().sendMessage(ChatMessageType.ACTION_BAR, actionBar);
-    }
-
-    /**
-     * 플레이어에게 액션바를 전송한다.
-     *
-     * @param message 메시지
-     */
-    public void sendActionBar(String message) {
-        sendActionBar(message, 0);
-    }
-
-    /**
      * 출혈 효과를 재생한다.
      *
      * @param count 파티클 수
@@ -797,9 +769,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     }
 
     /**
-     * 전투에 사용되는 자막(Subtitle) 종류.
+     * 전투에 사용되는 타이틀(Title) 종류.
      */
-    private interface SUBTITLES {
+    private interface TITLES {
         /** 공격 */
         String HIT = "§f×";
         /** 공격 (치명타) */

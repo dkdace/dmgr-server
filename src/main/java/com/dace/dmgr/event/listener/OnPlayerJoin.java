@@ -5,6 +5,7 @@ import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -39,7 +40,7 @@ public final class OnPlayerJoin implements Listener {
             public void onEnd() {
                 DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
 
-                player.sendTitle(TITLE, "", 0, 100, 40);
+                MessageUtil.sendTitle(player, TITLE, "", 0, 100, 40);
                 playJoinSound();
             }
         };
@@ -47,7 +48,7 @@ public final class OnPlayerJoin implements Listener {
         TaskManager.addTask(user, new TaskWait(10) {
             @Override
             public void onEnd() {
-                user.clearChat();
+                MessageUtil.clearChat(player);
                 OnPlayerResourcePackStatus.sendResourcePack(player);
             }
         });

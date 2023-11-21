@@ -2,14 +2,13 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.system.YamlFile;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 /**
  * 유저 설정 정보를 관리하는 클래스.
  *
- * @see User
+ * @see UserData
  */
 public final class UserConfig {
     /** 설정파일 관리를 위한 객체 */

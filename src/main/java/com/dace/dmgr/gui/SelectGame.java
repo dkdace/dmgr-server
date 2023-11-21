@@ -29,38 +29,12 @@ public final class SelectGame extends Gui {
         super(2, "§8게임 시작");
     }
 
-    @Override
-    protected void onOpen(Player player, Inventory inventory) {
-        InventoryUtil.fillAll(inventory, DisplayItem.EMPTY.getItemStack());
-
-        String[] normalGamePlayModeNames =
-                Arrays.stream(GameInfoRegistry.getGamePlayModes(false))
-                        .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
-        String[] rankGamePlayModeNames =
-                Arrays.stream(GameInfoRegistry.getGamePlayModes(true))
-                        .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
-
-        inventory.setItem(0,
-                new ItemBuilder(Material.IRON_SWORD)
-                        .setName("§a§l일반")
-                        .setLore("§f랭크 점수에 반영되지 않는 일반 게임입니다.",
-                                "",
-                                "§f다음 게임 모드 중에서 무작위로 선택됨 :")
-                        .addLore(normalGamePlayModeNames)
-                        .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
-                        .build());
-        inventory.setItem(9,
-                new ItemBuilder(Material.DIAMOND_SWORD)
-                        .setName("§6§l랭크")
-                        .setLore("§f랭크 점수에 반영되는 랭크 게임입니다.",
-                                "§f랭크 게임 §e" + GameConfig.RANK_PLACEMENT_PLAY_COUNT + "판§f을 플레이하면 첫 티어 및 랭크 점수가 결정됩니다.",
-                                "§f중간 난입이 불가능한 게임입니다.",
-                                "",
-                                "§f다음 게임 모드 중에서 무작위로 선택됨 :")
-                        .addLore(rankGamePlayModeNames)
-                        .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
-                        .build());
-
+    /**
+     * GUI에 게임 방 목록을 표시한다.
+     *
+     * @param inventory 인벤토리
+     */
+    private void displayRooms(Inventory inventory) {
         for (int i = 0; i < GameConfig.MAX_ROOM_COUNT; i++) {
             ItemBuilder room;
 
@@ -108,6 +82,41 @@ public final class SelectGame extends Gui {
 
             inventory.setItem(10 + i, room.build());
         }
+    }
+
+    @Override
+    protected void onOpen(Player player, Inventory inventory) {
+        InventoryUtil.fillAll(inventory, DisplayItem.EMPTY.getItemStack());
+
+        String[] normalGamePlayModeNames =
+                Arrays.stream(GameInfoRegistry.getGamePlayModes(false))
+                        .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
+        String[] rankGamePlayModeNames =
+                Arrays.stream(GameInfoRegistry.getGamePlayModes(true))
+                        .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
+
+        inventory.setItem(0,
+                new ItemBuilder(Material.IRON_SWORD)
+                        .setName("§a§l일반")
+                        .setLore("§f랭크 점수에 반영되지 않는 일반 게임입니다.",
+                                "",
+                                "§f다음 게임 모드 중에서 무작위로 선택됨 :")
+                        .addLore(normalGamePlayModeNames)
+                        .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
+                        .build());
+        inventory.setItem(9,
+                new ItemBuilder(Material.DIAMOND_SWORD)
+                        .setName("§6§l랭크")
+                        .setLore("§f랭크 점수에 반영되는 랭크 게임입니다.",
+                                "§f랭크 게임 §e" + GameConfig.RANK_PLACEMENT_PLAY_COUNT + "판§f을 플레이하면 첫 티어 및 랭크 점수가 결정됩니다.",
+                                "§f중간 난입이 불가능한 게임입니다.",
+                                "",
+                                "§f다음 게임 모드 중에서 무작위로 선택됨 :")
+                        .addLore(rankGamePlayModeNames)
+                        .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
+                        .build());
+
+        displayRooms(inventory);
     }
 
     @Override

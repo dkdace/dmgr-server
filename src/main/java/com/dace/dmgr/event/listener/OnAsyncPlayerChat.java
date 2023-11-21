@@ -5,7 +5,7 @@ import com.dace.dmgr.lobby.UserData;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.SystemPrefix;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public final class OnAsyncPlayerChat implements Listener {
     /** 채팅을 너무 빨리 쳤을 때 표시되는 메시지 */
-    private static final String SLOW_DOWN_MESSAGE = SystemPrefix.CHAT_WARN + "채팅을 천천히 하십시오.";
+    private static final String SLOW_DOWN_MESSAGE = "채팅을 천천히 하십시오.";
 
     @EventHandler
     public static void event(AsyncPlayerChatEvent event) {
@@ -26,7 +26,7 @@ public final class OnAsyncPlayerChat implements Listener {
 
         if (!player.isOp()) {
             if (CooldownManager.getCooldown(user, Cooldown.CHAT) > 0) {
-                player.sendMessage(SLOW_DOWN_MESSAGE);
+                MessageUtil.sendMessageWarn(player, SLOW_DOWN_MESSAGE);
                 return;
             }
             CooldownManager.setCooldown(user, Cooldown.CHAT);

@@ -46,6 +46,8 @@ public enum Cooldown {
     SCORE_DISPLAY_DURATION(CombatUser.SCORE_DISPLAY_DURATION),
     /** 액션바 지속시간 */
     ACTION_BAR(0),
+    /** 타이틀 지속시간 */
+    TITLE(0),
     /** 상태 효과 지속시간 */
     STATUS_EFFECT(0),
     /** 2중 탄창 무기 교체 */

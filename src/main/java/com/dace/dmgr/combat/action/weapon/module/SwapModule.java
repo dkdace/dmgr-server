@@ -8,6 +8,7 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public final class SwapModule<T extends Weapon> implements ActionModule {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                weapon.getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.SWAPPING, StringFormUtil.getProgressBar(i,
+                MessageUtil.sendActionBar(weapon.getCombatUser().getEntity(), MessageFormat.format(MESSAGES.SWAPPING, StringFormUtil.getProgressBar(i,
                         swapDuration, ChatColor.WHITE), time), 2);
 
                 return true;
@@ -76,7 +77,7 @@ public final class SwapModule<T extends Weapon> implements ActionModule {
                     return;
 
                 swapState = targetState;
-                weapon.getCombatUser().sendActionBar(MESSAGES.SWAP_COMPLETE, 8);
+                MessageUtil.sendActionBar(weapon.getCombatUser().getEntity(), MESSAGES.SWAP_COMPLETE, 8);
                 weapon.onSwapFinished(targetState);
             }
         });

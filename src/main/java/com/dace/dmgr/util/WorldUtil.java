@@ -1,7 +1,6 @@
 package com.dace.dmgr.util;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.lobby.Lobby;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.plugin.SWMPlugin;
@@ -11,11 +10,9 @@ import com.grinderwolf.swm.plugin.config.WorldData;
 import com.grinderwolf.swm.plugin.config.WorldsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 
@@ -61,34 +58,6 @@ public final class WorldUtil {
         });
 
         DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 복제 완료 : {0} -> {1}", worldName, duplicatedName));
-    }
-
-    /**
-     * 지정한 월드를 삭제한다.
-     *
-     * @param worldName 대상 월드 이름
-     */
-    public static void removeWorld(String worldName) {
-        World world = Bukkit.getWorld(worldName);
-        if (world == null)
-            return;
-
-        for (Player player : world.getPlayers())
-            player.teleport(Lobby.lobbyLocation);
-
-        if (Bukkit.unloadWorld(world, true)) {
-            DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 비활성화 완료 : {0}", worldName));
-            CommandManager.getInstance().getWorldsInUse().remove(worldName);
-
-            Path path = Paths.get(Bukkit.getWorldContainer().getAbsolutePath(), WORLD_DIRECTORY, worldName + ".slime");
-            System.out.println(path);
-            try {
-                Files.delete(path);
-                DMGR.getPlugin().getLogger().info(MessageFormat.format("월드 삭제 완료 : {0}", worldName));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 
     /**

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action.skill.module;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.util.MessageUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -83,11 +84,11 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.teleport(currentLocation.clone().add(0, -1.75, 0).add(currentLocation.getDirection().multiply(0.25)));
         if (isValid()) {
             GlowAPI.setGlowing(pointer, GlowAPI.Color.GREEN, player);
-            skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_VALID, acceptKey.getName(),
+            MessageUtil.sendTitle(skill.getCombatUser().getEntity(), "", MessageFormat.format(MESSAGES.CHECKING_VALID, acceptKey.getName(),
                     cancelKey.getName()), 0, 5, 5);
         } else {
             GlowAPI.setGlowing(pointer, GlowAPI.Color.RED, player);
-            skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_INVALID, acceptKey.getName(),
+            MessageUtil.sendTitle(skill.getCombatUser().getEntity(), "", MessageFormat.format(MESSAGES.CHECKING_INVALID, acceptKey.getName(),
                     cancelKey.getName()), 0, 5, 5);
         }
         pointer.setAI(false);

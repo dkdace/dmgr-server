@@ -14,6 +14,7 @@ import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Location;
@@ -203,7 +204,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         public void onTick(CombatEntity combatEntity, int i) {
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getEntity().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
+                MessageUtil.sendTitle(combatEntity.getEntity(), "§c§l얼어붙음!", "", 0, 2, 10);
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                     combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,

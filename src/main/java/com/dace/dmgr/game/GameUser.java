@@ -3,6 +3,7 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.lobby.Lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.util.MessageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -75,6 +76,15 @@ public final class GameUser {
         player.teleport(getRespawnLocation());
         player.getInventory().setHeldItemSlot(8);
         player.getInventory().setItem(8, Game.SELECT_CHARACTER_ITEM);
+        player.getInventory().setHeldItemSlot(4);
+        player.getInventory().setItem(4, Game.SELECT_CHARACTER_ITEM);
+        MessageUtil.clearChat(player);
+
+        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
+        if (combatUser == null) {
+            combatUser = new CombatUser(player, this);
+            combatUser.init();
+        }
     }
 
     public void setTeam(Team team) {
