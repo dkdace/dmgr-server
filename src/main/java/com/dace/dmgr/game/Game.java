@@ -529,7 +529,7 @@ public final class Game implements HasTask {
         int normalPlayCount = userData.getNormalPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
-        int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+        int playTime = (int) ((System.currentTimeMillis() - gameUser.getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
         userData.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
@@ -554,7 +554,7 @@ public final class Game implements HasTask {
         int rankPlayCount = userData.getRankPlayCount();
         float kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
-        int playTime = (int) ((System.currentTimeMillis() - startTime) / 1000);
+        int playTime = (int) ((System.currentTimeMillis() - gameUser.getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 

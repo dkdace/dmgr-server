@@ -48,6 +48,9 @@ public final class GameUser implements HasTask {
     /** 치유량 */
     @Setter
     private int heal = 0;
+    /** 게임 시작 시점 */
+    @Getter
+    private long startTime = 0;
 
     /**
      * 게임 시스템의 플레이어 인스턴스를 생성한다.
@@ -93,8 +96,8 @@ public final class GameUser implements HasTask {
 
         if (isInSpawnRegion()) {
             if (game.getPhase() == Game.Phase.PLAYING)
-                MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER : SelectChar.MESSAGES.CHANGE_CHARACTER,
-                        0, 10, 10);
+                MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER :
+                        SelectChar.MESSAGES.CHANGE_CHARACTER, 0, 10, 10);
 
             player.getInventory().setHeldItemSlot(4);
         } else {
@@ -114,6 +117,7 @@ public final class GameUser implements HasTask {
      * 게임 시작 시 실행할 작업.
      */
     public void onStart() {
+        startTime = System.currentTimeMillis();
         player.teleport(getRespawnLocation());
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(4, Game.SELECT_CHARACTER_ITEM);
@@ -123,7 +127,8 @@ public final class GameUser implements HasTask {
             MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10,
                     game.getGamePlayMode().getReadyDuration() * 20, 30, 80);
         else
-            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10, 40, 30, 80);
+            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10,
+                    40, 30, 80);
 
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null) {
