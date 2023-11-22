@@ -419,6 +419,8 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
     public void onKill(Damageable victim) {
         if (character == null)
             return;
+        if (this == victim)
+            return;
 
         character.onKill(this, victim);
 
