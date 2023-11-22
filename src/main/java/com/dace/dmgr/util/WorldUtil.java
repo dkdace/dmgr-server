@@ -70,13 +70,19 @@ public final class WorldUtil {
             return;
 
         for (File file : worlds) {
-            if (file.getName().startsWith("_")) {
-                try {
-                    Files.delete(Paths.get(file.getPath()));
-                    DMGR.getPlugin().getLogger().info(MessageFormat.format("복제된 월드 삭제 완료 : {0}", file.getName()));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            if (!file.getName().startsWith("_"))
+                continue;
+
+            try {
+                String worldName = file.getName().replace(".slime", "");
+                World world = Bukkit.getWorld(worldName);
+                if (world != null)
+                    Bukkit.unloadWorld(world, false);
+
+                Files.delete(Paths.get(file.getPath()));
+                DMGR.getPlugin().getLogger().info(MessageFormat.format("복제된 월드 삭제 완료 : {0}", file.getName()));
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
