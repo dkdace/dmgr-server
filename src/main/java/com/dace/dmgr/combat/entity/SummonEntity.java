@@ -52,7 +52,7 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
             return false;
         if (combatEntity instanceof SummonEntity && ((SummonEntity<?>) combatEntity).owner == owner)
             return false;
-        if (team == Team.NONE || combatEntity.getTeam() == Team.NONE)
+        if (getTeam() == Team.NONE || combatEntity.getTeam() == Team.NONE)
             return true;
         return !getTeam().equals(combatEntity.getTeam());
     }

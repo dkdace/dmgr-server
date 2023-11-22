@@ -9,5 +9,7 @@ public enum DamageType {
     /** 기본 */
     NORMAL,
     /** {@link SummonEntity}를 이용한 공격 */
-    ENTITY
+    ENTITY,
+    /** 시스템 (고정 피해) */
+    SYSTEM
 }

@@ -38,7 +38,7 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     protected final Hitbox[] hitboxes;
     /** 팀 */
     @Setter
-    protected Team team = Team.NONE;
+    private Team team = Team.NONE;
     /** 모듈 목록 */
     private CombatEntityModule[] modules = new CombatEntityModule[0];
     /** 히트박스의 가능한 최대 크기 */

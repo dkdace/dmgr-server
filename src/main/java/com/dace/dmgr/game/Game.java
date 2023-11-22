@@ -285,7 +285,7 @@ public final class Game implements HasTask {
     private void onStart() {
         divideTeam();
         startTime = System.currentTimeMillis();
-        gameUsers.forEach(GameUser::onStart);
+        gameUsers.forEach(GameUser::onGameStart);
     }
 
     /**
@@ -614,7 +614,7 @@ public final class Game implements HasTask {
                 gameUser.setTeam(Team.BLUE);
 
             teamUserMap.get(gameUser.getTeam()).add(gameUser);
-            gameUser.onStart();
+            gameUser.onGameStart();
         }
 
         gameUsers.add(gameUser);

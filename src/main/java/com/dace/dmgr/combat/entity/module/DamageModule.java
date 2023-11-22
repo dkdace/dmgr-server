@@ -92,19 +92,24 @@ public class DamageModule implements CombatEntityModule {
 
         if (isCrit)
             damage *= 2;
-        double damageMultiplier = attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
-        double defenseMultiplier = combatEntity.getAbilityStatusManager().getAbilityStatus(Ability.DEFENSE).getValue();
+
+        double damageMultiplier = attacker == null ?
+                1 : attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
+        double defenseMultiplier = damageType == DamageType.SYSTEM ?
+                1 : combatEntity.getAbilityStatusManager().getAbilityStatus(Ability.DEFENSE).getValue();
         int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
         int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
 
-        attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
+        if (attacker != null)
+            attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, isCrit, isUlt);
         playHitEffect();
 
         if (getHealth() - finalDamage > 0)
             setHealth(getHealth() - finalDamage);
         else {
-            attacker.onKill(combatEntity);
+            if (attacker != null)
+                attacker.onKill(combatEntity);
             combatEntity.onDeath(attacker);
         }
     }

@@ -16,7 +16,7 @@ public final class OnPlayerSwapHandItems implements Listener {
         Player player = event.getPlayer();
         GameUser gameUser = EntityInfoRegistry.getGameUser(event.getPlayer());
 
-        if (gameUser != null && gameUser.isInSpawnRegion()) {
+        if (gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) {
             event.setCancelled(true);
             SelectChar.getInstance().open(player);
         }

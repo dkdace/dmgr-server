@@ -253,6 +253,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
     @Override
     public boolean canBeTargeted() {
+        if (gameUser != null && gameUser.getSpawnRegionTeam() == getTeam())
+            return false;
+
         return !isDead();
     }
 

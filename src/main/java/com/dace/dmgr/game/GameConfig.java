@@ -20,6 +20,8 @@ public final class GameConfig {
     public static final int RANK_PLACEMENT_PLAY_COUNT;
     /** 게임 시작까지 필요한 대기 시간 (초) */
     public static final int WAITING_TIME;
+    /** 상대 팀 스폰 입장 시 초당 피해량 */
+    public static final int OPPOSITE_SPAWN_DAMAGE_PER_SECOND;
     /** 설정파일 관리를 위한 객체 */
     private static final YamlFile yamlFile = new YamlFile("GameConfig");
 
@@ -31,5 +33,6 @@ public final class GameConfig {
         RANK_MAX_PLAYER_COUNT = yamlFile.get("rankMaxPlayerCount", 12);
         RANK_PLACEMENT_PLAY_COUNT = yamlFile.get("rankPlacementPlayCount", 5);
         WAITING_TIME = yamlFile.get("waitingTime", 30);
+        OPPOSITE_SPAWN_DAMAGE_PER_SECOND = yamlFile.get("oppositeSpawnDamagePerSecond", 250);
     }
 }

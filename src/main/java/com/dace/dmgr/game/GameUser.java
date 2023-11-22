@@ -1,5 +1,7 @@
 package com.dace.dmgr.game;
 
+import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.gui.SelectChar;
@@ -78,7 +80,7 @@ public final class GameUser implements HasTask {
         TaskManager.addTask(this, new TaskTimer(1) {
             @Override
             public boolean onTimerTick(int i) {
-                onTick(i);
+                onTick();
                 return true;
             }
         });
@@ -86,24 +88,26 @@ public final class GameUser implements HasTask {
 
     /**
      * 매 tick마다 실행할 작업.
-     *
-     * @param i 인덱스
      */
-    private void onTick(int i) {
+    private void onTick() {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null)
             return;
 
-        if (isInSpawnRegion()) {
-            if (game.getPhase() == Game.Phase.PLAYING)
-                MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER :
-                        SelectChar.MESSAGES.CHANGE_CHARACTER, 0, 10, 10);
+        if (getSpawnRegionTeam() != null) {
+            if (getSpawnRegionTeam() == team) {
+                if (game.getPhase() == Game.Phase.PLAYING)
+                    MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER :
+                            SelectChar.MESSAGES.CHANGE_CHARACTER, 0, 10, 10);
 
-            player.getInventory().setHeldItemSlot(4);
-        } else {
-            if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
-                player.teleport(getRespawnLocation());
-        }
+                player.getInventory().setHeldItemSlot(4);
+            } else {
+                combatUser.getDamageModule().damage((Attacker) null, GameConfig.OPPOSITE_SPAWN_DAMAGE_PER_SECOND / 20, DamageType.SYSTEM,
+                        false, false);
+                MessageUtil.sendTitle(player, "", TITLES.OPPOSITE_SPAWN, 0, 10, 10);
+            }
+        } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
+            player.teleport(getRespawnLocation());
     }
 
     /**
@@ -116,7 +120,7 @@ public final class GameUser implements HasTask {
     /**
      * 게임 시작 시 실행할 작업.
      */
-    public void onStart() {
+    public void onGameStart() {
         startTime = System.currentTimeMillis();
         player.teleport(getRespawnLocation());
         player.getInventory().setHeldItemSlot(4);
@@ -183,16 +187,24 @@ public final class GameUser implements HasTask {
     }
 
     /**
-     * 플레이어가 팀 스폰 지역에 있는 지 확인한다.
+     * 플레이어가 있는 스폰 지역의 팀을 확인한다.
      *
-     * @return 팀 스폰 지역에 있으면 {@code true} 반환
+     * @return 해당 스폰 지역의 팀. 플레이어가 팀 스폰 외부에 있으면 {@code null} 반환
      */
-    public boolean isInSpawnRegion() {
-        if (team == Team.RED)
-            return LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.RED_SPAWN_CHECK_BLOCK);
-        else if (team == Team.BLUE)
-            return LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.BLUE_SPAWN_CHECK_BLOCK);
+    public Team getSpawnRegionTeam() {
+        if (LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.RED_SPAWN_CHECK_BLOCK))
+            return Team.RED;
+        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.BLUE_SPAWN_CHECK_BLOCK))
+            return Team.BLUE;
 
-        return false;
+        return null;
+    }
+
+    /**
+     * 게임에 사용되는 타이틀(Title) 종류.
+     */
+    private interface TITLES {
+        /** 상대 팀 스폰 지역 입장 시 메시지 */
+        String OPPOSITE_SPAWN = "§c상대 팀의 스폰 지역입니다.";
     }
 }
