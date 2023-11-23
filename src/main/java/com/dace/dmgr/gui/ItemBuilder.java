@@ -136,7 +136,18 @@ public final class ItemBuilder {
     /**
      * 아이템의 설명을 설정한다.
      *
-     * @param lores 설명
+     * @param lore 설명 ('\n'으로 줄바꿈)
+     * @return ItemBuilder
+     */
+    public ItemBuilder setLore(String lore) {
+        itemMeta.setLore(Arrays.asList(lore.split("\n")));
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 설정한다.
+     *
+     * @param lores 설명 목록
      * @return ItemBuilder
      */
     public ItemBuilder setLore(String... lores) {
@@ -147,13 +158,26 @@ public final class ItemBuilder {
     /**
      * 아이템의 설명을 추가한다.
      *
-     * @param lores 추가할 설명
+     * @param lore 추가할 설명 ('\n'으로 줄바꿈)
+     * @return ItemBuilder
+     */
+    public ItemBuilder addLore(String lore) {
+        List<String> _lore = itemMeta.getLore();
+        _lore.addAll(Arrays.asList(lore.split("\n")));
+        itemMeta.setLore(_lore);
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 추가한다.
+     *
+     * @param lores 추가할 설명 목록
      * @return ItemBuilder
      */
     public ItemBuilder addLore(String... lores) {
-        List<String> lore = itemMeta.getLore();
-        lore.addAll(Arrays.asList(lores));
-        itemMeta.setLore(lore);
+        List<String> _lore = itemMeta.getLore();
+        _lore.addAll(Arrays.asList(lores));
+        itemMeta.setLore(_lore);
         return this;
     }
 
