@@ -496,7 +496,7 @@ public final class Game implements HasTask {
 
         userData.setXp(RewardUtil.getFinalXp(xp, score, isWinner));
 
-        return userData.getXp() - xp;
+        return RewardUtil.getFinalXp(xp, score, isWinner) - xp;
     }
 
     /**
