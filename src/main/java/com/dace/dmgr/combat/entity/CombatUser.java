@@ -526,7 +526,7 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
 
                     MessageUtil.sendTitle(entity, TITLES.DEATH, MessageFormat.format(TITLES.RESPAWN_COOLDOWN,
                             String.format("%.1f", cooldown / 20F)), 0, 20, 10);
-                    entity.teleport(deadLocation);
+                    LocationUtil.teleportPlayer(entity, deadLocation);
 
                     return true;
                 }
@@ -537,9 +537,9 @@ public final class CombatUser extends CombatEntityBase<Player> implements Healab
                     entity.setGameMode(GameMode.SURVIVAL);
 
                     if (gameUser == null)
-                        entity.teleport(Lobby.lobbyLocation);
+                        LocationUtil.teleportPlayer(entity, Lobby.lobbyLocation);
                     else
-                        entity.teleport(gameUser.getRespawnLocation());
+                        LocationUtil.teleportPlayer(entity, gameUser.getRespawnLocation());
 
                     weapon.reset();
                     skillMap.forEach((skillInfo, skill) -> skill.reset());

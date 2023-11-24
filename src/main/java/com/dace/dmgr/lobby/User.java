@@ -1,5 +1,6 @@
 package com.dace.dmgr.lobby;
 
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
@@ -20,10 +22,14 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
  */
 @Getter
 public final class User implements HasTask {
+    /** {@link User#nameTagHider}의 고유 이름 */
+    public static final String NAME_TAG_HIDER_CUSTOM_NAME = "nametag";
     /** 플레이어 객체 */
     private final Player player;
     /** 유저 데이터 정보 객체 */
     private final UserData userData;
+    /** 이름표 숨기기용 갑옷 거치대 객체 */
+    private ArmorStand nameTagHider;
     /** 플레이어 사이드바 */
     @Setter
     private BPlayerBoard sidebar;
@@ -51,18 +57,43 @@ public final class User implements HasTask {
     public void init() {
         EntityInfoRegistry.addUser(player, this);
         Lobby.lobbyTick(this);
+        hideNameTag();
     }
 
     /**
      * 유저를 제거한다.
      */
     public void remove() {
+        reset();
+
         EntityInfoRegistry.removeUser(player);
         TaskManager.clearTask(this);
+        BossBarUtil.clearBossBar(player);
+        sidebar.delete();
+        nameTagHider.remove();
 
         GameUser gameUser = EntityInfoRegistry.getGameUser(player);
         if (gameUser != null)
             gameUser.getGame().removePlayer(player);
+    }
+
+    /**
+     * 플레이어의 이름표를 숨긴다.
+     */
+    private void hideNameTag() {
+        if (nameTagHider == null) {
+            nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
+            nameTagHider.setCustomName(NAME_TAG_HIDER_CUSTOM_NAME);
+            nameTagHider.setSilent(true);
+            nameTagHider.setInvulnerable(true);
+            nameTagHider.setGravity(false);
+            nameTagHider.setAI(false);
+            nameTagHider.setMarker(true);
+            nameTagHider.setVisible(false);
+        }
+
+        if (!player.getPassengers().contains(nameTagHider))
+            player.addPassenger(nameTagHider);
     }
 
     @Override
@@ -114,7 +145,8 @@ public final class User implements HasTask {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
-        SkinUtil.resetSkin(player);
+        if (DMGR.getPlugin().isEnabled())
+            SkinUtil.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getInventory().clear();

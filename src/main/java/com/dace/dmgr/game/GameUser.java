@@ -114,7 +114,7 @@ public final class GameUser implements HasTask {
                         false, false);
             }
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
-            player.teleport(getRespawnLocation());
+            LocationUtil.teleportPlayer(player, getRespawnLocation());
     }
 
     /**
@@ -130,9 +130,9 @@ public final class GameUser implements HasTask {
      */
     public void onGameStart() {
         startTime = System.currentTimeMillis();
-        player.teleport(getRespawnLocation());
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(4, Game.SELECT_CHARACTER_ITEM);
+        LocationUtil.teleportPlayer(player, getRespawnLocation());
         MessageUtil.clearChat(player);
 
         if (game.getPhase() == Game.Phase.READY)

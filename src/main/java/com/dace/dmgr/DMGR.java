@@ -9,10 +9,11 @@ import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
 import com.dace.dmgr.system.command.QuitCommand;
 import com.dace.dmgr.system.command.test.*;
-import com.dace.dmgr.util.BossBarUtil;
 import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,11 +56,15 @@ public class DMGR extends JavaPlugin {
     public void onDisable() {
         getLogger().info("플러그인 비활성화 완료");
 
+        Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
+                .filter(entity -> entity.getType() == EntityType.ARMOR_STAND && entity.getCustomName() != null &&
+                        entity.getCustomName().equals(User.NAME_TAG_HIDER_CUSTOM_NAME))
+                .forEach(Entity::remove);
+
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = EntityInfoRegistry.getUser(player);
             if (user != null)
-                user.getSidebar().delete();
-            BossBarUtil.clearBossBar(player);
+                user.remove();
             MessageUtil.sendMessage(player, "시스템 재부팅 중...");
         });
     }

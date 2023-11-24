@@ -3,6 +3,7 @@ package com.dace.dmgr.lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,7 +29,7 @@ public final class Lobby {
     public static void spawn(Player player) {
         User user = EntityInfoRegistry.getUser(player);
 
-        player.teleport(lobbyLocation);
+        LocationUtil.teleportPlayer(player, lobbyLocation);
         user.reset();
     }
 

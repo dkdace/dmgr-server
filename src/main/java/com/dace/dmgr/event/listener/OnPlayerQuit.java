@@ -25,7 +25,6 @@ public final class OnPlayerQuit implements Listener {
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         User user = EntityInfoRegistry.getUser(player);
-        user.reset();
         user.remove();
 
         event.setQuitMessage(PREFIX + player.getName());
