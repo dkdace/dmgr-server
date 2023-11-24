@@ -16,6 +16,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 /**
  * 유저 정보를 관리하는 클래스.
@@ -57,6 +59,7 @@ public final class User implements HasTask {
     public void init() {
         EntityInfoRegistry.addUser(player, this);
         Lobby.lobbyTick(this);
+        disableCollision();
 
         TaskManager.addTask(this, new TaskWait(1) {
             @Override
@@ -100,6 +103,19 @@ public final class User implements HasTask {
 
         if (!player.getPassengers().contains(nameTagHider))
             player.addPassenger(nameTagHider);
+    }
+
+    /**
+     * 플레이어끼리 밀치는 것을 비활성화한다.
+     */
+    private void disableCollision() {
+        Scoreboard scoreBoard = player.getScoreboard();
+        Team team = scoreBoard.getTeam("Default");
+        if (team == null)
+            team = scoreBoard.registerNewTeam("Default");
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+        team.addEntry(player.getName());
     }
 
     @Override
