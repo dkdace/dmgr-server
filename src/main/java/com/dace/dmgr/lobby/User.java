@@ -57,7 +57,13 @@ public final class User implements HasTask {
     public void init() {
         EntityInfoRegistry.addUser(player, this);
         Lobby.lobbyTick(this);
-        hideNameTag();
+
+        TaskManager.addTask(this, new TaskWait(1) {
+            @Override
+            protected void onEnd() {
+                initNameTagHider();
+            }
+        });
     }
 
     /**
@@ -78,9 +84,9 @@ public final class User implements HasTask {
     }
 
     /**
-     * 플레이어의 이름표를 숨긴다.
+     * {@link User#nameTagHider}를 초기화한다.
      */
-    private void hideNameTag() {
+    private void initNameTagHider() {
         if (nameTagHider == null) {
             nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
             nameTagHider.setCustomName(NAME_TAG_HIDER_CUSTOM_NAME);
