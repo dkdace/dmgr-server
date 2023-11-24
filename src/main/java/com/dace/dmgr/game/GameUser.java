@@ -96,6 +96,9 @@ public final class GameUser implements HasTask {
             return;
 
         if (getSpawnRegionTeam() != null) {
+            if (game.getPhase() == Game.Phase.READY)
+                return;
+
             if (getSpawnRegionTeam() == team) {
                 player.getInventory().setHeldItemSlot(4);
 
@@ -119,6 +122,7 @@ public final class GameUser implements HasTask {
      */
     public void remove() {
         EntityInfoRegistry.removeGameUser(player);
+        TaskManager.clearTask(this);
     }
 
     /**
