@@ -3,6 +3,7 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.gui.SelectChar;
 import com.dace.dmgr.lobby.Lobby;
@@ -96,15 +97,18 @@ public final class GameUser implements HasTask {
 
         if (getSpawnRegionTeam() != null) {
             if (getSpawnRegionTeam() == team) {
+                player.getInventory().setHeldItemSlot(4);
+
                 if (game.getPhase() == Game.Phase.PLAYING)
                     MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER :
                             SelectChar.MESSAGES.CHANGE_CHARACTER, 0, 10, 10);
 
-                player.getInventory().setHeldItemSlot(4);
+                combatUser.getDamageModule().heal((Healer) null, GameConfig.TEAM_SPAWN_HEAL_PER_SECOND / 20, false);
             } else {
+                MessageUtil.sendTitle(player, "", TITLES.OPPOSITE_SPAWN, 0, 10, 10);
+
                 combatUser.getDamageModule().damage((Attacker) null, GameConfig.OPPOSITE_SPAWN_DAMAGE_PER_SECOND / 20, DamageType.SYSTEM,
                         false, false);
-                MessageUtil.sendTitle(player, "", TITLES.OPPOSITE_SPAWN, 0, 10, 10);
             }
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
             player.teleport(getRespawnLocation());
