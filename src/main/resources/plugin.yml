@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.dace.dmgr.DMGR
 prefix: DMGR
 database: false
-depend: [ WorldEdit, WorldGuard, ProtocolLib, PacketWrapper, SkinsRestorer, Netherboard, GlowAPI, Tabbed ]
+depend: [ WorldEdit, WorldGuard, ProtocolLib, PacketWrapper, SkinsRestorer, Netherboard, GlowAPI ]
 authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:
