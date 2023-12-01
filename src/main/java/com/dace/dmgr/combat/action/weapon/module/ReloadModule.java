@@ -8,6 +8,7 @@ import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.MessageUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -83,7 +84,7 @@ public final class ReloadModule implements ActionModule {
                     return false;
 
                 String time = String.format("%.1f", (float) (repeat - i) / 20);
-                weapon.getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.RELOADING, StringFormUtil.getProgressBar(i,
+                MessageUtil.sendActionBar(weapon.getCombatUser().getEntity(), MessageFormat.format(MESSAGES.RELOADING, StringFormUtil.getProgressBar(i,
                         reloadDuration, ChatColor.WHITE), time), 2);
                 weapon.onReloadTick(i);
 
@@ -96,7 +97,7 @@ public final class ReloadModule implements ActionModule {
                 if (cancelled)
                     return;
 
-                weapon.getCombatUser().sendActionBar(MESSAGES.RELOAD_COMPLETE, 8);
+                MessageUtil.sendActionBar(weapon.getCombatUser().getEntity(), MESSAGES.RELOAD_COMPLETE, 8);
 
                 remainingAmmo = capacity;
                 isReloading = false;

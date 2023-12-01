@@ -3,6 +3,7 @@ package com.dace.dmgr.lobby;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,7 +29,7 @@ public final class Lobby {
     public static void spawn(Player player) {
         User user = EntityInfoRegistry.getUser(player);
 
-        player.teleport(lobbyLocation);
+        LocationUtil.teleportPlayer(player, lobbyLocation);
         user.reset();
     }
 
@@ -41,31 +42,50 @@ public final class Lobby {
      */
     public static void lobbyTick(User user) {
         Player player = user.getPlayer();
+        UserData userData = user.getUserData();
 
         TaskManager.addTask(user, new TaskTimer(20) {
             @Override
             public boolean onTimerTick(int i) {
-                if (user.getUserConfig().isNightVision())
+                if (userData.getUserConfig().isNightVision())
                     player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 0, false, false));
                 else
                     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-                int reqXp = user.getNextLevelXp();
-                int reqRank = user.getNextTierScore();
-                int curRank = user.getCurrentTierScore();
-                user.getLobbySidebar().clear();
-                user.getLobbySidebar().setName("§b§n" + player.getName());
-                user.getLobbySidebar().setAll(
-                        "§f",
-                        "§e보유 중인 돈",
-                        "§6" + String.format("%,d", user.getMoney()),
-                        "§f§f",
-                        "§f레벨 : " + user.getLevelPrefix(),
-                        StringFormUtil.getProgressBar(user.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + user.getXp() + "/" + reqXp + "]",
-                        "§f§f§f",
-                        "§f랭크 : " + user.getTierPrefix(),
-                        StringFormUtil.getProgressBar(user.getRank() - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + user.getRank() + "/" + reqRank + "]"
-                );
+                if (EntityInfoRegistry.getCombatUser(player) == null) {
+                    int reqXp = userData.getNextLevelXp();
+                    int rank = userData.isRanked() ? userData.getRankRate() : 0;
+                    int reqRank = userData.getTier().getMaxScore();
+                    int curRank = userData.getTier().getMinScore();
+
+                    switch (userData.getTier()) {
+                        case STONE:
+                            curRank = userData.getTier().getMaxScore();
+                            break;
+                        case DIAMOND:
+                        case NETHERITE:
+                            reqRank = userData.getTier().getMinScore();
+                            break;
+                        case NONE:
+                            reqRank = 1;
+                            curRank = 0;
+                            break;
+                    }
+
+                    user.getSidebar().clear();
+                    user.getSidebar().setName("§b§n" + player.getName());
+                    user.getSidebar().setAll(
+                            "§f",
+                            "§e보유 중인 돈",
+                            "§6" + String.format("%,d", userData.getMoney()),
+                            "§f§f",
+                            "§f레벨 : " + StringFormUtil.getLevelPrefix(userData.getLevel()),
+                            StringFormUtil.getProgressBar(userData.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + userData.getXp() + "/" + reqXp + "]",
+                            "§f§f§f",
+                            "§f랭크 : " + userData.getTier().getPrefix(),
+                            StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA) + " §3[" + rank + "/" + reqRank + "]"
+                    );
+                }
 
                 return true;
             }

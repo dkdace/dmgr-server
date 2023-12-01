@@ -17,7 +17,7 @@ public final class OnPlayerInteract implements Listener {
         if (combatUser != null) {
             if (event.hasBlock())
                 event.setCancelled(true);
-            if (combatUser.getCharacter() == null)
+            if (combatUser.getCharacterType() == null)
                 return;
 
             switch (event.getAction()) {

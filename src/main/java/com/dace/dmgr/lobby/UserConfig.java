@@ -2,12 +2,13 @@ package com.dace.dmgr.lobby;
 
 import com.dace.dmgr.system.YamlFile;
 import lombok.Getter;
-import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 /**
  * 유저 설정 정보를 관리하는 클래스.
  *
- * @see User
+ * @see UserData
  */
 public final class UserConfig {
     /** 설정파일 관리를 위한 객체 */
@@ -26,10 +27,10 @@ public final class UserConfig {
      *
      * <p>{@link User}가 생성될 때 호출되어야 한다.</p>
      *
-     * @param player 대상 플레이어
+     * @param playerUUID 대상 플레이어 UUID
      */
-    public UserConfig(Player player) {
-        this.yamlFile = new YamlFile("UserConfig/" + player.getUniqueId().toString());
+    public UserConfig(UUID playerUUID) {
+        this.yamlFile = new YamlFile("UserConfig/" + playerUUID);
         this.koreanChat = yamlFile.get("koreanChat", koreanChat);
         this.nightVision = yamlFile.get("nightVision", nightVision);
         this.chatSound = yamlFile.get("chatSound", chatSound);

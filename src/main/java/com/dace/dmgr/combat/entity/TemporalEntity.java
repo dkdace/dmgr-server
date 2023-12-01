@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -33,7 +32,6 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     public void init() {
         super.init();
 
-        EntityInfoRegistry.addTemporalEntity(getEntity(), this);
         if (getAbilityStatusManager().getAbilityStatus(Ability.SPEED).getBaseValue() == 0)
             getAbilityStatusManager().getAbilityStatus(Ability.SPEED).setBaseValue(getEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
                     .getBaseValue());
@@ -44,7 +42,6 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     public void remove() {
         super.remove();
 
-        EntityInfoRegistry.removeTemporalEntity(getEntity());
         TaskManager.clearTask(this);
         getEntity().remove();
     }

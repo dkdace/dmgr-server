@@ -2,6 +2,7 @@ package com.dace.dmgr.gui.menu;
 
 import com.dace.dmgr.gui.Gui;
 import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.gui.SelectGame;
 import com.dace.dmgr.gui.item.ButtonItem;
 import com.dace.dmgr.gui.item.DisplayItem;
 import com.dace.dmgr.util.InventoryUtil;
@@ -77,7 +78,7 @@ public final class Menu extends Gui {
         if (event.getClick() == ClickType.LEFT) {
             switch (clickItemName) {
                 case "게임 시작":
-                    player.performCommand("시작");
+                    SelectGame.getInstance().open(player);
                     break;
                 case "이동":
                     player.performCommand("이동");

@@ -3,6 +3,8 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
+import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -13,12 +15,17 @@ public final class OnPlayerItemHeld implements Listener {
     @EventHandler
     public static void event(PlayerItemHeldEvent event) {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
+        GameUser gameUser = EntityInfoRegistry.getGameUser(event.getPlayer());
         int newSlot = event.getNewSlot();
 
+        if (gameUser != null && gameUser.getGame().getPhase() == Game.Phase.READY) {
+            event.setCancelled(true);
+            return;
+        }
         if (combatUser != null) {
             event.setCancelled(true);
 
-            if (combatUser.getCharacter() != null && newSlot < 4) {
+            if (combatUser.getCharacterType() != null && newSlot < 4) {
                 ActionKey actionKey = null;
 
                 switch (newSlot) {

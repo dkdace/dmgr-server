@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.Projectile;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.Healer;
 
 /**
  * 치유를 받을 수 있는 엔티티의 모듈 클래스.
@@ -28,7 +28,8 @@ public final class HealModule extends DamageModule {
         if (getHealth() == getMaxHealth())
             return;
 
-        provider.onGiveHeal((Healable) combatEntity, amount, isUlt);
+        if (provider != null)
+            provider.onGiveHeal((Healable) combatEntity, amount, isUlt);
         ((Healable) combatEntity).onTakeHeal(provider, amount, isUlt);
 
         setHealth(getHealth() + amount);

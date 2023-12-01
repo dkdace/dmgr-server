@@ -3,7 +3,6 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
 import com.dace.dmgr.util.SoundUtil;
@@ -26,11 +25,9 @@ public final class OnPlayerQuit implements Listener {
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         User user = EntityInfoRegistry.getUser(player);
-        user.reset();
+        user.remove();
 
         event.setQuitMessage(PREFIX + player.getName());
-        TaskManager.clearTask(user);
-        EntityInfoRegistry.removeUser(player);
 
         new TaskWait(1) {
             @Override

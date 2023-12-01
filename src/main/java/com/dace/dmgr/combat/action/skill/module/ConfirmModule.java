@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.system.task.ActionTaskTimer;
 import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.MessageUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +47,7 @@ public class ConfirmModule implements ActionModule {
                     if (!isChecking)
                         return false;
 
-                    skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING, acceptKey.getName(), cancelKey.getName()),
+                    MessageUtil.sendTitle(skill.getCombatUser().getEntity(), "", MessageFormat.format(MESSAGES.CHECKING, acceptKey.getName(), cancelKey.getName()),
                             0, 5, 5);
                     skill.onCheckTick(i);
                     onCheckTick(i);

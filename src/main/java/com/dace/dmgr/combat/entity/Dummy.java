@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.gui.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Color;
@@ -44,6 +45,11 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
+    public Game getGame() {
+        return null;
+    }
+
+    @Override
     protected CombatEntityModule[] getModules() {
         return new CombatEntityModule[]{damageModule};
     }
@@ -52,7 +58,6 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     public void init() {
         super.init();
 
-        setTeam("DUMMY");
         entity.setBaby(false);
         entity.setAI(false);
 
@@ -75,7 +80,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt) {
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.MessageUtil;
 
 /**
  * 기절 상태 효과를 처리하는 클래스.
@@ -21,7 +22,7 @@ public class Stun implements StatusEffect {
     @Override
     public void onTick(CombatEntity combatEntity, int i) {
         if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getEntity().sendTitle("§c§l기절함!", "", 0, 2, 10);
+            MessageUtil.sendTitle(combatEntity.getEntity(), "§c§l기절함!", "", 0, 2, 10);
     }
 
     @Override

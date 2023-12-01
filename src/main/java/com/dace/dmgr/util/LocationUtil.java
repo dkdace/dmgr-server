@@ -1,7 +1,11 @@
 package com.dace.dmgr.util;
 
+import com.dace.dmgr.lobby.User;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
 
@@ -9,6 +13,23 @@ import org.bukkit.util.Vector;
  * 위치 관련 기능을 제공하는 클래스.
  */
 public final class LocationUtil {
+    /**
+     * 플레이어를 지정한 위치로 순간이동 시킨다.
+     *
+     * <p>이름표 숨기기 기능으로 인해 기본 텔레포트가 되지 않기 때문에 사용한다.</p>
+     *
+     * @param player   대상 플레이어
+     * @param location 이동시킬 위치
+     */
+    public static void teleportPlayer(Player player, Location location) {
+        User user = EntityInfoRegistry.getUser(player);
+
+        player.removePassenger(user.getNameTagHider());
+        player.teleport(location);
+        user.getNameTagHider().teleport(location);
+        player.addPassenger(user.getNameTagHider());
+    }
+
     /**
      * 지정한 블록이 통과할 수 있는 블록인 지 확인한다.
      *
@@ -147,5 +168,21 @@ public final class LocationUtil {
      */
     public static Location getLocationFromOffset(Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
+    }
+
+    /**
+     * 지정한 위치의 특정 Y 좌표에 특정 블록이 있는 지 확인한다.
+     *
+     * <p>주로 간단하게 지역을 확인할 때 사용한다.</p>
+     *
+     * @param location    확인할 위치
+     * @param yCoordinate Y 좌표
+     * @param material    블록의 종류
+     * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에 있으면 {@code true} 반환
+     */
+    public static boolean isInSameBlockXZ(Location location, int yCoordinate, Material material) {
+        Location loc = location.clone();
+        loc.setY(yCoordinate);
+        return loc.getBlock().getType() == material;
     }
 }

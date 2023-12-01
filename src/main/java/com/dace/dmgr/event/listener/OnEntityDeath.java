@@ -1,6 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.TemporalEntity;
 import com.dace.dmgr.system.EntityInfoRegistry;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -13,7 +14,7 @@ public final class OnEntityDeath implements Listener {
         LivingEntity entity = event.getEntity();
         CombatEntity combatEntity = EntityInfoRegistry.getCombatEntity(entity);
 
-        if (combatEntity != null)
+        if (combatEntity instanceof TemporalEntity)
             combatEntity.remove();
     }
 }

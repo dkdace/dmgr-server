@@ -14,7 +14,7 @@ public final class OnPlayerToggleSprint implements Listener {
     public static void event(PlayerToggleSprintEvent event) {
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
 
-        if (combatUser != null && combatUser.getCharacter() != null) {
+        if (combatUser != null && combatUser.getCharacterType() != null) {
             CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.SPRINT);
 
             Bukkit.getServer().getPluginManager().callEvent(newEvent);

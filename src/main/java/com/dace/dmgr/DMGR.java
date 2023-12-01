@@ -4,13 +4,16 @@ import com.dace.dmgr.combat.event.CombatEventManager;
 import com.dace.dmgr.event.MainEventManager;
 import com.dace.dmgr.lobby.User;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.SystemPrefix;
 import com.dace.dmgr.system.command.LobbyCommand;
 import com.dace.dmgr.system.command.MenuCommand;
 import com.dace.dmgr.system.command.PlayerOptionCommand;
-import com.dace.dmgr.system.command.test.DummyCommand;
-import com.dace.dmgr.system.command.test.SelectCharCommand;
+import com.dace.dmgr.system.command.QuitCommand;
+import com.dace.dmgr.system.command.test.*;
+import com.dace.dmgr.util.MessageUtil;
+import com.dace.dmgr.util.WorldUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,19 +35,18 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        getLogger().info(SystemPrefix.LOG + "플러그인 활성화 완료");
+        getLogger().info("플러그인 활성화 완료");
         MainEventManager.init();
         CombatEventManager.init();
+        WorldUtil.clearDuplicatedWorlds();
         registerCommands();
         registerTestCommands();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = new User(player);
             user.init();
-            getServer().broadcastMessage(SystemPrefix.CHAT + "플레이어 등록 : §e§n" + player.getName());
+            MessageUtil.sendMessage(player, "시스템 재부팅 완료");
         });
-        Bukkit.getOnlinePlayers().forEach((Player player) ->
-                player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 완료"));
     }
 
     /**
@@ -52,13 +54,18 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        getLogger().info(SystemPrefix.LOG + "플러그인 비활성화 완료");
+        getLogger().info("플러그인 비활성화 완료");
+
+        Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
+                .filter(entity -> entity.getType() == EntityType.ARMOR_STAND && entity.getCustomName() != null &&
+                        entity.getCustomName().equals(User.NAME_TAG_HIDER_CUSTOM_NAME))
+                .forEach(Entity::remove);
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = EntityInfoRegistry.getUser(player);
             if (user != null)
-                user.getLobbySidebar().delete();
-            player.sendMessage(SystemPrefix.CHAT + "시스템 재부팅 중...");
+                user.remove();
+            MessageUtil.sendMessage(player, "시스템 재부팅 중...");
         });
     }
 
@@ -69,6 +76,7 @@ public class DMGR extends JavaPlugin {
         getCommand("스폰").setExecutor(new LobbyCommand());
         getCommand("메뉴").setExecutor(new MenuCommand());
         getCommand("설정").setExecutor(new PlayerOptionCommand());
+        getCommand("퇴장").setExecutor(new QuitCommand());
     }
 
     /**
@@ -77,5 +85,8 @@ public class DMGR extends JavaPlugin {
     private void registerTestCommands() {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
+        getCommand("게임").setExecutor(new GameTestCommand());
+        getCommand("랭크설정").setExecutor(new RankRateTestCommand());
+        getCommand("경험치설정").setExecutor(new XpTestCommand());
     }
 }

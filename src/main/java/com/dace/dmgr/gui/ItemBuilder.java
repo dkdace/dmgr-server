@@ -1,5 +1,6 @@
 package com.dace.dmgr.gui;
 
+import com.dace.dmgr.util.SkinUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -62,6 +64,17 @@ public final class ItemBuilder {
     }
 
     /**
+     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 스킨의 머리로 생성한다.
+     *
+     * @param skin 스킨
+     * @return ItemBuilder
+     * @see com.dace.dmgr.util.SkinUtil.Skin
+     */
+    public static ItemBuilder fromPlayerSkull(SkinUtil.Skin skin) {
+        return fromPlayerSkull(SkinUtil.getSkinUrl(skin));
+    }
+
+    /**
      * 아이템을 생성하기 위한 빌더 인스턴스를 {@link PlayerSkull}으로 생성한다.
      *
      * @param playerSkull 플레이어 머리 아이템
@@ -69,11 +82,21 @@ public final class ItemBuilder {
      * @see PlayerSkull
      */
     public static ItemBuilder fromPlayerSkull(PlayerSkull playerSkull) {
+        return fromPlayerSkull(playerSkull.getUrl());
+    }
+
+    /**
+     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 스킨 URL의 머리로 생성한다.
+     *
+     * @param skinUrl 스킨 URL
+     * @return ItemBuilder
+     */
+    private static ItemBuilder fromPlayerSkull(String skinUrl) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
         SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-        gameProfile.getProperties().put("textures", new Property("textures", playerSkull.getUrl()));
+        gameProfile.getProperties().put("textures", new Property("textures", skinUrl));
 
         try {
             if (profileField == null) {
@@ -113,11 +136,48 @@ public final class ItemBuilder {
     /**
      * 아이템의 설명을 설정한다.
      *
-     * @param lores 설명
+     * @param lore 설명 ('\n'으로 줄바꿈)
+     * @return ItemBuilder
+     */
+    public ItemBuilder setLore(String lore) {
+        itemMeta.setLore(Arrays.asList(lore.split("\n")));
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 설정한다.
+     *
+     * @param lores 설명 목록
      * @return ItemBuilder
      */
     public ItemBuilder setLore(String... lores) {
         itemMeta.setLore(Arrays.asList(lores));
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 추가한다.
+     *
+     * @param lore 추가할 설명 ('\n'으로 줄바꿈)
+     * @return ItemBuilder
+     */
+    public ItemBuilder addLore(String lore) {
+        List<String> _lore = itemMeta.getLore();
+        _lore.addAll(Arrays.asList(lore.split("\n")));
+        itemMeta.setLore(_lore);
+        return this;
+    }
+
+    /**
+     * 아이템의 설명을 추가한다.
+     *
+     * @param lores 추가할 설명 목록
+     * @return ItemBuilder
+     */
+    public ItemBuilder addLore(String... lores) {
+        List<String> _lore = itemMeta.getLore();
+        _lore.addAll(Arrays.asList(lores));
+        itemMeta.setLore(_lore);
         return this;
     }
 

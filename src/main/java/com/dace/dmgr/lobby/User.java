@@ -1,59 +1,44 @@
 package com.dace.dmgr.lobby;
 
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.YamlFile;
 import com.dace.dmgr.system.task.HasTask;
-import com.dace.dmgr.util.SkinUtil;
+import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.system.task.TaskWait;
+import com.dace.dmgr.util.*;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 /**
  * 유저 정보를 관리하는 클래스.
  */
+@Getter
 public final class User implements HasTask {
+    /** {@link User#nameTagHider}의 고유 이름 */
+    public static final String NAME_TAG_HIDER_CUSTOM_NAME = "nametag";
     /** 플레이어 객체 */
-    @Getter
     private final Player player;
-    /** 로비 사이드바 */
-    @Getter
-    private final BPlayerBoard lobbySidebar;
-    /** 유저 설정 정보 관리를 위한 객체 */
-    @Getter
-    private final UserConfig userConfig;
-    /** 설정파일 관리를 위한 객체 */
-    private final YamlFile yamlFile;
-    /** 경험치 */
-    @Getter
-    private int xp = 0;
-    /** 레벨 */
-    @Getter
-    private int level = 1;
-    /** 돈 */
-    @Getter
-    private int money = 0;
-    /** 랭크 점수 */
-    @Getter
-    private int rank = 100;
-    /** 랭크게임 플레이 판 수 */
-    @Getter
-    private int rankPlay = 0;
-    /** 랭크게임 플레이 여부 */
-    @Getter
-    private boolean isRanked = false;
-    /** 매치메이킹 점수 */
-    @Getter
-    private int MMR = 100;
+    /** 유저 데이터 정보 객체 */
+    private final UserData userData;
+    /** 이름표 숨기기용 갑옷 거치대 객체 */
+    private ArmorStand nameTagHider;
+    /** 플레이어 사이드바 */
+    @Setter
+    private BPlayerBoard sidebar;
     /** 리소스팩 적용 여부 */
-    @Getter
     @Setter
     private boolean resourcePack = false;
     /** 리소스팩 적용 상태 */
-    @Getter
     @Setter
     private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
 
@@ -64,16 +49,8 @@ public final class User implements HasTask {
      */
     public User(Player player) {
         this.player = player;
-        this.userConfig = new UserConfig(player);
-        this.lobbySidebar = new BPlayerBoard(player, "lobbySidebar");
-        this.yamlFile = new YamlFile("User/" + player.getUniqueId().toString());
-        this.xp = yamlFile.get("xp", xp);
-        this.level = yamlFile.get("level", level);
-        this.money = yamlFile.get("money", money);
-        this.rank = yamlFile.get("rank", rank);
-        this.rankPlay = yamlFile.get("rankPlay", rankPlay);
-        this.isRanked = yamlFile.get("isRanked", isRanked);
-        this.MMR = yamlFile.get("mmr", MMR);
+        this.userData = new UserData(player.getUniqueId());
+        this.sidebar = new BPlayerBoard(player, "lobby");
     }
 
     /**
@@ -82,6 +59,63 @@ public final class User implements HasTask {
     public void init() {
         EntityInfoRegistry.addUser(player, this);
         Lobby.lobbyTick(this);
+        disableCollision();
+
+        TaskManager.addTask(this, new TaskWait(1) {
+            @Override
+            protected void onEnd() {
+                initNameTagHider();
+            }
+        });
+    }
+
+    /**
+     * 유저를 제거한다.
+     */
+    public void remove() {
+        reset();
+
+        EntityInfoRegistry.removeUser(player);
+        TaskManager.clearTask(this);
+        BossBarUtil.clearBossBar(player);
+        sidebar.delete();
+        nameTagHider.remove();
+
+        GameUser gameUser = EntityInfoRegistry.getGameUser(player);
+        if (gameUser != null)
+            gameUser.getGame().removePlayer(player);
+    }
+
+    /**
+     * {@link User#nameTagHider}를 초기화한다.
+     */
+    private void initNameTagHider() {
+        if (nameTagHider == null) {
+            nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
+            nameTagHider.setCustomName(NAME_TAG_HIDER_CUSTOM_NAME);
+            nameTagHider.setSilent(true);
+            nameTagHider.setInvulnerable(true);
+            nameTagHider.setGravity(false);
+            nameTagHider.setAI(false);
+            nameTagHider.setMarker(true);
+            nameTagHider.setVisible(false);
+        }
+
+        if (!player.getPassengers().contains(nameTagHider))
+            player.addPassenger(nameTagHider);
+    }
+
+    /**
+     * 플레이어끼리 밀치는 것을 비활성화한다.
+     */
+    private void disableCollision() {
+        Scoreboard scoreBoard = player.getScoreboard();
+        Team team = scoreBoard.getTeam("Default");
+        if (team == null)
+            team = scoreBoard.registerNewTeam("Default");
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+        team.addEntry(player.getName());
     }
 
     @Override
@@ -89,49 +123,52 @@ public final class User implements HasTask {
         return "User@" + player.getName();
     }
 
-    public void setXp(int xp) {
-        if (xp < 0) xp = 0;
-        this.xp = xp;
-        yamlFile.set("xp", this.xp);
+    /**
+     * 레벨 상승 시 효과를 재생한다.
+     */
+    public void playLevelUpEffect() {
+        TaskManager.addTask(this, new TaskWait(100) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play("random.good", 10F, 1F, player);
+                MessageUtil.sendTitle(player, StringFormUtil.getLevelPrefix(userData.getLevel()) + " §e§l달성!", "", 8,
+                        40, 30, 40);
+            }
+        });
     }
 
-    public void setLevel(int level) {
-        if (level < 0) level = 0;
-        this.level = level;
-        yamlFile.set("level", this.level);
+    /**
+     * 티어 승급 시 효과를 재생한다.
+     */
+    public void playTierUpEffect() {
+        TaskManager.addTask(this, new TaskWait(80) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, 10F, 1.5F, player);
+                MessageUtil.sendTitle(player, "§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
+            }
+        });
     }
 
-    public void setMoney(int money) {
-        if (money < 0) money = 0;
-        this.money = money;
-        yamlFile.set("money", this.money);
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-        yamlFile.set("rank", this.rank);
-    }
-
-    public void setRankPlay(int rankPlay) {
-        this.rankPlay = rankPlay;
-        yamlFile.set("rankPlay", this.rankPlay);
-    }
-
-    public void setMMR(int mmr) {
-        this.MMR = mmr;
-        yamlFile.set("mmr", this.MMR);
-    }
-
-    public void setRanked(boolean ranked) {
-        this.isRanked = ranked;
-        yamlFile.set("isRanked", this.isRanked);
+    /**
+     * 티어 강등 시 효과를 재생한다.
+     */
+    public void playTierDownEffect() {
+        TaskManager.addTask(this, new TaskWait(80) {
+            @Override
+            protected void onEnd() {
+                SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, 10F, 0F, player);
+                MessageUtil.sendTitle(player, "§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
+            }
+        });
     }
 
     /**
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
-        SkinUtil.resetSkin(player);
+        if (DMGR.getPlugin().isEnabled())
+            SkinUtil.resetSkin(player);
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getInventory().clear();
@@ -141,101 +178,15 @@ public final class User implements HasTask {
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
 
+        sidebar.delete();
+        sidebar = new BPlayerBoard(player, "lobby");
+
+        BossBarUtil.clearBossBar(player);
+
         CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser != null) {
             combatUser.reset();
             combatUser.remove();
         }
-    }
-
-    /**
-     * 레벨에 따른 칭호를 반환한다.
-     *
-     * @return 레벨 칭호
-     */
-    public String getLevelPrefix() {
-        String color;
-
-        if (level <= 100)
-            color = "§f§l";
-        else if (level <= 200)
-            color = "§a§l";
-        else if (level <= 300)
-            color = "§b§l";
-        else if (level <= 400)
-            color = "§d§l";
-        else
-            color = "§e§l";
-
-        return color + "[ Lv." + level + " ]";
-    }
-
-    /**
-     * 티어에 따른 칭호를 반환한다.
-     *
-     * @return 티어 칭호
-     */
-    public String getTierPrefix() {
-        if (rank <= 0)
-            return "§8§l[ F ]";
-        else if (rank <= 300)
-            return "§7§l[ E ]";
-        else if (rank <= 600)
-            return "§f§l[ D ]";
-        else if (rank <= 1000)
-            return "§a§l[ C ]";
-        else if (rank <= 1500)
-            return "§b§l[ B ]";
-        else if (rank <= 2000)
-            return "§d§l[ A ]";
-        else
-            return "§e§l[ S ]";
-    }
-
-    /**
-     * 레벨업에 필요한 경험치를 반환한다.
-     *
-     * @return 레벨업에 필요한 경험치
-     */
-    public int getNextLevelXp() {
-        return 250 + (level * 50);
-    }
-
-    /**
-     * 승급에 필요한 랭크 점수를 반환한다.
-     *
-     * @return 승급에 필요한 랭크 점수
-     */
-    public int getNextTierScore() {
-        if (rank <= 0)
-            return 0;
-        else if (rank <= 300)
-            return 300;
-        else if (rank <= 600)
-            return 600;
-        else if (rank <= 1000)
-            return 1000;
-        else if (rank <= 1500)
-            return 1500;
-        else
-            return 2000;
-    }
-
-    /**
-     * 현재 티어의 최소 랭크 점수를 반환한다.
-     *
-     * @return 현재 티어의 최소 랭크 점수
-     */
-    public int getCurrentTierScore() {
-        if (rank <= 300)
-            return 0;
-        else if (rank <= 600)
-            return 300;
-        else if (rank <= 1000)
-            return 600;
-        else if (rank <= 1500)
-            return 1000;
-        else
-            return 1500;
     }
 }

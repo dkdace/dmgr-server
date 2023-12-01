@@ -3,8 +3,10 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.system.Cooldown;
 import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.system.EntityInfoRegistry;
 import com.dace.dmgr.system.task.TaskManager;
 import com.dace.dmgr.system.task.TaskTimer;
 import com.dace.dmgr.system.task.TaskWait;
@@ -34,8 +36,9 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     protected final String name;
     /** 히트박스 객체 목록 */
     protected final Hitbox[] hitboxes;
+    /** 팀 */
     @Setter
-    protected String team = "";
+    private Team team = Team.NONE;
     /** 모듈 목록 */
     private CombatEntityModule[] modules = new CombatEntityModule[0];
     /** 히트박스의 가능한 최대 크기 */
@@ -61,12 +64,14 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
      */
     protected abstract CombatEntityModule[] getModules();
 
-    /**
-     * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
-     */
     @Override
     @MustBeInvokedByOverriders
     public void init() {
+        EntityInfoRegistry.addCombatEntity(entity, this);
+        if (getGame() == null)
+            EntityInfoRegistry.addIndependentCombatEntity(this);
+        else
+            getGame().addCombatEntity(this);
         modules = getModules();
         abilityStatusManager.getAbilityStatus(Ability.DAMAGE).setBaseValue(1);
         abilityStatusManager.getAbilityStatus(Ability.DEFENSE).setBaseValue(1);
@@ -124,14 +129,27 @@ public abstract class CombatEntityBase<T extends LivingEntity> implements Combat
     @Override
     @MustBeInvokedByOverriders
     public void remove() {
+        EntityInfoRegistry.removeCombatEntity(entity);
+        if (getGame() == null)
+            EntityInfoRegistry.removeIndependentCombatEntity(this);
+        else
+            getGame().removeCombatEntity(this);
+
         TaskManager.clearTask(this);
+
         for (CombatEntityModule module : modules) {
             module.onRemove();
         }
     }
 
     @Override
-    public final boolean isEnemy(CombatEntity combatEntity) {
+    public boolean isEnemy(CombatEntity combatEntity) {
+        if (combatEntity == this)
+            return false;
+        if (combatEntity instanceof SummonEntity && ((SummonEntity<?>) combatEntity).owner == this)
+            return false;
+        if (team == Team.NONE || combatEntity.getTeam() == Team.NONE)
+            return true;
         return !getTeam().equals(combatEntity.getTeam());
     }
 
