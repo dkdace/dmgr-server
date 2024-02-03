@@ -1,11 +1,19 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.entity.module.AttackModule;
+import lombok.NonNull;
 
 /**
  * 다른 엔티티를 공격할 수 있는 엔티티의 인터페이스.
  */
 public interface Attacker extends CombatEntity {
+    /**
+     * @return 공격 모듈
+     */
+    @NonNull
+    AttackModule getAttackModule();
+
     /**
      * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.
      *
@@ -16,7 +24,7 @@ public interface Attacker extends CombatEntity {
      * @param isUlt      궁극기 충전 여부
      * @see Damageable#onDamage(Attacker, int, int, DamageType, boolean, boolean)
      */
-    void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt);
+    void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt);
 
     /**
      * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업.
@@ -24,13 +32,13 @@ public interface Attacker extends CombatEntity {
      * @param victim 피격자
      * @see Damageable#onDeath(Attacker)
      */
-    void onKill(Damageable victim);
+    void onKill(@NonNull Damageable victim);
 
     /**
      * 엔티티가 기본 공격을 했을 때 실행될 작업.
      *
      * @param victim 피격자
      */
-    default void onDefaultAttack(Damageable victim) {
+    default void onDefaultAttack(@NonNull Damageable victim) {
     }
 }

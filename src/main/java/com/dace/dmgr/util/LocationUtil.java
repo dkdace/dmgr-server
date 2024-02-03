@@ -1,33 +1,34 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.sk89q.worldguard.bukkit.WGBukkit;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
 
 /**
  * 위치 관련 기능을 제공하는 클래스.
  */
+@UtilityClass
 public final class LocationUtil {
-    /**
-     * 플레이어를 지정한 위치로 순간이동 시킨다.
-     *
-     * <p>이름표 숨기기 기능으로 인해 기본 텔레포트가 되지 않기 때문에 사용한다.</p>
-     *
-     * @param player   대상 플레이어
-     * @param location 이동시킬 위치
-     */
-    public static void teleportPlayer(Player player, Location location) {
-        User user = EntityInfoRegistry.getUser(player);
+    /** 로비 스폰 위치 */
+    private static final Location lobbyLocation = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
 
-        player.removePassenger(user.getNameTagHider());
-        player.teleport(location);
-        user.getNameTagHider().teleport(location);
-        player.addPassenger(user.getNameTagHider());
+    /**
+     * 로비 스폰 위치를 반환한다.
+     *
+     * @return 스폰 위치
+     */
+    @NonNull
+    public static Location getLobbyLocation() {
+        return lobbyLocation.clone();
     }
 
     /**
@@ -36,7 +37,7 @@ public final class LocationUtil {
      * @param block 확인할 블록
      * @return 통과 가능하면 {@code true} 반환
      */
-    private static boolean canPassBlock(Block block) {
+    private static boolean isPassable(@NonNull Block block) {
         if (!block.getType().isSolid())
             return true;
 
@@ -69,17 +70,17 @@ public final class LocationUtil {
     /**
      * 지정한 위치를 통과할 수 있는지 확인한다.
      *
-     * <p>통과 가능한 블록은 {@link LocationUtil#canPassBlock(Block)}에서 판단한다.</p>
+     * <p>통과 가능한 블록은 {@link LocationUtil#isPassable(Block)}에서 판단한다.</p>
      *
      * <p>각종 스킬의 판정에 사용한다.</p>
      *
      * @param location 확인할 위치
      * @return 통과 가능하면 {@code true} 반환
      */
-    public static boolean isNonSolid(Location location) {
+    public static boolean isNonSolid(@NonNull Location location) {
         Block block = location.getBlock();
 
-        if (canPassBlock(block)) {
+        if (isPassable(block)) {
             MaterialData materialData = block.getState().getData();
 
             if (materialData instanceof Step) {
@@ -108,8 +109,12 @@ public final class LocationUtil {
      * @param start 시작 위치
      * @param end   끝 위치
      * @return 통과 가능하면 {@code true} 반환
+     * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있으면 발생
      */
-    public static boolean canPass(Location start, Location end) {
+    public static boolean canPass(@NonNull Location start, @NonNull Location end) {
+        if (start.getWorld() != end.getWorld())
+            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+
         Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.25);
         Location loc = start.clone();
         double distance = start.distance(end);
@@ -134,12 +139,14 @@ public final class LocationUtil {
      *
      * @param location  기준 위치
      * @param direction 기준 방향
-     * @param offsetX   왼쪽(-) / 오른쪽(+)
-     * @param offsetY   아래(-) / 위(+)
-     * @param offsetZ   뒤(-) / 앞(+)
+     * @param offsetX   왼쪽(-) / 오른쪽(+). (단위: 블록)
+     * @param offsetY   아래(-) / 위(+). (단위: 블록)
+     * @param offsetZ   뒤(-) / 앞(+). (단위: 블록)
      * @return 최종 위치
      */
-    public static Location getLocationFromOffset(Location location, Vector direction, double offsetX, double offsetY, double offsetZ) {
+    @NonNull
+    public static Location getLocationFromOffset(@NonNull Location location, @NonNull Vector direction,
+                                                 double offsetX, double offsetY, double offsetZ) {
         Location loc = location.clone();
         loc.setDirection(direction);
 
@@ -161,13 +168,32 @@ public final class LocationUtil {
      * }</pre>
      *
      * @param location 기준 위치
-     * @param offsetX  왼쪽(-) / 오른쪽(+)
-     * @param offsetY  아래(-) / 위(+)
-     * @param offsetZ  뒤(-) / 앞(+)
+     * @param offsetX  왼쪽(-) / 오른쪽(+). (단위: 블록)
+     * @param offsetY  아래(-) / 위(+). (단위: 블록)
+     * @param offsetZ  뒤(-) / 앞(+). (단위: 블록)
      * @return 최종 위치
      */
-    public static Location getLocationFromOffset(Location location, double offsetX, double offsetY, double offsetZ) {
+    @NonNull
+    public static Location getLocationFromOffset(@NonNull Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
+    }
+
+    /**
+     * 지정한 엔티티가 특정 지역 안에 있는지 확인한다.
+     *
+     * @param entity     확인할 엔티티
+     * @param regionName 지역 이름
+     * @return {@code entity}가 {@code regionName} 내부에 있으면 {@code true} 반환
+     */
+    public static boolean isInRegion(@NonNull Entity entity, @NonNull String regionName) {
+        RegionManager regionManager = WGBukkit.getRegionManager(entity.getWorld());
+
+        for (ProtectedRegion region : regionManager.getApplicableRegions(entity.getLocation())) {
+            if (region.getId().equalsIgnoreCase(regionName))
+                return true;
+        }
+
+        return false;
     }
 
     /**
@@ -180,7 +206,7 @@ public final class LocationUtil {
      * @param material    블록의 종류
      * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에 있으면 {@code true} 반환
      */
-    public static boolean isInSameBlockXZ(Location location, int yCoordinate, Material material) {
+    public static boolean isInSameBlockXZ(@NonNull Location location, int yCoordinate, @NonNull Material material) {
         Location loc = location.clone();
         loc.setY(yCoordinate);
         return loc.getBlock().getType() == material;

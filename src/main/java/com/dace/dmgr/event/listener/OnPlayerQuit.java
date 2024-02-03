@@ -1,11 +1,11 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.lobby.User;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.system.task.TaskWait;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -16,46 +16,36 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.text.MessageFormat;
 
 public final class OnPlayerQuit implements Listener {
-    /** 퇴장 메시지의 접두사 */
-    private static final String PREFIX = "§f§l[§6§l-§f§l] §b";
-    /** 퇴장 시 현재 인원 표시 */
-    private static final String CURRENT_PLAYERS = PREFIX + "현재 인원수는 §3§l{0}명§b입니다.";
-
     @EventHandler
     public static void event(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        User user = EntityInfoRegistry.getUser(player);
-        user.remove();
+        User user = User.fromPlayer(player);
+        user.dispose();
 
-        event.setQuitMessage(PREFIX + player.getName());
+        event.setQuitMessage(StringFormUtil.REMOVE_PREFIX + player.getName());
 
-        new TaskWait(1) {
-            @Override
-            public void onEnd() {
-                DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format(CURRENT_PLAYERS, Bukkit.getOnlinePlayers().size()));
-                playQuitSound();
-            }
-        };
+        new DelayTask(() -> {
+            DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format("{0}현재 인원수는 §3§l{1}명§b입니다.",
+                    StringFormUtil.REMOVE_PREFIX, Bukkit.getOnlinePlayers().size()));
+            playQuitSound();
+        }, 1).run();
     }
 
     /**
      * 퇴장 효과음을 재생한다.
      */
     private static void playQuitSound() {
-        new TaskTimer(1, 4) {
-            @Override
-            public boolean onTimerTick(int i) {
-                switch (i) {
-                    case 0:
-                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.8F);
-                        break;
-                    case 3:
-                        SoundUtil.playAll(Sound.BLOCK_NOTE_PLING, 1000F, 0.525F);
-                        break;
-                }
-
-                return true;
+        new IntervalTask(i -> {
+            switch (i.intValue()) {
+                case 0:
+                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000F, 0.8);
+                    break;
+                case 3:
+                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000F, 0.525);
+                    break;
             }
-        };
+
+            return true;
+        }, 1, 4).run();
     }
 }

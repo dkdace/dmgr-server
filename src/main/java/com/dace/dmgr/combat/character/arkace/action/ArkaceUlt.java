@@ -4,8 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
+import lombok.NonNull;
 
 public final class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt(CombatUser combatUser) {
@@ -28,21 +27,10 @@ public final class ArkaceUlt extends UltimateSkill {
     }
 
     @Override
-    protected void onUseUltimateSkill(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
+        super.onUse(actionKey);
+
         ((Reloadable) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
         setDuration();
-
-        TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, ArkaceUltInfo.DURATION) {
-            @Override
-            public boolean onTickAction(int i) {
-                return true;
-            }
-
-            @Override
-            public void onEnd(boolean cancelled) {
-                if (cancelled)
-                    setDuration(0);
-            }
-        });
     }
 }

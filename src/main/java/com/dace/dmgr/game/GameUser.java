@@ -1,54 +1,76 @@
 package com.dace.dmgr.game;
 
+import com.dace.dmgr.Disposable;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.game.map.GameMap;
-import com.dace.dmgr.gui.SelectChar;
-import com.dace.dmgr.lobby.Lobby;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.HasTask;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.MessageUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
+import java.text.MessageFormat;
 
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
-@Getter
-public final class GameUser implements HasTask {
+public final class GameUser implements Disposable {
+    /** 스폰 지역 확인 Y 좌표 */
+    private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
     /** 플레이어 객체 */
+    @NonNull
+    @Getter
     private final Player player;
+    /** 유저 정보 객체 */
+    @NonNull
+    @Getter
+    private final User user;
     /** 입장한 게임 */
+    @NonNull
+    @Getter
     private final Game game;
+    /** 전투 플레이어 객체 */
+    private CombatUser combatUser = null;
     /** 팀 */
-    private Team team;
+    @NonNull
+    @Getter
+    @Setter
+    private Team team = Team.NONE;
     /** 점수 */
+    @Getter
     @Setter
     private double score = 0;
     /** 킬 */
+    @Getter
     @Setter
     private int kill = 0;
     /** 데스 */
+    @Getter
     @Setter
     private int death = 0;
     /** 어시스트 */
+    @Getter
     @Setter
     private int assist = 0;
     /** 입힌 피해량 */
+    @Getter
     @Setter
     private int damage = 0;
     /** 막은 피해량 */
+    @Getter
     @Setter
     private int defend = 0;
     /** 치유량 */
+    @Getter
     @Setter
     private int heal = 0;
     /** 게임 시작 시점 */
@@ -56,42 +78,43 @@ public final class GameUser implements HasTask {
     private long startTime = 0;
 
     /**
-     * 게임 시스템의 플레이어 인스턴스를 생성한다.
+     * 게임 시스템의 플레이어 인스턴스를 생성하고, 게임의 소속 유저 목록({@link Game#getGameUsers()})에 추가한다.
      *
-     * <p>{@link GameUser#init()}을 호출하여 초기화해야 한다.</p>
-     *
-     * @param player 대상 플레이어
+     * @param user 대상 플레이어
+     * @throws IllegalStateException 해당 {@code user}의 GameUser가 이미 존재하면 발생
      */
-    public GameUser(Player player, Game game) {
-        this.player = player;
-        this.game = game;
-    }
+    public GameUser(@NonNull User user, @NonNull Game game) {
+        GameUser gameUser = GameUserRegistry.getInstance().get(user);
+        if (gameUser != null)
+            throw new IllegalStateException(MessageFormat.format("플레이어 {0}의 GameUser가 이미 생성됨", user.getPlayer().getName()));
 
-    @Override
-    public String getTaskIdentifier() {
-        return "GameUser@" + player.getName();
+        this.user = user;
+        this.player = user.getPlayer();
+        this.game = game;
+
+        game.addPlayer(this);
+        GameUserRegistry.getInstance().add(user, this);
+
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onTick();
+            return true;
+        }, 1));
     }
 
     /**
-     * 게임 유저를 초기화하고 틱 스케쥴러를 실행한다.
+     * 지정한 플레이어의 게임 유저 인스턴스를 반환한다.
+     *
+     * @param user 대상 플레이어
+     * @return 게임 유저 인스턴스. 존재하지 않으면 {@code null} 반환
      */
-    public void init() {
-        EntityInfoRegistry.addGameUser(player, this);
-
-        TaskManager.addTask(this, new TaskTimer(1) {
-            @Override
-            public boolean onTimerTick(int i) {
-                onTick();
-                return true;
-            }
-        });
+    public static GameUser fromUser(@NonNull User user) {
+        return GameUserRegistry.getInstance().get(user);
     }
 
     /**
      * 매 tick마다 실행할 작업.
      */
     private void onTick() {
-        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
         if (combatUser == null)
             return;
 
@@ -99,30 +122,53 @@ public final class GameUser implements HasTask {
             if (game.getPhase() == Game.Phase.READY)
                 return;
 
-            if (getSpawnRegionTeam() == team) {
-                player.getInventory().setHeldItemSlot(4);
-
-                if (game.getPhase() == Game.Phase.PLAYING)
-                    MessageUtil.sendTitle(player, "", combatUser.getCharacterType() == null ? SelectChar.MESSAGES.SELECT_CHARACTER :
-                            SelectChar.MESSAGES.CHANGE_CHARACTER, 0, 10, 10);
-
-                combatUser.getDamageModule().heal((Healer) null, GameConfig.TEAM_SPAWN_HEAL_PER_SECOND / 20, false);
-            } else {
-                MessageUtil.sendTitle(player, "", TITLES.OPPOSITE_SPAWN, 0, 10, 10);
-
-                combatUser.getDamageModule().damage((Attacker) null, GameConfig.OPPOSITE_SPAWN_DAMAGE_PER_SECOND / 20, DamageType.SYSTEM,
-                        false, false);
-            }
+            if (getSpawnRegionTeam() == team)
+                onTickTeamSpawn();
+            else
+                onTickOppositeSpawn();
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
-            LocationUtil.teleportPlayer(player, getRespawnLocation());
+            user.teleport(getRespawnLocation());
     }
 
     /**
-     * 게임 유저를 제거한다.
+     * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
-    public void remove() {
-        EntityInfoRegistry.removeGameUser(player);
-        TaskManager.clearTask(this);
+    private void onTickTeamSpawn() {
+        player.getInventory().setHeldItemSlot(4);
+
+        if (game.getPhase() == Game.Phase.PLAYING)
+            user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
+                    "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
+
+        combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20, false);
+    }
+
+    /**
+     * 플레이어가 상대 팀 스폰에 있을 때 매 틱마다 실행할 작업.
+     */
+    private void onTickOppositeSpawn() {
+        if (!combatUser.isDead())
+            user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
+
+        combatUser.getDamageModule().damage((Attacker) null,
+                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.SYSTEM, false, false);
+    }
+
+    /**
+     * 게임 유저를 제거하고, 소속된 게임({@link Game#getGameUsers()})에서 제거한다.
+     */
+    @Override
+    public void dispose() {
+        checkAccess();
+
+        GameUserRegistry.getInstance().remove(user);
+        game.removePlayer(this);
+        TaskUtil.clearTask(this);
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return GameUserRegistry.getInstance().get(user) == null;
     }
 
     /**
@@ -131,30 +177,15 @@ public final class GameUser implements HasTask {
     public void onGameStart() {
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
-        player.getInventory().setItem(4, Game.SELECT_CHARACTER_ITEM);
-        LocationUtil.teleportPlayer(player, getRespawnLocation());
-        MessageUtil.clearChat(player);
+        player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
+        user.teleport(getRespawnLocation());
+        user.clearChat();
 
-        if (game.getPhase() == Game.Phase.READY)
-            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10,
-                    game.getGamePlayMode().getReadyDuration() * 20, 30, 80);
-        else
-            MessageUtil.sendTitle(player, game.getGamePlayMode().getName(), SelectChar.MESSAGES.SELECT_CHARACTER, 10,
-                    40, 30, 80);
+        user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
+                (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
 
-        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
-        if (combatUser == null) {
-            combatUser = new CombatUser(player, this);
-            combatUser.init();
-        }
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-
-        CombatUser combatUser = EntityInfoRegistry.getCombatUser(player);
-        if (combatUser != null && combatUser.getTeam() != team)
-            combatUser.setTeam(team);
+        if (combatUser == null)
+            combatUser = new CombatUser(user);
     }
 
     /**
@@ -172,6 +203,7 @@ public final class GameUser implements HasTask {
      *
      * @return 리스폰 위치
      */
+    @NonNull
     public Location getRespawnLocation() {
         if (team == Team.RED)
             return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
@@ -180,7 +212,7 @@ public final class GameUser implements HasTask {
             return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
                     .toLocation(Bukkit.getWorld(game.getWorldName()));
 
-        return Lobby.lobbyLocation;
+        return LocationUtil.getLobbyLocation();
     }
 
     /**
@@ -190,8 +222,8 @@ public final class GameUser implements HasTask {
      *
      * @return (킬 + 어시스트) / 데스
      */
-    public float getKDARatio() {
-        return (float) (this.getKill() + this.getAssist()) / ((this.getDeath() == 0) ? 1 : this.getDeath());
+    public double getKDARatio() {
+        return (double) (kill + assist) / ((death == 0) ? 1 : death);
     }
 
     /**
@@ -200,19 +232,11 @@ public final class GameUser implements HasTask {
      * @return 해당 스폰 지역의 팀. 플레이어가 팀 스폰 외부에 있으면 {@code null} 반환
      */
     public Team getSpawnRegionTeam() {
-        if (LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.RED_SPAWN_CHECK_BLOCK))
+        if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.REDSTONE_ORE))
             return Team.RED;
-        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), GameMap.REGION.SPAWN_REGION_CHECK_Y_COORDINATE, GameMap.REGION.BLUE_SPAWN_CHECK_BLOCK))
+        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.LAPIS_ORE))
             return Team.BLUE;
 
         return null;
-    }
-
-    /**
-     * 게임에 사용되는 타이틀(Title) 종류.
-     */
-    private interface TITLES {
-        /** 상대 팀 스폰 지역 입장 시 메시지 */
-        String OPPOSITE_SPAWN = "§c상대 팀의 스폰 지역입니다.";
     }
 }

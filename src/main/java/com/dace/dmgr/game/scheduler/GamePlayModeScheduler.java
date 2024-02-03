@@ -8,7 +8,7 @@ import com.dace.dmgr.game.map.GameMap;
  */
 public interface GamePlayModeScheduler {
     /**
-     * 매 초마다 실행할 작업.
+     * 게임 진행 중 매 초마다 실행할 작업.
      *
      * @param game 해당 게임
      */
@@ -29,12 +29,4 @@ public interface GamePlayModeScheduler {
      * @see GameMap#getBlueTeamSpawns()
      */
     int getBlueTeamSpawnIndex();
-
-    /**
-     * 게임에 사용되는 메시지 목록.
-     */
-    interface MESSAGES {
-        /** 게임 진행 타이머 보스바 메시지 */
-        String BOSSBAR_REMAINING_TIME = "§b남은 시간 : {0}";
-    }
 }

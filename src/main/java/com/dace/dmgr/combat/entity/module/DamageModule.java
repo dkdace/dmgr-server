@@ -2,42 +2,73 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.Projectile;
-import com.dace.dmgr.combat.entity.Ability;
+import com.dace.dmgr.combat.entity.AbilityStatus;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import lombok.AllArgsConstructor;
+import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.util.Cooldown;
+import com.dace.dmgr.util.CooldownUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.attribute.Attribute;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.bukkit.entity.LivingEntity;
 
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
  *
- * <p>엔티티가 {@link Damageable}을 상속받는 클래스여야 한다.</p>
+ * <p>전투 시스템 엔티티가 {@link Damageable}을 상속받는 클래스여야 하며,
+ * 엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  *
  * @see Damageable
  */
-@AllArgsConstructor
-public class DamageModule implements CombatEntityModule {
+@Getter
+public class DamageModule {
+    /** 기본값 */
+    public static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
+    @NonNull
     protected final Damageable combatEntity;
     /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부. */
-    @Getter
     protected final boolean isUltProvider;
-
+    /** 방어력 배수 값 */
+    @NonNull
+    private final AbilityStatus defenseMultiplierStatus;
     /** 최대 체력 */
-    @Getter
     protected int maxHealth;
 
-    @Override
-    @MustBeInvokedByOverriders
-    public void onInit() {
+    /**
+     * 피해 모듈 인스턴스를 생성한다.
+     *
+     * @param combatEntity      대상 엔티티
+     * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
+     * @param maxHealth         최대 체력
+     * @param defenseMultiplier 방어력 배수 기본값
+     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     */
+    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, int maxHealth, double defenseMultiplier) {
+        if (!(combatEntity.getEntity() instanceof LivingEntity))
+            throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
+
+        this.combatEntity = combatEntity;
+        this.defenseMultiplierStatus = new AbilityStatus(defenseMultiplier);
+        this.isUltProvider = isUltProvider;
+        this.maxHealth = maxHealth;
+
         setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
+    }
+
+    /**
+     * 피해 모듈 인스턴스를 생성한다.
+     *
+     * @param combatEntity  대상 엔티티
+     * @param isUltProvider 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
+     * @param maxHealth     최대 체력
+     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     */
+    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, int maxHealth) {
+        this(combatEntity, isUltProvider, maxHealth, DEFAULT_VALUE);
     }
 
     /**
@@ -46,7 +77,7 @@ public class DamageModule implements CombatEntityModule {
      * @return 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
     public final int getHealth() {
-        return (int) (Math.round(combatEntity.getEntity().getHealth() * 50 * 100) / 100);
+        return (int) (Math.round(((LivingEntity) combatEntity.getEntity()).getHealth() * 50 * 100) / 100);
     }
 
     /**
@@ -55,7 +86,7 @@ public class DamageModule implements CombatEntityModule {
      * @param health 실제 체력×50 (체력 1줄 기준 {@code 1000})
      */
     public final void setHealth(int health) {
-        combatEntity.getEntity().setHealth(Math.min(Math.max(0, health), getMaxHealth()) / 50.0);
+        ((LivingEntity) combatEntity.getEntity()).setHealth(Math.min(Math.max(0, health), getMaxHealth()) / 50.0);
     }
 
     /**
@@ -65,7 +96,7 @@ public class DamageModule implements CombatEntityModule {
      */
     public final void setMaxHealth(int health) {
         maxHealth = health;
-        combatEntity.getEntity().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
+        ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 
     /**
@@ -86,7 +117,7 @@ public class DamageModule implements CombatEntityModule {
      * @param isCrit     치명타 여부
      * @param isUlt      궁극기 충전 여부
      */
-    public final void damage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public final void damage(Attacker attacker, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
             return;
 
@@ -94,9 +125,9 @@ public class DamageModule implements CombatEntityModule {
             damage *= 2;
 
         double damageMultiplier = attacker == null ?
-                1 : attacker.getAbilityStatusManager().getAbilityStatus(Ability.DAMAGE).getValue();
+                1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
         double defenseMultiplier = damageType == DamageType.SYSTEM ?
-                1 : combatEntity.getAbilityStatusManager().getAbilityStatus(Ability.DEFENSE).getValue();
+                1 : defenseMultiplierStatus.getValue();
         int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
         int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
 
@@ -123,7 +154,7 @@ public class DamageModule implements CombatEntityModule {
      * @param isCrit     치명타 여부
      * @param isUlt      궁극기 충전 여부
      */
-    public final void damage(Projectile projectile, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public final void damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         CombatEntity attacker = projectile.getShooter();
         if (attacker instanceof Attacker)
             damage((Attacker) attacker, damage, damageType, isCrit, isUlt);
@@ -133,8 +164,8 @@ public class DamageModule implements CombatEntityModule {
      * 엔티티의 피격 효과를 재생한다.
      */
     private void playHitEffect() {
-        if (CooldownManager.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
-            CooldownManager.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
+        if (CooldownUtil.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
+            CooldownUtil.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
             WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
             packet.setEntityID(combatEntity.getEntity().getEntityId());

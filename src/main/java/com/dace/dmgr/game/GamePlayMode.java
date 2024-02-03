@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum GamePlayMode {
-    TEAM_DEATHMATCH("팀 데스매치", 4, 10, false, 20, 600,
+    TEAM_DEATHMATCH("팀 데스매치", 4, 10, false, 20, 60,
             TeamDeathmatchScheduler.getInstance());
 
     /** 이름 */
@@ -22,9 +22,9 @@ public enum GamePlayMode {
     private final int maxPlayer;
     /** 랭크 여부 */
     private final boolean isRanked;
-    /** 게임 준비 시간 */
+    /** 게임 준비 시간 (초) */
     private final int readyDuration;
-    /** 게임 진행 시간 */
+    /** 게임 진행 시간 (초) */
     private final int playDuration;
     /** 게임 모드 스케쥴러 */
     private final GamePlayModeScheduler gamePlayModeScheduler;

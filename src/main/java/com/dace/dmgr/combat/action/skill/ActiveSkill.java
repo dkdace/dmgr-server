@@ -2,10 +2,11 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
+import com.dace.dmgr.util.Cooldown;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
 @Getter
-public abstract class ActiveSkill extends SkillBase {
+public abstract class ActiveSkill extends AbstractSkill {
     /** 스킬 슬롯 */
     protected final int slot;
 
@@ -26,16 +27,16 @@ public abstract class ActiveSkill extends SkillBase {
      * @param activeSkillInfo 액티브 스킬 정보 객체
      * @param slot            슬롯 번호
      */
-    protected ActiveSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+    protected ActiveSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
         super(number, combatUser, activeSkillInfo);
         this.slot = slot;
     }
 
     @Override
     protected void onCooldownTick() {
-        long cooldown = CooldownManager.getCooldown(this, Cooldown.SKILL_COOLDOWN);
+        long cooldown = CooldownUtil.getCooldown(this, Cooldown.SKILL_COOLDOWN);
 
-        displayCooldown((int) Math.ceil((float) cooldown / 20));
+        displayCooldown((int) Math.ceil(cooldown / 20.0));
     }
 
     @Override
@@ -51,15 +52,15 @@ public abstract class ActiveSkill extends SkillBase {
 
     @Override
     protected void onDurationTick() {
-        long duration = CooldownManager.getCooldown(this, Cooldown.SKILL_DURATION);
+        long duration = CooldownUtil.getCooldown(this, Cooldown.SKILL_DURATION);
 
-        displayUsing((int) Math.ceil((float) duration / 20));
+        displayUsing((int) Math.ceil(duration / 20.0));
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void remove() {
-        super.remove();
+    public void dispose() {
+        super.dispose();
 
         combatUser.getEntity().getInventory().clear(slot);
     }
@@ -68,7 +69,7 @@ public abstract class ActiveSkill extends SkillBase {
      * 쿨타임이 끝났을 때 효과음을 재생한다.
      */
     protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2F, 2F, combatUser.getEntity());
+        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, combatUser.getEntity(), 0.2, 2);
     }
 
     /**
@@ -76,7 +77,7 @@ public abstract class ActiveSkill extends SkillBase {
      *
      * @param amount 아이템 수량
      */
-    protected final void displayCooldown(int amount) {
+    final void displayCooldown(int amount) {
         itemStack = actionInfo.getItemStack().clone();
         itemStack.setDurability((short) 15);
         itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
@@ -88,7 +89,7 @@ public abstract class ActiveSkill extends SkillBase {
      *
      * @param amount 아이템 수량
      */
-    protected final void displayReady(int amount) {
+    final void displayReady(int amount) {
         itemStack = actionInfo.getItemStack().clone();
         display(amount);
     }
@@ -98,7 +99,7 @@ public abstract class ActiveSkill extends SkillBase {
      *
      * @param amount 아이템 수량
      */
-    protected final void displayUsing(int amount) {
+    final void displayUsing(int amount) {
         itemStack = actionInfo.getItemStack().clone();
         itemStack.setDurability((short) 5);
         display(amount);

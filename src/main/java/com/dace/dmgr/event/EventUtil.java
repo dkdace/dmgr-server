@@ -4,6 +4,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.dace.dmgr.DMGR;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.bukkit.event.Listener;
 
 /**
@@ -11,6 +13,7 @@ import org.bukkit.event.Listener;
  *
  * <p>이벤트는 반드시 플러그인이 활성화될 때 등록해야 한다.</p>
  */
+@UtilityClass
 public final class EventUtil {
     /** 패킷 이벤트 등록을 위한 객체 */
     private static final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
@@ -38,7 +41,7 @@ public final class EventUtil {
      *
      * @param listener 이벤트 처리기
      */
-    public static void registerListener(Listener listener) {
+    public static void registerListener(@NonNull Listener listener) {
         DMGR.getPlugin().getServer().getPluginManager().registerEvents(listener, DMGR.getPlugin());
     }
 
@@ -81,7 +84,7 @@ public final class EventUtil {
      *
      * @param packetAdapter 패킷 이벤트 처리기
      */
-    public static void registerPacketListener(PacketAdapter packetAdapter) {
+    public static void registerPacketListener(@NonNull PacketAdapter packetAdapter) {
         protocolManager.addPacketListener(packetAdapter);
     }
 }

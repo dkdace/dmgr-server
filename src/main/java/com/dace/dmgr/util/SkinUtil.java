@@ -1,37 +1,40 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.DMGR;
+import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.util.task.AsyncTask;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * 플레이어 스킨 관리 기능을 제공하는 클래스.
  */
+@UtilityClass
 public final class SkinUtil {
     /** API 객체 */
-    private static final SkinsRestorerAPI api = SkinsRestorerAPI.getApi();
+    private static final SkinsRestorerAPI API = SkinsRestorerAPI.getApi();
 
     /**
      * 플레이어의 스킨을 변경한다.
      *
      * @param player 대상 플레이어
-     * @param skin   스킨
+     * @param skin   적용할 스킨
      */
-    public static void applySkin(Player player, Skin skin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    api.applySkin(new PlayerWrapper(player), skin.getSkinName());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+    @NonNull
+    public static AsyncTask<Void> applySkin(@NonNull Player player, @NonNull Skin skin) {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                API.applySkin(new PlayerWrapper(player), skin.getSkinName());
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
+                onError.accept(ex);
             }
-        }.runTaskAsynchronously(DMGR.getPlugin());
+        });
     }
 
     /**
@@ -39,27 +42,17 @@ public final class SkinUtil {
      *
      * @param player 대상 플레이어
      */
-    public static void resetSkin(Player player) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                try {
-                    api.applySkin(new PlayerWrapper(player), player.getName());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+    @NonNull
+    public static AsyncTask<Void> resetSkin(@NonNull Player player) {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                API.applySkin(new PlayerWrapper(player), player.getName());
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
+                onError.accept(ex);
             }
-        }.runTaskAsynchronously(DMGR.getPlugin());
-    }
-
-    /**
-     * 지정한 스킨의 URL를 반환한다.
-     *
-     * @param skin 스킨
-     * @return 스킨 전체 URL
-     */
-    public static String getSkinUrl(Skin skin) {
-        return api.getSkinData(skin.getSkinName()).getValue();
+        });
     }
 
     /**
@@ -73,5 +66,10 @@ public final class SkinUtil {
 
         /** 스킨 이름 */
         private final String skinName;
+
+        @NonNull
+        public String getUrl() {
+            return API.getSkinData(skinName).getValue();
+        }
     }
 }

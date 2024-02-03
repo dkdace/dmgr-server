@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.TextIcon;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;

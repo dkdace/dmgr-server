@@ -1,11 +1,13 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.entity.module.CombatEntityModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.game.Game;
-import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
+import com.dace.dmgr.combat.interaction.HasCritHitbox;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.item.ItemBuilder;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Zombie;
@@ -34,7 +36,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
      * @param maxHealth 최대 체력
      */
     public Dummy(Zombie entity, int maxHealth) {
-        super(entity, "§7§lDummy",
+        super(entity, "훈련용 봇", null,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
@@ -42,22 +44,11 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         );
         damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
+
+        onInit();
     }
 
-    @Override
-    public Game getGame() {
-        return null;
-    }
-
-    @Override
-    protected CombatEntityModule[] getModules() {
-        return new CombatEntityModule[]{damageModule};
-    }
-
-    @Override
-    public void init() {
-        super.init();
-
+    private void onInit() {
         entity.setBaby(false);
         entity.setAI(false);
 
@@ -80,11 +71,22 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void activate() {
+        onActivate();
+    }
+
+    @Override
+    protected void onTickAfterActivation(long i) {
+        // 미사용
+    }
+
+    @Override
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+        // 미사용
     }
 
     @Override
     public void onDeath(Attacker attacker) {
-        remove();
+        dispose();
     }
 }

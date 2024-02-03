@@ -43,7 +43,7 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @param i          인덱스
      */
-    public void onTick(CombatUser combatUser, int i) {
+    public void onTick(CombatUser combatUser, long i) {
     }
 
     /**

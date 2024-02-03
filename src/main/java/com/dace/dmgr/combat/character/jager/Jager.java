@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.jager;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -11,12 +12,9 @@ import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
-import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
-import com.dace.dmgr.system.TextIcon;
 import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 import java.util.StringJoiner;
 
@@ -47,7 +45,7 @@ public final class Jager extends Character {
 
         int weapon1Ammo = weapon1.getReloadModule().getRemainingAmmo();
         int weapon2Ammo = weapon2.getReloadModule().getRemainingAmmo();
-        float skill1Health = skill1.getStateValue();
+        double skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
@@ -71,12 +69,9 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onTick(CombatUser combatUser, int i) {
-        if (i % 5 == 0) {
-            CombatUserActionEvent event = new CombatUserActionEvent(combatUser, ActionKey.PERIODIC_1);
-
-            Bukkit.getServer().getPluginManager().callEvent(event);
-        }
+    public void onTick(CombatUser combatUser, long i) {
+        if (i % 5 == 0)
+            combatUser.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -85,9 +80,9 @@ public final class Jager extends Character {
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
         if (!skill1.isDurationFinished() && victim instanceof Living)
-            skill1.getHasEntityModule().getSummonEntity().getEntity().setTarget(victim.getEntity());
+            skill1.getEntity().getEntity().setTarget(victim.getEntity());
 
-        return skillUlt.getHasEntityModule().getSummonEntity() == null;
+        return skillUlt.getEntity() == null;
     }
 
     @Override

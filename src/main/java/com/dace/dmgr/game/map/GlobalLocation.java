@@ -1,6 +1,7 @@
 package com.dace.dmgr.game.map;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -28,7 +29,8 @@ public final class GlobalLocation {
      * @param world 대상 월드
      * @return 위치
      */
-    public Location toLocation(World world) {
+    @NonNull
+    public Location toLocation(@NonNull World world) {
         return new Location(world, x, y, z, yaw, pitch);
     }
 }

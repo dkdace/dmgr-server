@@ -2,11 +2,12 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.Cooldown;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -17,7 +18,7 @@ public abstract class StackableSkill extends ActiveSkill {
     /** 스킬 스택 수 */
     protected int stack = 0;
 
-    protected StackableSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+    protected StackableSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
         super(number, combatUser, activeSkillInfo, slot);
         setStackCooldown(getDefaultStackCooldown());
     }
@@ -59,7 +60,7 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 스택 충전 쿨타임 (tick)
      */
     public final long getStackCooldown() {
-        return CooldownManager.getCooldown(this, Cooldown.SKILL_STACK_COOLDOWN);
+        return CooldownUtil.getCooldown(this, Cooldown.SKILL_STACK_COOLDOWN);
     }
 
     /**
@@ -72,10 +73,10 @@ public abstract class StackableSkill extends ActiveSkill {
             return;
 
         if (isStackCooldownFinished()) {
-            CooldownManager.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
             runStackCooldown(cooldown);
         } else
-            CooldownManager.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
     }
 
     /**
@@ -84,24 +85,21 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param cooldown 스택 충전 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     private void runStackCooldown(long cooldown) {
-        TaskManager.addTask(this, new TaskTimer(1) {
-            @Override
-            public boolean onTimerTick(int i) {
-                onCooldownTick();
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onCooldownTick();
 
-                if (isStackCooldownFinished()) {
-                    onStackCooldownFinished();
+            if (isStackCooldownFinished()) {
+                onStackCooldownFinished();
 
-                    addStack(1);
-                    if (stack < getMaxStack())
-                        setStackCooldown(cooldown);
+                addStack(1);
+                if (stack < getMaxStack())
+                    setStackCooldown(cooldown);
 
-                    return false;
-                }
-
-                return true;
+                return false;
             }
-        });
+
+            return true;
+        }, 1));
     }
 
     /**

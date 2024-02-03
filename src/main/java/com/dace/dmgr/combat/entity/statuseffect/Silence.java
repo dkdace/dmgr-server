@@ -2,30 +2,40 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.MessageUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 /**
  * 침묵 상태 효과를 처리하는 클래스.
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Silence implements StatusEffect {
+    @Getter
+    private static final Silence instance = new Silence();
+
     @Override
-    public StatusEffectType getStatusEffectType() {
-        return StatusEffectType.SILENCE;
+    @NonNull
+    public String getName() {
+        return "침묵";
     }
 
     @Override
-    public void onStart(CombatEntity combatEntity) {
+    public void onStart(@NonNull CombatEntity combatEntity) {
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).cancelAction();
     }
 
     @Override
-    public void onTick(CombatEntity combatEntity, int i) {
+    public void onTick(@NonNull CombatEntity combatEntity, long i) {
         if (combatEntity instanceof CombatUser) {
-            MessageUtil.sendTitle(combatEntity.getEntity(), "§5§l침묵당함!", "", 0, 2, 10);
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 2, 10);
             ((CombatUser) combatEntity).getEntity().stopSound("");
         }
     }
 
     @Override
-    public void onEnd(CombatEntity combatEntity) {
+    public void onEnd(@NonNull CombatEntity combatEntity) {
     }
 }

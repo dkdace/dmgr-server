@@ -1,17 +1,21 @@
 package com.dace.dmgr.combat.entity;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 엔티티의 능력치 정보를 관리하는 클래스.
+ * 엔티티의 능력치 값을 관리하는 클래스.
+ *
+ * <p>최종 값 계산 방식 : {@link AbilityStatus#baseValue} +
+ * (100+모든 수정자({@link AbilityStatus#modifiers}) 값의 합)/100</p>
  */
 public final class AbilityStatus {
     /** 값 수정자 목록 (수정자 ID : 증가량) */
-    private final Map<String, Double> modifiers = new HashMap<>();
+    private final HashMap<@NonNull String, Double> modifiers = new HashMap<>();
     /** 기본값 */
     @Getter
     @Setter
@@ -29,7 +33,7 @@ public final class AbilityStatus {
     /**
      * 기본값에 모든 수정자를 적용한 최종 값을 반환한다.
      *
-     * @return 최종 값
+     * @return {@link AbilityStatus#baseValue} + (100+모든 수정자({@link AbilityStatus#modifiers}) 값의 합)/100
      */
     public double getValue() {
         double valueSum = 0;
@@ -44,7 +48,8 @@ public final class AbilityStatus {
      *
      * @return 수정자 목록
      */
-    public Map<String, Double> getModifiers() {
+    @NonNull
+    public Map<@NonNull String, Double> getModifiers() {
         return new HashMap<>(modifiers);
     }
 
@@ -56,7 +61,7 @@ public final class AbilityStatus {
      * @param id        수정자 ID
      * @param increment 수치 증가량
      */
-    public void addModifier(String id, double increment) {
+    public void addModifier(@NonNull String id, double increment) {
         modifiers.put(id, increment);
     }
 
@@ -65,7 +70,7 @@ public final class AbilityStatus {
      *
      * @param id 수정자 ID
      */
-    public void removeModifier(String id) {
+    public void removeModifier(@NonNull String id) {
         modifiers.remove(id);
     }
 }

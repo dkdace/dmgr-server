@@ -1,7 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.system.task.TaskManager;
-import org.bukkit.attribute.Attribute;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.game.Game;
+import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -13,36 +14,25 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
  * @see SummonEntity
  */
-public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntityBase<T> {
+public abstract class TemporalEntity<T extends LivingEntity> extends AbstractCombatEntity<T> {
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
-     * <p>{@link CombatEntityBase#init()}을 호출하여 초기화해야 한다.</p>
-     *
-     * @param entity 대상 엔티티
-     * @param name   이름
-     * @param hitbox 히트박스 목록
+     * @param entity   대상 엔티티
+     * @param name     이름
+     * @param game     소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
+     * @param hitboxes 히트박스 목록
+     * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected TemporalEntity(T entity, String name, Hitbox... hitbox) {
-        super(entity, name, hitbox);
+    protected TemporalEntity(@NonNull T entity, @NonNull String name, Game game, @NonNull Hitbox... hitboxes) {
+        super(entity, name, game, hitboxes);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void init() {
-        super.init();
+    public void dispose() {
+        super.dispose();
 
-        if (getAbilityStatusManager().getAbilityStatus(Ability.SPEED).getBaseValue() == 0)
-            getAbilityStatusManager().getAbilityStatus(Ability.SPEED).setBaseValue(getEntity().getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
-                    .getBaseValue());
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void remove() {
-        super.remove();
-
-        TaskManager.clearTask(this);
         getEntity().remove();
     }
 
@@ -52,7 +42,8 @@ public abstract class TemporalEntity<T extends LivingEntity> extends CombatEntit
     }
 
     @Override
-    public String getTaskIdentifier() {
+    @NonNull
+    public String getTeamIdentifier() {
         return toString();
     }
 }

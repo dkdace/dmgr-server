@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.*;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
@@ -8,15 +9,16 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.statuseffect.Snare;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.MessageUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.interaction.BouncingProjectile;
+import com.dace.dmgr.combat.interaction.BouncingProjectileOption;
+import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.combat.interaction.ProjectileOption;
+import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,12 +27,16 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class JagerA3 extends ActiveSkill {
+    /** 수류탄 활성화 완료 여부 */
+    private boolean isEnabled = false;
+
     public JagerA3(CombatUser combatUser) {
         super(3, combatUser, JagerA3Info.getInstance(), 2);
     }
 
     @Override
-    public ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_3};
     }
 
@@ -50,7 +56,7 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
             ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
@@ -61,56 +67,42 @@ public final class JagerA3 extends ActiveSkill {
             setDuration();
             playUseSound(combatUser.getEntity().getLocation());
 
-            TaskManager.addTask(this, new ActionTaskTimer(combatUser, 1, JagerA3Info.READY_DURATION) {
-                @Override
-                public boolean onTickAction(int i) {
+            TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION);
+                playReadySound(combatUser.getEntity().getLocation());
+                isEnabled = true;
+
+                TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                            combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
+                    playTickEffect(loc);
+
                     return true;
-                }
+                }, isCancelled -> {
+                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
+                            combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
+                    isEnabled = false;
+                    onCancelled();
 
-                @Override
-                public void onEnd(boolean cancelled) {
-                    if (cancelled) {
-                        setDuration(0);
-                        return;
-                    }
-
-                    CooldownManager.setCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION);
-                    playReadySound(combatUser.getEntity().getLocation());
-
-                    TaskManager.addTask(JagerA3.this, new ActionTaskTimer(combatUser, 1, JagerA3Info.EXPLODE_DURATION) {
-                        @Override
-                        public boolean onTickAction(int i) {
-                            if (isDurationFinished())
-                                return false;
-
-                            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                                    combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
-                            playTickEffect(loc);
-
-                            return true;
-                        }
-
-                        @Override
-                        public void onEnd(boolean cancelled) {
-                            if (cancelled)
-                                return;
-
-                            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                                    combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
-                            setDuration(0);
-
-                            explode(loc, null);
-                        }
-                    });
-                }
-            });
+                    explode(loc, null);
+                }, 1, JagerA3Info.EXPLODE_DURATION));
+            }, JagerA3Info.READY_DURATION));
         } else {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
             new JagerA3Projectile().shoot(loc);
 
-            setDuration(0);
+            isEnabled = false;
+            onCancelled();
             playThrowSound(loc);
+        }
+    }
+
+    @Override
+    public void onCancelled() {
+        if (!isEnabled) {
+            super.onCancelled();
+            setDuration(0);
         }
     }
 
@@ -120,7 +112,7 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5F, 1.6F);
+        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5, 1.6);
     }
 
     /**
@@ -129,8 +121,8 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playReadySound(Location location) {
-        SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, location, 0.8F, 1.2F);
-        SoundUtil.play("new.block.chain.place", location, 0.8F, 1.2F);
+        SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, location, 0.8, 1.2);
+        SoundUtil.play("new.block.chain.place", location, 0.8, 1.2);
     }
 
     /**
@@ -139,7 +131,7 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playTickEffect(Location location) {
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1F, 0.1F, 0.1F, 120, 220, 240);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1, 0.1, 0.1, 120, 220, 240);
     }
 
     /**
@@ -148,7 +140,7 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playThrowSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8F, 0.8F);
+        SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8, 0.8);
     }
 
     /**
@@ -162,9 +154,9 @@ public final class JagerA3 extends ActiveSkill {
                 combatEntity -> combatEntity instanceof Damageable && combatEntity.canPass(location), true);
         for (CombatEntity target : targets) {
             int damage = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
-                    JagerA3Info.RADIUS / 2F, true);
+                    JagerA3Info.RADIUS / 2.0, true);
             int freeze = CombatUtil.getDistantDamage(location, target.getEntity().getLocation(), JagerA3Info.FREEZE,
-                    JagerA3Info.RADIUS / 2F, true);
+                    JagerA3Info.RADIUS / 2.0, true);
             if (projectile == null)
                 ((Damageable) target).getDamageModule().damage(combatUser, damage, DamageType.NORMAL, false, true);
             else
@@ -172,7 +164,7 @@ public final class JagerA3 extends ActiveSkill {
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
-                target.applyStatusEffect(new Freeze(), JagerA3Info.SNARE_DURATION);
+                target.applyStatusEffect(StatusEffectType.FREEZE, JagerA3Info.SNARE_DURATION);
             }
         }
 
@@ -185,61 +177,46 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playExplodeEffect(Location location) {
-        SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4F, 0.6F);
-        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4F, 1.2F);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, location, 4F, 1.5F);
-        SoundUtil.play("random.explosion_reverb", location, 6F, 1.2F);
+        SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4, 0.6);
+        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4, 1.2);
+        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, location, 4, 1.5);
+        SoundUtil.play("random.explosion_reverb", location, 6, 1.2);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, location,
-                300, 0.2F, 0.2F, 0.2F, 0.5F);
+                300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.PACKED_ICE, 0, location,
-                300, 0.2F, 0.2F, 0.2F, 0.5F);
+                300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, location, 1, 0, 0, 0, 0);
-        ParticleUtil.play(Particle.FIREWORKS_SPARK, location, 200, 0, 0, 0, 0.3F);
-    }
-
-    /**
-     * 빙결 상태 효과 클래스.
-     */
-    private static class Freeze extends Snare {
-        @Override
-        public void onTick(CombatEntity combatEntity, int i) {
-            if (combatEntity instanceof CombatUser)
-                MessageUtil.sendTitle(combatEntity.getEntity(), "§c§l얼어붙음!", "", 0, 2, 10);
-
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
-                    0.4F, 0.8F, 0.4F, 120, 220, 240);
-        }
+        ParticleUtil.play(Particle.FIREWORKS_SPARK, location, 200, 0, 0, 0, 0.3);
     }
 
     private class JagerA3Projectile extends BouncingProjectile {
         public JagerA3Projectile() {
             super(JagerA3.this.combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownManager.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true)
-                    .condition(JagerA3.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35F).build());
+                    .duration(CooldownUtil.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true)
+                    .condition(JagerA3.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
-        public void trail(Location location) {
+        public void trail(@NonNull Location location) {
             playTickEffect(location);
         }
 
         @Override
-        public boolean onHitBlockBouncing(Location location, Vector direction, Block hitBlock) {
-            SoundUtil.play("random.metalhit", location, (float) (0.1 + direction.length() * 2), (float) (1.2 + Math.random() * 0.1));
-            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, (float) (0.1 + direction.length() * 2), 2F);
+        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+            SoundUtil.play("random.metalhit", location, 0.1 + direction.length() * 2, 1.2, 0.1);
+            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + direction.length() * 2, 2);
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(Location location, Vector direction, Damageable target, boolean isCrit) {
+        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
             if (direction.length() > 0.05)
                 target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
 
         @Override
-        public void onDestroy(Location location) {
+        public void onDestroy(@NonNull Location location) {
             explode(location, this);
         }
     }

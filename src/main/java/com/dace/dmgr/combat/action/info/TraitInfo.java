@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.action.info;
 
-import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.item.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Material;
 

@@ -1,30 +1,26 @@
 package com.dace.dmgr.game;
 
 import com.comphenix.packetwrapper.WrapperPlayServerBoss;
+import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Disposable;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
-import com.dace.dmgr.gui.ItemBuilder;
-import com.dace.dmgr.lobby.Lobby;
-import com.dace.dmgr.lobby.UserData;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.GameInfoRegistry;
-import com.dace.dmgr.system.task.HasTask;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
-import com.dace.dmgr.system.task.TaskWait;
-import com.dace.dmgr.util.BossBarUtil;
-import com.dace.dmgr.util.MessageUtil;
+import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.WorldUtil;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.dace.dmgr.util.task.AsyncTask;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -33,19 +29,14 @@ import java.util.stream.Collectors;
 /**
  * 게임의 정보와 진행을 관리하는 클래스.
  */
-public final class Game implements HasTask {
-    /** 전투원 선택 아이템 객체 */
-    public static final ItemStack SELECT_CHARACTER_ITEM = new ItemBuilder(Material.EMERALD)
-            .setName("§a전투원 선택").build();
-
-    private static final Random random = new Random();
-
+public final class Game implements Disposable {
     /** 방 번호 */
     @Getter
     private final int number;
-    /** 엔티티 목록 */
+    /** 소속된 엔티티 목록 */
     private final HashSet<CombatEntity> combatEntitySet = new HashSet<>();
-    /** 플레이어 목록 */
+    /** 소속된 플레이어 목록 */
+    @NonNull
     @Getter
     private final ArrayList<GameUser> gameUsers = new ArrayList<>();
     /** 게임을 시작하기 위한 최소 인원 수 */
@@ -53,27 +44,29 @@ public final class Game implements HasTask {
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
+    private final EnumMap<@NonNull Team, @NonNull ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
+    /** 팀별 점수 (팀 : 점수) */
     @Getter
-    private final EnumMap<Team, ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
-    /** 팀 점수 (팀 : 점수) */
-    @Getter
-    private final EnumMap<Team, Integer> teamScore = new EnumMap<>(Team.class);
+    private final EnumMap<@NonNull Team, Integer> teamScore = new EnumMap<>(Team.class);
     /** 게임 모드 */
+    @NonNull
     @Getter
     private final GamePlayMode gamePlayMode;
+    /** 맵 */
+    @NonNull
+    @Getter
+    private final GameMap map;
     /** 전장 월드 이름 */
     @Getter
     private final String worldName;
-    /** 맵 */
-    @Getter
-    private final GameMap map;
     /** 게임 시작 시점 ({@link Phase#READY}가 된 시점) */
     @Getter
     private long startTime = 0;
-    /** 다음 진행 단계까지 남은 시간 */
+    /** 다음 진행 단계까지 남은 시간 (초) */
     @Getter
-    private int remainingTime = GameConfig.WAITING_TIME;
+    private int remainingTime = GeneralConfig.getGameConfig().getWaitingTime();
     /** 게임 진행 단계 */
+    @NonNull
     @Getter
     private Phase phase = Phase.WAITING;
 
@@ -82,84 +75,105 @@ public final class Game implements HasTask {
      *
      * @param isRanked 랭크 여부
      * @param number   방 번호
+     * @throws IllegalStateException 해당 {@code isRanked}, {@code number}의 Game이 이미 존재하면 발생
      */
     public Game(boolean isRanked, int number) {
+        Game game = GameRegistry.getInstance().get(new KeyPair(isRanked, number));
+        if (game != null)
+            throw new IllegalStateException(MessageFormat.format("랭크 여부 {0}, 방 번호 {1}의 Game이 이미 생성됨", isRanked, number));
+
         this.number = number;
-        this.gamePlayMode = GameInfoRegistry.getRandomGamePlayMode(isRanked);
-        this.map = GameInfoRegistry.getRandomMap(gamePlayMode);
+        this.gamePlayMode = GameUtil.getRandomGamePlayMode(isRanked);
+        this.map = GameUtil.getRandomMap(gamePlayMode);
         this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gamePlayMode, number);
-        minPlayerCount = isRanked ? GameConfig.RANK_MIN_PLAYER_COUNT : GameConfig.NORMAL_MIN_PLAYER_COUNT;
-        maxPlayerCount = isRanked ? GameConfig.RANK_MAX_PLAYER_COUNT : GameConfig.NORMAL_MAX_PLAYER_COUNT;
+        minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
+        maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
         }
+        GameRegistry.getInstance().add(new KeyPair(isRanked, number), this);
+
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onSecond();
+            return true;
+        }, 20));
     }
 
     /**
-     * 게임 정보를 초기화하고 스케쥴러를 실행한다.
+     * 지정한 번호의 게임 인스턴스를 반환한다.
+     *
+     * @param isRanked 랭크 여부
+     * @param number   방 번호
+     * @return 게임 인스턴스. 존재하지 않으면 {@code null} 반환
      */
-    public void init() {
-        GameInfoRegistry.addGame(this);
-
-        TaskManager.addTask(this, new TaskTimer(20) {
-            @Override
-            protected boolean onTimerTick(int i) {
-                onSecond();
-                return true;
-            }
-        });
-    }
-
-    /**
-     * 게임을 제거한다.
-     */
-    public void remove() {
-        if (!gameUsers.isEmpty())
-            for (GameUser gameUser : new ArrayList<>(gameUsers)) {
-                Lobby.spawn(gameUser.getPlayer());
-                removePlayer(gameUser.getPlayer());
-            }
-
-        GameInfoRegistry.removeGame(this);
-        TaskManager.clearTask(this);
+    public static Game fromNumber(boolean isRanked, int number) {
+        return GameRegistry.getInstance().get(new KeyPair(isRanked, number));
     }
 
     @Override
-    public String getTaskIdentifier() {
-        return "Game@" + gamePlayMode.toString() + hashCode();
+    public void dispose() {
+        checkAccess();
+
+        if (!gameUsers.isEmpty())
+            for (GameUser gameUser : new ArrayList<>(gameUsers)) {
+                if (phase != Phase.WAITING)
+                    gameUser.getUser().reset();
+
+                gameUser.dispose();
+            }
+
+        TaskUtil.clearTask(this);
+        GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return GameRegistry.getInstance().get(new KeyPair(gamePlayMode.isRanked(), number)) == null;
     }
 
     /**
+     * 게임에 소속된 모든 엔티티 목록을 반환한다.
+     *
      * @return 게임에 속한 모든 엔티티
      */
+    @NonNull
     public CombatEntity[] getAllCombatEntities() {
         return combatEntitySet.toArray(new CombatEntity[0]);
     }
 
     /**
+     * 게임에 지정한 엔티티를 추가한다.
+     *
      * @param combatEntity 전투 시스템의 엔티티 객체
      */
-    public void addCombatEntity(CombatEntity combatEntity) {
+    public void addCombatEntity(@NonNull CombatEntity combatEntity) {
         combatEntitySet.add(combatEntity);
     }
 
     /**
+     * 게임에 소속된 지정한 엔티티를 제거한다.
+     *
      * @param combatEntity 전투 시스템의 엔티티 객체
      */
-    public void removeCombatEntity(CombatEntity combatEntity) {
+    public void removeCombatEntity(@NonNull CombatEntity combatEntity) {
         combatEntitySet.remove(combatEntity);
     }
 
     /**
-     * 월드를 로드한다.
+     * 전장으로 사용할 월드를 생성한다.
      */
-    private void loadWorld() {
-        WorldUtil.duplicateWorld(map.getWorldName(), worldName);
+    @NonNull
+    private AsyncTask<World> createWorld() {
+        World world = Bukkit.getWorld(worldName);
+        if (world == null)
+            return WorldUtil.duplicateWorld(Bukkit.getWorld(map.getWorldName()), worldName);
+
+        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(world));
     }
 
     /**
-     * 매 초마다 실행할 작업.
+     * 게임 진행 중 매 초마다 실행할 작업.
      */
     private void onSecond() {
         remainingTime--;
@@ -167,21 +181,18 @@ public final class Game implements HasTask {
         switch (phase) {
             case WAITING: {
                 onSecondWaiting();
-
                 break;
             }
             case READY: {
                 onSecondReady();
-
                 break;
             }
             case PLAYING: {
                 onSecondPlaying();
-
                 break;
             }
             case END:
-                remove();
+                dispose();
         }
     }
 
@@ -192,22 +203,17 @@ public final class Game implements HasTask {
         gameUsers.forEach(this::sendBossBarWaiting);
 
         if (canStart()) {
-            if (remainingTime == 3)
-                loadWorld();
-
             if (remainingTime > 0 && (remainingTime <= 5 || remainingTime == 10))
-                gameUsers.forEach(gameUser -> MessageUtil.sendMessage(gameUser.getPlayer(),
-                        MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingTime)));
+                gameUsers.forEach(gameUser -> gameUser.getUser()
+                        .sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingTime));
 
             if (remainingTime == 0) {
                 phase = Phase.READY;
-                remainingTime = gamePlayMode.getReadyDuration();
-                gameUsers.forEach(gameUser -> BossBarUtil.clearBossBar(gameUser.getPlayer()));
 
-                onStart();
+                onReady();
             }
         } else
-            remainingTime = GameConfig.WAITING_TIME;
+            remainingTime = GeneralConfig.getGameConfig().getWaitingTime();
     }
 
     /**
@@ -215,18 +221,19 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      */
-    private void sendBossBarWaiting(GameUser gameUser) {
-        BossBarUtil.addBossBar(gameUser.getPlayer(), "waitQuit", MESSAGES.BOSSBAR_WAIT_QUIT,
+    private void sendBossBarWaiting(@NonNull GameUser gameUser) {
+        gameUser.getUser().addBossBar("GameWait1", "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.", BarColor.WHITE,
+                WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+        gameUser.getUser().addBossBar("GameWait2",
+                MessageFormat.format("§c게임을 시작하려면 최소 {0}명이 필요합니다.", minPlayerCount),
                 BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        BossBarUtil.addBossBar(gameUser.getPlayer(), "cannotStart", MessageFormat.format(MESSAGES.BOSSBAR_CANNOT_START,
-                minPlayerCount), BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        BossBarUtil.addBossBar(gameUser.getPlayer(), "timer",
-                MessageFormat.format(MESSAGES.BOSSBAR_TIMER,
+        gameUser.getUser().addBossBar("GameWait3",
+                MessageFormat.format("§a§l{0} §f[{1}§f/{2} 명]",
                         (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"), (canStart() ? "§f" : "§c") + gameUsers.size(),
                         maxPlayerCount),
                 BarColor.GREEN,
                 WrapperPlayServerBoss.BarStyle.PROGRESS,
-                canStart() ? (float) remainingTime / GameConfig.WAITING_TIME : 1);
+                canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTime() : 1);
     }
 
     /**
@@ -235,8 +242,8 @@ public final class Game implements HasTask {
     private void onSecondReady() {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                MessageUtil.sendTitle(gameUser.getPlayer(), "§f" + remainingTime, "", 0, 5, 10, 10);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, gameUser.getPlayer(), 1, 1);
+                gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
             });
         }
 
@@ -245,8 +252,8 @@ public final class Game implements HasTask {
             remainingTime = gamePlayMode.getPlayDuration();
 
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, 10F, 1F, gameUser.getPlayer());
-                MessageUtil.sendTitle(gameUser.getPlayer(), "§c§l전투 시작", "", 0, 40, 20, 40);
+                SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, gameUser.getPlayer(), 10, 1);
+                gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
             });
         }
     }
@@ -259,8 +266,8 @@ public final class Game implements HasTask {
 
         if (remainingTime > 0 && remainingTime <= 10) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F, gameUser.getPlayer());
-                MessageUtil.sendTitle(gameUser.getPlayer(), "", "§c" + remainingTime, 0, 5, 10, 10);
+                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, gameUser.getPlayer(), 1, 1);
+                gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
             });
         }
 
@@ -280,21 +287,34 @@ public final class Game implements HasTask {
     }
 
     /**
-     * 게임 시작 시 실행할 작업.
+     * 게임 준비 시 실행할 작업.
      */
-    private void onStart() {
-        divideTeam();
-        startTime = System.currentTimeMillis();
-        gameUsers.forEach(GameUser::onGameStart);
+    private void onReady() {
+        gameUsers.forEach(gameUser -> gameUser.getUser().sendMessageInfo("월드 불러오는 중..."));
+
+        createWorld().onFinish(() -> {
+            remainingTime = gamePlayMode.getReadyDuration();
+            startTime = System.currentTimeMillis();
+            divideTeam();
+
+            gameUsers.forEach(gameUser -> {
+                gameUser.getUser().clearBossBar();
+                gameUser.onGameStart();
+            });
+        }).onError(ex -> {
+            gameUsers.forEach(gameUser2 -> gameUser2.getUser()
+                    .sendMessageWarn("오류로 인해 월드를 불러올 수 없습니다. 관리자에게 문의하십시오."));
+            phase = Phase.END;
+        });
     }
 
     /**
      * 게임 참여자들의 MMR에 따라 팀을 나눈다.
      *
-     * <p>팀 분배는 다음과 같이 이뤄진다. (플레이어 수를 i라고 하자.)</p>
+     * <p>팀 분배는 다음과 같이 이뤄진다.</p>
      *
      * <ol>
-     * <li>먼저 최상위 플레이어를 일부 얻는다. (i / 4의 내림값의 인원수)</li>
+     * <li>플레이어 수를 i라고 하자. 먼저 최상위 플레이어를 일부 얻는다. (i / 4의 내림값의 인원수)</li>
      * <li>그 최상위 플레이어를 1팀으로 이동시킨다.</li>
      * <li>그리고 중위권 플레이어를 2팀에 전부 이동시킨다.</li>
      * <li>나머지 하위권 플레이어를 1팀으로 전부 이동시킨다.</li>
@@ -302,50 +322,41 @@ public final class Game implements HasTask {
      * </ol>
      */
     private void divideTeam() {
-        List<GameUser> sortedGameUsers = gameUsers.stream()
+        LinkedList<GameUser> sortedGameUsers = gameUsers.stream()
                 .sorted(Comparator.comparing(gameUser ->
-                        EntityInfoRegistry.getUser(((GameUser) gameUser).getPlayer()).getUserData().getMatchMakingRate()).reversed())
-                .collect(Collectors.toList());
-        ArrayList<GameUser> team1 = new ArrayList<>();
-        ArrayList<GameUser> team2 = new ArrayList<>();
+                        UserData.fromPlayer(((GameUser) gameUser).getPlayer()).getMatchMakingRate()).reversed())
+                .collect(Collectors.toCollection(LinkedList::new));
+        HashSet<GameUser> team1 = new HashSet<>();
+        HashSet<GameUser> team2 = new HashSet<>();
         int size = sortedGameUsers.size();
 
-        for (int i = 0; i < size / 4; i++) {
-            team1.add(sortedGameUsers.get(0));
-            sortedGameUsers.remove(0);
-        }
-        for (int i = 0; i < size / 2; i++) {
-            team2.add(sortedGameUsers.get(0));
-            sortedGameUsers.remove(0);
-        }
+        for (int i = 0; i < size / 4; i++)
+            team1.add(sortedGameUsers.pop());
+        for (int i = 0; i < size / 2; i++)
+            team2.add(sortedGameUsers.pop());
         team1.addAll(sortedGameUsers);
 
-        Team team1Team;
-        Team team2Team;
-        if (random.nextBoolean()) {
-            team1Team = Team.RED;
-            team2Team = Team.BLUE;
-        } else {
+        Team team1Team = Team.RED;
+        Team team2Team = Team.BLUE;
+        if (DMGR.getRandom().nextBoolean()) {
             team1Team = Team.BLUE;
             team2Team = Team.RED;
         }
 
-        team1.forEach(gameUser -> {
+        for (GameUser gameUser : team1) {
             gameUser.setTeam(team1Team);
             teamUserMap.get(team1Team).add(gameUser);
-        });
-        team2.forEach(gameUser -> {
+        }
+        for (GameUser gameUser : team2) {
             gameUser.setTeam(team2Team);
             teamUserMap.get(team2Team).add(gameUser);
-        });
+        }
     }
 
     /**
      * 게임 종료 시 실행할 작업.
      */
     private void onFinish() {
-        gameUsers.forEach(gameUser -> MessageUtil.clearChat(gameUser.getPlayer()));
-
         Team winnerTeam = teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
         if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
             winnerTeam = Team.NONE;
@@ -372,6 +383,8 @@ public final class Game implements HasTask {
         }
 
         for (GameUser gameUser : gameUsers) {
+            gameUser.getUser().clearChat();
+
             Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
 
             int moneyEarned = updateMoney(gameUser, isWinner);
@@ -396,7 +409,7 @@ public final class Game implements HasTask {
      * 게임 종료 시 결과 메시지와 효과를 전송한다.
      *
      * @param gameUser    대상 플레이어
-     * @param isWinner    승리 여부
+     * @param isWinner    승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @param scoreRank   점수 순위
      * @param damageRank  입힌 피해 순위
      * @param killRank    적 처치 순위
@@ -406,8 +419,9 @@ public final class Game implements HasTask {
      * @param xpEarned    획득한 경험치
      * @param rankEarned  획득한 랭크 점수
      */
-    private void sendResultReport(GameUser gameUser, Boolean isWinner, int scoreRank, int damageRank, int killRank, int defendRank, int healRank, int moneyEarned, int xpEarned, int rankEarned) {
-        ChatColor[] chatColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY};
+    private void sendResultReport(@NonNull GameUser gameUser, Boolean isWinner, int scoreRank, int damageRank, int killRank, int defendRank, int healRank,
+                                  int moneyEarned, int xpEarned, int rankEarned) {
+        ChatColor[] rankColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY};
         ChatColor winColor;
         String winText;
         if (isWinner == null) {
@@ -424,16 +438,36 @@ public final class Game implements HasTask {
             playLoseEffect(gameUser);
         }
 
-        MessageUtil.sendMessage(gameUser.getPlayer(), MessageFormat.format(MESSAGES.REWARD_REPORT, winColor, winText,
-                chatColors[scoreRank], gameUser.getScore(), scoreRank + 1,
-                chatColors[damageRank], gameUser.getDamage(), damageRank + 1,
-                chatColors[killRank], gameUser.getKill(), killRank + 1,
-                chatColors[defendRank], gameUser.getDefend(), defendRank + 1,
-                chatColors[healRank], gameUser.getHeal(), healRank + 1,
-                gameUser.getDeath(), moneyEarned, xpEarned));
+        gameUser.getUser().sendMessageInfo(
+                "§7==============================" +
+                        "\n§d§l플레이 정보 {0}§l[{1}]" +
+                        "\n" +
+                        "\n{2}§l■ {2}점수 : {3} §l[{4}위]" +
+                        "\n{5}§l■ {5}입힌 피해 : {6} §l[{7}위]" +
+                        "\n{8}§l■ {8}적 처치 : {9} §l[{10}위]" +
+                        "\n{11}§l■ {11}막은 피해 : {12} §l[{13}위]" +
+                        "\n{14}§l■ {14}치유 : {15} §l[{16}위]" +
+                        "\n§8§l■ §8사망 : {17}" +
+                        "\n" +
+                        "\n§d§l보상 획득" +
+                        "\n" +
+                        "\n§e▶ CP 획득 §7:: §6+{18}" +
+                        "\n§e▶ 경험치 획득 §7:: §6+{19}" +
+                        "\n§7==============================",
+                winColor, winText,
+                rankColors[scoreRank], gameUser.getScore(), scoreRank + 1,
+                rankColors[damageRank], gameUser.getDamage(), damageRank + 1,
+                rankColors[killRank], gameUser.getKill(), killRank + 1,
+                rankColors[defendRank], gameUser.getDefend(), defendRank + 1,
+                rankColors[healRank], gameUser.getHeal(), healRank + 1,
+                gameUser.getDeath(), moneyEarned, xpEarned);
         if (gamePlayMode.isRanked())
-            MessageUtil.sendMessage(gameUser.getPlayer(), MessageFormat.format(MESSAGES.RANK_REPORT,
-                    winColor + (rankEarned >= 0 ? "+" : ""), rankEarned));
+            gameUser.getUser().sendMessageInfo(
+                    "\n§d§l랭크" +
+                            "\n" +
+                            "\n§e▶ 랭크 점수 §7:: {0}{1}" +
+                            "\n§7==============================",
+                    winColor + (rankEarned >= 0 ? "+" : ""), rankEarned);
     }
 
     /**
@@ -441,14 +475,11 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      */
-    private void playWinEffect(GameUser gameUser) {
-        new TaskWait(40) {
-            @Override
-            protected void onEnd() {
-                MessageUtil.sendTitle(gameUser.getPlayer(), "§b§l승리", "", 8, 40, 30, 40);
-                SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, 10F, 1.5F, gameUser.getPlayer());
-            }
-        };
+    private void playWinEffect(@NonNull GameUser gameUser) {
+        new DelayTask(() -> {
+            gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
+            SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, gameUser.getPlayer(), 10, 1.5);
+        }, 40).run();
     }
 
     /**
@@ -456,14 +487,11 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      */
-    private void playLoseEffect(GameUser gameUser) {
-        new TaskWait(40) {
-            @Override
-            protected void onEnd() {
-                MessageUtil.sendTitle(gameUser.getPlayer(), "§c§l패배", "", 8, 40, 30, 40);
-                SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, 10F, 0F, gameUser.getPlayer());
-            }
-        };
+    private void playLoseEffect(@NonNull GameUser gameUser) {
+        new DelayTask(() -> {
+            gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
+            SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, gameUser.getPlayer(), 10, 0.5);
+        }, 40).run();
     }
 
     /**
@@ -471,14 +499,11 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      */
-    private void playDrawEffect(GameUser gameUser) {
-        new TaskWait(40) {
-            @Override
-            protected void onEnd() {
-                MessageUtil.sendTitle(gameUser.getPlayer(), "§e§l무승부", "", 8, 40, 30, 40);
-                SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 10F, 1F, gameUser.getPlayer());
-            }
-        };
+    private void playDrawEffect(@NonNull GameUser gameUser) {
+        new DelayTask(() -> {
+            gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
+            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, gameUser.getPlayer(), 10, 1);
+        }, 40).run();
     }
 
     /**
@@ -488,15 +513,15 @@ public final class Game implements HasTask {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 획득한 경험치
      */
-    private int updateXp(GameUser gameUser, Boolean isWinner) {
-        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
+    private int updateXp(@NonNull GameUser gameUser, Boolean isWinner) {
+        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
 
         int xp = userData.getXp();
         double score = gameUser.getScore();
 
-        userData.setXp(RewardUtil.getFinalXp(xp, score, isWinner));
+        userData.setXp(GameReward.getFinalXp(xp, score, isWinner));
 
-        return RewardUtil.getFinalXp(xp, score, isWinner) - xp;
+        return GameReward.getFinalXp(xp, score, isWinner) - xp;
     }
 
     /**
@@ -506,13 +531,13 @@ public final class Game implements HasTask {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 획득한 돈
      */
-    private int updateMoney(GameUser gameUser, Boolean isWinner) {
-        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
+    private int updateMoney(@NonNull GameUser gameUser, Boolean isWinner) {
+        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
 
         int money = userData.getMoney();
         double score = gameUser.getScore();
 
-        userData.setMoney(RewardUtil.getFinalMoney(money, score, isWinner));
+        userData.setMoney(GameReward.getFinalMoney(money, score, isWinner));
 
         return userData.getMoney() - money;
     }
@@ -522,21 +547,21 @@ public final class Game implements HasTask {
      *
      * @param gameUser 대상 플레이어
      */
-    private void updateMMR(GameUser gameUser) {
-        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
+    private void updateMMR(@NonNull GameUser gameUser) {
+        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
 
         int mmr = userData.getMatchMakingRate();
         int normalPlayCount = userData.getNormalPlayCount();
-        float kda = gameUser.getKDARatio();
+        double kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - gameUser.getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
-        userData.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
+        userData.setMatchMakingRate(GameReward.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
         userData.setNormalPlayCount(normalPlayCount + 1);
 
-        DMGR.getPlugin().getLogger().info(MessageFormat.format("유저 MMR 변동됨: ({0}) {1} -> {2} MMR PLAY: {3}",
-                gameUser.getPlayer().getName(), mmr, userData.getMatchMakingRate(), normalPlayCount + 1));
+        ConsoleLogger.info("{0}의 유저 MMR 변동됨: {1} -> {2}, 일반 매치 플레이 횟수: {3}",
+                gameUser.getPlayer().getName(), mmr, userData.getMatchMakingRate(), normalPlayCount + 1);
     }
 
     /**
@@ -546,34 +571,40 @@ public final class Game implements HasTask {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 랭크 점수 획득량
      */
-    private int updateRankRate(GameUser gameUser, Boolean isWinner) {
-        UserData userData = EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData();
+    private int updateRankRate(@NonNull GameUser gameUser, Boolean isWinner) {
+        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
 
         int mmr = userData.getMatchMakingRate();
         int rr = userData.getRankRate();
         int rankPlayCount = userData.getRankPlayCount();
-        float kda = gameUser.getKDARatio();
+        double kda = gameUser.getKDARatio();
         double score = gameUser.getScore();
         int playTime = (int) ((System.currentTimeMillis() - gameUser.getStartTime()) / 1000);
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 
-        userData.setMatchMakingRate(RewardUtil.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
+        userData.setMatchMakingRate(GameReward.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
         userData.setRankPlayCount(rankPlayCount + 1);
 
         if (!userData.isRanked()) {
-            if (rankPlayCount + 1 >= GameConfig.RANK_PLACEMENT_PLAY_COUNT) {
-                userData.setRankRate(RewardUtil.getFinalRankRate(mmr));
+            if (rankPlayCount + 1 >= GeneralConfig.getGameConfig().getRankPlacementPlayCount()) {
+                userData.setRankRate(GameReward.getFinalRankRate(mmr));
                 userData.setRanked(true);
             }
-        } else
-            userData.setRankRate(RewardUtil.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
+        } else {
+            userData.setRankRate(GameReward.getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRank, isWinner));
+            ConsoleLogger.info("{0}의 RR 변동됨: {1} -> {2}, 랭크 매치 플레이 횟수: {3}",
+                    gameUser.getPlayer().getName(), rr, userData.getRankRate(), rankPlayCount + 1);
+        }
 
         return userData.getRankRate() - rr;
     }
 
     /**
      * 플레이어가 게임에 참여할 수 있는 지 확인한다.
+     *
+     * <p>추가 인원을 수용할 수 있고 게임이 진행 중인 상태이며, 양 팀의 인원수가
+     * 다를 때 참여 가능하다.</p>
      *
      * @return 참여 가능 여부
      */
@@ -595,14 +626,11 @@ public final class Game implements HasTask {
      *
      * <p>게임이 진행 중이면 인원이 부족한 팀이 있을 때만 난입이 가능하다.</p>
      *
-     * @param player 대상 플레이어
+     * @param gameUser 대상 플레이어
      */
-    public void addPlayer(Player player) {
+    void addPlayer(@NonNull GameUser gameUser) {
         if (!canJoin())
             return;
-
-        GameUser gameUser = new GameUser(player, this);
-        gameUser.init();
 
         int redAmount = teamUserMap.get(Team.RED).size();
         int blueAmount = teamUserMap.get(Team.BLUE).size();
@@ -618,28 +646,20 @@ public final class Game implements HasTask {
         }
 
         gameUsers.add(gameUser);
-        gameUsers.forEach(gameUser2 -> MessageUtil.sendMessage(gameUser2.getPlayer(),
-                MESSAGES.JOIN_PREFIX + gameUser.getPlayer().getName()));
+        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
     }
 
     /**
      * 게임에서 지정한 플레이어를 제거한다.
      *
-     * @param player 대상 플레이어
+     * @param gameUser 대상 플레이어
      */
-    public void removePlayer(Player player) {
-        GameUser gameUser = EntityInfoRegistry.getGameUser(player);
-        if (gameUser == null)
-            return;
+    void removePlayer(@NonNull GameUser gameUser) {
+        gameUser.getUser().clearBossBar();
 
-        gameUser.remove();
-        BossBarUtil.clearBossBar(player);
-
-        gameUsers.forEach(gameUser2 -> MessageUtil.sendMessage(gameUser2.getPlayer(),
-                MESSAGES.QUIT_PREFIX + gameUser.getPlayer().getName()));
+        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
-        if (teamUserMap.get(gameUser.getTeam()) != null)
-            teamUserMap.get(gameUser.getTeam()).remove(gameUser);
+        teamUserMap.get(gameUser.getTeam()).remove(gameUser);
 
         if (phase != Phase.END && gameUsers.isEmpty())
             phase = Phase.END;
@@ -650,9 +670,9 @@ public final class Game implements HasTask {
      *
      * @return 참여자들의 MMR 평균
      */
-    public double getAverageMMR() {
+    private double getAverageMMR() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData().getMatchMakingRate())
+                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getMatchMakingRate())
                 .average()
                 .orElse(0);
     }
@@ -662,9 +682,9 @@ public final class Game implements HasTask {
      *
      * @return 참여자들의 랭크 점수 평균
      */
-    public double getAverageRankRate() {
+    private double getAverageRankRate() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> EntityInfoRegistry.getUser(gameUser.getPlayer()).getUserData().getRankRate())
+                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getRankRate())
                 .average()
                 .orElse(0);
     }
@@ -688,39 +708,14 @@ public final class Game implements HasTask {
     }
 
     /**
-     * 게임에 사용되는 메시지 목록.
+     * {@link GameRegistry}에서 키 값으로 사용되는 클래스.
      */
-    private interface MESSAGES {
-        /** 입장 메시지의 접두사 */
-        String JOIN_PREFIX = "§f§l[§a§l+§f§l] §b";
-        /** 퇴장 메시지의 접두사 */
-        String QUIT_PREFIX = "§f§l[§6§l-§f§l] §b";
-        /** 게임 종료 후 보상 메시지 */
-        String REWARD_REPORT = "§7==============================" +
-                "\n§d§l플레이 정보 {0}§l[{1}]" +
-                "\n" +
-                "\n{2}§l■ {2}점수 : {3} §l[{4}위]" +
-                "\n{5}§l■ {5}입힌 피해 : {6} §l[{7}위]" +
-                "\n{8}§l■ {8}적 처치 : {9} §l[{10}위]" +
-                "\n{11}§l■ {11}막은 피해 : {12} §l[{13}위]" +
-                "\n{14}§l■ {14}치유 : {15} §l[{16}위]" +
-                "\n§8§l■ §8사망 : {17}" +
-                "\n" +
-                "\n§d§l보상 획득" +
-                "\n" +
-                "\n§e▶ CP 획득 §7:: §6+{18}" +
-                "\n§e▶ 경험치 획득 §7:: §6+{19}" +
-                "\n§7==============================";
-        /** 게임 종료 후 랭크 변동 메시지 */
-        String RANK_REPORT = "\n§d§l랭크" +
-                "\n" +
-                "\n§e▶ 랭크 점수 §7:: {0}{1}" +
-                "\n§7==============================";
-        /** 대기열 나가기 보스바 메시지 */
-        String BOSSBAR_WAIT_QUIT = "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.";
-        /** 게임 시작 불가 보스바 메시지 */
-        String BOSSBAR_CANNOT_START = "§c게임을 시작하려면 최소 {0}명이 필요합니다.";
-        /** 게임 시작 타이머 보스바 메시지 */
-        String BOSSBAR_TIMER = "§a§l{0} §f[{1}§f/{2} 명]";
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @EqualsAndHashCode
+    public static final class KeyPair {
+        /** 랭크 여부 */
+        private final boolean isRanked;
+        /** 방 번호 */
+        private final int number;
     }
 }

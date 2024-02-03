@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.Action;
 /**
  * 스킬의 상태를 관리하는 인터페이스.
  *
- * @see SkillBase
+ * @see AbstractSkill
  */
 public interface Skill extends Action {
     /**
