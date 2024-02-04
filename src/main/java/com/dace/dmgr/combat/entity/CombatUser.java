@@ -648,7 +648,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!skill.isDurationFinished())
                 value = 0;
         }
-        if (value >= 1) {
+        if (value == 1) {
             onUltReady();
             value = 0.999;
         }
@@ -661,10 +661,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 궁극기 게이지를 증가시킨다.
      *
      * @param value 추가할 궁극기 게이지. 0~1 사이의 값. (단위: 백분율)
-     * @throws IllegalArgumentException {@code value}가 0~1 사이가 아니면 발생
      */
     public void addUltGaugePercent(double value) {
-        setUltGaugePercent(getUltGaugePercent() + value);
+        setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
 
     /**
