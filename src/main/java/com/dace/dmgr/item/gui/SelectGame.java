@@ -160,7 +160,7 @@ public final class SelectGame extends Gui {
             }
 
             String[] gamePlayModeNames =
-                    Arrays.stream(GamePlayMode.values()).filter(gamePlayMode -> !this.toString().equals("NORMAL"))
+                    Arrays.stream(GamePlayMode.values()).filter(gamePlayMode -> this.toString().equals("NORMAL"))
                             .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
             itemBuilder.addLore(gamePlayModeNames);
 

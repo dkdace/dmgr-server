@@ -99,10 +99,15 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        confirmModule.dispose();
+    }
+
+    @Override
     public void reset() {
         super.reset();
 
-        confirmModule.dispose();
         if (entity != null)
             entity.dispose();
     }
