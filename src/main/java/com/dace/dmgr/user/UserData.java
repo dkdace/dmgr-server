@@ -141,8 +141,31 @@ public final class UserData extends YamlFile {
                 return;
 
             User user = User.fromPlayer(player);
-            user.playLevelUpEffect(level);
+            user.playLevelUpEffect();
         }
+    }
+
+    /**
+     * 현재 레벨에 따른 칭호를 반환한다.
+     *
+     * @return 레벨 칭호
+     */
+    @NonNull
+    public String getLevelPrefix() {
+        String color;
+
+        if (level <= 100)
+            color = "§f§l";
+        else if (level <= 200)
+            color = "§a§l";
+        else if (level <= 300)
+            color = "§b§l";
+        else if (level <= 400)
+            color = "§d§l";
+        else
+            color = "§e§l";
+
+        return color + "[ Lv." + level + " ]";
     }
 
     public void setLevel(int level) {
@@ -167,9 +190,9 @@ public final class UserData extends YamlFile {
 
         User user = User.fromPlayer(player);
         if (getTier().getMinScore() > tier.getMinScore())
-            user.playTierUpEffect(tier);
+            user.playTierUpEffect();
         else if (getTier().getMinScore() < tier.getMinScore())
-            user.playTierDownEffect(tier);
+            user.playTierDownEffect();
     }
 
     public void setRanked(boolean ranked) {

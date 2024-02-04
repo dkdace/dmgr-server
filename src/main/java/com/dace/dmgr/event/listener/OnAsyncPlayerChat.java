@@ -20,6 +20,7 @@ public final class OnAsyncPlayerChat implements Listener {
 
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
+        UserData userData = UserData.fromPlayer(player);
 
         if (!player.isOp()) {
             if (CooldownUtil.getCooldown(user, Cooldown.CHAT) > 0) {
@@ -29,7 +30,8 @@ public final class OnAsyncPlayerChat implements Listener {
             CooldownUtil.setCooldown(user, Cooldown.CHAT);
         }
 
-        Bukkit.getServer().broadcastMessage(MessageFormat.format("<{0}> {1}", player.getDisplayName(), event.getMessage()));
+        Bukkit.getServer().broadcastMessage(MessageFormat.format("<{0} {1} §f{2}> {3}",
+                userData.getTier().getPrefix(), userData.getLevelPrefix(), player.getDisplayName(), event.getMessage()));
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
             UserData userData2 = UserData.fromPlayer(player2);
             SoundUtil.play(userData2.getConfig().getChatSound().getSound(), player2, 1000, Math.sqrt(2));

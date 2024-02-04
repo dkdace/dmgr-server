@@ -2,7 +2,6 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,7 +26,7 @@ public final class Menu extends Gui {
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         guiController.fillAll(DisplayItem.EMPTY.getGuiItem());
         guiController.set(4, PlayerInfoItem.instance, itemBuilder -> {
-            String prefix = StringFormUtil.getLevelPrefix(UserData.fromPlayer(player).getLevel());
+            String prefix = UserData.fromPlayer(player).getLevelPrefix();
             ((SkullMeta) itemBuilder.formatName(prefix, player.getName()).getItemMeta()).setOwningPlayer(player);
         });
         guiController.set(19, MenuItem.GAME_START.guiItem);
