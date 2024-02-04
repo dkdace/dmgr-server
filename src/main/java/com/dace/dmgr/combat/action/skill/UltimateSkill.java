@@ -1,22 +1,24 @@
 package com.dace.dmgr.combat.action.skill;
 
-import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.NonNull;
 import org.bukkit.Sound;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 public abstract class UltimateSkill extends ActiveSkill {
-    protected UltimateSkill(int number, CombatUser combatUser, UltimateSkillInfo ultimateSkillInfo) {
+    protected UltimateSkill(int number, @NonNull CombatUser combatUser, @NonNull UltimateSkillInfo ultimateSkillInfo) {
         super(number, combatUser, ultimateSkillInfo, 3);
     }
 
     @Override
-    public final ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public final ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_4};
     }
 
@@ -27,22 +29,14 @@ public abstract class UltimateSkill extends ActiveSkill {
 
     @Override
     protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 2F, combatUser.getEntity());
+        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, combatUser.getEntity(), 0.5, 2);
     }
 
     @Override
-    public final void onUse(ActionKey actionKey) {
+    @MustBeInvokedByOverriders
+    public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setUltGaugePercent(0);
-        playUseSound();
-
-        onUseUltimateSkill(actionKey);
-    }
-
-    /**
-     * 사용 효과음을 재생한다.
-     */
-    private void playUseSound() {
-        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, combatUser.getEntity().getLocation(), 10F, 2F);
+        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, combatUser.getEntity().getLocation(), 10, 2);
     }
 
     /**
@@ -51,9 +45,4 @@ public abstract class UltimateSkill extends ActiveSkill {
      * @return 필요 충전량
      */
     public abstract int getCost();
-
-    /**
-     * @see Action#onUse(ActionKey)
-     */
-    protected abstract void onUseUltimateSkill(ActionKey actionKey);
 }

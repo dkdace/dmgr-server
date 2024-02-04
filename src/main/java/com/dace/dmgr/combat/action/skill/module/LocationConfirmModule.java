@@ -1,9 +1,11 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,19 +25,31 @@ import java.text.MessageFormat;
  *
  * @see Confirmable
  */
-public final class LocationConfirmModule extends ConfirmModule {
-    /** 최대 거리 */
+public final class LocationConfirmModule extends ConfirmModule implements Disposable {
+    /** 최대 거리. (단위: 블록) */
     private final int maxDistance;
 
     /** 현재 지정 위치 */
+    @NonNull
     @Getter
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */
     private ArmorStand pointer = null;
+    @Getter
+    private boolean isDisposed = false;
 
+    /**
+     * 위치 확인 모듈 인스턴스를 생성한다.
+     *
+     * @param skill       대상 스킬
+     * @param acceptKey   수락 키
+     * @param cancelKey   취소 키
+     * @param maxDistance 최대 거리. (단위: 블록)
+     */
     public LocationConfirmModule(Confirmable skill, ActionKey acceptKey, ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
         this.maxDistance = maxDistance;
+        this.currentLocation = skill.getCombatUser().getEntity().getLocation();
     }
 
     /**
@@ -73,7 +87,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     }
 
     @Override
-    protected void onCheckTick(int i) {
+    protected void onCheckTick(long i) {
         Player player = skill.getCombatUser().getEntity();
 
         currentLocation = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 1, 0.5);
@@ -83,12 +97,12 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.teleport(currentLocation.clone().add(0, -1.75, 0).add(currentLocation.getDirection().multiply(0.25)));
         if (isValid()) {
             GlowAPI.setGlowing(pointer, GlowAPI.Color.GREEN, player);
-            skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_VALID, acceptKey.getName(),
-                    cancelKey.getName()), 0, 5, 5);
+            skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f설치     §7§l[{1}] §f취소",
+                    acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
         } else {
             GlowAPI.setGlowing(pointer, GlowAPI.Color.RED, player);
-            skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING_INVALID, acceptKey.getName(),
-                    cancelKey.getName()), 0, 5, 5);
+            skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §c설치     §7§l[{1}] §f취소",
+                    acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
         }
         pointer.setAI(false);
     }
@@ -99,24 +113,11 @@ public final class LocationConfirmModule extends ConfirmModule {
     }
 
     @Override
-    public void onReset() {
+    public void dispose() {
+        checkAccess();
+
         if (pointer != null)
             pointer.remove();
-    }
-
-    @Override
-    public void onRemove() {
-        if (pointer != null)
-            pointer.remove();
-    }
-
-    /**
-     * 메시지 목록.
-     */
-    private interface MESSAGES {
-        /** 확인 중 메시지 (사용 가능) */
-        String CHECKING_VALID = "§7§l[{0}] §f설치     §7§l[{1}] §f취소";
-        /** 확인 중 메시지 (사용 불가능) */
-        String CHECKING_INVALID = "§7§l[{0}] §c설치     §7§l[{1}] §f취소";
+        isDisposed = true;
     }
 }

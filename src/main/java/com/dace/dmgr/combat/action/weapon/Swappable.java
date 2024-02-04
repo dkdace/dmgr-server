@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.combat.action.weapon.module.SwapModule;
+import lombok.NonNull;
 
 /**
  * 주무기와 보조무기의 전환이 가능한 2중 무기의 인터페이스.
@@ -11,6 +12,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
     /**
      * @return 2중 무기 모듈
      */
+    @NonNull
     SwapModule<T> getSwapModule();
 
     /**
@@ -18,16 +20,14 @@ public interface Swappable<T extends Weapon> extends Weapon {
      *
      * @param swapState 변경할 상태
      */
-    default void onSwapStart(SwapState swapState) {
-    }
+    void onSwapStart(@NonNull SwapState swapState);
 
     /**
      * 무기 전환이 끝났을 때 실행할 작업.
      *
      * @param swapState 변경할 상태
      */
-    default void onSwapFinished(SwapState swapState) {
-    }
+    void onSwapFinished(@NonNull SwapState swapState);
 
     /**
      * 무기 전환 상태 목록.

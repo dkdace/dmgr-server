@@ -6,7 +6,7 @@
 
     <groupId>com.dace.dmgr</groupId>
     <artifactId>DMGR</artifactId>
-    <version>0.3.4</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
 
     <name>DMGR</name>
@@ -73,6 +73,10 @@
             <id>dmulloy2-repo</id>
             <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
+        <repository>
+            <id>glaremasters</id>
+            <url>https://repo.glaremasters.me/repository/concuncan/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -135,6 +139,16 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/worldguard-bukkit-6.2.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.grinderwolf</groupId>
+            <artifactId>slimeworldmanager-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.grinderwolf</groupId>
+            <artifactId>slimeworldmanager-plugin</artifactId>
+            <version>2.1.1</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,11 +1,14 @@
 package com.dace.dmgr.util;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 /**
- * 벡터 관련 기능을 제공하는 클래스.
+ * 벡터 연산 관련 기능을 제공하는 클래스.
  */
+@UtilityClass
 public final class VectorUtil {
     /**
      * 위치의 방향을 기준으로 Roll 축을 반환한다.
@@ -13,7 +16,8 @@ public final class VectorUtil {
      * @param location 기준 위치
      * @return Roll 축
      */
-    public static Vector getRollAxis(Location location) {
+    @NonNull
+    public static Vector getRollAxis(@NonNull Location location) {
         return location.getDirection();
     }
 
@@ -23,7 +27,8 @@ public final class VectorUtil {
      * @param location 기준 위치
      * @return Yaw 축
      */
-    public static Vector getYawAxis(Location location) {
+    @NonNull
+    public static Vector getYawAxis(@NonNull Location location) {
         Location loc = location.clone();
         loc.setYaw(location.getYaw() + 90);
         loc.setPitch(0);
@@ -36,7 +41,8 @@ public final class VectorUtil {
      * @param location 기준 위치
      * @return Pitch 축
      */
-    public static Vector getPitchAxis(Location location) {
+    @NonNull
+    public static Vector getPitchAxis(@NonNull Location location) {
         return getRollAxis(location).getCrossProduct(getYawAxis(location));
     }
 
@@ -45,10 +51,11 @@ public final class VectorUtil {
      *
      * @param vector 대상 벡터
      * @param axis   기준 축
-     * @param angle  각도
+     * @param angle  각도 (60분법)
      * @return 최종 벡터
      */
-    public static Vector getRotatedVector(Vector vector, Vector axis, double angle) {
+    @NonNull
+    public static Vector getRotatedVector(@NonNull Vector vector, @NonNull Vector axis, double angle) {
         double sin = Math.sin(Math.toRadians(angle));
         double cos = Math.cos(Math.toRadians(angle));
         Vector finalAxis = axis.clone().normalize();
@@ -72,7 +79,7 @@ public final class VectorUtil {
      * @param vector 대상 벡터
      * @return Yaw 값
      */
-    public static double getYaw(Vector vector) {
+    public static double getYaw(@NonNull Vector vector) {
         if (vector.getX() == 0 && vector.getZ() == 0)
             return 0;
 
@@ -89,7 +96,7 @@ public final class VectorUtil {
      * @param vector 대상 벡터
      * @return Pitch 값
      */
-    public static double getPitch(Vector vector) {
+    public static double getPitch(@NonNull Vector vector) {
         double xy = Math.sqrt(vector.getX() * vector.getX() + vector.getZ() * vector.getZ());
 
         return -Math.toDegrees(Math.atan(vector.getY() / xy));
@@ -99,10 +106,11 @@ public final class VectorUtil {
      * 벡터의 성분을 지정한 값만큼 무작위로 분산시킨 벡터를 반환한다.
      *
      * @param vector 대상 벡터
-     * @param amount 분산값. 단위: ×0.01블록/블록
+     * @param amount 분산값. (단위: ×0.01블록/블록)
      * @return 최종 벡터
      */
-    public static Vector getSpreadedVector(Vector vector, float amount) {
+    @NonNull
+    public static Vector getSpreadedVector(@NonNull Vector vector, double amount) {
         Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.01);
         return vector.clone().add(spread);
     }

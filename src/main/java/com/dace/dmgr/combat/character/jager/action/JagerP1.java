@@ -1,19 +1,20 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.SkillBase;
-import com.dace.dmgr.combat.entity.Ability;
+import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.NonNull;
 
-public final class JagerP1 extends SkillBase {
+public final class JagerP1 extends AbstractSkill {
     public JagerP1(CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
 
     @Override
-    public ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.PERIODIC_1};
     }
 
@@ -40,8 +41,8 @@ public final class JagerP1 extends SkillBase {
     private boolean canActivate() {
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished() && skill1.getHasEntityModule().getSummonEntity() != null) {
-            JagerA1Entity jagerA1Entity = skill1.getHasEntityModule().getSummonEntity();
+        if (!skill1.isDurationFinished() && skill1.entity != null) {
+            JagerA1Entity jagerA1Entity = skill1.entity;
 
             return jagerA1Entity.getHitboxes()[0].isInHitbox(combatUser.getEntity().getLocation(), JagerP1Info.DETECT_RADIUS);
         }
@@ -50,21 +51,13 @@ public final class JagerP1 extends SkillBase {
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("JagerP1", JagerP1Info.SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier("JagerP1", JagerP1Info.SPEED);
 
-        TaskManager.addTask(this, new TaskTimer(1) {
-            @Override
-            public boolean onTimerTick(int i) {
-                return canActivate();
-            }
-
-            @Override
-            public void onEnd(boolean cancelled) {
-                setDuration(0);
-                combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("JagerP1");
-            }
-        });
+        TaskUtil.addTask(this, new IntervalTask(i -> canActivate(), isCancelled -> {
+            setDuration(0);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerP1");
+        }, 1));
     }
 }

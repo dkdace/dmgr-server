@@ -1,0 +1,242 @@
+package com.dace.dmgr.game;
+
+import com.dace.dmgr.Disposable;
+import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import java.text.MessageFormat;
+
+/**
+ * 게임 시스템의 플레이어 정보를 관리하는 클래스.
+ */
+public final class GameUser implements Disposable {
+    /** 스폰 지역 확인 Y 좌표 */
+    private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
+    /** 플레이어 객체 */
+    @NonNull
+    @Getter
+    private final Player player;
+    /** 유저 정보 객체 */
+    @NonNull
+    @Getter
+    private final User user;
+    /** 입장한 게임 */
+    @NonNull
+    @Getter
+    private final Game game;
+    /** 전투 플레이어 객체 */
+    private CombatUser combatUser = null;
+    /** 팀 */
+    @NonNull
+    @Getter
+    @Setter
+    private Team team = Team.NONE;
+    /** 점수 */
+    @Getter
+    @Setter
+    private double score = 0;
+    /** 킬 */
+    @Getter
+    @Setter
+    private int kill = 0;
+    /** 데스 */
+    @Getter
+    @Setter
+    private int death = 0;
+    /** 어시스트 */
+    @Getter
+    @Setter
+    private int assist = 0;
+    /** 입힌 피해량 */
+    @Getter
+    @Setter
+    private int damage = 0;
+    /** 막은 피해량 */
+    @Getter
+    @Setter
+    private int defend = 0;
+    /** 치유량 */
+    @Getter
+    @Setter
+    private int heal = 0;
+    /** 게임 시작 시점 */
+    @Getter
+    private long startTime = 0;
+
+    /**
+     * 게임 시스템의 플레이어 인스턴스를 생성하고, 게임의 소속 유저 목록({@link Game#getGameUsers()})에 추가한다.
+     *
+     * @param user 대상 플레이어
+     * @throws IllegalStateException 해당 {@code user}의 GameUser가 이미 존재하면 발생
+     */
+    public GameUser(@NonNull User user, @NonNull Game game) {
+        GameUser gameUser = GameUserRegistry.getInstance().get(user);
+        if (gameUser != null)
+            throw new IllegalStateException(MessageFormat.format("플레이어 {0}의 GameUser가 이미 생성됨", user.getPlayer().getName()));
+
+        this.user = user;
+        this.player = user.getPlayer();
+        this.game = game;
+
+        game.addPlayer(this);
+        GameUserRegistry.getInstance().add(user, this);
+
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onTick();
+            return true;
+        }, 1));
+    }
+
+    /**
+     * 지정한 플레이어의 게임 유저 인스턴스를 반환한다.
+     *
+     * @param user 대상 플레이어
+     * @return 게임 유저 인스턴스. 존재하지 않으면 {@code null} 반환
+     */
+    public static GameUser fromUser(@NonNull User user) {
+        return GameUserRegistry.getInstance().get(user);
+    }
+
+    /**
+     * 매 tick마다 실행할 작업.
+     */
+    private void onTick() {
+        if (combatUser == null)
+            return;
+
+        if (getSpawnRegionTeam() != null) {
+            if (game.getPhase() == Game.Phase.READY)
+                return;
+
+            if (getSpawnRegionTeam() == team)
+                onTickTeamSpawn();
+            else
+                onTickOppositeSpawn();
+        } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
+            user.teleport(getRespawnLocation());
+    }
+
+    /**
+     * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
+     */
+    private void onTickTeamSpawn() {
+        player.getInventory().setHeldItemSlot(4);
+
+        if (game.getPhase() == Game.Phase.PLAYING)
+            user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
+                    "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
+
+        combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20, false);
+    }
+
+    /**
+     * 플레이어가 상대 팀 스폰에 있을 때 매 틱마다 실행할 작업.
+     */
+    private void onTickOppositeSpawn() {
+        if (!combatUser.isDead())
+            user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
+
+        combatUser.getDamageModule().damage((Attacker) null,
+                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.SYSTEM, false, false);
+    }
+
+    /**
+     * 게임 유저를 제거하고, 소속된 게임({@link Game#getGameUsers()})에서 제거한다.
+     */
+    @Override
+    public void dispose() {
+        checkAccess();
+
+        GameUserRegistry.getInstance().remove(user);
+        game.removePlayer(this);
+        TaskUtil.clearTask(this);
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return GameUserRegistry.getInstance().get(user) == null;
+    }
+
+    /**
+     * 게임 시작 시 실행할 작업.
+     */
+    public void onGameStart() {
+        startTime = System.currentTimeMillis();
+        player.getInventory().setHeldItemSlot(4);
+        player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
+        user.teleport(getRespawnLocation());
+        user.clearChat();
+
+        user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
+                (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
+
+        if (combatUser == null)
+            combatUser = new CombatUser(user);
+    }
+
+    /**
+     * 플레이어가 속한 팀의 팀 점수를 증가시킨다.
+     *
+     * @param increment 증가량
+     */
+    public void addTeamScore(int increment) {
+        if (team != Team.NONE)
+            game.getTeamScore().put(team, game.getTeamScore().get(team) + increment);
+    }
+
+    /**
+     * 리스폰 위치를 반환한다.
+     *
+     * @return 리스폰 위치
+     */
+    @NonNull
+    public Location getRespawnLocation() {
+        if (team == Team.RED)
+            return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
+                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+        else if (team == Team.BLUE)
+            return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
+                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+
+        return LocationUtil.getLobbyLocation();
+    }
+
+    /**
+     * 해당 게임 유저의 킬/데스 를 반환한다.
+     *
+     * <p>어시스트도 킬로 취급하며, 데스가 {@code 0}이면 {@code 1}로 처리한다.</p>
+     *
+     * @return (킬 + 어시스트) / 데스
+     */
+    public double getKDARatio() {
+        return (double) (kill + assist) / ((death == 0) ? 1 : death);
+    }
+
+    /**
+     * 플레이어가 있는 스폰 지역의 팀을 확인한다.
+     *
+     * @return 해당 스폰 지역의 팀. 플레이어가 팀 스폰 외부에 있으면 {@code null} 반환
+     */
+    public Team getSpawnRegionTeam() {
+        if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.REDSTONE_ORE))
+            return Team.RED;
+        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.LAPIS_ORE))
+            return Team.BLUE;
+
+        return null;
+    }
+}

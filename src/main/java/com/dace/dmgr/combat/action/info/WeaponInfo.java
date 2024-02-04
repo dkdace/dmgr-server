@@ -2,8 +2,9 @@ package com.dace.dmgr.combat.action.info;
 
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.gui.ItemBuilder;
+import com.dace.dmgr.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
 /**
@@ -24,6 +25,8 @@ public abstract class WeaponInfo extends ActionInfo {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setUnbreakable(true);
+        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemStack.setItemMeta(itemMeta);
     }
 

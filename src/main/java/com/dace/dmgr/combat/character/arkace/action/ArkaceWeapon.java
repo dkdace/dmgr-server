@@ -2,30 +2,26 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.GunHitscan;
-import com.dace.dmgr.combat.HitscanOption;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActionModule;
+import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.WeaponBase;
 import com.dace.dmgr.combat.action.weapon.module.GradualSpreadModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.combat.interaction.GunHitscan;
+import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 @Getter
-public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAuto {
+public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
@@ -39,12 +35,8 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public ActionModule[] getModules() {
-        return new ActionModule[]{reloadModule, fullAutoModule};
-    }
-
-    @Override
-    public ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.DROP};
     }
 
@@ -54,7 +46,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
                 if (reloadModule.getRemainingAmmo() == 0) {
@@ -63,11 +55,11 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
                 }
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
                     setCooldown(4);
-                    CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                    CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                     return;
                 }
 
-                CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 boolean isUlt = !combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished();
                 Location loc = combatUser.getEntity().getLocation();
 
@@ -77,7 +69,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
                 } else {
                     new ArkaceWeaponHitscan(false).shoot(fullAutoModule.increaseSpread());
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
-                            ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2F);
+                            ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     reloadModule.consume(1);
                     playShootSound(loc);
                 }
@@ -98,8 +90,8 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
      * @param location 발사 위치
      */
     private void playShootSound(Location location) {
-        SoundUtil.play("random.gun2.scarlight_1", location, 3F, 1F);
-        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+        SoundUtil.play("random.gun2.scarlight_1", location, 3, 1);
+        SoundUtil.play("random.gun_reverb", location, 5, 1.2);
     }
 
     /**
@@ -108,9 +100,9 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
      * @param location 발사 위치
      */
     private void playUltShootSound(Location location) {
-        SoundUtil.play("new.block.beacon.deactivate", location, 4F, 2F);
-        SoundUtil.play("random.energy", location, 4F, 1.6F);
-        SoundUtil.play("random.gun_reverb", location, 5F, 1.2F);
+        SoundUtil.play("new.block.beacon.deactivate", location, 4, 2);
+        SoundUtil.play("random.energy", location, 4, 1.6);
+        SoundUtil.play("random.gun_reverb", location, 5, 1.2);
     }
 
     @Override
@@ -124,32 +116,37 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
     }
 
     @Override
-    public void onReloadTick(int i) {
-        CooldownManager.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
+    public void onReloadTick(long i) {
+        CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
 
-        switch (i) {
+        switch ((int) i) {
             case 3:
-                SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6F, 1.6F);
+                SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6, 1.6);
                 break;
             case 4:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6F, 1.9F);
+                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 1.9);
                 break;
             case 18:
-                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6F, 0.5F);
+                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6, 0.5);
                 break;
             case 19:
-                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6F, 1F);
+                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 1);
                 break;
             case 20:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 1.8);
                 break;
             case 26:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6F, 1.7F);
+                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 1.7);
                 break;
             case 27:
-                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6F, 1.8F);
+                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.8);
                 break;
         }
+    }
+
+    @Override
+    public void onReloadFinished() {
+        // 미사용
     }
 
     private class ArkaceWeaponHitscan extends GunHitscan {
@@ -161,7 +158,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
         }
 
         @Override
-        public void trail(Location location) {
+        public void trail(@NonNull Location location) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
@@ -171,7 +168,7 @@ public final class ArkaceWeapon extends WeaponBase implements Reloadable, FullAu
         }
 
         @Override
-        public boolean onHitEntity(Location location, Vector direction, Damageable target, boolean isCrit) {
+        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
             if (isUlt)
                 target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
             else {

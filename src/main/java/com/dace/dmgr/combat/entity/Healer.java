@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
+import lombok.NonNull;
+
 /**
  * 다른 엔티티를 치유할 수 있는 엔티티의 인터페이스.
  */
@@ -12,5 +14,5 @@ public interface Healer extends CombatEntity {
      * @param isUlt  궁극기 충전 여부
      * @see Healable#onTakeHeal(Healer, int, boolean)
      */
-    void onGiveHeal(Healable target, int amount, boolean isUlt);
+    void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt);
 }

@@ -8,26 +8,31 @@ authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:
   스폰:
+    description: DMGR Command
     aliases:
       - tmvhs
       - spawn
       - 로비
       - fhql
       - lobby
-      - 퇴장
-      - xhlwkd
       - exit
-    description: DMGR Command
   메뉴:
+    description: DMGR Command
     aliases:
       - apsb
       - menu
-    description: DMGR Command
   설정:
+    description: DMGR Command
     aliases:
       - tjfwjd
       - option
       - config
+  퇴장:
+    description: DMGR Command
+    aliases:
+      - xhlwkd
+      - quit
+      - q
   선택:
     permission: admin
     description: DMGR Test command
@@ -42,3 +47,12 @@ commands:
       - dummy
       - 더미
       - ejal
+  게임:
+    permission: admin
+    description: DMGR Test command
+  랭크설정:
+    permission: admin
+    description: DMGR Test command
+  경험치설정:
+    permission: admin
+    description: DMGR Test command

@@ -1,13 +1,17 @@
 package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.game.Game;
+import com.dace.dmgr.util.Cooldown;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -18,6 +22,7 @@ import java.util.function.Predicate;
 /**
  * 전투 시스템에 사용되는 기능을 제공하는 클래스.
  */
+@UtilityClass
 public final class CombatUtil {
     /**
      * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
@@ -34,17 +39,21 @@ public final class CombatUtil {
      * @param start             시작 위치
      * @param end               끝 위치
      * @param damage            피해량
-     * @param weakeningDistance 피해 감소가 시작하는 거리
-     * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소하며,
-     *                          {@code false}면 최소 피해량이 0이 될 때까지 감소한다.
+     * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록)
+     * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소,
+     *                          {@code false}면 최소 피해량이 0이 될 때까지 감소
      * @return 최종 피해량
+     * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있으면 발생
      */
-    public static int getDistantDamage(Location start, Location end, int damage, double weakeningDistance, boolean isHalf) {
+    public static int getDistantDamage(@NonNull Location start, @NonNull Location end, int damage, double weakeningDistance, boolean isHalf) {
+        if (start.getWorld() != end.getWorld())
+            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+
         double distance = start.distance(end);
 
         if (distance > weakeningDistance) {
             distance = distance - weakeningDistance;
-            int finalDamage = (int) ((damage / 2) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2);
+            int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
 
             if (isHalf && finalDamage < damage / 2) {
                 finalDamage = damage / 2;
@@ -60,12 +69,34 @@ public final class CombatUtil {
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
      * @param location  위치
-     * @param range     범위 (반지름)
+     * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
      */
-    public static CombatEntity getNearCombatEntity(Location location, float range, Predicate<CombatEntity> condition) {
-        return EntityInfoRegistry.getAllCombatEntities().stream()
+    public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        return Arrays.stream(CombatEntityUtil.getAllExcluded())
+                .filter(condition)
+                .filter(combatEntity ->
+                        combatEntity.canBeTargeted() &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                .filter(combatEntity ->
+                        Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
+                                hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
+     *
+     * @param game      대상 게임
+     * @param location  위치
+     * @param range     범위 (반지름). (단위: 블록)
+     * @param condition 조건
+     * @return 범위 내 가장 가까운 엔티티
+     */
+    public static CombatEntity getNearCombatEntity(@NonNull Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted() &&
@@ -82,11 +113,13 @@ public final class CombatUtil {
      *
      * @param attacker  공격자 (기준 엔티티)
      * @param location  위치
-     * @param range     범위 (반지름)
+     * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 가장 가까운 적
      */
-    public static CombatEntity getNearEnemy(CombatEntity attacker, Location location, float range, Predicate<CombatEntity> condition) {
+    public static CombatEntity getNearEnemy(@NonNull CombatEntity attacker, @NonNull Location location, double range, Predicate<CombatEntity> condition) {
+        if (attacker.getGame() != null)
+            return getNearCombatEntity(attacker.getGame(), location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
         return getNearCombatEntity(location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
     }
 
@@ -94,12 +127,34 @@ public final class CombatUtil {
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
      * @param location  위치
-     * @param range     범위 (반지름)
+     * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 모든 엔티티
      */
-    public static CombatEntity[] getNearCombatEntities(Location location, float range, Predicate<CombatEntity> condition) {
-        return EntityInfoRegistry.getAllCombatEntities().stream()
+    @NonNull
+    public static CombatEntity[] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        return Arrays.stream(CombatEntityUtil.getAllExcluded())
+                .filter(condition)
+                .filter(combatEntity ->
+                        combatEntity.canBeTargeted() &&
+                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                .filter(combatEntity ->
+                        Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
+                .toArray(CombatEntity[]::new);
+    }
+
+    /**
+     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
+     *
+     * @param game      대상 게임
+     * @param location  위치
+     * @param range     범위 (반지름). (단위: 블록)
+     * @param condition 조건
+     * @return 범위 내 모든 엔티티
+     */
+    @NonNull
+    public static CombatEntity[] getNearCombatEntities(@NonNull Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted() &&
@@ -114,11 +169,14 @@ public final class CombatUtil {
      *
      * @param attacker  공격자 (기준 엔티티)
      * @param location  위치
-     * @param range     범위 (반지름)
+     * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 모든 적
      */
-    public static CombatEntity[] getNearEnemies(CombatEntity attacker, Location location, float range, Predicate<CombatEntity> condition) {
+    @NonNull
+    public static CombatEntity[] getNearEnemies(@NonNull CombatEntity attacker, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        if (attacker.getGame() != null)
+            return getNearCombatEntities(attacker.getGame(), location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
         return getNearCombatEntities(location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
     }
 
@@ -127,12 +185,16 @@ public final class CombatUtil {
      *
      * @param attacker       공격자 (기준 엔티티)
      * @param location       위치
-     * @param range          범위 (반지름)
+     * @param range          범위 (반지름). (단위: 블록)
      * @param condition      조건
-     * @param canContainSelf 공격자 포함 여부. {@code true}로 지정 시 공격자도 포함됨
+     * @param canContainSelf 공격자 포함 여부. {@code true}로 지정 시 공격자도 포함
      * @return 범위 내 모든 적
      */
-    public static CombatEntity[] getNearEnemies(CombatEntity attacker, Location location, float range, Predicate<CombatEntity> condition, boolean canContainSelf) {
+    @NonNull
+    public static CombatEntity[] getNearEnemies(@NonNull CombatEntity attacker, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition, boolean canContainSelf) {
+        if (attacker.getGame() != null)
+            return getNearCombatEntities(attacker.getGame(), location, range, condition.and(combatEntity -> (canContainSelf && combatEntity == attacker) ||
+                    combatEntity.isEnemy(attacker)));
         return getNearCombatEntities(location, range, condition.and(combatEntity -> (canContainSelf && combatEntity == attacker) ||
                 combatEntity.isEnemy(attacker)));
     }
@@ -144,14 +206,14 @@ public final class CombatUtil {
      * @param yaw    변경할 yaw
      * @param pitch  변경할 pitch
      */
-    private static void setYawAndPitch(Player player, float yaw, float pitch) {
+    private static void setYawAndPitch(@NonNull Player player, double yaw, double pitch) {
         WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
 
         packet.setX(0);
         packet.setY(0);
         packet.setZ(0);
-        packet.setYaw(yaw);
-        packet.setPitch(pitch);
+        packet.setYaw((float) yaw);
+        packet.setPitch((float) pitch);
         packet.setFlags(new HashSet<>(Arrays.asList(WrapperPlayServerPosition.PlayerTeleportFlag.values())));
 
         packet.sendPacket(player);
@@ -165,35 +227,32 @@ public final class CombatUtil {
      * @param side            수평 반동
      * @param upSpread        수직 반동 분산도
      * @param sideSpread      수평 반동 분산도
-     * @param ticks           반동 진행 시간
+     * @param duration        반동 진행 시간 (tick)
      * @param firstMultiplier 초탄 반동 계수. {@code 1}로 설정 시 차탄과 동일
      */
-    public static void setRecoil(CombatUser combatUser, float up, float side, float upSpread, float sideSpread, int ticks, float firstMultiplier) {
-        final float finalUpSpread = (float) (upSpread * (Math.random() - Math.random()) * 0.5);
-        final float finalSideSpread = (float) (sideSpread * (Math.random() - Math.random()) * 0.5);
-        final boolean first = CooldownManager.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0;
-        CooldownManager.setCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY);
+    public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
+        final double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
+        final double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
+        final boolean first = CooldownUtil.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0;
+        CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY);
 
         int sum = 0;
-        for (int i = 1; i <= ticks; i++) {
+        for (int i = 1; i <= duration; i++) {
             sum += i;
         }
 
         final int finalSum = sum;
 
-        TaskManager.addTask(combatUser, new TaskTimer(1, ticks) {
-            @Override
-            public boolean onTimerTick(int i) {
-                float finalUp = (up + finalUpSpread) / ((float) finalSum / (ticks - i));
-                float finalSide = (side + finalSideSpread) / ((float) finalSum / (ticks - i));
-                if (first) {
-                    finalUp *= firstMultiplier;
-                    finalSide *= firstMultiplier;
-                }
-                setYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
-
-                return true;
+        TaskUtil.addTask(combatUser, new IntervalTask(i -> {
+            double finalUp = (up + finalUpSpread) / ((double) finalSum / (duration - i));
+            double finalSide = (side + finalSideSpread) / ((double) finalSum / (duration - i));
+            if (first) {
+                finalUp *= firstMultiplier;
+                finalSide *= firstMultiplier;
             }
-        });
+            setYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
+
+            return true;
+        }, 1, duration));
     }
 }

@@ -1,12 +1,15 @@
 package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.system.EntityInfoRegistry;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
@@ -16,38 +19,67 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntity<T> {
     /** 엔티티를 소환한 플레이어 */
+    @NonNull
     protected final CombatUser owner;
+    /** 활성화 시간 (tick) */
+    protected final long activationTime;
 
     /**
      * 소환 가능한 엔티티 인스턴스를 생성한다.
      *
-     * @param entity 대상 엔티티
-     * @param name   이름
-     * @param owner  엔티티를 소환한 플레이어
-     * @param hitbox 히트박스 목록
+     * @param entity         대상 엔티티
+     * @param name           이름
+     * @param owner          엔티티를 소환한 플레이어
+     * @param hideForEnemies 엔티티를 적에게 보이지 할 지 여부
+     * @param activationTime 활성화 시간 (tick)
+     * @param hitboxes       히트박스 목록
+     * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected SummonEntity(T entity, String name, CombatUser owner, Hitbox... hitbox) {
-        super(entity, name, hitbox);
+    protected SummonEntity(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, long activationTime, boolean hideForEnemies,
+                           @NonNull Hitbox... hitboxes) {
+        super(entity, name, owner.getGame(), hitboxes);
+
+        this.activationTime = activationTime;
         this.owner = owner;
+        if (hideForEnemies)
+            hideForEnemies();
     }
 
     @Override
-    @MustBeInvokedByOverriders
-    public void init() {
-        super.init();
+    public final void activate() {
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            if (i < activationTime) {
+                lifeCycle = LifeCycle.ACTIVATING;
+                onTickBeforeActivation(i);
+            } else if (i == activationTime)
+                onActivate();
 
-        setTeam(owner.getTeam());
+            return true;
+        }, 1));
+    }
+
+    /**
+     * 활성화 준비 중에 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    protected abstract void onTickBeforeActivation(long i);
+
+    @Override
+    @NonNull
+    public final String getTeamIdentifier() {
+        return owner.getTeamIdentifier();
     }
 
     /**
      * 엔티티를 모든 적에게 보이지 않게 한다.
      */
-    protected final void hideForEnemies() {
+    private void hideForEnemies() {
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
         Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            CombatUser combatUser2 = EntityInfoRegistry.getCombatUser(player2);
+            CombatUser combatUser2 = CombatUser.fromUser(User.fromPlayer(player2));
             if (combatUser2 != null && getOwner().isEnemy(combatUser2))
                 packet.sendPacket(player2);
         });

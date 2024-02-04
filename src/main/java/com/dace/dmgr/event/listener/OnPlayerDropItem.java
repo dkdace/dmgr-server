@@ -2,9 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.event.combatuser.CombatUserActionEvent;
-import com.dace.dmgr.system.EntityInfoRegistry;
-import org.bukkit.Bukkit;
+import com.dace.dmgr.user.User;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,18 +12,15 @@ public final class OnPlayerDropItem implements Listener {
     @EventHandler
     public static void event(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        CombatUser combatUser = EntityInfoRegistry.getCombatUser(event.getPlayer());
+        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
 
         if (!player.isOp())
             event.setCancelled(true);
 
         if (combatUser != null) {
             event.setCancelled(true);
-            if (combatUser.getCharacter() != null) {
-                CombatUserActionEvent newEvent = new CombatUserActionEvent(combatUser, ActionKey.DROP);
-
-                Bukkit.getServer().getPluginManager().callEvent(newEvent);
-            }
+            if (combatUser.getCharacterType() != null)
+                combatUser.useAction(ActionKey.DROP);
         }
     }
 }

@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.TextIcon;
+import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
 
 public final class ArkaceA1Info extends ActiveSkillInfo {

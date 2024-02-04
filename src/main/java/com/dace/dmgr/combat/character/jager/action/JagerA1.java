@@ -1,37 +1,30 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
-import com.dace.dmgr.combat.action.skill.HasEntity;
-import com.dace.dmgr.combat.action.skill.module.HasEntityModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.entity.Wolf;
 
 @Getter
-public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1Entity>, Confirmable {
-    /** 엔티티 소환 모듈 */
-    private final HasEntityModule<JagerA1Entity> hasEntityModule;
+public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 위치 확인 모듈 */
     private final LocationConfirmModule confirmModule;
+    /** 소환한 엔티티 */
+    JagerA1Entity entity = null;
 
     public JagerA1(CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
-        hasEntityModule = new HasEntityModule<>(this);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }
 
     @Override
-    public ActionModule[] getModules() {
-        return new ActionModule[]{hasEntityModule, confirmModule};
-    }
-
-    @Override
-    public ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
     }
 
@@ -61,7 +54,7 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
         if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
             ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
             ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
@@ -71,8 +64,24 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
             confirmModule.toggleCheck();
         else {
             setDuration(0);
-            hasEntityModule.removeSummonEntity();
+            if (entity != null)
+                entity.dispose();
         }
+    }
+
+    @Override
+    public void onCheckEnable() {
+        // 미사용
+    }
+
+    @Override
+    public void onCheckTick(long i) {
+        // 미사용
+    }
+
+    @Override
+    public void onCheckDisable() {
+        // 미사용
     }
 
     @Override
@@ -85,8 +94,16 @@ public final class JagerA1 extends ChargeableSkill implements HasEntity<JagerA1E
         confirmModule.toggleCheck();
 
         Wolf wolf = CombatEntityUtil.spawn(Wolf.class, confirmModule.getCurrentLocation());
-        JagerA1Entity jagerA1Entity = new JagerA1Entity(wolf, combatUser);
-        jagerA1Entity.init();
-        hasEntityModule.setSummonEntity(jagerA1Entity);
+        entity = new JagerA1Entity(wolf, combatUser);
+        entity.activate();
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+
+        confirmModule.dispose();
+        if (entity != null)
+            entity.dispose();
     }
 }

@@ -1,69 +1,86 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
+import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
-import com.dace.dmgr.system.task.HasTask;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.game.Game;
+import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
  *
- * @see CombatEntityBase
+ * @see AbstractCombatEntity
  */
-public interface CombatEntity extends HasTask {
+public interface CombatEntity extends Disposable {
     /**
-     * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
-     * @return 엔티티 객체
+     * 지정한 엔티티의 전투 시스템 엔티티 인스턴스를 반환한다.
+     *
+     * @param entity 대상 엔티티
+     * @return 전투 시스템의 엔티티 인스턴스. 존재하지 않으면 {@code null} 반환
      */
-    <T extends LivingEntity> T getEntity();
+    static CombatEntity fromEntity(@NonNull Entity entity) {
+        return CombatEntityRegistry.getInstance().get(entity);
+    }
 
     /**
-     * @return 능력치 목록 관리 객체
+     * @param <T> {@link Entity}를 상속받는 엔티티 타입
+     * @return 엔티티 객체
      */
-    AbilityStatusManager getAbilityStatusManager();
+    @NonNull <T extends Entity> T getEntity();
 
     /**
      * @return 속성 목록 관리 객체
      */
+    @NonNull
     PropertyManager getPropertyManager();
 
     /**
      * @return 히트박스 객체 목록
      */
+    @NonNull
     Hitbox[] getHitboxes();
 
     /**
      * @return 이름
      */
+    @NonNull
     String getName();
 
-    String getTeam();
-
-    void setTeam(String team);
+    /**
+     * @return 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
+     */
+    Game getGame();
 
     /**
-     * @return 히트박스의 가능한 최대 크기
+     * 팀 식별자를 반환한다.
+     *
+     * <p>시스템에서 적과 아군을 구별하기 위해 사용한다.</p>
+     *
+     * @return 팀 식별자
+     */
+    @NonNull
+    String getTeamIdentifier();
+
+    /**
+     * @return 히트박스의 가능한 최대 크기. (단위: 블록)
      */
     double getMaxHitboxSize();
 
     /**
-     * 엔티티를 초기화하고 틱 스케쥴러를 실행한다.
+     * 엔티티 활성화 작업을 수행한다.
      */
-    void init();
-
-    /**
-     * 엔티티를 제거한다.
-     */
-    void remove();
+    void activate();
 
     /**
      * 지정한 엔티티가 적인 지 확인한다.
      *
      * @param combatEntity 대상 엔티티
      * @return 적이면 {@code true} 반환
+     * @see CombatEntity#getTeamIdentifier()
      */
-    boolean isEnemy(CombatEntity combatEntity);
+    boolean isEnemy(@NonNull CombatEntity combatEntity);
 
     /**
      * 엔티티가 해당 위치를 통과할 수 있는 지 확인한다.
@@ -71,7 +88,7 @@ public interface CombatEntity extends HasTask {
      * @param location 대상 위치
      * @return 통과 가능하면 {@code true} 반환
      */
-    boolean canPass(Location location);
+    boolean canPass(@NonNull Location location);
 
     /**
      * 엔티티가 대상 엔티티의 위치를 통과할 수 있는 지 확인한다.
@@ -79,7 +96,7 @@ public interface CombatEntity extends HasTask {
      * @param combatEntity 대상 엔티티
      * @return 통과 가능하면 {@code true} 반환
      */
-    boolean canPass(CombatEntity combatEntity);
+    boolean canPass(@NonNull CombatEntity combatEntity);
 
     /**
      * 엔티티에게 상태 효과를 적용한다.
@@ -87,10 +104,10 @@ public interface CombatEntity extends HasTask {
      * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
      * 남은 시간보다 길 경우에만 적용한다.</p>
      *
-     * @param statusEffect 적용할 상태 효과
-     * @param duration     지속시간 (tick)
+     * @param statusEffectType 적용할 상태 효과 종류
+     * @param duration         지속시간 (tick)
      */
-    void applyStatusEffect(StatusEffect statusEffect, long duration);
+    void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration);
 
     /**
      * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
@@ -98,7 +115,7 @@ public interface CombatEntity extends HasTask {
      * @param statusEffectType 확인할 상태 효과 종류
      * @return 남은 시간 (tick)
      */
-    long getStatusEffectDuration(StatusEffectType statusEffectType);
+    long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType);
 
     /**
      * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
@@ -106,14 +123,14 @@ public interface CombatEntity extends HasTask {
      * @param statusEffectType 확인할 상태 효과 종류
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
-    boolean hasStatusEffect(StatusEffectType statusEffectType);
+    boolean hasStatusEffect(@NonNull StatusEffectType statusEffectType);
 
     /**
      * 엔티티의 상태 효과를 제거한다.
      *
      * @param statusEffectType 제거할 상태 효과 종류
      */
-    void removeStatusEffect(StatusEffectType statusEffectType);
+    void removeStatusEffect(@NonNull StatusEffectType statusEffectType);
 
     /**
      * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.
@@ -121,4 +138,18 @@ public interface CombatEntity extends HasTask {
      * @return 지정할 수 있으면 {@code true} 반환
      */
     boolean canBeTargeted();
+
+    /**
+     * 엔티티의 생명 주기.
+     */
+    enum LifeCycle {
+        /** 활성화 안 됨 */
+        NOT_ACTIVATED,
+        /** 활성화 중 */
+        ACTIVATING,
+        /** 활성화 완료 */
+        ACTIVATED,
+        /** 제거 */
+        REMOVED,
+    }
 }

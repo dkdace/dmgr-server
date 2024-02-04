@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.util.SkinUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,8 +18,10 @@ import lombok.Getter;
 public abstract class Character {
     /** 이름 */
     private final String name;
-    /** 스킨 이름 */
-    private final String skinName;
+    /** 스킨 */
+    private final SkinUtil.Skin skin;
+    /** 역할군 */
+    private final Role role;
     /** 체력 */
     private final int health;
     /** 이동속도 계수 */
@@ -40,7 +43,7 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @param i          인덱스
      */
-    public void onTick(CombatUser combatUser, int i) {
+    public void onTick(CombatUser combatUser, long i) {
     }
 
     /**

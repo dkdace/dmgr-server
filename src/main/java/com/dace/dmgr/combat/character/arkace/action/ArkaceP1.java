@@ -1,17 +1,18 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.SkillBase;
-import com.dace.dmgr.combat.entity.Ability;
+import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import lombok.NonNull;
 
-public final class ArkaceP1 extends SkillBase {
+public final class ArkaceP1 extends AbstractSkill {
     public ArkaceP1(CombatUser combatUser) {
         super(1, combatUser, ArkaceP1Info.getInstance());
     }
 
     @Override
-    public ActionKey[] getDefaultActionKeys() {
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SPRINT};
     }
 
@@ -26,14 +27,14 @@ public final class ArkaceP1 extends SkillBase {
     }
 
     @Override
-    public void onUse(ActionKey actionKey) {
+    public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).addModifier("ArkaceP1", ArkaceP1Info.SPRINT_SPEED);
+            combatUser.getMoveModule().getSpeedStatus().addModifier("ArkaceP1", ArkaceP1Info.SPRINT_SPEED);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
         } else {
             setDuration(0);
-            combatUser.getAbilityStatusManager().getAbilityStatus(Ability.SPEED).removeModifier("ArkaceP1");
+            combatUser.getMoveModule().getSpeedStatus().removeModifier("ArkaceP1");
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
         }
     }

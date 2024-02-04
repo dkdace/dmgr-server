@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
-import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.system.Cooldown;
-import com.dace.dmgr.system.CooldownManager;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.Cooldown;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
@@ -22,8 +22,9 @@ import java.text.MessageFormat;
  *
  * @see Reloadable
  */
-public final class ReloadModule implements ActionModule {
+public final class ReloadModule {
     /** 무기 객체 */
+    @NonNull
     private final Reloadable weapon;
     /** 장탄수 */
     private final int capacity;
@@ -39,7 +40,14 @@ public final class ReloadModule implements ActionModule {
     @Setter
     private boolean isReloading = false;
 
-    public ReloadModule(Reloadable weapon, int capacity, long reloadDuration) {
+    /**
+     * 재장전 모듈 인스턴스를 생성한다.
+     *
+     * @param weapon         대상 무기
+     * @param capacity       장탄수
+     * @param reloadDuration 장전 시간 (tick)
+     */
+    public ReloadModule(@NonNull Reloadable weapon, int capacity, long reloadDuration) {
         this.weapon = weapon;
         this.remainingAmmo = capacity;
         this.capacity = capacity;
@@ -72,46 +80,30 @@ public final class ReloadModule implements ActionModule {
             return;
 
         isReloading = true;
-        CooldownManager.setCooldown(this, Cooldown.WEAPON_RELOAD, reloadDuration);
+        CooldownUtil.setCooldown(this, Cooldown.WEAPON_RELOAD, reloadDuration);
 
-        TaskManager.addTask(weapon, new ActionTaskTimer(weapon.getCombatUser(), 1, reloadDuration) {
-            @Override
-            public boolean onTickAction(int i) {
-                if (!isReloading)
-                    return false;
-                if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
-                    return false;
+        TaskUtil.addTask(weapon, new IntervalTask(i -> {
+            if (!isReloading)
+                return false;
+            if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
+                return false;
 
-                String time = String.format("%.1f", (float) (repeat - i) / 20);
-                weapon.getCombatUser().sendActionBar(MessageFormat.format(MESSAGES.RELOADING, StringFormUtil.getProgressBar(i,
-                        reloadDuration, ChatColor.WHITE), time), 2);
-                weapon.onReloadTick(i);
+            String time = String.format("%.1f", (reloadDuration - i) / 20.0);
+            weapon.getCombatUser().getUser().sendActionBar(MessageFormat.format("§c§l재장전... {0} §f[{1}초]",
+                    StringFormUtil.getProgressBar(i, reloadDuration, ChatColor.WHITE), time), 2);
+            weapon.onReloadTick(i);
 
-                return true;
-            }
+            return true;
+        }, isCancelled -> {
+            CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
+            if (isCancelled)
+                return;
 
-            @Override
-            public void onEnd(boolean cancelled) {
-                CooldownManager.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
-                if (cancelled)
-                    return;
+            weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", 8);
 
-                weapon.getCombatUser().sendActionBar(MESSAGES.RELOAD_COMPLETE, 8);
-
-                remainingAmmo = capacity;
-                isReloading = false;
-                weapon.onReloadFinished();
-            }
-        });
-    }
-
-    /**
-     * 메시지 목록.
-     */
-    private interface MESSAGES {
-        /** 재장전 중 메시지 */
-        String RELOADING = "§c§l재장전... {0} §f[{1}초]";
-        /** 재장전 완료 메시지 */
-        String RELOAD_COMPLETE = "§a§l재장전 완료";
+            remainingAmmo = capacity;
+            isReloading = false;
+            weapon.onReloadFinished();
+        }, 1, reloadDuration));
     }
 }

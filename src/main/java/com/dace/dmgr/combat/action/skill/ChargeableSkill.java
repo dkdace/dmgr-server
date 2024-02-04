@@ -2,9 +2,10 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.TaskManager;
-import com.dace.dmgr.system.task.TaskTimer;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -13,9 +14,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class ChargeableSkill extends ActiveSkill {
     /** 상태 변수 */
-    private float stateValue = 0;
+    private double stateValue = 0;
 
-    protected ChargeableSkill(int number, CombatUser combatUser, ActiveSkillInfo activeSkillInfo, int slot) {
+    protected ChargeableSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
         super(number, combatUser, activeSkillInfo, slot);
     }
 
@@ -48,14 +49,11 @@ public abstract class ChargeableSkill extends ActiveSkill {
      * 스킬의 상태 변수 충전을 실행한다.
      */
     private void runStateValueCharge() {
-        TaskManager.addTask(this, new TaskTimer(1) {
-            @Override
-            public boolean onTimerTick(int i) {
-                addStateValue(getStateValueIncrement());
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            addStateValue(getStateValueIncrement());
 
-                return (stateValue < getMaxStateValue()) && isDurationFinished() && isCooldownFinished();
-            }
-        });
+            return (stateValue < getMaxStateValue()) && isDurationFinished() && isCooldownFinished();
+        }, 1));
     }
 
     /**
@@ -68,7 +66,7 @@ public abstract class ChargeableSkill extends ActiveSkill {
     /**
      * @param stateValue 상태 변수
      */
-    public final void setStateValue(float stateValue) {
+    public final void setStateValue(double stateValue) {
         this.stateValue = Math.min(Math.max(0, stateValue), getMaxStateValue());
     }
 
@@ -77,7 +75,7 @@ public abstract class ChargeableSkill extends ActiveSkill {
      *
      * @param increment 증가량
      */
-    public final void addStateValue(float increment) {
+    public final void addStateValue(double increment) {
         setStateValue(stateValue + increment);
     }
 

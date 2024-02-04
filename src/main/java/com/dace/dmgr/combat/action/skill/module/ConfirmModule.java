@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.skill.Confirmable;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.text.MessageFormat;
@@ -18,12 +18,15 @@ import java.text.MessageFormat;
  * @see Confirmable
  */
 @RequiredArgsConstructor
-public class ConfirmModule implements ActionModule {
+public class ConfirmModule {
     /** 스킬 객체 */
+    @NonNull
     protected final Confirmable skill;
     /** 수락 키 */
+    @NonNull
     protected final ActionKey acceptKey;
     /** 취소 키 */
+    @NonNull
     protected final ActionKey cancelKey;
 
     /** 확인 중 상태 */
@@ -40,44 +43,44 @@ public class ConfirmModule implements ActionModule {
             skill.onCheckEnable();
             onCheckEnable();
 
-            TaskManager.addTask(skill, new ActionTaskTimer(skill.getCombatUser(), 1) {
-                @Override
-                public boolean onTickAction(int i) {
-                    if (!isChecking)
-                        return false;
+            TaskUtil.addTask(skill, new IntervalTask(i -> {
+                if (!isChecking)
+                    return false;
 
-                    skill.getCombatUser().getEntity().sendTitle("", MessageFormat.format(MESSAGES.CHECKING, acceptKey.getName(), cancelKey.getName()),
-                            0, 5, 5);
-                    skill.onCheckTick(i);
-                    onCheckTick(i);
+                skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
+                        acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
+                skill.onCheckTick(i);
+                ConfirmModule.this.onCheckTick(i);
 
-                    return true;
-                }
-
-                @Override
-                public void onEnd(boolean cancelled) {
-                    isChecking = false;
-                    onCheckDisable();
-                    skill.onCheckDisable();
-                }
-            });
+                return true;
+            }, isCancelled -> {
+                isChecking = false;
+                onCheckDisable();
+                skill.onCheckDisable();
+            }, 1));
         }
     }
 
+    /**
+     * 모듈에서 확인 모드 활성화 시 실행할 작업.
+     */
     protected void onCheckEnable() {
-    }
-
-    protected void onCheckTick(int i) {
-    }
-
-    protected void onCheckDisable() {
+        // 미사용
     }
 
     /**
-     * 메시지 목록.
+     * 모듈에서 확인 중에 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
      */
-    private interface MESSAGES {
-        /** 확인 중 메시지 */
-        String CHECKING = "§7§l[{0}] §f사용     §7§l[{1}] §f취소";
+    protected void onCheckTick(long i) {
+        // 미사용
+    }
+
+    /**
+     * 모듈에서 확인 모드 비활성화 시 실행할 작업.
+     */
+    protected void onCheckDisable() {
+        // 미사용
     }
 }

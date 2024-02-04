@@ -3,13 +3,15 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.DyeColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -22,67 +24,68 @@ import org.inventivetalent.glow.GlowAPI;
 public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Living, Movable {
     /** 스킬 객체 */
     private final JagerA1 skill;
+    /** 공격 모듈 */
+    @NonNull
+    @Getter
+    private final AttackModule attackModule;
     /** 피해 모듈 */
+    @NonNull
     @Getter
     private final DamageModule damageModule;
     /** 이동 모듈 */
+    @NonNull
     @Getter
     private final JumpModule moveModule;
 
-    public JagerA1Entity(Wolf entity, CombatUser owner) {
+    public JagerA1Entity(@NonNull Wolf entity, @NonNull CombatUser owner) {
         super(
                 entity,
-                "§f" + owner.getName() + "의 설랑",
+                owner.getName() + "의 설랑",
                 owner,
+                JagerA1Info.SUMMON_DURATION,
+                false,
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
+        attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
-        moveModule = new JumpModule(this);
+        moveModule = new JumpModule(this, entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
+
+        onInit();
     }
 
-    @Override
-    protected CombatEntityModule[] getModules() {
-        return new CombatEntityModule[]{damageModule, moveModule};
-    }
-
-    @Override
-    public void init() {
-        super.init();
-
-        abilityStatusManager.getAbilityStatus(Ability.SPEED).setBaseValue(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
-        damageModule.setHealth((int) skill.getStateValue());
+    private void onInit() {
         entity.setAI(false);
         entity.setCollarColor(DyeColor.CYAN);
         entity.setTamed(true);
         entity.setOwner(owner.getEntity());
         entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
         GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
-        playInitSound();
-    }
+        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, entity.getLocation(), 0.8, 1);
 
-    /**
-     * 소환 시 효과음을 재생한다.
-     */
-    private void playInitSound() {
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, entity.getLocation(), 0.8F, 1F);
+        damageModule.setHealth((int) skill.getStateValue());
     }
 
     @Override
-    public void onTick(int i) {
-        super.onTick(i);
+    protected void onTickBeforeActivation(long i) {
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
+                255, 255, 255);
+    }
 
-        double speed = abilityStatusManager.getAbilityStatus(Ability.SPEED).getValue();
+    @Override
+    protected void onActivate() {
+        super.onActivate();
+
+        SoundUtil.play(Sound.ENTITY_WOLF_GROWL, entity.getLocation(), 1, 1);
+        entity.setAI(true);
+    }
+
+    @Override
+    protected void onTickAfterActivation(long i) {
+        double speed = moveModule.getSpeedStatus().getValue();
         if (!moveModule.canMove())
-            speed = 0.0001F;
+            speed = 0.0001;
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
-
-        if (i < JagerA1Info.SUMMON_DURATION)
-            playSummonEffect();
-        else if (i == JagerA1Info.SUMMON_DURATION) {
-            playReadySound();
-            entity.setAI(true);
-        }
 
         if (i % 10 == 0 && entity.getTarget() == null) {
             Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
@@ -92,69 +95,39 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageabl
         }
     }
 
-    /**
-     * 준비 대기 시간의 효과를 재생한다.
-     */
-    private void playSummonEffect() {
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2F, 0.2F, 0.2F, 255, 255, 255);
-    }
+    @Override
+    public void dispose() {
+        super.dispose();
 
-    /**
-     * 준비 시 효과음을 재생한다.
-     */
-    private void playReadySound() {
-        SoundUtil.play(Sound.ENTITY_WOLF_GROWL, entity.getLocation(), 1F, 1F);
+        skill.entity = null;
     }
 
     @Override
-    public void remove() {
-        super.remove();
-
-        skill.getHasEntityModule().setSummonEntity(null);
-    }
-
-    @Override
-    public void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         owner.onAttack(victim, damage, damageType, isCrit, isUlt);
     }
 
     @Override
-    public void onKill(Damageable victim) {
+    public void onKill(@NonNull Damageable victim) {
         owner.onKill(victim);
     }
 
     @Override
-    public void onDefaultAttack(Damageable victim) {
+    public void onDefaultAttack(@NonNull Damageable victim) {
         victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
-        playDamageSound(damage);
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+        SoundUtil.play(Sound.ENTITY_WOLF_HURT, entity.getLocation(), 0.4 + damage * 0.001, 1, 0.1);
         skill.addStateValue(-damage);
-    }
-
-    /**
-     * 피해를 입었을 때 효과음을 재생한다.
-     *
-     * @param damage 피해량
-     */
-    private void playDamageSound(float damage) {
-        SoundUtil.play(Sound.ENTITY_WOLF_HURT, entity.getLocation(), (float) (0.4 + damage * 0.001), (float) (0.95 + Math.random() * 0.1));
     }
 
     @Override
     public void onDeath(Attacker attacker) {
-        remove();
-        playDeathSound();
+        dispose();
+        SoundUtil.play(Sound.ENTITY_WOLF_DEATH, entity.getLocation(), 1, 1);
         skill.setStateValue(0);
         skill.setCooldown(JagerA1Info.COOLDOWN_DEATH);
-    }
-
-    /**
-     * 죽었을 때 효과음을 재생한다.
-     */
-    private void playDeathSound() {
-        SoundUtil.play(Sound.ENTITY_WOLF_DEATH, entity.getLocation(), 1F, 1F);
     }
 }

@@ -1,42 +1,42 @@
 package com.dace.dmgr.combat.action;
 
+import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.system.task.HasTask;
+import lombok.NonNull;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
  *
- * @see ActionBase
+ * @see AbstractAction
  */
-public interface Action extends HasTask {
+public interface Action extends Disposable {
     /**
      * @return 플레이어 객체
      */
+    @NonNull
     CombatUser getCombatUser();
 
     /**
      * @return 동작 정보 객체
      */
+    @NonNull
     ActionInfo getActionInfo();
 
     /**
      * @return 아이템 객체
      */
+    @NonNull
     ItemStack getItemStack();
 
     /**
-     * 기본 사용 키를 반환한다.
+     * 기본 사용 키 목록을 반환한다.
      *
      * @return 기본 사용 키 목록
      */
-    ActionKey[] getDefaultActionKeys();
-
-    /**
-     * 동작을 초기화한다.
-     */
-    void init();
+    @NonNull
+    ActionKey @NonNull [] getDefaultActionKeys();
 
     /**
      * 기본 쿨타임을 반환한다.
@@ -88,19 +88,19 @@ public interface Action extends HasTask {
     boolean canUse();
 
     /**
-     * 사용 시 호출되는 이벤트.
+     * 동작 사용 시 실행할 작업.
      *
      * @param actionKey 사용 키
      */
-    void onUse(ActionKey actionKey);
+    void onUse(@NonNull ActionKey actionKey);
+
+    /**
+     * 동작 사용이 취소당했을 때 실행할 작업.
+     */
+    void onCancelled();
 
     /**
      * 동작의 상태를 초기화한다.
      */
     void reset();
-
-    /**
-     * 동작을 제거하고 작동을 중지시킨다.
-     */
-    void remove();
 }

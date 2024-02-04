@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.dace.dmgr.combat.action.ActionModule;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.system.task.ActionTaskTimer;
-import com.dace.dmgr.system.task.TaskManager;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -19,10 +19,12 @@ import lombok.Setter;
  * @see Aimable
  */
 @RequiredArgsConstructor
-public final class AimModule implements ActionModule {
+public final class AimModule {
     /** 무기 객체 */
+    @NonNull
     private final Aimable weapon;
     /** 확대 레벨 */
+    @NonNull
     private final Aimable.ZoomLevel zoomLevel;
 
     /** 정조준 상태 */
@@ -35,10 +37,10 @@ public final class AimModule implements ActionModule {
      *
      * @param value 값
      */
-    private void playZoomEffect(float value) {
+    private void playZoomEffect(double value) {
         WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
 
-        packet.setWalkingSpeed(weapon.getCombatUser().getEntity().getWalkSpeed() * value);
+        packet.setWalkingSpeed((float) (weapon.getCombatUser().getEntity().getWalkSpeed() * value));
 
         packet.sendPacket(weapon.getCombatUser().getEntity());
     }
@@ -55,25 +57,19 @@ public final class AimModule implements ActionModule {
         if (isAiming) {
             weapon.onAimEnable();
 
-            TaskManager.addTask(weapon, new ActionTaskTimer(weapon.getCombatUser(), 1) {
-                @Override
-                public boolean onTickAction(int i) {
-                    if (!isAiming)
-                        return false;
-                    if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
-                        return false;
+            TaskUtil.addTask(weapon, new IntervalTask(i -> {
+                if (!isAiming)
+                    return false;
+                if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
+                    return false;
 
-                    playZoomEffect(zoomLevel.getValue());
+                playZoomEffect(zoomLevel.getValue());
 
-                    return true;
-                }
-
-                @Override
-                public void onEnd(boolean cancelled) {
-                    isAiming = false;
-                    weapon.onAimDisable();
-                }
-            });
+                return true;
+            }, isCancelled -> {
+                isAiming = false;
+                weapon.onAimDisable();
+            }, 1));
         }
     }
 }

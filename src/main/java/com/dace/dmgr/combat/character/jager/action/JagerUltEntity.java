@@ -4,13 +4,15 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.CombatEntityModule;
+import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -27,83 +29,89 @@ import org.inventivetalent.glow.GlowAPI;
 public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
+    /** 공격 모듈 */
+    @NonNull
+    @Getter
+    private final AttackModule attackModule;
     /** 피해 모듈 */
+    @NonNull
     @Getter
     private final DamageModule damageModule;
 
-    public JagerUltEntity(MagmaCube entity, CombatUser owner) {
+    public JagerUltEntity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
         super(
                 entity,
-                "§f" + owner.getName() + "의 눈폭풍 발생기",
+                owner.getName() + "의 눈폭풍 발생기",
                 owner,
+                JagerUltInfo.SUMMON_DURATION,
+                true,
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
+        attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
+
+        onInit();
     }
 
-    @Override
-    protected CombatEntityModule[] getModules() {
-        return new CombatEntityModule[]{damageModule};
-    }
-
-    @Override
-    public void init() {
-        super.init();
-
+    private void onInit() {
         entity.setAI(false);
         entity.setSize(1);
         entity.setSilent(true);
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
+        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
+
         damageModule.setMaxHealth(JagerUltInfo.HEALTH);
         damageModule.setHealth(JagerUltInfo.HEALTH);
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
-        hideForEnemies();
-        playInitSound();
-    }
-
-    /**
-     * 소환 시 효과음을 재생한다.
-     */
-    private void playInitSound() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5F, 0.5F);
     }
 
     @Override
-    public void onTick(int i) {
-        super.onTick(i);
-
-        if (i < JagerUltInfo.SUMMON_DURATION) {
-            if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
-                entity.teleport(entity.getLocation().add(0, 0.2, 0));
-            playSummonEffect();
-        } else if (i >= JagerUltInfo.SUMMON_DURATION) {
-            float range = Math.min(JagerUltInfo.MIN_RADIUS + ((float) i / JagerUltInfo.MAX_RADIUS_DURATION) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
-                    JagerUltInfo.MAX_RADIUS);
-            playTickEffect(i, range);
-
-            if (i % 4 == 0) {
-                CombatEntity[] targets = CombatUtil.getNearEnemies(this, entity.getLocation(), range,
-                        combatEntity -> combatEntity instanceof Damageable && combatEntity.getEntity().getEyeLocation().getY() < entity.getLocation().getY() &&
-                                canPass(combatEntity));
-                for (CombatEntity target : targets) {
-                    onFindEnemy((Damageable) target);
-                }
-            }
-            if (i >= JagerUltInfo.DURATION)
-                remove();
-        }
-
+    public void onTickBeforeActivation(long i) {
+        if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
+            entity.teleport(entity.getLocation().add(0, 0.2, 0));
+        playReadyEffect();
         playTickEffect();
     }
 
     /**
      * 준비 대기 시간의 효과를 재생한다.
      */
-    private void playSummonEffect() {
-        ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3F);
-        SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, entity.getLocation(), 0.8F, 1.7F);
+    private void playReadyEffect() {
+        ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
+        SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, entity.getLocation(), 0.8, 1.7);
+    }
+
+    @Override
+    protected void onTickAfterActivation(long i) {
+        double range = Math.min(JagerUltInfo.MIN_RADIUS + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
+                JagerUltInfo.MAX_RADIUS);
+        playTickEffect(i, range);
+
+        if (i % 4 == 0) {
+            CombatEntity[] targets = CombatUtil.getNearEnemies(this, entity.getLocation(), range,
+                    combatEntity -> combatEntity instanceof Damageable &&
+                            combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY() &&
+                            canPass(combatEntity));
+            for (CombatEntity target : targets) {
+                onFindEnemy((Damageable) target);
+            }
+        }
+        if (i >= JagerUltInfo.DURATION)
+            dispose();
+
+        playTickEffect();
+    }
+
+    /**
+     * 발생기 표시 효과를 재생한다.
+     */
+    private void playTickEffect() {
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 8, 0.6, 0.02, 0.6,
+                96, 220, 255);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 3, 0.15, 0.02, 0.15,
+                80, 80, 100);
     }
 
     /**
@@ -111,32 +119,22 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
      *
      * @param target 대상 엔티티
      */
-    private void onFindEnemy(Damageable target) {
+    private void onFindEnemy(@NonNull Damageable target) {
         target.getDamageModule().damage(this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
         JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
     }
 
     /**
      * 발생기 표시 효과를 재생한다.
-     */
-    private void playTickEffect() {
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 8, 0.6F, 0.02F, 0.6F, 96, 220, 255);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 3, 0.15F, 0.02F, 0.15F, 80, 80, 100);
-    }
-
-    /**
-     * 발생기 표시 효과를 재생한다.
      *
      * @param i     인덱스
-     * @param range 현재 범위
+     * @param range 현재 범위. (단위: 블록)
      */
-    private void playTickEffect(int i, float range) {
-        int j = (int) (i - JagerUltInfo.SUMMON_DURATION);
-
-        int angle = j * 14;
-        if (j <= JagerUltInfo.DURATION - 100 && j % 30 == 0) {
-            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3F, (float) (1.2 + Math.random() * 0.2));
-            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3F, (float) (1.7 + Math.random() * 0.2));
+    private void playTickEffect(long i, double range) {
+        long angle = i * 14;
+        if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0) {
+            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3, 1.3, 0.2);
+            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3, 1.7, 0.2);
         }
 
         for (int _i = 1; _i <= 6; _i++) {
@@ -149,55 +147,46 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
             angle += 19;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            float distance = range / 6 * _i;
-            float offsetX = (float) (vec.getX());
-            float offsetZ = (float) (vec.getZ());
+            double distance = range / 6 * _i;
+            double offsetX = vec.getX();
+            double offsetZ = vec.getZ();
 
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec.clone().multiply(distance)), 0,
-                    offsetX, -0.6F, offsetZ, 0.05F * (7 - _i));
+                    offsetX, -0.6, offsetZ, 0.05 * (7 - _i));
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().subtract(vec.clone().multiply(distance)), 0,
-                    offsetX, 0.6F, offsetZ, -0.05F * (7 - _i));
+                    offsetX, 0.6, offsetZ, -0.05 * (7 - _i));
             ParticleUtil.play(Particle.SNOW_SHOVEL, loc.clone().add(vec.clone().multiply(distance)).subtract(0, 2.5, 0),
-                    5, 0, 1.4F, 0, 0.04F);
+                    5, 0, 1.4, 0, 0.04);
             ParticleUtil.play(Particle.SNOW_SHOVEL, loc.clone().subtract(vec.clone().multiply(distance)).subtract(0, 2.5, 0),
-                    5, 0, 1.4F, 0, 0.04F);
+                    5, 0, 1.4, 0, 0.04);
         }
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void dispose() {
+        super.dispose();
 
-        skill.getHasEntityModule().setSummonEntity(null);
+        skill.entity = null;
     }
 
     @Override
-    public void onAttack(Damageable victim, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         owner.onAttack(victim, damage, damageType, isCrit, isUlt);
     }
 
     @Override
-    public void onKill(Damageable victim) {
+    public void onKill(@NonNull Damageable victim) {
         owner.onKill(victim);
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, DamageType damageType, boolean isCrit, boolean isUlt) {
-        playDamageSound(damage);
-    }
-
-    /**
-     * 피해를 입었을 때 효과음을 재생한다.
-     *
-     * @param damage 피해량
-     */
-    private void playDamageSound(float damage) {
-        SoundUtil.play("random.metalhit", entity.getLocation(), (float) (0.4 + damage * 0.001), (float) (1.1 + Math.random() * 0.1));
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+        SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
     }
 
     @Override
     public void onDeath(Attacker attacker) {
-        remove();
+        dispose();
         playDeathEffect();
     }
 
