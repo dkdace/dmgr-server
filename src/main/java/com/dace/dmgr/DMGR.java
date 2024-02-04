@@ -10,13 +10,17 @@ import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.WorldUtil;
+import com.keenant.tabbed.Tabbed;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 /**
@@ -26,6 +30,8 @@ public class DMGR extends JavaPlugin {
     /** 난수 생성 객체 */
     @Getter
     private static final Random random = new Random();
+    /** 탭리스트 관리 객체 */
+    private static Tabbed tabbed = null;
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -34,6 +40,41 @@ public class DMGR extends JavaPlugin {
      */
     public static DMGR getPlugin() {
         return JavaPlugin.getPlugin(DMGR.class);
+    }
+
+    @NonNull
+    public static Tabbed getTabbed() {
+        if (tabbed == null)
+            tabbed = new Tabbed(DMGR.getPlugin());
+        return tabbed;
+    }
+
+    /**
+     * 서버의 최근 TPS (Ticks Per Second)를 반환한다.
+     *
+     * @return 최근 TPS
+     */
+    public static double getTps() {
+        try {
+            if (MinecraftServerNMS.minecraftServerClass == null)
+                MinecraftServerNMS.minecraftServerClass = Class.forName("net.minecraft.server.v1_12_R1.MinecraftServer");
+
+            if (MinecraftServerNMS.minecraftServer == null) {
+                Method getServerMethod = MinecraftServerNMS.minecraftServerClass.getDeclaredMethod("getServer");
+                getServerMethod.setAccessible(true);
+                MinecraftServerNMS.recentTpsField = MinecraftServerNMS.minecraftServerClass.getDeclaredField("recentTps");
+                MinecraftServerNMS.recentTpsField.setAccessible(true);
+                MinecraftServerNMS.minecraftServer = getServerMethod.invoke(null);
+            }
+
+            double[] recent = (double[]) MinecraftServerNMS.recentTpsField.get(MinecraftServerNMS.minecraftServer);
+
+            return recent[0];
+        } catch (Exception ex) {
+            ConsoleLogger.severe("서버 TPS를 구할 수 없음", ex);
+        }
+
+        return -1;
     }
 
     /**
@@ -99,5 +140,17 @@ public class DMGR extends JavaPlugin {
         getCommand("게임").setExecutor(new GameTestCommand());
         getCommand("랭크설정").setExecutor(new RankRateTestCommand());
         getCommand("경험치설정").setExecutor(new XpTestCommand());
+    }
+
+    /**
+     * NMS 객체 관리 클래스.
+     */
+    private static class MinecraftServerNMS {
+        /** 서버 NMS 클래스 */
+        private static Class<?> minecraftServerClass;
+        /** TPS 필드 객체 */
+        private static Field recentTpsField;
+        /** 서버 객체 */
+        private static Object minecraftServer;
     }
 }
