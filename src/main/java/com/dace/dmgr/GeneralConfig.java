@@ -1,18 +1,9 @@
 package com.dace.dmgr;
 
 import com.dace.dmgr.game.Tier;
-import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.task.AsyncTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * 전역 설정 클래스.
@@ -66,29 +57,6 @@ public final class GeneralConfig extends YamlFile {
     @Override
     protected void onInitError(Exception ex) {
         ConsoleLogger.severe("전역 설정 불러오기 실패");
-    }
-
-    /**
-     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
-     */
-    @NonNull
-    public AsyncTask<Void> loadUserDatas() {
-        File dir = new File(DMGR.getPlugin().getDataFolder(), "User");
-        File[] userDataFiles = dir.listFiles();
-        if (userDataFiles == null)
-            return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
-
-        List<AsyncTask<?>> userDataInitTasks = new ArrayList<>();
-
-        for (File userDataFile : userDataFiles) {
-            UUID uuid = UUID.fromString(FilenameUtils.removeExtension(userDataFile.getName()));
-            UserData userData = UserData.fromUUID(uuid);
-
-            if (!userData.isInitialized())
-                userDataInitTasks.add(userData.init());
-        }
-
-        return AsyncTask.all(userDataInitTasks);
     }
 
     /**
