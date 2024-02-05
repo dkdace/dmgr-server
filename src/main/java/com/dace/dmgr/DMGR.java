@@ -62,9 +62,11 @@ public class DMGR extends JavaPlugin {
             if (MinecraftServerNMS.minecraftServer == null) {
                 Method getServerMethod = MinecraftServerNMS.minecraftServerClass.getDeclaredMethod("getServer");
                 getServerMethod.setAccessible(true);
+                MinecraftServerNMS.minecraftServer = getServerMethod.invoke(null);
+            }
+            if (MinecraftServerNMS.recentTpsField == null) {
                 MinecraftServerNMS.recentTpsField = MinecraftServerNMS.minecraftServerClass.getDeclaredField("recentTps");
                 MinecraftServerNMS.recentTpsField.setAccessible(true);
-                MinecraftServerNMS.minecraftServer = getServerMethod.invoke(null);
             }
 
             double[] recent = (double[]) MinecraftServerNMS.recentTpsField.get(MinecraftServerNMS.minecraftServer);
