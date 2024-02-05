@@ -7,12 +7,12 @@ import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import com.keenant.tabbed.item.PlayerTabItem;
 import com.keenant.tabbed.item.TextTabItem;
 import com.keenant.tabbed.tablist.TableTabList;
 import com.keenant.tabbed.util.Skins;
@@ -207,10 +207,10 @@ public final class User implements Disposable {
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-        if (CombatUser.fromUser(this) == null) {
+        if (CombatUser.fromUser(this) == null)
             updateSidebar();
+        if (GameUser.fromUser(this) == null || GameUser.fromUser(this).getGame().getPhase() == Game.Phase.WAITING)
             updateTablist();
-        }
 
         return true;
     }
@@ -257,9 +257,6 @@ public final class User implements Disposable {
      * 로비 탭리스트를 업데이트한다.
      */
     private void updateTablist() {
-        player.setPlayerListName(MessageFormat.format("{0} {1} §f{2}", userData.getTier().getPrefix(),
-                userData.getLevelPrefix(), player.getName()));
-
         long freeMemory = Runtime.getRuntime().freeMemory() / 1024 / 1024;
         long totalMemory = Runtime.getRuntime().totalMemory() / 1024 / 1024;
         long memory = totalMemory - freeMemory;
@@ -322,7 +319,8 @@ public final class User implements Disposable {
             if (i > lobbyPlayers.length - 1)
                 tabList.remove(1, i + 1);
             else
-                tabList.set(1, i + 1, new PlayerTabItem(lobbyPlayers[i]));
+                tabList.set(1, i + 1, new TextTabItem(UserData.fromPlayer(lobbyPlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(lobbyPlayers[i])));
         }
 
         tabList.set(1, 0, new TextTabItem(
@@ -336,7 +334,8 @@ public final class User implements Disposable {
             if (i > gamePlayers.length - 1)
                 tabList.remove(2, i + 1);
             else
-                tabList.set(2, i + 1, new PlayerTabItem(gamePlayers[i]));
+                tabList.set(2, i + 1, new TextTabItem(UserData.fromPlayer(gamePlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(gamePlayers[i])));
         }
 
         tabList.set(2, 0, new TextTabItem(
@@ -350,7 +349,8 @@ public final class User implements Disposable {
             if (i > adminPlayers.length - 1)
                 tabList.remove(3, i + 1);
             else
-                tabList.set(3, i + 1, new PlayerTabItem(adminPlayers[i]));
+                tabList.set(3, i + 1, new TextTabItem(UserData.fromPlayer(adminPlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(adminPlayers[i])));
         }
 
         tabList.set(3, 0, new TextTabItem(
@@ -405,6 +405,8 @@ public final class User implements Disposable {
                 player.removePotionEffect(potionEffect.getType())));
 
         sidebar.clear();
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
         if (DMGR.getPlugin().isEnabled())

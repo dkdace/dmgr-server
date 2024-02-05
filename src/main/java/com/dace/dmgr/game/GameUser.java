@@ -3,22 +3,29 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import com.keenant.tabbed.item.TextTabItem;
+import com.keenant.tabbed.tablist.TableTabList;
+import com.keenant.tabbed.util.Skins;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
+import java.util.Comparator;
 
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
@@ -26,6 +33,8 @@ import java.text.MessageFormat;
 public final class GameUser implements Disposable {
     /** 스폰 지역 확인 Y 좌표 */
     private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
+    /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
+    private static final int HEAD_REVEAL_TIME_AFTER_GAME_START = 20;
     /** 플레이어 객체 */
     @NonNull
     @Getter
@@ -38,6 +47,8 @@ public final class GameUser implements Disposable {
     @NonNull
     @Getter
     private final Game game;
+    /** 플레이어 탭리스트 */
+    private final TableTabList tabList;
     /** 전투 플레이어 객체 */
     private CombatUser combatUser = null;
     /** 팀 */
@@ -91,12 +102,13 @@ public final class GameUser implements Disposable {
         this.user = user;
         this.player = user.getPlayer();
         this.game = game;
+        tabList = user.getTabList();
 
         game.addPlayer(this);
         GameUserRegistry.getInstance().add(user, this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick();
+            onTick(i);
             return true;
         }, 1));
     }
@@ -113,21 +125,25 @@ public final class GameUser implements Disposable {
 
     /**
      * 매 tick마다 실행할 작업.
+     *
+     * @param i 인덱스
      */
-    private void onTick() {
-        if (combatUser == null)
+    private void onTick(long i) {
+        if (combatUser == null || game.getPhase() == Game.Phase.WAITING)
             return;
 
         if (getSpawnRegionTeam() != null) {
-            if (game.getPhase() == Game.Phase.READY)
-                return;
-
-            if (getSpawnRegionTeam() == team)
-                onTickTeamSpawn();
-            else
-                onTickOppositeSpawn();
+            if (game.getPhase() == Game.Phase.PLAYING) {
+                if (getSpawnRegionTeam() == team)
+                    onTickTeamSpawn();
+                else
+                    onTickOppositeSpawn();
+            }
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
             user.teleport(getRespawnLocation());
+
+        if (i % 20 == 0)
+            updateGameTablist();
     }
 
     /**
@@ -183,9 +199,60 @@ public final class GameUser implements Disposable {
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
 
         if (combatUser == null)
             combatUser = new CombatUser(user);
+    }
+
+    /**
+     * 게임 탭리스트를 업데이트한다.
+     */
+    private void updateGameTablist() {
+        tabList.setHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
+                "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
+                game.getTeamScore().get(Team.RED), game.getTeamScore().get(Team.BLUE)));
+        tabList.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
+
+        tabList.set(1, 0, new TextTabItem(
+                MessageFormat.format("§c§l§n RED §f({0}명)", game.getTeamUserMap().get(Team.RED).size()),
+                0, Skins.getDot(ChatColor.RED)));
+        tabList.set(2, 0, new TextTabItem(
+                MessageFormat.format("§9§l§n BLUE §f({0}명)", game.getTeamUserMap().get(Team.BLUE).size()),
+                0, Skins.getDot(ChatColor.BLUE)));
+
+        boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
+                game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
+
+        GameUser[] redGameUsers = game.getTeamUserMap().get(Team.RED).stream().sorted(Comparator.comparing(GameUser::getScore).reversed()).toArray(GameUser[]::new);
+        GameUser[] blueGameUsers = game.getTeamUserMap().get(Team.BLUE).stream().sorted(Comparator.comparing(GameUser::getScore).reversed()).toArray(GameUser[]::new);
+        for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
+            if (i > redGameUsers.length - 1) {
+                tabList.remove(1, (i + 1) * 3 - 2);
+                tabList.remove(1, (i + 1) * 3 - 1);
+            } else {
+                tabList.set(1, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(redGameUsers[i].getPlayer()).getDisplayName(), 0,
+                        team == Team.RED || headReveal ? Skins.getPlayer(redGameUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
+                tabList.set(1, (i + 1) * 3 - 1, new TextTabItem(
+                        MessageFormat.format("§4✪ §f{0}   §4{1} §f{2}   §4{3} §f{4}   §4{5} §f{6}", redGameUsers[i].getScore(),
+                                TextIcon.DAMAGE, redGameUsers[i].getKill(), TextIcon.POISON, redGameUsers[i].getDeath(), "✔", redGameUsers[i].getAssist())));
+            }
+        }
+        for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
+            if (i > blueGameUsers.length - 1) {
+                tabList.remove(2, (i + 1) * 3 - 2);
+                tabList.remove(2, (i + 1) * 3 - 1);
+            } else {
+                tabList.set(2, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(blueGameUsers[i].getPlayer()).getDisplayName(), 0,
+                        team == Team.BLUE || headReveal ? Skins.getPlayer(blueGameUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
+                tabList.set(2, (i + 1) * 3 - 1, new TextTabItem(
+                        MessageFormat.format("§1✪ §f{0}   §1{1} §f{2}   §1{3} §f{4}   §1{5} §f{6}", blueGameUsers[i].getScore(),
+                                TextIcon.DAMAGE, blueGameUsers[i].getKill(), TextIcon.POISON, blueGameUsers[i].getDeath(), "✔", blueGameUsers[i].getAssist())));
+            }
+        }
+
+        tabList.batchUpdate();
     }
 
     /**
