@@ -315,46 +315,46 @@ public final class User implements Disposable {
         tabList.set(0, 10, new TextTabItem("§e 탈주 §7:: §c0회 §f(0%)", 0, Skins.getPlayer("MHF_TNT2")));
         tabList.set(0, 11, new TextTabItem("§e 플레이 시간 §7:: §fnull", 0, Skins.getPlayer("Olaf_C")));
 
-
-        int lobbyIndex = 0;
         Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) == null && !player2.isOp())
-                .limit(20).toArray(Player[]::new);
-        for (Player player2 : lobbyPlayers)
-            tabList.set(1, 1 + lobbyIndex++, new PlayerTabItem(player2));
-        for (int i = lobbyIndex + 1; i <= 19; i++)
-            tabList.remove(1, i);
+                .toArray(Player[]::new);
+        for (int i = 0; i < 19; i++) {
+            if (i > lobbyPlayers.length - 1)
+                tabList.remove(1, i + 1);
+            else
+                tabList.set(1, i + 1, new PlayerTabItem(lobbyPlayers[i]));
+        }
 
         tabList.set(1, 0, new TextTabItem(
-                MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyIndex),
+                MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyPlayers.length),
                 0, Skins.getDot(ChatColor.GREEN)));
 
-        int gameIndex = 0;
         Player[] gamePlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) != null && !player2.isOp())
-                .limit(20)
                 .toArray(Player[]::new);
-        for (Player player2 : gamePlayers)
-            tabList.set(2, 1 + gameIndex++, new PlayerTabItem(player2));
-        for (int i = gameIndex + 1; i <= 19; i++)
-            tabList.remove(2, i);
+        for (int i = 0; i < 19; i++) {
+            if (i > gamePlayers.length - 1)
+                tabList.remove(2, i + 1);
+            else
+                tabList.set(2, i + 1, new PlayerTabItem(gamePlayers[i]));
+        }
 
         tabList.set(2, 0, new TextTabItem(
-                MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gameIndex),
+                MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gamePlayers.length),
                 0, Skins.getDot(ChatColor.RED)));
 
-        int adminIndex = 0;
         Player[] adminPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(ServerOperator::isOp)
-                .limit(20)
                 .toArray(Player[]::new);
-        for (Player player2 : adminPlayers)
-            tabList.set(3, 1 + adminIndex++, new PlayerTabItem(player2));
-        for (int i = adminIndex + 1; i <= 19; i++)
-            tabList.remove(3, i);
+        for (int i = 0; i < 19; i++) {
+            if (i > adminPlayers.length - 1)
+                tabList.remove(3, i + 1);
+            else
+                tabList.set(3, i + 1, new PlayerTabItem(adminPlayers[i]));
+        }
 
         tabList.set(3, 0, new TextTabItem(
-                MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminIndex),
+                MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminPlayers.length),
                 0, Skins.getDot(ChatColor.AQUA)));
 
         tabList.batchUpdate();
