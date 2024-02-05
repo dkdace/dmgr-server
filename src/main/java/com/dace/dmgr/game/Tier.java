@@ -9,9 +9,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Tier {
-    NONE("없음", Integer.MIN_VALUE, -1, "§f[ 등급 없음 ]"),
-    STONE("스톤", Integer.MIN_VALUE, -1, "§8§l[ 스톤 ]"),
-    IRON("아이언", 0, 249, "§7§l[ 아이언 ]"),
+    NONE("없음", Integer.MIN_VALUE, -1, "§8[ 등급 없음 ]"),
+    STONE("스톤", Integer.MIN_VALUE, -1, "§7§l[ 스톤 ]"),
+    IRON("아이언", 0, 249, "§f§l[ 아이언 ]"),
     GOLD("골드", 250, 499, "§e§l[ 골드 ]"),
     REDSTONE("레드스톤", 500, 749, "§c§l[ 레드스톤 ]"),
     EMERALD("에메랄드", 750, 999, "§a§l[ 에메랄드 ]"),

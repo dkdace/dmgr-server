@@ -106,7 +106,7 @@ public final class GeneralConfig extends YamlFile {
         /** 랭킹 업데이트 주기 (분) */
         private long rankingUpdatePeriod = 5;
         /** 메시지의 접두사 */
-        private String messagePrefix = "§3§l[ §b§lDMGR §3§l] §f";
+        private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
     }
 
     /**

@@ -140,28 +140,4 @@ public final class StringFormUtil {
                         .toString())
                 .toString();
     }
-
-    /**
-     * 유저 레벨에 따른 칭호를 반환한다.
-     *
-     * @param level 레벨
-     * @return 레벨 칭호
-     */
-    @NonNull
-    public static String getLevelPrefix(int level) {
-        String color;
-
-        if (level <= 100)
-            color = "§f§l";
-        else if (level <= 200)
-            color = "§a§l";
-        else if (level <= 300)
-            color = "§b§l";
-        else if (level <= 400)
-            color = "§d§l";
-        else
-            color = "§e§l";
-
-        return color + "[ Lv." + level + " ]";
-    }
 }

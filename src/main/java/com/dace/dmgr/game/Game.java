@@ -44,6 +44,7 @@ public final class Game implements Disposable {
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
+    @Getter
     private final EnumMap<@NonNull Team, @NonNull ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
     /** 팀별 점수 (팀 : 점수) */
     @Getter

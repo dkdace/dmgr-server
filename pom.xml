@@ -77,6 +77,10 @@
             <id>glaremasters</id>
             <url>https://repo.glaremasters.me/repository/concuncan/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -149,6 +153,11 @@
             <groupId>com.grinderwolf</groupId>
             <artifactId>slimeworldmanager-plugin</artifactId>
             <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thekeenant</groupId>
+            <artifactId>tabbed</artifactId>
+            <version>v1.8</version>
         </dependency>
     </dependencies>
 </project>
