@@ -48,8 +48,11 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
         if (isDurationFinished()) {
             CooldownUtil.setCooldown(this, Cooldown.SKILL_DURATION, duration);
             runDuration();
-        } else
+        } else {
             CooldownUtil.setCooldown(this, Cooldown.SKILL_DURATION, duration);
+            if (duration == 0)
+                onDurationFinished();
+        }
     }
 
     @Override
