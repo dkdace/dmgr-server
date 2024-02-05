@@ -26,7 +26,7 @@ public final class StringFormUtil {
      *
      * <pre>{@code
      * // <흰색>*****<검정색>*****
-     * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10, *);
+     * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10, '*');
      * }</pre>
      *
      * @param current 현재 값
@@ -108,7 +108,7 @@ public final class StringFormUtil {
      *
      * <pre>{@code
      * // [Test] <노란색>****<흰색>****** [40/100]
-     * StringFormUtil.getActionbarProgressBar("[Test]", 40, 100, 10, *);
+     * StringFormUtil.getActionbarProgressBar("[Test]", 40, 100, 10, '*');
      * }</pre>
      *
      * @param prefix  접두사
