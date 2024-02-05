@@ -11,8 +11,11 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.WorldUtil;
 import com.keenant.tabbed.Tabbed;
+import com.dace.dmgr.util.task.AsyncTask;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.NonNull;
+import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -21,7 +24,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * 플러그인 메인 클래스.
@@ -86,7 +93,7 @@ public class DMGR extends JavaPlugin {
     public void onEnable() {
         ConsoleLogger.info("플러그인 활성화 완료");
 
-        GeneralConfig.getInstance().init().onFinish(() -> GeneralConfig.getInstance().loadUserDatas()).onFinish(RankUtil::run);
+        GeneralConfig.getInstance().init().onFinish(this::loadUserDatas).onFinish(RankUtil::run);
         registerCommands();
         registerTestCommands();
         EventManager.register();
@@ -111,6 +118,29 @@ public class DMGR extends JavaPlugin {
             user.sendMessageInfo("시스템 재부팅 중...");
             user.dispose();
         });
+    }
+
+    /**
+     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
+     */
+    @NonNull
+    private AsyncTask<Void> loadUserDatas() {
+        File dir = new File(DMGR.getPlugin().getDataFolder(), "User");
+        File[] userDataFiles = dir.listFiles();
+        if (userDataFiles == null)
+            return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
+
+        List<AsyncTask<?>> userDataInitTasks = new ArrayList<>();
+
+        for (File userDataFile : userDataFiles) {
+            UUID uuid = UUID.fromString(FilenameUtils.removeExtension(userDataFile.getName()));
+            UserData userData = UserData.fromUUID(uuid);
+
+            if (!userData.isInitialized())
+                userDataInitTasks.add(userData.init());
+        }
+
+        return AsyncTask.all(userDataInitTasks);
     }
 
     /**

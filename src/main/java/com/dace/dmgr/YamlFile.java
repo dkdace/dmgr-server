@@ -88,14 +88,13 @@ public abstract class YamlFile implements Initializable<Void> {
                 config.load(file);
                 isInitialized = true;
 
-                onInitFinish();
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
                 onInitError(ex);
-                onError.accept(ex);
+
             }
-        });
+        }).onFinish(this::onInitFinish).onError(this::onInitError);
     }
 
     /**
