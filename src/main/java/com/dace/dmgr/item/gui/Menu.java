@@ -26,8 +26,8 @@ public final class Menu extends Gui {
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         guiController.fillAll(DisplayItem.EMPTY.getGuiItem());
         guiController.set(4, PlayerInfoItem.instance, itemBuilder -> {
-            String prefix = UserData.fromPlayer(player).getLevelPrefix();
-            ((SkullMeta) itemBuilder.formatName(prefix, player.getName()).getItemMeta()).setOwningPlayer(player);
+            UserData userData = UserData.fromPlayer(player);
+            ((SkullMeta) itemBuilder.setName(userData.getDisplayName()).getItemMeta()).setOwningPlayer(player);
         });
         guiController.set(19, MenuItem.GAME_START.guiItem);
         guiController.set(21, MenuItem.WARP.guiItem);

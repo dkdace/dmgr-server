@@ -12,6 +12,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 /**
@@ -247,6 +248,17 @@ public final class UserData extends YamlFile {
      */
     public int getNextLevelXp() {
         return 250 + (level * 50);
+    }
+
+    /**
+     * 플레이어의 표시 이름을 반환한다.
+     *
+     * @return 표시 이름
+     */
+    @NonNull
+    public String getDisplayName() {
+        return MessageFormat.format("{0} {1} {2}{3}§f", getTier().getPrefix(), getLevelPrefix(),
+                (Bukkit.getOfflinePlayer(playerUUID).isOp() ? "§a" : "§f"), playerName);
     }
 
     /**
