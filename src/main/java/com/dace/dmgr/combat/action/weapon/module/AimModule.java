@@ -57,7 +57,7 @@ public final class AimModule {
         if (isAiming) {
             weapon.onAimEnable();
 
-            TaskUtil.addTask(weapon, new IntervalTask(i -> {
+            TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
                 if (!isAiming)
                     return false;
                 if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())

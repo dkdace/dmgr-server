@@ -50,12 +50,9 @@ public final class JagerUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
-
+        combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
+
         Location location = combatUser.getEntity().getLocation();
         playUseSound(location);
         setDuration();

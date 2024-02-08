@@ -43,7 +43,7 @@ public class ConfirmModule {
             skill.onCheckEnable();
             onCheckEnable();
 
-            TaskUtil.addTask(skill, new IntervalTask(i -> {
+            TaskUtil.addTask(skill.getTaskRunner(), new IntervalTask(i -> {
                 if (!isChecking)
                     return false;
 

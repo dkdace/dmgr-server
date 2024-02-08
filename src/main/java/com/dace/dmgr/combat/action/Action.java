@@ -31,6 +31,12 @@ public interface Action extends Disposable {
     ItemStack getItemStack();
 
     /**
+     * @return 동작 태스크 실행 객체
+     */
+    @NonNull
+    Object getTaskRunner();
+
+    /**
      * 기본 사용 키 목록을 반환한다.
      *
      * @return 기본 사용 키 목록

@@ -57,10 +57,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
+        combatUser.getWeapon().onCancelled();
 
         if (isDurationFinished()) {
             combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);

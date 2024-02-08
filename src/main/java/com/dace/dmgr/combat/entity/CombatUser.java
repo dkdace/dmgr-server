@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.*;
@@ -774,31 +773,31 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
             realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
 
-        if (action instanceof AbstractWeapon) {
-            if (realWeapon instanceof FullAuto && (((FullAuto) realWeapon).getFullAutoModule().getFullAutoKey() == actionKey))
-                handleUseFullAutoWeapon(actionKey, realWeapon);
-            else
-                handleUseWeapon(actionKey, realWeapon);
-
-        } else if (action instanceof AbstractSkill) {
-            if (!action.canUse())
-                return;
-            if (hasStatusEffect(StatusEffectType.SILENCE))
-                return;
-            if (action.getActionInfo() instanceof ActiveSkillInfo && realWeapon instanceof Reloadable)
-                ((Reloadable) realWeapon).getReloadModule().setReloading(false);
-
-            action.onUse(actionKey);
-        }
+        if (action instanceof Weapon)
+            handleUseWeapon(actionKey, realWeapon);
+        else if (action instanceof Skill)
+            handleUseSkill(actionKey, (Skill) action);
     }
 
+    /**
+     * 무기 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param weapon    무기
+     */
     private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
-        if (!weapon.canUse())
-            return;
-
-        weapon.onUse(actionKey);
+        if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
+            handleUseFullAutoWeapon(actionKey, weapon);
+        else if (weapon.canUse())
+            weapon.onUse(actionKey);
     }
 
+    /**
+     * 연사 무기의 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param weapon    무기
+     */
     private void handleUseFullAutoWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
         if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0)
             return;
@@ -812,7 +811,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             public Boolean apply(Long i) {
                 if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return true;
-                if (weapon.canUse() && ((FullAuto) weapon).getFullAutoModule().isFireTick(entity.getTicksLived())) {
+                if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(entity.getTicksLived())) {
                     j++;
                     weapon.onUse(actionKey);
                 }
@@ -820,6 +819,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return true;
             }
         }, 1, 4));
+    }
+
+    /**
+     * 스킬 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param skill     스킬
+     */
+    private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
+        if (!skill.canUse() || hasStatusEffect(StatusEffectType.SILENCE))
+            return;
+
+        skill.onUse(actionKey);
     }
 
     /**

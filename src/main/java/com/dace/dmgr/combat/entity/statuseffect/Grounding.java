@@ -23,6 +23,7 @@ public class Grounding implements StatusEffect {
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
+        // 미사용
     }
 
     @Override
@@ -33,5 +34,6 @@ public class Grounding implements StatusEffect {
 
     @Override
     public void onEnd(@NonNull CombatEntity combatEntity) {
+        // 미사용
     }
 }
