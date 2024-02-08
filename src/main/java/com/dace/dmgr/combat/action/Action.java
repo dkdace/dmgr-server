@@ -21,13 +21,11 @@ public interface Action extends Disposable {
     /**
      * @return 동작 정보 객체
      */
-    @NonNull
     ActionInfo getActionInfo();
 
     /**
      * @return 아이템 객체
      */
-    @NonNull
     ItemStack getItemStack();
 
     /**

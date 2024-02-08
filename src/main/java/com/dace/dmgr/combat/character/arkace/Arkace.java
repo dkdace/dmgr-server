@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * 전투원 - 아케이스 클래스.
@@ -29,7 +30,7 @@ public final class Arkace extends Character {
     }
 
     @Override
-    public String getActionbarString(CombatUser combatUser) {
+    public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
@@ -39,6 +40,12 @@ public final class Arkace extends Character {
     }
 
     @Override
+    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
+    @NonNull
     public ArkaceWeaponInfo getWeaponInfo() {
         return ArkaceWeaponInfo.getInstance();
     }
@@ -68,6 +75,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @NonNull
     public ArkaceUltInfo getUltimateSkillInfo() {
         return ArkaceUltInfo.getInstance();
     }

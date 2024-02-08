@@ -8,6 +8,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.MeleeAttackAction;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
@@ -164,8 +165,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onTick(this, i);
 
-        entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                99999, 10, false, false), true);
+        if (!entity.hasPotionEffect(PotionEffectType.SLOW_DIGGING))
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                    99999, 10, false, false), true);
 
         hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
         hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
@@ -585,6 +587,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setGlobalCooldown(int cooldown) {
+        if (cooldown < CooldownUtil.getCooldown(this, Cooldown.GLOBAL_COOLDOWN))
+            return;
+
         CooldownUtil.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, cooldown);
         entity.setCooldown(SkillInfo.MATERIAL, cooldown);
         entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
@@ -733,6 +738,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actionMap.clear();
         skillMap.clear();
 
+        actionMap.put(ActionKey.SWAP_HAND, new MeleeAttackAction(this));
+
         weapon = character.getWeaponInfo().createWeapon(this);
         for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
             actionMap.put(actionKey, weapon);
@@ -768,6 +775,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Action action = actionMap.get(actionKey);
         if (isDead() || action == null)
             return;
+
+        if (action instanceof MeleeAttackAction && action.canUse()) {
+            action.onUse(actionKey);
+            return;
+        }
 
         Weapon realWeapon = this.weapon;
         if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
