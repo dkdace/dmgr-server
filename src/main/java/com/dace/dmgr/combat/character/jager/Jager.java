@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
-import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,7 +34,7 @@ public final class Jager extends Character {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", SkinUtil.Skin.JAGER, Role.MARKSMAN, 1000, 1.0F, 1.0F);
+        super("예거", "DVJager", Role.MARKSMAN, 1000, 1.0F, 1.0F);
     }
 
     @Override

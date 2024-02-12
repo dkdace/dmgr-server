@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.util.SkinUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,9 +19,9 @@ public abstract class Character {
     /** 이름 */
     @NonNull
     private final String name;
-    /** 스킨 */
+    /** 스킨 이름 */
     @NonNull
-    private final SkinUtil.Skin skin;
+    private final String skinName;
     /** 역할군 */
     @NonNull
     private final Role role;

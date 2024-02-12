@@ -2,8 +2,6 @@ package com.dace.dmgr.util;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.util.task.AsyncTask;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.skinsrestorer.api.PlayerWrapper;
@@ -21,14 +19,14 @@ public final class SkinUtil {
     /**
      * 플레이어의 스킨을 변경한다.
      *
-     * @param player 대상 플레이어
-     * @param skin   적용할 스킨
+     * @param player   대상 플레이어
+     * @param skinName 적용할 스킨 이름
      */
     @NonNull
-    public static AsyncTask<Void> applySkin(@NonNull Player player, @NonNull Skin skin) {
+    public static AsyncTask<Void> applySkin(@NonNull Player player, @NonNull String skinName) {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                API.applySkin(new PlayerWrapper(player), skin.getSkinName());
+                API.applySkin(new PlayerWrapper(player), skinName);
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
@@ -56,20 +54,13 @@ public final class SkinUtil {
     }
 
     /**
-     * 지정할 수 있는 스킨의 목록.
+     * 지정한 스킨 이름의 스킨 URL을 반환한다.
+     *
+     * @param skinName 스킨 이름
+     * @return 스킨 URL
      */
-    @AllArgsConstructor
-    @Getter
-    public enum Skin {
-        ARKACE("DVArkace"),
-        JAGER("DVJager");
-
-        /** 스킨 이름 */
-        private final String skinName;
-
-        @NonNull
-        public String getUrl() {
-            return API.getSkinData(skinName).getValue();
-        }
+    @NonNull
+    public static String getSkinUrl(@NonNull String skinName) {
+        return API.getSkinData(skinName).getValue();
     }
 }
