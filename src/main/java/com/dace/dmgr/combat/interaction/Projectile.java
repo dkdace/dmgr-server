@@ -20,7 +20,7 @@ import java.util.function.Function;
  */
 public abstract class Projectile extends Bullet {
     /** 기본 판정 범위. (단위: 블록) */
-    private static final double SIZE = 0.13F;
+    private static final double SIZE = 0.13;
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;

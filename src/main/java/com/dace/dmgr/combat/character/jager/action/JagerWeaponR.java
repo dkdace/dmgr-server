@@ -11,7 +11,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;
-import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -87,6 +87,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         super.onCancelled();
         mainWeapon.getAimModule().toggleAim();
         mainWeapon.getSwapModule().swap();
+        reloadModule.setReloading(false);
     }
 
     /**
@@ -105,8 +106,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
             mainWeapon.getAimModule().toggleAim();
             mainWeapon.getSwapModule().swap();
 
-            TaskUtil.addTask(this, new IntervalTask(i -> true, isCancelled -> mainWeapon.getReloadModule().reload(),
-                    1, JagerWeaponInfo.SWAP_DURATION));
+            TaskUtil.addTask(taskRunner, new DelayTask(() -> mainWeapon.getReloadModule().reload(), JagerWeaponInfo.SWAP_DURATION));
         }
     }
 

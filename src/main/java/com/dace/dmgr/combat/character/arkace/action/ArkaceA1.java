@@ -50,6 +50,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
+        combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown(10);
         setDuration();
 

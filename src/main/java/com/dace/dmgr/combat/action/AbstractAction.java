@@ -19,20 +19,17 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * @see AbstractWeapon
  * @see AbstractSkill
  */
+@Getter
 public abstract class AbstractAction implements Action {
     /** 플레이어 객체 */
-    @Getter
     protected final CombatUser combatUser;
     /** 동작 정보 객체 */
-    @Getter
     protected final ActionInfo actionInfo;
-
+    /** 동작 태스크 실행 객체 */
     protected final Object taskRunner = new Object();
     /** 아이템 */
-    @Getter
     protected ItemStack itemStack;
     /** 비활성화 여부 */
-    @Getter
     private boolean isDisposed = false;
 
     /**
@@ -41,10 +38,11 @@ public abstract class AbstractAction implements Action {
      * @param combatUser 대상 플레이어
      * @param actionInfo 동작 정보
      */
-    protected AbstractAction(@NonNull CombatUser combatUser, @NonNull ActionInfo actionInfo) {
+    protected AbstractAction(@NonNull CombatUser combatUser, ActionInfo actionInfo) {
         this.combatUser = combatUser;
         this.actionInfo = actionInfo;
-        this.itemStack = actionInfo.getItemStack().clone();
+        if (actionInfo != null)
+            this.itemStack = actionInfo.getItemStack().clone();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -8,11 +9,11 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.MeleeAttackAction;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.*;
@@ -165,8 +166,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onTick(this, i);
 
-        entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                99999, 10, false, false), true);
+        if (!entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                    99999, 40, false, false), true);
+
+            WrapperPlayServerEntityEffect packet = new WrapperPlayServerEntityEffect();
+            packet.setEntityID(entity.getEntityId());
+            packet.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
+            packet.setAmplifier((byte) 40);
+            packet.setDuration(-1);
+            packet.setHideParticles(true);
+            packet.broadcastPacket();
+        }
 
         hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
         hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
@@ -586,6 +597,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setGlobalCooldown(int cooldown) {
+        if (cooldown < CooldownUtil.getCooldown(this, Cooldown.GLOBAL_COOLDOWN))
+            return;
+
         CooldownUtil.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, cooldown);
         entity.setCooldown(SkillInfo.MATERIAL, cooldown);
         entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
@@ -734,6 +748,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actionMap.clear();
         skillMap.clear();
 
+        actionMap.put(ActionKey.SWAP_HAND, new MeleeAttackAction(this));
+
         weapon = character.getWeaponInfo().createWeapon(this);
         for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
             actionMap.put(actionKey, weapon);
@@ -770,35 +786,40 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (isDead() || action == null)
             return;
 
+        if (action instanceof MeleeAttackAction && action.canUse()) {
+            action.onUse(actionKey);
+            return;
+        }
+
         Weapon realWeapon = this.weapon;
         if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
             realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
 
-        if (action instanceof AbstractWeapon) {
-            if (realWeapon instanceof FullAuto && (((FullAuto) realWeapon).getFullAutoModule().getFullAutoKey() == actionKey))
-                handleUseFullAutoWeapon(actionKey, realWeapon);
-            else
-                handleUseWeapon(actionKey, realWeapon);
-
-        } else if (action instanceof AbstractSkill) {
-            if (!action.canUse())
-                return;
-            if (hasStatusEffect(StatusEffectType.SILENCE))
-                return;
-            if (action.getActionInfo() instanceof ActiveSkillInfo && realWeapon instanceof Reloadable)
-                ((Reloadable) realWeapon).getReloadModule().setReloading(false);
-
-            action.onUse(actionKey);
-        }
+        if (action instanceof Weapon)
+            handleUseWeapon(actionKey, realWeapon);
+        else if (action instanceof Skill)
+            handleUseSkill(actionKey, (Skill) action);
     }
 
+    /**
+     * 무기 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param weapon    무기
+     */
     private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
-        if (!weapon.canUse())
-            return;
-
-        weapon.onUse(actionKey);
+        if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
+            handleUseFullAutoWeapon(actionKey, weapon);
+        else if (weapon.canUse())
+            weapon.onUse(actionKey);
     }
 
+    /**
+     * 연사 무기의 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param weapon    무기
+     */
     private void handleUseFullAutoWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
         if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0)
             return;
@@ -812,7 +833,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             public Boolean apply(Long i) {
                 if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return true;
-                if (weapon.canUse() && ((FullAuto) weapon).getFullAutoModule().isFireTick(entity.getTicksLived())) {
+                if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(entity.getTicksLived())) {
                     j++;
                     weapon.onUse(actionKey);
                 }
@@ -820,6 +841,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return true;
             }
         }, 1, 4));
+    }
+
+    /**
+     * 스킬 사용 로직을 처리한다.
+     *
+     * @param actionKey 동작 사용 키
+     * @param skill     스킬
+     */
+    private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
+        if (!skill.canUse() || hasStatusEffect(StatusEffectType.SILENCE))
+            return;
+
+        skill.onUse(actionKey);
     }
 
     /**

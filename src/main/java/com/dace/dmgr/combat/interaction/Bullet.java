@@ -33,7 +33,7 @@ public abstract class Bullet {
     /** 트레일 이벤트 ({@link Bullet#trail(Location)})를 호출하는 주기. (단위: 판정점 개수) */
     protected int trailInterval;
     /** 총알의 최대 사거리. (단위: 블록) */
-    protected int maxDistance;
+    protected double maxDistance;
     /** 관통 여부 */
     protected boolean penetrating;
     /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */

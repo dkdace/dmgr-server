@@ -84,6 +84,12 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
     }
 
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        reloadModule.setReloading(false);
+    }
+
     /**
      * 발사 시 효과음을 재생한다.
      *

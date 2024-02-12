@@ -54,12 +54,9 @@ public final class JagerA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
-
+        combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
+
         Location location = combatUser.getEntity().getLocation();
         setDuration();
         playUseSound(location);

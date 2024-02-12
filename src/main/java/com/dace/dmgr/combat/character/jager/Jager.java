@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.StringJoiner;
 
@@ -38,7 +39,7 @@ public final class Jager extends Character {
     }
 
     @Override
-    public String getActionbarString(CombatUser combatUser) {
+    public String getActionbarString(@NonNull CombatUser combatUser) {
         JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
         JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
@@ -69,13 +70,13 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onTick(CombatUser combatUser, long i) {
+    public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
-    public boolean onAttack(CombatUser attacker, Damageable victim, int damage, DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
@@ -86,6 +87,13 @@ public final class Jager extends Character {
     }
 
     @Override
+    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
+        return !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
+    @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();
     }
@@ -117,6 +125,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @NonNull
     public JagerUltInfo getUltimateSkillInfo() {
         return JagerUltInfo.getInstance();
     }

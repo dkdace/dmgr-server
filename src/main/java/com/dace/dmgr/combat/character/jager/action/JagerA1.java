@@ -55,10 +55,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
+        combatUser.getWeapon().onCancelled();
 
         if (isDurationFinished())
             confirmModule.toggleCheck();
@@ -67,6 +64,13 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             if (entity != null)
                 entity.dispose();
         }
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        if (confirmModule.isChecking())
+            confirmModule.toggleCheck();
     }
 
     @Override

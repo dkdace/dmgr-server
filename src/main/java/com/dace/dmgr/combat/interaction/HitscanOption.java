@@ -18,7 +18,7 @@ public final class HitscanOption {
     final int trailInterval = 14;
     /** 총알의 최대 사거리. (단위: 블록) */
     @Builder.Default
-    final int maxDistance = 70;
+    final double maxDistance = 70;
     /** 관통 여부 */
     @Builder.Default
     final boolean penetrating = false;

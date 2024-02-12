@@ -21,6 +21,8 @@ public enum ActionKey {
     SLOT_3("3"),
     /** 4번 슬롯 */
     SLOT_4("4"),
+    /** 양손 교체(F) */
+    SWAP_HAND("F"),
     /** 버리기(Q) */
     DROP("Q"),
     /** 달리기 */
