@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -165,9 +166,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onTick(this, i);
 
-        if (!entity.hasPotionEffect(PotionEffectType.SLOW_DIGGING))
+        if (!entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                    99999, 10, false, false), true);
+                    99999, 40, false, false), true);
+
+            WrapperPlayServerEntityEffect packet = new WrapperPlayServerEntityEffect();
+            packet.setEntityID(entity.getEntityId());
+            packet.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
+            packet.setAmplifier((byte) 40);
+            packet.setDuration(-1);
+            packet.setHideParticles(true);
+            packet.broadcastPacket();
+        }
 
         hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
         hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
