@@ -19,9 +19,6 @@ public final class HitscanOption {
     /** 총알의 최대 사거리. (단위: 블록) */
     @Builder.Default
     final double maxDistance = 70;
-    /** 관통 여부 */
-    @Builder.Default
-    final boolean penetrating = false;
     /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
     @Builder.Default
     final double hitboxMultiplier = 1;

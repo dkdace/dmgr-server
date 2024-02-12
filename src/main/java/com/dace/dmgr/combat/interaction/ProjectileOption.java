@@ -22,9 +22,6 @@ public final class ProjectileOption {
     /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
     @Builder.Default
     final long duration = -1;
-    /** 관통 여부 */
-    @Builder.Default
-    final boolean penetrating = false;
     /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
     @Builder.Default
     final double hitboxMultiplier = 1;

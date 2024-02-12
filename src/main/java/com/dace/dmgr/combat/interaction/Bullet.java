@@ -34,8 +34,6 @@ public abstract class Bullet {
     protected int trailInterval;
     /** 총알의 최대 사거리. (단위: 블록) */
     protected double maxDistance;
-    /** 관통 여부 */
-    protected boolean penetrating;
     /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
     protected double hitboxMultiplier;
     /** 대상 엔티티를 찾는 조건 */

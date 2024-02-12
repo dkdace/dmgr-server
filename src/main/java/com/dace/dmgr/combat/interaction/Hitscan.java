@@ -27,7 +27,7 @@ public abstract class Hitscan extends Bullet {
      * @see HitscanOption
      */
     protected Hitscan(@NonNull CombatEntity shooter, @NonNull HitscanOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
+        super(shooter, option.trailInterval, option.maxDistance, option.hitboxMultiplier, option.condition);
     }
 
     /**
@@ -40,7 +40,6 @@ public abstract class Hitscan extends Bullet {
         HitscanOption hitscanOption = HitscanOption.builder().build();
         this.trailInterval = hitscanOption.trailInterval;
         this.maxDistance = hitscanOption.maxDistance;
-        this.penetrating = hitscanOption.penetrating;
         this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
         this.condition = hitscanOption.condition;
     }

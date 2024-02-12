@@ -42,7 +42,7 @@ public abstract class Projectile extends Bullet {
      * @see ProjectileOption
      */
     protected Projectile(@NonNull CombatEntity shooter, int velocity, @NonNull ProjectileOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.penetrating, option.hitboxMultiplier, option.condition);
+        super(shooter, option.trailInterval, option.maxDistance, option.hitboxMultiplier, option.condition);
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
         this.velocity = velocity;
         this.duration = option.duration;
@@ -61,7 +61,6 @@ public abstract class Projectile extends Bullet {
         ProjectileOption option = ProjectileOption.builder().build();
         this.trailInterval = option.trailInterval;
         this.maxDistance = option.maxDistance;
-        this.penetrating = option.penetrating;
         this.hitboxMultiplier = option.hitboxMultiplier;
         this.condition = option.condition;
         this.velocity = velocity;

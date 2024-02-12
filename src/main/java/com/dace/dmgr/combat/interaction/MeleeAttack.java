@@ -11,7 +11,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 기본 근접 공격의 판정을 관리하는 클래스.
@@ -47,7 +46,6 @@ public final class MeleeAttack extends Hitscan {
     }
 
     @Override
-    @MustBeInvokedByOverriders
     public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
         target.getDamageModule().damage((CombatUser) shooter, damage, DamageType.NORMAL, false, true);
 
