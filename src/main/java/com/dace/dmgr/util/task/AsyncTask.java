@@ -169,6 +169,7 @@ public final class AsyncTask<T> extends Task {
         return new AsyncTask<>(nextFuture);
     }
 
+    @NonNull
     BukkitTask getBukkitTask() {
         return new BukkitRunnable() {
             @Override

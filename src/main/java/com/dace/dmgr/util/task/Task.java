@@ -2,6 +2,7 @@ package com.dace.dmgr.util.task;
 
 import com.dace.dmgr.Disposable;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -39,5 +40,6 @@ public abstract class Task implements Disposable {
      *
      * @return 스케쥴러 태스크 객체
      */
+    @NonNull
     abstract BukkitTask getBukkitTask();
 }

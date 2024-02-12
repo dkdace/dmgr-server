@@ -26,6 +26,7 @@ public final class DelayTask extends Task {
     private final long delay;
 
     @Override
+    @NonNull
     BukkitTask getBukkitTask() {
         return new BukkitRunnable() {
             @Override

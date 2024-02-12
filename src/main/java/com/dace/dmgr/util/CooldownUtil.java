@@ -2,7 +2,6 @@ package com.dace.dmgr.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.WeakHashMap;
@@ -131,7 +130,7 @@ public final class CooldownUtil {
      * @param cooldown 쿨타임 종류
      * @return 남은 시간 (tick). 해당 종류의 쿨타임이 존재하지 않으면 0 반환
      */
-    public static long getCooldown(@NonNull Object object, @NotNull Cooldown cooldown) {
+    public static long getCooldown(@NonNull Object object, @NonNull Cooldown cooldown) {
         return getCooldown(object, cooldown.toString());
     }
 

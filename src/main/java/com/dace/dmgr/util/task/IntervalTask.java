@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -101,7 +100,7 @@ public final class IntervalTask extends Task {
     }
 
     @Override
-    @NotNull
+    @NonNull
     BukkitTask getBukkitTask() {
         return new BukkitRunnable() {
             long i = 0;

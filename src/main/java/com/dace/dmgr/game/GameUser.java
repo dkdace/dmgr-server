@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -215,40 +214,34 @@ public final class GameUser implements Disposable {
                 game.getTeamScore().get(Team.RED), game.getTeamScore().get(Team.BLUE)));
         tabList.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
 
-        tabList.set(1, 0, new TextTabItem(
-                MessageFormat.format("§c§l§n RED §f({0}명)", game.getTeamUserMap().get(Team.RED).size()),
-                0, Skins.getDot(ChatColor.RED)));
-        tabList.set(2, 0, new TextTabItem(
-                MessageFormat.format("§9§l§n BLUE §f({0}명)", game.getTeamUserMap().get(Team.BLUE).size()),
-                0, Skins.getDot(ChatColor.BLUE)));
-
         boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
                 game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
 
-        GameUser[] redGameUsers = game.getTeamUserMap().get(Team.RED).stream().sorted(Comparator.comparing(GameUser::getScore).reversed()).toArray(GameUser[]::new);
-        GameUser[] blueGameUsers = game.getTeamUserMap().get(Team.BLUE).stream().sorted(Comparator.comparing(GameUser::getScore).reversed()).toArray(GameUser[]::new);
-        for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
-            if (i > redGameUsers.length - 1) {
-                tabList.remove(1, (i + 1) * 3 - 2);
-                tabList.remove(1, (i + 1) * 3 - 1);
-            } else {
-                tabList.set(1, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(redGameUsers[i].getPlayer()).getDisplayName(), 0,
-                        team == Team.RED || headReveal ? Skins.getPlayer(redGameUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
-                tabList.set(1, (i + 1) * 3 - 1, new TextTabItem(
-                        MessageFormat.format("§4✪ §f{0}   §4{1} §f{2}   §4{3} §f{4}   §4{5} §f{6}", redGameUsers[i].getScore(),
-                                TextIcon.DAMAGE, redGameUsers[i].getKill(), TextIcon.POISON, redGameUsers[i].getDeath(), "✔", redGameUsers[i].getAssist())));
-            }
-        }
-        for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
-            if (i > blueGameUsers.length - 1) {
-                tabList.remove(2, (i + 1) * 3 - 2);
-                tabList.remove(2, (i + 1) * 3 - 1);
-            } else {
-                tabList.set(2, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(blueGameUsers[i].getPlayer()).getDisplayName(), 0,
-                        team == Team.BLUE || headReveal ? Skins.getPlayer(blueGameUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
-                tabList.set(2, (i + 1) * 3 - 1, new TextTabItem(
-                        MessageFormat.format("§1✪ §f{0}   §1{1} §f{2}   §1{3} §f{4}   §1{5} §f{6}", blueGameUsers[i].getScore(),
-                                TextIcon.DAMAGE, blueGameUsers[i].getKill(), TextIcon.POISON, blueGameUsers[i].getDeath(), "✔", blueGameUsers[i].getAssist())));
+        int column = 0;
+        for (Team team2 : Team.values()) {
+            if (team2 == Team.NONE)
+                continue;
+
+            column++;
+            tabList.set(column, 0, new TextTabItem(
+                    MessageFormat.format("{0}§l§n {1} §f({2}명)", team2.getColor(), team2.getName(), game.getTeamUserMap().get(team2).size()),
+                    0, Skins.getDot(team2.getColor())));
+
+            GameUser[] teamUsers = game.getTeamUserMap().get(team2).stream()
+                    .sorted(Comparator.comparing(GameUser::getScore).reversed())
+                    .toArray(GameUser[]::new);
+
+            for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
+                if (i > teamUsers.length - 1) {
+                    tabList.remove(column, (i + 1) * 3 - 2);
+                    tabList.remove(column, (i + 1) * 3 - 1);
+                } else {
+                    tabList.set(column, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(), 0,
+                            this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
+                    tabList.set(column, (i + 1) * 3 - 1, new TextTabItem(
+                            MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}", teamUsers[i].getScore(),
+                                    TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(), "✔", teamUsers[i].getAssist())));
+                }
             }
         }
 
