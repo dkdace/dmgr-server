@@ -34,7 +34,7 @@ public final class Jager extends Character {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", Role.MARKSMAN, 1000, 1.0F, 1.0F);
+        super("예거", "DVJager", Role.MARKSMAN, 1000, 1.0, 1.0);
     }
 
     @Override

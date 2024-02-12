@@ -13,7 +13,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
     /** 투사체 속력 */
     public static final int VELOCITY = 80;
     /** 탄퍼짐 */
-    public static final float SPREAD = 5F;
+    public static final double SPREAD = 5;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 쿨타임 */
@@ -58,13 +58,13 @@ public final class JagerWeaponInfo extends WeaponInfo {
          */
         interface RECOIL {
             /** 수직 반동 */
-            float UP = 2.8F;
+            double UP = 2.8;
             /** 수평 반동 */
-            float SIDE = 0F;
+            double SIDE = 0;
             /** 수직 반동 분산도 */
-            float UP_SPREAD = 0.3F;
+            double UP_SPREAD = 0.3;
             /** 수평 반동 분산도 */
-            float SIDE_SPREAD = 0.4F;
+            double SIDE_SPREAD = 0.4;
         }
     }
 
@@ -73,13 +73,13 @@ public final class JagerWeaponInfo extends WeaponInfo {
      */
     public interface RECOIL {
         /** 수직 반동 */
-        float UP = 0.8F;
+        double UP = 0.8;
         /** 수평 반동 */
-        float SIDE = 0F;
+        double SIDE = 0;
         /** 수직 반동 분산도 */
-        float UP_SPREAD = 0.1F;
+        double UP_SPREAD = 0.1;
         /** 수평 반동 분산도 */
-        float SIDE_SPREAD = 0.05F;
+        double SIDE_SPREAD = 0.05;
     }
 
     /**

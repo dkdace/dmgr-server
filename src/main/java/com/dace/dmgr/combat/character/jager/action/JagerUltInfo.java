@@ -18,9 +18,9 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     /** 초당 피해량 */
     public static final int DAMAGE_PER_SECOND = 100;
     /** 최소 피해 범위 */
-    public static final int MIN_RADIUS = 4;
+    public static final double MIN_RADIUS = 4;
     /** 최대 피해 범위 */
-    public static final int MAX_RADIUS = 12;
+    public static final double MAX_RADIUS = 12;
     /** 최대 피해 범위에 도달하는 시간 */
     public static final long MAX_RADIUS_DURATION = 5 * 20;
     /** 초당 빙결량 */

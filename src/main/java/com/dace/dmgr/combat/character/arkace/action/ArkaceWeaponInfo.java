@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
 
 public final class ArkaceWeaponInfo extends WeaponInfo {
     /** 피해량 */
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 */
-    public static final int DAMAGE_DISTANCE = 25;
+    public static final double DAMAGE_DISTANCE = 25;
     /** 쿨타임 */
     public static final long COOLDOWN = (long) (0.1 * 20);
     /** 장탄수 */
@@ -42,13 +42,13 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
      */
     public interface RECOIL {
         /** 수직 반동 */
-        float UP = 0.6F;
+        double UP = 0.6;
         /** 수평 반동 */
-        float SIDE = 0.04F;
+        double SIDE = 0.04;
         /** 수직 반동 분산도 */
-        float UP_SPREAD = 0.1F;
+        double UP_SPREAD = 0.1;
         /** 수평 반동 분산도 */
-        float SIDE_SPREAD = 0.06F;
+        double SIDE_SPREAD = 0.06;
     }
 
     /**
@@ -56,7 +56,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
      */
     public interface SPREAD {
         /** 탄퍼짐 증가량 */
-        float INCREMENT = 0.3F;
+        double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */
         int START = 5;
         /** 탄퍼짐 최대 시점 */
