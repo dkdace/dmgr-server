@@ -14,7 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public final class ArkaceA2 extends ActiveSkill {
-    public ArkaceA2(CombatUser combatUser) {
+    public ArkaceA2(@NonNull CombatUser combatUser) {
         super(2, combatUser, ArkaceA2Info.getInstance(), 2);
     }
 

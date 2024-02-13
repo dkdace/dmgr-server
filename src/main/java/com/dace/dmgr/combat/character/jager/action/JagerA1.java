@@ -13,11 +13,12 @@ import org.bukkit.entity.Wolf;
 @Getter
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 위치 확인 모듈 */
+    @NonNull
     private final LocationConfirmModule confirmModule;
     /** 소환한 엔티티 */
     JagerA1Entity entity = null;
 
-    public JagerA1(CombatUser combatUser) {
+    public JagerA1(@NonNull CombatUser combatUser) {
         super(1, combatUser, JagerA1Info.getInstance(), 0);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }

@@ -23,7 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class ArkaceA1 extends ActiveSkill {
-    public ArkaceA1(CombatUser combatUser) {
+    public ArkaceA1(@NonNull CombatUser combatUser) {
         super(1, combatUser, ArkaceA1Info.getInstance(), 1);
     }
 

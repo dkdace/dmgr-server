@@ -30,7 +30,7 @@ public final class JagerA3 extends ActiveSkill {
     /** 수류탄 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public JagerA3(CombatUser combatUser) {
+    public JagerA3(@NonNull CombatUser combatUser) {
         super(3, combatUser, JagerA3Info.getInstance(), 2);
     }
 

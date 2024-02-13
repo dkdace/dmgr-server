@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 
 public final class ArkaceP1 extends AbstractSkill {
-    public ArkaceP1(CombatUser combatUser) {
+    public ArkaceP1(@NonNull CombatUser combatUser) {
         super(1, combatUser, ArkaceP1Info.getInstance());
     }
 

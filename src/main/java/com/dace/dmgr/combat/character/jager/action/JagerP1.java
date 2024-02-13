@@ -8,7 +8,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 public final class JagerP1 extends AbstractSkill {
-    public JagerP1(CombatUser combatUser) {
+    public JagerP1(@NonNull CombatUser combatUser) {
         super(1, combatUser, JagerP1Info.getInstance());
     }
 

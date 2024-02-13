@@ -26,13 +26,16 @@ import org.bukkit.util.Vector;
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
     /** 재장전 모듈 */
+    @NonNull
     private final ReloadModule reloadModule;
     /** 2중 무기 모듈 */
+    @NonNull
     private final SwapModule<JagerWeaponR> swapModule;
     /** 정조준 모듈 */
+    @NonNull
     private final AimModule aimModule;
 
-    public JagerWeaponL(CombatUser combatUser) {
+    public JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
@@ -68,7 +71,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                     return;
                 }
 
-                new JagerWeaponProjectile().shoot(JagerWeaponInfo.SPREAD);
+                new JagerWeaponLProjectile().shoot(JagerWeaponInfo.SPREAD);
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 setCooldown();
@@ -192,8 +195,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerWeaponL");
     }
 
-    private class JagerWeaponProjectile extends Projectile {
-        public JagerWeaponProjectile() {
+    private class JagerWeaponLProjectile extends Projectile {
+        public JagerWeaponLProjectile() {
             super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
                     .maxDistance(JagerWeaponInfo.DISTANCE).condition(JagerWeaponL.this.combatUser::isEnemy).build());
         }

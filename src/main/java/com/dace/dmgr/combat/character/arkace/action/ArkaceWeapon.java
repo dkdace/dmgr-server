@@ -23,11 +23,13 @@ import org.bukkit.util.Vector;
 @Getter
 public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
+    @NonNull
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
+    @NonNull
     private final GradualSpreadModule fullAutoModule;
 
-    public ArkaceWeapon(CombatUser combatUser) {
+    public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600, ArkaceWeaponInfo.SPREAD.INCREMENT,

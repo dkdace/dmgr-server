@@ -24,9 +24,10 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     private final JagerWeaponL mainWeapon;
     /** 재장전 모듈 */
     @Getter
+    @NonNull
     private final ReloadModule reloadModule;
 
-    public JagerWeaponR(CombatUser combatUser, JagerWeaponL mainWeapon) {
+    public JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
         this.mainWeapon = mainWeapon;
         reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
@@ -57,7 +58,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                     return;
                 }
 
-                new JagerWeaponProjectile().shoot(0);
+                new JagerWeaponRHitscan().shoot(0);
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
@@ -130,8 +131,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         // 미사용
     }
 
-    private class JagerWeaponProjectile extends GunHitscan {
-        public JagerWeaponProjectile() {
+    private class JagerWeaponRHitscan extends GunHitscan {
+        public JagerWeaponRHitscan() {
             super(JagerWeaponR.this.combatUser, HitscanOption.builder().trailInterval(12).condition(JagerWeaponR.this.combatUser::isEnemy).build());
         }
 
