@@ -8,6 +8,8 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 /**
@@ -163,6 +165,40 @@ public final class ParticleUtil {
                 offsetY, offsetZ, (float) speed);
 
         packet.sendPacket(player);
+    }
+
+    /**
+     * 지정한 위치에 블록 타격 효과를 재생한다.
+     *
+     * @param location 대상 위치
+     * @param block    블록
+     */
+    public static void playBlockHitEffect(@NonNull Location location, @NonNull Block block) {
+        switch (ParticleUtil.getBlockTexture(block.getType())) {
+            case GRASS:
+                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8, 0.7, 0.1);
+                break;
+            case DIRT:
+                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8, 0.7, 0.1);
+                break;
+            case STONE:
+                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1, 0.9, 0.1);
+                break;
+            case METAL:
+                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5, 1.95, 0.1);
+                SoundUtil.play("random.metalhit", location, 0.8, 1.95, 0.1);
+                break;
+            case WOOD:
+                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8, 0.8, 0.1);
+                SoundUtil.play("random.stab", location, 0.8, 1.95, 0.1);
+                break;
+            case GLASS:
+                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8, 0.7, 0.1);
+                break;
+            case WOOL:
+                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1, 0.8, 0.1);
+                break;
+        }
     }
 
     /**

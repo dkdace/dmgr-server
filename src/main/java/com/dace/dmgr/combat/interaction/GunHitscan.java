@@ -6,7 +6,6 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -40,31 +39,6 @@ public abstract class GunHitscan extends Hitscan {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                 3, 0, 0, 0, 0.1);
         ParticleUtil.play(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
-
-        switch (ParticleUtil.getBlockTexture(hitBlock.getType())) {
-            case GRASS:
-                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case DIRT:
-                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case STONE:
-                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1, 0.9, 0.1);
-                break;
-            case METAL:
-                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5, 1.95, 0.1);
-                SoundUtil.play("random.metalhit", location, 0.8, 1.95, 0.1);
-                break;
-            case WOOD:
-                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8, 0.8, 0.1);
-                SoundUtil.play("random.stab", location, 0.8, 1.95, 0.1);
-                break;
-            case GLASS:
-                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case WOOL:
-                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1, 0.8, 0.1);
-                break;
-        }
+        ParticleUtil.playBlockHitEffect(location, hitBlock);
     }
 }
