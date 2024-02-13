@@ -30,7 +30,7 @@ public final class MeleeAttack extends Hitscan {
      * @param damage  피해량
      */
     public MeleeAttack(@NonNull CombatUser shooter, int damage) {
-        super(shooter, HitscanOption.builder().hitboxMultiplier(HITBOX_MULTIPLIER).maxDistance(DISTANCE).build());
+        super(shooter, HitscanOption.builder().hitboxMultiplier(HITBOX_MULTIPLIER).maxDistance(DISTANCE).condition(shooter::isEnemy).build());
         this.damage = damage;
     }
 
