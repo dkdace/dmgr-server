@@ -50,6 +50,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
 
     private void onInit() {
         entity.setBaby(false);
+        entity.setSilent(true);
         entity.setAI(false);
 
         List<ItemStack> equipment = new ArrayList<>();
@@ -71,12 +72,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
-    public void activate() {
-        onActivate();
-    }
-
-    @Override
-    protected void onTickAfterActivation(long i) {
+    protected void onTick(long i) {
         // 미사용
     }
 

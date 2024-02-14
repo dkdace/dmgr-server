@@ -154,12 +154,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Override
     public void activate() {
         reset();
-        onActivate();
+        super.activate();
     }
 
     @Override
-    protected void onTickAfterActivation(long i) {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+    protected void onTick(long i) {
+        if (!isActivated)
             return;
 
         character.onTick(this, i);
@@ -265,6 +265,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public boolean canBeTargeted() {
+        if (!isActivated)
+            return false;
         if (gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam())
             return false;
 
@@ -315,7 +317,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         if (this == victim)
             return;
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return;
 
         isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
@@ -354,7 +356,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return;
         if (this == attacker)
             return;
@@ -380,7 +382,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public boolean canTakeDamage() {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return false;
         if (entity.getGameMode() != GameMode.SURVIVAL)
             return false;
@@ -390,7 +392,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public boolean canDie() {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return false;
         if (LocationUtil.isInRegion(entity, "BattleTrain"))
             return false;
@@ -411,7 +413,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onTakeHeal(Healer provider, int amount, boolean isUlt) {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return;
 
         character.onTakeHeal(this, provider, amount);
@@ -433,7 +435,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onKill(@NonNull Damageable victim) {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return;
         if (this == victim)
             return;
@@ -502,7 +504,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onDeath(Attacker attacker) {
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             return;
         if (CooldownUtil.getCooldown(this, Cooldown.RESPAWN_TIME) != 0)
             return;
@@ -655,7 +657,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (value < 0 || value > 1)
             throw new IllegalArgumentException("'value'가 0에서 1 사이여야 함");
 
-        if (lifeCycle != LifeCycle.ACTIVATED)
+        if (!isActivated)
             value = 0;
         else {
             Skill skill = skillMap.get(character.getUltimateSkillInfo());
@@ -719,7 +721,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.characterType = characterType;
         this.character = realCharacter;
         initActions();
-        if (lifeCycle == LifeCycle.NOT_ACTIVATED)
+        if (!isActivated)
             activate();
     }
 
