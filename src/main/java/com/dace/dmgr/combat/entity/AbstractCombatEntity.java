@@ -40,9 +40,8 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     /** 히트박스 객체 목록 */
     @NonNull
     protected final Hitbox[] hitboxes;
-    /** 생명 주기 */
-    @NonNull
-    protected LifeCycle lifeCycle = LifeCycle.NOT_ACTIVATED;
+    /** 활성화 여부 */
+    protected boolean isActivated = false;
     /** 히트박스의 가능한 최대 크기. (단위: 블록) */
     private double maxHitboxSize = 0;
 
@@ -77,15 +76,13 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
         CombatEntityRegistry.getInstance().add(entity, this);
     }
 
-    /**
-     * 엔티티 활성화 완료 시 실행할 작업.
-     */
+    @Override
     @MustBeInvokedByOverriders
-    protected void onActivate() {
-        lifeCycle = LifeCycle.ACTIVATED;
+    public void activate() {
+        isActivated = true;
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTickAfterActivation(i);
+            onTick(i);
             updateHitboxTick();
 
             return true;
@@ -93,11 +90,11 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     /**
-     * 활성화 완료 후 매 틱마다 실행할 작업.
+     * 엔티티가 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */
-    protected abstract void onTickAfterActivation(long i);
+    protected abstract void onTick(long i);
 
     /**
      * 엔티티의 히트박스를 업데이트한다.
@@ -117,7 +114,6 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     public void dispose() {
         checkAccess();
 
-        lifeCycle = LifeCycle.REMOVED;
         CombatEntityRegistry.getInstance().remove(entity);
         if (game != null)
             game.removeCombatEntity(this);

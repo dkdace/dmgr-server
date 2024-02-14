@@ -69,6 +69,13 @@ public interface CombatEntity extends Disposable {
     double getMaxHitboxSize();
 
     /**
+     * 엔티티가 활성화 되었는지 확인한다.
+     *
+     * @return 엔티티 활성화 여부
+     */
+    boolean isActivated();
+
+    /**
      * 엔티티 활성화 작업을 수행한다.
      */
     void activate();
@@ -138,18 +145,4 @@ public interface CombatEntity extends Disposable {
      * @return 지정할 수 있으면 {@code true} 반환
      */
     boolean canBeTargeted();
-
-    /**
-     * 엔티티의 생명 주기.
-     */
-    enum LifeCycle {
-        /** 활성화 안 됨 */
-        NOT_ACTIVATED,
-        /** 활성화 중 */
-        ACTIVATING,
-        /** 활성화 완료 */
-        ACTIVATED,
-        /** 제거 */
-        REMOVED,
-    }
 }

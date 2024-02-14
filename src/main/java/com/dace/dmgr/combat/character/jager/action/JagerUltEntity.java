@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -26,7 +27,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 눈폭풍 발생기 클래스.
  */
-public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
+public final class JagerUltEntity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
     /** 공격 모듈 */
@@ -37,19 +38,23 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     @NonNull
     @Getter
     private final DamageModule damageModule;
+    /** 준비 시간 모듈 */
+    @NonNull
+    @Getter
+    private final ReadyTimeModule readyTimeModule;
 
     public JagerUltEntity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
         super(
                 entity,
                 owner.getName() + "의 눈폭풍 발생기",
                 owner,
-                JagerUltInfo.SUMMON_DURATION,
                 true,
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
+        readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
         onInit();
     }
@@ -68,23 +73,38 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     }
 
     @Override
-    public void onTickBeforeActivation(long i) {
+    public void activate() {
+        super.activate();
+        readyTimeModule.ready();
+    }
+
+    @Override
+    public void onTickBeforeReady(long i) {
         if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
             entity.teleport(entity.getLocation().add(0, 0.2, 0));
-        playReadyEffect();
+        playBeforeReadyEffect();
         playTickEffect();
     }
 
     /**
      * 준비 대기 시간의 효과를 재생한다.
      */
-    private void playReadyEffect() {
+    private void playBeforeReadyEffect() {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
         SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, entity.getLocation(), 0.8, 1.7);
     }
 
     @Override
-    protected void onTickAfterActivation(long i) {
+    public void onReady() {
+        // 미사용
+    }
+
+    @Override
+    protected void onTick(long i) {
+        playTickEffect();
+        if (!readyTimeModule.isReady())
+            return;
+
         double range = Math.min(JagerUltInfo.MIN_RADIUS + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
                 JagerUltInfo.MAX_RADIUS);
         playTickEffect(i, range);
@@ -100,8 +120,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
         }
         if (i >= JagerUltInfo.DURATION)
             dispose();
-
-        playTickEffect();
     }
 
     /**
