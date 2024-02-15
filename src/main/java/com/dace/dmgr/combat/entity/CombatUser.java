@@ -90,8 +90,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     private final Hitbox critHitbox;
     /** 킬 기여자별 피해량 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 누적 피해량) */
-    @NonNull
-    @Getter
     private final HashMap<@NonNull CombatUser, Integer> damageMap = new HashMap<>();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     @NonNull
@@ -443,8 +441,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onKill(this, victim);
 
         if (victim instanceof CombatUser) {
-            int totalDamage = ((CombatUser) victim).getDamageMap().values().stream().mapToInt(Integer::intValue).sum();
-            int damage = ((CombatUser) victim).getDamageMap().getOrDefault(this, 0);
+            int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
+            int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
             int score = Math.round(((float) damage / totalDamage) * 100);
 
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
@@ -477,7 +475,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      */
     private void broadcastPlayerKillMessage(@NonNull CombatEntity victim) {
-        Map<CombatUser, Integer> victimDamageMap = ((CombatUser) victim).getDamageMap();
+        Map<CombatUser, Integer> victimDamageMap = ((CombatUser) victim).damageMap;
 
         Set<String> attackerNames = new HashSet<>();
         for (CombatUser attacker2 : victimDamageMap.keySet()) {
