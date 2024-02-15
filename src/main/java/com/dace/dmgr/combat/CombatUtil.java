@@ -206,7 +206,7 @@ public final class CombatUtil {
      * @param yaw    변경할 yaw
      * @param pitch  변경할 pitch
      */
-    private static void setYawAndPitch(@NonNull Player player, double yaw, double pitch) {
+    public static void setYawAndPitch(@NonNull Player player, double yaw, double pitch) {
         WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
 
         packet.setX(0);
