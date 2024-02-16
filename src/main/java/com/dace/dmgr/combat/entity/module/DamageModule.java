@@ -129,14 +129,18 @@ public class DamageModule {
         double defenseMultiplier = damageType == DamageType.SYSTEM ?
                 1 : defenseMultiplierStatus.getValue();
         int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
+        if (getHealth() - finalDamage < 0)
+            finalDamage = getHealth();
         int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
+        if (getHealth() - reducedDamage < 0)
+            reducedDamage = getHealth();
 
         if (attacker != null)
             attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, isCrit, isUlt);
         playHitEffect();
 
-        if (getHealth() - finalDamage > 0)
+        if (getHealth() > finalDamage)
             setHealth(getHealth() - finalDamage);
         else {
             if (attacker != null)

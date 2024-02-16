@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -11,10 +11,10 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  *
  * <p>설랑, 포탈 등 전투에서 일시적으로 사용하는 엔티티를 말한다.</p>
  *
- * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
+ * @param <T> {@link Entity}를 상속받는 엔티티 타입
  * @see SummonEntity
  */
-public abstract class TemporalEntity<T extends LivingEntity> extends AbstractCombatEntity<T> {
+public abstract class TemporalEntity<T extends Entity> extends AbstractCombatEntity<T> {
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
@@ -38,7 +38,7 @@ public abstract class TemporalEntity<T extends LivingEntity> extends AbstractCom
 
     @Override
     public boolean canBeTargeted() {
-        return true;
+        return isActivated;
     }
 
     @Override
