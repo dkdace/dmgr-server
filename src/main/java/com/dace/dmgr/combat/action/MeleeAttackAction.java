@@ -51,7 +51,7 @@ public final class MeleeAttackAction extends AbstractAction {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown(20);
-        setCooldown(20);
+        setCooldown();
 
         playUseSound(combatUser.getEntity().getEyeLocation());
         sendPotionEffect();
