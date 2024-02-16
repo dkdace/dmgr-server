@@ -411,8 +411,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (target.getDamageModule().isUltProvider() && isUlt) {
             int ultAmount = amount;
 
-            if (target instanceof CombatUser)
-                ultAmount = -((CombatUser) target).selfHarmDamage;
+            if (target instanceof CombatUser && ((CombatUser) target).selfHarmDamage > 0)
+                ultAmount = -((CombatUser) target).selfHarmDamage - amount;
 
             if (ultAmount > 0)
                 addUltGauge(ultAmount);
@@ -532,7 +532,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
                 int score = Math.round(((float) damage / totalDamage) * 100);
 
-                addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
+                attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 attacker2.playPlayerKillEffect();
 
                 if (attacker2.gameUser != null)
