@@ -364,6 +364,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             selfHarmDamage += damage;
             return;
         }
+        if (damageType == DamageType.SYSTEM)
+            selfHarmDamage += damage;
 
         character.onDamage(this, attacker, damage, damageType, isCrit);
 
@@ -409,12 +411,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (target.getDamageModule().isUltProvider() && isUlt) {
             int ultAmount = amount;
 
-            if (target instanceof CombatUser) {
-                ((CombatUser) target).selfHarmDamage -= amount;
+            if (target instanceof CombatUser)
                 ultAmount = -((CombatUser) target).selfHarmDamage;
-                if (((CombatUser) target).selfHarmDamage < 0)
-                    ((CombatUser) target).selfHarmDamage = 0;
-            }
 
             if (ultAmount > 0)
                 addUltGauge(ultAmount);
@@ -430,6 +428,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return;
 
         character.onTakeHeal(this, provider, amount);
+        selfHarmDamage -= amount;
+        if (selfHarmDamage < 0)
+            selfHarmDamage = 0;
 
         playTakeHealEffect(amount);
     }
