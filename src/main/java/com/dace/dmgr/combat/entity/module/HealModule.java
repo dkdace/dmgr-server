@@ -54,11 +54,15 @@ public final class HealModule extends DamageModule {
         if (getHealth() == getMaxHealth())
             return;
 
-        if (provider != null)
-            provider.onGiveHeal((Healable) combatEntity, amount, isUlt);
-        ((Healable) combatEntity).onTakeHeal(provider, amount, isUlt);
+        int finalAmount = amount;
+        if (getHealth() + finalAmount > getMaxHealth())
+            finalAmount = getMaxHealth() - getHealth();
 
-        setHealth(getHealth() + amount);
+        if (provider != null)
+            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
+        ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
+
+        setHealth(getHealth() + finalAmount);
     }
 
     /**

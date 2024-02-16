@@ -99,6 +99,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final HashMap<@NonNull SkillInfo, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final HashMap<@NonNull String, Double> scoreMap = new LinkedHashMap<>();
+    /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
+    private int selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
     private double scoreStreakSum = 0;
 
@@ -358,8 +360,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         if (!isActivated)
             return;
-        if (this == attacker)
+        if (this == attacker) {
+            selfHarmDamage += damage;
             return;
+        }
 
         character.onDamage(this, attacker, damage, damageType, isCrit);
 
@@ -370,8 +374,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 CooldownUtil.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT, String.valueOf(entity.getEntityId()));
             CooldownUtil.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT, String.valueOf(entity.getEntityId()));
 
-            if (damageModule.getHealth() - damage <= 0)
-                damage = damageModule.getHealth();
             int sumDamage = damageMap.getOrDefault(attacker, 0);
             damageMap.put((CombatUser) attacker, sumDamage + damage);
         }
@@ -404,8 +406,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt) {
         isUlt = isUlt && character.onGiveHeal(this, target, amount);
 
-        if (target.getDamageModule().isUltProvider() && isUlt)
-            addUltGauge(amount);
+        if (target.getDamageModule().isUltProvider() && isUlt) {
+            int ultAmount = amount;
+
+            if (target instanceof CombatUser) {
+                ((CombatUser) target).selfHarmDamage -= amount;
+                ultAmount = -((CombatUser) target).selfHarmDamage;
+                if (((CombatUser) target).selfHarmDamage < 0)
+                    ((CombatUser) target).selfHarmDamage = 0;
+            }
+
+            if (ultAmount > 0)
+                addUltGauge(ultAmount);
+        }
 
         if (gameUser != null && target instanceof CombatUser)
             gameUser.setHeal(gameUser.getHeal() + amount);
@@ -527,6 +540,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         });
 
         broadcastPlayerKillMessage(this);
+        selfHarmDamage = 0;
         damageMap.clear();
 
         if (gameUser != null)
