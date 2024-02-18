@@ -35,4 +35,9 @@ public interface GameMap {
      * @return 블루 팀 스폰 위치 목록
      */
     GlobalLocation @NonNull [] getBlueTeamSpawns();
+
+    /**
+     * @return 힐 팩 위치 목록
+     */
+    GlobalLocation @NonNull [] getHealPackLocations();
 }
