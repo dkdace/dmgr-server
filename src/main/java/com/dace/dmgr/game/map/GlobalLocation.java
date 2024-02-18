@@ -33,4 +33,14 @@ public final class GlobalLocation {
     public Location toLocation(@NonNull World world) {
         return new Location(world, x, y, z, yaw, pitch);
     }
+
+    /**
+     * 지정한 위치와 X, Y, Z 좌표가 같은 지 확인한다.
+     *
+     * @param location 확인할 위치
+     * @return 좌표가 같으면 {@code true} 반환
+     */
+    public boolean isSameLocation(@NonNull Location location) {
+        return x == location.getX() && y == location.getY() && z == location.getZ();
+    }
 }
