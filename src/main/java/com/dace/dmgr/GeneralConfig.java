@@ -85,7 +85,7 @@ public final class GeneralConfig extends YamlFile {
     public static final class CombatConfig {
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
-        /** 리스폰 시간 */
+        /** 리스폰 시간 (틱) */
         private int respawnTime = 200;
     }
 
