@@ -20,6 +20,8 @@ import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
+import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -49,6 +51,8 @@ public final class User implements Disposable {
     public static final String NAME_TAG_HIDER_CUSTOM_NAME = "nametag";
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
+    /** 생성된 홀로그램 목록 (홀로그램 ID : UUID) */
+    private final HashMap<String, Hologram> hologramMap = new HashMap<>();
     /** 플레이어 객체 */
     @NonNull
     @Getter
@@ -654,6 +658,52 @@ public final class User implements Disposable {
         });
 
         bossBarMap.clear();
+    }
+
+    /**
+     * 플레이어에게 홀로그램을 지정한 위치에 표시한다.
+     *
+     * <p>이미 해당 ID의 홀로그램이 존재할 경우 덮어쓴다.</p>
+     *
+     * @param id       홀로그램 ID
+     * @param location 생성할 위치
+     * @param contents 내용 목록
+     */
+    public void addHologram(@NonNull String id, @NonNull Location location, @NonNull String... contents) {
+        Hologram hologram = hologramMap.get(id);
+        if (hologram == null)
+            hologram = DMGR.getHolographicDisplaysAPI().createHologram(location);
+
+        hologram.getVisibilitySettings().setGlobalVisibility(VisibilitySettings.Visibility.HIDDEN);
+        hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.VISIBLE);
+        hologram.getLines().clear();
+        for (String content : contents) {
+            hologram.getLines().appendText(content);
+        }
+
+        hologramMap.putIfAbsent(id, hologram);
+    }
+
+    /**
+     * 플레이어의 홀로그램을 제거한다.
+     *
+     * @param id 홀로그램 ID
+     */
+    public void removeHologram(@NonNull String id) {
+        Hologram hologram = hologramMap.get(id);
+        if (hologram == null)
+            return;
+
+        hologram.delete();
+        hologramMap.remove(id);
+    }
+
+    /**
+     * 플레이어의 모든 홀로그램을 제거한다.
+     */
+    public void clearHologram() {
+        hologramMap.forEach((id, hologram) -> hologram.delete());
+        hologramMap.clear();
     }
 
     /**
