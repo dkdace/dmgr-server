@@ -13,7 +13,19 @@ public enum TeamDeathmatchMap implements GameMap {
     TESTMAP(GamePlayMode.TEAM_DEATHMATCH, "테스트맵", "TestMap",
             new GlobalLocation[]{new GlobalLocation(19.5, 63, 52.5, 180, 0)},
             new GlobalLocation[]{new GlobalLocation(-114.5, 64, 53.5, -90, 0)},
-            new GlobalLocation[]{new GlobalLocation(1, 61, 21, 0, 0)}
+            new GlobalLocation[]{
+                    new GlobalLocation(1, 61, 21),
+                    new GlobalLocation(43, 61, -21),
+                    new GlobalLocation(-4, 66, -15),
+                    new GlobalLocation(-13, 61, -56),
+                    new GlobalLocation(2, 66, -56),
+                    new GlobalLocation(-47, 65, -52),
+                    new GlobalLocation(-43, 66, 31),
+                    new GlobalLocation(-60, 59, -4),
+                    new GlobalLocation(-53, 67, -13),
+                    new GlobalLocation(-82, 61, 36),
+                    new GlobalLocation(-75, 63, 58)
+            }
     );
 
     /** 게임 모드 */

@@ -24,6 +24,17 @@ public final class GlobalLocation {
     private final float pitch;
 
     /**
+     * 지정한 좌표로 전역 위치 인스턴스를 생성한다.
+     *
+     * @param x X 좌표
+     * @param y Y 좌표
+     * @param z Z 좌표
+     */
+    public GlobalLocation(double x, double y, double z) {
+        this(x, y, z, 0, 0);
+    }
+
+    /**
      * 현재 좌표를 바탕으로 지정한 월드의 위치를 반환한다.
      *
      * @param world 대상 월드
