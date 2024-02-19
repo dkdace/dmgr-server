@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.MeleeAttackAction;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
@@ -29,6 +30,7 @@ import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
@@ -187,6 +189,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         setCanSprint(canSprint());
         adjustWalkSpeed();
+        checkHealPack();
         onTickActionbar();
 
         sidebar.clear();
@@ -252,6 +255,57 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         sidebar.set("§f", i--);
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
             sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30), i--);
+    }
+
+    /**
+     * 현재 위치의 힐 팩을 확인한다.
+     */
+    private void checkHealPack() {
+        if (gameUser == null)
+            return;
+
+        Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
+        if (location.getBlock().getType() == GeneralConfig.getCombatConfig().getHealPackBlock()) {
+            GlobalLocation healPackLoc = Arrays.stream(game.getMap().getHealPackLocations())
+                    .filter(globalLocation -> globalLocation.isSameLocation(location))
+                    .findFirst()
+                    .orElse(null);
+            if (healPackLoc == null)
+                return;
+
+            useHealPack(location, healPackLoc);
+        }
+    }
+
+    /**
+     * 지정한 위치의 힐 팩을 사용한다.
+     *
+     * @param location         실제 위치
+     * @param healPackLocation 힐 팩 위치
+     */
+    private void useHealPack(@NonNull Location location, @NonNull GlobalLocation healPackLocation) {
+        if (CooldownUtil.getCooldown(healPackLocation, Cooldown.HEAL_PACK) > 0)
+            return;
+        if (damageModule.getHealth() == damageModule.getMaxHealth())
+            return;
+
+        CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK);
+        damageModule.heal((Healer) null, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
+        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, entity.getLocation(), 0.5, 1.2);
+
+        Location hologramLoc = location.add(0.5, 1.7, 0.5);
+
+        TaskUtil.addTask(game, new IntervalTask(i -> {
+            long cooldown = CooldownUtil.getCooldown(healPackLocation, Cooldown.HEAL_PACK);
+            if (cooldown <= 0)
+                return false;
+
+            game.getGameUsers().forEach(gameUser2 -> gameUser2.getUser().addHologram("healpack-" + healPackLocation, hologramLoc,
+                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0))));
+
+            return true;
+        }, isCancalled -> game.getGameUsers().forEach(gameUser2 -> gameUser2.getUser().removeHologram("healpack-" + healPackLocation)),
+                20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
     }
 
     @Override
