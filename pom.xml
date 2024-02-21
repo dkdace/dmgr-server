@@ -81,6 +81,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -158,6 +162,11 @@
             <groupId>com.github.thekeenant</groupId>
             <artifactId>tabbed</artifactId>
             <version>v1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>me.filoghost.holographicdisplays</groupId>
+            <artifactId>holographicdisplays-api</artifactId>
+            <version>3.0.4</version>
         </dependency>
     </dependencies>
 </project>

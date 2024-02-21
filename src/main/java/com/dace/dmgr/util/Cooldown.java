@@ -45,6 +45,8 @@ public enum Cooldown {
     SKILL_DURATION(0),
     /** 획득 점수 표시 유지시간 */
     SCORE_DISPLAY_DURATION(CombatUser.SCORE_DISPLAY_DURATION),
+    /** 힐 팩 쿨타임 */
+    HEAL_PACK(GeneralConfig.getCombatConfig().getHealPackCooldown() * 20L),
     /** 액션바 지속시간 */
     ACTION_BAR(0),
     /** 타이틀 지속시간 */
