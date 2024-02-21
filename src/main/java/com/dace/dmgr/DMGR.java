@@ -9,6 +9,7 @@ import com.dace.dmgr.event.EventManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.keenant.tabbed.Tabbed;
@@ -108,6 +109,7 @@ public class DMGR extends JavaPlugin {
         EventManager.register();
         clearUnusedEntities();
         WorldUtil.clearDuplicatedWorlds();
+        HologramUtil.clearHologram();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);

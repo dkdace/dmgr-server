@@ -300,11 +300,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (cooldown <= 0)
                 return false;
 
-            game.getGameUsers().forEach(gameUser2 -> gameUser2.getUser().addHologram("healpack-" + healPackLocation, hologramLoc,
-                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0))));
+            HologramUtil.addHologram("healpack" + healPackLocation, hologramLoc,
+                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
+            game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility("healpack" + healPackLocation,
+                    LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
 
             return true;
-        }, isCancalled -> game.getGameUsers().forEach(gameUser2 -> gameUser2.getUser().removeHologram("healpack-" + healPackLocation)),
+        }, isCancalled -> HologramUtil.removeHologram("healpack" + healPackLocation),
                 20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
     }
 
