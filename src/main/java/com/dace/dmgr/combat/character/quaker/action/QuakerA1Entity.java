@@ -64,7 +64,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         particleLocs[2] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), -hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
         particleLocs[3] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
 
-        if (i % 5 == 0) {
+        if (i % 4 == 0) {
             for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[1], 0.4))
                 ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
             for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[2], 0.4))
@@ -87,14 +87,18 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         super.onDamage(attacker, damage, reducedDamage, damageType, isCrit, isUlt);
 
-        SoundUtil.play(Sound.ENTITY_WOLF_HURT, entity.getLocation(), 0.4 + damage * 0.001, 1, 0.1);
+        SoundUtil.play(Sound.BLOCK_ANVIL_LAND, entity.getLocation(), 0.25 + damage * 0.001, 1.2, 0.1);
+        SoundUtil.play("random.metalhit", entity.getLocation(), 0.3 + damage * 0.001, 0.85, 0.1);
         skill.addStateValue(-damage);
     }
 
     @Override
     public void onDeath(Attacker attacker) {
         dispose();
-        SoundUtil.play(Sound.ENTITY_WOLF_DEATH, entity.getLocation(), 1, 1);
+        SoundUtil.play(Sound.ENTITY_IRONGOLEM_HURT, entity.getLocation(), 2, 0.5);
+        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2, 0.7);
+        SoundUtil.play("random.metalhit", entity.getLocation(), 2, 0.7);
+        SoundUtil.play(Sound.ITEM_SHIELD_BLOCK, entity.getLocation(), 2, 0.5);
         skill.setStateValue(0);
         skill.setCooldown(QuakerA1Info.COOLDOWN_DEATH);
     }
