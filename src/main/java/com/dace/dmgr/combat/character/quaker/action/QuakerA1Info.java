@@ -11,6 +11,8 @@ public final class QuakerA1Info extends ActiveSkillInfo {
     public static final int HEALTH = 5000;
     /** 체력 최대 회복 시간 */
     public static final int RECOVER_DURATION = 12;
+    /** 사용 중 이동속도 감소량 */
+    public static final int USE_SPEED = 25;
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 

@@ -58,6 +58,7 @@ public final class QuakerA1 extends ChargeableSkill {
         if (isDurationFinished()) {
             combatUser.setGlobalCooldown(8);
             setDuration();
+            combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA1", -QuakerA1Info.USE_SPEED);
             playUseSound(combatUser.getEntity().getLocation());
 
             ArmorStand armorStand = CombatEntityUtil.spawn(ArmorStand.class, combatUser.getEntity().getLocation());
@@ -65,6 +66,7 @@ public final class QuakerA1 extends ChargeableSkill {
             entity.activate();
         } else {
             setDuration(0);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA1");
             SoundUtil.play(Sound.BLOCK_SHULKER_BOX_CLOSE, combatUser.getEntity().getLocation(), 1, 1.4);
             if (entity != null)
                 entity.dispose();
