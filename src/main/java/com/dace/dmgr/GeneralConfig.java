@@ -4,6 +4,7 @@ import com.dace.dmgr.game.Tier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.bukkit.Material;
 
 /**
  * 전역 설정 클래스.
@@ -35,6 +36,9 @@ public final class GeneralConfig extends YamlFile {
 
         combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
         combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
+        combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
+        combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
+        combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
 
         gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
         gameConfig.normalMinPlayerCount = (int) getLong("normalMinPlayerCount", gameConfig.normalMinPlayerCount);
@@ -87,6 +91,12 @@ public final class GeneralConfig extends YamlFile {
         private int idleUltChargePerSecond = 10;
         /** 리스폰 시간 (틱) */
         private int respawnTime = 200;
+        /** 힐 팩에 사용되는 블록의 타입 */
+        private Material healPackBlock = Material.NETHERRACK;
+        /** 힐 팩 쿨타임 (초) */
+        private int healPackCooldown = 15;
+        /** 힐 팩 회복량 */
+        private int healPackHeal = 350;
     }
 
     /**
