@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -195,6 +196,7 @@ public final class GameUser implements Disposable {
         player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
         user.teleport(getRespawnLocation());
         user.clearChat();
+        HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
@@ -265,12 +267,14 @@ public final class GameUser implements Disposable {
      */
     @NonNull
     public Location getRespawnLocation() {
+        if (game.getWorld() == null)
+            return LocationUtil.getLobbyLocation();
         if (team == Team.RED)
             return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
-                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+                    .toLocation(game.getWorld());
         else if (team == Team.BLUE)
             return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
-                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+                    .toLocation(game.getWorld());
 
         return LocationUtil.getLobbyLocation();
     }

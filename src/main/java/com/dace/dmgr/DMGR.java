@@ -9,12 +9,13 @@ import com.dace.dmgr.event.EventManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.WorldUtil;
-import com.keenant.tabbed.Tabbed;
 import com.dace.dmgr.util.task.AsyncTask;
+import com.keenant.tabbed.Tabbed;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.NonNull;
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -22,9 +23,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,6 +40,8 @@ public class DMGR extends JavaPlugin {
     private static final Random random = new Random();
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;
+    /** 홀로그램 관리 객체 */
+    private static HolographicDisplaysAPI holographicDisplaysAPI = null;
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -54,6 +57,13 @@ public class DMGR extends JavaPlugin {
         if (tabbed == null)
             tabbed = new Tabbed(DMGR.getPlugin());
         return tabbed;
+    }
+
+    @NonNull
+    public static HolographicDisplaysAPI getHolographicDisplaysAPI() {
+        if (holographicDisplaysAPI == null)
+            holographicDisplaysAPI = HolographicDisplaysAPI.get(DMGR.getPlugin());
+        return holographicDisplaysAPI;
     }
 
     /**
@@ -99,6 +109,7 @@ public class DMGR extends JavaPlugin {
         EventManager.register();
         clearUnusedEntities();
         WorldUtil.clearDuplicatedWorlds();
+        HologramUtil.clearHologram();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);

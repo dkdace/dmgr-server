@@ -128,7 +128,6 @@ public final class User implements Disposable {
         checkAccess();
 
         reset();
-        clearBossBar();
         TaskUtil.clearTask(this);
         sidebar.delete();
         tabList.disable();
