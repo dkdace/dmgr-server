@@ -78,6 +78,11 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         readyTimeModule.ready();
     }
 
+    @NonNull
+    public Location[] getPassCheckLocations() {
+        return new Location[]{entity.getLocation().add(0, 0.2, 0)};
+    }
+
     @Override
     public void onTickBeforeReady(long i) {
         if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))

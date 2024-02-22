@@ -14,6 +14,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
@@ -75,6 +76,11 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
     public void activate() {
         super.activate();
         readyTimeModule.ready();
+    }
+
+    @NonNull
+    public Location[] getPassCheckLocations() {
+        return new Location[]{entity.getLocation().add(0, 0.25, 0)};
     }
 
     @Override

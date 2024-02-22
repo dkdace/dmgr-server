@@ -12,6 +12,7 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -82,6 +83,11 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     public void activate() {
         super.activate();
         readyTimeModule.ready();
+    }
+
+    @NonNull
+    public Location[] getPassCheckLocations() {
+        return new Location[]{entity.getLocation().add(0, 0.2, 0)};
     }
 
     @Override

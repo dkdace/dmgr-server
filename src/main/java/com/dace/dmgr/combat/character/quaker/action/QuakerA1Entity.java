@@ -52,6 +52,19 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     }
 
     @Override
+    @NonNull
+    public Location[] getPassCheckLocations() {
+        return new Location[]{
+                LocationUtil.getLocationFromOffset(entity.getLocation(), -2, 1, 0),
+                LocationUtil.getLocationFromOffset(entity.getLocation(), -2, 2.3, 0),
+                LocationUtil.getLocationFromOffset(entity.getLocation(), 0, 1, 0),
+                LocationUtil.getLocationFromOffset(entity.getLocation(), 0, 2.3, 0),
+                LocationUtil.getLocationFromOffset(entity.getLocation(), 2, 1, 0),
+                LocationUtil.getLocationFromOffset(entity.getLocation(), 2, 2.3, 0),
+        };
+    }
+
+    @Override
     protected void onTick(long i) {
         Location loc = LocationUtil.getLocationFromOffset(owner.getEntity().getEyeLocation(), owner.getEntity().getLocation().getDirection(),
                 0, 0, 1.5);

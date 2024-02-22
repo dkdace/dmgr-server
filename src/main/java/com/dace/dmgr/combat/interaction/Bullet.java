@@ -118,9 +118,9 @@ public abstract class Bullet {
      * @param condition 대상 엔티티를 찾는 조건
      * @return {@link Bullet#onHitEntity(Location, Vector, Damageable, boolean)}의 반환값
      */
-    protected final boolean findEnemyAndHandleCollision(@NonNull Location location, @NonNull Vector direction, @NonNull Set<CombatEntity> targets,
-                                                        double size, @NonNull Predicate<CombatEntity> condition) {
-        Damageable target = (Damageable) CombatUtil.getNearEnemy(shooter, location.clone(), size * hitboxMultiplier,
+    protected final boolean findTargetAndHandleCollision(@NonNull Location location, @NonNull Vector direction, @NonNull Set<CombatEntity> targets,
+                                                         double size, @NonNull Predicate<CombatEntity> condition) {
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(location.clone(), size * hitboxMultiplier,
                 condition.and(Damageable.class::isInstance));
         boolean isCrit = false;
 

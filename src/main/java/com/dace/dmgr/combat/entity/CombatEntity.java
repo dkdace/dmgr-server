@@ -43,6 +43,12 @@ public interface CombatEntity extends Disposable {
     Hitbox[] getHitboxes();
 
     /**
+     * @return 통과 판정 확인용 위치 목록. {@link CombatEntity#canPass(Location)}에서 사용한다.
+     */
+    @NonNull
+    Location[] getPassCheckLocations();
+
+    /**
      * @return 이름
      */
     @NonNull

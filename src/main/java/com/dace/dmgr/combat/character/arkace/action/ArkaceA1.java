@@ -96,7 +96,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         public void onHit(@NonNull Location location) {
-            explode(location);
+            explode(location.add(0, 0.1, 0));
         }
 
         @Override

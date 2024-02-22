@@ -63,7 +63,7 @@ public abstract class Hitscan extends Bullet {
             if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
                 break;
 
-            if (!findEnemyAndHandleCollision(loc, direction, targets, SIZE, condition))
+            if (!findTargetAndHandleCollision(loc, direction, targets, SIZE, condition))
                 break;
 
             loc.add(direction);

@@ -331,6 +331,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         return !isDead();
     }
 
+    @NonNull
+    public Location[] getPassCheckLocations() {
+        return new Location[]{entity.getLocation().add(0, 0.5, 0), entity.getLocation().add(0, 1.25, 0)};
+    }
+
     @Override
     @NonNull
     public String getTeamIdentifier() {

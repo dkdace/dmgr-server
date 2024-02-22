@@ -214,7 +214,7 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         public void onDestroy(@NonNull Location location) {
-            explode(location, this);
+            explode(location.add(0, 0.1, 0), this);
         }
     }
 }

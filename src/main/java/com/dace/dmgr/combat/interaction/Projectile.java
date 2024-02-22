@@ -104,7 +104,7 @@ public abstract class Projectile extends Bullet {
                     if (!LocationUtil.isNonSolid(loc) && !Projectile.this.handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (!Projectile.this.findEnemyAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
+                    if (!Projectile.this.findTargetAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))

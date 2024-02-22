@@ -132,19 +132,26 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     @Override
-    public boolean canPass(@NonNull Location location) {
+    public final boolean canPass(@NonNull Location location) {
         if (entity.getWorld() != location.getWorld())
             return false;
-        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0)) ||
-                LocationUtil.canPass(location, getEntity().getLocation().add(0, 1, 0));
+        for (Location loc : getPassCheckLocations())
+            if (LocationUtil.canPass(loc, location))
+                return true;
+
+        return false;
     }
 
     @Override
-    public boolean canPass(@NonNull CombatEntity combatEntity) {
+    public final boolean canPass(@NonNull CombatEntity combatEntity) {
         if (entity.getWorld() != combatEntity.getEntity().getWorld())
             return false;
-        return LocationUtil.canPass(combatEntity.getEntity().getLocation().add(0, 0.1, 0),
-                getEntity().getLocation().add(0, 0.1, 0));
+        for (Location loc1 : getPassCheckLocations())
+            for (Location loc2 : combatEntity.getPassCheckLocations())
+                if (LocationUtil.canPass(loc1, loc2))
+                    return true;
+
+        return false;
     }
 
     @Override
