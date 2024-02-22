@@ -17,7 +17,10 @@ import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.weapon.*;
+import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
@@ -359,11 +362,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private boolean canSprint() {
         if (isDead())
             return false;
+        if (!character.canSprint(this))
+            return false;
         if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) || hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
         if (CooldownUtil.getCooldown(this, Cooldown.NO_SPRINT) > 0)
-            return false;
-        if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
