@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.VectorUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
@@ -49,14 +48,12 @@ public abstract class Hitscan extends Bullet {
      *
      * @param origin    발사 위치
      * @param direction 발사 방향
-     * @param spread    탄퍼짐 정도. (단위: ×0.01블록/블록)
      */
     @Override
-    public final void shoot(@NonNull Location origin, @NonNull Vector direction, double spread) {
-        direction.normalize();
+    public final void shoot(@NonNull Location origin, @NonNull Vector direction) {
+        direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
         loc.add(direction.clone().multiply(START_DISTANCE));
-        direction = VectorUtil.getSpreadedVector(direction.multiply(HITBOX_INTERVAL), spread);
         Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < maxDistance; i++) {

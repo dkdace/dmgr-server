@@ -75,7 +75,7 @@ public abstract class BouncingProjectile extends Projectile {
     }
 
     @Override
-    public final boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+    protected final boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
         if (onHitBlockBouncing(location, direction, hitBlock))
             return true;
 
@@ -96,7 +96,7 @@ public abstract class BouncingProjectile extends Projectile {
     public abstract boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock);
 
     @Override
-    public final boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+    protected final boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
         if (onHitEntityBouncing(location, direction, target, isCrit))
             return true;
 

@@ -71,12 +71,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                     return;
                 }
 
-                new JagerWeaponLProjectile().shoot(JagerWeaponInfo.SPREAD);
+                Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
+                new JagerWeaponLProjectile().shoot(dir);
+                playShootSound(combatUser.getEntity().getLocation());
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 setCooldown();
                 reloadModule.consume(1);
-                playShootSound(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -196,24 +197,24 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     }
 
     private class JagerWeaponLProjectile extends Projectile {
-        public JagerWeaponLProjectile() {
+        private JagerWeaponLProjectile() {
             super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
                     .maxDistance(JagerWeaponInfo.DISTANCE).condition(JagerWeaponL.this.combatUser::isEnemy).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
         }
 
         @Override
-        public boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
             JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
             return false;

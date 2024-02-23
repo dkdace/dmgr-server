@@ -12,7 +12,6 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -85,11 +84,6 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         readyTimeModule.ready();
     }
 
-    @NonNull
-    public Location[] getPassCheckLocations() {
-        return new Location[]{entity.getLocation().add(0, 0.2, 0)};
-    }
-
     @Override
     public void onTickBeforeReady(long i) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
@@ -107,8 +101,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         if (!readyTimeModule.isReady())
             return;
 
-        Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8,
-                combatEntity -> combatEntity instanceof Damageable && canPass(combatEntity));
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
+                combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this));
         if (target != null)
             onCatchEnemy(target);
 

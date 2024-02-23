@@ -89,13 +89,16 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
-     * @param game      대상 게임
+     * @param game      대상 게임. {@code null}로 지정 시
+     *                  {@link CombatUtil#getNearCombatEntity(Location, double, Predicate)} 호출
      * @param location  위치
      * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
      */
-    public static CombatEntity getNearCombatEntity(@NonNull Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity getNearCombatEntity(Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        if (game == null)
+            return getNearCombatEntity(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
@@ -106,21 +109,6 @@ public final class CombatUtil {
                                 hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 적을 반환한다.
-     *
-     * @param attacker  공격자 (기준 엔티티)
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
-     * @param condition 조건
-     * @return 범위 내 가장 가까운 적
-     */
-    public static CombatEntity getNearEnemy(@NonNull CombatEntity attacker, @NonNull Location location, double range, Predicate<CombatEntity> condition) {
-        if (attacker.getGame() != null)
-            return getNearCombatEntity(attacker.getGame(), location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
-        return getNearCombatEntity(location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
     }
 
     /**
@@ -146,14 +134,17 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param game      대상 게임
+     * @param game      대상 게임. {@code null}로 지정 시
+     *                  {@link CombatUtil#getNearCombatEntities(Location, double, Predicate)} 호출
      * @param location  위치
      * @param range     범위 (반지름). (단위: 블록)
      * @param condition 조건
      * @return 범위 내 모든 엔티티
      */
     @NonNull
-    public static CombatEntity[] getNearCombatEntities(@NonNull Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity[] getNearCombatEntities(Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+        if (game == null)
+            return getNearCombatEntities(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
@@ -162,41 +153,6 @@ public final class CombatUtil {
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .toArray(CombatEntity[]::new);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 적을 반환한다.
-     *
-     * @param attacker  공격자 (기준 엔티티)
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
-     * @param condition 조건
-     * @return 범위 내 모든 적
-     */
-    @NonNull
-    public static CombatEntity[] getNearEnemies(@NonNull CombatEntity attacker, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
-        if (attacker.getGame() != null)
-            return getNearCombatEntities(attacker.getGame(), location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
-        return getNearCombatEntities(location, range, condition.and(combatEntity -> combatEntity.isEnemy(attacker)));
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 적을 반환한다.
-     *
-     * @param attacker       공격자 (기준 엔티티)
-     * @param location       위치
-     * @param range          범위 (반지름). (단위: 블록)
-     * @param condition      조건
-     * @param canContainSelf 공격자 포함 여부. {@code true}로 지정 시 공격자도 포함
-     * @return 범위 내 모든 적
-     */
-    @NonNull
-    public static CombatEntity[] getNearEnemies(@NonNull CombatEntity attacker, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition, boolean canContainSelf) {
-        if (attacker.getGame() != null)
-            return getNearCombatEntities(attacker.getGame(), location, range, condition.and(combatEntity -> (canContainSelf && combatEntity == attacker) ||
-                    combatEntity.isEnemy(attacker)));
-        return getNearCombatEntities(location, range, condition.and(combatEntity -> (canContainSelf && combatEntity == attacker) ||
-                combatEntity.isEnemy(attacker)));
     }
 
     /**

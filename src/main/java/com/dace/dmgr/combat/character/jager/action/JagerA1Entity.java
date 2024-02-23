@@ -14,7 +14,6 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.DyeColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
@@ -78,11 +77,6 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         readyTimeModule.ready();
     }
 
-    @NonNull
-    public Location[] getPassCheckLocations() {
-        return new Location[]{entity.getLocation().add(0, 0.25, 0)};
-    }
-
     @Override
     public void onTickBeforeReady(long i) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
@@ -106,8 +100,9 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
 
         if (i % 10 == 0 && entity.getTarget() == null) {
-            Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLowHealth());
+            Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
+                    combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this) &&
+                            ((Damageable) combatEntity).getDamageModule().isLowHealth());
             if (target != null)
                 entity.setTarget(target.getEntity());
         }

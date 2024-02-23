@@ -40,47 +40,34 @@ public abstract class Bullet {
     protected Predicate<CombatEntity> condition;
 
     /**
-     * 총알을 발사한다.
+     * 지정한 위치와 방향으로 총알을 발사한다.
      *
      * @param origin    발사 위치
      * @param direction 발사 방향
-     * @param spread    탄퍼짐 정도
      */
-    public abstract void shoot(@NonNull Location origin, @NonNull Vector direction, double spread);
+    public abstract void shoot(@NonNull Location origin, @NonNull Vector direction);
 
     /**
-     * 엔티티가 보는 방향으로 총알을 발사한다.
-     *
-     * @param origin 발사 위치
-     * @param spread 탄퍼짐 정도
-     */
-    public final void shoot(@NonNull Location origin, double spread) {
-        shoot(origin, shooter.getEntity().getLocation().getDirection(), spread);
-    }
-
-    /**
-     * 엔티티가 보는 방향으로 탄퍼짐 없이 총알을 발사한다.
+     * 지정한 위치에서 엔티티가 보는 방향으로 총알을 발사한다.
      *
      * @param origin 발사 위치
      */
     public final void shoot(@NonNull Location origin) {
-        shoot(origin, 0);
+        shoot(origin, shooter.getEntity().getLocation().getDirection());
     }
 
     /**
-     * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
-     *
-     * @param spread 탄퍼짐 정도
+     * 엔티티에서 지정한 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
      */
-    public final void shoot(double spread) {
+    public final void shoot(@NonNull Vector direction) {
         if (shooter instanceof CombatUser)
-            shoot(((CombatUser) shooter).getEntity().getEyeLocation(), spread);
+            shoot(((CombatUser) shooter).getEntity().getEyeLocation(), direction);
         else
-            shoot(shooter.getEntity().getLocation(), spread);
+            shoot(shooter.getEntity().getLocation(), direction);
     }
 
     /**
-     * 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 탄퍼짐 없이 총알을 발사한다.
+     * 엔티티에서 엔티티가 보는 방향으로, 엔티티의 눈 위치에서 총알을 발사한다.
      */
     public final void shoot() {
         if (shooter instanceof CombatUser)
@@ -141,7 +128,9 @@ public abstract class Bullet {
      *
      * @param location 위치
      */
-    public abstract void trail(@NonNull Location location);
+    protected void trail(@NonNull Location location) {
+        // 미사용
+    }
 
     /**
      * 총알이 블록에 맞았을 때 실행될 작업.
@@ -153,7 +142,7 @@ public abstract class Bullet {
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
-    public abstract boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock);
+    protected abstract boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock);
 
     /**
      * 총알이 엔티티에 맞았을 때 실행될 작업.
@@ -166,7 +155,7 @@ public abstract class Bullet {
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    public abstract boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit);
+    protected abstract boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit);
 
     /**
      * 총알이 어느 곳이든(블록 또는 엔티티) 맞았을 때 실행될 작업.
@@ -175,7 +164,7 @@ public abstract class Bullet {
      * @see Bullet#onHitBlock
      * @see Bullet#onHitEntity
      */
-    public void onHit(@NonNull Location location) {
+    protected void onHit(@NonNull Location location) {
     }
 
     /**
@@ -183,6 +172,6 @@ public abstract class Bullet {
      *
      * @param location 소멸한 위치
      */
-    public void onDestroy(@NonNull Location location) {
+    protected void onDestroy(@NonNull Location location) {
     }
 }

@@ -4,9 +4,11 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.Explosion;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
@@ -21,6 +23,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(@NonNull CombatUser combatUser) {
@@ -82,39 +88,42 @@ public final class ArkaceA1 extends ActiveSkill {
     }
 
     private class ArkaceA1Projectile extends Projectile {
-        public ArkaceA1Projectile() {
+        private ArkaceA1Projectile() {
             super(ArkaceA1.this.combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(10)
                     .condition(ArkaceA1.this.combatUser::isEnemy).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location) {
             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
                     0, 0, 0, 32, 250, 225);
         }
 
         @Override
-        public void onHit(@NonNull Location location) {
+        protected void onHit(@NonNull Location location) {
             explode(location.add(0, 0.1, 0));
         }
 
         @Override
-        public boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
 
         private void explode(Location location) {
-            CombatEntity[] targets = CombatUtil.getNearEnemies(combatUser, location, ArkaceA1Info.RADIUS,
-                    combatEntity -> combatEntity instanceof Damageable && combatEntity.canPass(location), true);
-            for (CombatEntity target : targets) {
-                ((Damageable) target).getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+            HashSet<CombatEntity> targets = new HashSet<>();
+            Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable &&
+                    (combatEntity.isEnemy(combatUser) || combatEntity == combatUser);
+
+            for (CombatEntity target : CombatUtil.getNearCombatEntities(combatUser.getGame(), location, ArkaceA1Info.RADIUS, condition)) {
+                new ArkaceA1Explosion(targets, condition).shoot(location, LocationUtil.getDirection(location,
+                        target.getNearestLocationOfHitboxes(location)));
             }
 
             playExplodeEffect(location);
@@ -127,6 +136,23 @@ public final class ArkaceA1 extends ActiveSkill {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
                     2.5, 2.5, 2.5, 32, 250, 225);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2, 0.2, 0.2, 0.2);
+        }
+    }
+
+    private class ArkaceA1Explosion extends Explosion {
+        private ArkaceA1Explosion(Set<CombatEntity> targets, Predicate<CombatEntity> condition) {
+            super(ArkaceA1.this.combatUser, ArkaceA1Info.RADIUS, targets, condition);
+        }
+
+        @Override
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        public boolean onHitEntityExplosion(@NonNull Location location, @NonNull Damageable target) {
+            target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+            return !(target instanceof Barrier);
         }
     }
 }

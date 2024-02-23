@@ -94,14 +94,14 @@ public final class JagerUlt extends UltimateSkill {
     }
 
     private class JagerUltProjectile extends BouncingProjectile {
-        public JagerUltProjectile() {
+        private JagerUltProjectile() {
             super(JagerUlt.this.combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
                     .condition(JagerUlt.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
@@ -117,7 +117,7 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        public void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location) {
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             entity = new JagerUltEntity(magmaCube, combatUser);
             entity.activate();

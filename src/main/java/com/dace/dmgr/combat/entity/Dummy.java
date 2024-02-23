@@ -9,7 +9,6 @@ import com.dace.dmgr.item.ItemBuilder;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
@@ -70,11 +69,6 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         entity.getEquipment().setBoots(equipment.get(2));
         entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOW, 99999, 5, false, false));
-    }
-
-    @NonNull
-    public Location[] getPassCheckLocations() {
-        return new Location[]{entity.getLocation().add(0, 0.5, 0), entity.getLocation().add(0, 1.25, 0)};
     }
 
     @Override

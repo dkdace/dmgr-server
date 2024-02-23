@@ -64,18 +64,19 @@ public final class QuakerA1 extends ChargeableSkill {
             ArmorStand armorStand = CombatEntityUtil.spawn(ArmorStand.class, combatUser.getEntity().getLocation());
             entity = new QuakerA1Entity(armorStand, combatUser);
             entity.activate();
-        } else {
-            setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA1");
-            SoundUtil.play(Sound.BLOCK_SHULKER_BOX_CLOSE, combatUser.getEntity().getLocation(), 1, 1.4);
-            if (entity != null)
-                entity.dispose();
-        }
+        } else
+            onCancelled();
     }
 
     @Override
     public void onCancelled() {
         super.onCancelled();
+        setDuration(0);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA1");
+        SoundUtil.play(Sound.BLOCK_SHULKER_BOX_CLOSE, combatUser.getEntity().getLocation(), 1, 1.4);
+
+        if (entity != null)
+            entity.dispose();
     }
 
     /**

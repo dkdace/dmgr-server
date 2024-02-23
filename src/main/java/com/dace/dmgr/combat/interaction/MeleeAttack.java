@@ -35,18 +35,13 @@ public final class MeleeAttack extends Hitscan {
     }
 
     @Override
-    public void trail(@NonNull Location location) {
-        // 미사용
-    }
-
-    @Override
-    public boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
         playHitBlockEffect(location, hitBlock);
         return false;
     }
 
     @Override
-    public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+    protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
         target.getDamageModule().damage((CombatUser) shooter, damage, DamageType.NORMAL, false, true);
 
         SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 0.8, 1.1, 0.1);

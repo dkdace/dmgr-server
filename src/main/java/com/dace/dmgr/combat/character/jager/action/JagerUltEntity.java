@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.interaction.Explosion;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -18,11 +19,16 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.inventivetalent.glow.GlowAPI;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * 예거 - 눈폭풍 발생기 클래스.
@@ -78,11 +84,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         readyTimeModule.ready();
     }
 
-    @NonNull
-    public Location[] getPassCheckLocations() {
-        return new Location[]{entity.getLocation().add(0, 0.2, 0)};
-    }
-
     @Override
     public void onTickBeforeReady(long i) {
         if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
@@ -115,12 +116,13 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         playTickEffect(i, range);
 
         if (i % 4 == 0) {
-            CombatEntity[] targets = CombatUtil.getNearEnemies(this, entity.getLocation(), range,
-                    combatEntity -> combatEntity instanceof Damageable &&
-                            combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY() &&
-                            canPass(combatEntity));
-            for (CombatEntity target : targets) {
-                onFindEnemy((Damageable) target);
+            HashSet<CombatEntity> targets = new HashSet<>();
+            Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this);
+
+            for (CombatEntity target : CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition.and(combatEntity ->
+                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY()))) {
+                new JagerUltExplosion(targets, condition, range).shoot(LocationUtil.getDirection(entity.getLocation(),
+                        target.getNearestLocationOfHitboxes(entity.getLocation())));
             }
         }
         if (i >= JagerUltInfo.DURATION)
@@ -135,16 +137,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
                 96, 220, 255);
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 3, 0.15, 0.02, 0.15,
                 80, 80, 100);
-    }
-
-    /**
-     * 적을 찾았을 때 실행할 작업.
-     *
-     * @param target 대상 엔티티
-     */
-    private void onFindEnemy(@NonNull Damageable target) {
-        target.getDamageModule().damage(this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
-        JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
     }
 
     /**
@@ -224,5 +216,24 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2F, 0.7F);
         SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 2F, 0.7F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2F, 1.2F);
+    }
+
+    private class JagerUltExplosion extends Explosion {
+        private JagerUltExplosion(@NonNull Set<CombatEntity> targets, Predicate<CombatEntity> condition, double radius) {
+            super(JagerUltEntity.this, radius, targets, condition);
+        }
+
+        @Override
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        protected boolean onHitEntityExplosion(@NonNull Location location, @NonNull Damageable target) {
+            target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
+            JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
+
+            return true;
+        }
     }
 }
