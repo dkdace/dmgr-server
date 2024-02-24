@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Bullet {
+abstract class Bullet {
     /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
     protected static final double START_DISTANCE = 0.5;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. (단위: 블록) */
@@ -34,8 +34,8 @@ public abstract class Bullet {
     protected int trailInterval;
     /** 총알의 최대 사거리. (단위: 블록) */
     protected double maxDistance;
-    /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
-    protected double hitboxMultiplier;
+    /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
+    protected double size;
     /** 대상 엔티티를 찾는 조건 */
     protected Predicate<CombatEntity> condition;
 
@@ -101,13 +101,12 @@ public abstract class Bullet {
      * @param location  맞은 위치
      * @param direction 발사 방향
      * @param targets   피격자 목록
-     * @param size      기본 판정 범위. (단위: 블록)
      * @param condition 대상 엔티티를 찾는 조건
      * @return {@link Bullet#onHitEntity(Location, Vector, Damageable, boolean)}의 반환값
      */
     protected final boolean findTargetAndHandleCollision(@NonNull Location location, @NonNull Vector direction, @NonNull Set<CombatEntity> targets,
-                                                         double size, @NonNull Predicate<CombatEntity> condition) {
-        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(location.clone(), size * hitboxMultiplier,
+                                                         @NonNull Predicate<CombatEntity> condition) {
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(location.clone(), size,
                 condition.and(Damageable.class::isInstance));
         boolean isCrit = false;
 

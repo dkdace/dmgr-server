@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -116,7 +117,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         private final Set<CombatEntity> targets;
 
         public QuakerWeaponAttack(Set<CombatEntity> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(6).hitboxMultiplier(12).maxDistance(QuakerWeaponInfo.DISTANCE)
+            super(combatUser, HitscanOption.builder().trailInterval(6).size(0.5).maxDistance(QuakerWeaponInfo.DISTANCE)
                     .condition(combatUser::isEnemy).build());
 
             this.targets = targets;
@@ -157,7 +158,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                 SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 1, 1.2, 0.1);
             }
 
-            return true;
+            return !(target instanceof Barrier);
         }
 
         @Override

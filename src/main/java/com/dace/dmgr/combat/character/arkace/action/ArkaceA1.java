@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.Explosion;
+import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
@@ -24,8 +24,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 public final class ArkaceA1 extends ActiveSkill {
@@ -117,15 +115,11 @@ public final class ArkaceA1 extends ActiveSkill {
         }
 
         private void explode(Location location) {
-            HashSet<CombatEntity> targets = new HashSet<>();
             Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable &&
                     (combatEntity.isEnemy(combatUser) || combatEntity == combatUser);
+            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, ArkaceA1Info.RADIUS, condition);
 
-            for (CombatEntity target : CombatUtil.getNearCombatEntities(combatUser.getGame(), location, ArkaceA1Info.RADIUS, condition)) {
-                new ArkaceA1Explosion(targets, condition).shoot(location, LocationUtil.getDirection(location,
-                        target.getNearestLocationOfHitboxes(location)));
-            }
-
+            new ArkaceA1Area(condition, targets).emit(location);
             playExplodeEffect(location);
         }
 
@@ -139,18 +133,18 @@ public final class ArkaceA1 extends ActiveSkill {
         }
     }
 
-    private class ArkaceA1Explosion extends Explosion {
-        private ArkaceA1Explosion(Set<CombatEntity> targets, Predicate<CombatEntity> condition) {
-            super(ArkaceA1.this.combatUser, ArkaceA1Info.RADIUS, targets, condition);
+    private class ArkaceA1Area extends Area {
+        private ArkaceA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
+            super(ArkaceA1.this.combatUser, ArkaceA1Info.RADIUS, condition, targets);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntityExplosion(@NonNull Location location, @NonNull Damageable target) {
+        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
             return !(target instanceof Barrier);
         }

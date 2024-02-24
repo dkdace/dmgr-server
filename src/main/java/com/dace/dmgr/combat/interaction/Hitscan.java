@@ -13,9 +13,6 @@ import java.util.Set;
  * 히트스캔. 광선과 같이 탄속이 무한한 총알을 관리하는 클래스.
  */
 public abstract class Hitscan extends Bullet {
-    /** 기본 판정 범위. (단위: 블록) */
-    private static final double SIZE = 0.05;
-
     /**
      * 히트스캔 인스턴스를 생성한다.
      *
@@ -26,7 +23,7 @@ public abstract class Hitscan extends Bullet {
      * @see HitscanOption
      */
     protected Hitscan(@NonNull CombatEntity shooter, @NonNull HitscanOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.hitboxMultiplier, option.condition);
+        super(shooter, option.trailInterval, option.maxDistance, option.size, option.condition);
     }
 
     /**
@@ -39,7 +36,7 @@ public abstract class Hitscan extends Bullet {
         HitscanOption hitscanOption = HitscanOption.builder().build();
         this.trailInterval = hitscanOption.trailInterval;
         this.maxDistance = hitscanOption.maxDistance;
-        this.hitboxMultiplier = hitscanOption.hitboxMultiplier;
+        this.size = hitscanOption.size;
         this.condition = hitscanOption.condition;
     }
 
@@ -60,7 +57,7 @@ public abstract class Hitscan extends Bullet {
             if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
                 break;
 
-            if (!findTargetAndHandleCollision(loc, direction, targets, SIZE, condition))
+            if (!findTargetAndHandleCollision(loc, direction, targets, condition))
                 break;
 
             loc.add(direction);

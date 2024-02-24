@@ -16,8 +16,8 @@ import org.bukkit.util.Vector;
  * 기본 근접 공격의 판정을 관리하는 클래스.
  */
 public final class MeleeAttack extends Hitscan {
-    /** 판정 반경 배수 */
-    private static final double HITBOX_MULTIPLIER = 12;
+    /** 기본 판정 크기. (단위: 블록) */
+    private static final double SIZE = 0.5;
     /** 사거리. (단위: 블록) */
     private static final double DISTANCE = 2;
     /** 피해량 */
@@ -30,7 +30,7 @@ public final class MeleeAttack extends Hitscan {
      * @param damage  피해량
      */
     public MeleeAttack(@NonNull CombatUser shooter, int damage) {
-        super(shooter, HitscanOption.builder().hitboxMultiplier(HITBOX_MULTIPLIER).maxDistance(DISTANCE).condition(shooter::isEnemy).build());
+        super(shooter, HitscanOption.builder().size(SIZE).maxDistance(DISTANCE).condition(shooter::isEnemy).build());
         this.damage = damage;
     }
 

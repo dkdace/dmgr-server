@@ -7,9 +7,9 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.BouncingProjectileOption;
-import com.dace.dmgr.combat.interaction.Explosion;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
@@ -23,8 +23,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 public final class JagerA3 extends ActiveSkill {
@@ -148,15 +146,11 @@ public final class JagerA3 extends ActiveSkill {
      * @param projectile 투사체
      */
     private void explode(Location location, JagerA3Projectile projectile) {
-        HashSet<CombatEntity> targets = new HashSet<>();
         Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable &&
                 (combatEntity.isEnemy(combatUser) || combatEntity == combatUser);
+        CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, JagerA3Info.RADIUS, condition);
 
-        for (CombatEntity target : CombatUtil.getNearCombatEntities(combatUser.getGame(), location, JagerA3Info.RADIUS, condition)) {
-            new JagerA3Explosion(targets, condition, location, projectile).shoot(location, LocationUtil.getDirection(location,
-                    target.getNearestLocationOfHitboxes(location)));
-        }
-
+        new JagerA3Area(condition, targets, projectile).emit(location);
         playExplodeEffect(location);
     }
 
@@ -210,23 +204,21 @@ public final class JagerA3 extends ActiveSkill {
         }
     }
 
-    private class JagerA3Explosion extends Explosion {
-        private final Location center;
+    private class JagerA3Area extends Area {
         private final JagerA3Projectile projectile;
 
-        private JagerA3Explosion(Set<CombatEntity> targets, Predicate<CombatEntity> condition, Location center, JagerA3Projectile projectile) {
-            super(JagerA3.this.combatUser, JagerA3Info.RADIUS, targets, condition);
-            this.center = center;
+        private JagerA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets, JagerA3Projectile projectile) {
+            super(JagerA3.this.combatUser, JagerA3Info.RADIUS, condition, targets);
             this.projectile = projectile;
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntityExplosion(@NonNull Location location, @NonNull Damageable target) {
+        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             int damage = CombatUtil.getDistantDamage(center, target.getEntity().getLocation(), JagerA3Info.DAMAGE_EXPLODE,
                     JagerA3Info.RADIUS / 2.0, true);
             int freeze = CombatUtil.getDistantDamage(center, target.getEntity().getLocation(), JagerA3Info.FREEZE,

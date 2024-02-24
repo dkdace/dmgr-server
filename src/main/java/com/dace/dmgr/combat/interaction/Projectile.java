@@ -18,8 +18,6 @@ import java.util.function.Function;
  * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
  */
 public abstract class Projectile extends Bullet {
-    /** 기본 판정 범위. (단위: 블록) */
-    private static final double SIZE = 0.13;
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;
@@ -41,7 +39,7 @@ public abstract class Projectile extends Bullet {
      * @see ProjectileOption
      */
     protected Projectile(@NonNull CombatEntity shooter, int velocity, @NonNull ProjectileOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.hitboxMultiplier, option.condition);
+        super(shooter, option.trailInterval, option.maxDistance, option.size, option.condition);
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
         this.velocity = velocity;
         this.duration = option.duration;
@@ -60,7 +58,7 @@ public abstract class Projectile extends Bullet {
         ProjectileOption option = ProjectileOption.builder().build();
         this.trailInterval = option.trailInterval;
         this.maxDistance = option.maxDistance;
-        this.hitboxMultiplier = option.hitboxMultiplier;
+        this.size = option.size;
         this.condition = option.condition;
         this.velocity = velocity;
         this.duration = option.duration;
@@ -101,7 +99,7 @@ public abstract class Projectile extends Bullet {
                     if (!LocationUtil.isNonSolid(loc) && !Projectile.this.handleBlockCollision(loc, finalDirection))
                         return false;
 
-                    if (!Projectile.this.findTargetAndHandleCollision(loc, finalDirection, targets, SIZE, condition))
+                    if (!Projectile.this.findTargetAndHandleCollision(loc, finalDirection, targets, condition))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(loc.clone().subtract(0, 0.1, 0)))

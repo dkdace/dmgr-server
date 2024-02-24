@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
-import com.dace.dmgr.combat.interaction.Explosion;
+import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -26,8 +26,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.inventivetalent.glow.GlowAPI;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -116,14 +114,11 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         playTickEffect(i, range);
 
         if (i % 4 == 0) {
-            HashSet<CombatEntity> targets = new HashSet<>();
             Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this);
+            CombatEntity[] targets = CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition.and(combatEntity ->
+                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY()));
 
-            for (CombatEntity target : CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition.and(combatEntity ->
-                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY()))) {
-                new JagerUltExplosion(targets, condition, range).shoot(LocationUtil.getDirection(entity.getLocation(),
-                        target.getNearestLocationOfHitboxes(entity.getLocation())));
-            }
+            new JagerUltArea(condition, targets, range).emit(entity.getLocation());
         }
         if (i >= JagerUltInfo.DURATION)
             dispose();
@@ -218,18 +213,18 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2F, 1.2F);
     }
 
-    private class JagerUltExplosion extends Explosion {
-        private JagerUltExplosion(@NonNull Set<CombatEntity> targets, Predicate<CombatEntity> condition, double radius) {
-            super(JagerUltEntity.this, radius, targets, condition);
+    private class JagerUltArea extends Area {
+        private JagerUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets, double radius) {
+            super(JagerUltEntity.this, radius, condition, targets);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntityExplosion(@NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
             JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 

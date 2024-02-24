@@ -33,7 +33,8 @@ public abstract class BouncingProjectile extends Projectile {
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
      * @see BouncingProjectileOption
      */
-    protected BouncingProjectile(@NonNull CombatEntity shooter, int velocity, int bouncing, @NonNull ProjectileOption option, @NonNull BouncingProjectileOption bouncingOption) {
+    protected BouncingProjectile(@NonNull CombatEntity shooter, int velocity, int bouncing, @NonNull ProjectileOption option,
+                                 @NonNull BouncingProjectileOption bouncingOption) {
         super(shooter, velocity, option);
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
