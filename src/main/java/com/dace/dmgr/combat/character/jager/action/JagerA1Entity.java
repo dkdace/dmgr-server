@@ -22,7 +22,7 @@ import org.inventivetalent.glow.GlowAPI;
 /**
  * 예거 - 설랑 클래스.
  */
-public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Movable {
+public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
     /** 공격 모듈 */
@@ -95,7 +95,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
             return;
 
         double speed = moveModule.getSpeedStatus().getValue();
-        if (!moveModule.canMove())
+        if (!canMove())
             speed = 0.0001;
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
 

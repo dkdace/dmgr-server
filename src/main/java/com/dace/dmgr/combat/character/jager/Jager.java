@@ -97,6 +97,11 @@ public final class Jager extends Character {
     }
 
     @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
     @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();

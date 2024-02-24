@@ -58,6 +58,11 @@ public final class Quaker extends Character {
     }
 
     @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     @NonNull
     public QuakerWeaponInfo getWeaponInfo() {
         return QuakerWeaponInfo.getInstance();

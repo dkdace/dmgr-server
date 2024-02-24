@@ -59,7 +59,7 @@ import java.util.function.Function;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Movable {
+public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Jumpable {
     /** 기본 이동속도 */
     public static final double DEFAULT_SPEED = 0.24;
     /** 적 처치 기여 (데미지 누적) 제한시간 (tick) */
@@ -211,7 +211,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!entity.isOnGround())
                 speed *= speed / DEFAULT_SPEED;
         }
-        if (!moveModule.canMove())
+        if (!canMove())
             speed = 0.0001;
 
         entity.setWalkSpeed((float) speed);
@@ -372,6 +372,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
 
         return true;
+    }
+
+    @Override
+    public boolean canJump() {
+        if (!character.canJump(this))
+            return false;
+
+        return Jumpable.super.canJump();
     }
 
     @Override

@@ -49,6 +49,11 @@ public final class Arkace extends Character {
     }
 
     @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
     @NonNull
     public ArkaceWeaponInfo getWeaponInfo() {
         return ArkaceWeaponInfo.getInstance();

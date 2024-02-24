@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity.module;
 import com.dace.dmgr.combat.entity.AbilityStatus;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -61,14 +60,5 @@ public class MoveModule {
     public MoveModule(@NonNull Movable combatEntity) {
         this(combatEntity, (combatEntity.getEntity() instanceof Attributable) ?
                 ((Attributable) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() : 0);
-    }
-
-    /**
-     * 엔티티가 움직일 수 있는 지 확인한다.
-     *
-     * @return 이동 가능 여부
-     */
-    public final boolean canMove() {
-        return !combatEntity.hasStatusEffect(StatusEffectType.STUN) && !combatEntity.hasStatusEffect(StatusEffectType.SNARE);
     }
 }
