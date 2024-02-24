@@ -100,6 +100,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         SoundUtil.play("random.metalhit", entity.getLocation(), 2, 0.7);
         SoundUtil.play(Sound.ITEM_SHIELD_BLOCK, entity.getLocation(), 2, 0.5);
         skill.setStateValue(0);
+        skill.onCancelled();
         skill.setCooldown(QuakerA1Info.COOLDOWN_DEATH);
     }
 }
