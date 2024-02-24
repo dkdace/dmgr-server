@@ -54,6 +54,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setGlobalCooldown(8);
         setCooldown();
+        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
@@ -101,6 +102,12 @@ public final class QuakerWeapon extends AbstractWeapon {
                 }, delay));
             }
         }, 2));
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
     }
 
     /**
