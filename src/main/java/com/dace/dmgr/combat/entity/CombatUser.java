@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
@@ -117,6 +118,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 무기 객체 */
     @Getter
     private Weapon weapon = null;
+    /** 시야각 값 */
+    @Getter
+    @Setter
+    private double fovValue = 0;
     @Getter
     @Setter
     private long time = System.currentTimeMillis();
@@ -192,12 +197,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         setCanSprint(canSprint());
         adjustWalkSpeed();
+        changeFov(fovValue);
         checkHealPack();
         onTickActionbar();
 
         sidebar.clear();
         if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > 0)
             sendScoreSidebar();
+    }
+
+    /**
+     * 플레이어의 시야각을 변경한다.
+     *
+     * @param value 값
+     */
+    private void changeFov(double value) {
+        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
+
+        packet.setWalkingSpeed((float) (entity.getWalkSpeed() * value));
+
+        packet.sendPacket(entity);
     }
 
     /**
@@ -828,6 +847,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 entity.removePotionEffect(potionEffect.getType())));
         entity.setFlying(false);
         entity.setGameMode(GameMode.SURVIVAL);
+        fovValue = 0;
+        changeFov(0);
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
     }
