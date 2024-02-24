@@ -60,27 +60,19 @@ public final class QuakerWeapon extends AbstractWeapon {
             isClockwise = !isClockwise;
             Set<CombatEntity> targets = new HashSet<>();
 
+            int delay = 0;
             for (int i = 0; i < 8; i++) {
                 final int index = i;
-                int delay = 0;
 
                 switch (i) {
                     case 1:
-                        delay = 2;
+                        delay += 2;
                         break;
                     case 2:
-                        delay = 3;
-                        break;
-                    case 3:
                     case 4:
-                        delay = 4;
-                        break;
-                    case 5:
                     case 6:
-                        delay = 5;
-                        break;
                     case 7:
-                        delay = 6;
+                        delay += 1;
                         break;
                 }
 
