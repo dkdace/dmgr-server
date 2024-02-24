@@ -33,7 +33,8 @@ public abstract class BouncingProjectile extends Projectile {
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
      * @see BouncingProjectileOption
      */
-    protected BouncingProjectile(@NonNull CombatEntity shooter, int velocity, int bouncing, @NonNull ProjectileOption option, @NonNull BouncingProjectileOption bouncingOption) {
+    protected BouncingProjectile(@NonNull CombatEntity shooter, int velocity, int bouncing, @NonNull ProjectileOption option,
+                                 @NonNull BouncingProjectileOption bouncingOption) {
         super(shooter, velocity, option);
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
@@ -75,7 +76,7 @@ public abstract class BouncingProjectile extends Projectile {
     }
 
     @Override
-    public final boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+    protected final boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
         if (onHitBlockBouncing(location, direction, hitBlock))
             return true;
 
@@ -96,7 +97,7 @@ public abstract class BouncingProjectile extends Projectile {
     public abstract boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock);
 
     @Override
-    public final boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+    protected final boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
         if (onHitEntityBouncing(location, direction, target, isCrit))
             return true;
 

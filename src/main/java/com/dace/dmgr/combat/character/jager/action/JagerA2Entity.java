@@ -101,8 +101,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         if (!readyTimeModule.isReady())
             return;
 
-        Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8,
-                combatEntity -> combatEntity instanceof Damageable && canPass(combatEntity));
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
+                combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this));
         if (target != null)
             onCatchEnemy(target);
 

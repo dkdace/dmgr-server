@@ -108,14 +108,14 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     private class JagerA2Projectile extends BouncingProjectile {
-        public JagerA2Projectile() {
+        private JagerA2Projectile() {
             super(JagerA2.this.combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
                     .condition(JagerA2.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
                     0.7, 0, 0.7, 120, 120, 135);
         }
@@ -131,7 +131,7 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        public void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location) {
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             entity = new JagerA2Entity(magmaCube, combatUser);
             entity.activate();

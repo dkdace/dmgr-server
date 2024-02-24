@@ -19,9 +19,9 @@ public final class HitscanOption {
     /** 총알의 최대 사거리. (단위: 블록) */
     @Builder.Default
     final double maxDistance = 70;
-    /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
+    /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     @Builder.Default
-    final double hitboxMultiplier = 1;
+    final double size = 0.05;
     /** 대상 엔티티를 찾는 조건 */
     @Builder.Default
     final Predicate<CombatEntity> condition = combatEntity -> true;

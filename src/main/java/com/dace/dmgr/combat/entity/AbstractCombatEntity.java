@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -18,6 +17,8 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * {@link CombatEntity}의 기본 구현체, 모든 전투 시스템 엔티티의 기반 클래스.
@@ -110,6 +111,14 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     @Override
+    @NonNull
+    public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
+        return Arrays.stream(hitboxes).map(hitbox -> hitbox.getNearestLocation(location))
+                .min(Comparator.comparing(loc -> loc.distance(location)))
+                .get();
+    }
+
+    @Override
     @MustBeInvokedByOverriders
     public void dispose() {
         checkAccess();
@@ -129,22 +138,6 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     @Override
     public boolean isEnemy(@NonNull CombatEntity combatEntity) {
         return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
-    }
-
-    @Override
-    public boolean canPass(@NonNull Location location) {
-        if (entity.getWorld() != location.getWorld())
-            return false;
-        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0)) ||
-                LocationUtil.canPass(location, getEntity().getLocation().add(0, 1, 0));
-    }
-
-    @Override
-    public boolean canPass(@NonNull CombatEntity combatEntity) {
-        if (entity.getWorld() != combatEntity.getEntity().getWorld())
-            return false;
-        return LocationUtil.canPass(combatEntity.getEntity().getLocation().add(0, 0.1, 0),
-                getEntity().getLocation().add(0, 0.1, 0));
     }
 
     @Override

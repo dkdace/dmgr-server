@@ -22,9 +22,9 @@ public final class ProjectileOption {
     /** 투사체가 유지되는 시간 (tick). {@code -1}로 설정 시 무한 지속 */
     @Builder.Default
     final long duration = -1;
-    /** 판정 반경의 배수. 판정의 엄격함에 영향을 미침 */
+    /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     @Builder.Default
-    final double hitboxMultiplier = 1;
+    final double size = 0.13;
     /** 중력 작용 여부 */
     @Builder.Default
     final boolean hasGravity = false;

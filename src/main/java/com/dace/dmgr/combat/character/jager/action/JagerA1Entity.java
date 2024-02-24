@@ -100,8 +100,9 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
 
         if (i % 10 == 0 && entity.getTarget() == null) {
-            Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLowHealth());
+            Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
+                    combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this) &&
+                            ((Damageable) combatEntity).getDamageModule().isLowHealth());
             if (target != null)
                 entity.setTarget(target.getEntity());
         }

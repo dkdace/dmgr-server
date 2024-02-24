@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -88,7 +89,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                     Vector axis = VectorUtil.getYawAxis(loc);
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
-                    new QuakerWeaponAttack(targets).shoot(loc, vec, 0);
+                    new QuakerWeaponAttack(targets).shoot(loc, vec);
                     CombatUtil.setYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
 
                     if (index % 2 == 0)
@@ -116,14 +117,14 @@ public final class QuakerWeapon extends AbstractWeapon {
         private final Set<CombatEntity> targets;
 
         public QuakerWeaponAttack(Set<CombatEntity> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(6).hitboxMultiplier(12).maxDistance(QuakerWeaponInfo.DISTANCE)
+            super(combatUser, HitscanOption.builder().trailInterval(6).size(0.5).maxDistance(QuakerWeaponInfo.DISTANCE)
                     .condition(combatUser::isEnemy).build());
 
             this.targets = targets;
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location) {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -133,13 +134,13 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        public void onHit(@NonNull Location location) {
+        protected void onHit(@NonNull Location location) {
             SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_STRONG, location, 0.8, 0.75, 0.1);
             SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.6, 0.85, 0.1);
         }
 
         @Override
-        public boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                     7, 0.08, 0.08, 0.08, 0.1);
             ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.1, 0.1, 0.1, 0);
@@ -149,7 +150,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
                 ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
@@ -157,11 +158,11 @@ public final class QuakerWeapon extends AbstractWeapon {
                 SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 1, 1.2, 0.1);
             }
 
-            return true;
+            return !(target instanceof Barrier);
         }
 
         @Override
-        public void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 30, 0.15, 0.15, 0.15, 0.05);
         }

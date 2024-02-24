@@ -43,6 +43,15 @@ public interface CombatEntity extends Disposable {
     Hitbox[] getHitboxes();
 
     /**
+     * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
+     *
+     * @param location 대상 위치
+     * @return 가장 가까운 히트박스까지의 방향
+     */
+    @NonNull
+    Location getNearestLocationOfHitboxes(@NonNull Location location);
+
+    /**
      * @return 이름
      */
     @NonNull
@@ -88,22 +97,6 @@ public interface CombatEntity extends Disposable {
      * @see CombatEntity#getTeamIdentifier()
      */
     boolean isEnemy(@NonNull CombatEntity combatEntity);
-
-    /**
-     * 엔티티가 해당 위치를 통과할 수 있는 지 확인한다.
-     *
-     * @param location 대상 위치
-     * @return 통과 가능하면 {@code true} 반환
-     */
-    boolean canPass(@NonNull Location location);
-
-    /**
-     * 엔티티가 대상 엔티티의 위치를 통과할 수 있는 지 확인한다.
-     *
-     * @param combatEntity 대상 엔티티
-     * @return 통과 가능하면 {@code true} 반환
-     */
-    boolean canPass(@NonNull CombatEntity combatEntity);
 
     /**
      * 엔티티에게 상태 효과를 적용한다.
