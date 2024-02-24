@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.quaker.action.QuakerA1;
 import com.dace.dmgr.combat.character.quaker.action.QuakerA1Info;
+import com.dace.dmgr.combat.character.quaker.action.QuakerA2Info;
 import com.dace.dmgr.combat.character.quaker.action.QuakerWeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
@@ -53,7 +54,7 @@ public final class Quaker extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -75,6 +76,8 @@ public final class Quaker extends Character {
         switch (number) {
             case 1:
                 return QuakerA1Info.getInstance();
+            case 2:
+                return QuakerA2Info.getInstance();
             case 4:
                 return ArkaceUltInfo.getInstance();
             default:

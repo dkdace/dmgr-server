@@ -668,11 +668,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
+     * 플레이어의 전역 쿨타임을 초기화한다.
+     */
+    public void resetGlobalCooldown() {
+        CooldownUtil.setCooldown(this, Cooldown.GLOBAL_COOLDOWN, 0);
+        entity.setCooldown(SkillInfo.MATERIAL, 0);
+        entity.setCooldown(WeaponInfo.MATERIAL, 0);
+    }
+
+    /**
      * 플레이어의 전역 쿨타임을 설정한다.
      *
      * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
      */
     public void setGlobalCooldown(int cooldown) {
+        if (cooldown == -1)
+            cooldown = 99999;
         if (cooldown < CooldownUtil.getCooldown(this, Cooldown.GLOBAL_COOLDOWN))
             return;
 

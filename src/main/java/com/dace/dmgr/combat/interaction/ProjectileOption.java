@@ -25,9 +25,12 @@ public final class ProjectileOption {
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     @Builder.Default
     final double size = 0.13;
-    /** 중력 작용 여부 */
+    /** 중력 작용 여부. {@link ProjectileOption#isOnGround}와 동시에 사용할 수 없음 */
     @Builder.Default
     final boolean hasGravity = false;
+    /** 지면 고정 여부. {@link ProjectileOption#hasGravity}와 동시에 사용할 수 없음 */
+    @Builder.Default
+    final boolean isOnGround = false;
     /** 대상 엔티티를 찾는 조건 */
     @Builder.Default
     final Predicate<CombatEntity> condition = combatEntity -> true;
