@@ -901,6 +901,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Action action = actionMap.get(actionKey);
         if (isDead() || action == null)
             return;
+        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.FREEZE))
+            return;
 
         if (action instanceof MeleeAttackAction && action.canUse()) {
             action.onUse(actionKey);
