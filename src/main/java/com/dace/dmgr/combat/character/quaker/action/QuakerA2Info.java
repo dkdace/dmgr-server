@@ -12,7 +12,7 @@ public final class QuakerA2Info extends ActiveSkillInfo {
     /** 피해량 */
     public static final int DAMAGE = 250;
     /** 사거리 */
-    public static final double DISTANCE = 8;
+    public static final double DISTANCE = 10;
     /** 투사체 속력 */
     public static final int VELOCITY = 20;
     /** 기절 시간 */

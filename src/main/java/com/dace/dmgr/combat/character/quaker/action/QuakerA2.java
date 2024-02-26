@@ -81,14 +81,16 @@ public final class QuakerA2 extends ActiveSkill {
                 Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
                 Vector axis = VectorUtil.getPitchAxis(loc);
 
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, (index < 2 ? -13 : -30 + index * 17));
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, (index < 2 ? -13 : -30 + index * 16));
                 new QuakerA2Effect().shoot(loc, vec);
 
                 if (index % 2 == 0)
                     playUseSound(loc.add(vec));
-                if (index == 9) {
-                    onCancelled();
-                    onReady();
+                if (index == 11) {
+                    TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled -> {
+                        onCancelled();
+                        onReady();
+                    }, 1));
                 }
             }, delay));
         }
@@ -118,11 +120,11 @@ public final class QuakerA2 extends ActiveSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        playReadySound(combatUser.getEntity().getLocation());
+        Location loc = combatUser.getEntity().getLocation();
+        playReadySound(loc);
         Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; i < 7; i++) {
-            Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
             loc.setPitch(0);
             Vector vector = VectorUtil.getPitchAxis(loc);
             Vector axis = VectorUtil.getYawAxis(loc);

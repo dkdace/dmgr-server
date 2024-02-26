@@ -105,8 +105,8 @@ public abstract class Projectile extends Bullet {
                     if ((duration != -1 && i >= duration) || loc.distance(origin) > maxDistance)
                         return false;
 
-                    if (isOnGround)
-                        handleGround(loc);
+                    if (isOnGround && !handleGround(loc))
+                        return false;
 
                     if (!LocationUtil.isNonSolid(loc) && !Projectile.this.handleBlockCollision(loc, finalDirection))
                         return false;
@@ -133,23 +133,31 @@ public abstract class Projectile extends Bullet {
      *
      * @param location 위치
      */
-    private void handleGround(@NonNull Location location) {
+    private boolean handleGround(@NonNull Location location) {
         if (!LocationUtil.isNonSolid(location)) {
             Location shiftLocUp = location.clone();
-            for (int k = 1; k <= 15; k++) {
-                if (LocationUtil.isNonSolid(shiftLocUp.add(0, 0.2, 0))) {
-                    location.add(0, k * 0.2, 0);
-                    return;
-                }
+            for (int k = 1; k <= 16; k++) {
+                if (!LocationUtil.isNonSolid(shiftLocUp.add(0, HITBOX_INTERVAL, 0)))
+                    continue;
+
+                location.add(0, k * HITBOX_INTERVAL, 0);
+                return true;
             }
-        } else if (LocationUtil.isNonSolid(location.clone().subtract(0, 0.1, 0))) {
+
+            return false;
+        } else if (LocationUtil.isNonSolid(location.clone().subtract(0, HITBOX_INTERVAL, 0))) {
             Location shiftLocDown = location.clone();
-            for (int k = 1; k <= 15; k++) {
-                if (!LocationUtil.isNonSolid(shiftLocDown.subtract(0, 0.2, 0))) {
-                    location.subtract(0, k * 0.2 - 0.1, 0);
-                    return;
-                }
+            for (int k = 1; k <= 16; k++) {
+                if (LocationUtil.isNonSolid(shiftLocDown.subtract(0, HITBOX_INTERVAL, 0)))
+                    continue;
+
+                location.subtract(0, k * HITBOX_INTERVAL - HITBOX_INTERVAL, 0);
+                return true;
             }
+
+            return false;
         }
+
+        return true;
     }
 }
