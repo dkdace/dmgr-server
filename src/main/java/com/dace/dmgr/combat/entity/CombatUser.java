@@ -136,7 +136,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         super(user.getPlayer(), user.getPlayer().getName(), GameUser.fromUser(user) == null ? null : GameUser.fromUser(user).getGame(),
                 new FixedPitchHitbox(user.getPlayer().getLocation(), 0.5, 0.7, 0.3, 0, 0, 0, 0, 0.35, 0),
                 new FixedPitchHitbox(user.getPlayer().getLocation(), 0.8, 0.7, 0.45, 0, 0, 0, 0, 1.05, 0),
-                new Hitbox(user.getPlayer().getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.4, 0),
+                new Hitbox(user.getPlayer().getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.4, 0),
                 new Hitbox(user.getPlayer().getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
         );
         this.user = user;
@@ -829,6 +829,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.getInventory().setItem(9, CommunicationItem.REQ_HEAL.staticItem.getItemStack());
         entity.getInventory().setItem(10, CommunicationItem.SHOW_ULT.staticItem.getItemStack());
         entity.getInventory().setItem(11, CommunicationItem.REQ_RALLY.staticItem.getItemStack());
+
+        double hitboxMultiplier = realCharacter.getHitboxMultiplier();
+        for (Hitbox hitbox : hitboxes) {
+            hitbox.setSizeX(hitbox.getSizeX() * hitboxMultiplier);
+            hitbox.setSizeZ(hitbox.getSizeZ() * hitboxMultiplier);
+        }
 
         this.characterType = characterType;
         this.character = realCharacter;

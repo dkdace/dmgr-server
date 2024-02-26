@@ -16,13 +16,16 @@ import org.bukkit.util.Vector;
 public class Hitbox {
     /** 가로. (단위: 블록) */
     @Getter
-    protected final double sizeX;
+    @Setter
+    protected double sizeX;
     /** 높이. (단위: 블록) */
     @Getter
-    protected final double sizeY;
+    @Setter
+    protected double sizeY;
     /** 세로. (단위: 블록) */
     @Getter
-    protected final double sizeZ;
+    @Setter
+    protected double sizeZ;
     /** 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록) */
     @Getter
     @Setter
