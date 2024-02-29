@@ -4,9 +4,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.util.GlowUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -14,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.inventivetalent.glow.GlowAPI;
 
 import java.text.MessageFormat;
 
@@ -96,11 +97,11 @@ public final class LocationConfirmModule extends ConfirmModule implements Dispos
 
         pointer.teleport(currentLocation.clone().add(0, -1.75, 0).add(currentLocation.getDirection().multiply(0.25)));
         if (isValid()) {
-            GlowAPI.setGlowing(pointer, GlowAPI.Color.GREEN, player);
+            GlowUtil.setGlowing(pointer, ChatColor.GREEN, player);
             skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f설치     §7§l[{1}] §f취소",
                     acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
         } else {
-            GlowAPI.setGlowing(pointer, GlowAPI.Color.RED, player);
+            GlowUtil.setGlowing(pointer, ChatColor.RED, player);
             skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §c설치     §7§l[{1}] §f취소",
                     acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
         }

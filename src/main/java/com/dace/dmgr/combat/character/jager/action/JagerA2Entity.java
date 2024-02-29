@@ -8,17 +8,18 @@ import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
+import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.inventivetalent.glow.GlowAPI;
 
 /**
  * 예거 - 곰덫 클래스.
@@ -62,7 +63,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         entity.teleport(entity.getLocation().add(0, 0.05, 0));
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
         playInitSound();
 
         damageModule.setMaxHealth(JagerA2Info.HEALTH);
