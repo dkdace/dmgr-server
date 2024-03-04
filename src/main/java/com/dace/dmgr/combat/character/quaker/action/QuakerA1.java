@@ -28,7 +28,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
     @Override
     public long getDefaultCooldown() {
-        return 0;
+        return QuakerA1Info.COOLDOWN;
     }
 
     @Override
