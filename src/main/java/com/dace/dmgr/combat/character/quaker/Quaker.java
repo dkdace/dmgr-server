@@ -5,10 +5,7 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
-import com.dace.dmgr.combat.character.quaker.action.QuakerA1;
-import com.dace.dmgr.combat.character.quaker.action.QuakerA1Info;
-import com.dace.dmgr.combat.character.quaker.action.QuakerA2Info;
-import com.dace.dmgr.combat.character.quaker.action.QuakerWeaponInfo;
+import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -18,6 +15,11 @@ import java.util.StringJoiner;
 
 /**
  * 전투원 - 퀘이커 클래스.
+ *
+ * @see QuakerWeapon
+ * @see QuakerA1
+ * @see QuakerA2
+ * @see QuakerA3
  */
 public final class Quaker extends Character {
     @Getter
@@ -83,6 +85,8 @@ public final class Quaker extends Character {
                 return QuakerA1Info.getInstance();
             case 2:
                 return QuakerA2Info.getInstance();
+            case 3:
+                return QuakerA3Info.getInstance();
             case 4:
                 return ArkaceUltInfo.getInstance();
             default:
