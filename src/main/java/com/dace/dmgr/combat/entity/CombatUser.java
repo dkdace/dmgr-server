@@ -28,6 +28,7 @@ import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
+import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
@@ -79,6 +80,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final GameUser gameUser;
     /** 플레이어 사이드바 */
     private final BPlayerBoard sidebar;
+    /** 넉백 저항 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackResistanceModule knockbackResistanceModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -142,6 +147,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.user = user;
         this.gameUser = GameUser.fromUser(user);
         sidebar = user.getSidebar();
+        knockbackResistanceModule = new KnockbackResistanceModule(this);
         attackModule = new AttackModule(this);
         damageModule = new HealModule(this, true, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);
@@ -198,7 +204,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setCanSprint(canSprint());
         adjustWalkSpeed();
         changeFov(fovValue);
-        checkHealPack();
         onTickActionbar();
 
         sidebar.clear();
@@ -242,6 +247,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param i 인덱스
      */
     private void onTickLive(long i) {
+        checkHealPack();
+
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
@@ -287,16 +294,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return;
 
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
-        if (location.getBlock().getType() == GeneralConfig.getCombatConfig().getHealPackBlock()) {
-            GlobalLocation healPackLoc = Arrays.stream(game.getMap().getHealPackLocations())
-                    .filter(globalLocation -> globalLocation.isSameLocation(location))
-                    .findFirst()
-                    .orElse(null);
-            if (healPackLoc == null)
-                return;
+        if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getHealPackBlock())
+            return;
 
-            useHealPack(location, healPackLoc);
-        }
+        Arrays.stream(game.getMap().getHealPackLocations())
+                .filter(globalLocation -> globalLocation.isSameLocation(location))
+                .findFirst()
+                .ifPresent(healPackLoc -> useHealPack(location, healPackLoc));
     }
 
     /**

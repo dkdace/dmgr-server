@@ -14,6 +14,7 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.text.MessageFormat;
@@ -138,6 +139,29 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     @Override
     public boolean isEnemy(@NonNull CombatEntity combatEntity) {
         return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
+    }
+
+    @Override
+    public final void push(@NonNull Vector velocity, boolean isReset) {
+        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !hasStatusEffect(StatusEffectType.SNARE))
+            entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
+    }
+
+    @Override
+    public final void push(@NonNull Vector velocity) {
+        push(velocity, false);
+    }
+
+    @Override
+    public final void knockback(@NonNull Vector velocity, boolean isReset) {
+        CooldownUtil.setCooldown(entity, Cooldown.KNOCKBACK);
+        Vector finalVelocity = velocity.multiply(1 - getKnockbackResistanceModule().getResistanceMultiplierStatus().getValue());
+        entity.setVelocity(isReset ? finalVelocity : entity.getVelocity().add(finalVelocity));
+    }
+
+    @Override
+    public final void knockback(@NonNull Vector velocity) {
+        knockback(velocity, false);
     }
 
     @Override

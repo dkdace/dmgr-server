@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -24,7 +25,11 @@ import java.util.List;
  */
 @Getter
 public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
+    /** 넉백 저항 모듈 */
+    @NonNull
+    private final KnockbackResistanceModule knockbackResistanceModule;
     /** 피해 모듈 */
+    @NonNull
     private final DamageModule damageModule;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
@@ -42,6 +47,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
                 new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
+        knockbackResistanceModule = new KnockbackResistanceModule(this);
         damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
 

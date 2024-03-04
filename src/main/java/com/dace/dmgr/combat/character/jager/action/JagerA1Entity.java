@@ -3,10 +3,7 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.JumpModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
@@ -26,6 +23,10 @@ import org.bukkit.entity.Wolf;
 public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
+    /** 넉백 저항 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackResistanceModule knockbackResistanceModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -52,6 +53,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
+        knockbackResistanceModule = new KnockbackResistanceModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
         moveModule = new JumpModule(this, entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);

@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.Disposable;
+import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
@@ -78,6 +80,12 @@ public interface CombatEntity extends Disposable {
     double getMaxHitboxSize();
 
     /**
+     * @return 넉백 저항 모듈
+     */
+    @NonNull
+    KnockbackResistanceModule getKnockbackResistanceModule();
+
+    /**
      * 엔티티가 활성화 되었는지 확인한다.
      *
      * @return 엔티티 활성화 여부
@@ -97,6 +105,40 @@ public interface CombatEntity extends Disposable {
      * @see CombatEntity#getTeamIdentifier()
      */
     boolean isEnemy(@NonNull CombatEntity combatEntity);
+
+    /**
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
+     *
+     * @param velocity 속도
+     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
+     * @see CombatEntity#knockback(Vector, boolean)
+     */
+    void push(@NonNull Vector velocity, boolean isReset);
+
+    /**
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
+     *
+     * @param velocity 속도
+     * @see CombatEntity#knockback(Vector)
+     */
+    void push(@NonNull Vector velocity);
+
+    /**
+     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
+     *
+     * @param velocity 속도
+     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
+     * @see CombatEntity#push(Vector, boolean)
+     */
+    void knockback(@NonNull Vector velocity, boolean isReset);
+
+    /**
+     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
+     *
+     * @param velocity 속도
+     * @see CombatEntity#push(Vector)
+     */
+    void knockback(@NonNull Vector velocity);
 
     /**
      * 엔티티에게 상태 효과를 적용한다.

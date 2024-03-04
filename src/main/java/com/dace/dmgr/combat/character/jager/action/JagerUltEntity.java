@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
@@ -27,6 +28,10 @@ import java.util.function.Predicate;
 public final class JagerUltEntity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
+    /** 넉백 저항 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackResistanceModule knockbackResistanceModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -49,6 +54,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
+        knockbackResistanceModule = new KnockbackResistanceModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
