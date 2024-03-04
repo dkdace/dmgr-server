@@ -180,7 +180,7 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             playTickEffect(location);
         }
 

@@ -51,7 +51,6 @@ public abstract class Projectile extends Bullet {
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
         this.isOnGround = option.isOnGround;
-
     }
 
     /**
@@ -120,7 +119,7 @@ public abstract class Projectile extends Bullet {
                     if (finalDirection.length() > 0.01)
                         loc.add(finalDirection);
                     if (count++ % trailInterval == 0)
-                        Projectile.this.trail(loc.clone());
+                        Projectile.this.trail(loc.clone(), finalDirection.clone().normalize());
                 }
 
                 return true;

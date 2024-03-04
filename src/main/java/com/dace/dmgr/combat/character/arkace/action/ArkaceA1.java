@@ -92,7 +92,7 @@ public final class ArkaceA1 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
                     0, 0, 0, 32, 250, 225);

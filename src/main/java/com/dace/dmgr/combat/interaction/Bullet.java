@@ -30,7 +30,7 @@ abstract class Bullet {
     @NonNull
     @Getter
     protected final CombatEntity shooter;
-    /** 트레일 이벤트 ({@link Bullet#trail(Location)})를 호출하는 주기. (단위: 판정점 개수) */
+    /** 트레일 이벤트 ({@link Bullet#trail(Location, Vector)})를 호출하는 주기. (단위: 판정점 개수) */
     protected int trailInterval;
     /** 총알의 최대 사거리. (단위: 블록) */
     protected double maxDistance;
@@ -125,9 +125,10 @@ abstract class Bullet {
      *
      * <p>주로 파티클을 남길 때 사용한다.</p>
      *
-     * @param location 위치
+     * @param location  위치
+     * @param direction 발사 방향
      */
-    protected void trail(@NonNull Location location) {
+    protected void trail(@NonNull Location location, @NonNull Vector direction) {
         // 미사용
     }
 

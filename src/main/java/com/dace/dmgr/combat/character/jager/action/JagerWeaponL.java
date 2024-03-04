@@ -203,7 +203,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
         }

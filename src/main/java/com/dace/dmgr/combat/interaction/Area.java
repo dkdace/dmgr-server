@@ -22,12 +22,12 @@ public abstract class Area {
     @NonNull
     @Getter
     protected final CombatEntity shooter;
+    /** 예상 피격자 목록 */
+    protected final CombatEntity[] targets;
     /** 범위 (반지름). (단위: 블록) */
     private final double radius;
     /** 대상 엔티티를 찾는 조건 */
     private final Predicate<CombatEntity> condition;
-    /** 예상 피격자 목록 */
-    private final CombatEntity[] targets;
     /** 피격자별 관통 가능 여부 목록. (피격자 : 관통 가능 여부) */
     private final HashMap<CombatEntity, Boolean> penetrationMap = new HashMap<>();
 

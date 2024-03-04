@@ -123,7 +123,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 

@@ -115,7 +115,7 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
                     0.7, 0, 0.7, 120, 120, 135);
         }

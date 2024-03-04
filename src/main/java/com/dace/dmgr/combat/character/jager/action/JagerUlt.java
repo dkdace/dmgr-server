@@ -101,7 +101,7 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
