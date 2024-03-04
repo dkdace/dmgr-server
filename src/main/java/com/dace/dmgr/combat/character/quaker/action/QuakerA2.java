@@ -113,7 +113,7 @@ public final class QuakerA2 extends ActiveSkill {
      */
     private void playUseSound(Location location) {
         SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, location, 1, 0.5);
-        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.6, 0.1);
+        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.5);
     }
 
     /**
@@ -153,12 +153,12 @@ public final class QuakerA2 extends ActiveSkill {
 
     private class QuakerA2Effect extends Hitscan {
         public QuakerA2Effect() {
-            super(combatUser, HitscanOption.builder().trailInterval(6).size(0.5).maxDistance(QuakerWeaponInfo.DISTANCE)
+            super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE)
                     .condition(combatUser::isEnemy).build());
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -169,10 +169,6 @@ public final class QuakerA2 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
-                    7, 0.08, 0.08, 0.08, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.1, 0.1, 0.1, 0);
-
             return false;
         }
 
@@ -199,7 +195,7 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, floor.getType(), floor.getData(), location,
                     10, 0.2, 0.05, 0.2, 0.2);
@@ -223,9 +219,7 @@ public final class QuakerA2 extends ActiveSkill {
                             ((Movable) target).getMoveModule().getSpeedStatus().removeModifier("QuakerA2"), QuakerA2Info.SLOW_DURATION));
                 }
 
-                ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
-                SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_STRONG, location, 1, 0.7, 0.05);
-                SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 1, 1, 0.1);
+                ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
             }
 
             return !(target instanceof Barrier);
