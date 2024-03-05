@@ -150,7 +150,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
      */
     private void onCatchEnemy(@NonNull Damageable target) {
         playCatchSound();
-        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
+        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, false, true);
         target.applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
 
         dispose();

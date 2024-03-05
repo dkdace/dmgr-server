@@ -130,7 +130,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onDefaultAttack(@NonNull Damageable victim) {
-        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.ENTITY, victim.hasStatusEffect(StatusEffectType.SNARE), true);
+        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, victim.hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override

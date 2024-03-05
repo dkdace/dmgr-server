@@ -414,12 +414,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
 
-        if (damageType == DamageType.NORMAL) {
-            if (isCrit)
-                playCritAttackEffect();
-            else
-                playAttackEffect();
-        }
+        if (isCrit)
+            playCritAttackEffect();
+        else
+            playAttackEffect();
 
         if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
@@ -454,7 +452,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             selfHarmDamage += damage;
             return;
         }
-        if (damageType == DamageType.SYSTEM)
+        if (attacker == null)
             selfHarmDamage += damage;
 
         character.onDamage(this, attacker, damage, damageType, isCrit);
