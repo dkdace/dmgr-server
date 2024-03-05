@@ -161,7 +161,6 @@ public final class QuakerA3 extends ActiveSkill {
 
     private class QuakerA3Projectile extends Projectile {
         private final HashSet<Damageable> targets = new HashSet<>();
-        private int hitCount = 0;
 
         private QuakerA3Projectile() {
             super(QuakerA3.this.combatUser, QuakerA3Info.VELOCITY, ProjectileOption.builder().trailInterval(15).size(QuakerA3Info.SIZE)
@@ -208,11 +207,10 @@ public final class QuakerA3 extends ActiveSkill {
             SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 2, 0.7);
             SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 2, 0.7);
 
-            if (hitCount++ > 0)
-                for (Damageable target2 : targets) {
-                    if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
-                        target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, false, true);
-                }
+            for (Damageable target2 : targets) {
+                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
+                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, false, true);
+            }
         }
 
         private class QuakerA3Area extends Area {
@@ -230,7 +228,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (QuakerA3Projectile.this.targets.add(target)) {
+                if (QuakerA3Projectile.this.targets.add(target) && targets.length > 1) {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                     onImpact(location);
                 }
