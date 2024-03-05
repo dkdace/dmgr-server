@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
@@ -28,10 +28,10 @@ import org.bukkit.potion.PotionEffectType;
 public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerA2 skill;
-    /** 넉백 저항 모듈 */
+    /** 넉백 모듈 */
     @NonNull
     @Getter
-    private final KnockbackResistanceModule knockbackResistanceModule;
+    private final KnockbackModule knockbackModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -54,7 +54,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
-        knockbackResistanceModule = new KnockbackResistanceModule(this, 1);
+        knockbackModule = new KnockbackModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);

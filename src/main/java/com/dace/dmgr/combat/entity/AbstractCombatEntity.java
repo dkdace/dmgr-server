@@ -152,17 +152,6 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
         push(velocity, false);
     }
 
-    @Override
-    public final void knockback(@NonNull Vector velocity, boolean isReset) {
-        CooldownUtil.setCooldown(entity, Cooldown.KNOCKBACK);
-        Vector finalVelocity = velocity.multiply(1 - getKnockbackResistanceModule().getResistanceMultiplierStatus().getValue());
-        entity.setVelocity(isReset ? finalVelocity : entity.getVelocity().add(finalVelocity));
-    }
-
-    @Override
-    public final void knockback(@NonNull Vector velocity) {
-        knockback(velocity, false);
-    }
 
     @Override
     public final void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration) {

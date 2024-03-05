@@ -28,7 +28,7 @@ import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.JumpModule;
-import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
@@ -80,10 +80,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final GameUser gameUser;
     /** 플레이어 사이드바 */
     private final BPlayerBoard sidebar;
-    /** 넉백 저항 모듈 */
+    /** 넉백 모듈 */
     @NonNull
     @Getter
-    private final KnockbackResistanceModule knockbackResistanceModule;
+    private final KnockbackModule knockbackModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -147,7 +147,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.user = user;
         this.gameUser = GameUser.fromUser(user);
         sidebar = user.getSidebar();
-        knockbackResistanceModule = new KnockbackResistanceModule(this);
+        knockbackModule = new KnockbackModule(this);
         attackModule = new AttackModule(this);
         damageModule = new HealModule(this, true, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);

@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackResistanceModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
@@ -23,10 +23,10 @@ import org.bukkit.util.EulerAngle;
  * 퀘이커 - 불굴의 방패 클래스.
  */
 public final class QuakerA1Entity extends Barrier<ArmorStand> {
-    /** 넉백 저항 모듈 */
+    /** 넉백 모듈 */
     @NonNull
     @Getter
-    private final KnockbackResistanceModule knockbackResistanceModule;
+    private final KnockbackModule knockbackModule;
     /** 스킬 객체 */
     private final QuakerA1 skill;
 
@@ -39,7 +39,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
                 new Hitbox(entity.getLocation(), 6, 3.5, 0.2, 0, 0, -0.2, 0, 1.2, 0)
         );
         skill = (QuakerA1) owner.getSkill(QuakerA1Info.getInstance());
-        knockbackResistanceModule = new KnockbackResistanceModule(this, 1);
+        knockbackModule = new KnockbackModule(this, 1);
 
         onInit();
     }

@@ -234,7 +234,7 @@ public final class QuakerA3 extends ActiveSkill {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                     onImpact(location);
                 }
-                target.knockback(direction.clone().multiply(2), true);
+                target.getKnockbackModule().knockback(direction.clone().multiply(2), true);
 
                 return !(target instanceof Barrier);
             }

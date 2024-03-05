@@ -23,10 +23,10 @@ import org.bukkit.entity.Wolf;
 public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Jumpable {
     /** 스킬 객체 */
     private final JagerA1 skill;
-    /** 넉백 저항 모듈 */
+    /** 넉백 모듈 */
     @NonNull
     @Getter
-    private final KnockbackResistanceModule knockbackResistanceModule;
+    private final KnockbackModule knockbackModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -53,7 +53,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
                 new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
-        knockbackResistanceModule = new KnockbackResistanceModule(this);
+        knockbackModule = new KnockbackModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
         moveModule = new JumpModule(this, entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
