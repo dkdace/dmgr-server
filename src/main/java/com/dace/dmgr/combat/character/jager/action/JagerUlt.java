@@ -107,12 +107,12 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             return false;
         }
 

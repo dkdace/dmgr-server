@@ -178,7 +178,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (isUlt)
                 target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
             else {

@@ -59,12 +59,12 @@ public abstract class Area {
         for (CombatEntity target : targets) {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).maxDistance(radius).condition(condition).build()) {
                 @Override
-                protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+                protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
                     return Area.this.onHitBlock(center, location, hitBlock);
                 }
 
                 @Override
-                protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+                protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
                     Boolean canPenetrate = penetrationMap.get(target);
                     if (canPenetrate == null) {
                         canPenetrate = Area.this.onHitEntity(center, location, target);

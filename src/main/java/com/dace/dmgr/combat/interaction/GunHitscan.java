@@ -22,7 +22,7 @@ public abstract class GunHitscan extends Hitscan {
     }
 
     @Override
-    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
         playHitBlockEffect(location, hitBlock);
         return false;
     }

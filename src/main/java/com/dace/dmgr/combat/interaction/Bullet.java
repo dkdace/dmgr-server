@@ -79,34 +79,34 @@ abstract class Bullet {
     /**
      * 총알의 블록 충돌 로직을 처리한다.
      *
-     * @param location  맞은 위치
-     * @param direction 발사 방향
+     * @param location 맞은 위치
+     * @param velocity 발사 속도
      * @return {@link Bullet#onHitBlock(Location, Vector, Block)}의 반환값
      */
-    protected final boolean handleBlockCollision(@NonNull Location location, @NonNull Vector direction) {
-        Vector subDir = direction.clone().multiply(0.5);
+    protected final boolean handleBlockCollision(@NonNull Location location, @NonNull Vector velocity) {
+        Vector subDir = velocity.clone().multiply(0.5);
         Block hitBlock = location.getBlock();
 
-        if (direction.length() > 0.01)
+        if (velocity.length() > 0.01)
             while (!LocationUtil.isNonSolid(location))
                 location.subtract(subDir);
 
         onHit(location.clone());
-        return onHitBlock(location.clone(), direction, hitBlock);
+        return onHitBlock(location.clone(), velocity, hitBlock);
     }
 
     /**
      * 총알 주변의 지정한 조건을 만족하는 엔티티를 찾고 피격 로직을 처리한다.
      *
      * @param location  맞은 위치
-     * @param direction 발사 방향
+     * @param velocity  발사 속도
      * @param targets   피격자 목록
      * @param condition 대상 엔티티를 찾는 조건
      * @return {@link Bullet#onHitEntity(Location, Vector, Damageable, boolean)}의 반환값
      */
-    protected final boolean findTargetAndHandleCollision(@NonNull Location location, @NonNull Vector direction, @NonNull Set<CombatEntity> targets,
+    protected final boolean findTargetAndHandleCollision(@NonNull Location location, @NonNull Vector velocity, @NonNull Set<CombatEntity> targets,
                                                          @NonNull Predicate<CombatEntity> condition) {
-        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(location.clone(), size,
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), location.clone(), size,
                 condition.and(Damageable.class::isInstance));
         boolean isCrit = false;
 
@@ -114,7 +114,7 @@ abstract class Bullet {
             onHit(location.clone());
             if (target instanceof HasCritHitbox)
                 isCrit = ((HasCritHitbox) target).getCritHitbox().isInHitbox(location, size);
-            return onHitEntity(location.clone(), direction, target, isCrit);
+            return onHitEntity(location.clone(), velocity, target, isCrit);
         }
 
         return true;
@@ -135,27 +135,27 @@ abstract class Bullet {
     /**
      * 총알이 블록에 맞았을 때 실행될 작업.
      *
-     * @param location  맞은 위치
-     * @param direction 발사 방향
-     * @param hitBlock  맞은 블록
+     * @param location 맞은 위치
+     * @param velocity 발사 속도
+     * @param hitBlock 맞은 블록
      * @return 관통 여부. {@code true} 반환 시 블록 관통
      * @see Bullet#onHit
      * @see Bullet#onHitEntity
      */
-    protected abstract boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock);
+    protected abstract boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock);
 
     /**
      * 총알이 엔티티에 맞았을 때 실행될 작업.
      *
-     * @param location  맞은 위치
-     * @param direction 발사 방향
-     * @param target    맞은 엔티티
-     * @param isCrit    치명타 여부
+     * @param location 맞은 위치
+     * @param velocity 발사 속도
+     * @param target   맞은 엔티티
+     * @param isCrit   치명타 여부
      * @return 관통 여부. {@code true} 반환 시 엔티티 관통
      * @see Bullet#onHit
      * @see Bullet#onHitBlock
      */
-    protected abstract boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit);
+    protected abstract boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit);
 
     /**
      * 총알이 어느 곳이든(블록 또는 엔티티) 맞았을 때 실행될 작업.

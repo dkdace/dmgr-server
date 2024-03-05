@@ -139,7 +139,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                     7, 0.08, 0.08, 0.08, 0.1);
             ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.1, 0.1, 0.1, 0);
@@ -149,7 +149,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
                 ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);

@@ -185,15 +185,15 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
-            SoundUtil.play("random.metalhit", location, 0.1 + direction.length() * 2, 1.2, 0.1);
-            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + direction.length() * 2, 2);
+        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+            SoundUtil.play("random.metalhit", location, 0.1 + velocity.length() * 2, 1.2, 0.1);
+            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + velocity.length() * 2, 2);
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
-            if (direction.length() > 0.05)
+        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+            if (velocity.length() > 0.05)
                 target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
