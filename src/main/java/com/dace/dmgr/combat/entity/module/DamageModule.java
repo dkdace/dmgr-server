@@ -24,12 +24,12 @@ import org.bukkit.entity.LivingEntity;
  */
 @Getter
 public class DamageModule {
-    /** 기본값 */
+    /** 방어력 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
     @NonNull
     protected final Damageable combatEntity;
-    /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부. */
+    /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부 */
     protected final boolean isUltProvider;
     /** 방어력 배수 값 */
     @NonNull

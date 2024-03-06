@@ -13,12 +13,12 @@ import org.bukkit.util.Vector;
  */
 @Getter
 public final class KnockbackModule {
-    /** 기본값 */
+    /** 넉백 저항 기본값 */
     private static final double DEFAULT_VALUE = 0;
     /** 엔티티 객체 */
     @NonNull
     private final CombatEntity combatEntity;
-    /** 넉백 저항 배수 값 */
+    /** 넉백 저항 값 */
     @NonNull
     private final AbilityStatus resistanceStatus;
 
