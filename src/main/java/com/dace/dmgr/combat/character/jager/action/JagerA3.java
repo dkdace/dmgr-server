@@ -64,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
             playUseSound(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
-                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION);
+                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION);
                 playReadySound(combatUser.getEntity().getLocation());
                 isEnabled = true;
 
@@ -175,7 +175,7 @@ public final class JagerA3 extends ActiveSkill {
     private class JagerA3Projectile extends BouncingProjectile {
         private JagerA3Projectile() {
             super(JagerA3.this.combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownUtil.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true)
+                    .duration(CooldownUtil.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION)).hasGravity(true)
                     .condition(JagerA3.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
         }
 

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
@@ -18,7 +19,9 @@ import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -151,6 +154,29 @@ public final class QuakerA2 extends ActiveSkill {
         SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 3, 0.7);
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    private static class QuakerA2Slow extends Slow {
+        private static final QuakerA2Slow instance = new QuakerA2Slow();
+
+        @Override
+        @NonNull
+        public String getName() {
+            return super.getName() + "QuakerA2";
+        }
+
+        @Override
+        public void onStart(@NonNull CombatEntity combatEntity) {
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("QuakerA2", -QuakerA2Info.SLOW);
+        }
+
+        @Override
+        public void onEnd(@NonNull CombatEntity combatEntity) {
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("QuakerA2");
+        }
+    }
+
     private class QuakerA2Effect extends Hitscan {
         public QuakerA2Effect() {
             super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE)
@@ -212,12 +238,8 @@ public final class QuakerA2 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, false, true);
-                target.applyStatusEffect(StatusEffectType.STUN, QuakerA2Info.STUN_DURATION);
-                if (target instanceof Movable) {
-                    ((Movable) target).getMoveModule().getSpeedStatus().addModifier("QuakerA2", -QuakerA2Info.SLOW);
-                    TaskUtil.addTask(combatUser, new DelayTask(() ->
-                            ((Movable) target).getMoveModule().getSpeedStatus().removeModifier("QuakerA2"), QuakerA2Info.SLOW_DURATION));
-                }
+                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerA2Info.STUN_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
 
                 ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
             }

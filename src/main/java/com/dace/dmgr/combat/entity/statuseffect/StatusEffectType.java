@@ -11,6 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum StatusEffectType {
+    /** 둔화 */
+    SLOW(Slow.getInstance()),
     /** 기절 */
     STUN(Stun.getInstance()),
     /** 속박 */
