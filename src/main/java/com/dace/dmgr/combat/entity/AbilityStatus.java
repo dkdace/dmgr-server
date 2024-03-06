@@ -73,4 +73,11 @@ public final class AbilityStatus {
     public void removeModifier(@NonNull String id) {
         modifiers.remove(id);
     }
+
+    /**
+     * 모든 수정자를 제거한다.
+     */
+    public void clearModifier() {
+        modifiers.clear();
+    }
 }

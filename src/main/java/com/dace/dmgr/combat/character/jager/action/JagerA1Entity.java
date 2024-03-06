@@ -27,6 +27,10 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
     @NonNull
     @Getter
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -54,6 +58,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         );
         skill = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
         knockbackModule = new KnockbackModule(this);
+        statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
         moveModule = new JumpModule(this, entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
@@ -97,11 +102,6 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         if (!readyTimeModule.isReady())
             return;
 
-        double speed = moveModule.getSpeedStatus().getValue();
-        if (!canMove())
-            speed = 0.0001;
-        entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
-
         if (i % 10 == 0 && entity.getTarget() == null) {
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
                     combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this) &&
@@ -130,7 +130,8 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onDefaultAttack(@NonNull Damageable victim) {
-        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, victim.hasStatusEffect(StatusEffectType.SNARE), true);
+        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL,
+                victim.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override

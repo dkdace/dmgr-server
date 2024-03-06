@@ -25,10 +25,7 @@ import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.HealModule;
-import com.dace.dmgr.combat.entity.module.JumpModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
@@ -84,6 +81,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -148,6 +149,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.gameUser = GameUser.fromUser(user);
         sidebar = user.getSidebar();
         knockbackModule = new KnockbackModule(this);
+        statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new HealModule(this, true, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);
@@ -375,6 +377,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet.setFood(canSprint ? 19 : 2);
 
         packet.sendPacket(entity);
+
+        if (isDead())
+            entity.setSprinting(false);
     }
 
     /**
@@ -387,7 +392,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canSprint(this))
             return false;
-        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) || hasStatusEffect(StatusEffectType.GROUNDING))
+        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
+                statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
         if (CooldownUtil.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
@@ -859,6 +865,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         changeFov(0);
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
+
+        knockbackModule.getResistanceStatus().clearModifier();
+        statusEffectModule.getResistanceStatus().clearModifier();
+        attackModule.getDamageMultiplierStatus().clearModifier();
+        damageModule.getDefenseMultiplierStatus().clearModifier();
+        moveModule.getSpeedStatus().clearModifier();
     }
 
     /**
@@ -909,7 +921,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Action action = actionMap.get(actionKey);
         if (isDead() || action == null)
             return;
-        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.FREEZE))
+        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
             return;
 
         if (action instanceof MeleeAttackAction && action.canUse()) {
@@ -976,7 +988,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse() || hasStatusEffect(StatusEffectType.SILENCE))
+        if (!skill.canUse() || statusEffectModule.hasStatusEffect(StatusEffectType.SILENCE))
             return;
 
         skill.onUse(actionKey);

@@ -230,7 +230,7 @@ public final class JagerA3 extends ActiveSkill {
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
-                target.applyStatusEffect(StatusEffectType.FREEZE, JagerA3Info.SNARE_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerTrait.Freeze.getInstance(), JagerA3Info.SNARE_DURATION);
 
             return !(target instanceof Barrier);
         }

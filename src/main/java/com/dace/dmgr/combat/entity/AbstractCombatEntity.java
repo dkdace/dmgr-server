@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
@@ -143,49 +142,12 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
 
     @Override
     public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !hasStatusEffect(StatusEffectType.SNARE))
+        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
             entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
     }
 
     @Override
     public final void push(@NonNull Vector velocity) {
         push(velocity, false);
-    }
-
-
-    @Override
-    public final void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration) {
-        StatusEffect statusEffect = statusEffectType.getStatusEffect();
-
-        if (!hasStatusEffect(statusEffectType)) {
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getName(), duration);
-
-            statusEffect.onStart(this);
-
-            TaskUtil.addTask(this, new IntervalTask(i -> {
-                if (!hasStatusEffect(statusEffectType))
-                    return false;
-
-                statusEffect.onTick(AbstractCombatEntity.this, i);
-
-                return true;
-            }, isCancelled -> statusEffect.onEnd(AbstractCombatEntity.this), 1));
-        } else if (getStatusEffectDuration(statusEffectType) < duration)
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getName(), duration);
-    }
-
-    @Override
-    public final long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType) {
-        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.getStatusEffect().getName());
-    }
-
-    @Override
-    public final boolean hasStatusEffect(@NonNull StatusEffectType statusEffectType) {
-        return getStatusEffectDuration(statusEffectType) > 0;
-    }
-
-    @Override
-    public final void removeStatusEffect(@NonNull StatusEffectType statusEffectType) {
-        CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.getStatusEffect().getName());
     }
 }

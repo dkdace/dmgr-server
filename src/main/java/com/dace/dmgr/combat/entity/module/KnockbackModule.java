@@ -20,7 +20,7 @@ public final class KnockbackModule {
     private final CombatEntity combatEntity;
     /** 넉백 저항 배수 값 */
     @NonNull
-    private final AbilityStatus resistanceMultiplierStatus;
+    private final AbilityStatus resistanceStatus;
 
     /**
      * 넉백 모듈 인스턴스를 생성한다.
@@ -30,7 +30,7 @@ public final class KnockbackModule {
      */
     public KnockbackModule(@NonNull CombatEntity combatEntity, double resistance) {
         this.combatEntity = combatEntity;
-        this.resistanceMultiplierStatus = new AbilityStatus(resistance);
+        this.resistanceStatus = new AbilityStatus(resistance);
     }
 
     /**
@@ -51,7 +51,7 @@ public final class KnockbackModule {
      */
     public void knockback(@NonNull Vector velocity, boolean isReset) {
         CooldownUtil.setCooldown(combatEntity, Cooldown.KNOCKBACK);
-        Vector finalVelocity = velocity.multiply(1 - resistanceMultiplierStatus.getValue());
+        Vector finalVelocity = velocity.multiply(1 - resistanceStatus.getValue());
         combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));
     }
 

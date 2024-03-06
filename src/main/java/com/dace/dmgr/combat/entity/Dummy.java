@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -28,6 +29,9 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     /** 넉백 모듈 */
     @NonNull
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    private final StatusEffectModule statusEffectModule;
     /** 피해 모듈 */
     @NonNull
     private final DamageModule damageModule;
@@ -48,6 +52,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
         knockbackModule = new KnockbackModule(this);
+        statusEffectModule = new StatusEffectModule(this);
         damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
 

@@ -4,10 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.*;
@@ -32,6 +29,10 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     @NonNull
     @Getter
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -55,6 +56,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);

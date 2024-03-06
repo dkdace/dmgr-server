@@ -21,8 +21,8 @@ public interface Jumpable extends Movable {
      * @return 점프 가능 여부
      */
     default boolean canJump() {
-        if (hasStatusEffect(StatusEffectType.STUN) || hasStatusEffect(StatusEffectType.SNARE) ||
-                hasStatusEffect(StatusEffectType.GROUNDING))
+        if (getStatusEffectModule().hasStatusEffect(StatusEffectType.STUN) || getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE) ||
+                getStatusEffectModule().hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
         return getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
     }

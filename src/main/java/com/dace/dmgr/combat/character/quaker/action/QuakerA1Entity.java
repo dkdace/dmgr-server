@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
@@ -27,6 +28,10 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     @NonNull
     @Getter
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 스킬 객체 */
     private final QuakerA1 skill;
 
@@ -40,6 +45,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         );
         skill = (QuakerA1) owner.getSkill(QuakerA1Info.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this);
 
         onInit();
     }

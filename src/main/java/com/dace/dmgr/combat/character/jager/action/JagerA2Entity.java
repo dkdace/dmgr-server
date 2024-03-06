@@ -3,10 +3,7 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
@@ -32,6 +29,10 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     @NonNull
     @Getter
     private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -55,6 +56,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
@@ -151,7 +153,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     private void onCatchEnemy(@NonNull Damageable target) {
         playCatchSound();
         target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, false, true);
-        target.applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
+        target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
 
         dispose();
     }

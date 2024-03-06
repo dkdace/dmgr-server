@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity.statuseffect;
 
-import com.dace.dmgr.combat.character.jager.JagerTrait;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,8 +13,6 @@ import lombok.Getter;
 public enum StatusEffectType {
     /** 기절 */
     STUN(Stun.getInstance()),
-    /** 빙결 */
-    FREEZE(JagerTrait.Freeze.getInstance()),
     /** 속박 */
     SNARE(Snare.getInstance()),
     /** 고정 */
@@ -23,6 +20,6 @@ public enum StatusEffectType {
     /** 침묵 */
     SILENCE(Silence.getInstance());
 
-    /** 상태 효과 정보 */
+    /** 기본 상태 효과 정보 */
     private final StatusEffect statusEffect;
 }

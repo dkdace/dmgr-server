@@ -22,6 +22,6 @@ public interface Movable extends CombatEntity {
      * @return 이동 가능 여부
      */
     default boolean canMove() {
-        return !hasStatusEffect(StatusEffectType.STUN) && !hasStatusEffect(StatusEffectType.SNARE);
+        return !getStatusEffectModule().hasStatusEffect(StatusEffectType.STUN) && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE);
     }
 }
