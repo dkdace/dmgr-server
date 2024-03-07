@@ -20,7 +20,6 @@ import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -32,7 +31,6 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
 public final class QuakerA2 extends ActiveSkill {
     public QuakerA2(@NonNull CombatUser combatUser) {
         super(2, combatUser, QuakerA2Info.getInstance(), 1);

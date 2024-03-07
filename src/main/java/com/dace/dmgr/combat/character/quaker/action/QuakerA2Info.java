@@ -18,7 +18,7 @@ public final class QuakerA2Info extends ActiveSkillInfo {
     /** 기절 시간 */
     public static final long STUN_DURATION = (long) (0.8 * 20);
     /** 이동 속도 감소량 */
-    public static final int SLOW = 20;
+    public static final int SLOW = 40;
     /** 이동 속도 감소 시간 */
     public static final long SLOW_DURATION = (long) (2.8 * 20);
     @Getter
