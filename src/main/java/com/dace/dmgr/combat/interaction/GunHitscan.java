@@ -39,6 +39,6 @@ public abstract class GunHitscan extends Hitscan {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                 3, 0, 0, 0, 0.1);
         ParticleUtil.play(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
-        ParticleUtil.playBlockHitEffect(location, hitBlock);
+        SoundUtil.playBlockHitSound(location, hitBlock);
     }
 }

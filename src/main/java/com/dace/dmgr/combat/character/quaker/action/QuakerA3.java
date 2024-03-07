@@ -15,7 +15,6 @@ import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -26,7 +25,6 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.function.Predicate;
 
-@Getter
 public final class QuakerA3 extends ActiveSkill {
     public QuakerA3(@NonNull CombatUser combatUser) {
         super(3, combatUser, QuakerA3Info.getInstance(), 2);

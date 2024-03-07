@@ -62,6 +62,6 @@ public final class MeleeAttack extends Hitscan {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                 6, 0.05, 0.05, 0.05, 0.1);
         ParticleUtil.play(Particle.TOWN_AURA, location, 20, 0.05, 0.05, 0.05, 0);
-        ParticleUtil.playBlockHitEffect(location, hitBlock);
+        SoundUtil.playBlockHitSound(location, hitBlock);
     }
 }

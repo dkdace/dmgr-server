@@ -143,7 +143,7 @@ public final class QuakerWeapon extends AbstractWeapon {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                     7, 0.08, 0.08, 0.08, 0.1);
             ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.1, 0.1, 0.1, 0);
-            ParticleUtil.playBlockHitEffect(location, hitBlock);
+            SoundUtil.playBlockHitSound(location, hitBlock);
 
             return false;
         }
