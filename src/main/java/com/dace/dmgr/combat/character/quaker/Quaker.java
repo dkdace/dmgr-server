@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
-import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
@@ -20,6 +19,7 @@ import java.util.StringJoiner;
  * @see QuakerA1
  * @see QuakerA2
  * @see QuakerA3
+ * @see QuakerUlt
  */
 public final class Quaker extends Character {
     @Getter
@@ -89,7 +89,7 @@ public final class Quaker extends Character {
             case 3:
                 return QuakerA3Info.getInstance();
             case 4:
-                return ArkaceUltInfo.getInstance();
+                return QuakerUltInfo.getInstance();
             default:
                 return null;
         }
@@ -97,7 +97,7 @@ public final class Quaker extends Character {
 
     @Override
     @NonNull
-    public ArkaceUltInfo getUltimateSkillInfo() {
-        return ArkaceUltInfo.getInstance();
+    public QuakerUltInfo getUltimateSkillInfo() {
+        return QuakerUltInfo.getInstance();
     }
 }

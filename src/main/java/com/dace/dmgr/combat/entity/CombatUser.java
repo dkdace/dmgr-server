@@ -230,7 +230,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 이동 속도를 조정한다.
      */
     private void adjustWalkSpeed() {
-        double speed = moveModule.getSpeedStatus().getValue();
+        double speed = Math.max(0, moveModule.getSpeedStatus().getValue());
 
         if (entity.isSprinting()) {
             speed *= 0.88;
