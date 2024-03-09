@@ -203,7 +203,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!isDead())
             onTickLive(i);
 
-        setCanSprint(canSprint());
+        setCanSprint();
         adjustWalkSpeed();
         changeFov(fovValue);
         onTickActionbar();
@@ -367,14 +367,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /**
      * 플레이어의 달리기 가능 여부를 설정한다.
-     *
-     * @param canSprint 달리기 가능 여부
      */
-    private void setCanSprint(boolean canSprint) {
+    private void setCanSprint() {
         WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
 
         packet.setHealth((float) entity.getHealth());
-        packet.setFood(canSprint ? 19 : 2);
+        packet.setFood(canSprint() ? 19 : 2);
 
         packet.sendPacket(entity);
 
@@ -405,6 +403,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public boolean canJump() {
+        if (!isActivated)
+            return true;
         if (!character.canJump(this))
             return false;
 
