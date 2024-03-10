@@ -51,6 +51,18 @@ public abstract class Character {
     }
 
     /**
+     * 전투원이 걸을 때 실행할 작업.
+     *
+     * <p>주로 발소리 재생에 사용한다.</p>
+     *
+     * @param combatUser 대상 플레이어
+     * @param volume     발소리 음량
+     */
+    public void onFootstep(@NonNull CombatUser combatUser, double volume) {
+        // 미사용
+    }
+
+    /**
      * 전투원으로 다른 엔티티를 공격했을 때 실행할 작업.
      *
      * @param attacker   공격자

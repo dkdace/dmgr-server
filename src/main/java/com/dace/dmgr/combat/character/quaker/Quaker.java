@@ -6,9 +6,11 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Sound;
 
 import java.util.StringJoiner;
 
@@ -48,6 +50,14 @@ public final class Quaker extends Character {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         combatUser.getStatusEffectModule().getResistanceStatus().addModifier("QuakerT1", QuakerT1Info.STATUS_EFFECT_RESISTANCE);
+    }
+
+    @Override
+    public void onFootstep(@NonNull CombatUser combatUser, double volume) {
+        if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
+            volume = 1.4;
+        SoundUtil.play(Sound.ENTITY_COW_STEP, combatUser.getEntity().getLocation(), 0.3 * volume, 0.9, 0.1);
+        SoundUtil.play("new.entity.ravager.step", combatUser.getEntity().getLocation(), 0.2 * volume, 0.8, 0.1);
     }
 
     @Override
