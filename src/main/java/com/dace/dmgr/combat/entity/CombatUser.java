@@ -187,7 +187,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onTick(this, i);
 
-        if (!entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
+        if (i > 1 && !entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                     99999, 40, false, false), true);
 
