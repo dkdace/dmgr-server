@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
@@ -231,6 +232,7 @@ public final class QuakerA3 extends ActiveSkill {
                     onImpact(location);
                 }
                 target.getKnockbackModule().knockback(direction.clone().multiply(2), true);
+                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);
             }
