@@ -253,6 +253,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onTickLive(long i) {
         checkHealPack();
+        checkFallZone();
+
         onFootstep();
 
         if (i % 10 == 0)
@@ -340,6 +342,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancalled -> HologramUtil.removeHologram("healpack" + healPackLocation),
                 20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
+    }
+
+    /**
+     * 현재 위치의 낙사 구역을 확인한다.
+     */
+    private void checkFallZone() {
+        Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
+        if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getFallZoneBlock())
+            return;
+
+        onDeath(null);
     }
 
     /**
