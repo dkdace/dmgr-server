@@ -641,6 +641,9 @@ public final class Game implements Disposable {
         int redAmount = teamUserMap.get(Team.RED).size();
         int blueAmount = teamUserMap.get(Team.BLUE).size();
 
+        gameUsers.add(gameUser);
+        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
+
         if (phase != Phase.WAITING) {
             if (redAmount < blueAmount)
                 gameUser.setTeam(Team.RED);
@@ -650,9 +653,6 @@ public final class Game implements Disposable {
             teamUserMap.get(gameUser.getTeam()).add(gameUser);
             gameUser.onGameStart();
         }
-
-        gameUsers.add(gameUser);
-        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
     }
 
     /**
