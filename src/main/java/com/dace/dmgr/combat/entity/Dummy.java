@@ -48,7 +48,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         super(entity, "훈련용 봇", null,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
-                new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.5, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
         knockbackModule = new KnockbackModule(this);

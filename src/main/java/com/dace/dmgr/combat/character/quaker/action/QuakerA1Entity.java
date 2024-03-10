@@ -41,7 +41,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
                 owner.getName() + "의 방패",
                 owner,
                 QuakerA1Info.HEALTH,
-                new Hitbox(entity.getLocation(), 6, 3.5, 0.2, 0, 0, -0.2, 0, 1.2, 0)
+                new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
         );
         skill = (QuakerA1) owner.getSkill(QuakerA1Info.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
