@@ -120,7 +120,12 @@ public final class HologramUtil {
      * 생성된 모든 홀로그램을 제거한다.
      */
     public void clearHologram() {
-        hologramMap.forEach((id, hologram) -> removeHologram(id));
+        hologramMap.forEach((id, hologram) -> {
+            hologram.delete();
+            TaskUtil.clearTask(hologram);
+        });
+
         hologramMap.clear();
+        DMGR.getHolographicDisplaysAPI().deleteHolograms();
     }
 }

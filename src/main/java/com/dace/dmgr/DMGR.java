@@ -109,7 +109,6 @@ public class DMGR extends JavaPlugin {
         EventManager.register();
         clearUnusedEntities();
         WorldUtil.clearDuplicatedWorlds();
-        HologramUtil.clearHologram();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);
@@ -124,6 +123,7 @@ public class DMGR extends JavaPlugin {
     public void onDisable() {
         ConsoleLogger.info("플러그인 비활성화 완료");
 
+        HologramUtil.clearHologram();
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);
             user.sendMessageInfo("시스템 재부팅 중...");
