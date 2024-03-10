@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.Disposable;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
@@ -78,6 +80,18 @@ public interface CombatEntity extends Disposable {
     double getMaxHitboxSize();
 
     /**
+     * @return 넉백 모듈
+     */
+    @NonNull
+    KnockbackModule getKnockbackModule();
+
+    /**
+     * @return 상태 효과 모듈
+     */
+    @NonNull
+    StatusEffectModule getStatusEffectModule();
+
+    /**
      * 엔티티가 활성화 되었는지 확인한다.
      *
      * @return 엔티티 활성화 여부
@@ -99,38 +113,19 @@ public interface CombatEntity extends Disposable {
     boolean isEnemy(@NonNull CombatEntity combatEntity);
 
     /**
-     * 엔티티에게 상태 효과를 적용한다.
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
-     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
-     * 남은 시간보다 길 경우에만 적용한다.</p>
-     *
-     * @param statusEffectType 적용할 상태 효과 종류
-     * @param duration         지속시간 (tick)
+     * @param velocity 속도
+     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
      */
-    void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration);
+    void push(@NonNull Vector velocity, boolean isReset);
 
     /**
-     * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
-     * @param statusEffectType 확인할 상태 효과 종류
-     * @return 남은 시간 (tick)
+     * @param velocity 속도
      */
-    long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType);
-
-    /**
-     * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
-     *
-     * @param statusEffectType 확인할 상태 효과 종류
-     * @return 상태 효과를 가지고 있으면 {@code true} 반환
-     */
-    boolean hasStatusEffect(@NonNull StatusEffectType statusEffectType);
-
-    /**
-     * 엔티티의 상태 효과를 제거한다.
-     *
-     * @param statusEffectType 제거할 상태 효과 종류
-     */
-    void removeStatusEffect(@NonNull StatusEffectType statusEffectType);
+    void push(@NonNull Vector velocity);
 
     /**
      * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.

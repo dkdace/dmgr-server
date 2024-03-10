@@ -128,7 +128,8 @@ public final class SelectChar extends Gui {
     @Getter
     public enum SelectCharItem {
         ARKACE(CharacterType.ARKACE),
-        JAGER(CharacterType.JAGER);
+        JAGER(CharacterType.JAGER),
+        QUAKER(CharacterType.QUAKER);
 
         /** GUI 아이템 객체 */
         private final GuiItem<SelectCharItem> guiItem;

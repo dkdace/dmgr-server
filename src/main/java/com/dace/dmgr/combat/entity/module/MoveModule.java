@@ -1,11 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.AbilityStatus;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -43,13 +40,17 @@ public class MoveModule {
 
         this.combatEntity = combatEntity;
         this.speedStatus = new AbilityStatus(speed);
-        TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
-            speedStatus.addModifier("JagerT1", -combatEntity.getPropertyManager().getValue(Property.FREEZE));
-            if (CooldownUtil.getCooldown(combatEntity, Cooldown.JAGER_FREEZE_VALUE_DURATION) == 0)
-                combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
 
-            return true;
-        }, 1));
+        if (!(combatEntity instanceof CombatUser)) {
+            TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+                double movementSpeed = speedStatus.getValue();
+                if (!combatEntity.canMove())
+                    movementSpeed = 0.0001;
+                ((Attributable) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(movementSpeed);
+
+                return true;
+            }, 1));
+        }
     }
 
     /**
@@ -61,14 +62,5 @@ public class MoveModule {
     public MoveModule(@NonNull Movable combatEntity) {
         this(combatEntity, (combatEntity.getEntity() instanceof Attributable) ?
                 ((Attributable) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() : 0);
-    }
-
-    /**
-     * 엔티티가 움직일 수 있는 지 확인한다.
-     *
-     * @return 이동 가능 여부
-     */
-    public final boolean canMove() {
-        return !combatEntity.hasStatusEffect(StatusEffectType.STUN) && !combatEntity.hasStatusEffect(StatusEffectType.SNARE);
     }
 }

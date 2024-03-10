@@ -4,27 +4,18 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.inventivetalent.glow.GlowAPI;
 
 import java.util.function.Predicate;
 
@@ -34,6 +25,14 @@ import java.util.function.Predicate;
 public final class JagerUltEntity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -56,6 +55,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
+        knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
@@ -69,7 +70,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         entity.setSilent(true);
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
         SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
 
         damageModule.setMaxHealth(JagerUltInfo.HEALTH);
@@ -225,7 +226,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
+            target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.NORMAL,
+                    false, false);
             JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 
             return true;

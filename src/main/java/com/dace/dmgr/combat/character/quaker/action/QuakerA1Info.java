@@ -5,6 +5,8 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 
 public final class QuakerA1Info extends ActiveSkillInfo {
+    /** 쿨타임 */
+    public static final long COOLDOWN = 1 * 20;
     /** 사망 시 쿨타임 */
     public static final long COOLDOWN_DEATH = 4 * 20;
     /** 체력 */

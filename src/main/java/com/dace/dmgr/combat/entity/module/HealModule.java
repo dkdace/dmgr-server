@@ -40,7 +40,7 @@ public final class HealModule extends DamageModule {
      * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, int maxHealth) {
-        this(combatEntity, isUltProvider, maxHealth, DEFAULT_VALUE);
+        super(combatEntity, isUltProvider, maxHealth);
     }
 
     /**

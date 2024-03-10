@@ -4,10 +4,7 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
-import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
-import com.dace.dmgr.combat.character.quaker.action.QuakerA1;
-import com.dace.dmgr.combat.character.quaker.action.QuakerA1Info;
-import com.dace.dmgr.combat.character.quaker.action.QuakerWeaponInfo;
+import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -17,13 +14,19 @@ import java.util.StringJoiner;
 
 /**
  * 전투원 - 퀘이커 클래스.
+ *
+ * @see QuakerWeapon
+ * @see QuakerA1
+ * @see QuakerA2
+ * @see QuakerA3
+ * @see QuakerUlt
  */
 public final class Quaker extends Character {
     @Getter
     private static final Quaker instance = new Quaker();
 
     private Quaker() {
-        super("퀘이커", "DVQuaker", Role.GUARDIAN, 2500, 0.85, 1.6);
+        super("퀘이커", "DVQuaker", Role.GUARDIAN, 2500, 0.85, 1.8);
     }
 
     @Override
@@ -44,11 +47,22 @@ public final class Quaker extends Character {
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        combatUser.getStatusEffectModule().getResistanceStatus().addModifier("QuakerT1", QuakerT1Info.STATUS_EFFECT_RESISTANCE);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
         return false;
+    }
+
+    @Override
+    public boolean canSprint(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -70,8 +84,12 @@ public final class Quaker extends Character {
         switch (number) {
             case 1:
                 return QuakerA1Info.getInstance();
+            case 2:
+                return QuakerA2Info.getInstance();
+            case 3:
+                return QuakerA3Info.getInstance();
             case 4:
-                return ArkaceUltInfo.getInstance();
+                return QuakerUltInfo.getInstance();
             default:
                 return null;
         }
@@ -79,7 +97,7 @@ public final class Quaker extends Character {
 
     @Override
     @NonNull
-    public ArkaceUltInfo getUltimateSkillInfo() {
-        return ArkaceUltInfo.getInstance();
+    public QuakerUltInfo getUltimateSkillInfo() {
+        return QuakerUltInfo.getInstance();
     }
 }

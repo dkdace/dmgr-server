@@ -16,13 +16,16 @@ import org.bukkit.util.Vector;
 public class Hitbox {
     /** 가로. (단위: 블록) */
     @Getter
-    protected final double sizeX;
+    @Setter
+    protected double sizeX;
     /** 높이. (단위: 블록) */
     @Getter
-    protected final double sizeY;
+    @Setter
+    protected double sizeY;
     /** 세로. (단위: 블록) */
     @Getter
-    protected final double sizeZ;
+    @Setter
+    protected double sizeZ;
     /** 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록) */
     @Getter
     @Setter
@@ -118,7 +121,7 @@ public class Hitbox {
     public final Location getNearestLocation(@NonNull Location location) {
         Vector rotVec = VectorUtil.getRotatedVector(
                 VectorUtil.getRotatedVector(location.toVector().subtract(center.toVector()), new Vector(0, 1, 0), center.getYaw()),
-                new Vector(1, 0, 0), center.getPitch());
+                new Vector(1, 0, 0), -center.getPitch());
         Location rotLoc = center.clone().add(rotVec);
         Location cuboidEdge = center.clone().add(
                 (rotLoc.getX() > center.getX() ? 1 : -1) * Math.min(sizeX / 2, Math.abs(rotLoc.getX() - center.getX())),
@@ -127,7 +130,7 @@ public class Hitbox {
         );
 
         Vector retVec = VectorUtil.getRotatedVector(
-                VectorUtil.getRotatedVector(cuboidEdge.toVector().subtract(center.toVector()), new Vector(1, 0, 0), -center.getPitch()),
+                VectorUtil.getRotatedVector(cuboidEdge.toVector().subtract(center.toVector()), new Vector(1, 0, 0), center.getPitch()),
                 new Vector(0, 1, 0), -center.getYaw());
         return center.clone().add(retVec);
     }

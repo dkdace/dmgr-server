@@ -28,7 +28,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
     @Override
     public long getDefaultCooldown() {
-        return 0;
+        return QuakerA1Info.COOLDOWN;
     }
 
     @Override
@@ -47,11 +47,6 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse();
-    }
-
-    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().onCancelled();
 
@@ -59,6 +54,7 @@ public final class QuakerA1 extends ChargeableSkill {
             combatUser.setGlobalCooldown(8);
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA1", -QuakerA1Info.USE_SPEED);
+            combatUser.setFovValue(0.3);
             playUseSound(combatUser.getEntity().getLocation());
 
             ArmorStand armorStand = CombatEntityUtil.spawn(ArmorStand.class, combatUser.getEntity().getLocation());
@@ -73,6 +69,7 @@ public final class QuakerA1 extends ChargeableSkill {
         super.onCancelled();
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA1");
+        combatUser.setFovValue(0);
         SoundUtil.play(Sound.BLOCK_SHULKER_BOX_CLOSE, combatUser.getEntity().getLocation(), 1, 1.4);
 
         if (entity != null)
@@ -85,7 +82,6 @@ public final class QuakerA1 extends ChargeableSkill {
      * @param location 사용 위치
      */
     private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_ENDERDRAGON_FLAP, location, 1, 0.6);
         SoundUtil.play(Sound.ENTITY_ENDERDRAGON_FLAP, location, 1, 0.6);
         SoundUtil.play(Sound.BLOCK_SHULKER_BOX_OPEN, location, 1, 0.7);
     }

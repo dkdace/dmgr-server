@@ -30,6 +30,6 @@ public final class QuakerWeaponInfo extends WeaponInfo {
         /** 기본 */
         short DEFAULT = 3;
         /** 사용 */
-        short USE = DEFAULT + 1000;
+        short USE = 1561;
     }
 }

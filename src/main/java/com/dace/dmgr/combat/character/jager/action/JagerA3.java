@@ -64,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
             playUseSound(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
-                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_EXPLODE_DURATION);
+                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION);
                 playReadySound(combatUser.getEntity().getLocation());
                 isEnabled = true;
 
@@ -175,25 +175,25 @@ public final class JagerA3 extends ActiveSkill {
     private class JagerA3Projectile extends BouncingProjectile {
         private JagerA3Projectile() {
             super(JagerA3.this.combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownUtil.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_EXPLODE_DURATION)).hasGravity(true)
+                    .duration(CooldownUtil.getCooldown(JagerA3.this.combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION)).hasGravity(true)
                     .condition(JagerA3.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             playTickEffect(location);
         }
 
         @Override
-        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
-            SoundUtil.play("random.metalhit", location, 0.1 + direction.length() * 2, 1.2, 0.1);
-            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + direction.length() * 2, 2);
+        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+            SoundUtil.play("random.metalhit", location, 0.1 + velocity.length() * 2, 1.2, 0.1);
+            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + velocity.length() * 2, 2);
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
-            if (direction.length() > 0.05)
+        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+            if (velocity.length() > 0.05)
                 target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
             return false;
         }
@@ -230,7 +230,7 @@ public final class JagerA3 extends ActiveSkill {
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
-                target.applyStatusEffect(StatusEffectType.FREEZE, JagerA3Info.SNARE_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerTrait.Freeze.getInstance(), JagerA3Info.SNARE_DURATION);
 
             return !(target instanceof Barrier);
         }

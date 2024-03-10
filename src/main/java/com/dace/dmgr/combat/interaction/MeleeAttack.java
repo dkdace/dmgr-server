@@ -35,13 +35,13 @@ public final class MeleeAttack extends Hitscan {
     }
 
     @Override
-    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
         playHitBlockEffect(location, hitBlock);
         return false;
     }
 
     @Override
-    protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+    protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
         target.getDamageModule().damage((CombatUser) shooter, damage, DamageType.NORMAL, false, true);
 
         SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 0.8, 1.1, 0.1);
@@ -62,6 +62,6 @@ public final class MeleeAttack extends Hitscan {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                 6, 0.05, 0.05, 0.05, 0.1);
         ParticleUtil.play(Particle.TOWN_AURA, location, 20, 0.05, 0.05, 0.05, 0);
-        ParticleUtil.playBlockHitEffect(location, hitBlock);
+        SoundUtil.playBlockHitSound(location, hitBlock);
     }
 }

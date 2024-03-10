@@ -135,6 +135,22 @@ public abstract class Character {
     public abstract boolean canUseMeleeAttack(@NonNull CombatUser combatUser);
 
     /**
+     * 전투원이 달리기를 할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 달리기 가능 여부
+     */
+    public abstract boolean canSprint(@NonNull CombatUser combatUser);
+
+    /**
+     * 전투원이 점프를 할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 점프 가능 여부
+     */
+    public abstract boolean canJump(@NonNull CombatUser combatUser);
+
+    /**
      * @return 무기 정보
      */
     @NonNull

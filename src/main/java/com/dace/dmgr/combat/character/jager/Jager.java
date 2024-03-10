@@ -92,6 +92,16 @@ public final class Jager extends Character {
     }
 
     @Override
+    public boolean canSprint(@NonNull CombatUser combatUser) {
+        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+    }
+
+    @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
     @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();

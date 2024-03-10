@@ -4,23 +4,34 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.inventivetalent.glow.GlowAPI;
+import org.bukkit.util.EulerAngle;
 
 /**
  * 퀘이커 - 불굴의 방패 클래스.
  */
 public final class QuakerA1Entity extends Barrier<ArmorStand> {
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 스킬 객체 */
     private final QuakerA1 skill;
 
@@ -30,9 +41,11 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
                 owner.getName() + "의 방패",
                 owner,
                 QuakerA1Info.HEALTH,
-                new Hitbox(entity.getLocation(), 6, 3.5, 0.2, 0, 0, 0)
+                new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
         );
         skill = (QuakerA1) owner.getSkill(QuakerA1Info.getInstance());
+        knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this);
 
         onInit();
     }
@@ -46,34 +59,35 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         entity.setVisible(false);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false,
                 false), true);
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        entity.setItemInHand(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
 
         damageModule.setHealth((int) skill.getStateValue());
     }
 
     @Override
     protected void onTick(long i) {
-        Location loc = LocationUtil.getLocationFromOffset(owner.getEntity().getEyeLocation(), owner.getEntity().getLocation().getDirection(),
-                0, 0, 1.5);
+        Location loc = LocationUtil.getLocationFromOffset(owner.getEntity().getLocation(), owner.getEntity().getLocation().getDirection(),
+                0, 0.8, 1.5);
+        entity.setRightArmPose(new EulerAngle(Math.toRadians(loc.getPitch() - 90), 0, 0));
         entity.teleport(loc);
 
-        Hitbox hitbox = hitboxes[0];
-        Location[] particleLocs = new Location[4];
-        particleLocs[0] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), -hitbox.getSizeX() / 2, -hitbox.getSizeY() / 2, 0);
-        particleLocs[1] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), hitbox.getSizeX() / 2, -hitbox.getSizeY() / 2, 0);
-        particleLocs[2] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), -hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
-        particleLocs[3] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
-
-        if (i % 4 == 0) {
-            for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[1], 0.4))
-                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
-            for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[2], 0.4))
-                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
-            for (Location loc2 : LocationUtil.getLine(particleLocs[1], particleLocs[3], 0.4))
-                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
-            for (Location loc2 : LocationUtil.getLine(particleLocs[2], particleLocs[3], 0.4))
-                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
-        }
+//        Hitbox hitbox = hitboxes[0];
+//        Location[] particleLocs = new Location[4];
+//        particleLocs[0] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), -hitbox.getSizeX() / 2, -hitbox.getSizeY() / 2, 0);
+//        particleLocs[1] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), hitbox.getSizeX() / 2, -hitbox.getSizeY() / 2, 0);
+//        particleLocs[2] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), -hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
+//        particleLocs[3] = LocationUtil.getLocationFromOffset(hitbox.getCenter(), hitbox.getSizeX() / 2, hitbox.getSizeY() / 2, 0);
+//
+//        if (i % 4 == 0) {
+//            for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[1], 0.4))
+//                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
+//            for (Location loc2 : LocationUtil.getLine(particleLocs[0], particleLocs[2], 0.4))
+//                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
+//            for (Location loc2 : LocationUtil.getLine(particleLocs[1], particleLocs[3], 0.4))
+//                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
+//            for (Location loc2 : LocationUtil.getLine(particleLocs[2], particleLocs[3], 0.4))
+//                ParticleUtil.play(Particle.CRIT, loc2, 1, 0, 0, 0, 0);
+//        }
     }
 
     @Override
@@ -100,6 +114,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         SoundUtil.play("random.metalhit", entity.getLocation(), 2, 0.7);
         SoundUtil.play(Sound.ITEM_SHIELD_BLOCK, entity.getLocation(), 2, 0.5);
         skill.setStateValue(0);
+        skill.onCancelled();
         skill.setCooldown(QuakerA1Info.COOLDOWN_DEATH);
     }
 }

@@ -62,7 +62,7 @@ public abstract class Hitscan extends Bullet {
 
             loc.add(direction);
             if (i % trailInterval == 0)
-                trail(loc.clone());
+                trail(loc.clone(), direction.clone().normalize());
         }
 
         onDestroy(loc.clone());

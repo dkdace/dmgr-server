@@ -27,6 +27,8 @@ public abstract class Projectile extends Bullet {
     protected long duration;
     /** 중력 작용 여부 */
     protected boolean hasGravity;
+    /** 지면 고정 여부 */
+    protected boolean isOnGround;
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -36,14 +38,19 @@ public abstract class Projectile extends Bullet {
      * @param shooter  발사자
      * @param velocity 투사체의 속력. (단위: 블록/s)
      * @param option   선택적 옵션
+     * @throws IllegalArgumentException 투사체 옵션의 'hasGravity'와 'isOnGround'가 동시에 true이면 발생
      * @see ProjectileOption
      */
     protected Projectile(@NonNull CombatEntity shooter, int velocity, @NonNull ProjectileOption option) {
         super(shooter, option.trailInterval, option.maxDistance, option.size, option.condition);
+        if (option.hasGravity && option.isOnGround)
+            throw new IllegalArgumentException("투사체 옵션의 'hasGravity'와 'isOnGround'는 동시에 true일 수 없음");
+
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
         this.velocity = velocity;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
+        this.isOnGround = option.isOnGround;
     }
 
     /**
@@ -63,6 +70,7 @@ public abstract class Projectile extends Bullet {
         this.velocity = velocity;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
+        this.isOnGround = option.isOnGround;
     }
 
     /**
@@ -96,6 +104,9 @@ public abstract class Projectile extends Bullet {
                     if ((duration != -1 && i >= duration) || loc.distance(origin) > maxDistance)
                         return false;
 
+                    if (isOnGround && !handleGround(loc))
+                        return false;
+
                     if (!LocationUtil.isNonSolid(loc) && !Projectile.this.handleBlockCollision(loc, finalDirection))
                         return false;
 
@@ -108,11 +119,44 @@ public abstract class Projectile extends Bullet {
                     if (finalDirection.length() > 0.01)
                         loc.add(finalDirection);
                     if (count++ % trailInterval == 0)
-                        Projectile.this.trail(loc.clone());
+                        Projectile.this.trail(loc.clone(), finalDirection.clone().normalize());
                 }
 
                 return true;
             }
         }, isCancelled -> onDestroy(loc.clone()), 1));
+    }
+
+    /**
+     * 투사체의 지면 고정 로직을 처리한다.
+     *
+     * @param location 위치
+     */
+    private boolean handleGround(@NonNull Location location) {
+        if (!LocationUtil.isNonSolid(location)) {
+            Location shiftLocUp = location.clone();
+            for (int k = 1; k <= 16; k++) {
+                if (!LocationUtil.isNonSolid(shiftLocUp.add(0, HITBOX_INTERVAL, 0)))
+                    continue;
+
+                location.add(0, k * HITBOX_INTERVAL, 0);
+                return true;
+            }
+
+            return false;
+        } else if (LocationUtil.isNonSolid(location.clone().subtract(0, HITBOX_INTERVAL, 0))) {
+            Location shiftLocDown = location.clone();
+            for (int k = 1; k <= 16; k++) {
+                if (LocationUtil.isNonSolid(shiftLocDown.subtract(0, HITBOX_INTERVAL, 0)))
+                    continue;
+
+                location.subtract(0, k * HITBOX_INTERVAL - HITBOX_INTERVAL, 0);
+                return true;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -57,8 +57,6 @@ public final class MeleeAttackAction extends AbstractAction {
         sendPotionEffect();
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
-        sendPotionEffect();
-
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
             new MeleeAttack(combatUser, DAMAGE).shoot();
 

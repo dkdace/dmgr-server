@@ -54,32 +54,25 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setGlobalCooldown(8);
         setCooldown();
+        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
             Set<CombatEntity> targets = new HashSet<>();
 
+            int delay = 0;
             for (int i = 0; i < 8; i++) {
                 final int index = i;
-                int delay = 0;
 
                 switch (i) {
                     case 1:
-                        delay = 2;
+                        delay += 2;
                         break;
                     case 2:
-                        delay = 3;
-                        break;
-                    case 3:
                     case 4:
-                        delay = 4;
-                        break;
-                    case 5:
                     case 6:
-                        delay = 5;
-                        break;
                     case 7:
-                        delay = 6;
+                        delay += 1;
                         break;
                 }
 
@@ -103,6 +96,12 @@ public final class QuakerWeapon extends AbstractWeapon {
         }, 2));
     }
 
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+    }
+
     /**
      * 사용 시 효과음을 재생한다.
      *
@@ -124,7 +123,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -140,17 +139,17 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                     7, 0.08, 0.08, 0.08, 0.1);
             ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.1, 0.1, 0.1, 0);
-            ParticleUtil.playBlockHitEffect(location, hitBlock);
+            SoundUtil.playBlockHitSound(location, hitBlock);
 
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
                 ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
