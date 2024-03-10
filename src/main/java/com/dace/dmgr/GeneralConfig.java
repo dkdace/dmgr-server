@@ -39,6 +39,7 @@ public final class GeneralConfig extends YamlFile {
         combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
         combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
         combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
+        combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
 
         gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
         gameConfig.normalMinPlayerCount = (int) getLong("normalMinPlayerCount", gameConfig.normalMinPlayerCount);
@@ -97,6 +98,8 @@ public final class GeneralConfig extends YamlFile {
         private int healPackCooldown = 15;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
+        /** 낙사 구역에 사용되는 블록의 타입 */
+        private Material fallZoneBlock = Material.BEDROCK;
     }
 
     /**
