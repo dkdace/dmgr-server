@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -20,6 +21,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -104,8 +106,8 @@ public final class GameUser implements Disposable {
         this.game = game;
         tabList = user.getTabList();
 
-        game.addPlayer(this);
         GameUserRegistry.getInstance().add(user, this);
+        game.addPlayer(this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
             onTick(i);
@@ -197,6 +199,10 @@ public final class GameUser implements Disposable {
         user.teleport(getRespawnLocation());
         user.clearChat();
         HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+        game.getGameUsers().forEach(gameUser2 -> {
+            if (gameUser2.team == team)
+                GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+        });
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
