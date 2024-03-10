@@ -154,7 +154,7 @@ public final class GameUser implements Disposable {
     private void onTickTeamSpawn() {
         player.getInventory().setHeldItemSlot(4);
 
-        if (game.getPhase() == Game.Phase.PLAYING)
+        if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
 

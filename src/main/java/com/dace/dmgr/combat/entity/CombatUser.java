@@ -206,6 +206,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!isDead())
             onTickLive(i);
 
+        setLowHealthScreenEffect(damageModule.isLowHealth() || isDead());
         setCanSprint();
         adjustWalkSpeed();
         changeFov(fovValue);
@@ -260,11 +261,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
-        if (damageModule.isLowHealth()) {
+        if (damageModule.isLowHealth())
             playBleedingEffect(1);
-            setLowHealthScreenEffect(true);
-        } else
-            setLowHealthScreenEffect(false);
     }
 
     /**
@@ -704,8 +702,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Location deadLocation = entity.getLocation().add(0, 0.5, 0);
-        deadLocation.setPitch(90);
+        Location deadLocation;
+        if (gameUser == null)
+            deadLocation = LocationUtil.getLobbyLocation();
+        else
+            deadLocation = gameUser.getRespawnLocation();
+        deadLocation.add(0, 2, 0);
+        user.teleport(deadLocation);
 
         CooldownUtil.setCooldown(this, Cooldown.RESPAWN_TIME);
         entity.setGameMode(GameMode.SPECTATOR);
@@ -717,18 +720,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return false;
 
             user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
-                    String.format("%.1f", cooldown / 20.0)), 0, 20, 10);
+                    String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
             user.teleport(deadLocation);
 
             return true;
         }, isCancelled -> {
             damageModule.setHealth(damageModule.getMaxHealth());
             entity.setGameMode(GameMode.SURVIVAL);
-
-            if (gameUser == null)
-                user.teleport(LocationUtil.getLobbyLocation());
-            else
-                user.teleport(gameUser.getRespawnLocation());
 
             weapon.reset();
             skillMap.forEach((skillInfo, skill) -> skill.reset());
