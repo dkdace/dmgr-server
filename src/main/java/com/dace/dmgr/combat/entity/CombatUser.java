@@ -37,6 +37,7 @@ import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
@@ -128,6 +129,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     @Setter
     private double fovValue = 0;
+    /** 이동 거리. 발소리 재생에 사용됨 */
+    private double footstepDistance = 0;
     @Getter
     @Setter
     private long time = System.currentTimeMillis();
@@ -250,6 +253,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onTickLive(long i) {
         checkHealPack();
+        onFootstep();
 
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
@@ -336,6 +340,44 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancalled -> HologramUtil.removeHologram("healpack" + healPackLocation),
                 20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
+    }
+
+    /**
+     * 매 걸음마다 실행할 작업.
+     *
+     * <p>주로 발소리 재생에 사용한다.</p>
+     */
+    private void onFootstep() {
+        Location oldLoc = entity.getLocation();
+        double fallDistance = entity.getFallDistance();
+
+        TaskUtil.addTask(this, new DelayTask(() -> {
+            footstepDistance += oldLoc.distance(entity.getLocation());
+            if (entity.isOnGround() && footstepDistance > 1.6) {
+                footstepDistance = 0;
+                double volume = 1.2 + fallDistance * 0.05;
+
+                if (fallDistance > 6) {
+                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.5 * volume, 0.8, 0.1);
+                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.5 * volume, 0.9, 0.1);
+                    SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity.getLocation(), 0.5 * volume, 0.9, 0.1);
+                } else if (fallDistance > 3) {
+                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.4 * volume, 0.9, 0.1);
+                    SoundUtil.play(Sound.ENTITY_PLAYER_SMALL_FALL, entity.getLocation(), 0.4 * volume, 0.9, 0.1);
+                } else if (fallDistance > 0)
+                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.3 * volume, 0.9, 0.1);
+
+                if (entity.isSprinting())
+                    volume = 1;
+                else if (!entity.isSneaking())
+                    volume = 0.8;
+                else
+                    volume = 0.4;
+
+                character.onFootstep(this, volume);
+            }
+
+        }, 1));
     }
 
     @Override
