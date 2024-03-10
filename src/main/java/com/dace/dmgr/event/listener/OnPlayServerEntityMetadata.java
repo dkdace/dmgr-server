@@ -4,9 +4,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.util.GlowUtil;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -21,13 +23,20 @@ public final class OnPlayServerEntityMetadata extends PacketAdapter {
         Player player = event.getPlayer();
         Entity entity = packet.getEntity(event);
 
-        if (packet.getMetadata().get(0).getIndex() != 0 || entity == null)
+        WrappedWatchableObject metadata = packet.getMetadata().get(0);
+
+        if (metadata == null || metadata.getIndex() != 0 || entity == null)
             return;
 
-        WrappedWatchableObject wo = packet.getMetadata().get(0);
+        if (entity instanceof ArmorStand && ((ArmorStand) entity).isSmall())
+            return;
+
+        WrappedDataWatcher dw = WrappedDataWatcher.getEntityWatcher(entity);
+        dw.deepClone();
+
         if (GlowUtil.isGlowing(entity, player))
-            wo.setValue((byte) ((byte) wo.getValue() | (1 << 6)));
+            metadata.setValue((byte) ((byte) metadata.getValue() | (1 << 6)));
         else
-            wo.setValue((byte) ((byte) wo.getValue() & ~(1 << 6)));
+            metadata.setValue((byte) ((byte) metadata.getValue() & ~(1 << 6)));
     }
 }
