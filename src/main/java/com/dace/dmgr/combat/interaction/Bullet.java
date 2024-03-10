@@ -22,8 +22,6 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class Bullet {
-    /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
-    protected static final double START_DISTANCE = 0.5;
     /** 궤적 상 히트박스 판정점 간 거리 기본값. (단위: 블록) */
     protected static final double HITBOX_INTERVAL = 0.125;
     /** 발사자 엔티티 */
@@ -32,6 +30,8 @@ abstract class Bullet {
     protected final CombatEntity shooter;
     /** 트레일 이벤트 ({@link Bullet#trail(Location, Vector)})를 호출하는 주기. (단위: 판정점 개수) */
     protected int trailInterval;
+    /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
+    protected double startDistance;
     /** 총알의 최대 사거리. (단위: 블록) */
     protected double maxDistance;
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */

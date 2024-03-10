@@ -23,7 +23,7 @@ public abstract class Hitscan extends Bullet {
      * @see HitscanOption
      */
     protected Hitscan(@NonNull CombatEntity shooter, @NonNull HitscanOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.size, option.condition);
+        super(shooter, option.trailInterval, option.startDistance, option.maxDistance, option.size, option.condition);
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class Hitscan extends Bullet {
     public final void shoot(@NonNull Location origin, @NonNull Vector direction) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
-        loc.add(direction.clone().multiply(START_DISTANCE));
+        loc.add(direction.clone().multiply(startDistance));
         Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; loc.distance(origin) < maxDistance; i++) {

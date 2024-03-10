@@ -42,7 +42,7 @@ public abstract class Projectile extends Bullet {
      * @see ProjectileOption
      */
     protected Projectile(@NonNull CombatEntity shooter, int velocity, @NonNull ProjectileOption option) {
-        super(shooter, option.trailInterval, option.maxDistance, option.size, option.condition);
+        super(shooter, option.trailInterval, option.startDistance, option.maxDistance, option.size, option.condition);
         if (option.hasGravity && option.isOnGround)
             throw new IllegalArgumentException("투사체 옵션의 'hasGravity'와 'isOnGround'는 동시에 true일 수 없음");
 
@@ -83,7 +83,7 @@ public abstract class Projectile extends Bullet {
     public final void shoot(@NonNull Location origin, @NonNull Vector direction) {
         direction.normalize().multiply(HITBOX_INTERVAL);
         Location loc = origin.clone();
-        loc.add(direction.clone().multiply(START_DISTANCE));
+        loc.add(direction.clone().multiply(startDistance));
         Set<CombatEntity> targets = new HashSet<>();
 
         int loopCount = (int) (velocity / 2.5);
