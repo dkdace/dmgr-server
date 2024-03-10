@@ -112,7 +112,13 @@ public final class User implements Disposable {
      */
     void onDataInit() {
         sidebar = new BPlayerBoard(player, "lobby");
-        tabList = DMGR.getTabbed().newTableTabList(player);
+        tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
+        if (tabList == null)
+            tabList = DMGR.getTabbed().newTableTabList(player);
+        HologramUtil.addHologram(player.getName(), player.getLocation(), userData.getDisplayName());
+        HologramUtil.bindHologram(player.getName(), player, 0, 2.25, 0);
+        HologramUtil.setHologramVisibility(player.getName(), false, player);
+
         TaskUtil.addTask(User.this, new IntervalTask(i -> User.this.onSecond(), 20));
 
         if (!userData.getConfig().isKoreanChat())
@@ -132,6 +138,7 @@ public final class User implements Disposable {
         sidebar.delete();
         tabList.disable();
         nameTagHider.remove();
+        HologramUtil.removeHologram(player.getName());
 
         GameUser gameUser = GameUser.fromUser(User.this);
         if (gameUser != null)
@@ -402,6 +409,9 @@ public final class User implements Disposable {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
+        HologramUtil.setHologramVisibility(player.getName(), true, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+        HologramUtil.setHologramVisibility(player.getName(), false, player);
+        Bukkit.getOnlinePlayers().forEach(player2 -> GlowUtil.removeGlowing(player, player2));
 
         sidebar.clear();
         for (int i = 0; i < 80; i++)
