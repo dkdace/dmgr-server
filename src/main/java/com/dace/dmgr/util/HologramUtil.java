@@ -11,7 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.WeakHashMap;
+import java.util.HashMap;
 
 /**
  * 홀로그램 관리 기능을 제공하는 클래스.
@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class HologramUtil {
     /** 생성된 홀로그램 목록 (홀로그램 ID : 홀로그램 객체) */
-    private static final WeakHashMap<String, Hologram> hologramMap = new WeakHashMap<>();
+    private static final HashMap<String, Hologram> hologramMap = new HashMap<>();
 
     /**
      * 지정한 위치에 홀로그램을 생성한다.
@@ -96,9 +96,12 @@ public final class HologramUtil {
         TaskUtil.clearTask(hologram);
         if (entity != null)
             TaskUtil.addTask(hologram, new IntervalTask(i -> {
+                if (entity.isDead())
+                    return false;
+
                 hologram.setPosition(entity.getLocation().add(offsetX, offsetY, offsetZ));
                 return true;
-            }, 1));
+            }, isCancelled -> HologramUtil.removeHologram(id), 1));
     }
 
     /**
