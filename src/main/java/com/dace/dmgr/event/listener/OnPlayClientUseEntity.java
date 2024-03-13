@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public final class OnPlayClientUseEntity extends PacketAdapter {
     public OnPlayClientUseEntity() {
@@ -26,6 +27,11 @@ public final class OnPlayClientUseEntity extends PacketAdapter {
             return;
 
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK)
-            combatUser.useAction(ActionKey.LEFT_CLICK);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    combatUser.useAction(ActionKey.LEFT_CLICK);
+                }
+            }.runTask(DMGR.getPlugin());
     }
 }
