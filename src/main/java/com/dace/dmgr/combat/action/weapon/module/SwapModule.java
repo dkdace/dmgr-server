@@ -59,7 +59,7 @@ public final class SwapModule<T extends Weapon> {
         CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, swapDuration);
         weapon.onSwapStart(targetState);
 
-        TaskUtil.addTask(weapon, new IntervalTask(i -> {
+        TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
             if (getSwapState() != Swappable.SwapState.SWAPPING)
                 return false;
 

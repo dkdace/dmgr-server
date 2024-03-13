@@ -23,11 +23,8 @@ public class Stun implements StatusEffect {
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
-        if (!(combatEntity instanceof CombatUser))
-            return;
-
-        ((CombatUser) combatEntity).getEntity().getInventory().setHeldItemSlot(8);
-        ((CombatUser) combatEntity).cancelAction();
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).cancelAction();
     }
 
     @Override
@@ -38,7 +35,6 @@ public class Stun implements StatusEffect {
 
     @Override
     public void onEnd(@NonNull CombatEntity combatEntity) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getEntity().getInventory().setHeldItemSlot(4);
+        // 미사용
     }
 }

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Movable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,8 @@ public class Snare implements StatusEffect {
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
+        if (combatEntity instanceof Movable)
+            ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("Snare", -100);
     }
 
     @Override
@@ -33,5 +36,7 @@ public class Snare implements StatusEffect {
 
     @Override
     public void onEnd(@NonNull CombatEntity combatEntity) {
+        if (combatEntity instanceof Movable)
+            ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
     }
 }

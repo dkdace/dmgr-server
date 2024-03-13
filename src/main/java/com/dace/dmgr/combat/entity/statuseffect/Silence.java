@@ -37,5 +37,6 @@ public class Silence implements StatusEffect {
 
     @Override
     public void onEnd(@NonNull CombatEntity combatEntity) {
+        // 미사용
     }
 }

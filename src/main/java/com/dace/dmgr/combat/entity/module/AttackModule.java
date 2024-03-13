@@ -14,7 +14,7 @@ import lombok.NonNull;
  */
 @Getter
 public final class AttackModule {
-    /** 기본값 */
+    /** 공격력 배수 기본값 */
     private static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
     @NonNull

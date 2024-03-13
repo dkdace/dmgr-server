@@ -7,7 +7,9 @@ import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
+import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.WorldUtil;
@@ -44,6 +46,7 @@ public final class Game implements Disposable {
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
+    @Getter
     private final EnumMap<@NonNull Team, @NonNull ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
     /** 팀별 점수 (팀 : 점수) */
     @Getter
@@ -56,9 +59,9 @@ public final class Game implements Disposable {
     @NonNull
     @Getter
     private final GameMap map;
-    /** 전장 월드 이름 */
+    /** 전장 월드 */
     @Getter
-    private final String worldName;
+    private World world;
     /** 게임 시작 시점 ({@link Phase#READY}가 된 시점) */
     @Getter
     private long startTime = 0;
@@ -85,7 +88,7 @@ public final class Game implements Disposable {
         this.number = number;
         this.gamePlayMode = GameUtil.getRandomGamePlayMode(isRanked);
         this.map = GameUtil.getRandomMap(gamePlayMode);
-        this.worldName = MessageFormat.format("_{0}-{1}-{2}", map.getWorldName(), gamePlayMode, number);
+        this.world = Bukkit.getWorld(MessageFormat.format("_{0}-{1}-{2}", map.getWorld().getName(), gamePlayMode, number));
         minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
         for (Team team : Team.values()) {
@@ -123,6 +126,8 @@ public final class Game implements Disposable {
                 gameUser.dispose();
             }
 
+        for (GlobalLocation healPackLocation : map.getHealPackLocations())
+            HologramUtil.removeHologram("healpack" + healPackLocation);
         TaskUtil.clearTask(this);
         GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
     }
@@ -165,9 +170,9 @@ public final class Game implements Disposable {
      */
     @NonNull
     private AsyncTask<World> createWorld() {
-        World world = Bukkit.getWorld(worldName);
         if (world == null)
-            return WorldUtil.duplicateWorld(Bukkit.getWorld(map.getWorldName()), worldName);
+            return WorldUtil.duplicateWorld(map.getWorld(), MessageFormat.format("_{0}-{1}-{2}",
+                    map.getWorld().getName(), gamePlayMode, number));
 
         return new AsyncTask<>((onFinish, onError) -> onFinish.accept(world));
     }
@@ -292,7 +297,8 @@ public final class Game implements Disposable {
     private void onReady() {
         gameUsers.forEach(gameUser -> gameUser.getUser().sendMessageInfo("월드 불러오는 중..."));
 
-        createWorld().onFinish(() -> {
+        createWorld().onFinish(newWorld -> {
+            world = newWorld;
             remainingTime = gamePlayMode.getReadyDuration();
             startTime = System.currentTimeMillis();
             divideTeam();
@@ -635,6 +641,9 @@ public final class Game implements Disposable {
         int redAmount = teamUserMap.get(Team.RED).size();
         int blueAmount = teamUserMap.get(Team.BLUE).size();
 
+        gameUsers.add(gameUser);
+        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
+
         if (phase != Phase.WAITING) {
             if (redAmount < blueAmount)
                 gameUser.setTeam(Team.RED);
@@ -644,9 +653,6 @@ public final class Game implements Disposable {
             teamUserMap.get(gameUser.getTeam()).add(gameUser);
             gameUser.onGameStart();
         }
-
-        gameUsers.add(gameUser);
-        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
     }
 
     /**

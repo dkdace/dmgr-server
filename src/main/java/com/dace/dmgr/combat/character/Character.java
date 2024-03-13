@@ -6,9 +6,9 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.util.SkinUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * 전투원 정보를 관리하는 클래스.
@@ -17,17 +17,20 @@ import lombok.Getter;
 @Getter
 public abstract class Character {
     /** 이름 */
+    @NonNull
     private final String name;
-    /** 스킨 */
-    private final SkinUtil.Skin skin;
+    /** 스킨 이름 */
+    @NonNull
+    private final String skinName;
     /** 역할군 */
+    @NonNull
     private final Role role;
     /** 체력 */
     private final int health;
     /** 이동속도 계수 */
-    private final float speedMultiplier;
+    private final double speedMultiplier;
     /** 히트박스 크기 계수 */
-    private final float hitboxMultiplier;
+    private final double hitboxMultiplier;
 
     /**
      * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
@@ -35,7 +38,7 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @return 액션바 문자열
      */
-    public abstract String getActionbarString(CombatUser combatUser);
+    public abstract String getActionbarString(@NonNull CombatUser combatUser);
 
     /**
      * 전투원으로 매 틱마다 실행할 작업.
@@ -43,7 +46,20 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @param i          인덱스
      */
-    public void onTick(CombatUser combatUser, long i) {
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        // 미사용
+    }
+
+    /**
+     * 전투원이 걸을 때 실행할 작업.
+     *
+     * <p>주로 발소리 재생에 사용한다.</p>
+     *
+     * @param combatUser 대상 플레이어
+     * @param volume     발소리 음량
+     */
+    public void onFootstep(@NonNull CombatUser combatUser, double volume) {
+        // 미사용
     }
 
     /**
@@ -57,7 +73,7 @@ public abstract class Character {
      * @return 궁극기 충전 여부
      * @see Character#onDamage(CombatUser, Attacker, int, DamageType, boolean)
      */
-    public boolean onAttack(CombatUser attacker, Damageable victim, int damage, DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
         return true;
     }
 
@@ -71,7 +87,8 @@ public abstract class Character {
      * @param isCrit     치명타 여부
      * @see Character#onAttack(CombatUser, Damageable, int, DamageType, boolean)
      */
-    public void onDamage(CombatUser victim, Attacker attacker, int damage, DamageType damageType, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, boolean isCrit) {
+        // 미사용
     }
 
     /**
@@ -83,7 +100,7 @@ public abstract class Character {
      * @return 궁극기 충전 여부
      * @see Character#onTakeHeal(CombatUser, Healer, int)
      */
-    public boolean onGiveHeal(CombatUser provider, Healable target, int amount) {
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
         return true;
     }
 
@@ -95,7 +112,8 @@ public abstract class Character {
      * @param amount   치유량
      * @see Character#onGiveHeal(CombatUser, Healable, int)
      */
-    public void onTakeHeal(CombatUser target, Healer provider, int amount) {
+    public void onTakeHeal(@NonNull CombatUser target, Healer provider, int amount) {
+        // 미사용
     }
 
     /**
@@ -105,7 +123,8 @@ public abstract class Character {
      * @param victim   피격자
      * @see Character#onDeath(CombatUser, Attacker)
      */
-    public void onKill(CombatUser attacker, Damageable victim) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+        // 미사용
     }
 
     /**
@@ -115,12 +134,38 @@ public abstract class Character {
      * @param attacker 공격자
      * @see Character#onKill(CombatUser, Damageable)
      */
-    public void onDeath(CombatUser victim, Attacker attacker) {
+    public void onDeath(@NonNull CombatUser victim, Attacker attacker) {
+        // 미사용
     }
+
+    /**
+     * 전투원이 기본 근접 공격을 사용할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 근접 공격을 사용할 수 있으면 {@code true} 반환
+     */
+    public abstract boolean canUseMeleeAttack(@NonNull CombatUser combatUser);
+
+    /**
+     * 전투원이 달리기를 할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 달리기 가능 여부
+     */
+    public abstract boolean canSprint(@NonNull CombatUser combatUser);
+
+    /**
+     * 전투원이 점프를 할 수 있는 지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 점프 가능 여부
+     */
+    public abstract boolean canJump(@NonNull CombatUser combatUser);
 
     /**
      * @return 무기 정보
      */
+    @NonNull
     public abstract WeaponInfo getWeaponInfo();
 
     /**
@@ -142,5 +187,6 @@ public abstract class Character {
     /**
      * @return 궁극기 정보
      */
+    @NonNull
     public abstract UltimateSkillInfo getUltimateSkillInfo();
 }

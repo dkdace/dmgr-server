@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.Disposable;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
@@ -43,6 +45,15 @@ public interface CombatEntity extends Disposable {
     Hitbox[] getHitboxes();
 
     /**
+     * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
+     *
+     * @param location 대상 위치
+     * @return 가장 가까운 히트박스까지의 방향
+     */
+    @NonNull
+    Location getNearestLocationOfHitboxes(@NonNull Location location);
+
+    /**
      * @return 이름
      */
     @NonNull
@@ -69,6 +80,25 @@ public interface CombatEntity extends Disposable {
     double getMaxHitboxSize();
 
     /**
+     * @return 넉백 모듈
+     */
+    @NonNull
+    KnockbackModule getKnockbackModule();
+
+    /**
+     * @return 상태 효과 모듈
+     */
+    @NonNull
+    StatusEffectModule getStatusEffectModule();
+
+    /**
+     * 엔티티가 활성화 되었는지 확인한다.
+     *
+     * @return 엔티티 활성화 여부
+     */
+    boolean isActivated();
+
+    /**
      * 엔티티 활성화 작업을 수행한다.
      */
     void activate();
@@ -83,54 +113,19 @@ public interface CombatEntity extends Disposable {
     boolean isEnemy(@NonNull CombatEntity combatEntity);
 
     /**
-     * 엔티티가 해당 위치를 통과할 수 있는 지 확인한다.
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
-     * @param location 대상 위치
-     * @return 통과 가능하면 {@code true} 반환
+     * @param velocity 속도
+     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
      */
-    boolean canPass(@NonNull Location location);
+    void push(@NonNull Vector velocity, boolean isReset);
 
     /**
-     * 엔티티가 대상 엔티티의 위치를 통과할 수 있는 지 확인한다.
+     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
-     * @param combatEntity 대상 엔티티
-     * @return 통과 가능하면 {@code true} 반환
+     * @param velocity 속도
      */
-    boolean canPass(@NonNull CombatEntity combatEntity);
-
-    /**
-     * 엔티티에게 상태 효과를 적용한다.
-     *
-     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
-     * 남은 시간보다 길 경우에만 적용한다.</p>
-     *
-     * @param statusEffectType 적용할 상태 효과 종류
-     * @param duration         지속시간 (tick)
-     */
-    void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration);
-
-    /**
-     * 엔티티의 지정한 상태 효과의 남은 시간을 반환한다.
-     *
-     * @param statusEffectType 확인할 상태 효과 종류
-     * @return 남은 시간 (tick)
-     */
-    long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType);
-
-    /**
-     * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
-     *
-     * @param statusEffectType 확인할 상태 효과 종류
-     * @return 상태 효과를 가지고 있으면 {@code true} 반환
-     */
-    boolean hasStatusEffect(@NonNull StatusEffectType statusEffectType);
-
-    /**
-     * 엔티티의 상태 효과를 제거한다.
-     *
-     * @param statusEffectType 제거할 상태 효과 종류
-     */
-    void removeStatusEffect(@NonNull StatusEffectType statusEffectType);
+    void push(@NonNull Vector velocity);
 
     /**
      * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.
@@ -138,18 +133,4 @@ public interface CombatEntity extends Disposable {
      * @return 지정할 수 있으면 {@code true} 반환
      */
     boolean canBeTargeted();
-
-    /**
-     * 엔티티의 생명 주기.
-     */
-    enum LifeCycle {
-        /** 활성화 안 됨 */
-        NOT_ACTIVATED,
-        /** 활성화 중 */
-        ACTIVATING,
-        /** 활성화 완료 */
-        ACTIVATED,
-        /** 제거 */
-        REMOVED,
-    }
 }

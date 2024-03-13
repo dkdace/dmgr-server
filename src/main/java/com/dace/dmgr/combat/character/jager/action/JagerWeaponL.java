@@ -26,13 +26,16 @@ import org.bukkit.util.Vector;
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
     /** 재장전 모듈 */
+    @NonNull
     private final ReloadModule reloadModule;
     /** 2중 무기 모듈 */
+    @NonNull
     private final SwapModule<JagerWeaponR> swapModule;
     /** 정조준 모듈 */
+    @NonNull
     private final AimModule aimModule;
 
-    public JagerWeaponL(CombatUser combatUser) {
+    public JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
@@ -68,12 +71,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                     return;
                 }
 
-                new JagerWeaponProjectile().shoot(JagerWeaponInfo.SPREAD);
+                Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
+                new JagerWeaponLProjectile().shoot(dir);
+                playShootSound(combatUser.getEntity().getLocation());
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 setCooldown();
                 reloadModule.consume(1);
-                playShootSound(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -101,8 +105,10 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onCancelled() {
         if (swapModule.getSwapState() == SwapState.SECONDARY)
             swapModule.getSubweapon().onCancelled();
-        else
+        else {
             super.onCancelled();
+            reloadModule.setReloading(false);
+        }
     }
 
     /**
@@ -190,25 +196,33 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerWeaponL");
     }
 
-    private class JagerWeaponProjectile extends Projectile {
-        public JagerWeaponProjectile() {
+    @Override
+    public void reset() {
+        super.reset();
+
+        reloadModule.setRemainingAmmo(JagerWeaponInfo.CAPACITY);
+        swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
+    }
+
+    private class JagerWeaponLProjectile extends Projectile {
+        private JagerWeaponLProjectile() {
             super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
                     .maxDistance(JagerWeaponInfo.DISTANCE).condition(JagerWeaponL.this.combatUser::isEnemy).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
         }
 
         @Override
-        public boolean onHitBlock(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
             JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
             return false;

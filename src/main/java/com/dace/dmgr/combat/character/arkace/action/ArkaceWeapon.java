@@ -23,11 +23,13 @@ import org.bukkit.util.Vector;
 @Getter
 public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
+    @NonNull
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
+    @NonNull
     private final GradualSpreadModule fullAutoModule;
 
-    public ArkaceWeapon(CombatUser combatUser) {
+    public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600, ArkaceWeaponInfo.SPREAD.INCREMENT,
@@ -64,14 +66,16 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 Location loc = combatUser.getEntity().getLocation();
 
                 if (isUlt) {
-                    new ArkaceWeaponHitscan(true).shoot(0);
+                    new ArkaceWeaponHitscan(true).shoot();
                     playUltShootSound(loc);
                 } else {
-                    new ArkaceWeaponHitscan(false).shoot(fullAutoModule.increaseSpread());
+                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), fullAutoModule.increaseSpread());
+                    new ArkaceWeaponHitscan(false).shoot(dir);
+                    playShootSound(loc);
+
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     reloadModule.consume(1);
-                    playShootSound(loc);
                 }
 
                 break;
@@ -82,6 +86,12 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 break;
             }
         }
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        reloadModule.setReloading(false);
     }
 
     /**
@@ -149,16 +159,23 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         // 미사용
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        reloadModule.setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
+    }
+
     private class ArkaceWeaponHitscan extends GunHitscan {
         private final boolean isUlt;
 
-        public ArkaceWeaponHitscan(boolean isUlt) {
+        private ArkaceWeaponHitscan(boolean isUlt) {
             super(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build());
             this.isUlt = isUlt;
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
@@ -168,7 +185,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (isUlt)
                 target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, isCrit, false);
             else {

@@ -1,17 +1,20 @@
 package com.dace.dmgr.combat.character.jager;
 
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.statuseffect.Snare;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
 
 /**
  * 전투원 - 예거 특성 클래스.
@@ -24,9 +27,45 @@ public final class JagerTrait {
      * @param victim 피격자
      * @param amount 증가량
      */
-    public static void addFreezeValue(CombatEntity victim, int amount) {
+    public static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
-        CooldownUtil.setCooldown(victim, Cooldown.JAGER_FREEZE_VALUE_DURATION);
+        victim.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, FreezeValue.instance, JagerT1Info.DURATION);
+    }
+
+    /**
+     * 빙결 수치 상태 효과 클래스.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FreezeValue extends Slow {
+        private static final FreezeValue instance = new FreezeValue();
+
+        @Override
+        @NonNull
+        public String getName() {
+            return super.getName() + "JagerTrait";
+        }
+
+        @Override
+        public void onStart(@NonNull CombatEntity combatEntity) {
+            // 미사용
+        }
+
+        @Override
+        public void onTick(@NonNull CombatEntity combatEntity, long i) {
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
+                    1, 0.25, 0, 0.25, 0);
+
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("JagerT1",
+                        -combatEntity.getPropertyManager().getValue(Property.FREEZE));
+        }
+
+        @Override
+        public void onEnd(@NonNull CombatEntity combatEntity) {
+            combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("JagerT1");
+        }
     }
 
     /**

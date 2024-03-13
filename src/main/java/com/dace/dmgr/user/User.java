@@ -7,18 +7,22 @@ import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import com.keenant.tabbed.item.TextTabItem;
+import com.keenant.tabbed.tablist.TableTabList;
+import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -27,6 +31,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.permissions.ServerOperator;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
@@ -55,6 +60,13 @@ public final class User implements Disposable {
     /** 플레이어 사이드바 */
     @Getter
     private BPlayerBoard sidebar;
+    /** 플레이어 탭리스트 */
+    @Getter
+    private TableTabList tabList;
+    /** 현재 핑 (ms) */
+    @Getter
+    @Setter
+    private int ping = 0;
     /** 리소스팩 적용 여부 */
     private boolean resourcePack = false;
     /** 리소스팩 적용 상태 */
@@ -100,6 +112,13 @@ public final class User implements Disposable {
      */
     void onDataInit() {
         sidebar = new BPlayerBoard(player, "lobby");
+        tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
+        if (tabList == null)
+            tabList = DMGR.getTabbed().newTableTabList(player);
+        HologramUtil.addHologram(player.getName(), player.getLocation(), userData.getDisplayName());
+        HologramUtil.bindHologram(player.getName(), player, 0, 2.25, 0);
+        HologramUtil.setHologramVisibility(player.getName(), false, player);
+
         TaskUtil.addTask(User.this, new IntervalTask(i -> User.this.onSecond(), 20));
 
         if (!userData.getConfig().isKoreanChat())
@@ -115,10 +134,11 @@ public final class User implements Disposable {
         checkAccess();
 
         reset();
-        clearBossBar();
         TaskUtil.clearTask(this);
         sidebar.delete();
+        tabList.disable();
         nameTagHider.remove();
+        HologramUtil.removeHologram(player.getName());
 
         GameUser gameUser = GameUser.fromUser(User.this);
         if (gameUser != null)
@@ -185,7 +205,7 @@ public final class User implements Disposable {
     }
 
     /**
-     * 로비에 있을 때 매 초마다 실행할 작업.
+     * 매 초마다 실행할 작업.
      */
     private boolean onSecond() {
         if (userData.getConfig().isNightVision())
@@ -193,9 +213,10 @@ public final class User implements Disposable {
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-        if (CombatUser.fromUser(this) == null) {
+        if (CombatUser.fromUser(this) == null)
             updateSidebar();
-        }
+        if (GameUser.fromUser(this) == null || GameUser.fromUser(this).getGame().getPhase() == Game.Phase.WAITING)
+            updateTablist();
 
         return true;
     }
@@ -230,7 +251,7 @@ public final class User implements Disposable {
                 "§e보유 중인 돈",
                 "§6" + String.format("%,d", userData.getMoney()),
                 "§f§f",
-                "§f레벨 : " + StringFormUtil.getLevelPrefix(userData.getLevel()),
+                "§f레벨 : " + userData.getLevelPrefix(),
                 StringFormUtil.getProgressBar(userData.getXp(), reqXp, ChatColor.DARK_GREEN) + " §2[" + userData.getXp() + "/" + reqXp + "]",
                 "§f§f§f",
                 "§f랭크 : " + userData.getTier().getPrefix(),
@@ -239,39 +260,140 @@ public final class User implements Disposable {
     }
 
     /**
-     * 레벨 상승 시 효과를 재생한다.
-     *
-     * @param level 레벨
+     * 로비 탭리스트를 업데이트한다.
      */
-    public void playLevelUpEffect(int level) {
+    private void updateTablist() {
+        long freeMemory = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+        long totalMemory = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+        long memory = totalMemory - freeMemory;
+        double memoryPercent = (double) memory / totalMemory;
+        double tps = DMGR.getTps();
+
+        ChatColor memoryColor = ChatColor.RED;
+        if (memoryPercent < 0.5)
+            memoryColor = ChatColor.GREEN;
+        else if (memoryPercent < 0.75)
+            memoryColor = ChatColor.YELLOW;
+        else if (memoryPercent < 0.9)
+            memoryColor = ChatColor.GOLD;
+
+        ChatColor pingColor = ChatColor.RED;
+        if (ping < 60)
+            pingColor = ChatColor.GREEN;
+        else if (ping < 120)
+            pingColor = ChatColor.YELLOW;
+        else if (ping < 180)
+            pingColor = ChatColor.GOLD;
+
+        ChatColor tpsColor = ChatColor.GREEN;
+        if (tps < 19)
+            tpsColor = ChatColor.RED;
+        else if (tps < 19.4)
+            tpsColor = ChatColor.GOLD;
+        else if (tps < 19.7)
+            tpsColor = ChatColor.YELLOW;
+
+        tabList.setHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
+        tabList.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
+
+        tabList.set(0, 0, new TextTabItem("§f§l§n 서버 상태 ", 0, Skins.getPlayer("computer_")));
+        tabList.set(0, 2, new TextTabItem(
+                MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
+                0, Skins.getPlayer("FranciRoma")));
+        tabList.set(0, 3, new TextTabItem(
+                MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
+                0, Skins.getPlayer("AddelBurgh")));
+        tabList.set(0, 4, new TextTabItem(
+                MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
+                0, Skins.getPlayer("CommandBlock")));
+        tabList.set(0, 5, new TextTabItem(
+                MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
+                0, Skins.getPlayer("MHF_Steve")));
+        tabList.set(0, 7, new TextTabItem(
+                MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
+                0, Skins.getPlayer(player)));
+        tabList.set(0, 9, new TextTabItem(
+                MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", 0, 0, 0),
+                0, Skins.getPlayer("goldblock")));
+        tabList.set(0, 10, new TextTabItem("§e 탈주 §7:: §c0회 §f(0%)", 0, Skins.getPlayer("MHF_TNT2")));
+        tabList.set(0, 11, new TextTabItem("§e 플레이 시간 §7:: §fnull", 0, Skins.getPlayer("Olaf_C")));
+
+        Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
+                .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) == null && !player2.isOp())
+                .toArray(Player[]::new);
+        for (int i = 0; i < 19; i++) {
+            if (i > lobbyPlayers.length - 1)
+                tabList.remove(1, i + 1);
+            else
+                tabList.set(1, i + 1, new TextTabItem(UserData.fromPlayer(lobbyPlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(lobbyPlayers[i])));
+        }
+
+        tabList.set(1, 0, new TextTabItem(
+                MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyPlayers.length),
+                0, Skins.getDot(ChatColor.GREEN)));
+
+        Player[] gamePlayers = Bukkit.getOnlinePlayers().stream()
+                .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) != null && !player2.isOp())
+                .toArray(Player[]::new);
+        for (int i = 0; i < 19; i++) {
+            if (i > gamePlayers.length - 1)
+                tabList.remove(2, i + 1);
+            else
+                tabList.set(2, i + 1, new TextTabItem(UserData.fromPlayer(gamePlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(gamePlayers[i])));
+        }
+
+        tabList.set(2, 0, new TextTabItem(
+                MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gamePlayers.length),
+                0, Skins.getDot(ChatColor.RED)));
+
+        Player[] adminPlayers = Bukkit.getOnlinePlayers().stream()
+                .filter(ServerOperator::isOp)
+                .toArray(Player[]::new);
+        for (int i = 0; i < 19; i++) {
+            if (i > adminPlayers.length - 1)
+                tabList.remove(3, i + 1);
+            else
+                tabList.set(3, i + 1, new TextTabItem(UserData.fromPlayer(adminPlayers[i]).getDisplayName(), 0,
+                        Skins.getPlayer(adminPlayers[i])));
+        }
+
+        tabList.set(3, 0, new TextTabItem(
+                MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminPlayers.length),
+                0, Skins.getDot(ChatColor.AQUA)));
+
+        tabList.batchUpdate();
+    }
+
+    /**
+     * 레벨 상승 시 효과를 재생한다.
+     */
+    public void playLevelUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
             SoundUtil.play("random.good", player, 10, 1);
-            sendTitle(StringFormUtil.getLevelPrefix(level) + " §e§l달성!", "", 8,
+            sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", 8,
                     40, 30, 40);
         }, 100));
     }
 
     /**
      * 티어 승급 시 효과를 재생한다.
-     *
-     * @param tier 티어
      */
-    public void playTierUpEffect(@NonNull Tier tier) {
+    public void playTierUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
             SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, player, 10, 1.5);
-            sendTitle("§b§l등급 상승", tier.getPrefix(), 8, 40, 30, 40);
+            sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }
 
     /**
      * 티어 강등 시 효과를 재생한다.
-     *
-     * @param tier 티어
      */
-    public void playTierDownEffect(@NonNull Tier tier) {
+    public void playTierDownEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
             SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, player, 10, 0.5);
-            sendTitle("§c§l등급 강등", tier.getPrefix(), 8, 40, 30, 40);
+            sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }
 
@@ -287,9 +409,13 @@ public final class User implements Disposable {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
+        HologramUtil.setHologramVisibility(player.getName(), true, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+        HologramUtil.setHologramVisibility(player.getName(), false, player);
+        Bukkit.getOnlinePlayers().forEach(player2 -> GlowUtil.removeGlowing(player, player2));
 
-        sidebar.delete();
-        sidebar = new BPlayerBoard(player, "lobby");
+        sidebar.clear();
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
         if (DMGR.getPlugin().isEnabled())

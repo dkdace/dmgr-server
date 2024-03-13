@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
-import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -33,19 +32,6 @@ public final class AimModule {
     private boolean isAiming = false;
 
     /**
-     * 플레이어에게 화면 확대 효과를 재생한다.
-     *
-     * @param value 값
-     */
-    private void playZoomEffect(double value) {
-        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
-
-        packet.setWalkingSpeed((float) (weapon.getCombatUser().getEntity().getWalkSpeed() * value));
-
-        packet.sendPacket(weapon.getCombatUser().getEntity());
-    }
-
-    /**
      * 무기 정조준을 활성화 또는 비활성화한다.
      */
     public void toggleAim() {
@@ -57,17 +43,18 @@ public final class AimModule {
         if (isAiming) {
             weapon.onAimEnable();
 
-            TaskUtil.addTask(weapon, new IntervalTask(i -> {
+            TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
                 if (!isAiming)
                     return false;
                 if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return false;
 
-                playZoomEffect(zoomLevel.getValue());
+                weapon.getCombatUser().setFovValue(zoomLevel.getValue());
 
                 return true;
             }, isCancelled -> {
                 isAiming = false;
+                weapon.getCombatUser().setFovValue(0);
                 weapon.onAimDisable();
             }, 1));
         }

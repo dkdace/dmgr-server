@@ -4,31 +4,35 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.*;
+import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.inventivetalent.glow.GlowAPI;
+
+import java.util.function.Predicate;
 
 /**
  * 예거 - 눈폭풍 발생기 클래스.
  */
-public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
+public final class JagerUltEntity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerUlt skill;
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -37,19 +41,25 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     @NonNull
     @Getter
     private final DamageModule damageModule;
+    /** 준비 시간 모듈 */
+    @NonNull
+    @Getter
+    private final ReadyTimeModule readyTimeModule;
 
     public JagerUltEntity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
         super(
                 entity,
                 owner.getName() + "의 눈폭풍 발생기",
                 owner,
-                JagerUltInfo.SUMMON_DURATION,
                 true,
                 new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
+        knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
+        readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
         onInit();
     }
@@ -60,7 +70,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
         entity.setSilent(true);
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
         SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
 
         damageModule.setMaxHealth(JagerUltInfo.HEALTH);
@@ -68,40 +78,51 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
     }
 
     @Override
-    public void onTickBeforeActivation(long i) {
+    public void activate() {
+        super.activate();
+        readyTimeModule.ready();
+    }
+
+    @Override
+    public void onTickBeforeReady(long i) {
         if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
             entity.teleport(entity.getLocation().add(0, 0.2, 0));
-        playReadyEffect();
+        playBeforeReadyEffect();
         playTickEffect();
     }
 
     /**
      * 준비 대기 시간의 효과를 재생한다.
      */
-    private void playReadyEffect() {
+    private void playBeforeReadyEffect() {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
         SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, entity.getLocation(), 0.8, 1.7);
     }
 
     @Override
-    protected void onTickAfterActivation(long i) {
+    public void onReady() {
+        // 미사용
+    }
+
+    @Override
+    protected void onTick(long i) {
+        playTickEffect();
+        if (!readyTimeModule.isReady())
+            return;
+
         double range = Math.min(JagerUltInfo.MIN_RADIUS + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
                 JagerUltInfo.MAX_RADIUS);
         playTickEffect(i, range);
 
         if (i % 4 == 0) {
-            CombatEntity[] targets = CombatUtil.getNearEnemies(this, entity.getLocation(), range,
-                    combatEntity -> combatEntity instanceof Damageable &&
-                            combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY() &&
-                            canPass(combatEntity));
-            for (CombatEntity target : targets) {
-                onFindEnemy((Damageable) target);
-            }
+            Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this);
+            CombatEntity[] targets = CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition.and(combatEntity ->
+                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY()));
+
+            new JagerUltArea(condition, targets, range).emit(entity.getLocation());
         }
         if (i >= JagerUltInfo.DURATION)
             dispose();
-
-        playTickEffect();
     }
 
     /**
@@ -112,16 +133,6 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
                 96, 220, 255);
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 3, 0.15, 0.02, 0.15,
                 80, 80, 100);
-    }
-
-    /**
-     * 적을 찾았을 때 실행할 작업.
-     *
-     * @param target 대상 엔티티
-     */
-    private void onFindEnemy(@NonNull Damageable target) {
-        target.getDamageModule().damage(this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.ENTITY, false, false);
-        JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
     }
 
     /**
@@ -201,5 +212,25 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Dam
         SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2F, 0.7F);
         SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 2F, 0.7F);
         SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2F, 1.2F);
+    }
+
+    private class JagerUltArea extends Area {
+        private JagerUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets, double radius) {
+            super(JagerUltEntity.this, radius, condition, targets);
+        }
+
+        @Override
+        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.NORMAL,
+                    false, false);
+            JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
+
+            return true;
+        }
     }
 }

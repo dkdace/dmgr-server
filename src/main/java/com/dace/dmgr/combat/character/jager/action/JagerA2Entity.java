@@ -2,32 +2,37 @@ package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.SummonEntity;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
+import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.inventivetalent.glow.GlowAPI;
 
 /**
  * 예거 - 곰덫 클래스.
  */
-public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Damageable, Attacker {
+public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
     /** 스킬 객체 */
     private final JagerA2 skill;
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -36,19 +41,25 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     @NonNull
     @Getter
     private final DamageModule damageModule;
+    /** 준비 시간 모듈 */
+    @NonNull
+    @Getter
+    private final ReadyTimeModule readyTimeModule;
 
     public JagerA2Entity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
         super(
                 entity,
                 owner.getName() + "의 곰덫",
                 owner,
-                JagerA2Info.SUMMON_DURATION,
                 true,
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
+        knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
+        readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
         onInit();
     }
@@ -60,7 +71,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         entity.teleport(entity.getLocation().add(0, 0.05, 0));
-        GlowAPI.setGlowing(entity, GlowAPI.Color.WHITE, owner.getEntity());
+        GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
         playInitSound();
 
         damageModule.setMaxHealth(JagerA2Info.HEALTH);
@@ -77,23 +88,30 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
     }
 
     @Override
-    protected void onTickBeforeActivation(long i) {
+    public void activate() {
+        super.activate();
+        readyTimeModule.ready();
+    }
+
+    @Override
+    public void onTickBeforeReady(long i) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
                 120, 120, 135);
         playTickEffect();
     }
 
     @Override
-    protected void onActivate() {
-        super.onActivate();
-
+    public void onReady() {
         SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
     }
 
     @Override
-    protected void onTickAfterActivation(long i) {
-        Damageable target = (Damageable) CombatUtil.getNearEnemy(this, entity.getLocation(), 0.8,
-                combatEntity -> combatEntity instanceof Damageable && canPass(combatEntity));
+    protected void onTick(long i) {
+        if (!readyTimeModule.isReady())
+            return;
+
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
+                combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this));
         if (target != null)
             onCatchEnemy(target);
 
@@ -134,8 +152,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements Dama
      */
     private void onCatchEnemy(@NonNull Damageable target) {
         playCatchSound();
-        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.ENTITY, false, true);
-        target.applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
+        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, false, true);
+        target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
 
         dispose();
     }

@@ -2,6 +2,8 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -24,7 +26,14 @@ import java.util.List;
  */
 @Getter
 public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
+    /** 넉백 모듈 */
+    @NonNull
+    private final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    private final StatusEffectModule statusEffectModule;
     /** 피해 모듈 */
+    @NonNull
     private final DamageModule damageModule;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
@@ -39,9 +48,11 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         super(entity, "훈련용 봇", null,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
-                new Hitbox(entity.getLocation(), 0.45, 0.45, 0.45, 0, 0.225, 0, 0, 1.5, 0),
+                new Hitbox(entity.getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.5, 0),
                 new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
         );
+        knockbackModule = new KnockbackModule(this);
+        statusEffectModule = new StatusEffectModule(this);
         damageModule = new DamageModule(this, true, maxHealth);
         critHitbox = hitboxes[3];
 
@@ -50,6 +61,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
 
     private void onInit() {
         entity.setBaby(false);
+        entity.setSilent(true);
         entity.setAI(false);
 
         List<ItemStack> equipment = new ArrayList<>();
@@ -71,12 +83,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
-    public void activate() {
-        onActivate();
-    }
-
-    @Override
-    protected void onTickAfterActivation(long i) {
+    protected void onTick(long i) {
         // 미사용
     }
 

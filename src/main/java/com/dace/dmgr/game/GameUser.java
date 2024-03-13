@@ -3,22 +3,31 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import com.keenant.tabbed.item.TextTabItem;
+import com.keenant.tabbed.tablist.TableTabList;
+import com.keenant.tabbed.util.Skins;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
+import java.util.Comparator;
 
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
@@ -26,6 +35,8 @@ import java.text.MessageFormat;
 public final class GameUser implements Disposable {
     /** 스폰 지역 확인 Y 좌표 */
     private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
+    /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
+    private static final int HEAD_REVEAL_TIME_AFTER_GAME_START = 20;
     /** 플레이어 객체 */
     @NonNull
     @Getter
@@ -38,6 +49,8 @@ public final class GameUser implements Disposable {
     @NonNull
     @Getter
     private final Game game;
+    /** 플레이어 탭리스트 */
+    private final TableTabList tabList;
     /** 전투 플레이어 객체 */
     private CombatUser combatUser = null;
     /** 팀 */
@@ -91,12 +104,13 @@ public final class GameUser implements Disposable {
         this.user = user;
         this.player = user.getPlayer();
         this.game = game;
+        tabList = user.getTabList();
 
-        game.addPlayer(this);
         GameUserRegistry.getInstance().add(user, this);
+        game.addPlayer(this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick();
+            onTick(i);
             return true;
         }, 1));
     }
@@ -113,21 +127,25 @@ public final class GameUser implements Disposable {
 
     /**
      * 매 tick마다 실행할 작업.
+     *
+     * @param i 인덱스
      */
-    private void onTick() {
-        if (combatUser == null)
+    private void onTick(long i) {
+        if (combatUser == null || game.getPhase() == Game.Phase.WAITING)
             return;
 
         if (getSpawnRegionTeam() != null) {
-            if (game.getPhase() == Game.Phase.READY)
-                return;
-
-            if (getSpawnRegionTeam() == team)
-                onTickTeamSpawn();
-            else
-                onTickOppositeSpawn();
+            if (game.getPhase() == Game.Phase.PLAYING) {
+                if (getSpawnRegionTeam() == team)
+                    onTickTeamSpawn();
+                else
+                    onTickOppositeSpawn();
+            }
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
             user.teleport(getRespawnLocation());
+
+        if (i % 20 == 0)
+            updateGameTablist();
     }
 
     /**
@@ -136,7 +154,7 @@ public final class GameUser implements Disposable {
     private void onTickTeamSpawn() {
         player.getInventory().setHeldItemSlot(4);
 
-        if (game.getPhase() == Game.Phase.PLAYING)
+        if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
 
@@ -151,7 +169,7 @@ public final class GameUser implements Disposable {
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
         combatUser.getDamageModule().damage((Attacker) null,
-                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.SYSTEM, false, false);
+                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.NORMAL, false, false);
     }
 
     /**
@@ -180,12 +198,62 @@ public final class GameUser implements Disposable {
         player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
         user.teleport(getRespawnLocation());
         user.clearChat();
+        HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+        game.getGameUsers().forEach(gameUser2 -> {
+            if (gameUser2.team == team)
+                GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+        });
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
 
         if (combatUser == null)
             combatUser = new CombatUser(user);
+    }
+
+    /**
+     * 게임 탭리스트를 업데이트한다.
+     */
+    private void updateGameTablist() {
+        tabList.setHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
+                "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
+                game.getTeamScore().get(Team.RED), game.getTeamScore().get(Team.BLUE)));
+        tabList.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
+
+        boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
+                game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
+
+        int column = 0;
+        for (Team team2 : Team.values()) {
+            if (team2 == Team.NONE)
+                continue;
+
+            column++;
+            tabList.set(column, 0, new TextTabItem(
+                    MessageFormat.format("{0}§l§n {1} §f({2}명)", team2.getColor(), team2.getName(), game.getTeamUserMap().get(team2).size()),
+                    0, Skins.getDot(team2.getColor())));
+
+            GameUser[] teamUsers = game.getTeamUserMap().get(team2).stream()
+                    .sorted(Comparator.comparing(GameUser::getScore).reversed())
+                    .toArray(GameUser[]::new);
+
+            for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
+                if (i > teamUsers.length - 1) {
+                    tabList.remove(column, (i + 1) * 3 - 2);
+                    tabList.remove(column, (i + 1) * 3 - 1);
+                } else {
+                    tabList.set(column, (i + 1) * 3 - 2, new TextTabItem(UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(), 0,
+                            this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("question_mark_")));
+                    tabList.set(column, (i + 1) * 3 - 1, new TextTabItem(
+                            MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}", teamUsers[i].getScore(),
+                                    TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(), "✔", teamUsers[i].getAssist())));
+                }
+            }
+        }
+
+        tabList.batchUpdate();
     }
 
     /**
@@ -205,12 +273,14 @@ public final class GameUser implements Disposable {
      */
     @NonNull
     public Location getRespawnLocation() {
+        if (game.getWorld() == null)
+            return LocationUtil.getLobbyLocation();
         if (team == Team.RED)
             return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
-                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+                    .toLocation(game.getWorld());
         else if (team == Team.BLUE)
             return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
-                    .toLocation(Bukkit.getWorld(game.getWorldName()));
+                    .toLocation(game.getWorld());
 
         return LocationUtil.getLobbyLocation();
     }

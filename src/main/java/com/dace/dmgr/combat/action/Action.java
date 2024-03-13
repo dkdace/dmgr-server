@@ -21,14 +21,18 @@ public interface Action extends Disposable {
     /**
      * @return 동작 정보 객체
      */
-    @NonNull
     ActionInfo getActionInfo();
 
     /**
      * @return 아이템 객체
      */
-    @NonNull
     ItemStack getItemStack();
+
+    /**
+     * @return 동작 태스크 실행 객체
+     */
+    @NonNull
+    Object getTaskRunner();
 
     /**
      * 기본 사용 키 목록을 반환한다.

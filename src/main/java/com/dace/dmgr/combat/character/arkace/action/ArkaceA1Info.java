@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
 
 public final class ArkaceA1Info extends ActiveSkillInfo {
@@ -15,7 +15,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     /** 투사체 속력 */
     public static final int VELOCITY = 60;
     /** 피해 범위 */
-    public static final int RADIUS = 3;
+    public static final double RADIUS = 3;
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 

@@ -1,5 +1,7 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.gui.SelectChar;
 import com.dace.dmgr.user.User;
@@ -16,10 +18,13 @@ public final class OnPlayerSwapHandItems implements Listener {
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
+        CombatUser combatUser = CombatUser.fromUser(user);
 
         if (gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) {
-            event.setCancelled(true);
             SelectChar.getInstance().open(player);
+            return;
         }
+        if (combatUser != null && combatUser.getCharacterType() != null)
+            combatUser.useAction(ActionKey.SWAP_HAND);
     }
 }

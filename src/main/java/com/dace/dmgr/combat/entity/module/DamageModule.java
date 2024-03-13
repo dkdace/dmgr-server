@@ -24,12 +24,12 @@ import org.bukkit.entity.LivingEntity;
  */
 @Getter
 public class DamageModule {
-    /** 기본값 */
+    /** 방어력 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
     @NonNull
     protected final Damageable combatEntity;
-    /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부. */
+    /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부 */
     protected final boolean isUltProvider;
     /** 방어력 배수 값 */
     @NonNull
@@ -109,6 +109,46 @@ public class DamageModule {
     }
 
     /**
+     * 엔티티의 피해 로직을 처리한다.
+     *
+     * @param attacker          공격자
+     * @param damage            피해량
+     * @param damageMultiplier  공격력 배수
+     * @param defenseMultiplier 방어력 배수
+     * @param damageType        피해 타입
+     * @param isCrit            치명타 여부
+     * @param isUlt             궁극기 충전 여부
+     */
+    private void handleDamage(Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
+                              @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
+            return;
+
+        if (isCrit)
+            damage *= 2;
+
+        int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
+        if (getHealth() - finalDamage < 0)
+            finalDamage = getHealth();
+        int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
+        if (getHealth() - reducedDamage < 0)
+            reducedDamage = getHealth();
+
+        if (attacker != null)
+            attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
+        combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, isCrit, isUlt);
+        playHitEffect();
+
+        if (getHealth() > finalDamage)
+            setHealth(getHealth() - finalDamage);
+        else {
+            if (attacker != null)
+                attacker.onKill(combatEntity);
+            combatEntity.onDeath(attacker);
+        }
+    }
+
+    /**
      * 엔티티에게 피해를 입힌다.
      *
      * @param attacker   공격자
@@ -118,31 +158,12 @@ public class DamageModule {
      * @param isUlt      궁극기 충전 여부
      */
     public final void damage(Attacker attacker, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
-            return;
-
-        if (isCrit)
-            damage *= 2;
-
-        double damageMultiplier = attacker == null ?
+        double damageMultiplier = attacker == null || damageType == DamageType.AREA ?
                 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
-        double defenseMultiplier = damageType == DamageType.SYSTEM ?
+        double defenseMultiplier = attacker == null ?
                 1 : defenseMultiplierStatus.getValue();
-        int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
-        int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
 
-        if (attacker != null)
-            attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
-        combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, isCrit, isUlt);
-        playHitEffect();
-
-        if (getHealth() - finalDamage > 0)
-            setHealth(getHealth() - finalDamage);
-        else {
-            if (attacker != null)
-                attacker.onKill(combatEntity);
-            combatEntity.onDeath(attacker);
-        }
+        handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, isCrit, isUlt);
     }
 
     /**
@@ -156,8 +177,12 @@ public class DamageModule {
      */
     public final void damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         CombatEntity attacker = projectile.getShooter();
-        if (attacker instanceof Attacker)
-            damage((Attacker) attacker, damage, damageType, isCrit, isUlt);
+        if (attacker instanceof Attacker) {
+            double damageMultiplier = projectile.getDamageIncrement();
+            double defenseMultiplier = defenseMultiplierStatus.getValue();
+
+            handleDamage((Attacker) attacker, damage, damageMultiplier, defenseMultiplier, damageType, isCrit, isUlt);
+        }
     }
 
     /**

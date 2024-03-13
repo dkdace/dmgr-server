@@ -1,12 +1,10 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -15,9 +13,12 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * {@link CombatEntity}의 기본 구현체, 모든 전투 시스템 엔티티의 기반 클래스.
@@ -40,9 +41,8 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     /** 히트박스 객체 목록 */
     @NonNull
     protected final Hitbox[] hitboxes;
-    /** 생명 주기 */
-    @NonNull
-    protected LifeCycle lifeCycle = LifeCycle.NOT_ACTIVATED;
+    /** 활성화 여부 */
+    protected boolean isActivated = false;
     /** 히트박스의 가능한 최대 크기. (단위: 블록) */
     private double maxHitboxSize = 0;
 
@@ -77,15 +77,13 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
         CombatEntityRegistry.getInstance().add(entity, this);
     }
 
-    /**
-     * 엔티티 활성화 완료 시 실행할 작업.
-     */
+    @Override
     @MustBeInvokedByOverriders
-    protected void onActivate() {
-        lifeCycle = LifeCycle.ACTIVATED;
+    public void activate() {
+        isActivated = true;
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTickAfterActivation(i);
+            onTick(i);
             updateHitboxTick();
 
             return true;
@@ -93,11 +91,11 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     /**
-     * 활성화 완료 후 매 틱마다 실행할 작업.
+     * 엔티티가 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */
-    protected abstract void onTickAfterActivation(long i);
+    protected abstract void onTick(long i);
 
     /**
      * 엔티티의 히트박스를 업데이트한다.
@@ -113,11 +111,18 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     @Override
+    @NonNull
+    public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
+        return Arrays.stream(hitboxes).map(hitbox -> hitbox.getNearestLocation(location))
+                .min(Comparator.comparing(loc -> loc.distance(location)))
+                .get();
+    }
+
+    @Override
     @MustBeInvokedByOverriders
     public void dispose() {
         checkAccess();
 
-        lifeCycle = LifeCycle.REMOVED;
         CombatEntityRegistry.getInstance().remove(entity);
         if (game != null)
             game.removeCombatEntity(this);
@@ -136,54 +141,13 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     @Override
-    public boolean canPass(@NonNull Location location) {
-        if (entity.getWorld() != location.getWorld())
-            return false;
-        return LocationUtil.canPass(location, getEntity().getLocation().add(0, 0.1, 0)) ||
-                LocationUtil.canPass(location, getEntity().getLocation().add(0, 1, 0));
+    public final void push(@NonNull Vector velocity, boolean isReset) {
+        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
+            entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
     }
 
     @Override
-    public boolean canPass(@NonNull CombatEntity combatEntity) {
-        if (entity.getWorld() != combatEntity.getEntity().getWorld())
-            return false;
-        return LocationUtil.canPass(combatEntity.getEntity().getLocation().add(0, 0.1, 0),
-                getEntity().getLocation().add(0, 0.1, 0));
-    }
-
-    @Override
-    public final void applyStatusEffect(@NonNull StatusEffectType statusEffectType, long duration) {
-        StatusEffect statusEffect = statusEffectType.getStatusEffect();
-
-        if (!hasStatusEffect(statusEffectType)) {
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getName(), duration);
-
-            statusEffect.onStart(this);
-
-            TaskUtil.addTask(this, new IntervalTask(i -> {
-                if (!hasStatusEffect(statusEffectType))
-                    return false;
-
-                statusEffect.onTick(AbstractCombatEntity.this, i);
-
-                return true;
-            }, isCancelled -> statusEffect.onEnd(AbstractCombatEntity.this), 1));
-        } else if (getStatusEffectDuration(statusEffectType) < duration)
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffect.getName(), duration);
-    }
-
-    @Override
-    public final long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType) {
-        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.getStatusEffect().getName());
-    }
-
-    @Override
-    public final boolean hasStatusEffect(@NonNull StatusEffectType statusEffectType) {
-        return getStatusEffectDuration(statusEffectType) > 0;
-    }
-
-    @Override
-    public final void removeStatusEffect(@NonNull StatusEffectType statusEffectType) {
-        CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.getStatusEffect().getName());
+    public final void push(@NonNull Vector velocity) {
+        push(velocity, false);
     }
 }

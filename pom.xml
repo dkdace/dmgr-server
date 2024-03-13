@@ -77,6 +77,14 @@
             <id>glaremasters</id>
             <url>https://repo.glaremasters.me/repository/concuncan/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -120,13 +128,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.inventivetalent.glow</groupId>
-            <artifactId>GlowAPI</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/GlowAPI_v1.4.6-SNAPSHOT.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>WorldEdit</artifactId>
             <version>1.0</version>
@@ -149,6 +150,16 @@
             <groupId>com.grinderwolf</groupId>
             <artifactId>slimeworldmanager-plugin</artifactId>
             <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thekeenant</groupId>
+            <artifactId>tabbed</artifactId>
+            <version>v1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>me.filoghost.holographicdisplays</groupId>
+            <artifactId>holographicdisplays-api</artifactId>
+            <version>3.0.4</version>
         </dependency>
     </dependencies>
 </project>

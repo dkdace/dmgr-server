@@ -4,6 +4,7 @@ import com.dace.dmgr.game.Tier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.bukkit.Material;
 
 /**
  * 전역 설정 클래스.
@@ -35,6 +36,10 @@ public final class GeneralConfig extends YamlFile {
 
         combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
         combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
+        combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
+        combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
+        combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
+        combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
 
         gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
         gameConfig.normalMinPlayerCount = (int) getLong("normalMinPlayerCount", gameConfig.normalMinPlayerCount);
@@ -74,7 +79,7 @@ public final class GeneralConfig extends YamlFile {
         /** 랭킹 업데이트 주기 (분) */
         private long rankingUpdatePeriod = 5;
         /** 메시지의 접두사 */
-        private String messagePrefix = "§3§l[ §b§lDMGR §3§l] §f";
+        private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
     }
 
     /**
@@ -85,8 +90,16 @@ public final class GeneralConfig extends YamlFile {
     public static final class CombatConfig {
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
-        /** 리스폰 시간 */
+        /** 리스폰 시간 (틱) */
         private int respawnTime = 200;
+        /** 힐 팩에 사용되는 블록의 타입 */
+        private Material healPackBlock = Material.NETHERRACK;
+        /** 힐 팩 쿨타임 (초) */
+        private int healPackCooldown = 15;
+        /** 힐 팩 회복량 */
+        private int healPackHeal = 350;
+        /** 낙사 구역에 사용되는 블록의 타입 */
+        private Material fallZoneBlock = Material.BEDROCK;
     }
 
     /**

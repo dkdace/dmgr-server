@@ -21,7 +21,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketAdapter {
         Player player = event.getPlayer();
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
 
-        if (combatUser != null && combatUser.hasStatusEffect(StatusEffectType.SILENCE))
+        if (combatUser != null && combatUser.getStatusEffectModule().hasStatusEffect(StatusEffectType.SILENCE))
             event.setCancelled(true);
     }
 }

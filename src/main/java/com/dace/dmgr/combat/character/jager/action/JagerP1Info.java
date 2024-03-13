@@ -8,7 +8,7 @@ public final class JagerP1Info extends PassiveSkillInfo {
     /** 이동속도 증가량 */
     public static final int SPEED = 15;
     /** 감지 범위 */
-    public static final int DETECT_RADIUS = 10;
+    public static final double DETECT_RADIUS = 10;
     @Getter
     private static final JagerP1Info instance = new JagerP1Info();
 

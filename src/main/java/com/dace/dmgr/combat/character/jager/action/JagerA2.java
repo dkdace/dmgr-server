@@ -26,7 +26,7 @@ public final class JagerA2 extends ActiveSkill {
     /** 소환한 엔티티 */
     JagerA2Entity entity = null;
 
-    public JagerA2(CombatUser combatUser) {
+    public JagerA2(@NonNull CombatUser combatUser) {
         super(2, combatUser, JagerA2Info.getInstance(), 1);
     }
 
@@ -54,12 +54,9 @@ public final class JagerA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
-
+        combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
+
         Location location = combatUser.getEntity().getLocation();
         setDuration();
         playUseSound(location);
@@ -111,30 +108,30 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     private class JagerA2Projectile extends BouncingProjectile {
-        public JagerA2Projectile() {
+        private JagerA2Projectile() {
             super(JagerA2.this.combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
                     .condition(JagerA2.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
                     0.7, 0, 0.7, 120, 120, 135);
         }
 
         @Override
-        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             return false;
         }
 
         @Override
-        public void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location) {
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             entity = new JagerA2Entity(magmaCube, combatUser);
             entity.activate();

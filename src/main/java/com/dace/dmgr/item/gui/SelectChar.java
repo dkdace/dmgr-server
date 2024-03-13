@@ -60,7 +60,7 @@ public final class SelectChar extends Gui {
                     break;
             }
 
-            guiController.set(j, SelectCharItem.valueOf(characterType.toString()).guiItem);
+            guiController.set(j, CharacterType.valueOf(characterType.toString()).getGuiItem());
         }
     }
 
@@ -119,32 +119,6 @@ public final class SelectChar extends Gui {
                 @Override
                 public boolean isClickable() {
                     return false;
-                }
-            };
-        }
-    }
-
-    @Getter
-    public enum SelectCharItem {
-        ARKACE(CharacterType.ARKACE),
-        JAGER(CharacterType.JAGER);
-
-        /** GUI 아이템 객체 */
-        private final GuiItem<SelectCharItem> guiItem;
-
-        SelectCharItem(CharacterType characterType) {
-            this.guiItem = new GuiItem<SelectCharItem>(this, ItemBuilder.fromPlayerSkull(characterType.getCharacter().getSkin().getUrl())
-                    .setName("§c" + characterType.getCharacter().getName())
-                    .setLore("§f전투원 설명", characterType.toString())
-                    .build()) {
-                @Override
-                public Gui getGui() {
-                    return instance;
-                }
-
-                @Override
-                public boolean isClickable() {
-                    return true;
                 }
             };
         }

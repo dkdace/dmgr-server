@@ -26,7 +26,7 @@ public final class JagerUlt extends UltimateSkill {
     /** 소환한 엔티티 */
     JagerUltEntity entity = null;
 
-    public JagerUlt(CombatUser combatUser) {
+    public JagerUlt(@NonNull CombatUser combatUser) {
         super(4, combatUser, JagerUltInfo.getInstance());
     }
 
@@ -50,12 +50,9 @@ public final class JagerUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        if (((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming()) {
-            ((JagerWeaponL) combatUser.getWeapon()).getAimModule().toggleAim();
-            ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().swap();
-        }
-
+        combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
+
         Location location = combatUser.getEntity().getLocation();
         playUseSound(location);
         setDuration();
@@ -97,30 +94,30 @@ public final class JagerUlt extends UltimateSkill {
     }
 
     private class JagerUltProjectile extends BouncingProjectile {
-        public JagerUltProjectile() {
+        private JagerUltProjectile() {
             super(JagerUlt.this.combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
                     .condition(JagerUlt.this.combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }
 
         @Override
-        public void trail(@NonNull Location location) {
+        protected void trail(@NonNull Location location, @NonNull Vector direction) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
 
         @Override
-        public boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Block hitBlock) {
+        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        public boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector direction, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             return false;
         }
 
         @Override
-        public void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location) {
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             entity = new JagerUltEntity(magmaCube, combatUser);
             entity.activate();

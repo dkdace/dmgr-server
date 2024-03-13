@@ -16,13 +16,16 @@ import org.bukkit.util.Vector;
 public class Hitbox {
     /** 가로. (단위: 블록) */
     @Getter
-    protected final double sizeX;
+    @Setter
+    protected double sizeX;
     /** 높이. (단위: 블록) */
     @Getter
-    protected final double sizeY;
+    @Setter
+    protected double sizeY;
     /** 세로. (단위: 블록) */
     @Getter
-    protected final double sizeZ;
+    @Setter
+    protected double sizeZ;
     /** 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록) */
     @Getter
     @Setter
@@ -109,15 +112,16 @@ public class Hitbox {
     }
 
     /**
-     * 지정한 위치까지의 거리를 반환한다.
+     * 히트박스 안에서 지정한 위치까지 가장 가까운 위치를 반환한다.
      *
      * @param location 확인할 위치
-     * @return 지정한 위치까지의 거리. (단위: 블록)
+     * @return 가장 가까운 위치
      */
-    public final double getDistance(@NonNull Location location) {
+    @NonNull
+    public final Location getNearestLocation(@NonNull Location location) {
         Vector rotVec = VectorUtil.getRotatedVector(
                 VectorUtil.getRotatedVector(location.toVector().subtract(center.toVector()), new Vector(0, 1, 0), center.getYaw()),
-                new Vector(1, 0, 0), center.getPitch());
+                new Vector(1, 0, 0), -center.getPitch());
         Location rotLoc = center.clone().add(rotVec);
         Location cuboidEdge = center.clone().add(
                 (rotLoc.getX() > center.getX() ? 1 : -1) * Math.min(sizeX / 2, Math.abs(rotLoc.getX() - center.getX())),
@@ -125,7 +129,20 @@ public class Hitbox {
                 (rotLoc.getZ() > center.getZ() ? 1 : -1) * Math.min(sizeZ / 2, Math.abs(rotLoc.getZ() - center.getZ()))
         );
 
-        return cuboidEdge.distance(rotLoc);
+        Vector retVec = VectorUtil.getRotatedVector(
+                VectorUtil.getRotatedVector(cuboidEdge.toVector().subtract(center.toVector()), new Vector(1, 0, 0), center.getPitch()),
+                new Vector(0, 1, 0), -center.getYaw());
+        return center.clone().add(retVec);
+    }
+
+    /**
+     * 지정한 위치까지의 거리를 반환한다.
+     *
+     * @param location 확인할 위치
+     * @return 지정한 위치까지의 거리. (단위: 블록)
+     */
+    public final double getDistance(@NonNull Location location) {
+        return getNearestLocation(location).distance(location);
     }
 
     /**

@@ -13,6 +13,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 위치 관련 기능을 제공하는 클래스.
  */
@@ -102,6 +105,22 @@ public final class LocationUtil {
     }
 
     /**
+     * 시작 위치에서 끝 위치로 향하는 방향을 반환한다.
+     *
+     * @param start 시작 위치
+     * @param end   끝 위치
+     * @return 방향
+     * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있으면 발생
+     */
+    @NonNull
+    public static Vector getDirection(@NonNull Location start, @NonNull Location end) {
+        if (start.getWorld() != end.getWorld())
+            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+
+        return end.toVector().subtract(start.toVector()).normalize();
+    }
+
+    /**
      * 두 위치 사이를 통과할 수 있는지 확인한다.
      *
      * <p>각종 스킬의 판정에 사용한다.</p>
@@ -115,7 +134,7 @@ public final class LocationUtil {
         if (start.getWorld() != end.getWorld())
             throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
 
-        Vector direction = end.toVector().subtract(start.toVector()).normalize().multiply(0.25);
+        Vector direction = getDirection(start, end).multiply(0.25);
         Location loc = start.clone();
         double distance = start.distance(end);
 
@@ -125,6 +144,29 @@ public final class LocationUtil {
         }
 
         return true;
+    }
+
+    /**
+     * 두 위치 사이에 있는 지정한 간격의 모든 위치를 반환한다.
+     *
+     * @param start    시작 위치
+     * @param end      끝 위치
+     * @param interval 위치 간 간격
+     * @return 해당 위치 목록
+     */
+    @NonNull
+    public static List<Location> getLine(Location start, Location end, double interval) {
+        Vector direction = getDirection(start, end).multiply(interval);
+        Location loc = start.clone();
+        List<Location> locs = new ArrayList<>();
+        double distance = start.distance(end);
+
+        while (loc.distance(start) < distance) {
+            locs.add(loc.clone());
+            loc.add(direction);
+        }
+
+        return locs;
     }
 
     /**

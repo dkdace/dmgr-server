@@ -2,6 +2,7 @@ package com.dace.dmgr.game.map;
 
 import com.dace.dmgr.game.GamePlayMode;
 import lombok.NonNull;
+import org.bukkit.World;
 
 /**
  * 게임에 사용되는 맵을 관리하는 인터페이스.
@@ -20,10 +21,10 @@ public interface GameMap {
     String getName();
 
     /**
-     * @return 월드 이름
+     * @return 맵 월드
      */
     @NonNull
-    String getWorldName();
+    World getWorld();
 
     /**
      * @return 레드 팀 스폰 위치 목록
@@ -35,4 +36,9 @@ public interface GameMap {
      * @return 블루 팀 스폰 위치 목록
      */
     GlobalLocation @NonNull [] getBlueTeamSpawns();
+
+    /**
+     * @return 힐 팩 위치 목록
+     */
+    GlobalLocation @NonNull [] getHealPackLocations();
 }

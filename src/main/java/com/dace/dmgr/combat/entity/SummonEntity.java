@@ -3,26 +3,22 @@ package com.dace.dmgr.combat.entity;
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
  *
- * @param <T> {@link LivingEntity}를 상속받는 엔티티 타입
+ * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 @Getter
-public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntity<T> {
+public abstract class SummonEntity<T extends Entity> extends TemporalEntity<T> {
     /** 엔티티를 소환한 플레이어 */
     @NonNull
     protected final CombatUser owner;
-    /** 활성화 시간 (tick) */
-    protected final long activationTime;
 
     /**
      * 소환 가능한 엔티티 인스턴스를 생성한다.
@@ -31,39 +27,17 @@ public abstract class SummonEntity<T extends LivingEntity> extends TemporalEntit
      * @param name           이름
      * @param owner          엔티티를 소환한 플레이어
      * @param hideForEnemies 엔티티를 적에게 보이지 할 지 여부
-     * @param activationTime 활성화 시간 (tick)
      * @param hitboxes       히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected SummonEntity(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, long activationTime, boolean hideForEnemies,
+    protected SummonEntity(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, boolean hideForEnemies,
                            @NonNull Hitbox... hitboxes) {
         super(entity, name, owner.getGame(), hitboxes);
 
-        this.activationTime = activationTime;
         this.owner = owner;
         if (hideForEnemies)
             hideForEnemies();
     }
-
-    @Override
-    public final void activate() {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            if (i < activationTime) {
-                lifeCycle = LifeCycle.ACTIVATING;
-                onTickBeforeActivation(i);
-            } else if (i == activationTime)
-                onActivate();
-
-            return true;
-        }, 1));
-    }
-
-    /**
-     * 활성화 준비 중에 매 틱마다 실행할 작업.
-     *
-     * @param i 인덱스
-     */
-    protected abstract void onTickBeforeActivation(long i);
 
     @Override
     @NonNull

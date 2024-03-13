@@ -12,6 +12,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 /**
@@ -141,8 +142,31 @@ public final class UserData extends YamlFile {
                 return;
 
             User user = User.fromPlayer(player);
-            user.playLevelUpEffect(level);
+            user.playLevelUpEffect();
         }
+    }
+
+    /**
+     * 현재 레벨에 따른 칭호를 반환한다.
+     *
+     * @return 레벨 칭호
+     */
+    @NonNull
+    public String getLevelPrefix() {
+        String color;
+
+        if (level <= 100)
+            color = "§f§l";
+        else if (level <= 200)
+            color = "§a§l";
+        else if (level <= 300)
+            color = "§b§l";
+        else if (level <= 400)
+            color = "§d§l";
+        else
+            color = "§e§l";
+
+        return color + "[ Lv." + level + " ]";
     }
 
     public void setLevel(int level) {
@@ -167,9 +191,9 @@ public final class UserData extends YamlFile {
 
         User user = User.fromPlayer(player);
         if (getTier().getMinScore() > tier.getMinScore())
-            user.playTierUpEffect(tier);
+            user.playTierUpEffect();
         else if (getTier().getMinScore() < tier.getMinScore())
-            user.playTierDownEffect(tier);
+            user.playTierDownEffect();
     }
 
     public void setRanked(boolean ranked) {
@@ -224,6 +248,17 @@ public final class UserData extends YamlFile {
      */
     public int getNextLevelXp() {
         return 250 + (level * 50);
+    }
+
+    /**
+     * 플레이어의 표시 이름을 반환한다.
+     *
+     * @return 표시 이름
+     */
+    @NonNull
+    public String getDisplayName() {
+        return MessageFormat.format("{0} {1} {2}{3}§f", getTier().getPrefix(), getLevelPrefix(),
+                (Bukkit.getOfflinePlayer(playerUUID).isOp() ? "§a" : "§f"), playerName);
     }
 
     /**
