@@ -4,13 +4,10 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
-import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,14 +21,6 @@ import org.bukkit.util.EulerAngle;
  * 퀘이커 - 불굴의 방패 클래스.
  */
 public final class QuakerA1Entity extends Barrier<ArmorStand> {
-    /** 넉백 모듈 */
-    @NonNull
-    @Getter
-    private final KnockbackModule knockbackModule;
-    /** 상태 효과 모듈 */
-    @NonNull
-    @Getter
-    private final StatusEffectModule statusEffectModule;
     /** 스킬 객체 */
     private final QuakerA1 skill;
 
@@ -44,8 +33,6 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
                 new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
         );
         skill = (QuakerA1) owner.getSkill(QuakerA1Info.getInstance());
-        knockbackModule = new KnockbackModule(this, 1);
-        statusEffectModule = new StatusEffectModule(this);
 
         onInit();
     }

@@ -56,7 +56,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         );
         skill = (JagerUlt) owner.getSkill(JagerUltInfo.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
-        statusEffectModule = new StatusEffectModule(this);
+        statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);

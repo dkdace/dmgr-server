@@ -2,6 +2,8 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GameUser;
 import lombok.Getter;
@@ -18,6 +20,13 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class Barrier<T extends Entity> extends SummonEntity<T> implements Damageable {
+    /** 넉백 모듈 */
+    @NonNull
+    protected final KnockbackModule knockbackModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    protected final StatusEffectModule statusEffectModule;
+    /** 피해 모듈 */
     @NonNull
     protected final DamageModule damageModule;
 
@@ -34,6 +43,8 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
     protected Barrier(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, int maxHealth, @NonNull Hitbox... hitboxes) {
         super(entity, name, owner, false, hitboxes);
 
+        knockbackModule = new KnockbackModule(this, 1);
+        statusEffectModule = new StatusEffectModule(this, 1);
         damageModule = new DamageModule(this, false, maxHealth);
     }
 

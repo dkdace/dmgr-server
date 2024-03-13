@@ -56,7 +56,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         );
         skill = (JagerA2) owner.getSkill(JagerA2Info.getInstance());
         knockbackModule = new KnockbackModule(this, 1);
-        statusEffectModule = new StatusEffectModule(this);
+        statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
         damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
