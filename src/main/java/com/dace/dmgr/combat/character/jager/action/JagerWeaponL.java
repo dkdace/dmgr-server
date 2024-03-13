@@ -196,6 +196,14 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerWeaponL");
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        reloadModule.setRemainingAmmo(JagerWeaponInfo.CAPACITY);
+        swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
+    }
+
     private class JagerWeaponLProjectile extends Projectile {
         private JagerWeaponLProjectile() {
             super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)

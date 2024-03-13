@@ -159,6 +159,13 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         // 미사용
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        reloadModule.setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
+    }
+
     private class ArkaceWeaponHitscan extends GunHitscan {
         private final boolean isUlt;
 
