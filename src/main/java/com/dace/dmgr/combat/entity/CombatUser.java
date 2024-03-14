@@ -262,7 +262,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            playBleedingEffect(1);
+            ParticleUtil.playBleeding(entity, 0);
     }
 
     /**
@@ -504,7 +504,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         if (!isActivated)
             return;
         if (this == attacker) {
@@ -514,7 +514,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker == null)
             selfHarmDamage += damage;
 
-        character.onDamage(this, attacker, damage, damageType, isCrit);
+        character.onDamage(this, attacker, damage, damageType, location, isCrit);
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import lombok.NonNull;
+import org.bukkit.Location;
 
 /**
  * 생명력 수치를 조정하고 피해를 입을 수 있는 엔티티의 인터페이스.
@@ -43,11 +44,12 @@ public interface Damageable extends CombatEntity {
      * @param damage        피해량
      * @param reducedDamage 방어력에 의해 경감된 피해량
      * @param damageType    타입
+     * @param location      맞은 위치
      * @param isCrit        치명타 여부
      * @param isUlt         궁극기 충전 여부
      * @see Attacker#onAttack(Damageable, int, DamageType, boolean, boolean)
      */
-    void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt);
+    void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt);
 
     /**
      * 엔티티가 죽었을 때 실행될 작업.

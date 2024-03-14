@@ -146,7 +146,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                     JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
-            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, isCrit, true);
+            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
             return false;
         }
     }

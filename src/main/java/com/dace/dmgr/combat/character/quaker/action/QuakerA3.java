@@ -208,7 +208,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             for (Damageable target2 : targets) {
                 if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
-                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, false, true);
+                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true);
             }
         }
 

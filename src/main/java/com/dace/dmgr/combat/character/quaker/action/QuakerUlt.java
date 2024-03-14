@@ -239,7 +239,7 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, true);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerUltInfo.STUN_DURATION);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),

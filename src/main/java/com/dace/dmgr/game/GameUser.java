@@ -169,7 +169,7 @@ public final class GameUser implements Disposable {
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
         combatUser.getDamageModule().damage((Attacker) null,
-                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.NORMAL, false, false);
+                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.NORMAL, null, false, false);
     }
 
     /**

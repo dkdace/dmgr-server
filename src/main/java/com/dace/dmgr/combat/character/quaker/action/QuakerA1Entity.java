@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -85,11 +86,14 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
-        super.onDamage(attacker, damage, reducedDamage, damageType, isCrit, isUlt);
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+        super.onDamage(attacker, damage, reducedDamage, damageType, location, isCrit, isUlt);
 
         SoundUtil.play(Sound.BLOCK_ANVIL_LAND, entity.getLocation(), 0.25 + damage * 0.001, 1.2, 0.1);
         SoundUtil.play("random.metalhit", entity.getLocation(), 0.3 + damage * 0.001, 0.85, 0.1);
+        if (location != null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.04),
+                    0, 0, 0, 0.1);
         skill.addStateValue(-damage);
     }
 
