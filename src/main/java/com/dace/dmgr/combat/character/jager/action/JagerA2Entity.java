@@ -189,6 +189,13 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
+        if (location == null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.07),
+                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, 0.1);
+        else
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.03),
+                    0, 0, 0, 0.1);
     }
 
     @Override
