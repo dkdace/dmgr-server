@@ -490,8 +490,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playAttackEffect() {
         user.sendTitle("", "§f×", 0, 2, 10);
-        SoundUtil.play("random.stab", entity, 0.4, 2);
-        SoundUtil.play(Sound.ENTITY_GENERIC_SMALL_FALL, entity, 0.4, 1.5);
+        TaskUtil.addTask(this, new DelayTask(() -> {
+            SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity, 1, 1.4);
+            SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity, 1, 0.7);
+        }, 2));
     }
 
     /**
@@ -499,8 +501,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playCritAttackEffect() {
         user.sendTitle("", "§c§l×", 0, 2, 10);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 0.6, 1.9);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 0.35, 0.5);
+        TaskUtil.addTask(this, new DelayTask(() -> {
+            SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity, 2, 0.7);
+            SoundUtil.play(Sound.BLOCK_ANVIL_PLACE, entity, 0.4, 1.8);
+        }, 2));
     }
 
     @Override
@@ -603,13 +607,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onKill(this, victim);
 
+        playKillEffect();
         if (victim instanceof CombatUser) {
             int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
             int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
             int score = Math.round(((float) damage / totalDamage) * 100);
 
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
-            playPlayerKillEffect();
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);
@@ -619,17 +623,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         } else {
             if (victim instanceof Dummy)
                 addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), 100);
-            playEntityKillEffect();
         }
     }
 
     /**
-     * 다른 플레이어를 처치했을 때 효과를 재생한다.
+     * 엔티티를 처치했을 때 효과를 재생한다.
      */
-    private void playPlayerKillEffect() {
-        user.sendTitle("", "§c§lKILL", 0, 2, 10);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 1, 1.25);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 0.6, 1.25);
+    private void playKillEffect() {
+        user.sendTitle("", "§c" + TextIcon.POISON, 0, 2, 10);
+        TaskUtil.addTask(this, new DelayTask(() -> {
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 2, 1.25);
+            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 1, 1.25);
+        }, 2));
     }
 
     /**
@@ -654,15 +659,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
     }
 
-    /**
-     * 플레이어 외의 엔티티를 처치했을 때 효과를 재생한다.
-     */
-    private void playEntityKillEffect() {
-        user.sendTitle("", "§c✔", 0, 2, 10);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 1, 1.25);
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 0.6, 1.25);
-    }
-
     @Override
     public void onDeath(Attacker attacker) {
         if (!isActivated)
@@ -680,7 +676,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 int score = Math.round(((float) damage / totalDamage) * 100);
 
                 attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-                attacker2.playPlayerKillEffect();
+                attacker2.playKillEffect();
 
                 if (attacker2.gameUser != null)
                     attacker2.gameUser.setAssist(attacker2.gameUser.getAssist() + 1);
@@ -1056,16 +1052,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!skill.isDurationFinished())
                 skill.onCancelled();
         });
-    }
-
-    /**
-     * 출혈 효과를 재생한다.
-     *
-     * @param count 파티클 수
-     */
-    private void playBleedingEffect(int count) {
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
-                entity.getLocation().add(0, entity.getHeight() / 2, 0), count, 0.2, 0.35, 0.2, 0.03);
     }
 
     /**
