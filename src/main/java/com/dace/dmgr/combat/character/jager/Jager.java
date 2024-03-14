@@ -9,12 +9,15 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.jager.action.*;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 
 import java.util.StringJoiner;
 
@@ -83,6 +86,11 @@ public final class Jager extends Character {
             skill1.getEntity().getEntity().setTarget(victim.getEntity());
 
         return skillUlt.getEntity() == null;
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        ParticleUtil.playBleeding(location, victim.getEntity(), damage);
     }
 
     @Override

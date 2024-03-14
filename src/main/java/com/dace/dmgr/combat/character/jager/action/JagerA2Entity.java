@@ -11,10 +11,7 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -152,7 +149,8 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
      */
     private void onCatchEnemy(@NonNull Damageable target) {
         playCatchSound();
-        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, false, true);
+        target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
+                false, true);
         target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
 
         dispose();
@@ -189,8 +187,15 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
+        if (location == null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.07),
+                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, 0.1);
+        else
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.03),
+                    0, 0, 0, 0.1);
     }
 
     @Override

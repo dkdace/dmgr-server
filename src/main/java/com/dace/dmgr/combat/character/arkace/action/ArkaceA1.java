@@ -110,7 +110,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+            target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
             return false;
         }
 
@@ -145,7 +145,8 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+            target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, null, false, true);
+            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location).multiply(0.4));
             return !(target instanceof Barrier);
         }
     }

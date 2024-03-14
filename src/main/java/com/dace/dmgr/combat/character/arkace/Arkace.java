@@ -1,15 +1,19 @@
 package com.dace.dmgr.combat.character.arkace;
 
+import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.*;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 
 /**
  * 전투원 - 아케이스 클래스.
@@ -36,6 +40,11 @@ public final class Arkace extends Character {
 
         return StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, ArkaceWeaponInfo.CAPACITY,
                 ArkaceWeaponInfo.CAPACITY, '|');
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        ParticleUtil.playBleeding(location, victim.getEntity(), damage);
     }
 
     @Override

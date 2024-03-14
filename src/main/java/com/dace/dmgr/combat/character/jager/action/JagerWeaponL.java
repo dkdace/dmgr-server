@@ -223,7 +223,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
+            target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
             JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
             return false;
         }

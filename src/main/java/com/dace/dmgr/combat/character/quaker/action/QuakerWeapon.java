@@ -151,7 +151,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
                 ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
                 SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_STRONG, location, 1, 0.9, 0.05);
                 SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 1, 1.2, 0.1);

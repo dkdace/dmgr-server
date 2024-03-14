@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
@@ -130,13 +131,14 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onDefaultAttack(@NonNull Damageable victim) {
-        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL,
+        victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, null,
                 victim.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE), true);
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.play(Sound.ENTITY_WOLF_HURT, entity.getLocation(), 0.4 + damage * 0.001, 1, 0.1);
+        ParticleUtil.playBleeding(location, entity, damage);
         skill.addStateValue(-damage);
     }
 

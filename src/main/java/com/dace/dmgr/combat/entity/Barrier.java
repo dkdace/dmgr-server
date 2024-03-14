@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GameUser;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -50,7 +51,7 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
 
     @Override
     @MustBeInvokedByOverriders
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         if (owner.getGameUser() != null)
             owner.getGameUser().setDefend(owner.getGameUser().getDefend() + damage);
     }

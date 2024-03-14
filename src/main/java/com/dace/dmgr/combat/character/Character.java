@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 
 /**
  * 전투원 정보를 관리하는 클래스.
@@ -71,7 +72,7 @@ public abstract class Character {
      * @param damageType 피해 타입
      * @param isCrit     치명타 여부
      * @return 궁극기 충전 여부
-     * @see Character#onDamage(CombatUser, Attacker, int, DamageType, boolean)
+     * @see Character#onDamage(CombatUser, Attacker, int, DamageType, Location, boolean)
      */
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
         return true;
@@ -84,10 +85,11 @@ public abstract class Character {
      * @param attacker   공격자
      * @param damage     피해량
      * @param damageType 피해 타입
+     * @param location   맞은 위치
      * @param isCrit     치명타 여부
      * @see Character#onAttack(CombatUser, Damageable, int, DamageType, boolean)
      */
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         // 미사용
     }
 

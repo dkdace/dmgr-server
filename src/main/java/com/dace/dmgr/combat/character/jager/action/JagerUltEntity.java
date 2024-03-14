@@ -191,8 +191,15 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
+        if (location == null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.07),
+                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, 0.1);
+        else
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.03),
+                    0, 0, 0, 0.1);
     }
 
     @Override
@@ -206,12 +213,12 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
      */
     private void playDeathEffect() {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
-                0.1F, 0.1F, 0.1F, 0.15F);
-        ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1F, 0.1F, 0.1F, 0.5F);
+                0.1, 0.1, 0.1, 0.15);
+        ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1, 0.1, 0.1, 0.5);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2F, 0.7F);
-        SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 2F, 0.7F);
-        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2F, 1.2F);
+        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2, 0.7);
+        SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 2, 0.7);
+        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2, 1.2);
     }
 
     private class JagerUltArea extends Area {
@@ -227,7 +234,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.NORMAL,
-                    false, false);
+                    null, false, false);
             JagerTrait.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 
             return true;

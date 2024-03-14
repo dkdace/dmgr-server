@@ -194,7 +194,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (velocity.length() > 0.05)
-                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
             return false;
         }
 
@@ -224,9 +224,9 @@ public final class JagerA3 extends ActiveSkill {
             int freeze = CombatUtil.getDistantDamage(center, target.getEntity().getLocation(), JagerA3Info.FREEZE,
                     JagerA3Info.RADIUS / 2.0, true);
             if (projectile == null)
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
             else
-                target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, false, true);
+                target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
