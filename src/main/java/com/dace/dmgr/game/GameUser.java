@@ -199,10 +199,6 @@ public final class GameUser implements Disposable {
         user.teleport(getRespawnLocation());
         user.clearChat();
         HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
-        game.getGameUsers().forEach(gameUser2 -> {
-            if (gameUser2.team == team)
-                GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
-        });
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
@@ -211,6 +207,13 @@ public final class GameUser implements Disposable {
 
         if (combatUser == null)
             combatUser = new CombatUser(user);
+
+        for (GameUser gameUser2 : game.getGameUsers()) {
+            if (gameUser2.team != team)
+                continue;
+
+            GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+        }
     }
 
     /**
