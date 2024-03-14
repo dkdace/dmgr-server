@@ -12,6 +12,7 @@ import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.potion.PotionEffect;
@@ -104,6 +105,15 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
         SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2, 0.7);
         SoundUtil.play("random.metalhit", entity.getLocation(), 2, 0.7);
         SoundUtil.play(Sound.ITEM_SHIELD_BLOCK, entity.getLocation(), 2, 0.5);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 2; j++) {
+                Location loc = LocationUtil.getLocationFromOffset(hitboxes[0].getCenter(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
+                ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, loc, 50,
+                        0.3, 0.3, 0.3, 0.2);
+                ParticleUtil.play(Particle.CRIT, loc, 50, 0.3, 0.3, 0.3, 0.4);
+            }
+        }
+
         skill.setStateValue(0);
         skill.onCancelled();
         skill.setCooldown(QuakerA1Info.COOLDOWN_DEATH);
