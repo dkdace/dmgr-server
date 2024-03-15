@@ -43,6 +43,7 @@ public final class MeleeAttack extends Hitscan {
     @Override
     protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
         target.getDamageModule().damage((CombatUser) shooter, damage, DamageType.NORMAL, false, true);
+        target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(0.3));
 
         SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 0.8, 1.1, 0.1);
         SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 0.8, 1.1, 0.1);

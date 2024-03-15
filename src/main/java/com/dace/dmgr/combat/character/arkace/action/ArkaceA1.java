@@ -146,6 +146,7 @@ public final class ArkaceA1 extends ActiveSkill {
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, false, true);
+            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(0.25));
             return !(target instanceof Barrier);
         }
     }
