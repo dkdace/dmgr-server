@@ -398,6 +398,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (weapon != null)
             weapon.dispose();
         skillMap.forEach((skillInfo, skill) -> skill.dispose());
+        HologramUtil.removeHologram("hitHealth" + this);
 
         reset();
     }
@@ -473,6 +474,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
 
+        if (!(victim instanceof Barrier))
+            showHealthHologram(victim);
         if (isCrit)
             playCritAttackEffect();
         else
@@ -483,6 +486,27 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (gameUser != null && victim instanceof CombatUser)
             gameUser.setDamage(gameUser.getDamage() + damage);
+    }
+
+    /**
+     * 공격했을 때 피격자의 남은 생명력 홀로그램을 표시한다.
+     */
+    private void showHealthHologram(@NonNull Damageable victim) {
+        if (CooldownUtil.getCooldown(this, Cooldown.HIT_HEALTH_HOLOGRAM, victim.toString()) == 0) {
+            CooldownUtil.setCooldown(this, Cooldown.HIT_HEALTH_HOLOGRAM, victim.toString());
+
+            TaskUtil.addTask(this, new IntervalTask(i -> {
+                long cooldown = CooldownUtil.getCooldown(this, Cooldown.HIT_HEALTH_HOLOGRAM, victim.toString());
+                if (cooldown <= 0 || victim.isDisposed())
+                    return false;
+
+                Location loc = victim.getEntity().getLocation().add(0, victim.getEntity().getHeight(), 0);
+                HologramUtil.setHologramVisibility("hitHealth" + victim, LocationUtil.canPass(entity.getEyeLocation(), loc), entity);
+
+                return true;
+            }, isCancelled -> HologramUtil.setHologramVisibility("hitHealth" + victim, false, entity), 1));
+        } else
+            CooldownUtil.setCooldown(this, Cooldown.HIT_HEALTH_HOLOGRAM, victim.toString());
     }
 
     /**

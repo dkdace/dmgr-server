@@ -213,6 +213,8 @@ public final class GameUser implements Disposable {
                 continue;
 
             GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+            if (gameUser2 != this)
+                HologramUtil.setHologramVisibility("hitHealth" + combatUser, true, gameUser2.player);
         }
     }
 

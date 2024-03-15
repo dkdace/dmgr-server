@@ -18,6 +18,8 @@ public enum Cooldown {
     COMMAND(GeneralConfig.getConfig().getCommandCooldown()),
     /** 피격 시 애니메이션 */
     DAMAGE_ANIMATION(6),
+    /** 적 타격 시 생명력 홀로그램 */
+    HIT_HEALTH_HOLOGRAM(20),
     /** 적 처치 기여 (데미지 누적) 제한시간 */
     DAMAGE_SUM_TIME_LIMIT(CombatUser.DAMAGE_SUM_TIME_LIMIT),
     /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 */
