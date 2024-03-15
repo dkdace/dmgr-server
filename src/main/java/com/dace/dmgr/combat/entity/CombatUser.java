@@ -254,6 +254,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onTickLive(long i) {
         checkHealPack();
+        checkJumpPad();
         checkFallZone();
 
         onFootstep();
@@ -340,6 +341,24 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancalled -> HologramUtil.removeHologram("healpack" + healPackLocation),
                 20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
+    }
+
+    /**
+     * 현재 위치의 점프대를 확인한다.
+     */
+    private void checkJumpPad() {
+        Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
+        if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getJumpPadBlock())
+            return;
+        if (CooldownUtil.getCooldown(this, Cooldown.JUMP_PAD) > 0)
+            return;
+
+        CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD);
+
+        push(new Vector(0, 1.4, 0), true);
+        SoundUtil.play(Sound.ENTITY_PLAYER_SMALL_FALL, entity.getLocation(), 1.5, 1.5, 0.1);
+        SoundUtil.play(Sound.ENTITY_ITEM_PICKUP, entity.getLocation(), 1.5, 0.8, 0.05);
+        SoundUtil.play(Sound.ENTITY_ITEM_PICKUP, entity.getLocation(), 1.5, 1.4, 0.05);
     }
 
     /**

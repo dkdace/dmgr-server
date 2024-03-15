@@ -54,6 +54,8 @@ public enum Cooldown {
     TITLE(0),
     /** 넉백 지속시간 */
     KNOCKBACK(3),
+    /** 점프대 사용 쿨타임 */
+    JUMP_PAD(10),
     /** 상태 효과 지속시간 */
     STATUS_EFFECT(0),
     /** 2중 탄창 무기 교체 */
