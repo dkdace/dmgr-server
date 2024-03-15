@@ -31,7 +31,10 @@ public final class JumpModule extends MoveModule {
         if (!(combatEntity.getEntity() instanceof LivingEntity))
             throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
 
-        TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            if (combatEntity.isDisposed())
+                return false;
+
             if (combatEntity.canJump())
                 ((LivingEntity) combatEntity.getEntity()).removePotionEffect(PotionEffectType.JUMP);
             else

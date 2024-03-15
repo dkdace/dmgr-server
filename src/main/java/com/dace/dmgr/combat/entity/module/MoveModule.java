@@ -42,7 +42,10 @@ public class MoveModule {
         this.speedStatus = new AbilityStatus(speed);
 
         if (!(combatEntity instanceof CombatUser)) {
-            TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+            TaskUtil.addTask(this, new IntervalTask(i -> {
+                if (combatEntity.isDisposed())
+                    return false;
+
                 double movementSpeed = speedStatus.getValue();
                 if (!combatEntity.canMove())
                     movementSpeed = 0.0001;

@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -26,7 +27,7 @@ import java.text.MessageFormat;
  *
  * @see Confirmable
  */
-public final class LocationConfirmModule extends ConfirmModule implements Disposable {
+public final class LocationConfirmModule extends ConfirmModule {
     /** 최대 거리. (단위: 블록) */
     private final int maxDistance;
 
@@ -47,10 +48,15 @@ public final class LocationConfirmModule extends ConfirmModule implements Dispos
      * @param cancelKey   취소 키
      * @param maxDistance 최대 거리. (단위: 블록)
      */
-    public LocationConfirmModule(Confirmable skill, ActionKey acceptKey, ActionKey cancelKey, int maxDistance) {
+    public LocationConfirmModule(@NonNull Confirmable skill, @NonNull ActionKey acceptKey, @NonNull ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getEntity().getLocation();
+
+        TaskUtil.addTask(this, new IntervalTask(i -> !skill.isDisposed(), isCancelled -> {
+            if (pointer != null)
+                pointer.remove();
+        }, 1));
     }
 
     /**
@@ -111,14 +117,5 @@ public final class LocationConfirmModule extends ConfirmModule implements Dispos
     @Override
     protected void onCheckDisable() {
         pointer.remove();
-    }
-
-    @Override
-    public void dispose() {
-        checkAccess();
-
-        if (pointer != null)
-            pointer.remove();
-        isDisposed = true;
     }
 }
