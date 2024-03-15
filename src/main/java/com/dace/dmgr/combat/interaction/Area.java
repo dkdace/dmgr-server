@@ -57,7 +57,7 @@ public abstract class Area {
      */
     public void emit(@NonNull Location center) {
         for (CombatEntity target : targets) {
-            new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0.1).maxDistance(radius).condition(condition).build()) {
+            new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override
                 protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
                     return Area.this.onHitBlock(center, location, hitBlock);
@@ -73,7 +73,7 @@ public abstract class Area {
 
                     return canPenetrate;
                 }
-            }.shoot(center, LocationUtil.getDirection(center, target.getNearestLocationOfHitboxes(center)));
+            }.shoot(center, LocationUtil.getDirection(center, target.getNearestLocationOfHitboxes(center).add(0, 0.1, 0)));
         }
     }
 

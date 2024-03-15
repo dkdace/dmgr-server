@@ -227,6 +227,7 @@ public final class JagerA3 extends ActiveSkill {
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, false, true);
             else
                 target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, false, true);
+            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(0.6));
             JagerTrait.addFreezeValue(target, freeze);
 
             if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
