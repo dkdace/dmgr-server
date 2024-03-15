@@ -200,7 +200,7 @@ public final class ParticleUtil {
      */
     public static void playBleeding(@NonNull Entity entity, int damage) {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
-                entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.1),
+                entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.1),
                 entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
     }
 
