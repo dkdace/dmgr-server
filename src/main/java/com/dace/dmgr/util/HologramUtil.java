@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
+import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,6 +43,30 @@ public final class HologramUtil {
         }
 
         hologramMap.putIfAbsent(id, hologram);
+    }
+
+    /**
+     * 홀로그램의 내용을 업데이트한다.
+     *
+     * <p>이미 해당 ID의 홀로그램이 존재할 경우 덮어쓴다.</p>
+     *
+     * @param id       홀로그램 ID
+     * @param contents 내용 목록
+     */
+    public void editHologram(@NonNull String id, @NonNull String... contents) {
+        Hologram hologram = hologramMap.get(id);
+        if (hologram == null)
+            return;
+
+        if (contents.length < hologram.getLines().size())
+            hologram.getLines().clear();
+
+        for (int i = 0; i < contents.length; i++) {
+            if (i < hologram.getLines().size())
+                ((TextHologramLine) hologram.getLines().get(i)).setText(contents[i]);
+            else
+                hologram.getLines().appendText(contents[i]);
+        }
     }
 
     /**

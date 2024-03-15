@@ -2,18 +2,22 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.entity.AbilityStatus;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.HologramUtil;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
@@ -58,6 +62,32 @@ public class DamageModule {
 
         setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
+
+        if (!(combatEntity instanceof Barrier)) {
+            HologramUtil.addHologram("hitHealth" + combatEntity, combatEntity.getEntity().getLocation(), "§f");
+            HologramUtil.bindHologram("hitHealth" + combatEntity, combatEntity.getEntity(),
+                    0, combatEntity.getEntity().getHeight() + 0.4, 0);
+            HologramUtil.setHologramVisibility("hitHealth" + combatEntity, false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+
+            TaskUtil.addTask(this, new IntervalTask(i -> {
+                if (combatEntity.isDisposed())
+                    return false;
+
+                int current = getHealth();
+                int max = getMaxHealth();
+                ChatColor color;
+                if (current <= max / 4)
+                    color = ChatColor.RED;
+                else if (current <= max / 2)
+                    color = ChatColor.YELLOW;
+                else
+                    color = ChatColor.GREEN;
+
+                HologramUtil.editHologram("hitHealth" + combatEntity, StringFormUtil.getProgressBar(current, max, color));
+
+                return true;
+            }, isCancelled -> HologramUtil.removeHologram("hitHealth" + combatEntity), 1));
+        }
     }
 
     /**

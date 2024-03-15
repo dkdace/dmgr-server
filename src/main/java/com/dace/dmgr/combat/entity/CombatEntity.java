@@ -48,7 +48,7 @@ public interface CombatEntity extends Disposable {
      * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
      *
      * @param location 대상 위치
-     * @return 가장 가까운 히트박스까지의 방향
+     * @return 가장 가까운 위치
      */
     @NonNull
     Location getNearestLocationOfHitboxes(@NonNull Location location);
