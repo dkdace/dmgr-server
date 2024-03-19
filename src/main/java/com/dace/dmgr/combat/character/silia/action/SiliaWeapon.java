@@ -85,11 +85,16 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
+        protected void onHit(@NonNull Location location) {
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 10, 0.1, 0.1, 0.1, 0.15);
+        }
+
+        @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
             SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_WEAK, location, 0.8, 0.9, 0.05);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
-                    6, 0.05, 0.05, 0.05, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, location, 20, 0.05, 0.05, 0.05, 0);
+                    7, 0.08, 0.08, 0.08, 0.1);
+            ParticleUtil.play(Particle.TOWN_AURA, location, 40, 0.08, 0.08, 0.08, 0);
             SoundUtil.playBlockHitSound(location, hitBlock);
 
             return false;
