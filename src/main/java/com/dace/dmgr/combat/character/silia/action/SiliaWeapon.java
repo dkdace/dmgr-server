@@ -47,6 +47,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         isOpposite = !isOpposite;
 
         new SiliaWeaponProjectile().shoot();
+        combatUser.playMeleeAttackAnimation(-4, 10);
         playUseSound(combatUser.getEntity().getLocation());
     }
 

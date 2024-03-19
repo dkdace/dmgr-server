@@ -1,9 +1,5 @@
 package com.dace.dmgr.combat.action;
 
-import com.comphenix.packetwrapper.WrapperPlayClientArmAnimation;
-import com.comphenix.packetwrapper.WrapperPlayServerAnimation;
-import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
-import com.comphenix.packetwrapper.WrapperPlayServerRemoveEntityEffect;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeAttack;
 import com.dace.dmgr.util.SoundUtil;
@@ -12,8 +8,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /**
  * 기본 근접 공격 동작 클래스.
@@ -54,44 +48,15 @@ public final class MeleeAttackAction extends AbstractAction {
         setCooldown();
 
         playUseSound(combatUser.getEntity().getEyeLocation());
-        sendPotionEffect();
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
             new MeleeAttack(combatUser, DAMAGE).shoot();
 
-            WrapperPlayClientArmAnimation packet = new WrapperPlayClientArmAnimation();
-            packet.receivePacket(combatUser.getEntity());
-
-            WrapperPlayServerAnimation packet2 = new WrapperPlayServerAnimation();
-            packet2.setAnimation(0);
-            packet2.setEntityID(combatUser.getEntity().getEntityId());
-            packet2.broadcastPacket();
+            combatUser.playMeleeAttackAnimation(-7, 18);
         }, 2));
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
-    }
-
-    /**
-     * 플레이어에게 성급함 포션 효과를 적용한다.
-     */
-    private void sendPotionEffect() {
-        combatUser.getEntity().removePotionEffect(PotionEffectType.FAST_DIGGING);
-        combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                20, -7, false, false), true);
-
-        WrapperPlayServerRemoveEntityEffect packet = new WrapperPlayServerRemoveEntityEffect();
-        packet.setEntityID(combatUser.getEntity().getEntityId());
-        packet.setEffect(PotionEffectType.FAST_DIGGING);
-        packet.broadcastPacket();
-
-        WrapperPlayServerEntityEffect packet2 = new WrapperPlayServerEntityEffect();
-        packet2.setEntityID(combatUser.getEntity().getEntityId());
-        packet2.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
-        packet2.setAmplifier((byte) -7);
-        packet2.setDuration(20);
-        packet2.setHideParticles(true);
-        packet2.broadcastPacket();
     }
 
     /**

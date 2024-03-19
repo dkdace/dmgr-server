@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
-import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
-import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
-import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
+import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
@@ -1109,6 +1106,39 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet.setWarningDistance(isEnabled ? 999999999 : 0);
 
         packet.sendPacket(entity);
+    }
+
+    /**
+     * 플레이어에게 근접 공격 애니메이션을 재생한다.
+     *
+     * @param amplifier 성급함 포션 효과 레벨
+     * @param duration  지속시간 (tick)
+     */
+    public void playMeleeAttackAnimation(int amplifier, int duration) {
+        entity.removePotionEffect(PotionEffectType.FAST_DIGGING);
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                duration, amplifier, false, false), true);
+
+        WrapperPlayServerRemoveEntityEffect packet = new WrapperPlayServerRemoveEntityEffect();
+        packet.setEntityID(entity.getEntityId());
+        packet.setEffect(PotionEffectType.FAST_DIGGING);
+        packet.broadcastPacket();
+
+        WrapperPlayServerEntityEffect packet2 = new WrapperPlayServerEntityEffect();
+        packet2.setEntityID(entity.getEntityId());
+        packet2.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
+        packet2.setAmplifier((byte) amplifier);
+        packet2.setDuration(duration);
+        packet2.setHideParticles(true);
+        packet2.broadcastPacket();
+
+        WrapperPlayClientArmAnimation packet3 = new WrapperPlayClientArmAnimation();
+        packet3.receivePacket(entity);
+
+        WrapperPlayServerAnimation packet4 = new WrapperPlayServerAnimation();
+        packet4.setAnimation(0);
+        packet4.setEntityID(entity.getEntityId());
+        packet4.broadcastPacket();
     }
 
     @Getter
