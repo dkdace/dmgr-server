@@ -42,7 +42,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -104,7 +107,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     @NonNull
     @Getter
-    private final EnumMap<@NonNull ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
+    private final EnumMap<@NonNull ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
     private final HashMap<@NonNull SkillInfo, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
@@ -973,11 +976,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actionMap.clear();
         skillMap.clear();
 
-        actionMap.put(ActionKey.SWAP_HAND, new MeleeAttackAction(this));
+        for (ActionKey actionKey : ActionKey.values())
+            actionMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
+
+        actionMap.get(ActionKey.SWAP_HAND).add(new MeleeAttackAction(this));
 
         weapon = character.getWeaponInfo().createWeapon(this);
         for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
-            actionMap.put(actionKey, weapon);
+            actionMap.get(actionKey).add(weapon);
         }
         for (int i = 1; i <= 4; i++) {
             ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
@@ -985,7 +991,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 Skill skill = activeSkillInfo.createSkill(this);
                 skillMap.put(activeSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
-                    actionMap.put(actionKey, skill);
+                    actionMap.get(actionKey).add(skill);
                 }
             }
         }
@@ -995,7 +1001,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 Skill skill = passiveSkillInfo.createSkill(this);
                 skillMap.put(passiveSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
-                    actionMap.put(actionKey, skill);
+                    actionMap.get(actionKey).add(skill);
                 }
             }
         }
@@ -1007,25 +1013,28 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param actionKey 동작 사용 키
      */
     public void useAction(@NonNull ActionKey actionKey) {
-        Action action = actionMap.get(actionKey);
-        if (isDead() || action == null)
-            return;
-        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
-            return;
+        TreeSet<Action> actions = actionMap.get(actionKey);
 
-        if (action instanceof MeleeAttackAction && action.canUse()) {
-            action.onUse(actionKey);
-            return;
-        }
+        actions.forEach(action -> {
+            if (isDead() || action == null)
+                return;
+            if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
+                return;
 
-        Weapon realWeapon = this.weapon;
-        if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
-            realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
+            if (action instanceof MeleeAttackAction && action.canUse()) {
+                action.onUse(actionKey);
+                return;
+            }
 
-        if (action instanceof Weapon)
-            handleUseWeapon(actionKey, realWeapon);
-        else if (action instanceof Skill)
-            handleUseSkill(actionKey, (Skill) action);
+            Weapon realWeapon = this.weapon;
+            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+                realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
+
+            if (action instanceof Weapon)
+                handleUseWeapon(actionKey, realWeapon);
+            else if (action instanceof Skill)
+                handleUseSkill(actionKey, (Skill) action);
+        });
     }
 
     /**
