@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.character.silia.SiliaTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -102,7 +103,8 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, false);
+            target.getDamageModule().damage(combatUser, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
+                    SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
             ParticleUtil.play(Particle.CRIT, location, 15, 0, 0, 0, 0.4);
             SoundUtil.play("random.stab", location, 1, 0.8, 0.05);
 
