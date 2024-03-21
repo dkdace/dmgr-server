@@ -58,6 +58,11 @@ public final class Arkace extends Character {
     }
 
     @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return false;
+    }
+
+    @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         return true;
     }
