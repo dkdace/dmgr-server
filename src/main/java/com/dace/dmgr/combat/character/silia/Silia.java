@@ -6,6 +6,8 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.quaker.action.QuakerUltInfo;
+import com.dace.dmgr.combat.character.silia.action.SiliaP1Info;
+import com.dace.dmgr.combat.character.silia.action.SiliaP2Info;
 import com.dace.dmgr.combat.character.silia.action.SiliaWeaponInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -46,6 +48,11 @@ public final class Silia extends Character {
     }
 
     @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(SiliaP1Info.getInstance()).canUse();
+    }
+
+    @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         return true;
     }
@@ -59,6 +66,10 @@ public final class Silia extends Character {
     @Override
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return SiliaP1Info.getInstance();
+            case 2:
+                return SiliaP2Info.getInstance();
             default:
                 return null;
         }
