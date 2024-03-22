@@ -83,12 +83,12 @@ public final class QuakerWeapon extends AbstractWeapon {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
                     new QuakerWeaponAttack(targets).shoot(loc, vec);
-                    CombatUtil.setYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
 
                     if (index % 2 == 0)
                         playUseSound(loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.setYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
+                        CombatUtil.addYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
                     }
                 }, delay));

@@ -85,12 +85,12 @@ public final class QuakerUlt extends UltimateSkill {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (index + 1) * 20);
                     new QuakerUltEffect().shoot(loc, vec);
-                    CombatUtil.setYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
 
                     if (index % 2 == 0)
                         playUseSound(loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.setYawAndPitch(combatUser.getEntity(), -1, -0.7);
+                        CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
                         onCancelled();
                         onReady();
                     }
@@ -139,7 +139,7 @@ public final class QuakerUlt extends UltimateSkill {
             }
         }
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.setYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
             return true;
         }, 1, 6));

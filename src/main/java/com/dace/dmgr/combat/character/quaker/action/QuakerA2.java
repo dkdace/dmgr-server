@@ -134,7 +134,7 @@ public final class QuakerA2 extends ActiveSkill {
             new QuakerA2Projectile(targets).shoot(loc, vec);
         }
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.setYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
             return true;
         }, 1, 5));

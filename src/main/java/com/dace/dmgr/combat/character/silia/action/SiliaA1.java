@@ -63,13 +63,15 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.playMeleeAttackAnimation(-3, 6, true);
         playUseSound(combatUser.getEntity().getLocation());
 
+        Location location = combatUser.getEntity().getLocation();
         Set<CombatEntity> targets = new HashSet<>();
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation().add(0, 0.5, 0);
-
             combatUser.push(loc.getDirection().multiply(2.4), true);
+
             new SiliaA1Hitscan(targets).shoot();
             new SiliaA1Effect().shoot();
+            CombatUtil.setYawAndPitch(combatUser.getEntity(), location.getYaw(), location.getPitch());
 
             return true;
         }, isCancelled -> {
