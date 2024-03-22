@@ -87,13 +87,18 @@ public final class SiliaP2 extends AbstractSkill {
 
             return true;
         }, isCancelled -> {
-            combatUser.resetGlobalCooldown();
-            setDuration(0);
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+            onCancelled();
             combatUser.push(new Vector(0, 0.4, 0), true);
-
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
                     isCancelled2 -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
         }, 3, 10));
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        combatUser.resetGlobalCooldown();
+        setDuration(0);
+        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 }
