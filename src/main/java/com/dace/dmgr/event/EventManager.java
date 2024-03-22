@@ -35,6 +35,8 @@ public final class EventManager {
         EventUtil.registerListener(new OnTabComplete());
         EventUtil.registerListener(new OnPlayerCommandPreprocess());
         EventUtil.registerListener(new OnPlayerItemHeld());
+        EventUtil.registerListener(new OnPlayerBucketEmpty());
+        EventUtil.registerListener(new OnPlayerBucketFill());
         EventUtil.registerListener(new OnPlayerInteract());
 
         EventUtil.registerPacketListener(new OnPlayClientUseEntity());
