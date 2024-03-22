@@ -206,6 +206,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!isDead())
             onTickLive(i);
 
+        entity.setAllowFlight(canFly());
         setLowHealthScreenEffect(damageModule.isLowHealth() || isDead());
         setCanSprint();
         adjustWalkSpeed();
@@ -225,6 +226,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void changeFov(double value) {
         WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
 
+        packet.setCanFly(isActivated && canFly());
         packet.setWalkingSpeed((float) (entity.getWalkSpeed() * value));
 
         packet.sendPacket(entity);
@@ -469,6 +471,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (CooldownUtil.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
+            return false;
+
+        return true;
+    }
+
+    /**
+     * 플레이어가 비행할 수 있는 지 확인한다.
+     *
+     * @return 비행 가능 여부
+     */
+    private boolean canFly() {
+        if (isDead())
+            return false;
+        if (!character.canFly(this))
             return false;
 
         return true;
