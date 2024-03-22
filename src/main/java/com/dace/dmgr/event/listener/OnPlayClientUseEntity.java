@@ -9,6 +9,8 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,7 +23,11 @@ public final class OnPlayClientUseEntity extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
         WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
         Player player = event.getPlayer();
+        Entity entity = packet.getTarget(event);
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+
+        if (!player.isOp() && entity instanceof Hanging)
+            event.setCancelled(true);
 
         if (combatUser == null)
             return;
