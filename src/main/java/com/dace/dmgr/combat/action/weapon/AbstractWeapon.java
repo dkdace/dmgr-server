@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
+import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -43,6 +44,15 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
     @Override
     public final void displayDurability(short durability) {
         itemStack.setDurability(durability);
+        combatUser.getEntity().getInventory().setItem(4, itemStack);
+    }
+
+    @Override
+    public final void setGlowing(boolean isGlowing) {
+        if (isGlowing)
+            itemStack.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);
+        else
+            itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 }

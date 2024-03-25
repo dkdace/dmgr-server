@@ -53,7 +53,7 @@ public final class MeleeAttackAction extends AbstractAction {
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
             new MeleeAttack(combatUser, DAMAGE).shoot();
 
-            combatUser.playMeleeAttackAnimation(-7, 18);
+            combatUser.playMeleeAttackAnimation(-7, 18, true);
         }, 2));
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));

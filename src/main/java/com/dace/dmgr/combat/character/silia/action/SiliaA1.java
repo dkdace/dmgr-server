@@ -85,7 +85,11 @@ public final class SiliaA1 extends ActiveSkill {
         super.onCancelled();
         if (!isDurationFinished())
             setDuration(0);
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+
+        if (((SiliaWeapon) combatUser.getWeapon()).isStrike)
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+        else
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 
     /**

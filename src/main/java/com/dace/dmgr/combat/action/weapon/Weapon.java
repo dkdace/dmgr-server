@@ -14,4 +14,11 @@ public interface Weapon extends Action {
      * @param durability 내구도
      */
     void displayDurability(short durability);
+
+    /**
+     * 무기 아이템의 발광(마법 부여) 여부를 설정한다.
+     *
+     * @param isGlowing 아이템 발광(마법 부여) 여부
+     */
+    void setGlowing(boolean isGlowing);
 }

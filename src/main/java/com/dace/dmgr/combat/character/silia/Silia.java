@@ -11,9 +11,12 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+
+import java.util.StringJoiner;
 
 /**
  * 전투원 - 실리아 클래스.
@@ -22,6 +25,7 @@ import org.bukkit.Location;
  * @see SiliaP1
  * @see SiliaP2
  * @see SiliaA1
+ * @see SiliaA3
  */
 public final class Silia extends Character {
     @Getter
@@ -33,7 +37,18 @@ public final class Silia extends Character {
 
     @Override
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        return "";
+        SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
+
+        double skill3Duration = skill3.getStateValue() / 20;
+        double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
+
+        StringJoiner text = new StringJoiner("    ");
+
+        String skill3Display = StringFormUtil.getActionbarDurationBar("§e[폭풍전야]", skill3Duration, skill3MaxDuration,
+                10, '■');
+        text.add(skill3Display);
+
+        return text.toString();
     }
 
     @Override
@@ -92,6 +107,8 @@ public final class Silia extends Character {
         switch (number) {
             case 1:
                 return SiliaA1Info.getInstance();
+            case 3:
+                return SiliaA3Info.getInstance();
             case 4:
                 return QuakerUltInfo.getInstance();
             default:

@@ -83,7 +83,10 @@ public final class SiliaP2 extends AbstractSkill {
 
             combatUser.push(new Vector(0, 0.45, 0), true);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
-            SoundUtil.play(Sound.BLOCK_STONE_STEP, combatUser.getEntity().getLocation(), 0.9, 0.55, 0.05);
+            if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+                SoundUtil.play(Sound.BLOCK_STONE_STEP, combatUser.getEntity().getLocation(), 0.9, 0.55, 0.05);
+            else
+                SoundUtil.play(Sound.BLOCK_STONE_STEP, combatUser.getEntity().getLocation(), 0.08, 0.8, 0.05);
 
             return true;
         }, isCancelled -> {
@@ -99,6 +102,10 @@ public final class SiliaP2 extends AbstractSkill {
         super.onCancelled();
         combatUser.resetGlobalCooldown();
         setDuration(0);
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+
+        if (((SiliaWeapon) combatUser.getWeapon()).isStrike)
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+        else
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 }

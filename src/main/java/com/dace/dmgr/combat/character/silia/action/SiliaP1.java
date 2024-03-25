@@ -7,13 +7,11 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
-@Getter
 public final class SiliaP1 extends AbstractSkill {
     public SiliaP1(@NonNull CombatUser combatUser) {
         super(1, combatUser, SiliaP1Info.getInstance());
@@ -72,7 +70,12 @@ public final class SiliaP1 extends AbstractSkill {
      * @param location 사용 위치
      */
     private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.8, 1.2);
-        SoundUtil.play(Sound.BLOCK_CLOTH_STEP, location, 0.8, 1.2);
+        if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()) {
+            SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.8, 1.2);
+            SoundUtil.play(Sound.BLOCK_CLOTH_STEP, location, 0.8, 1.2);
+        } else {
+            SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.08, 1.4);
+            SoundUtil.play(Sound.BLOCK_CLOTH_STEP, location, 0.08, 1.4);
+        }
     }
 }

@@ -1138,8 +1138,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * @param amplifier 성급함 포션 효과 레벨
      * @param duration  지속시간 (tick)
+     * @param isRight   왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로 지정 시 오른손
      */
-    public void playMeleeAttackAnimation(int amplifier, int duration) {
+    public void playMeleeAttackAnimation(int amplifier, int duration, boolean isRight) {
         entity.removePotionEffect(PotionEffectType.FAST_DIGGING);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                 duration, amplifier, false, false), true);
@@ -1157,13 +1158,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet2.setHideParticles(true);
         packet2.broadcastPacket();
 
-        WrapperPlayClientArmAnimation packet3 = new WrapperPlayClientArmAnimation();
-        packet3.receivePacket(entity);
-
-        WrapperPlayServerAnimation packet4 = new WrapperPlayServerAnimation();
-        packet4.setAnimation(0);
-        packet4.setEntityID(entity.getEntityId());
-        packet4.broadcastPacket();
+        WrapperPlayServerAnimation packet3 = new WrapperPlayServerAnimation();
+        packet3.setAnimation(isRight ? 0 : 3);
+        packet3.setEntityID(entity.getEntityId());
+        packet3.broadcastPacket();
     }
 
     @Getter
