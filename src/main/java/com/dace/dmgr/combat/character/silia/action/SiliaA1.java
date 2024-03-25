@@ -16,6 +16,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -66,12 +67,19 @@ public final class SiliaA1 extends ActiveSkill {
         Location location = combatUser.getEntity().getLocation();
         Set<CombatEntity> targets = new HashSet<>();
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getEntity().getLocation().add(0, 0.5, 0);
-            combatUser.push(loc.getDirection().multiply(2.4), true);
+            Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
+            combatUser.push(loc.getDirection().multiply(2.5), true);
 
             new SiliaA1Hitscan(targets).shoot();
-            new SiliaA1Effect().shoot();
             CombatUtil.setYawAndPitch(combatUser.getEntity(), location.getYaw(), location.getPitch());
+
+            TaskUtil.addTask(combatUser, new DelayTask(() -> {
+                Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
+                for (Location trailLoc : LocationUtil.getLine(loc, loc2, 0.3)) {
+                    ParticleUtil.play(Particle.CRIT, trailLoc, 3, 0.02, 0.02, 0.02, 0);
+                    ParticleUtil.play(Particle.END_ROD, trailLoc, 1, 0.02, 0.02, 0.02, 0);
+                }
+            }, 1));
 
             return true;
         }, isCancelled -> {
@@ -114,7 +122,7 @@ public final class SiliaA1 extends ActiveSkill {
         @Override
         protected void trail(@NonNull Location location, @NonNull Vector direction) {
             for (int i = 0; i < 12; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1);
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
                 Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
                 Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -126,7 +134,7 @@ public final class SiliaA1 extends ActiveSkill {
 
                     if ((i == 0 || i == 11) && j == 1) {
                         Vector vec2 = VectorUtil.getSpreadedVector(direction, 10);
-                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, trailLoc, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.5);
+                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, trailLoc, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
                     }
                 }
             }
@@ -165,28 +173,6 @@ public final class SiliaA1 extends ActiveSkill {
 
                 return !(target instanceof Barrier);
             }
-        }
-    }
-
-    private class SiliaA1Effect extends Hitscan {
-        public SiliaA1Effect() {
-            super(combatUser, HitscanOption.builder().trailInterval(4).maxDistance(3).build());
-        }
-
-        @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
-            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.5, 0);
-            ParticleUtil.play(Particle.CRIT, trailLoc, 3, 0.02, 0.02, 0.02, 0);
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
-            return true;
         }
     }
 }
