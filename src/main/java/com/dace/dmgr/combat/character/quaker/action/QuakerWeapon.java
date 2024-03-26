@@ -54,7 +54,8 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setGlobalCooldown(8);
         setCooldown();
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 15, isClockwise);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
@@ -99,7 +100,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        setVisible(true);
     }
 
     /**

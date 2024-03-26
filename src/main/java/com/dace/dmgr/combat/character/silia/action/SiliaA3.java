@@ -52,7 +52,8 @@ public final class SiliaA3 extends ChargeableSkill {
 
             int health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth() >= combatUser.getDamageModule().getMaxHealth() * 0.1)
+                if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth() >=
+                        combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO)
                     return false;
 
                 combatUser.getEntity().setFallDistance(0);
@@ -60,14 +61,16 @@ public final class SiliaA3 extends ChargeableSkill {
                 if (i >= SiliaA3Info.ACTIVATE_DURATION && !((SiliaWeapon) combatUser.getWeapon()).isStrike) {
                     ((SiliaWeapon) combatUser.getWeapon()).isStrike = true;
                     combatUser.getWeapon().setGlowing(true);
-
-                    if (combatUser.isGlobalCooldownFinished())
-                        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+                    combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
                     SoundUtil.play("new.item.trident.return", combatUser.getEntity(), 1, 1.2);
                 }
 
                 return true;
-            }, isCancelled -> onCancelled(), 1));
+            }, isCancelled -> {
+                onCancelled();
+                if (getStateValue() > 0)
+                    setCooldown(SiliaA3Info.COOLDOWN_FORCE);
+            }, 1));
         } else
             onCancelled();
     }
@@ -75,7 +78,7 @@ public final class SiliaA3 extends ChargeableSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setCooldown();
         ((SiliaWeapon) combatUser.getWeapon()).isStrike = false;
         combatUser.getWeapon().setGlowing(false);
         combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);

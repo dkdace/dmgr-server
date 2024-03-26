@@ -59,7 +59,8 @@ public final class QuakerUlt extends UltimateSkill {
         combatUser.setGlobalCooldown(16);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerUlt", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 16, false);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             int delay = 0;
@@ -104,7 +105,7 @@ public final class QuakerUlt extends UltimateSkill {
         super.onCancelled();
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerUlt");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**

@@ -33,8 +33,6 @@ public final class SiliaWeaponInfo extends WeaponInfo {
     public interface RESOURCE {
         /** 기본 */
         short DEFAULT = 4;
-        /** 사용 */
-        short USE = 1561;
         /** 확장 */
         short EXTENDED = DEFAULT + 1000;
     }

@@ -9,8 +9,8 @@ public final class SiliaA3Info extends ActiveSkillInfo {
     public static final long COOLDOWN = 1 * 20;
     /** 강제 해제 쿨타임 */
     public static final long COOLDOWN_FORCE = 5 * 20;
-    /** 강제 해제 피해량 */
-    public static final long CANCEL_DAMAGE = 10;
+    /** 강제 해제 피해량 비율 */
+    public static final double CANCEL_DAMAGE_RATIO = 0.1;
     /** 이동속도 증가량 */
     public static final int SPEED = 20;
     /** 지속시간 */
@@ -27,15 +27,5 @@ public final class SiliaA3Info extends ActiveSkillInfo {
     @Override
     public SiliaA3 createSkill(CombatUser combatUser) {
         return new SiliaA3(combatUser);
-    }
-
-    /**
-     * 일격 정보.
-     */
-    public interface STRIKE {
-        /** 피해량 */
-        int DAMAGE = 350;
-        /** 사거리 */
-        double DISTANCE = 3.5;
     }
 }

@@ -21,4 +21,11 @@ public interface Weapon extends Action {
      * @param isGlowing 아이템 발광(마법 부여) 여부
      */
     void setGlowing(boolean isGlowing);
+
+    /**
+     * 무기 아이템의 표시 여부를 설정한다.
+     *
+     * @param isVisible 아이템 표시 여부
+     */
+    void setVisible(boolean isVisible);
 }

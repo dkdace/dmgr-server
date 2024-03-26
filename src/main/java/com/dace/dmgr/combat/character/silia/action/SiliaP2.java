@@ -71,9 +71,8 @@ public final class SiliaP2 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.setGlobalCooldown(-1);
         setDuration();
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (!canActivate())
@@ -100,12 +99,7 @@ public final class SiliaP2 extends AbstractSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        combatUser.resetGlobalCooldown();
         setDuration(0);
-
-        if (((SiliaWeapon) combatUser.getWeapon()).isStrike)
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-        else
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 }

@@ -58,7 +58,8 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.setGlobalCooldown(16);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA3", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-7, 12, true);
 
         Location location = combatUser.getEntity().getEyeLocation();
         playUseSound(location);
@@ -85,7 +86,7 @@ public final class QuakerA3 extends ActiveSkill {
         super.onCancelled();
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA3");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**

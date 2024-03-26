@@ -29,7 +29,5 @@ public final class QuakerWeaponInfo extends WeaponInfo {
     public interface RESOURCE {
         /** 기본 */
         short DEFAULT = 3;
-        /** 사용 */
-        short USE = 1561;
     }
 }

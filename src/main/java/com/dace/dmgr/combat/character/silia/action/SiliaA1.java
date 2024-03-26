@@ -52,7 +52,7 @@ public final class SiliaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished();
+        return super.canUse() && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -60,7 +60,7 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.getWeapon().setCooldown(0);
         combatUser.setGlobalCooldown(6);
         setDuration(-1);
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-3, 6, true);
         playUseSound(combatUser.getEntity().getLocation());
 
@@ -93,11 +93,7 @@ public final class SiliaA1 extends ActiveSkill {
         super.onCancelled();
         if (!isDurationFinished())
             setDuration(0);
-
-        if (((SiliaWeapon) combatUser.getWeapon()).isStrike)
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-        else
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**

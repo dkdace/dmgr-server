@@ -63,7 +63,8 @@ public final class QuakerA2 extends ActiveSkill {
         combatUser.setGlobalCooldown(-1);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA2", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 15, true);
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
@@ -104,7 +105,7 @@ public final class QuakerA2 extends ActiveSkill {
         combatUser.resetGlobalCooldown();
         combatUser.setGlobalCooldown(20);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA2");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**

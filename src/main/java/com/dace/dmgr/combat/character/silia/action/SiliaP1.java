@@ -35,7 +35,7 @@ public final class SiliaP1 extends AbstractSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished();
+        return super.canUse() && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
