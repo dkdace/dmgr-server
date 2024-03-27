@@ -25,6 +25,7 @@ import java.util.StringJoiner;
  * @see SiliaP1
  * @see SiliaP2
  * @see SiliaA1
+ * @see SiliaA2
  * @see SiliaA3
  */
 public final class Silia extends Character {
@@ -53,7 +54,7 @@ public final class Silia extends Character {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleeding(location, victim.getEntity(), damage);
+        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -107,6 +108,8 @@ public final class Silia extends Character {
         switch (number) {
             case 1:
                 return SiliaA1Info.getInstance();
+            case 2:
+                return SiliaA2Info.getInstance();
             case 3:
                 return SiliaA3Info.getInstance();
             case 4:
