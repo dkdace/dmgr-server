@@ -128,8 +128,12 @@ public final class Game implements Disposable {
 
         for (GlobalLocation healPackLocation : map.getHealPackLocations())
             HologramUtil.removeHologram("healpack" + healPackLocation);
+
         TaskUtil.clearTask(this);
-        GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
+        removeWorld().onFinish(() -> {
+            world = null;
+            GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
+        });
     }
 
     @Override
@@ -175,6 +179,17 @@ public final class Game implements Disposable {
                     map.getWorld().getName(), gamePlayMode, number));
 
         return new AsyncTask<>((onFinish, onError) -> onFinish.accept(world));
+    }
+
+    /**
+     * 전장 월드를 제거한다.
+     */
+    @NonNull
+    private AsyncTask<Void> removeWorld() {
+        if (world != null)
+            return WorldUtil.removeWorld(world.getName());
+
+        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
     }
 
     /**
