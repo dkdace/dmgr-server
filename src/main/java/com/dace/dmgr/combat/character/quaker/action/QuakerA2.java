@@ -12,10 +12,7 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -24,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -87,7 +83,7 @@ public final class QuakerA2 extends ActiveSkill {
                 new QuakerA2Effect().shoot(loc, vec);
 
                 if (index % 2 == 0)
-                    playUseSound(loc.add(vec));
+                    SoundUtil.play(NamedSound.COMBAT_QUAKER_A2_USE, loc.add(vec));
                 if (index == 11) {
                     TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled -> {
                         onCancelled();
@@ -109,21 +105,11 @@ public final class QuakerA2 extends ActiveSkill {
     }
 
     /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, location, 1, 0.5);
-        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.5);
-    }
-
-    /**
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
         Location loc = combatUser.getEntity().getLocation();
-        playReadySound(loc);
+        SoundUtil.play(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
         Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; i < 7; i++) {
@@ -139,18 +125,6 @@ public final class QuakerA2 extends ActiveSkill {
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
             return true;
         }, 1, 5));
-    }
-
-    /**
-     * 시전 완료 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playReadySound(Location location) {
-        SoundUtil.play(Sound.ENTITY_IRONGOLEM_HURT, location, 3, 0.5);
-        SoundUtil.play(Sound.ITEM_TOTEM_USE, location, 3, 1.6);
-        SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 3, 0.6);
-        SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 3, 0.7);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -213,7 +187,7 @@ public final class QuakerA2 extends ActiveSkill {
         private final Set<CombatEntity> targets;
 
         private QuakerA2Projectile(Set<CombatEntity> targets) {
-            super(QuakerA2.this.combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(12).size(0.5)
+            super(QuakerA2.this.combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(0.5)
                     .maxDistance(QuakerA2Info.DISTANCE).isOnGround(true).condition(QuakerA2.this.combatUser::isEnemy).build());
 
             this.targets = targets;
@@ -222,10 +196,8 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected void trail(@NonNull Location location, @NonNull Vector direction) {
             Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, floor.getType(), floor.getData(), location,
-                    10, 0.2, 0.05, 0.2, 0.2);
-            ParticleUtil.play(Particle.TOWN_AURA, location, 60, 0.2, 0.05, 0.2, 0);
-            ParticleUtil.play(Particle.CRIT, location, 30, 0.2, 0.05, 0.2, 0.2);
+            ParticleUtil.playBlockHitEffect(location, floor, 3);
+            ParticleUtil.play(Particle.CRIT, location, 20, 0.2, 0.05, 0.2, 0.25);
         }
 
         @Override

@@ -73,9 +73,11 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
                 new JagerWeaponLProjectile().shoot(dir);
-                playShootSound(combatUser.getEntity().getLocation());
+                SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
+                        JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
                 setCooldown();
                 reloadModule.consume(1);
 
@@ -109,18 +111,6 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
             super.onCancelled();
             reloadModule.setReloading(false);
         }
-    }
-
-    /**
-     * 발사 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playShootSound(Location location) {
-        SoundUtil.play("random.gun2.m16_1", location, 0.8, 1.2);
-        SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, location, 0.8, 1.7);
-        CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
-                JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
     }
 
     @Override
@@ -172,9 +162,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onSwapStart(@NonNull SwapState swapState) {
         Location location = combatUser.getEntity().getLocation();
         if (swapState == SwapState.PRIMARY)
-            SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, location, 0.6, 1.9);
+            SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF, location);
         else if (swapState == SwapState.SECONDARY)
-            SoundUtil.play(Sound.ENTITY_WOLF_HOWL, location, 0.6, 1.9);
+            SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON, location);
 
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
     }

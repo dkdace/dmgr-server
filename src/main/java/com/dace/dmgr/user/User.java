@@ -25,7 +25,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
@@ -371,7 +370,7 @@ public final class User implements Disposable {
      */
     public void playLevelUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play("random.good", player, 10, 1);
+            SoundUtil.play(NamedSound.GENERAL_SUCCESS, player);
             sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", 8,
                     40, 30, 40);
         }, 100));
@@ -382,7 +381,7 @@ public final class User implements Disposable {
      */
     public void playTierUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, player, 10, 1.5);
+            SoundUtil.play(NamedSound.GAME_WIN, player);
             sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }
@@ -392,7 +391,7 @@ public final class User implements Disposable {
      */
     public void playTierDownEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, player, 10, 0.5);
+            SoundUtil.play(NamedSound.GAME_LOSE, player);
             sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }

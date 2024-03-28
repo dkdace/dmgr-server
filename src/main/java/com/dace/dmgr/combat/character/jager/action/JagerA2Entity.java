@@ -7,11 +7,15 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -69,19 +73,10 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         entity.teleport(entity.getLocation().add(0, 0.05, 0));
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        playInitSound();
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_SUMMON, entity.getLocation());
 
         damageModule.setMaxHealth(JagerA2Info.HEALTH);
         damageModule.setHealth(JagerA2Info.HEALTH);
-    }
-
-    /**
-     * 소환 시 효과음을 재생한다.
-     */
-    private void playInitSound() {
-        SoundUtil.play(Sound.ENTITY_HORSE_ARMOR, entity.getLocation(), 0.5, 1.6);
-        SoundUtil.play("random.craft", entity.getLocation(), 0.5, 1.3);
-        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
     }
 
     @Override
@@ -99,7 +94,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
 
     @Override
     public void onReady() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_SUMMON_READY, entity.getLocation());
     }
 
     @Override
@@ -148,21 +143,12 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
      * @param target 대상 엔티티
      */
     private void onCatchEnemy(@NonNull Damageable target) {
-        playCatchSound();
         target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
                 false, true);
         target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
 
         dispose();
-    }
-
-    /**
-     * 덫 발동 시 효과음을 재생한다.
-     */
-    private void playCatchSound() {
-        SoundUtil.play(Sound.ENTITY_SHEEP_SHEAR, entity.getLocation(), 2, 1.2);
-        SoundUtil.play("new.entity.player.hurt_sweet_berry_bush", entity.getLocation(), 2, 0.8);
-        SoundUtil.play("random.metalhit", entity.getLocation(), 2, 1.2);
     }
 
     @Override
@@ -188,30 +174,16 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
-        if (location == null)
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
-                    entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.07),
-                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, 0.1);
-        else
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.03),
-                    0, 0, 0, 0.1);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        ParticleUtil.playBreakEffect(location, entity, damage);
     }
 
     @Override
     public void onDeath(Attacker attacker) {
         dispose();
-        playDeathEffect();
-    }
 
-    /**
-     * 죽었을 때 효과를 재생한다.
-     */
-    private void playDeathEffect() {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                 0.1, 0.1, 0.1, 0.15);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 1, 0.8);
-        SoundUtil.play("random.metalhit", entity.getLocation(), 1, 0.8);
-        SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 1, 0.8);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_DEATH, entity.getLocation());
     }
 }

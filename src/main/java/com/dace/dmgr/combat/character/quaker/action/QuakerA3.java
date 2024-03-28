@@ -10,16 +10,12 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -60,9 +56,7 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA3", -100);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-7, 12, true);
-
-        Location location = combatUser.getEntity().getEyeLocation();
-        playUseSound(location);
+        SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             for (int j = 0; j < i; j++) {
@@ -77,7 +71,9 @@ public final class QuakerA3 extends ActiveSkill {
             return true;
         }, isCancelled -> {
             onCancelled();
-            onReady();
+
+            new QuakerA3Projectile().shoot();
+            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_USE_READY, combatUser.getEntity().getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
     }
 
@@ -87,37 +83,6 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA3");
         combatUser.getWeapon().setVisible(true);
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, location, 1, 0.8);
-        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.5);
-        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.8);
-    }
-
-    /**
-     * 시전 완료 시 실행할 작업.
-     */
-    private void onReady() {
-        Location loc = combatUser.getEntity().getLocation();
-        new QuakerA3Projectile().shoot();
-        playReadySound(loc);
-    }
-
-    /**
-     * 시전 완료 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playReadySound(Location location) {
-        SoundUtil.play(Sound.ENTITY_GHAST_SHOOT, location, 2, 0.5);
-        SoundUtil.play("new.item.trident.throw", location, 2, 0.7);
-        SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_SWEEP, location, 2, 0.7);
     }
 
     private class QuakerA3Effect extends Hitscan {
@@ -180,7 +145,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Vector vec2 = VectorUtil.getSpreadedVector(direction, 30);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.2);
             }
-            SoundUtil.play(Sound.ENTITY_GHAST_SHOOT, location, 0.6, 0.5);
+            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_TICK, location);
 
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, size, condition);
 
@@ -189,8 +154,7 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
-                    80, 0.2, 0.2, 0.2, 0.2);
+            ParticleUtil.playBlockHitEffect(location, hitBlock, 5);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 50, 0.2, 0.2, 0.2, 0.4);
             onImpact(location.add(0, 0.1, 0));
 
@@ -203,9 +167,7 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         private void onImpact(@NonNull Location location) {
-            SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 2, 0.6);
-            SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, location, 2, 0.7);
-            SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_CRIT, location, 2, 0.7);
+            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_HIT, location);
 
             for (Damageable target2 : targets) {
                 if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)

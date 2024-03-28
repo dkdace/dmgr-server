@@ -9,10 +9,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.HologramUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.WorldUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -20,7 +17,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 
@@ -128,8 +124,12 @@ public final class Game implements Disposable {
 
         for (GlobalLocation healPackLocation : map.getHealPackLocations())
             HologramUtil.removeHologram("healpack" + healPackLocation);
+
         TaskUtil.clearTask(this);
-        GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
+        removeWorld().onFinish(() -> {
+            world = null;
+            GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
+        });
     }
 
     @Override
@@ -175,6 +175,17 @@ public final class Game implements Disposable {
                     map.getWorld().getName(), gamePlayMode, number));
 
         return new AsyncTask<>((onFinish, onError) -> onFinish.accept(world));
+    }
+
+    /**
+     * 전장 월드를 제거한다.
+     */
+    @NonNull
+    private AsyncTask<Void> removeWorld() {
+        if (world != null)
+            return WorldUtil.removeWorld(world.getName());
+
+        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
     }
 
     /**
@@ -247,7 +258,7 @@ public final class Game implements Disposable {
     private void onSecondReady() {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, gameUser.getPlayer(), 1, 1);
+                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
             });
         }
@@ -257,7 +268,7 @@ public final class Game implements Disposable {
             remainingTime = gamePlayMode.getPlayDuration();
 
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, gameUser.getPlayer(), 10, 1);
+                SoundUtil.play(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
             });
         }
@@ -271,7 +282,7 @@ public final class Game implements Disposable {
 
         if (remainingTime > 0 && remainingTime <= 10) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, gameUser.getPlayer(), 1, 1);
+                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
             });
         }
@@ -484,7 +495,7 @@ public final class Game implements Disposable {
     private void playWinEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
-            SoundUtil.play(Sound.UI_TOAST_CHALLENGE_COMPLETE, gameUser.getPlayer(), 10, 1.5);
+            SoundUtil.play(NamedSound.GAME_WIN, gameUser.getPlayer());
         }, 40).run();
     }
 
@@ -496,7 +507,7 @@ public final class Game implements Disposable {
     private void playLoseEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
-            SoundUtil.play(Sound.ENTITY_BLAZE_DEATH, gameUser.getPlayer(), 10, 0.5);
+            SoundUtil.play(NamedSound.GAME_LOSE, gameUser.getPlayer());
         }, 40).run();
     }
 
@@ -508,7 +519,7 @@ public final class Game implements Disposable {
     private void playDrawEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
-            SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, gameUser.getPlayer(), 10, 1);
+            SoundUtil.play(NamedSound.GAME_DRAW, gameUser.getPlayer());
         }, 40).run();
     }
 

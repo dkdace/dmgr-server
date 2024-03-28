@@ -59,7 +59,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 }
 
                 new JagerWeaponRHitscan().shoot();
-                playShootSound(combatUser.getEntity().getLocation());
+                SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_USE_SCOPE, combatUser.getEntity().getLocation());
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
@@ -89,17 +89,6 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         mainWeapon.getAimModule().toggleAim();
         mainWeapon.getSwapModule().swap();
         reloadModule.setReloading(false);
-    }
-
-    /**
-     * 발사 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playShootSound(Location location) {
-        SoundUtil.play("random.gun2.psg_1_1", location, 3.5, 1);
-        SoundUtil.play("random.gun2.m16_1", location, 3.5, 1);
-        SoundUtil.play("random.gun.reverb", location, 5.5, 0.95);
     }
 
     private void reload() {

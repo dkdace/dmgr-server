@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -20,7 +21,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -62,7 +62,7 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), -0.2, 0, 0);
             new ArkaceA1Projectile().shoot(loc);
-            playShootSound(loc);
+            SoundUtil.play(NamedSound.COMBAT_ARKACE_A1_USE, loc);
 
             return true;
         }, isCancelled ->
@@ -73,16 +73,6 @@ public final class ArkaceA1 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
-    }
-
-    /**
-     * 발사 시 효과음을 재생한다.
-     *
-     * @param location 발사 위치
-     */
-    private void playShootSound(Location location) {
-        SoundUtil.play("random.gun.grenade", location, 3, 1.5);
-        SoundUtil.play(Sound.ENTITY_SHULKER_SHOOT, location, 3, 1.2);
     }
 
     private class ArkaceA1Projectile extends Projectile {
@@ -120,13 +110,8 @@ public final class ArkaceA1 extends ActiveSkill {
             CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, ArkaceA1Info.RADIUS, condition);
 
             new ArkaceA1Area(condition, targets).emit(location);
-            playExplodeEffect(location);
-        }
 
-        private void playExplodeEffect(Location location) {
-            SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4, 0.8);
-            SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4, 1.4);
-            SoundUtil.play("random.gun_reverb2", location, 6, 0.9);
+            SoundUtil.play(NamedSound.COMBAT_ARKACE_A1_EXPLODE, location);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
                     2.5, 2.5, 2.5, 32, 250, 225);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2, 0.2, 0.2, 0.2);

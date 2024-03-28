@@ -34,11 +34,10 @@ public abstract class Area {
     /**
      * 광역 판정 인스턴스를 생성한다.
      *
-     * <p>선택적 옵션은 {@link HitscanOption} 객체를 통해 전달받는다.</p>
-     *
-     * @param shooter 발사자
-     * @param radius  범위 (반지름). (단위: 블록)
-     * @param targets 예상 피격자 목록
+     * @param shooter   발사자
+     * @param radius    범위 (반지름). (단위: 블록)
+     * @param condition 대상 엔티티를 찾는 조건
+     * @param targets   예상 피격자 목록
      */
     protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<CombatEntity> condition, @NonNull CombatEntity[] targets) {
         this.shooter = shooter;
@@ -55,7 +54,7 @@ public abstract class Area {
      *
      * @param center 판정 중심지
      */
-    public void emit(@NonNull Location center) {
+    public final void emit(@NonNull Location center) {
         for (CombatEntity target : targets) {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override

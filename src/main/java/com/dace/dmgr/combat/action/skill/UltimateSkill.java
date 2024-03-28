@@ -3,9 +3,9 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
-import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -28,15 +28,16 @@ public abstract class UltimateSkill extends ActiveSkill {
     }
 
     @Override
-    protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, combatUser.getEntity(), 0.5, 2);
+    protected void onCooldownFinished() {
+        super.onCooldownFinished();
+        SoundUtil.play(NamedSound.COMBAT_ULTIMATE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setUltGaugePercent(0);
-        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, combatUser.getEntity().getLocation(), 10, 2);
+        SoundUtil.play(NamedSound.COMBAT_ULTIMATE_SKILL_USE, combatUser.getEntity().getLocation());
     }
 
     /**

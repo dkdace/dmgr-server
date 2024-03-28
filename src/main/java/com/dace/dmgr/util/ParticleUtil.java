@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -173,35 +174,51 @@ public final class ParticleUtil {
      * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBleeding(Location location, Entity entity, int damage) {
+    public static void playBleedingEffect(Location location, Entity entity, int damage) {
+        if (location == null && entity == null)
+            return;
+
         if (location == null)
-            playBleeding(entity, damage);
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.1),
+                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
         else
-            playBleeding(location, damage);
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0, location, (int) Math.ceil(damage * 0.06),
+                    0, 0, 0, 0.1);
     }
 
-
     /**
-     * 지정한 위치에 출혈 효과를 재생한다.
+     * 지정한 위치 또는 엔티티에 파괴 효과를 재생한다.
      *
      * @param location 대상 위치
+     * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBleeding(@NonNull Location location, int damage) {
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0, location, (int) Math.ceil(damage * 0.06),
-                0, 0, 0, 0.1);
+    public static void playBreakEffect(Location location, Entity entity, int damage) {
+        if (location == null && entity == null)
+            return;
+
+        if (location == null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
+                    entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.07),
+                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
+        else
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.04),
+                    0, 0, 0, 0.1);
     }
 
     /**
-     * 지정한 엔티티에 출혈 효과를 재생한다.
+     * 지정한 위치에 블록 타격 효과를 재생한다.
      *
-     * @param entity 대상 엔티티
-     * @param damage 피해량
+     * @param location        대상 위치
+     * @param block           블록
+     * @param scaleMultiplier 규모(입자의 양 및 범위) 배수
      */
-    public static void playBleeding(@NonNull Entity entity, int damage) {
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
-                entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.1),
-                entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
+    public static void playBlockHitEffect(@NonNull Location location, @NonNull Block block, double scaleMultiplier) {
+        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, block.getType(), block.getData(), location,
+                (int) (6 * scaleMultiplier), 0.06 * scaleMultiplier, 0.06 * scaleMultiplier, 0.06 * scaleMultiplier, 0.1);
+        ParticleUtil.play(Particle.TOWN_AURA, location, (int) (25 * scaleMultiplier),
+                0.05 * scaleMultiplier, 0.05 * scaleMultiplier, 0.05 * scaleMultiplier, 0);
     }
 
     /**

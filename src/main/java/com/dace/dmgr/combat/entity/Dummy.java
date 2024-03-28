@@ -91,7 +91,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        ParticleUtil.playBleeding(location, entity, damage);
+        ParticleUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override

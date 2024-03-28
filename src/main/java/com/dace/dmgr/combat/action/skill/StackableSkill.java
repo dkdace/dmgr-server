@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -105,8 +107,9 @@ public abstract class StackableSkill extends ActiveSkill {
     /**
      * 스택 충전 쿨타임이 끝났을 때 실행할 작업.
      */
+    @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
-        playCooldownFinishSound();
+        SoundUtil.play(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     /**

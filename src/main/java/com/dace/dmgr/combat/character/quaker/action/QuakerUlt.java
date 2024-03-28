@@ -12,10 +12,7 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -24,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -89,7 +85,7 @@ public final class QuakerUlt extends UltimateSkill {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
 
                     if (index % 2 == 0)
-                        playUseSound(loc.add(vec));
+                        SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
                         CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
                         onCancelled();
@@ -109,21 +105,11 @@ public final class QuakerUlt extends UltimateSkill {
     }
 
     /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, location, 1, 0.5);
-        SoundUtil.play("random.gun2.shovel_leftclick", location, 1, 0.5);
-    }
-
-    /**
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0.3, 0);
-        playReadySound(loc);
+        SoundUtil.play(NamedSound.COMBAT_QUAKER_ULT_USE_READY, loc);
         ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
                 0.2, 0.2, 0.2, 0.6);
         Set<CombatEntity> targets = new HashSet<>();
@@ -144,19 +130,6 @@ public final class QuakerUlt extends UltimateSkill {
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
             return true;
         }, 1, 6));
-    }
-
-    /**
-     * 시전 완료 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playReadySound(Location location) {
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 5, 0.5);
-        SoundUtil.play(Sound.ENTITY_IRONGOLEM_DEATH, location, 5, 0.7);
-        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 5, 0.7);
-        SoundUtil.play(Sound.BLOCK_ANVIL_PLACE, location, 5, 0.5);
-        SoundUtil.play("random.explosion_reverb", location, 7, 1.4);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -240,7 +213,7 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, true);
+                target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerUltInfo.STUN_DURATION);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),

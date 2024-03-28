@@ -19,7 +19,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -61,11 +60,11 @@ public final class JagerA3 extends ActiveSkill {
         if (isDurationFinished()) {
             combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             setDuration();
-            playUseSound(combatUser.getEntity().getLocation());
+            SoundUtil.play(NamedSound.COMBAT_JAGER_A3_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION);
-                playReadySound(combatUser.getEntity().getLocation());
+                SoundUtil.play(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
                 isEnabled = true;
 
                 TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -87,7 +86,7 @@ public final class JagerA3 extends ActiveSkill {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
             new JagerA3Projectile().shoot(loc);
-            playThrowSound(loc);
+            SoundUtil.play(NamedSound.COMBAT_THROW, loc);
 
             isEnabled = false;
             onCancelled();
@@ -103,40 +102,12 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5, 1.6);
-    }
-
-    /**
-     * 시전 완료 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playReadySound(Location location) {
-        SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, location, 0.8, 1.2);
-        SoundUtil.play("new.block.chain.place", location, 0.8, 1.2);
-    }
-
-    /**
      * 사용 중 효과를 재생한다.
      *
      * @param location 사용 위치
      */
     private void playTickEffect(Location location) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1, 0.1, 0.1, 120, 220, 240);
-    }
-
-    /**
-     * 투척 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playThrowSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_WITCH_THROW, location, 0.8, 0.8);
     }
 
     /**
@@ -151,19 +122,8 @@ public final class JagerA3 extends ActiveSkill {
         CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, JagerA3Info.RADIUS, condition);
 
         new JagerA3Area(condition, targets, projectile).emit(location);
-        playExplodeEffect(location);
-    }
 
-    /**
-     * 폭파 시 효과를 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playExplodeEffect(Location location) {
-        SoundUtil.play(Sound.ENTITY_FIREWORK_LARGE_BLAST, location, 4, 0.6);
-        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, location, 4, 1.2);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, location, 4, 1.5);
-        SoundUtil.play("random.explosion_reverb", location, 6, 1.2);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A3_EXPLODE, location);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, location,
                 300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.PACKED_ICE, 0, location,
@@ -186,8 +146,7 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.play("random.metalhit", location, 0.1 + velocity.length() * 2, 1.2, 0.1);
-            SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.1 + velocity.length() * 2, 2);
+            SoundUtil.play(NamedSound.COMBAT_THROW_BOUNCE, location, 0.1 + velocity.length() * 2);
             return false;
         }
 
