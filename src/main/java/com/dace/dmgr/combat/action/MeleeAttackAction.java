@@ -2,12 +2,11 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeAttack;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 
 /**
  * 기본 근접 공격 동작 클래스.
@@ -47,7 +46,7 @@ public final class MeleeAttackAction extends AbstractAction {
         combatUser.setGlobalCooldown(20);
         setCooldown();
 
-        playUseSound(combatUser.getEntity().getEyeLocation());
+        SoundUtil.play(NamedSound.COMBAT_MELEE_ATTACK_USE, combatUser.getEntity().getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
@@ -57,14 +56,5 @@ public final class MeleeAttackAction extends AbstractAction {
         }, 2));
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_SWEEP, location, 0.6, 1.1, 0.1);
     }
 }
