@@ -4,10 +4,10 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -40,9 +40,10 @@ public abstract class ActiveSkill extends AbstractSkill {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
         displayReady(1);
-        playCooldownFinishSound();
+        SoundUtil.play(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override
@@ -63,13 +64,6 @@ public abstract class ActiveSkill extends AbstractSkill {
         super.dispose();
 
         combatUser.getEntity().getInventory().clear(slot);
-    }
-
-    /**
-     * 쿨타임이 끝났을 때 효과음을 재생한다.
-     */
-    protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, combatUser.getEntity(), 0.2, 2);
     }
 
     /**

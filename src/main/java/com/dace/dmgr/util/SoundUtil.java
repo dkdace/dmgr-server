@@ -3,7 +3,10 @@ package com.dace.dmgr.util;
 import com.dace.dmgr.DMGR;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -125,6 +128,60 @@ public final class SoundUtil {
     }
 
     /**
+     * 지정한 위치에 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound       이름이 지정된 효과음
+     * @param location         위치
+     * @param volumeMultiplier 음량 배수
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier) {
+        for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
+            String soundName = definedSound.getSound();
+            if (soundName.toUpperCase().equals(soundName))
+                play(Sound.valueOf(soundName), location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+            else
+                play(soundName, location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+        }
+    }
+
+    /**
+     * 지정한 플레이어만 들을 수 있는 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound       이름이 지정된 효과음
+     * @param player           대상 플레이어
+     * @param volumeMultiplier 음량 배수.
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier) {
+        for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
+            String soundName = definedSound.getSound();
+            if (soundName.toUpperCase().equals(soundName))
+                play(Sound.valueOf(soundName), player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+            else
+                play(soundName, player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+        }
+    }
+
+    /**
+     * 지정한 위치에 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound 이름이 지정된 효과음
+     * @param location   위치
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Location location) {
+        play(namedSound, location, 1);
+    }
+
+    /**
+     * 지정한 플레이어만 들을 수 있는 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound 이름이 지정된 효과음
+     * @param player     대상 플레이어
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Player player) {
+        play(namedSound, player, 1);
+    }
+
+    /**
      * 모든 플레이어에게 소리를 재생한다.
      *
      * @param sound  소리 종류
@@ -178,56 +235,25 @@ public final class SoundUtil {
     /**
      * 지정한 위치에 블록 타격 효과음을 재생한다.
      *
-     * @param location 대상 위치
-     * @param block    블록
+     * @param location         대상 위치
+     * @param block            블록
+     * @param volumeMultiplier 음량 배수
      */
-    public static void playBlockHitSound(@NonNull Location location, @NonNull Block block) {
-        switch (getBlockTexture(block.getType())) {
-            case GRASS:
-                play(Sound.BLOCK_GRASS_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case DIRT:
-                play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case STONE:
-                play(Sound.BLOCK_STONE_BREAK, location, 1, 0.9, 0.1);
-                break;
-            case METAL:
-                play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5, 1.95, 0.1);
-                play("random.metalhit", location, 0.8, 1.95, 0.1);
-                break;
-            case WOOD:
-                play(Sound.BLOCK_WOOD_BREAK, location, 0.8, 0.8, 0.1);
-                play("random.stab", location, 0.8, 1.95, 0.1);
-                break;
-            case GLASS:
-                play(Sound.BLOCK_GLASS_BREAK, location, 0.8, 0.7, 0.1);
-                break;
-            case WOOL:
-                play(Sound.BLOCK_CLOTH_BREAK, location, 1, 0.8, 0.1);
-                break;
-        }
-    }
-
-    /**
-     * 블록의 재질을 반환한다.
-     *
-     * @param material 아이템 타입
-     */
-    @NonNull
-    private static Texture getBlockTexture(@NonNull Material material) {
-        switch (material) {
+    public static void playBlockHitSound(@NonNull Location location, @NonNull Block block, double volumeMultiplier) {
+        switch (block.getType()) {
             case GRASS:
             case LEAVES:
             case LEAVES_2:
             case SPONGE:
             case HAY_BLOCK:
-                return Texture.GRASS;
+                play(Sound.BLOCK_GRASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                break;
             case DIRT:
             case GRAVEL:
             case SAND:
             case CLAY:
-                return Texture.DIRT;
+                play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                break;
             case STONE:
             case COBBLESTONE:
             case COBBLESTONE_STAIRS:
@@ -254,7 +280,8 @@ public final class SoundUtil {
             case STONE_SLAB2:
             case DOUBLE_STONE_SLAB2:
             case CONCRETE:
-                return Texture.STONE;
+                play(Sound.BLOCK_STONE_BREAK, location, 1 * volumeMultiplier, 0.9, 0.1);
+                break;
             case IRON_BLOCK:
             case GOLD_BLOCK:
             case IRON_DOOR_BLOCK:
@@ -262,7 +289,9 @@ public final class SoundUtil {
             case IRON_TRAPDOOR:
             case CAULDRON:
             case HOPPER:
-                return Texture.METAL;
+                play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5 * volumeMultiplier, 1.95, 0.1);
+                play("random.metalhit", location, 0.8 * volumeMultiplier, 1.95, 0.1);
+                break;
             case WOOD:
             case LOG:
             case LOG_2:
@@ -296,7 +325,9 @@ public final class SoundUtil {
             case ACACIA_DOOR:
             case CHEST:
             case BOOKSHELF:
-                return Texture.WOOD;
+                play(Sound.BLOCK_WOOD_BREAK, location, 0.8 * volumeMultiplier, 0.8, 0.1);
+                play("random.stab", location, 0.8 * volumeMultiplier, 1.95, 0.1);
+                break;
             case GLASS:
             case THIN_GLASS:
             case STAINED_GLASS:
@@ -307,34 +338,12 @@ public final class SoundUtil {
             case REDSTONE_LAMP_OFF:
             case REDSTONE_LAMP_ON:
             case SEA_LANTERN:
-                return Texture.GLASS;
+                play(Sound.BLOCK_GLASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                break;
             case WOOL:
             case CARPET:
-                return Texture.WOOL;
-            default:
-                return Texture.NONE;
+                play(Sound.BLOCK_CLOTH_BREAK, location, 1 * volumeMultiplier, 0.8, 0.1);
+                break;
         }
-    }
-
-    /**
-     * 블록 재질의 종류.
-     */
-    private enum Texture {
-        /** 미지정 */
-        NONE,
-        /** 풀 */
-        GRASS,
-        /** 흙 */
-        DIRT,
-        /** 석재 */
-        STONE,
-        /** 금속 */
-        METAL,
-        /** 목재 */
-        WOOD,
-        /** 유리 */
-        GLASS,
-        /** 양털 */
-        WOOL
     }
 }

@@ -45,7 +45,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -263,7 +266,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            ParticleUtil.playBleeding(entity, 0);
+            ParticleUtil.playBleedingEffect(null, entity, 0);
     }
 
     /**
@@ -324,7 +327,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK);
         damageModule.heal((Healer) null, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, entity.getLocation(), 0.5, 1.2);
+        SoundUtil.play(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
 
@@ -356,9 +359,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD);
 
         push(new Vector(0, 1.4, 0), true);
-        SoundUtil.play(Sound.ENTITY_PLAYER_SMALL_FALL, entity.getLocation(), 1.5, 1.5, 0.1);
-        SoundUtil.play(Sound.ENTITY_ITEM_PICKUP, entity.getLocation(), 1.5, 0.8, 0.05);
-        SoundUtil.play(Sound.ENTITY_ITEM_PICKUP, entity.getLocation(), 1.5, 1.4, 0.05);
+        SoundUtil.play(NamedSound.COMBAT_USE_JUMP_PAD, entity.getLocation());
     }
 
     /**
@@ -387,15 +388,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 footstepDistance = 0;
                 double volume = 1.2 + fallDistance * 0.05;
 
-                if (fallDistance > 6) {
-                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.5 * volume, 0.8, 0.1);
-                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.5 * volume, 0.9, 0.1);
-                    SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity.getLocation(), 0.5 * volume, 0.9, 0.1);
-                } else if (fallDistance > 3) {
-                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.4 * volume, 0.9, 0.1);
-                    SoundUtil.play(Sound.ENTITY_PLAYER_SMALL_FALL, entity.getLocation(), 0.4 * volume, 0.9, 0.1);
-                } else if (fallDistance > 0)
-                    SoundUtil.play(Sound.BLOCK_STONE_STEP, entity.getLocation(), 0.3 * volume, 0.9, 0.1);
+                if (fallDistance > 6)
+                    SoundUtil.play(NamedSound.COMBAT_FALL_HIGH, entity.getLocation(), volume);
+                else if (fallDistance > 3)
+                    SoundUtil.play(NamedSound.COMBAT_FALL_MID, entity.getLocation(), volume);
+                else if (fallDistance > 0)
+                    SoundUtil.play(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
 
                 if (entity.isSprinting())
                     volume = 1;
@@ -495,10 +493,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (!(victim instanceof Barrier))
             showHealthHologram(victim);
-        if (isCrit)
-            playCritAttackEffect();
-        else
-            playAttackEffect();
+        if (isCrit) {
+            user.sendTitle("", "§c§l×", 0, 2, 10);
+            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
+        } else {
+            user.sendTitle("", "§f×", 0, 2, 10);
+            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_ATTACK, entity), 2));
+        }
 
         if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
@@ -526,28 +527,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }, isCancelled -> HologramUtil.setHologramVisibility("hitHealth" + victim, false, entity), 1));
         } else
             CooldownUtil.setCooldown(this, Cooldown.HIT_HEALTH_HOLOGRAM, victim.toString());
-    }
-
-    /**
-     * 공격했을 때 효과를 재생한다.
-     */
-    private void playAttackEffect() {
-        user.sendTitle("", "§f×", 0, 2, 10);
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity, 1, 1.4);
-            SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity, 1, 0.7);
-        }, 2));
-    }
-
-    /**
-     * 공격했을 때 효과를 재생한다. (치명타)
-     */
-    private void playCritAttackEffect() {
-        user.sendTitle("", "§c§l×", 0, 2, 10);
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(Sound.ENTITY_PLAYER_BIG_FALL, entity, 2, 0.7);
-            SoundUtil.play(Sound.BLOCK_ANVIL_PLACE, entity, 0.4, 1.8);
-        }, 2));
     }
 
     @Override
@@ -674,10 +653,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playKillEffect() {
         user.sendTitle("", "§c" + TextIcon.POISON, 0, 2, 10);
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 2, 1.25);
-            SoundUtil.play(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, entity, 1, 1.25);
-        }, 2));
+        TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_KILL, entity), 2));
     }
 
     /**
@@ -951,6 +927,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.getInventory().setHeldItemSlot(4);
         entity.getActivePotionEffects().forEach((potionEffect ->
                 entity.removePotionEffect(potionEffect.getType())));
+        entity.setAllowFlight(false);
         entity.setFlying(false);
         entity.setGameMode(GameMode.SURVIVAL);
         fovValue = 0;

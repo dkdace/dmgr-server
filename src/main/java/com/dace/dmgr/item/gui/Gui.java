@@ -3,13 +3,13 @@ package com.dace.dmgr.item.gui;
 import com.dace.dmgr.event.EventUtil;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -76,7 +76,7 @@ public abstract class Gui implements Listener {
                 return;
 
             if (((GuiItem<?>) staticItem).isClickable()) {
-                SoundUtil.play(Sound.UI_BUTTON_CLICK, player, 1, 1);
+                SoundUtil.play(NamedSound.GENERAL_GUI_CLICK, player);
 
                 onClick(event, player, (GuiItem<?>) staticItem);
             }

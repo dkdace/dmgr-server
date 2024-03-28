@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.BouncingProjectileOption;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -16,7 +17,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.util.Vector;
@@ -54,7 +54,7 @@ public final class JagerUlt extends UltimateSkill {
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
 
         Location location = combatUser.getEntity().getLocation();
-        playUseSound(location);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_USE, location);
         setDuration();
         if (entity != null)
             entity.dispose();
@@ -64,7 +64,7 @@ public final class JagerUlt extends UltimateSkill {
 
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
-            SoundUtil.play(Sound.ENTITY_WITCH_THROW, loc, 0.8, 0.7);
+            SoundUtil.play(NamedSound.COMBAT_THROW, loc);
 
             new JagerUltProjectile().shoot(loc);
         }, JagerUltInfo.READY_DURATION));
@@ -74,15 +74,6 @@ public final class JagerUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_CAT_PURREOW, location, 0.5, 1.6);
     }
 
     @Override

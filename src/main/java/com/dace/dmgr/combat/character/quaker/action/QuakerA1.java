@@ -4,11 +4,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 
 @Getter
@@ -55,7 +54,7 @@ public final class QuakerA1 extends ChargeableSkill {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA1", -QuakerA1Info.USE_SPEED);
             combatUser.setFovValue(0.3);
-            playUseSound(combatUser.getEntity().getLocation());
+            SoundUtil.play(NamedSound.COMBAT_QUAKER_A1_USE, combatUser.getEntity().getLocation());
 
             ArmorStand armorStand = CombatEntityUtil.spawn(ArmorStand.class, combatUser.getEntity().getLocation());
             entity = new QuakerA1Entity(armorStand, combatUser);
@@ -70,20 +69,10 @@ public final class QuakerA1 extends ChargeableSkill {
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA1");
         combatUser.setFovValue(0);
-        SoundUtil.play(Sound.BLOCK_SHULKER_BOX_CLOSE, combatUser.getEntity().getLocation(), 1, 1.4);
+        SoundUtil.play(NamedSound.COMBAT_QUAKER_A1_DISABLE, combatUser.getEntity().getLocation());
 
         if (entity != null)
             entity.dispose();
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_ENDERDRAGON_FLAP, location, 1, 0.6);
-        SoundUtil.play(Sound.BLOCK_SHULKER_BOX_OPEN, location, 1, 0.7);
     }
 
     @Override

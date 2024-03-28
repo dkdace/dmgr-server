@@ -8,13 +8,13 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 
 import java.util.StringJoiner;
 
@@ -60,13 +60,12 @@ public final class Quaker extends Character {
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
-        SoundUtil.play(Sound.ENTITY_COW_STEP, combatUser.getEntity().getLocation(), 0.3 * volume, 0.9, 0.1);
-        SoundUtil.play("new.entity.ravager.step", combatUser.getEntity().getLocation(), 0.2 * volume, 0.8, 0.1);
+        SoundUtil.play(NamedSound.COMBAT_QUAKER_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleeding(location, victim.getEntity(), damage);
+        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override

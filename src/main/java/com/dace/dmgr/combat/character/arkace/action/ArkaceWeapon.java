@@ -67,11 +67,11 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 if (isUlt) {
                     new ArkaceWeaponHitscan(true).shoot();
-                    playUltShootSound(loc);
+                    SoundUtil.play(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
                 } else {
                     Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), fullAutoModule.increaseSpread());
                     new ArkaceWeaponHitscan(false).shoot(dir);
-                    playShootSound(loc);
+                    SoundUtil.play(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
 
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
@@ -92,27 +92,6 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     public void onCancelled() {
         super.onCancelled();
         reloadModule.setReloading(false);
-    }
-
-    /**
-     * 발사 시 효과음을 재생한다.
-     *
-     * @param location 발사 위치
-     */
-    private void playShootSound(Location location) {
-        SoundUtil.play("random.gun2.scarlight_1", location, 3, 1);
-        SoundUtil.play("random.gun_reverb", location, 5, 1.2);
-    }
-
-    /**
-     * 발사 시 효과음을 재생한다. (궁극기)
-     *
-     * @param location 발사 위치
-     */
-    private void playUltShootSound(Location location) {
-        SoundUtil.play("new.block.beacon.deactivate", location, 4, 2);
-        SoundUtil.play("random.energy", location, 4, 1.6);
-        SoundUtil.play("random.gun_reverb", location, 5, 1.2);
     }
 
     @Override

@@ -90,7 +90,7 @@ public final class Jager extends Character {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleeding(location, victim.getEntity(), damage);
+        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 
@@ -75,7 +75,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         entity.setOwner(owner.getEntity());
         entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, entity.getLocation(), 0.8, 1);
+        SoundUtil.play(NamedSound.COMBAT_ENTITY_SUMMON, entity.getLocation());
 
         damageModule.setHealth((int) skill.getStateValue());
     }
@@ -94,7 +94,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onReady() {
-        SoundUtil.play(Sound.ENTITY_WOLF_GROWL, entity.getLocation(), 1, 1);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_SUMMON_READY, entity.getLocation());
         entity.setAI(true);
     }
 
@@ -137,15 +137,16 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play(Sound.ENTITY_WOLF_HURT, entity.getLocation(), 0.4 + damage * 0.001, 1, 0.1);
-        ParticleUtil.playBleeding(location, entity, damage);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        ParticleUtil.playBleedingEffect(location, entity, damage);
         skill.addStateValue(-damage);
     }
 
     @Override
     public void onDeath(Attacker attacker) {
         dispose();
-        SoundUtil.play(Sound.ENTITY_WOLF_DEATH, entity.getLocation(), 1, 1);
+
+        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
         skill.setStateValue(0);
         skill.setCooldown(JagerA1Info.COOLDOWN_DEATH);
     }

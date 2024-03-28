@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.*;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
@@ -71,7 +74,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        SoundUtil.play(Sound.ENTITY_PLAYER_HURT, entity.getLocation(), 0.5, 0.5);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_SUMMON, entity.getLocation());
 
         damageModule.setMaxHealth(JagerUltInfo.HEALTH);
         damageModule.setHealth(JagerUltInfo.HEALTH);
@@ -87,16 +90,10 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     public void onTickBeforeReady(long i) {
         if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
             entity.teleport(entity.getLocation().add(0, 0.2, 0));
-        playBeforeReadyEffect();
-        playTickEffect();
-    }
 
-    /**
-     * 준비 대기 시간의 효과를 재생한다.
-     */
-    private void playBeforeReadyEffect() {
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
-        SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, entity.getLocation(), 0.8, 1.7);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, entity.getLocation());
+        playTickEffect();
     }
 
     @Override
@@ -143,10 +140,8 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
      */
     private void playTickEffect(long i, double range) {
         long angle = i * 14;
-        if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0) {
-            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3, 1.3, 0.2);
-            SoundUtil.play(Sound.ITEM_ELYTRA_FLYING, entity.getLocation(), 3, 1.7, 0.2);
-        }
+        if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
+            SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_TICK, entity.getLocation());
 
         for (int _i = 1; _i <= 6; _i++) {
             Location loc = entity.getLocation();
@@ -192,33 +187,19 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play("random.metalhit", entity.getLocation(), 0.4 + damage * 0.001, 1.1, 0.1);
-        if (location == null)
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
-                    entity.getLocation().add(0, entity.getHeight() / 2, 0), (int) Math.ceil(damage * 0.07),
-                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, 0.1);
-        else
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.03),
-                    0, 0, 0, 0.1);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        ParticleUtil.playBreakEffect(location, entity, damage);
     }
 
     @Override
     public void onDeath(Attacker attacker) {
         dispose();
-        playDeathEffect();
-    }
 
-    /**
-     * 죽었을 때 효과를 재생한다.
-     */
-    private void playDeathEffect() {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
                 0.1, 0.1, 0.1, 0.15);
         ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1, 0.1, 0.1, 0.5);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-        SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, entity.getLocation(), 2, 0.7);
-        SoundUtil.play(Sound.ENTITY_ITEM_BREAK, entity.getLocation(), 2, 0.7);
-        SoundUtil.play(Sound.ENTITY_GENERIC_EXPLODE, entity.getLocation(), 2, 1.2);
+        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_DEATH, entity.getLocation());
     }
 
     private class JagerUltArea extends Area {
