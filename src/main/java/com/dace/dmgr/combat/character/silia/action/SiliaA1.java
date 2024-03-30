@@ -12,10 +12,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -62,10 +59,11 @@ public final class SiliaA1 extends ActiveSkill {
         setDuration(-1);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-3, 6, true);
-        playUseSound(combatUser.getEntity().getLocation());
 
         Location location = combatUser.getEntity().getLocation();
+        SoundUtil.play(NamedSound.COMBAT_SILIA_A1_USE, location);
         Set<CombatEntity> targets = new HashSet<>();
+
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
             combatUser.push(loc.getDirection().multiply(2.5), true);
@@ -73,7 +71,7 @@ public final class SiliaA1 extends ActiveSkill {
             new SiliaA1Hitscan(targets).shoot();
             CombatUtil.setYawAndPitch(combatUser.getEntity(), location.getYaw(), location.getPitch());
 
-            TaskUtil.addTask(combatUser, new DelayTask(() -> {
+            TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
                 for (Location trailLoc : LocationUtil.getLine(loc, loc2, 0.3)) {
                     ParticleUtil.play(Particle.CRIT, trailLoc, 3, 0.02, 0.02, 0.02, 0);
@@ -94,17 +92,6 @@ public final class SiliaA1 extends ActiveSkill {
         if (!isDurationFinished())
             setDuration(0);
         combatUser.getWeapon().setVisible(true);
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play("new.item.trident.throw", location, 1.5, 0.8);
-        SoundUtil.play("random.swordhit", location, 1.5, 0.8);
-        SoundUtil.play("random.swordhit", location, 1.5, 0.8);
     }
 
     private class SiliaA1Hitscan extends Hitscan {

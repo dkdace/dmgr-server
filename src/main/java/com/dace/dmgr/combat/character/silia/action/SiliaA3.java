@@ -3,13 +3,12 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 
 @Getter
 public final class SiliaA3 extends ChargeableSkill {
@@ -48,7 +47,7 @@ public final class SiliaA3 extends ChargeableSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier("SiliaA3", SiliaA3Info.SPEED);
-            playUseSound(combatUser.getEntity().getLocation());
+            SoundUtil.play(NamedSound.COMBAT_SILIA_A3_USE, combatUser.getEntity().getLocation());
 
             int health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -62,7 +61,7 @@ public final class SiliaA3 extends ChargeableSkill {
                     ((SiliaWeapon) combatUser.getWeapon()).isStrike = true;
                     combatUser.getWeapon().setGlowing(true);
                     combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-                    SoundUtil.play("new.item.trident.return", combatUser.getEntity(), 1, 1.2);
+                    SoundUtil.play(NamedSound.COMBAT_SILIA_A3_ACTIVATE, combatUser.getEntity());
                 }
 
                 return true;
@@ -83,26 +82,6 @@ public final class SiliaA3 extends ChargeableSkill {
         combatUser.getWeapon().setGlowing(false);
         combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("SiliaA3");
-        playDisableSound(combatUser.getEntity().getLocation());
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.2, 1);
-        SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, location, 0.15, 1.5);
-    }
-
-    /**
-     * 비활성화 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playDisableSound(Location location) {
-        SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.2, 1.2);
-        SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, location, 0.15, 1.7);
+        SoundUtil.play(NamedSound.COMBAT_SILIA_A3_DISABLE, combatUser.getEntity().getLocation());
     }
 }

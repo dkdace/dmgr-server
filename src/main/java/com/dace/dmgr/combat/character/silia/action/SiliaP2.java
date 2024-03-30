@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -11,7 +12,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public final class SiliaP2 extends AbstractSkill {
@@ -83,9 +83,9 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.push(new Vector(0, 0.45, 0), true);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SoundUtil.play(Sound.BLOCK_STONE_STEP, combatUser.getEntity().getLocation(), 0.9, 0.55, 0.05);
+                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
             else
-                SoundUtil.play(Sound.BLOCK_STONE_STEP, combatUser.getEntity().getLocation(), 0.08, 0.8, 0.05);
+                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
 
             return true;
         }, isCancelled -> {

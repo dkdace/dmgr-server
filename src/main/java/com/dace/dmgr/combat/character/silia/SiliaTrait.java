@@ -8,17 +8,13 @@ import com.dace.dmgr.combat.character.silia.action.SiliaT2Info;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -88,25 +84,13 @@ public final class SiliaTrait {
                 CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
 
                 if (index < 3)
-                    playStrikeSound(loc.add(vec), index);
+                    SoundUtil.play(NamedSound.COMBAT_SILIA_T2_USE, loc.add(vec), 1, index * 0.12);
                 if (index == 7) {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), isOpposite ? 0.7 : -0.7, -0.85);
                     combatUser.getWeapon().onCancelled();
                 }
             }, delay));
         }
-    }
-
-    /**
-     * 일격 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     * @param index    인덱스
-     */
-    private void playStrikeSound(Location location, int index) {
-        SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_SWEEP, location, 1.5, 1);
-        SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, location, 1.5, 0.8);
-        SoundUtil.play("random.swordhit", location, 1.5, 0.7 + index * 0.15);
     }
 
     private class SiliaWeaponStrikeAttack extends Hitscan {
@@ -138,10 +122,8 @@ public final class SiliaTrait {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
-                    7, 0.08, 0.08, 0.08, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, location, 40, 0.08, 0.08, 0.08, 0);
-            SoundUtil.playBlockHitSound(location, hitBlock);
+            ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
+            SoundUtil.playBlockHitSound(location, hitBlock, 1);
 
             return false;
         }
@@ -152,8 +134,9 @@ public final class SiliaTrait {
                 target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
                         SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
                 target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()));
+
                 ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
-                SoundUtil.play("random.stab", location, 1, 0.8, 0.05);
+                SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
             }
 
             return !(target instanceof Barrier);

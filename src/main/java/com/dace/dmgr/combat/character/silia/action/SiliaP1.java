@@ -4,12 +4,12 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
@@ -42,7 +42,10 @@ public final class SiliaP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         Location location = combatUser.getEntity().getLocation();
-        playUseSound(location);
+        if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location);
+        else
+            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location, 0.1, 0.2);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation();
@@ -62,20 +65,5 @@ public final class SiliaP1 extends AbstractSkill {
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
                     isCancelled2 -> setDuration(0), 1));
         }, 1, 2));
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()) {
-            SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.8, 1.2);
-            SoundUtil.play(Sound.BLOCK_CLOTH_STEP, location, 0.8, 1.2);
-        } else {
-            SoundUtil.play(Sound.ENTITY_LLAMA_SWAG, location, 0.08, 1.4);
-            SoundUtil.play(Sound.BLOCK_CLOTH_STEP, location, 0.08, 1.4);
-        }
     }
 }

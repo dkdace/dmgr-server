@@ -8,13 +8,13 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -56,7 +56,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             new SiliaWeaponProjectile().shoot();
             combatUser.playMeleeAttackAnimation(-4, 10, true);
-            playUseSound(combatUser.getEntity().getLocation());
+            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
         }
     }
 
@@ -64,17 +64,6 @@ public final class SiliaWeapon extends AbstractWeapon {
     public void onCancelled() {
         super.onCancelled();
         setVisible(true);
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play("random.gun2.knife_leftclick", location, 0.8, 1);
-        SoundUtil.play("random.swordhit", location, 0.7, 1.2);
-        SoundUtil.play("new.item.trident.riptide_1", location, 0.6, 1.3);
     }
 
     private class SiliaWeaponProjectile extends Projectile {
@@ -104,11 +93,9 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.play(Sound.ENTITY_PLAYER_ATTACK_WEAK, location, 0.8, 0.9, 0.05);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
-                    7, 0.08, 0.08, 0.08, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, location, 40, 0.08, 0.08, 0.08, 0);
-            SoundUtil.playBlockHitSound(location, hitBlock);
+            SoundUtil.play(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
+            SoundUtil.playBlockHitSound(location, hitBlock, 1);
+            ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
 
             return false;
         }
@@ -117,8 +104,9 @@ public final class SiliaWeapon extends AbstractWeapon {
         protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
                     SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+
             ParticleUtil.play(Particle.CRIT, location, 15, 0, 0, 0, 0.4);
-            SoundUtil.play("random.stab", location, 1, 0.8, 0.05);
+            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
 
             return false;
         }

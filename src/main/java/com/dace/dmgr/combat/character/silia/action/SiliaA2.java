@@ -5,21 +5,16 @@ import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.silia.SiliaTrait;
-import com.dace.dmgr.combat.entity.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -55,7 +50,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration(-1);
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
-        playUseSound(combatUser.getEntity().getLocation());
+        SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -74,7 +69,7 @@ public final class SiliaA2 extends ActiveSkill {
 
             new SiliaA2Projectile().shoot();
 
-            playReadySound(combatUser.getEntity().getLocation());
+            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
     }
 
@@ -82,25 +77,6 @@ public final class SiliaA2 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
-    }
-
-    /**
-     * 사용 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playUseSound(Location location) {
-        SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, location, 1, 1);
-    }
-
-    /**
-     * 시전 완료 시 효과음을 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playReadySound(Location location) {
-        SoundUtil.play("random.swing", location, 1.5, 0.6);
-        SoundUtil.play("new.item.trident.riptide_3", location, 1.5, 0.8);
     }
 
     private class SiliaA2Projectile extends Projectile {
@@ -139,6 +115,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+            ParticleUtil.playBlockHitEffect(location, hitBlock, 3);
             return false;
         }
 
@@ -156,13 +133,12 @@ public final class SiliaA2 extends ActiveSkill {
             for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5)) {
                 ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
             }
-            SoundUtil.play("random.swing", location, 1, 0.7, 0.05);
-            SoundUtil.play("new.item.trident.riptide_2", location, 1, 0.9, 0.05);
+            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
             combatUser.getUser().teleport(loc);
             combatUser.push(new Vector(0, 0.8, 0), true);
 
-            return !(target instanceof Barrier);
+            return false;
         }
     }
 }
