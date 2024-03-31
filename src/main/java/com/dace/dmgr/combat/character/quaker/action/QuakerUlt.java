@@ -44,7 +44,12 @@ public final class QuakerUlt extends UltimateSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        if (combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished()) {
+            combatUser.getUser().sendAlert(QuakerA1Info.getInstance() + " 를 활성화한 상태에서만 사용할 수 있습니다.");
+            return false;
+        }
+
+        return super.canUse() && isDurationFinished();
     }
 
     @Override

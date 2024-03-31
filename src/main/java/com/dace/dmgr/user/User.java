@@ -543,6 +543,26 @@ public final class User implements Disposable {
     }
 
     /**
+     * 플레이어에게 경고 액션바를 전송한다.
+     *
+     * @param message 경고 메시지
+     */
+    public void sendAlert(@NonNull String message) {
+        SoundUtil.play(NamedSound.GENERAL_ALERT, player);
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            ChatColor color = ChatColor.YELLOW;
+            if (i == 1)
+                color = ChatColor.GOLD;
+            else if (i == 2)
+                color = ChatColor.RED;
+
+            sendActionBar(color + ChatColor.stripColor(message), 16);
+
+            return true;
+        }, 1, 3));
+    }
+
+    /**
      * 플레이어에게 타이틀을 전송한다.
      *
      * @param title         제목
