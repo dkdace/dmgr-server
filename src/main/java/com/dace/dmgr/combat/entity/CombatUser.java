@@ -481,6 +481,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canFly(this))
             return false;
+        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
+                statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
+            return false;
 
         return true;
     }
