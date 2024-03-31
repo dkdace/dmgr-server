@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.character.silia;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
-import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.character.silia.action.SiliaT1Info;
 import com.dace.dmgr.combat.character.silia.action.SiliaT2Info;
 import com.dace.dmgr.combat.entity.*;
@@ -49,9 +48,6 @@ public final class SiliaTrait {
      * @param isOpposite 반대 방향 여부
      */
     public static void strike(@NonNull CombatUser combatUser, boolean isOpposite) {
-        if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
-
         combatUser.setGlobalCooldown(6);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-2, 6, isOpposite);

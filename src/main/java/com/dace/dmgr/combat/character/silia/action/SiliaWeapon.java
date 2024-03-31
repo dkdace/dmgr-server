@@ -59,6 +59,9 @@ public final class SiliaWeapon extends AbstractWeapon {
             combatUser.playMeleeAttackAnimation(-4, 10, true);
             SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
         }
+
+        if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+            combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
     }
 
     @Override
