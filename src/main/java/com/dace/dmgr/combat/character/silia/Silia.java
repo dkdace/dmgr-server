@@ -59,6 +59,9 @@ public final class Silia extends Character {
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+        if (!(victim instanceof CombatUser))
+            return;
+
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
 
