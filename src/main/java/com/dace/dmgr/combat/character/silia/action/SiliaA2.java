@@ -41,13 +41,14 @@ public final class SiliaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse() && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setGlobalCooldown(20);
-        setDuration(-1);
+        setDuration();
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
         SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());

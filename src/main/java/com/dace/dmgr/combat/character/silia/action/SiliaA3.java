@@ -43,6 +43,11 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
+    public boolean canUse() {
+        return super.canUse() && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();

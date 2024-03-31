@@ -49,8 +49,9 @@ public final class SiliaWeapon extends AbstractWeapon {
         isOpposite = !isOpposite;
 
         if (isStrike) {
-            setCooldown(6);
             SiliaTrait.strike(combatUser, isOpposite);
+            if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
+                setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
         } else {
             setCooldown();
 

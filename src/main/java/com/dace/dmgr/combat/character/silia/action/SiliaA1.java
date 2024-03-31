@@ -56,7 +56,7 @@ public final class SiliaA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().setCooldown(0);
         combatUser.setGlobalCooldown(6);
-        setDuration(-1);
+        setDuration();
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-3, 6, true);
 

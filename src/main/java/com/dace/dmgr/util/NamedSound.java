@@ -325,7 +325,14 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 0.15, 1.7)
     ),
     /** 전투 - '실리아' 액티브 3번 - 활성화 */
-    COMBAT_SILIA_A3_ACTIVATE(new DefinedSound("new.item.trident.return", 1, 1.2));
+    COMBAT_SILIA_A3_ACTIVATE(new DefinedSound("new.item.trident.return", 1, 1.2)),
+    /** 전투 - '실리아' 궁극기 - 사용 준비 */
+    COMBAT_SILIA_ULT_USE_READY(
+            new DefinedSound("random.swordhit", 2, 1),
+            new DefinedSound("random.swordhit", 2, 0.7),
+            new DefinedSound("new.item.trident.return", 2.5, 1.4),
+            new DefinedSound("new.item.trident.return", 2.5, 1.2)
+    );
 
     /** 지정된 효과음 목록 */
     private final DefinedSound[] definedSounds;

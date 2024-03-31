@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.Role;
-import com.dace.dmgr.combat.character.quaker.action.QuakerUltInfo;
 import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -27,6 +26,7 @@ import java.util.StringJoiner;
  * @see SiliaA1
  * @see SiliaA2
  * @see SiliaA3
+ * @see SiliaUlt
  */
 public final class Silia extends Character {
     @Getter
@@ -60,9 +60,12 @@ public final class Silia extends Character {
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim) {
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
+        SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
 
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
+        if (!skillUlt.isDurationFinished())
+            skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
     }
 
     @Override
@@ -113,7 +116,7 @@ public final class Silia extends Character {
             case 3:
                 return SiliaA3Info.getInstance();
             case 4:
-                return QuakerUltInfo.getInstance();
+                return SiliaUltInfo.getInstance();
             default:
                 return null;
         }
@@ -121,7 +124,7 @@ public final class Silia extends Character {
 
     @Override
     @NonNull
-    public QuakerUltInfo getUltimateSkillInfo() {
-        return QuakerUltInfo.getInstance();
+    public SiliaUltInfo getUltimateSkillInfo() {
+        return SiliaUltInfo.getInstance();
     }
 }
