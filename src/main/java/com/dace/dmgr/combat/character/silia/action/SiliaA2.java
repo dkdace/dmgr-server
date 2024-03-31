@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.silia.SiliaTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
@@ -136,8 +137,10 @@ public final class SiliaA2 extends ActiveSkill {
             }
             SoundUtil.play(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
-            combatUser.getUser().teleport(loc);
-            combatUser.push(new Vector(0, 0.8, 0), true);
+            if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
+                combatUser.getUser().teleport(loc);
+                combatUser.push(new Vector(0, 0.8, 0), true);
+            }
 
             return false;
         }
