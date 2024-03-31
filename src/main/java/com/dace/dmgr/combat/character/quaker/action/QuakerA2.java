@@ -59,7 +59,8 @@ public final class QuakerA2 extends ActiveSkill {
         combatUser.setGlobalCooldown(-1);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA2", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 15, true);
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
@@ -100,7 +101,7 @@ public final class QuakerA2 extends ActiveSkill {
         combatUser.resetGlobalCooldown();
         combatUser.setGlobalCooldown(20);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA2");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**
@@ -120,7 +121,7 @@ public final class QuakerA2 extends ActiveSkill {
             new QuakerA2Projectile(targets).shoot(loc, vec);
         }
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.setYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
             return true;
         }, 1, 5));

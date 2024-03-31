@@ -27,6 +27,8 @@ public enum ActionKey {
     DROP("Q"),
     /** 달리기 */
     SPRINT(""),
+    /** 더블 점프(SPACE) */
+    SPACE("SPACE"),
     /** 웅크리기(SHIFT) */
     SNEAK("SHIFT"),
     /** 자동 사용 1번 */

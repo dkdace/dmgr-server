@@ -1,5 +1,6 @@
 package com.dace.dmgr.util;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -138,6 +139,45 @@ public final class StringFormUtil {
                         .add(color + currentDisplay)
                         .add(maxDisplay)
                         .toString())
+                .toString();
+    }
+
+    /**
+     * 액션바에 사용되는 남은 시간 막대를 반환한다.
+     *
+     * <p>기본적으로 흰색, 현재 값이 최대 값의 1/2 이하일 경우 노란색,
+     * 1/4 이하일 경우 빨간색으로 표시한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // [Test] <노란색>****<흰색>****** [{@link TextIcon#DURATION} 40.5]
+     * StringFormUtil.getActionbarProgressBar("[Test]", 40.5, 100, 10, '*');
+     * }</pre>
+     *
+     * @param prefix  접두사
+     * @param current 남은 시간 (tick)
+     * @param max     최대 시간 (tick)
+     * @param length  막대 길이 (글자 수)
+     * @param symbol  막대 기호
+     * @return 액션바 남은 시간 막대 문자열
+     */
+    @NonNull
+    public static String getActionbarDurationBar(@NonNull String prefix, double current, double max, int length, char symbol) {
+        ChatColor color;
+        if (current <= max / 4)
+            color = ChatColor.RED;
+        else if (current <= max / 2)
+            color = ChatColor.YELLOW;
+        else
+            color = ChatColor.WHITE;
+
+        String currentDisplay = String.format("%.1f", current);
+
+        return new StringJoiner(" §f")
+                .add(prefix)
+                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
+                .add("[" + color + TextIcon.DURATION + " " + currentDisplay + "§f]")
                 .toString();
     }
 }

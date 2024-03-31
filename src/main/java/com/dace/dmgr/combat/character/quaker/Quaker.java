@@ -75,12 +75,19 @@ public final class Quaker extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
+        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+    }
+
+    @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return false;
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished();
+        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

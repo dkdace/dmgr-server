@@ -31,6 +31,7 @@ public final class EventManager {
         EventUtil.registerListener(new OnEntityTarget());
         EventUtil.registerListener(new OnPlayerSwapHandItems());
         EventUtil.registerListener(new OnPlayerToggleSprint());
+        EventUtil.registerListener(new OnPlayerToggleFlight());
         EventUtil.registerListener(new OnPlayerDropItem());
         EventUtil.registerListener(new OnTabComplete());
         EventUtil.registerListener(new OnPlayerCommandPreprocess());

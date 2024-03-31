@@ -54,7 +54,8 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.setGlobalCooldown(16);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA3", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-7, 12, true);
         SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -81,7 +82,7 @@ public final class QuakerA3 extends ActiveSkill {
         super.onCancelled();
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerA3");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     private class QuakerA3Effect extends Hitscan {

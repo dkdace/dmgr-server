@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
-import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.comphenix.packetwrapper.WrapperPlayServerEntityEffect;
-import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
-import com.comphenix.packetwrapper.WrapperPlayServerWorldBorder;
+import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
@@ -110,7 +107,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     @NonNull
     @Getter
-    private final EnumMap<@NonNull ActionKey, Action> actionMap = new EnumMap<>(ActionKey.class);
+    private final EnumMap<@NonNull ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
     private final HashMap<@NonNull SkillInfo, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
@@ -209,6 +206,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!isDead())
             onTickLive(i);
 
+        entity.setAllowFlight(canFly());
         setLowHealthScreenEffect(damageModule.isLowHealth() || isDead());
         setCanSprint();
         adjustWalkSpeed();
@@ -228,6 +226,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void changeFov(double value) {
         WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
 
+        packet.setCanFly(isActivated && canFly());
         packet.setWalkingSpeed((float) (entity.getWalkSpeed() * value));
 
         packet.sendPacket(entity);
@@ -467,6 +466,23 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (CooldownUtil.getCooldown(this, Cooldown.NO_SPRINT) > 0)
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
+            return false;
+
+        return true;
+    }
+
+    /**
+     * 플레이어가 비행할 수 있는 지 확인한다.
+     *
+     * @return 비행 가능 여부
+     */
+    private boolean canFly() {
+        if (isDead())
+            return false;
+        if (!character.canFly(this))
+            return false;
+        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
+                statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
 
         return true;
@@ -953,11 +969,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actionMap.clear();
         skillMap.clear();
 
-        actionMap.put(ActionKey.SWAP_HAND, new MeleeAttackAction(this));
+        for (ActionKey actionKey : ActionKey.values())
+            actionMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
+
+        actionMap.get(ActionKey.SWAP_HAND).add(new MeleeAttackAction(this));
 
         weapon = character.getWeaponInfo().createWeapon(this);
         for (ActionKey actionKey : weapon.getDefaultActionKeys()) {
-            actionMap.put(actionKey, weapon);
+            actionMap.get(actionKey).add(weapon);
         }
         for (int i = 1; i <= 4; i++) {
             ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
@@ -965,7 +984,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 Skill skill = activeSkillInfo.createSkill(this);
                 skillMap.put(activeSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
-                    actionMap.put(actionKey, skill);
+                    actionMap.get(actionKey).add(skill);
                 }
             }
         }
@@ -975,7 +994,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 Skill skill = passiveSkillInfo.createSkill(this);
                 skillMap.put(passiveSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys()) {
-                    actionMap.put(actionKey, skill);
+                    actionMap.get(actionKey).add(skill);
                 }
             }
         }
@@ -987,25 +1006,28 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param actionKey 동작 사용 키
      */
     public void useAction(@NonNull ActionKey actionKey) {
-        Action action = actionMap.get(actionKey);
-        if (isDead() || action == null)
-            return;
-        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
-            return;
+        TreeSet<Action> actions = actionMap.get(actionKey);
 
-        if (action instanceof MeleeAttackAction && action.canUse()) {
-            action.onUse(actionKey);
-            return;
-        }
+        actions.forEach(action -> {
+            if (isDead() || action == null)
+                return;
+            if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
+                return;
 
-        Weapon realWeapon = this.weapon;
-        if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
-            realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
+            if (action instanceof MeleeAttackAction && action.canUse()) {
+                action.onUse(actionKey);
+                return;
+            }
 
-        if (action instanceof Weapon)
-            handleUseWeapon(actionKey, realWeapon);
-        else if (action instanceof Skill)
-            handleUseSkill(actionKey, (Skill) action);
+            Weapon realWeapon = this.weapon;
+            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+                realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
+
+            if (action instanceof Weapon)
+                handleUseWeapon(actionKey, realWeapon);
+            else if (action instanceof Skill)
+                handleUseSkill(actionKey, (Skill) action);
+        });
     }
 
     /**
@@ -1086,6 +1108,37 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet.setWarningDistance(isEnabled ? 999999999 : 0);
 
         packet.sendPacket(entity);
+    }
+
+    /**
+     * 플레이어에게 근접 공격 애니메이션을 재생한다.
+     *
+     * @param amplifier 성급함 포션 효과 레벨
+     * @param duration  지속시간 (tick)
+     * @param isRight   왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로 지정 시 오른손
+     */
+    public void playMeleeAttackAnimation(int amplifier, int duration, boolean isRight) {
+        entity.removePotionEffect(PotionEffectType.FAST_DIGGING);
+        entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                duration, amplifier, false, false), true);
+
+        WrapperPlayServerRemoveEntityEffect packet = new WrapperPlayServerRemoveEntityEffect();
+        packet.setEntityID(entity.getEntityId());
+        packet.setEffect(PotionEffectType.FAST_DIGGING);
+        packet.broadcastPacket();
+
+        WrapperPlayServerEntityEffect packet2 = new WrapperPlayServerEntityEffect();
+        packet2.setEntityID(entity.getEntityId());
+        packet2.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
+        packet2.setAmplifier((byte) amplifier);
+        packet2.setDuration(duration);
+        packet2.setHideParticles(true);
+        packet2.broadcastPacket();
+
+        WrapperPlayServerAnimation packet3 = new WrapperPlayServerAnimation();
+        packet3.setAnimation(isRight ? 0 : 3);
+        packet3.setEntityID(entity.getEntityId());
+        packet3.broadcastPacket();
     }
 
     @Getter

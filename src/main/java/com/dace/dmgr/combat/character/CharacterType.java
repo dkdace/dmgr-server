@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.character.quaker.Quaker;
+import com.dace.dmgr.combat.character.silia.Silia;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.Gui;
 import com.dace.dmgr.item.gui.GuiItem;
@@ -19,7 +20,8 @@ import lombok.Getter;
 public enum CharacterType {
     ARKACE(Arkace.getInstance()),
     JAGER(Jager.getInstance()),
-    QUAKER(Quaker.getInstance());
+    QUAKER(Quaker.getInstance()),
+    SILIA(Silia.getInstance());
 
     /** 전투원 정보 */
     private final Character character;

@@ -161,8 +161,31 @@ public final class CombatUtil {
      * @param player 대상 플레이어
      * @param yaw    변경할 yaw
      * @param pitch  변경할 pitch
+     * @see CombatUtil#addYawAndPitch(Player, double, double)
      */
     public static void setYawAndPitch(@NonNull Player player, double yaw, double pitch) {
+        WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
+
+        packet.setX(0);
+        packet.setY(0);
+        packet.setZ(0);
+        packet.setYaw((float) yaw);
+        packet.setPitch((float) pitch);
+        packet.setFlags(new HashSet<>(Arrays.asList(WrapperPlayServerPosition.PlayerTeleportFlag.X,
+                WrapperPlayServerPosition.PlayerTeleportFlag.Y, WrapperPlayServerPosition.PlayerTeleportFlag.Z)));
+
+        packet.sendPacket(player);
+    }
+
+    /**
+     * 지정한 플레이어의 시야(yaw/pitch)를 변경한다.
+     *
+     * @param player 대상 플레이어
+     * @param yaw    추가할 yaw
+     * @param pitch  추가할 pitch
+     * @see CombatUtil#setYawAndPitch(Player, double, double)
+     */
+    public static void addYawAndPitch(@NonNull Player player, double yaw, double pitch) {
         WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
 
         packet.setX(0);
@@ -206,7 +229,7 @@ public final class CombatUtil {
                 finalUp *= firstMultiplier;
                 finalSide *= firstMultiplier;
             }
-            setYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
+            addYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
 
             return true;
         }, 1, duration));

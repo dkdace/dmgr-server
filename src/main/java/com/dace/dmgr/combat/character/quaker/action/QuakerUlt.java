@@ -55,7 +55,8 @@ public final class QuakerUlt extends UltimateSkill {
         combatUser.setGlobalCooldown(16);
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerUlt", -100);
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        combatUser.getWeapon().setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 16, false);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             int delay = 0;
@@ -81,12 +82,12 @@ public final class QuakerUlt extends UltimateSkill {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (index + 1) * 20);
                     new QuakerUltEffect().shoot(loc, vec);
-                    CombatUtil.setYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
 
                     if (index % 2 == 0)
                         SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.setYawAndPitch(combatUser.getEntity(), -1, -0.7);
+                        CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
                         onCancelled();
                         onReady();
                     }
@@ -100,7 +101,7 @@ public final class QuakerUlt extends UltimateSkill {
         super.onCancelled();
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerUlt");
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**
@@ -125,7 +126,7 @@ public final class QuakerUlt extends UltimateSkill {
             }
         }
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.setYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
             return true;
         }, 1, 6));

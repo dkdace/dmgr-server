@@ -133,14 +133,44 @@ public final class SoundUtil {
      * @param namedSound       이름이 지정된 효과음
      * @param location         위치
      * @param volumeMultiplier 음량 배수
+     * @param pitchAdder       음정 증감량
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier) {
+    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier, double pitchAdder) {
         for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
             String soundName = definedSound.getSound();
             if (soundName.toUpperCase().equals(soundName))
-                play(Sound.valueOf(soundName), location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+                play(Sound.valueOf(soundName), location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder);
             else
                 play(soundName, location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+        }
+    }
+
+    /**
+     * 지정한 위치에 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound       이름이 지정된 효과음
+     * @param location         위치
+     * @param volumeMultiplier 음량 배수
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier) {
+        play(namedSound, location, volumeMultiplier, 0);
+    }
+
+    /**
+     * 지정한 플레이어만 들을 수 있는 이름이 지정된 일련의 효과음을 재생한다.
+     *
+     * @param namedSound       이름이 지정된 효과음
+     * @param player           대상 플레이어
+     * @param volumeMultiplier 음량 배수
+     * @param pitchAdder       음정 증감량
+     */
+    public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier, double pitchAdder) {
+        for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
+            String soundName = definedSound.getSound();
+            if (soundName.toUpperCase().equals(soundName))
+                play(Sound.valueOf(soundName), player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder);
+            else
+                play(soundName, player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
         }
     }
 
@@ -152,13 +182,7 @@ public final class SoundUtil {
      * @param volumeMultiplier 음량 배수.
      */
     public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier) {
-        for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
-            String soundName = definedSound.getSound();
-            if (soundName.toUpperCase().equals(soundName))
-                play(Sound.valueOf(soundName), player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
-            else
-                play(soundName, player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
-        }
+        play(namedSound, player, volumeMultiplier, 0);
     }
 
     /**

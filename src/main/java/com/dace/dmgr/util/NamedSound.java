@@ -274,6 +274,64 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 5, 0.7),
             new DefinedSound(Sound.BLOCK_ANVIL_PLACE, 5, 0.5),
             new DefinedSound("random.explosion_reverb", 7, 1.4)
+    ),
+    /** 전투 - '실리아' 무기 - 사용 */
+    COMBAT_SILIA_WEAPON_USE(
+            new DefinedSound("random.gun2.knife_leftclick", 0.8, 1),
+            new DefinedSound("random.swordhit", 0.7, 1.2),
+            new DefinedSound("new.item.trident.riptide_1", 0.6, 1.3)
+    ),
+    /** 전투 - '실리아' 무기 - 엔티티 타격 */
+    COMBAT_SILIA_WEAPON_HIT_ENTITY(new DefinedSound("random.stab", 1, 0.8, 0.05)),
+    /** 전투 - '실리아' 특성 2번 - 사용 */
+    COMBAT_SILIA_T2_USE(
+            new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5, 1),
+            new DefinedSound(Sound.ENTITY_IRONGOLEM_ATTACK, 1.5, 0.8),
+            new DefinedSound("random.swordhit", 1.5, 0.7)
+    ),
+    /** 전투 - '실리아' 패시브 1번 - 사용 */
+    COMBAT_SILIA_P1_USE(
+            new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 0.8, 1.2),
+            new DefinedSound(Sound.BLOCK_CLOTH_STEP, 0.8, 1.2)
+    ),
+    /** 전투 - '실리아' 패시브 2번 - 사용 */
+    COMBAT_SILIA_P2_USE(new DefinedSound(Sound.BLOCK_STONE_STEP, 0.9, 0.55, 0.05)),
+    /** 전투 - '실리아' 액티브 1번 - 사용 */
+    COMBAT_SILIA_A1_USE(
+            new DefinedSound("new.item.trident.throw", 1.5, 0.8),
+            new DefinedSound("random.swordhit", 1.5, 0.8),
+            new DefinedSound("random.swordhit", 1.5, 0.8)
+    ),
+    /** 전투 - '실리아' 액티브 2번 - 사용 */
+    COMBAT_SILIA_A2_USE(new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 1, 1)),
+    /** 전투 - '실리아' 액티브 2번 - 사용 준비 */
+    COMBAT_SILIA_A2_USE_READY(
+            new DefinedSound("random.swing", 1.5, 0.6),
+            new DefinedSound("new.item.trident.riptide_3", 1.5, 0.8)
+    ),
+    /** 전투 - '실리아' 액티브 2번 - 엔티티 타격 */
+    COMBAT_SILIA_A2_HIT_ENTITY(
+            new DefinedSound("random.swing", 1, 0.7, 0.05),
+            new DefinedSound("new.item.trident.riptide_2", 1, 0.9, 0.05)
+    ),
+    /** 전투 - '실리아' 액티브 3번 - 사용 */
+    COMBAT_SILIA_A3_USE(
+            new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 0.2, 1),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 0.15, 1.5)
+    ),
+    /** 전투 - '실리아' 액티브 3번 - 해제 */
+    COMBAT_SILIA_A3_DISABLE(
+            new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 0.2, 1.2),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 0.15, 1.7)
+    ),
+    /** 전투 - '실리아' 액티브 3번 - 활성화 */
+    COMBAT_SILIA_A3_ACTIVATE(new DefinedSound("new.item.trident.return", 1, 1.2)),
+    /** 전투 - '실리아' 궁극기 - 사용 준비 */
+    COMBAT_SILIA_ULT_USE_READY(
+            new DefinedSound("random.swordhit", 2, 1),
+            new DefinedSound("random.swordhit", 2, 0.7),
+            new DefinedSound("new.item.trident.return", 2.5, 1.4),
+            new DefinedSound("new.item.trident.return", 2.5, 1.2)
     );
 
     /** 지정된 효과음 목록 */

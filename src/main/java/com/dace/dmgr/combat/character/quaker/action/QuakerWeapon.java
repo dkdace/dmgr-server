@@ -50,7 +50,8 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setGlobalCooldown(8);
         setCooldown();
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.USE);
+        setVisible(false);
+        combatUser.playMeleeAttackAnimation(-10, 15, isClockwise);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
@@ -79,12 +80,12 @@ public final class QuakerWeapon extends AbstractWeapon {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
                     new QuakerWeaponAttack(targets).shoot(loc, vec);
-                    CombatUtil.setYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
 
                     if (index % 2 == 0)
                         SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.setYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
+                        CombatUtil.addYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
                     }
                 }, delay));
@@ -95,7 +96,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        combatUser.getWeapon().displayDurability(QuakerWeaponInfo.RESOURCE.DEFAULT);
+        setVisible(true);
     }
 
     private class QuakerWeaponAttack extends Hitscan {

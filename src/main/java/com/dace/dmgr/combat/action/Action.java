@@ -35,6 +35,19 @@ public interface Action extends Disposable {
     Object getTaskRunner();
 
     /**
+     * 동작 사용 우선순위를 반환한다.
+     *
+     * <p>같은 사용 키를 가진 동작이 있을 경우 우선순위가 높은 동작이 먼저 사용된다.</p>
+     *
+     * <p>기본값은 {@code 0}이며, 오버라이딩하여 재설정할 수 있다.</p>
+     *
+     * @return 우선순위
+     */
+    default int getPriority() {
+        return 0;
+    }
+
+    /**
      * 기본 사용 키 목록을 반환한다.
      *
      * @return 기본 사용 키 목록

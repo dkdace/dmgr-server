@@ -31,6 +31,8 @@ import org.bukkit.entity.Player;
 public class DamageModule {
     /** 방어력 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
+    /** 치명타 배수 기본값 */
+    public static final double DEFAULT_CRIT_MULTIPLIER = 2;
     /** 엔티티 객체 */
     @NonNull
     protected final Damageable combatEntity;
@@ -148,16 +150,15 @@ public class DamageModule {
      * @param defenseMultiplier 방어력 배수
      * @param damageType        피해 타입
      * @param location          맞은 위치
-     * @param isCrit            치명타 여부
+     * @param critMultiplier    치명타 배수. {@code 1}로 설정 시 치명타 미적용
      * @param isUlt             궁극기 충전 여부
      */
     private void handleDamage(Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
-                              @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+                              @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
             return;
 
-        if (isCrit)
-            damage *= 2;
+        damage *= (int) critMultiplier;
 
         int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
         if (getHealth() - finalDamage < 0)
@@ -167,8 +168,8 @@ public class DamageModule {
             reducedDamage = getHealth();
 
         if (attacker != null)
-            attacker.onAttack(combatEntity, finalDamage, damageType, isCrit, isUlt);
-        combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, isCrit, isUlt);
+            attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
+        combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, critMultiplier != 1, isUlt);
         playHitEffect();
 
         if (getHealth() > finalDamage)
@@ -183,6 +184,25 @@ public class DamageModule {
     /**
      * 엔티티에게 피해를 입힌다.
      *
+     * @param attacker       공격자
+     * @param damage         피해량
+     * @param damageType     피해 타입
+     * @param location       맞은 위치
+     * @param critMultiplier 치명타 배수. {@code 1}로 설정 시 치명타 미적용
+     * @param isUlt          궁극기 충전 여부
+     */
+    public final void damage(Attacker attacker, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+        double damageMultiplier = attacker == null || damageType == DamageType.AREA ?
+                1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
+        double defenseMultiplier = attacker == null ?
+                1 : defenseMultiplierStatus.getValue();
+
+        handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
+    }
+
+    /**
+     * 엔티티에게 피해를 입힌다.
+     *
      * @param attacker   공격자
      * @param damage     피해량
      * @param damageType 피해 타입
@@ -191,12 +211,27 @@ public class DamageModule {
      * @param isUlt      궁극기 충전 여부
      */
     public final void damage(Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        double damageMultiplier = attacker == null || damageType == DamageType.AREA ?
-                1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
-        double defenseMultiplier = attacker == null ?
-                1 : defenseMultiplierStatus.getValue();
+        damage(attacker, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
+    }
 
-        handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, isCrit, isUlt);
+    /**
+     * 엔티티에게 피해를 입힌다.
+     *
+     * @param projectile     공격자가 발사한 투사체
+     * @param damage         피해량
+     * @param damageType     피해 타입
+     * @param location       맞은 위치
+     * @param critMultiplier 치명타 배수. {@code 1}로 설정 시 치명타 미적용
+     * @param isUlt          궁극기 충전 여부
+     */
+    public final void damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+        CombatEntity attacker = projectile.getShooter();
+        if (attacker instanceof Attacker) {
+            double damageMultiplier = projectile.getDamageIncrement();
+            double defenseMultiplier = defenseMultiplierStatus.getValue();
+
+            handleDamage((Attacker) attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
+        }
     }
 
     /**
@@ -210,13 +245,7 @@ public class DamageModule {
      * @param isUlt      궁극기 충전 여부
      */
     public final void damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        CombatEntity attacker = projectile.getShooter();
-        if (attacker instanceof Attacker) {
-            double damageMultiplier = projectile.getDamageIncrement();
-            double defenseMultiplier = defenseMultiplierStatus.getValue();
-
-            handleDamage((Attacker) attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, isCrit, isUlt);
-        }
+        damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 
     /**
