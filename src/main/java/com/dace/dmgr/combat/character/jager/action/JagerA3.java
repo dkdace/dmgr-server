@@ -67,13 +67,19 @@ public final class JagerA3 extends ActiveSkill {
                 SoundUtil.play(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
                 isEnabled = true;
 
-                TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+                TaskUtil.addTask(JagerA3.this, new IntervalTask(i -> {
+                    if (isDurationFinished())
+                        return false;
+
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                             combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
                     playTickEffect(loc);
 
                     return true;
                 }, isCancelled -> {
+                    if (isCancelled)
+                        return;
+
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                             combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0.3);
                     isEnabled = false;

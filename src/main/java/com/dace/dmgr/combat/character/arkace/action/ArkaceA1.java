@@ -66,7 +66,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
             return true;
         }, isCancelled ->
-                TaskUtil.addTask(ArkaceA1.this, new DelayTask(this::onCancelled, 4)), 5, 3));
+                TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
     }
 
     @Override
