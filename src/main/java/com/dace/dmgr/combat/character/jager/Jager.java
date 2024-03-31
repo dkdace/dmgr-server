@@ -45,6 +45,7 @@ public final class Jager extends Character {
         JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
         JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
+        JagerA3 skill3 = (JagerA3) combatUser.getSkill(JagerA3Info.getInstance());
 
         int weapon1Ammo = weapon1.getReloadModule().getRemainingAmmo();
         int weapon2Ammo = weapon2.getReloadModule().getRemainingAmmo();
@@ -57,16 +58,21 @@ public final class Jager extends Character {
                 JagerWeaponInfo.CAPACITY, '*');
         String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, JagerWeaponInfo.SCOPE.CAPACITY,
                 JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar("§e[설랑]", (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getActionInfo().toString(), (int) skill1Health, skill1MaxHealth,
                 10, '■');
         if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
         else if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
             weapon2Display = "§a" + weapon2Display;
+
         text.add(weapon1Display);
         text.add(weapon2Display);
         text.add("");
+        if (!skill1.isDurationFinished())
+            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f회수";
         text.add(skill1Display);
+        if (!skill3.isDurationFinished() && combatUser.isGlobalCooldownFinished())
+            text.add(skill3.getActionInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
 
         return text.toString();
     }

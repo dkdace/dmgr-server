@@ -44,8 +44,11 @@ public final class Quaker extends Character {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar("§e[불굴의 방패]", (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getActionInfo().toString(), (int) skill1Health, skill1MaxHealth,
                 10, '■');
+
+        if (!skill1.isDurationFinished())
+            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "][" + skill1.getDefaultActionKeys()[1].getName() + "] §f해제";
         text.add(skill1Display);
 
         return text.toString();

@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.StringJoiner;
+
 /**
  * 전투원 - 아케이스 클래스.
  *
@@ -35,11 +37,34 @@ public final class Arkace extends Character {
     @Override
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
+        ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());
+        ArkaceUlt skill4 = (ArkaceUlt) combatUser.getSkill(ArkaceUltInfo.getInstance());
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
+        double skill2Duration = skill2.getDuration() / 20.0;
+        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
-        return StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, ArkaceWeaponInfo.CAPACITY,
+        StringJoiner text = new StringJoiner("    ");
+
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, ArkaceWeaponInfo.CAPACITY,
                 ArkaceWeaponInfo.CAPACITY, '|');
+
+        text.add(weaponDisplay);
+        text.add("");
+        if (!skill2.isDurationFinished()) {
+            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getActionInfo().toString(), skill2Duration,
+                    skill2MaxDuration, 10, '■');
+            text.add(skill2Display);
+        }
+        if (!skill4.isDurationFinished()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getActionInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
+
+        return text.toString();
     }
 
     @Override

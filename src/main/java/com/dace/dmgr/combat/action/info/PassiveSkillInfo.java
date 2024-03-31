@@ -8,4 +8,9 @@ public abstract class PassiveSkillInfo extends SkillInfo {
         super(number, name, lore);
         itemStack.setDurability((short) 4);
     }
+
+    @Override
+    public String toString() {
+        return "§e［" + name + "］";
+    }
 }

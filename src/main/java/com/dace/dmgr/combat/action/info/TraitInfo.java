@@ -24,4 +24,9 @@ public abstract class TraitInfo extends ActionInfo {
                 .build());
         this.number = number;
     }
+
+    @Override
+    public String toString() {
+        return "§9［" + name + "］";
+    }
 }

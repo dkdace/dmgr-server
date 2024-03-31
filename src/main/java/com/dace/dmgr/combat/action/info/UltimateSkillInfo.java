@@ -17,4 +17,9 @@ public abstract class UltimateSkillInfo extends ActiveSkillInfo {
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemStack.setItemMeta(itemMeta);
     }
+
+    @Override
+    public String toString() {
+        return "§d［" + name + "］";
+    }
 }
