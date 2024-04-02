@@ -54,7 +54,7 @@ public final class Silia extends Character {
         if (!skill3.isDurationFinished())
             skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
         text.add(skill3Display);
-        if (!skill4.isDurationFinished() && combatUser.isGlobalCooldownFinished()) {
+        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getActionInfo().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
