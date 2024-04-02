@@ -112,10 +112,6 @@ public final class UserData extends YamlFile {
         config.chatSound = getString("chatSound", config.chatSound);
 
         ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
-
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player != null)
-            User.fromPlayer(player).onDataInit();
     }
 
     @Override

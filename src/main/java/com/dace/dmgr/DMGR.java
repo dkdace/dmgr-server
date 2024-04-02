@@ -126,7 +126,8 @@ public class DMGR extends JavaPlugin {
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);
-            UserData.fromPlayer(player).init().onFinish(() -> user.sendMessageInfo("시스템 재부팅 완료"));
+            user.init();
+            user.sendMessageInfo("시스템 재부팅 완료");
         });
     }
 

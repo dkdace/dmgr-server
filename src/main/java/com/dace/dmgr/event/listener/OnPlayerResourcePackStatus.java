@@ -28,10 +28,10 @@ public final class OnPlayerResourcePackStatus implements Listener {
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
 
-        user.setResourcePackStatus(event.getStatus());
+        user.setResourcePackAccepted(event.getStatus() == PlayerResourcePackStatusEvent.Status.ACCEPTED ||
+                event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED);
 
-        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
+        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
             player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR);
-        }
     }
 }

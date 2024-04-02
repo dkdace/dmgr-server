@@ -29,7 +29,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.permissions.ServerOperator;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -44,8 +43,14 @@ import java.util.UUID;
  * 유저 정보 및 상태를 관리하는 클래스.
  */
 public final class User implements Disposable {
-    /** {@link User#nameTagHider}의 고유 이름 */
-    public static final String NAME_TAG_HIDER_CUSTOM_NAME = "nametag";
+    /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
+    private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
+            "\n" +
+            "\n§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오." +
+            "\n" +
+            "\n§7오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
+    /** 리소스팩 적용 시간 제한 (tick) */
+    private static final long RESOURCE_PACK_TIMEOUT = 8 * 20;
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
     /** 플레이어 객체 */
@@ -53,6 +58,8 @@ public final class User implements Disposable {
     @Getter
     private final Player player;
     /** 유저 데이터 정보 객체 */
+    @NonNull
+    @Getter
     private final UserData userData;
     /** 이름표 숨기기용 갑옷 거치대 객체 */
     private ArmorStand nameTagHider;
@@ -66,11 +73,9 @@ public final class User implements Disposable {
     @Getter
     @Setter
     private int ping = 0;
-    /** 리소스팩 적용 여부 */
-    private boolean resourcePack = false;
-    /** 리소스팩 적용 상태 */
+    /** 리소스팩 적용 수락 여부 */
     @Setter
-    private PlayerResourcePackStatusEvent.Status resourcePackStatus = null;
+    private boolean isResourcePackAccepted = false;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -80,13 +85,6 @@ public final class User implements Disposable {
     private User(@NonNull Player player) {
         this.player = player;
         this.userData = UserData.fromPlayer(player);
-
-        disableCollision();
-        TaskUtil.addTask(this, new DelayTask(this::updateNameTagHider, 1));
-        TaskUtil.addTask(this, new DelayTask(this::sendResourcePack, 10));
-        SkinUtil.resetSkin(player).run();
-        if (userData.isInitialized())
-            onDataInit();
 
         UserRegistry.getInstance().add(player, this);
     }
@@ -107,9 +105,28 @@ public final class User implements Disposable {
     }
 
     /**
-     * 유저 데이터 정보 객체({@link UserData}) 초기화 완료 시 실행할 작업.
+     * 유저 초기화 작업을 수행한다.
      */
-    void onDataInit() {
+    public void init() {
+        validate();
+
+        if (userData.isInitialized())
+            onInit();
+        else
+            TaskUtil.addTask(this, userData.init().onFinish(this::onInit).onError(ex -> {
+                TaskUtil.addTask(User.this, new DelayTask(() -> player.kickPlayer(MESSAGE_KICK_ERR), 60));
+            }));
+    }
+
+    /**
+     * 유저 초기화 완료 시 실행할 작업.
+     */
+    private void onInit() {
+        disableCollision();
+        TaskUtil.addTask(this, new DelayTask(this::updateNameTagHider, 1));
+        TaskUtil.addTask(this, new DelayTask(this::sendResourcePack, 10));
+        TaskUtil.addTask(this, SkinUtil.resetSkin(player));
+
         sidebar = new BPlayerBoard(player, "lobby");
         tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
         if (tabList == null)
@@ -117,7 +134,7 @@ public final class User implements Disposable {
         HologramUtil.addHologram(player.getName(), player, 0, 2.25, 0, userData.getDisplayName());
         HologramUtil.setHologramVisibility(player.getName(), false, player);
 
-        TaskUtil.addTask(User.this, new IntervalTask(i -> User.this.onSecond(), 20));
+        TaskUtil.addTask(this, new IntervalTask(i -> User.this.onSecond(), 20));
 
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
@@ -133,9 +150,12 @@ public final class User implements Disposable {
 
         reset();
         TaskUtil.clearTask(this);
-        sidebar.delete();
-        tabList.disable();
-        nameTagHider.remove();
+        if (sidebar != null)
+            sidebar.delete();
+        if (tabList != null)
+            tabList.disable();
+        if (nameTagHider != null)
+            nameTagHider.remove();
         HologramUtil.removeHologram(player.getName());
 
         GameUser gameUser = GameUser.fromUser(User.this);
@@ -143,10 +163,12 @@ public final class User implements Disposable {
             gameUser.dispose();
         UserRegistry.getInstance().remove(player);
 
-        if (DMGR.getPlugin().isEnabled())
-            userData.save().run();
-        else {
-            userData.saveSync();
+        if (userData.isInitialized()) {
+            if (DMGR.getPlugin().isEnabled())
+                userData.save();
+            else {
+                userData.saveSync();
+            }
         }
     }
 
@@ -191,15 +213,12 @@ public final class User implements Disposable {
      * 플레이어에게 리소스팩을 전송하고, 적용하지 않을 시 강제 퇴장 시킨다.
      */
     private void sendResourcePack() {
-        if (!resourcePack) {
-            resourcePack = true;
-            player.setResourcePack(GeneralConfig.getConfig().getResourcePackUrl());
+        player.setResourcePack(GeneralConfig.getConfig().getResourcePackUrl());
 
-            TaskUtil.addTask(this, new DelayTask(() -> {
-                if (resourcePackStatus == null || resourcePackStatus == PlayerResourcePackStatusEvent.Status.DECLINED)
-                    player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + OnPlayerResourcePackStatus.MESSAGE_KICK_DENY);
-            }, 160));
-        }
+        TaskUtil.addTask(this, new DelayTask(() -> {
+            if (!isResourcePackAccepted)
+                player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + OnPlayerResourcePackStatus.MESSAGE_KICK_DENY);
+        }, RESOURCE_PACK_TIMEOUT));
     }
 
     /**
@@ -207,7 +226,7 @@ public final class User implements Disposable {
      */
     private boolean onSecond() {
         if (userData.getConfig().isNightVision())
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 0, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
@@ -413,9 +432,11 @@ public final class User implements Disposable {
         HologramUtil.setHologramVisibility(player.getName(), false, player);
         Bukkit.getOnlinePlayers().forEach(player2 -> GlowUtil.removeGlowing(player, player2));
 
-        sidebar.clear();
-        for (int i = 0; i < 80; i++)
-            tabList.remove(i);
+        if (sidebar != null)
+            sidebar.clear();
+        if (tabList != null)
+            for (int i = 0; i < 80; i++)
+                tabList.remove(i);
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
         if (DMGR.getPlugin().isEnabled())
@@ -693,9 +714,15 @@ public final class User implements Disposable {
      * @param location 이동할 위치
      */
     public void teleport(@NonNull Location location) {
-        player.removePassenger(nameTagHider);
-        player.teleport(location);
-        nameTagHider.teleport(location);
-        player.addPassenger(nameTagHider);
+        validate();
+
+        if (nameTagHider == null)
+            player.teleport(location);
+        else {
+            player.removePassenger(nameTagHider);
+            player.teleport(location);
+            nameTagHider.teleport(location);
+            player.addPassenger(nameTagHider);
+        }
     }
 }

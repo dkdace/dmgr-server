@@ -2,7 +2,6 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -22,15 +21,12 @@ public final class OnPlayerJoin implements Listener {
     public static void event(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
-        UserData userData = UserData.fromPlayer(player);
+        user.init();
 
         event.setJoinMessage(StringFormUtil.ADD_PREFIX + player.getName());
 
         user.sendTitle("§bWelcome!", "", 0, 50, 40);
         TaskUtil.addTask(user, new DelayTask(user::clearChat, 10));
-
-        if (!userData.isInitialized())
-            userData.init();
 
         new DelayTask(() -> {
             DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format("{0}현재 인원수는 §3§l{1}명§b입니다.",
