@@ -389,13 +389,13 @@ public final class Game implements Disposable {
 
             scoreRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
                     .collect(Collectors.toList()));
-            damageRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+            damageRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
                     .collect(Collectors.toList()));
-            killRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+            killRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
                     .collect(Collectors.toList()));
-            defendRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+            defendRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
                     .collect(Collectors.toList()));
-            healRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+            healRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
                     .collect(Collectors.toList()));
         }
 
