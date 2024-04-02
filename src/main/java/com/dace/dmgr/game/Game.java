@@ -112,7 +112,7 @@ public final class Game implements Disposable {
 
     @Override
     public void dispose() {
-        checkAccess();
+        validate();
 
         if (!gameUsers.isEmpty())
             for (GameUser gameUser : new ArrayList<>(gameUsers)) {
@@ -496,7 +496,7 @@ public final class Game implements Disposable {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
             SoundUtil.play(NamedSound.GAME_WIN, gameUser.getPlayer());
-        }, 40).run();
+        }, 40);
     }
 
     /**
@@ -508,7 +508,7 @@ public final class Game implements Disposable {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
             SoundUtil.play(NamedSound.GAME_LOSE, gameUser.getPlayer());
-        }, 40).run();
+        }, 40);
     }
 
     /**
@@ -520,7 +520,7 @@ public final class Game implements Disposable {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
             SoundUtil.play(NamedSound.GAME_DRAW, gameUser.getPlayer());
-        }, 40).run();
+        }, 40);
     }
 
     /**

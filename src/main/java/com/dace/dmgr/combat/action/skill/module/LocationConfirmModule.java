@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -37,8 +36,6 @@ public final class LocationConfirmModule extends ConfirmModule {
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */
     private ArmorStand pointer = null;
-    @Getter
-    private boolean isDisposed = false;
 
     /**
      * 위치 확인 모듈 인스턴스를 생성한다.
@@ -53,10 +50,10 @@ public final class LocationConfirmModule extends ConfirmModule {
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getEntity().getLocation();
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !skill.isDisposed(), isCancelled -> {
+        new IntervalTask(i -> !skill.isDisposed(), isCancelled -> {
             if (pointer != null)
                 pointer.remove();
-        }, 1));
+        }, 1);
     }
 
     /**

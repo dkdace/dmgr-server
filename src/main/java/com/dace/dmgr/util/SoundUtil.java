@@ -20,7 +20,7 @@ public final class SoundUtil {
      *
      * @param sound    소리 종류
      * @param location 위치
-     * @param volume   음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume   음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch    음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */
@@ -34,7 +34,7 @@ public final class SoundUtil {
      *
      * @param sound            소리 종류
      * @param location         위치
-     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch            음정. 0.5~2 사이의 값
      * @param pitchSpreadRange 음정의 분산도
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
@@ -48,7 +48,7 @@ public final class SoundUtil {
      *
      * @param sound    소리 이름
      * @param location 위치
-     * @param volume   음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume   음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch    음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */
@@ -62,7 +62,7 @@ public final class SoundUtil {
      *
      * @param sound            소리 이름
      * @param location         위치
-     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch            음정. 0.5~2 사이의 값
      * @param pitchSpreadRange 음정의 분산도
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
@@ -76,7 +76,7 @@ public final class SoundUtil {
      *
      * @param sound  소리 종류
      * @param player 대상 플레이어
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch  음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */
@@ -90,7 +90,7 @@ public final class SoundUtil {
      *
      * @param sound            소리 종류
      * @param player           대상 플레이어
-     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch            음정. 0.5~2 사이의 값
      * @param pitchSpreadRange 음정의 분산도
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
@@ -104,7 +104,7 @@ public final class SoundUtil {
      *
      * @param sound  소리 이름
      * @param player 대상 플레이어
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch  음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */
@@ -118,7 +118,7 @@ public final class SoundUtil {
      *
      * @param sound            소리 이름
      * @param player           대상 플레이어
-     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume           음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch            음정. 0.5~2 사이의 값
      * @param pitchSpreadRange 음정의 분산도
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
@@ -179,7 +179,7 @@ public final class SoundUtil {
      *
      * @param namedSound       이름이 지정된 효과음
      * @param player           대상 플레이어
-     * @param volumeMultiplier 음량 배수.
+     * @param volumeMultiplier 음량 배수
      */
     public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier) {
         play(namedSound, player, volumeMultiplier, 0);
@@ -209,7 +209,7 @@ public final class SoundUtil {
      * 모든 플레이어에게 소리를 재생한다.
      *
      * @param sound  소리 종류
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch  음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */
@@ -223,7 +223,7 @@ public final class SoundUtil {
      * 모든 플레이어에게 소리를 재생한다.
      *
      * @param sound  소리 이름
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어난다.
+     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
      * @param pitch  음정. 0.5~2 사이의 값
      * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
      */

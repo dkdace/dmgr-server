@@ -226,7 +226,7 @@ public final class UserData extends YamlFile {
         if (!isRanked)
             return Tier.NONE;
 
-        int rank = RankUtil.getRankIndex(RankUtil.Sector.RANK_RATE, this);
+        int rank = RankUtil.getRankIndex(RankUtil.Indicator.RANK_RATE, this);
 
         if (rankRate <= Tier.STONE.getMaxScore())
             return Tier.STONE;

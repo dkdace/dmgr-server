@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action;
 
+import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -25,12 +26,22 @@ public abstract class AbstractAction implements Action {
     protected final CombatUser combatUser;
     /** 동작 정보 객체 */
     protected final ActionInfo actionInfo;
-    /** 동작 태스크 실행 객체 */
-    protected final Object taskRunner = new Object();
     /** 아이템 */
     protected ItemStack itemStack;
     /** 비활성화 여부 */
     private boolean isDisposed = false;
+    /** 동작 태스크 실행 객체 */
+    protected final Disposable taskRunner = new Disposable() {
+        @Override
+        public void dispose() {
+            throw new UnsupportedOperationException("TaskRunner는 폐기될 수 없음");
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return AbstractAction.this.isDisposed();
+        }
+    };
 
     /**
      * 동작 인스턴스를 생성한다.
@@ -132,7 +143,7 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void dispose() {
-        checkAccess();
+        validate();
 
         reset();
         TaskUtil.clearTask(taskRunner);

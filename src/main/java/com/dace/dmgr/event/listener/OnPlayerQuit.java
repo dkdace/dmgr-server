@@ -28,7 +28,7 @@ public final class OnPlayerQuit implements Listener {
             DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format("{0}현재 인원수는 §3§l{1}명§b입니다.",
                     StringFormUtil.REMOVE_PREFIX, Bukkit.getOnlinePlayers().size()));
             playQuitSound();
-        }, 1).run();
+        }, 1);
     }
 
     /**
@@ -46,6 +46,6 @@ public final class OnPlayerQuit implements Listener {
             }
 
             return true;
-        }, 1, 4).run();
+        }, 1, 4);
     }
 }

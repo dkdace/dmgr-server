@@ -32,7 +32,7 @@ public interface Action extends Disposable {
      * @return 동작 태스크 실행 객체
      */
     @NonNull
-    Object getTaskRunner();
+    Disposable getTaskRunner();
 
     /**
      * 동작 사용 우선순위를 반환한다.

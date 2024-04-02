@@ -33,6 +33,7 @@ public final class GeneralConfig extends YamlFile {
         config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
         config.rankingUpdatePeriod = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriod);
         config.messagePrefix = getString("messagePrefix", config.messagePrefix);
+        config.adminContact = getString("adminContact", config.adminContact);
 
         combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
         combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
@@ -81,6 +82,8 @@ public final class GeneralConfig extends YamlFile {
         private long rankingUpdatePeriod = 5;
         /** 메시지의 접두사 */
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
+        /** 관리자 연락처 */
+        private String adminContact = "디스코드 dkdace (DarkDace＃4671)";
     }
 
     /**

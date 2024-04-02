@@ -8,7 +8,7 @@ import org.bukkit.Sound;
 /**
  * 이름이 지정된 일련의 효과음 목록.
  */
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public enum NamedSound {
     /** 성공 */
     GENERAL_SUCCESS(new DefinedSound("random.good", 1000, 1)),

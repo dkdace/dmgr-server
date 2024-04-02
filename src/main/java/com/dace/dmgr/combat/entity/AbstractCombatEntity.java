@@ -121,7 +121,7 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     @Override
     @MustBeInvokedByOverriders
     public void dispose() {
-        checkAccess();
+        validate();
 
         CombatEntityRegistry.getInstance().remove(entity);
         if (game != null)

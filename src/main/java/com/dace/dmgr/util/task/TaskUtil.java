@@ -4,8 +4,7 @@ import com.dace.dmgr.Disposable;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 
 /**
@@ -18,22 +17,23 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class TaskUtil {
     /** 태스크 목록 (실행 주체 : 태스크 목록) */
-    private static final WeakHashMap<Object, List<Task>> taskMap = new WeakHashMap<>();
+    private static final WeakHashMap<Disposable, HashSet<Task>> taskMap = new WeakHashMap<>();
 
     /**
      * 지정한 객체가 실행하는 태스크를 추가한다.
      *
      * @param object 태스크를 실행하는 객체
      * @param task   태스크 객체
+     * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
      */
-    public static void addTask(@NonNull Object object, @NonNull Task task) {
-        if (object instanceof Disposable && ((Disposable) object).isDisposed())
+    public static void addTask(@NonNull Disposable object, @NonNull Task task) {
+        if (object.isDisposed())
             return;
 
-        taskMap.putIfAbsent(object, new ArrayList<>());
-        List<Task> taskList = taskMap.get(object);
-        task.run();
-        taskList.add(task);
+        taskMap.putIfAbsent(object, new HashSet<>());
+        HashSet<Task> tasks = taskMap.get(object);
+        if (!tasks.add(task))
+            throw new IllegalStateException("해당 Task가 이미 추가됨");
     }
 
     /**
@@ -41,12 +41,12 @@ public final class TaskUtil {
      *
      * @param object 태스크를 실행하는 객체
      */
-    public static void clearTask(@NonNull Object object) {
-        List<Task> taskList = taskMap.get(object);
-        if (taskList == null)
+    public static void clearTask(@NonNull Disposable object) {
+        HashSet<Task> tasks = taskMap.get(object);
+        if (tasks == null)
             return;
 
-        taskList.stream().filter(task -> !task.isDisposed).forEach(Task::dispose);
+        tasks.stream().filter(task -> !task.isDisposed).forEach(Task::dispose);
         taskMap.remove(object);
     }
 }

@@ -25,12 +25,12 @@ import java.util.function.Supplier;
  *
  *     try {
  *         // 작업 성공 시 호출해야 한다.
- *         onFinish(1);
+ *         onFinish.accept(1);
  *     } catch (Exception ex) {
  *         // 작업 실패(예외 발생) 시 호출해야 한다.
- *         onError(ex);
+ *         onError.accept(ex);
  *     }
- * }).onFinishIn(result -> {
+ * }).onFinish(result -> {
  *     // 작업 성공 시 호출된다.
  * }).onError(ex -> {
  *     // 작업 실패(예외 발생) 시 호출된다.
@@ -56,13 +56,7 @@ public final class AsyncTask<T> extends Task {
      */
     public AsyncTask(@NonNull Callback<T> onInit) {
         future = new CompletableFuture<>();
-        action = () -> {
-            try {
-                onInit.run(value -> runSync(() -> future.complete(value)), ex -> runSync(() -> future.completeExceptionally(ex)));
-            } catch (Exception ex) {
-                future.completeExceptionally(ex);
-            }
-        };
+        action = () -> onInit.run(value -> runSync(() -> future.complete(value)), ex -> runSync(() -> future.completeExceptionally(ex)));
 
         run();
     }
@@ -75,7 +69,7 @@ public final class AsyncTask<T> extends Task {
      * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
      */
     @NonNull
-    public static AsyncTask<Void> all(@NonNull AsyncTask<?>... asyncTasks) {
+    public static AsyncTask<Void> all(@NonNull AsyncTask<?> @NonNull ... asyncTasks) {
         return new AsyncTask<>(CompletableFuture.allOf(
                 Arrays.stream(asyncTasks).map(asyncTask -> asyncTask.future).toArray(CompletableFuture[]::new)));
     }
@@ -84,7 +78,7 @@ public final class AsyncTask<T> extends Task {
      * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
      */
     @NonNull
-    public static AsyncTask<Void> all(@NonNull List<AsyncTask<?>> asyncTasks) {
+    public static AsyncTask<Void> all(@NonNull List<@NonNull AsyncTask<?>> asyncTasks) {
         return new AsyncTask<>(CompletableFuture.allOf(
                 asyncTasks.stream().map(asyncTask -> asyncTask.future).toArray(CompletableFuture[]::new)));
     }
@@ -169,6 +163,7 @@ public final class AsyncTask<T> extends Task {
         return new AsyncTask<>(nextFuture);
     }
 
+    @Override
     @NonNull
     BukkitTask getBukkitTask() {
         return new BukkitRunnable() {
@@ -201,6 +196,6 @@ public final class AsyncTask<T> extends Task {
          * @param onFinish 작업 성공 시 호출해야 한다.
          * @param onError  작업 실패(예외 발생) 시 호출해야 한다.
          */
-        void run(Consumer<T> onFinish, Consumer<Exception> onError);
+        void run(@NonNull Consumer<T> onFinish, @NonNull Consumer<Exception> onError);
     }
 }

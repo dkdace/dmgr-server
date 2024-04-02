@@ -29,7 +29,7 @@ public final class ReadyTimeModule {
      * 엔티티 준비 작업을 수행한다.
      */
     public void ready() {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
             if (i < readyTime)
                 combatEntity.onTickBeforeReady(i);
             else if (i == readyTime) {

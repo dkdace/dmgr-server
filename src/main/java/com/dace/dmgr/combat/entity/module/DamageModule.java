@@ -66,15 +66,11 @@ public class DamageModule {
         setHealth(getMaxHealth());
 
         if (!(combatEntity instanceof Barrier)) {
-            HologramUtil.addHologram("hitHealth" + combatEntity, combatEntity.getEntity().getLocation(), "§f");
-            HologramUtil.bindHologram("hitHealth" + combatEntity, combatEntity.getEntity(),
-                    0, combatEntity.getEntity().getHeight() + 0.4, 0);
+            HologramUtil.addHologram("hitHealth" + combatEntity, combatEntity.getEntity(),
+                    0, combatEntity.getEntity().getHeight() + 0.4, 0, "§f");
             HologramUtil.setHologramVisibility("hitHealth" + combatEntity, false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
 
-            TaskUtil.addTask(this, new IntervalTask(i -> {
-                if (combatEntity.isDisposed())
-                    return false;
-
+            TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
                 int current = getHealth();
                 int max = getMaxHealth();
                 ChatColor color;

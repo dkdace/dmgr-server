@@ -36,7 +36,7 @@ public final class OnPlayerJoin implements Listener {
             DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format("{0}현재 인원수는 §3§l{1}명§b입니다.",
                     StringFormUtil.ADD_PREFIX, Bukkit.getOnlinePlayers().size()));
             playJoinSound();
-        }, 1).run();
+        }, 1);
     }
 
     /**
@@ -54,6 +54,6 @@ public final class OnPlayerJoin implements Listener {
             }
 
             return true;
-        }, 1, 4).run();
+        }, 1, 4);
     }
 }

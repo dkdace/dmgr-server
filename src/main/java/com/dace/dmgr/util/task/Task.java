@@ -18,8 +18,10 @@ public abstract class Task implements Disposable {
     /**
      * 태스크 스케쥴러를 실행한다.
      */
-    public final void run() {
-        checkAccess();
+    protected final void run() {
+        if (isDisposed)
+            throw new IllegalStateException("인스턴스가 폐기됨");
+
         bukkitTask = getBukkitTask();
     }
 
@@ -31,7 +33,8 @@ public abstract class Task implements Disposable {
         if (isDisposed)
             return;
 
-        bukkitTask.cancel();
+        if (bukkitTask != null)
+            bukkitTask.cancel();
         isDisposed = true;
     }
 

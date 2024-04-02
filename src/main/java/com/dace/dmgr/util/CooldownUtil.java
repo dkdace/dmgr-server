@@ -36,7 +36,7 @@ public final class CooldownUtil {
         }
 
         if (duration == -1)
-            duration = 99999;
+            duration = Long.MAX_VALUE;
 
         long time = System.currentTimeMillis() / 50 + duration;
         identifierMap.put(identifier, time);
@@ -50,7 +50,7 @@ public final class CooldownUtil {
      * @param object   쿨타임을 적용할 대상
      * @param cooldown 쿨타임 종류
      * @param id       쿨타임 ID
-     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
      */
     public static void setCooldown(@NonNull Object object, @NonNull Cooldown cooldown, @NonNull String id, long duration) {
         setCooldown(object, cooldown + id, duration);
@@ -79,7 +79,7 @@ public final class CooldownUtil {
      *
      * @param object   쿨타임을 적용할 대상
      * @param cooldown 쿨타임 종류
-     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
      */
     public static void setCooldown(@NonNull Object object, @NonNull Cooldown cooldown, long duration) {
         setCooldown(object, cooldown.toString(), duration);

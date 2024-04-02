@@ -914,7 +914,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         reset();
         Character realCharacter = characterType.getCharacter();
 
-        SkinUtil.applySkin(entity, realCharacter.getSkinName()).run();
+        SkinUtil.applySkin(entity, realCharacter.getSkinName());
         damageModule.setMaxHealth(realCharacter.getHealth());
         damageModule.setHealth(realCharacter.getHealth());
         moveModule.getSpeedStatus().setBaseValue(DEFAULT_SPEED * realCharacter.getSpeedMultiplier());

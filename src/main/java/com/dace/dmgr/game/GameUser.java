@@ -177,7 +177,7 @@ public final class GameUser implements Disposable {
      */
     @Override
     public void dispose() {
-        checkAccess();
+        validate();
 
         GameUserRegistry.getInstance().remove(user);
         game.removePlayer(this);

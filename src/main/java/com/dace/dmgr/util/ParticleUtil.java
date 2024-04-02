@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 입자 생성 기능을 제공하는 클래스.
@@ -174,7 +175,7 @@ public final class ParticleUtil {
      * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBleedingEffect(Location location, Entity entity, int damage) {
+    public static void playBleedingEffect(@Nullable Location location, @Nullable Entity entity, int damage) {
         if (location == null && entity == null)
             return;
 
@@ -194,7 +195,7 @@ public final class ParticleUtil {
      * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBreakEffect(Location location, Entity entity, int damage) {
+    public static void playBreakEffect(@Nullable Location location, @Nullable Entity entity, int damage) {
         if (location == null && entity == null)
             return;
 

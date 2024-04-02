@@ -66,13 +66,13 @@ public final class WorldUtil {
      * 지정한 월드를 삭제한다.
      *
      * @param worldName 삭제할 월드 이름
-     * @throws IllegalStateException 월드 {@code worldName}이 존재하지 않으면 발생
+     * @throws NullPointerException 월드 {@code worldName}이 존재하지 않으면 발생
      */
     @NonNull
     public static AsyncTask<Void> removeWorld(@NonNull String worldName) {
         World world = Bukkit.getWorld(worldName);
         if (world == null)
-            throw new IllegalStateException(MessageFormat.format("월드 {0}이 존재하지 않음", worldName));
+            throw new NullPointerException(MessageFormat.format("월드 {0}이 존재하지 않음", worldName));
 
         File file = new File(Bukkit.getWorldContainer(), MessageFormat.format("{0}/{1}.slime",
                 ConfigManager.getDatasourcesConfig().getFileConfig().getPath(), worldName));

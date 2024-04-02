@@ -114,8 +114,7 @@ public final class User implements Disposable {
         tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
         if (tabList == null)
             tabList = DMGR.getTabbed().newTableTabList(player);
-        HologramUtil.addHologram(player.getName(), player.getLocation(), userData.getDisplayName());
-        HologramUtil.bindHologram(player.getName(), player, 0, 2.25, 0);
+        HologramUtil.addHologram(player.getName(), player, 0, 2.25, 0, userData.getDisplayName());
         HologramUtil.setHologramVisibility(player.getName(), false, player);
 
         TaskUtil.addTask(User.this, new IntervalTask(i -> User.this.onSecond(), 20));
@@ -130,7 +129,7 @@ public final class User implements Disposable {
      * <p>플레이어 퇴장 시 호출해야 한다.</p>
      */
     public void dispose() {
-        checkAccess();
+        validate();
 
         reset();
         TaskUtil.clearTask(this);
@@ -175,7 +174,7 @@ public final class User implements Disposable {
     private void updateNameTagHider() {
         if (nameTagHider == null) {
             nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
-            nameTagHider.setCustomName(NAME_TAG_HIDER_CUSTOM_NAME);
+            nameTagHider.setCustomName(DMGR.TEMPORAL_ENTITY_CUSTOM_NAME);
             nameTagHider.setSilent(true);
             nameTagHider.setInvulnerable(true);
             nameTagHider.setGravity(false);
@@ -400,6 +399,8 @@ public final class User implements Disposable {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정하고 스폰으로 이동시킨다.
      */
     public void reset() {
+        validate();
+
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.getInventory().clear();
@@ -418,7 +419,7 @@ public final class User implements Disposable {
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
         if (DMGR.getPlugin().isEnabled())
-            SkinUtil.resetSkin(player).run();
+            SkinUtil.resetSkin(player);
 
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)

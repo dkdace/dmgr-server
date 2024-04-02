@@ -16,10 +16,10 @@ import com.keenant.tabbed.Tabbed;
 import lombok.Getter;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,13 +35,18 @@ import java.util.UUID;
  * 플러그인 메인 클래스.
  */
 public class DMGR extends JavaPlugin {
+    /** 일시적인 엔티티의 사용자 지정 이름 */
+    public static final String TEMPORAL_ENTITY_CUSTOM_NAME = "temporal";
     /** 난수 생성 객체 */
+    @NonNull
     @Getter
     private static final Random random = new Random();
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;
     /** 홀로그램 관리 객체 */
     private static HolographicDisplaysAPI holographicDisplaysAPI = null;
+    /** 스킨 API 객체 */
+    private static SkinsRestorerAPI skinsRestorerAPI = null;
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -64,6 +69,13 @@ public class DMGR extends JavaPlugin {
         if (holographicDisplaysAPI == null)
             holographicDisplaysAPI = HolographicDisplaysAPI.get(DMGR.getPlugin());
         return holographicDisplaysAPI;
+    }
+
+    @NonNull
+    public static SkinsRestorerAPI getSkinsRestorerAPI() {
+        if (skinsRestorerAPI == null)
+            skinsRestorerAPI = SkinsRestorerAPI.getApi();
+        return skinsRestorerAPI;
     }
 
     /**
@@ -103,12 +115,14 @@ public class DMGR extends JavaPlugin {
     public void onEnable() {
         ConsoleLogger.info("플러그인 활성화 완료");
 
-        GeneralConfig.getInstance().init().onFinish(this::loadUserDatas).onFinish(RankUtil::run);
-        registerCommands();
-        registerTestCommands();
+        GeneralConfig.getInstance().init();
+        loadUserDatas().onFinish(RankUtil::run);
         EventManager.register();
         clearUnusedEntities();
         WorldUtil.clearDuplicatedWorlds();
+
+        registerCommands();
+        registerTestCommands();
 
         Bukkit.getOnlinePlayers().forEach((Player player) -> {
             User user = User.fromPlayer(player);
@@ -159,8 +173,7 @@ public class DMGR extends JavaPlugin {
      */
     private void clearUnusedEntities() {
         Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
-                .filter(entity -> entity.getType() == EntityType.ARMOR_STAND && entity.getCustomName() != null &&
-                        entity.getCustomName().equals(User.NAME_TAG_HIDER_CUSTOM_NAME))
+                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORAL_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
     }
 

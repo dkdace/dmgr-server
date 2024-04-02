@@ -1,7 +1,6 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.ConsoleLogger;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
@@ -9,7 +8,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -20,7 +18,7 @@ import java.util.EnumMap;
 @UtilityClass
 public final class RankUtil {
     /** 랭킹 (데이터 지표 : 유저 데이터 목록) */
-    private static final EnumMap<Sector, UserData[]> ranking = new EnumMap<>(Sector.class);
+    private static final EnumMap<Indicator, UserData[]> ranking = new EnumMap<>(Indicator.class);
 
     /**
      * 랭킹 업데이트 스케쥴러를 실행한다.
@@ -36,7 +34,7 @@ public final class RankUtil {
                     .onError(ex -> ConsoleLogger.severe("전체 랭킹 업데이트 실패", ex));
 
             return true;
-        }, GeneralConfig.getConfig().getRankingUpdatePeriod() * 60 * 20).run();
+        }, GeneralConfig.getConfig().getRankingUpdatePeriod() * 60 * 20);
     }
 
     /**
@@ -44,21 +42,17 @@ public final class RankUtil {
      */
     @NonNull
     private static AsyncTask<Integer> updateRanking() {
-        File dir = new File(DMGR.getPlugin().getDataFolder(), "User");
-        File[] userDataFiles = dir.listFiles();
-
         return new AsyncTask<>((onFinish, onError) -> {
-            if (userDataFiles == null) {
-                onFinish.accept(null);
-                return;
-            }
-
             try {
                 UserData[] userDatas = UserData.getAllUserDatas();
+                if (userDatas.length == 0) {
+                    onFinish.accept(0);
+                    return;
+                }
 
-                ranking.put(Sector.RANK_RATE, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getRankRate).reversed())
+                ranking.put(Indicator.RANK_RATE, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getRankRate).reversed())
                         .toArray(UserData[]::new));
-                ranking.put(Sector.LEVEL, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getLevel).reversed())
+                ranking.put(Indicator.LEVEL, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getLevel).reversed())
                         .toArray(UserData[]::new));
 
                 onFinish.accept(userDatas.length);
@@ -71,27 +65,31 @@ public final class RankUtil {
     /**
      * 랭크 점수를 기준으로 내림차순 정렬된 유저 데이터 정보 목록을 반환한다.
      *
-     * @param sector 데이터 지표 종류
-     * @param limit  반환할 유저 데이터의 갯수
+     * @param indicator 데이터 지표 종류
+     * @param limit     반환할 유저 데이터의 갯수
      * @return {@code limit}위까지의 유저 랭킹
      * @throws IllegalArgumentException {@code limit}가 1 미만이면 발생
      */
-    @NonNull
-    public static UserData[] getRanking(@NonNull Sector sector, int limit) {
+    public static UserData @NonNull [] getRanking(@NonNull RankUtil.Indicator indicator, int limit) {
         if (limit < 1)
             throw new IllegalArgumentException("'limit'가 1 이상이어야 함");
-        return Arrays.copyOf(ranking.get(sector), Math.min(ranking.get(sector).length, limit));
+
+        UserData[] userDatas = ranking.get(indicator);
+        if (userDatas == null)
+            return new UserData[0];
+
+        return Arrays.copyOf(userDatas, Math.min(userDatas.length, limit));
     }
 
     /**
      * 지정한 플레이어의 랭크 점수 순위를 반환한다.
      *
-     * @param sector   데이터 지표 종류
-     * @param userData 유저 데이터 정보 객체
-     * @return 랭크 점수 순위. 대상이 존재하지 않으면 {@code -1} 반환
+     * @param indicator 데이터 지표 종류
+     * @param userData  유저 데이터 정보 객체
+     * @return 랭크 점수 순위. 대상이 존재하지 않으면 -1 반환
      */
-    public static int getRankIndex(@NonNull Sector sector, @NonNull UserData userData) {
-        UserData[] userDatas = ranking.get(sector);
+    public static int getRankIndex(@NonNull RankUtil.Indicator indicator, @NonNull UserData userData) {
+        UserData[] userDatas = ranking.get(indicator);
         if (userDatas == null)
             return -1;
 
@@ -106,7 +104,7 @@ public final class RankUtil {
     /**
      * 랭킹에 사용되는 데이터 지표 목록.
      */
-    public enum Sector {
+    public enum Indicator {
         /** 랭크 점수 */
         RANK_RATE,
         /** 레벨 */

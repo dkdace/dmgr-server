@@ -7,7 +7,6 @@ import lombok.NonNull;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.nio.file.Files;
 
 /**
  * Yaml 파일을 관리하는 클래스.
@@ -76,7 +75,7 @@ public abstract class YamlFile implements Initializable<Void> {
     @NonNull
     public final AsyncTask<Void> init() {
         if (isInitialized)
-            throw new CannotAccessException();
+            throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -88,13 +87,14 @@ public abstract class YamlFile implements Initializable<Void> {
                 config.load(file);
                 isInitialized = true;
 
-                onFinish.accept(null);
+                onFinish.andThen(v -> onInitFinish()).accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-                onInitError(ex);
 
+                onInitError(ex);
+                onError.andThen(this::onInitError).accept(ex);
             }
-        }).onFinish(this::onInitFinish).onError(this::onInitError);
+        });
     }
 
     /**
@@ -110,34 +110,11 @@ public abstract class YamlFile implements Initializable<Void> {
     protected abstract void onInitError(Exception ex);
 
     /**
-     * 파일을 삭제한다.
-     *
-     * @throws IllegalStateException 읽기 전용으로 호출 시 발생
-     */
-    @NonNull
-    public final AsyncTask<Void> delete() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
-
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                Files.delete(file.toPath());
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 삭제 실패 : {0}", ex, file);
-                onError.accept(ex);
-            }
-        });
-    }
-
-    /**
      * 파일을 다시 불러온다.
      */
     @NonNull
     public final AsyncTask<Void> reload() {
-        checkAccess();
+        validate();
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -159,10 +136,8 @@ public abstract class YamlFile implements Initializable<Void> {
      */
     @NonNull
     public final AsyncTask<Void> save() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+        validate();
+        validateReadOnly();
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -183,10 +158,8 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalStateException 읽기 전용으로 호출 시 발생
      */
     public final void saveSync() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+        validate();
+        validateReadOnly();
 
         try {
             config.save(file);
@@ -205,10 +178,8 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalStateException 읽기 전용으로 호출 시 발생
      */
     protected final void set(@NonNull String key, Object value) {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+        validate();
+        validateReadOnly();
 
         config.set(key, value);
     }
@@ -221,7 +192,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      */
     protected final long getLong(@NonNull String key, long defaultValue) {
-        checkAccess();
+        validate();
         return config.getLong(key, defaultValue);
     }
 
@@ -232,7 +203,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 0 반환
      */
     protected final long getLong(@NonNull String key) {
-        checkAccess();
+        validate();
         return getLong(key, 0);
     }
 
@@ -243,7 +214,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
      */
     protected final double getDouble(@NonNull String key, double defaultValue) {
-        checkAccess();
+        validate();
         return config.getDouble(key, defaultValue);
     }
 
@@ -254,7 +225,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 0 반환
      */
     protected final double getDouble(@NonNull String key) {
-        checkAccess();
+        validate();
         return getDouble(key, 0);
     }
 
@@ -266,7 +237,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      */
     protected final String getString(@NonNull String key, String defaultValue) {
-        checkAccess();
+        validate();
         return config.getString(key, defaultValue);
     }
 
@@ -277,7 +248,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
      */
     protected final String getString(@NonNull String key) {
-        checkAccess();
+        validate();
         return getString(key, null);
     }
 
@@ -289,7 +260,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      */
     protected final boolean getBoolean(@NonNull String key, boolean defaultValue) {
-        checkAccess();
+        validate();
         return config.getBoolean(key, defaultValue);
     }
 
@@ -300,7 +271,17 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
      */
     protected final boolean getBoolean(@NonNull String key) {
-        checkAccess();
+        validate();
         return getBoolean(key, false);
+    }
+
+    /**
+     * 인스턴스가 읽기 전용으로 생성되었으면 예외를 발생시킨다.
+     *
+     * @throws IllegalStateException 인스턴스가 읽기 전용으로 생성되었으면 발생
+     */
+    private void validateReadOnly() {
+        if (isReadOnly)
+            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
     }
 }
