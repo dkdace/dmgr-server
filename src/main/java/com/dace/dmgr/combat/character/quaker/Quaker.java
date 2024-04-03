@@ -32,7 +32,7 @@ public final class Quaker extends Character {
     private static final Quaker instance = new Quaker();
 
     private Quaker() {
-        super("퀘이커", "DVQuaker", Role.GUARDIAN, 2500, 0.85, 1.8);
+        super("퀘이커", "DVQuaker", Role.GUARDIAN, '\u32D3', 2500, 0.85, 1.8);
     }
 
     @Override

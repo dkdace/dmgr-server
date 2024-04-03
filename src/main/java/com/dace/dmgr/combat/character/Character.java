@@ -26,6 +26,8 @@ public abstract class Character {
     /** 역할군 */
     @NonNull
     private final Role role;
+    /** 전투원 아이콘 */
+    private final char icon;
     /** 체력 */
     private final int health;
     /** 이동속도 계수 */

@@ -33,7 +33,7 @@ public final class Silia extends Character {
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super("실리아", "DVSilia", Role.ASSASSIN, 1000, 1.0, 1.0);
+        super("실리아", "DVSilia", Role.ASSASSIN, '\u32D1', 1000, 1.0, 1.0);
     }
 
     @Override
