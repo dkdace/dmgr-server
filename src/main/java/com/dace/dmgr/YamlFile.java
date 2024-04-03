@@ -5,6 +5,7 @@ import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -211,7 +212,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * 파일에서 실수 값을 불러온다.
      *
      * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      */
     protected final double getDouble(@NonNull String key, double defaultValue) {
         validate();
@@ -236,7 +237,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @param defaultValue 기본값
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      */
-    protected final String getString(@NonNull String key, String defaultValue) {
+    protected final String getString(@NonNull String key, @Nullable String defaultValue) {
         validate();
         return config.getString(key, defaultValue);
     }
@@ -268,7 +269,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * 파일에서 부울 값을 불러온다.
      *
      * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @return 값. 데이터가 존재하지 않으면 {@code false} 반환
      */
     protected final boolean getBoolean(@NonNull String key) {
         validate();

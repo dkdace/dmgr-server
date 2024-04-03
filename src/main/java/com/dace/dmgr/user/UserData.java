@@ -91,7 +91,7 @@ public final class UserData extends YamlFile {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    public static UserData[] getAllUserDatas() {
+    public static UserData @NonNull [] getAllUserDatas() {
         return UserDataRegistry.getInstance().getAllUserDatas();
     }
 

@@ -26,7 +26,7 @@ final class UserDataRegistry extends Registry<UUID, UserData> {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    public UserData[] getAllUserDatas() {
+    public UserData @NonNull [] getAllUserDatas() {
         return map.values().toArray(new UserData[0]);
     }
 }
