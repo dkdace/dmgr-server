@@ -42,11 +42,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -68,6 +66,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public static final long FASTKILL_TIME_LIMIT = (long) (2.5 * 20);
     /** 획득 점수 표시 유지시간 (tick) */
     public static final long SCORE_DISPLAY_DURATION = 100;
+    /** 킬 로그 표시 유지시간 (tick) */
+    private static final long KILL_LOG_DISPLAY_DURATION = 80;
 
     /** 유저 정보 객체 */
     @NonNull
@@ -674,24 +674,28 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /**
      * 처치 시 킬로그를 표시한다.
-     *
-     * @param victim 피격자
      */
-    private void broadcastPlayerKillMessage(@NonNull CombatEntity victim) {
-        Map<CombatUser, Integer> victimDamageMap = ((CombatUser) victim).damageMap;
+    private void broadcastPlayerKillMessage() {
+        if (damageMap.isEmpty() || game == null)
+            return;
 
         Set<String> attackerNames = new HashSet<>();
-        for (CombatUser attacker2 : victimDamageMap.keySet()) {
-            String s = "§f\u3000§l" + attacker2.getName();
+        for (CombatUser attacker2 : damageMap.keySet()) {
+            ChatColor color = attacker2.getGameUser() == null ? ChatColor.WHITE : attacker2.getGameUser().getTeam().getColor();
+            String s = MessageFormat.format("§f{0}{1}§l {2}", attacker2.character.getIcon(), color, attacker2.getName());
             attackerNames.add(s);
         }
-        String victimName = "§f\u3000§l" + victim.getName();
+        ChatColor color = gameUser == null ? ChatColor.WHITE : gameUser.getTeam().getColor();
+        String victimName = MessageFormat.format("§f{0}{1}§l {2}", character.getIcon(), color, name);
 
-        if (!victimDamageMap.isEmpty() && game != null) {
-            game.getGameUsers().forEach(gameUser2 ->
-                    User.fromPlayer(gameUser2.getPlayer()).sendMessageInfo("{0} §4§l-> {1}",
-                            String.join(" ,", attackerNames), victimName));
-        }
+        game.getGameUsers().forEach(gameUser2 -> {
+            gameUser2.getUser().addBossBar("CombatKill" + this,
+                    MessageFormat.format("{0} §4§l-> {1}", String.join(" ,", attackerNames), victimName),
+                    BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+
+            TaskUtil.addTask(gameUser2, new DelayTask(() ->
+                    gameUser2.getUser().removeBossBar("CombatKill" + this), KILL_LOG_DISPLAY_DURATION));
+        });
     }
 
     @Override
@@ -718,7 +722,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
         });
 
-        broadcastPlayerKillMessage(this);
+        broadcastPlayerKillMessage();
         selfHarmDamage = 0;
         damageMap.clear();
 

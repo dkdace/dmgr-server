@@ -31,7 +31,7 @@ public final class Arkace extends Character {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super("아케이스", "DVArkace", Role.MARKSMAN, 1000, 1.0, 1.0);
+        super("아케이스", "DVArkace", Role.MARKSMAN, '\u32D0', 1000, 1.0, 1.0);
     }
 
     @Override

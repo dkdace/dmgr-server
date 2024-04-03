@@ -9,10 +9,12 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
+@Getter
 public final class SiliaUlt extends UltimateSkill {
     /** 일격 활성화 완료 여부 */
     private boolean isEnabled = false;

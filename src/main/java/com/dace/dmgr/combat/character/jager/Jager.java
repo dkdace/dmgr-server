@@ -37,7 +37,7 @@ public final class Jager extends Character {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", Role.MARKSMAN, 1000, 1.0, 1.0);
+        super("예거", "DVJager", Role.MARKSMAN, '\u32D2', 1000, 1.0, 1.0);
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class Jager extends Character {
         if (!skill1.isDurationFinished())
             skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f회수";
         text.add(skill1Display);
-        if (!skill3.isDurationFinished() && combatUser.isGlobalCooldownFinished())
+        if (!skill3.isDurationFinished() && skill3.isEnabled())
             text.add(skill3.getActionInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
 
         return text.toString();

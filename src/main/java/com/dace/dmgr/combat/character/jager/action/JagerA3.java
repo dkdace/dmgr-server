@@ -15,6 +15,7 @@ import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +25,7 @@ import org.bukkit.util.Vector;
 
 import java.util.function.Predicate;
 
+@Getter
 public final class JagerA3 extends ActiveSkill {
     /** 수류탄 활성화 완료 여부 */
     private boolean isEnabled = false;
