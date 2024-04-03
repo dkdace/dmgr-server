@@ -15,6 +15,7 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.item.TextTabItem;
 import com.keenant.tabbed.tablist.TableTabList;
+import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
@@ -34,6 +35,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -64,10 +66,8 @@ public final class User implements Disposable {
     /** 이름표 숨기기용 갑옷 거치대 객체 */
     private ArmorStand nameTagHider;
     /** 플레이어 사이드바 */
-    @Getter
     private BPlayerBoard sidebar;
     /** 플레이어 탭리스트 */
-    @Getter
     private TableTabList tabList;
     /** 현재 핑 (ms) */
     @Getter
@@ -86,6 +86,7 @@ public final class User implements Disposable {
         this.player = player;
         this.userData = UserData.fromPlayer(player);
 
+        disableCollision();
         UserRegistry.getInstance().add(player, this);
     }
 
@@ -113,16 +114,14 @@ public final class User implements Disposable {
         if (userData.isInitialized())
             onInit();
         else
-            TaskUtil.addTask(this, userData.init().onFinish(this::onInit).onError(ex -> {
-                TaskUtil.addTask(User.this, new DelayTask(() -> player.kickPlayer(MESSAGE_KICK_ERR), 60));
-            }));
+            TaskUtil.addTask(this, userData.init().onFinish(this::onInit).onError(ex ->
+                    TaskUtil.addTask(User.this, new DelayTask(() -> player.kickPlayer(MESSAGE_KICK_ERR), 60))));
     }
 
     /**
      * 유저 초기화 완료 시 실행할 작업.
      */
     private void onInit() {
-        disableCollision();
         TaskUtil.addTask(this, new DelayTask(this::updateNameTagHider, 1));
         TaskUtil.addTask(this, new DelayTask(this::sendResourcePack, 10));
         TaskUtil.addTask(this, SkinUtil.resetSkin(player));
@@ -150,12 +149,6 @@ public final class User implements Disposable {
 
         reset();
         TaskUtil.clearTask(this);
-        if (sidebar != null)
-            sidebar.delete();
-        if (tabList != null)
-            tabList.disable();
-        if (nameTagHider != null)
-            nameTagHider.remove();
         HologramUtil.removeHologram(player.getName());
 
         GameUser gameUser = GameUser.fromUser(User.this);
@@ -164,6 +157,12 @@ public final class User implements Disposable {
         UserRegistry.getInstance().remove(player);
 
         if (userData.isInitialized()) {
+            sidebar.delete();
+            sidebar = null;
+            tabList.disable();
+            tabList = null;
+            nameTagHider.remove();
+
             if (DMGR.getPlugin().isEnabled())
                 userData.save();
             else {
@@ -261,9 +260,9 @@ public final class User implements Disposable {
                 break;
         }
 
-        sidebar.clear();
-        sidebar.setName("§b§n" + player.getName());
-        sidebar.setAll(
+        clearSidebar();
+        setSidebarName("§b§n" + player.getName());
+        editSidebar(
                 "§f",
                 "§e보유 중인 돈",
                 "§6" + String.format("%,d", userData.getMoney()),
@@ -310,77 +309,60 @@ public final class User implements Disposable {
         else if (tps < 19.7)
             tpsColor = ChatColor.YELLOW;
 
-        tabList.setHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
-        tabList.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
+        setTabListHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
+        setTabListFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
 
-        tabList.set(0, 0, new TextTabItem("§f§l§n 서버 상태 ", 0, Skins.getPlayer("computer_")));
-        tabList.set(0, 2, new TextTabItem(
-                MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
-                0, Skins.getPlayer("FranciRoma")));
-        tabList.set(0, 3, new TextTabItem(
-                MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
-                0, Skins.getPlayer("AddelBurgh")));
-        tabList.set(0, 4, new TextTabItem(
-                MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
-                0, Skins.getPlayer("CommandBlock")));
-        tabList.set(0, 5, new TextTabItem(
-                MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
-                0, Skins.getPlayer("MHF_Steve")));
-        tabList.set(0, 7, new TextTabItem(
-                MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
-                0, Skins.getPlayer(player)));
-        tabList.set(0, 9, new TextTabItem(
-                MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", 0, 0, 0),
-                0, Skins.getPlayer("goldblock")));
-        tabList.set(0, 10, new TextTabItem("§e 탈주 §7:: §c0회 §f(0%)", 0, Skins.getPlayer("MHF_TNT2")));
-        tabList.set(0, 11, new TextTabItem("§e 플레이 시간 §7:: §fnull", 0, Skins.getPlayer("Olaf_C")));
+        setTabListItem(0, 0, "§f§l§n 서버 상태 ", Skins.getPlayer("TimmyTimothy"));
+        setTabListItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
+                Skins.getPlayer("FranciRoma"));
+        setTabListItem(0, 3, MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
+                Skins.getPlayer("AddelBurgh"));
+        setTabListItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
+                Skins.getPlayer("CommandBlock"));
+        setTabListItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
+                Skins.getPlayer("MHF_Steve"));
+        setTabListItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
+                Skins.getPlayer(player));
+        setTabListItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", 0, 0, 0),
+                Skins.getPlayer("goldblock"));
+        setTabListItem(0, 10, "§e 탈주 §7:: §c0회 §f(0%)", Skins.getPlayer("MHF_TNT2"));
+        setTabListItem(0, 11, "§e 플레이 시간 §7:: §fnull", Skins.getPlayer("Olaf_C"));
 
         Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) == null && !player2.isOp())
                 .toArray(Player[]::new);
         for (int i = 0; i < 19; i++) {
             if (i > lobbyPlayers.length - 1)
-                tabList.remove(1, i + 1);
+                removeTabListItem(1, i + 1);
             else
-                tabList.set(1, i + 1, new TextTabItem(UserData.fromPlayer(lobbyPlayers[i]).getDisplayName(), 0,
-                        Skins.getPlayer(lobbyPlayers[i])));
+                setTabListItem(1, i + 1, UserData.fromPlayer(lobbyPlayers[i]).getDisplayName(), Skins.getPlayer(lobbyPlayers[i]));
         }
 
-        tabList.set(1, 0, new TextTabItem(
-                MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyPlayers.length),
-                0, Skins.getDot(ChatColor.GREEN)));
+        setTabListItem(1, 0, MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyPlayers.length), Skins.getDot(ChatColor.GREEN));
 
         Player[] gamePlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) != null && !player2.isOp())
                 .toArray(Player[]::new);
         for (int i = 0; i < 19; i++) {
             if (i > gamePlayers.length - 1)
-                tabList.remove(2, i + 1);
+                removeTabListItem(2, i + 1);
             else
-                tabList.set(2, i + 1, new TextTabItem(UserData.fromPlayer(gamePlayers[i]).getDisplayName(), 0,
-                        Skins.getPlayer(gamePlayers[i])));
+                setTabListItem(2, i + 1, UserData.fromPlayer(gamePlayers[i]).getDisplayName(), Skins.getPlayer(gamePlayers[i]));
         }
 
-        tabList.set(2, 0, new TextTabItem(
-                MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gamePlayers.length),
-                0, Skins.getDot(ChatColor.RED)));
+        setTabListItem(2, 0, MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gamePlayers.length), Skins.getDot(ChatColor.RED));
 
         Player[] adminPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(ServerOperator::isOp)
                 .toArray(Player[]::new);
         for (int i = 0; i < 19; i++) {
             if (i > adminPlayers.length - 1)
-                tabList.remove(3, i + 1);
+                removeTabListItem(3, i + 1);
             else
-                tabList.set(3, i + 1, new TextTabItem(UserData.fromPlayer(adminPlayers[i]).getDisplayName(), 0,
-                        Skins.getPlayer(adminPlayers[i])));
+                setTabListItem(3, i + 1, UserData.fromPlayer(adminPlayers[i]).getDisplayName(), Skins.getPlayer(adminPlayers[i]));
         }
 
-        tabList.set(3, 0, new TextTabItem(
-                MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminPlayers.length),
-                0, Skins.getDot(ChatColor.AQUA)));
-
-        tabList.batchUpdate();
+        setTabListItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminPlayers.length), Skins.getDot(ChatColor.AQUA));
     }
 
     /**
@@ -432,15 +414,15 @@ public final class User implements Disposable {
         HologramUtil.setHologramVisibility(player.getName(), false, player);
         Bukkit.getOnlinePlayers().forEach(player2 -> GlowUtil.removeGlowing(player, player2));
 
-        if (sidebar != null)
-            sidebar.clear();
-        if (tabList != null)
-            for (int i = 0; i < 80; i++)
-                tabList.remove(i);
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
         if (DMGR.getPlugin().isEnabled())
             SkinUtil.resetSkin(player);
+
+        if (userData.isInitialized()) {
+            sidebar.clear();
+            clearTabListItems();
+        }
 
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
@@ -614,6 +596,108 @@ public final class User implements Disposable {
      */
     public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut) {
         sendTitle(title, subtitle, fadeIn, stay, fadeOut, 0);
+    }
+
+    /**
+     * 플레이어의 사이드바 이름을 지정한다.
+     *
+     * @param name 사이드바 이름
+     */
+    public void setSidebarName(@NonNull String name) {
+        if (sidebar != null)
+            sidebar.setName(name);
+    }
+
+    /**
+     * 플레이어의 사이드바 내용을 업데이트한다.
+     *
+     * @param line    줄 번호. 0~14 사이의 값
+     * @param content 내용
+     * @throws IllegalArgumentException {@code line}이 0~14 사이가 아니면 발생
+     */
+    public void editSidebar(int line, @NonNull String content) {
+        if (line < 0 || line > 14)
+            throw new IllegalArgumentException("'line'가 0에서 14 사이여야 함");
+        if (sidebar != null)
+            sidebar.set(content, 14 - line);
+    }
+
+    /**
+     * 플레이어의 사이드바 내용을 업데이트한다.
+     *
+     * @param contents 내용 목록
+     */
+    public void editSidebar(@NonNull String @NonNull ... contents) {
+        if (sidebar != null)
+            sidebar.setAll(contents);
+    }
+
+    /**
+     * 플레이어의 사이드바 내용을 초기화한다.
+     */
+    public void clearSidebar() {
+        if (sidebar != null)
+            sidebar.clear();
+    }
+
+    /**
+     * 플레이어의 탭리스트 헤더(상단부)의 내용을 지정한다.
+     *
+     * @param content 내용
+     */
+    public void setTabListHeader(@NonNull String content) {
+        tabList.setHeader(content);
+    }
+
+    /**
+     * 플레이어의 탭리스트 푸터(하단부)의 내용을 지정한다.
+     *
+     * @param content 내용
+     */
+    public void setTabListFooter(@NonNull String content) {
+        tabList.setFooter(content);
+    }
+
+    /**
+     * 플레이어의 탭리스트에서 지정한 항목을 설정한다.
+     *
+     * @param column  열 번호. 0~3 사이의 값
+     * @param row     행 번호. 0~19 사이의 값
+     * @param content 내용
+     * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
+     * @throws IllegalArgumentException {@code column}이 0~3 사이가 아니거나 {@code row}가 0~19 사이가 아니면 발생
+     */
+    public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
+        if (column < 0 || column > 3)
+            throw new IllegalArgumentException("'column'이 0에서 3 사이여야 함");
+        if (row < 0 || row > 19)
+            throw new IllegalArgumentException("'row'가 0에서 19 사이여야 함");
+
+        tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
+    }
+
+    /**
+     * 플레이어의 탭리스트에서 지정한 항목을 제거한다.
+     *
+     * @param column 열 번호. 0~3 사이의 값
+     * @param row    행 번호. 0~19 사이의 값
+     * @throws IllegalArgumentException {@code column}이 0~3 사이가 아니거나 {@code row}가 0~19 사이가 아니면 발생
+     */
+    public void removeTabListItem(int column, int row) {
+        if (column < 0 || column > 3)
+            throw new IllegalArgumentException("'column'이 0에서 3 사이여야 함");
+        if (row < 0 || row > 19)
+            throw new IllegalArgumentException("'row'가 0에서 19 사이여야 함");
+
+        tabList.remove(column, row);
+    }
+
+    /**
+     * 플레이어의 탭리스트에서 모든 항목을 제거한다.
+     */
+    public void clearTabListItems() {
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
     }
 
     /**

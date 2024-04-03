@@ -37,7 +37,6 @@ import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -58,14 +57,14 @@ import java.util.function.Function;
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Jumpable {
-    /** 기본 이동속도 */
-    public static final double DEFAULT_SPEED = 0.24;
     /** 적 처치 기여 (데미지 누적) 제한시간 (tick) */
     public static final long DAMAGE_SUM_TIME_LIMIT = 10 * 20;
     /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 (tick) */
     public static final long FASTKILL_TIME_LIMIT = (long) (2.5 * 20);
     /** 획득 점수 표시 유지시간 (tick) */
     public static final long SCORE_DISPLAY_DURATION = 100;
+    /** 기본 이동속도 */
+    private static final double DEFAULT_SPEED = 0.24;
     /** 킬 로그 표시 유지시간 (tick) */
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
 
@@ -76,8 +75,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
     @Getter
     private final GameUser gameUser;
-    /** 플레이어 사이드바 */
-    private final BPlayerBoard sidebar;
     /** 넉백 모듈 */
     @NonNull
     @Getter
@@ -150,14 +147,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         );
         this.user = user;
         this.gameUser = GameUser.fromUser(user);
-        sidebar = user.getSidebar();
+
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
         damageModule = new HealModule(this, true, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);
         critHitbox = hitboxes[3];
-        sidebar.clear();
+        user.clearSidebar();
     }
 
     /**
@@ -213,7 +210,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         changeFov(fovValue);
         onTickActionbar();
 
-        sidebar.clear();
+        user.clearSidebar();
         if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > 0)
             sendScoreSidebar();
     }
@@ -286,13 +283,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (scoreMap.isEmpty())
             return;
 
-        int i = 14;
+        int i = 0;
         boolean isNew = CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > SCORE_DISPLAY_DURATION - 10;
 
-        sidebar.setName(MessageFormat.format("{0}+{1}", isNew ? "§d" : "§a", (int) scoreStreakSum));
-        sidebar.set("§f", i--);
+        user.setSidebarName(MessageFormat.format("{0}+{1}", isNew ? "§d" : "§a", (int) scoreStreakSum));
+        user.editSidebar(i++, "§f");
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
-            sidebar.set(StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30), i--);
+            user.editSidebar(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));
     }
 
     /**
