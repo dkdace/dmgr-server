@@ -80,7 +80,7 @@ public final class SiliaTrait {
                 CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
 
                 if (index < 3)
-                    SoundUtil.play(NamedSound.COMBAT_SILIA_T2_USE, loc.add(vec), 1, index * 0.12);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_T2_USE, loc.add(vec), 1, index * 0.12);
                 if (index == 7) {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), isOpposite ? 0.7 : -0.7, -0.85);
                     combatUser.getWeapon().onCancelled();
@@ -132,7 +132,7 @@ public final class SiliaTrait {
                 target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()));
 
                 ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
-                SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
             }
 
             return !(target instanceof Barrier);

@@ -76,7 +76,7 @@ public abstract class Gui implements Listener {
                 return;
 
             if (((GuiItem<?>) staticItem).isClickable()) {
-                SoundUtil.play(NamedSound.GENERAL_GUI_CLICK, player);
+                SoundUtil.playNamedSound(NamedSound.GENERAL_GUI_CLICK, player);
 
                 onClick(event, player, (GuiItem<?>) staticItem);
             }

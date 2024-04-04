@@ -59,7 +59,7 @@ public final class JagerA2 extends ActiveSkill {
 
         Location location = combatUser.getEntity().getLocation();
         setDuration();
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_USE, location);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_USE, location);
         if (entity != null)
             entity.dispose();
 
@@ -70,7 +70,7 @@ public final class JagerA2 extends ActiveSkill {
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
             new JagerA2Projectile().shoot(loc);
 
-            SoundUtil.play(NamedSound.COMBAT_THROW, loc);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
         }, JagerA2Info.READY_DURATION));
     }
 

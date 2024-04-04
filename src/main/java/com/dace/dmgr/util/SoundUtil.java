@@ -3,7 +3,6 @@ package com.dace.dmgr.util;
 import com.dace.dmgr.DMGR;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -135,7 +134,7 @@ public final class SoundUtil {
      * @param volumeMultiplier 음량 배수
      * @param pitchAdder       음정 증감량
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier, double pitchAdder) {
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier, double pitchAdder) {
         for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
             String soundName = definedSound.getSound();
             if (soundName.toUpperCase().equals(soundName))
@@ -152,8 +151,8 @@ public final class SoundUtil {
      * @param location         위치
      * @param volumeMultiplier 음량 배수
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier) {
-        play(namedSound, location, volumeMultiplier, 0);
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Location location, double volumeMultiplier) {
+        playNamedSound(namedSound, location, volumeMultiplier, 0);
     }
 
     /**
@@ -164,7 +163,7 @@ public final class SoundUtil {
      * @param volumeMultiplier 음량 배수
      * @param pitchAdder       음정 증감량
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier, double pitchAdder) {
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier, double pitchAdder) {
         for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
             String soundName = definedSound.getSound();
             if (soundName.toUpperCase().equals(soundName))
@@ -181,8 +180,8 @@ public final class SoundUtil {
      * @param player           대상 플레이어
      * @param volumeMultiplier 음량 배수
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier) {
-        play(namedSound, player, volumeMultiplier, 0);
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Player player, double volumeMultiplier) {
+        playNamedSound(namedSound, player, volumeMultiplier, 0);
     }
 
     /**
@@ -191,8 +190,8 @@ public final class SoundUtil {
      * @param namedSound 이름이 지정된 효과음
      * @param location   위치
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Location location) {
-        play(namedSound, location, 1);
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Location location) {
+        playNamedSound(namedSound, location, 1);
     }
 
     /**
@@ -201,36 +200,8 @@ public final class SoundUtil {
      * @param namedSound 이름이 지정된 효과음
      * @param player     대상 플레이어
      */
-    public static void play(@NonNull NamedSound namedSound, @NonNull Player player) {
-        play(namedSound, player, 1);
-    }
-
-    /**
-     * 모든 플레이어에게 소리를 재생한다.
-     *
-     * @param sound  소리 종류
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
-     * @param pitch  음정. 0.5~2 사이의 값
-     * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
-     */
-    public static void broadcast(@NonNull Sound sound, double volume, double pitch) {
-        validatePitch(pitch);
-        Bukkit.getOnlinePlayers().forEach((Player player) ->
-                player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) volume, (float) pitch));
-    }
-
-    /**
-     * 모든 플레이어에게 소리를 재생한다.
-     *
-     * @param sound  소리 이름
-     * @param volume 음량. 1을 초과하면 소리가 들리는 범위만 늘어남
-     * @param pitch  음정. 0.5~2 사이의 값
-     * @throws IllegalArgumentException {@code pitch}가 0.5~2 사이가 아니면 발생
-     */
-    public static void broadcast(@NonNull String sound, double volume, double pitch) {
-        validatePitch(pitch);
-        Bukkit.getOnlinePlayers().forEach((Player player) ->
-                player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) volume, (float) pitch));
+    public static void playNamedSound(@NonNull NamedSound namedSound, @NonNull Player player) {
+        playNamedSound(namedSound, player, 1);
     }
 
     /**

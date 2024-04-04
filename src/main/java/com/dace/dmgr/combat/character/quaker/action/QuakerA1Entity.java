@@ -90,7 +90,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         super.onDamage(attacker, damage, reducedDamage, damageType, location, isCrit, isUlt);
 
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         if (location != null)
             ParticleUtil.playBreakEffect(location, entity, damage);
         skill.addStateValue(-damage);
@@ -100,7 +100,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     public void onDeath(Attacker attacker) {
         dispose();
 
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 2; j++) {
                 Location loc = LocationUtil.getLocationFromOffset(hitboxes[0].getCenter(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);

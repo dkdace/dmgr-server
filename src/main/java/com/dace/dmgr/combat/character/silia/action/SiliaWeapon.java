@@ -57,7 +57,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             new SiliaWeaponProjectile().shoot();
             combatUser.playMeleeAttackAnimation(-4, 10, true);
-            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
         }
 
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
@@ -97,7 +97,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.play(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
             SoundUtil.playBlockHitSound(location, hitBlock, 1);
             ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
 
@@ -110,7 +110,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                     SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
             ParticleUtil.play(Particle.CRIT, location, 15, 0, 0, 0, 0.4);
-            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
 
             return false;
         }

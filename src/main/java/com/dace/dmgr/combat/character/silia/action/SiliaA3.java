@@ -52,7 +52,7 @@ public final class SiliaA3 extends ChargeableSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier("SiliaA3", SiliaA3Info.SPEED);
-            SoundUtil.play(NamedSound.COMBAT_SILIA_A3_USE, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_USE, combatUser.getEntity().getLocation());
 
             int health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -66,7 +66,7 @@ public final class SiliaA3 extends ChargeableSkill {
                     ((SiliaWeapon) combatUser.getWeapon()).isStrike = true;
                     combatUser.getWeapon().setGlowing(true);
                     combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-                    SoundUtil.play(NamedSound.COMBAT_SILIA_A3_ACTIVATE, combatUser.getEntity());
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_ACTIVATE, combatUser.getEntity());
                 }
 
                 return true;
@@ -87,6 +87,6 @@ public final class SiliaA3 extends ChargeableSkill {
         combatUser.getWeapon().setGlowing(false);
         combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
         combatUser.getMoveModule().getSpeedStatus().removeModifier("SiliaA3");
-        SoundUtil.play(NamedSound.COMBAT_SILIA_A3_DISABLE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_DISABLE, combatUser.getEntity().getLocation());
     }
 }

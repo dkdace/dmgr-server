@@ -83,7 +83,7 @@ public final class QuakerA2 extends ActiveSkill {
                 new QuakerA2Effect().shoot(loc, vec);
 
                 if (index % 2 == 0)
-                    SoundUtil.play(NamedSound.COMBAT_QUAKER_A2_USE, loc.add(vec));
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE, loc.add(vec));
                 if (index == 11) {
                     TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled -> {
                         onCancelled();
@@ -109,7 +109,7 @@ public final class QuakerA2 extends ActiveSkill {
      */
     private void onReady() {
         Location loc = combatUser.getEntity().getLocation();
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
         Set<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; i < 7; i++) {

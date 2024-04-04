@@ -52,7 +52,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
-        SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -71,7 +71,7 @@ public final class SiliaA2 extends ActiveSkill {
 
             new SiliaA2Projectile().shoot();
 
-            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
     }
 
@@ -135,7 +135,7 @@ public final class SiliaA2 extends ActiveSkill {
             for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5)) {
                 ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
             }
-            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
             if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                 combatUser.getUser().teleport(loc);

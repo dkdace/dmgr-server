@@ -73,7 +73,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
                 new JagerWeaponLProjectile().shoot(dir);
-                SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
 
                 CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
@@ -162,9 +162,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onSwapStart(@NonNull SwapState swapState) {
         Location location = combatUser.getEntity().getLocation();
         if (swapState == SwapState.PRIMARY)
-            SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF, location);
         else if (swapState == SwapState.SECONDARY)
-            SoundUtil.play(NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON, location);
 
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
     }

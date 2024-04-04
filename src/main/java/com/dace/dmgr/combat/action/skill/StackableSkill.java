@@ -109,7 +109,7 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
-        SoundUtil.play(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     /**

@@ -43,9 +43,9 @@ public final class SiliaP1 extends AbstractSkill {
         setDuration();
         Location location = combatUser.getEntity().getLocation();
         if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P1_USE, location);
         else
-            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location, 0.1, 0.2);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P1_USE, location, 0.1, 0.2);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation();

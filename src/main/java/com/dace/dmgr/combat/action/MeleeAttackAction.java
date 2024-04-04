@@ -46,7 +46,7 @@ public final class MeleeAttackAction extends AbstractAction {
         combatUser.setGlobalCooldown(20);
         setCooldown();
 
-        SoundUtil.play(NamedSound.COMBAT_MELEE_ATTACK_USE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_USE, combatUser.getEntity().getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> {

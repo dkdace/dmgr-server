@@ -370,7 +370,7 @@ public final class User implements Disposable {
      */
     public void playLevelUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(NamedSound.GENERAL_SUCCESS, player);
+            SoundUtil.playNamedSound(NamedSound.GENERAL_SUCCESS, player);
             sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", 8,
                     40, 30, 40);
         }, 100));
@@ -381,7 +381,7 @@ public final class User implements Disposable {
      */
     public void playTierUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(NamedSound.GAME_WIN, player);
+            SoundUtil.playNamedSound(NamedSound.GAME_WIN, player);
             sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }
@@ -391,7 +391,7 @@ public final class User implements Disposable {
      */
     public void playTierDownEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.play(NamedSound.GAME_LOSE, player);
+            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, player);
             sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
         }, 80));
     }
@@ -552,7 +552,7 @@ public final class User implements Disposable {
      * @param message 경고 메시지
      */
     public void sendAlert(@NonNull String message) {
-        SoundUtil.play(NamedSound.GENERAL_ALERT, player);
+        SoundUtil.playNamedSound(NamedSound.GENERAL_ALERT, player);
         TaskUtil.addTask(this, new IntervalTask(i -> {
             ChatColor color = ChatColor.YELLOW;
             if (i == 1)

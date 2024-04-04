@@ -74,7 +74,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         entity.setInvulnerable(true);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_SUMMON, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON, entity.getLocation());
 
         damageModule.setMaxHealth(JagerUltInfo.HEALTH);
         damageModule.setHealth(JagerUltInfo.HEALTH);
@@ -92,7 +92,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
             entity.teleport(entity.getLocation().add(0, 0.2, 0));
 
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
-        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, entity.getLocation());
         playTickEffect();
     }
 
@@ -141,7 +141,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     private void playTickEffect(long i, double range) {
         long angle = i * 14;
         if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
-            SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_TICK, entity.getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_TICK, entity.getLocation());
 
         for (int _i = 1; _i <= 6; _i++) {
             Location loc = entity.getLocation();
@@ -187,7 +187,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         ParticleUtil.playBreakEffect(location, entity, damage);
     }
 
@@ -199,7 +199,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
                 0.1, 0.1, 0.1, 0.15);
         ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1, 0.1, 0.1, 0.5);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_DEATH, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DEATH, entity.getLocation());
     }
 
     private class JagerUltArea extends Area {

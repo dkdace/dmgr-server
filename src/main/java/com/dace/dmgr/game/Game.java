@@ -258,7 +258,7 @@ public final class Game implements Disposable {
     private void onSecondReady() {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
             });
         }
@@ -268,7 +268,7 @@ public final class Game implements Disposable {
             remainingTime = gamePlayMode.getPlayDuration();
 
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
             });
         }
@@ -282,7 +282,7 @@ public final class Game implements Disposable {
 
         if (remainingTime > 0 && remainingTime <= 10) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
             });
         }
@@ -495,7 +495,7 @@ public final class Game implements Disposable {
     private void playWinEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_WIN, gameUser.getPlayer());
+            SoundUtil.playNamedSound(NamedSound.GAME_WIN, gameUser.getPlayer());
         }, 40);
     }
 
@@ -507,7 +507,7 @@ public final class Game implements Disposable {
     private void playLoseEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_LOSE, gameUser.getPlayer());
+            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, gameUser.getPlayer());
         }, 40);
     }
 
@@ -519,7 +519,7 @@ public final class Game implements Disposable {
     private void playDrawEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_DRAW, gameUser.getPlayer());
+            SoundUtil.playNamedSound(NamedSound.GAME_DRAW, gameUser.getPlayer());
         }, 40);
     }
 

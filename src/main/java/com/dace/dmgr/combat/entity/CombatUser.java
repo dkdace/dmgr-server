@@ -323,7 +323,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK);
         damageModule.heal((Healer) null, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
-        SoundUtil.play(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
 
@@ -355,7 +355,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD);
 
         push(new Vector(0, 1.4, 0), true);
-        SoundUtil.play(NamedSound.COMBAT_USE_JUMP_PAD, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_JUMP_PAD, entity.getLocation());
     }
 
     /**
@@ -385,11 +385,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 double volume = 1.2 + fallDistance * 0.05;
 
                 if (fallDistance > 6)
-                    SoundUtil.play(NamedSound.COMBAT_FALL_HIGH, entity.getLocation(), volume);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_HIGH, entity.getLocation(), volume);
                 else if (fallDistance > 3)
-                    SoundUtil.play(NamedSound.COMBAT_FALL_MID, entity.getLocation(), volume);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_MID, entity.getLocation(), volume);
                 else if (fallDistance > 0)
-                    SoundUtil.play(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
 
                 if (entity.isSprinting())
                     volume = 1;
@@ -508,10 +508,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             showHealthHologram(victim);
         if (isCrit) {
             user.sendTitle("", "§c§l×", 0, 2, 10);
-            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
+            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
         } else {
             user.sendTitle("", "§f×", 0, 2, 10);
-            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_ATTACK, entity), 2));
+            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK, entity), 2));
         }
 
         if (victim.getDamageModule().isUltProvider() && isUlt)
@@ -666,7 +666,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playKillEffect() {
         user.sendTitle("", "§c" + TextIcon.POISON, 0, 2, 10);
-        TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.play(NamedSound.COMBAT_KILL, entity), 2));
+        TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_KILL, entity), 2));
     }
 
     /**

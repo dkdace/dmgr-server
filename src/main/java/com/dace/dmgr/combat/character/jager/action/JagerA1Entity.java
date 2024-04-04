@@ -75,7 +75,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         entity.setOwner(owner.getEntity());
         entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        SoundUtil.play(NamedSound.COMBAT_ENTITY_SUMMON, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ENTITY_SUMMON, entity.getLocation());
 
         damageModule.setHealth((int) skill.getStateValue());
     }
@@ -94,7 +94,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onReady() {
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_SUMMON_READY, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_SUMMON_READY, entity.getLocation());
         entity.setAI(true);
     }
 
@@ -137,7 +137,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         ParticleUtil.playBleedingEffect(location, entity, damage);
         skill.addStateValue(-damage);
     }
@@ -146,7 +146,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
     public void onDeath(Attacker attacker) {
         dispose();
 
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
         skill.setStateValue(0);
         skill.setCooldown(JagerA1Info.COOLDOWN_DEATH);
     }

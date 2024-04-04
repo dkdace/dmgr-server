@@ -90,7 +90,7 @@ public final class QuakerUlt extends UltimateSkill {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
 
                     if (index % 2 == 0)
-                        SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
+                        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
                         CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
                         onCancelled();
@@ -114,7 +114,7 @@ public final class QuakerUlt extends UltimateSkill {
      */
     private void onReady() {
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0.3, 0);
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_ULT_USE_READY, loc);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_ULT_USE_READY, loc);
         ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
                 0.2, 0.2, 0.2, 0.6);
         Set<CombatEntity> targets = new HashSet<>();

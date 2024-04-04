@@ -62,11 +62,11 @@ public final class JagerA3 extends ActiveSkill {
         if (isDurationFinished()) {
             combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             setDuration();
-            SoundUtil.play(NamedSound.COMBAT_JAGER_A3_USE, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION);
-                SoundUtil.play(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
                 isEnabled = true;
 
                 TaskUtil.addTask(JagerA3.this, new IntervalTask(i -> {
@@ -94,7 +94,7 @@ public final class JagerA3 extends ActiveSkill {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
             new JagerA3Projectile().shoot(loc);
-            SoundUtil.play(NamedSound.COMBAT_THROW, loc);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
 
             isEnabled = false;
             onCancelled();
@@ -131,7 +131,7 @@ public final class JagerA3 extends ActiveSkill {
 
         new JagerA3Area(condition, targets, projectile).emit(location);
 
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A3_EXPLODE, location);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_EXPLODE, location);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, location,
                 300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.PACKED_ICE, 0, location,
@@ -154,7 +154,7 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.play(NamedSound.COMBAT_THROW_BOUNCE, location, 0.1 + velocity.length() * 2);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, location, 0.1 + velocity.length() * 2);
             return false;
         }
 

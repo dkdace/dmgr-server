@@ -83,7 +83,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
 
                     if (index % 2 == 0)
-                        SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
+                        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
                         CombatUtil.addYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
@@ -121,7 +121,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_HIT, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, location);
         }
 
         @Override
@@ -139,7 +139,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                 target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ? -0.3 : 0.3));
 
                 ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
-                SoundUtil.play(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, location);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, location);
             }
 
             return !(target instanceof Barrier);

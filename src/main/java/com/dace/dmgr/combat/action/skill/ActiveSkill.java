@@ -43,7 +43,7 @@ public abstract class ActiveSkill extends AbstractSkill {
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
         displayReady(1);
-        SoundUtil.play(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override

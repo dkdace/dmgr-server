@@ -73,7 +73,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false, false), true);
         entity.teleport(entity.getLocation().add(0, 0.05, 0));
         GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_SUMMON, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_SUMMON, entity.getLocation());
 
         damageModule.setMaxHealth(JagerA2Info.HEALTH);
         damageModule.setHealth(JagerA2Info.HEALTH);
@@ -94,7 +94,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
 
     @Override
     public void onReady() {
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_SUMMON_READY, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_SUMMON_READY, entity.getLocation());
     }
 
     @Override
@@ -146,7 +146,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
                 false, true);
         target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
 
         dispose();
     }
@@ -174,7 +174,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
 
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         ParticleUtil.playBreakEffect(location, entity, damage);
     }
 
@@ -184,6 +184,6 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
 
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                 0.1, 0.1, 0.1, 0.15);
-        SoundUtil.play(NamedSound.COMBAT_JAGER_A2_DEATH, entity.getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DEATH, entity.getLocation());
     }
 }

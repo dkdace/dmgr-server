@@ -54,7 +54,7 @@ public final class JagerUlt extends UltimateSkill {
         combatUser.setGlobalCooldown((int) JagerUltInfo.READY_DURATION);
 
         Location location = combatUser.getEntity().getLocation();
-        SoundUtil.play(NamedSound.COMBAT_JAGER_ULT_USE, location);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_USE, location);
         setDuration();
         if (entity != null)
             entity.dispose();
@@ -64,7 +64,7 @@ public final class JagerUlt extends UltimateSkill {
 
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
-            SoundUtil.play(NamedSound.COMBAT_THROW, loc);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
 
             new JagerUltProjectile().shoot(loc);
         }, JagerUltInfo.READY_DURATION));

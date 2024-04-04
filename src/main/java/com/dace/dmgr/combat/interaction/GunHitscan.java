@@ -24,7 +24,7 @@ public abstract class GunHitscan extends Hitscan {
 
     @Override
     protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-        SoundUtil.play(NamedSound.COMBAT_GUN_HIT_BLOCK, location);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, location);
         SoundUtil.playBlockHitSound(location, hitBlock, 1);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
                 3, 0, 0, 0, 0.1);

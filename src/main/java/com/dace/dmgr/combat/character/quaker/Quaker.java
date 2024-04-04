@@ -63,7 +63,7 @@ public final class Quaker extends Character {
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
     }
 
     @Override

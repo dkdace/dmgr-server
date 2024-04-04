@@ -67,11 +67,11 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 if (isUlt) {
                     new ArkaceWeaponHitscan(true).shoot();
-                    SoundUtil.play(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
                 } else {
                     Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), fullAutoModule.increaseSpread());
                     new ArkaceWeaponHitscan(false).shoot(dir);
-                    SoundUtil.play(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
 
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);

@@ -61,7 +61,7 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.playMeleeAttackAnimation(-3, 6, true);
 
         Location location = combatUser.getEntity().getLocation();
-        SoundUtil.play(NamedSound.COMBAT_SILIA_A1_USE, location);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A1_USE, location);
         Set<CombatEntity> targets = new HashSet<>();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {

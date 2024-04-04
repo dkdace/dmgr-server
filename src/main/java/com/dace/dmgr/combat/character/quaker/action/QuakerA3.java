@@ -56,7 +56,7 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerA3", -100);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-7, 12, true);
-        SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             for (int j = 0; j < i; j++) {
@@ -73,7 +73,7 @@ public final class QuakerA3 extends ActiveSkill {
             onCancelled();
 
             new QuakerA3Projectile().shoot();
-            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_USE_READY, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE_READY, combatUser.getEntity().getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
     }
 
@@ -145,7 +145,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Vector vec2 = VectorUtil.getSpreadedVector(direction, 30);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.2);
             }
-            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_TICK, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, location);
 
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, size, condition);
 
@@ -167,7 +167,7 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         private void onImpact(@NonNull Location location) {
-            SoundUtil.play(NamedSound.COMBAT_QUAKER_A3_HIT, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
 
             for (Damageable target2 : targets) {
                 if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)

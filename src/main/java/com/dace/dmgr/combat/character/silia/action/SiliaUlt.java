@@ -114,7 +114,7 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
         combatUser.getMoveModule().getSpeedStatus().addModifier("SiliaUlt", SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
-        SoundUtil.play(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(SiliaUlt.this, new IntervalTask(i -> !isDurationFinished(), isCancelled2 -> {
             isEnabled = false;

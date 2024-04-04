@@ -42,10 +42,10 @@ public final class OnPlayerJoin implements Listener {
         new IntervalTask(i -> {
             switch (i.intValue()) {
                 case 0:
-                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000, 0.7);
+                    Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, -6 / 12.0)));
                     break;
                 case 3:
-                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000, 1.05);
+                    Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, 1 / 12.0)));
                     break;
             }
 

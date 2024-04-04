@@ -30,14 +30,14 @@ public abstract class UltimateSkill extends ActiveSkill {
     @Override
     protected void onCooldownFinished() {
         super.onCooldownFinished();
-        SoundUtil.play(NamedSound.COMBAT_ULTIMATE_SKILL_READY, combatUser.getEntity());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setUltGaugePercent(0);
-        SoundUtil.play(NamedSound.COMBAT_ULTIMATE_SKILL_USE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_USE, combatUser.getEntity().getLocation());
     }
 
     /**

@@ -62,7 +62,7 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     combatUser.getEntity().getLocation().getDirection(), -0.2, 0, 0);
             new ArkaceA1Projectile().shoot(loc);
-            SoundUtil.play(NamedSound.COMBAT_ARKACE_A1_USE, loc);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_USE, loc);
 
             return true;
         }, isCancelled ->
@@ -111,7 +111,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
             new ArkaceA1Area(condition, targets).emit(location);
 
-            SoundUtil.play(NamedSound.COMBAT_ARKACE_A1_EXPLODE, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_EXPLODE, location);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
                     2.5, 2.5, 2.5, 32, 250, 225);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2, 0.2, 0.2, 0.2);

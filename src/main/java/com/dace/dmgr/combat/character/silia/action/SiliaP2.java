@@ -83,9 +83,9 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.push(new Vector(0, 0.45, 0), true);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
             else
-                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
 
             return true;
         }, isCancelled -> {
