@@ -33,8 +33,6 @@ import java.util.UUID;
  * }</pre>
  */
 public final class ItemBuilder {
-    /** 머리 스킨을 불러올 때 사용하는 토큰의 접두사 */
-    public static final String TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
     private static Field profileField;
     /** 생성할 아이템 객체 */
@@ -164,10 +162,11 @@ public final class ItemBuilder {
      * @throws IllegalStateException 아이템 이름이 설정되지 않았을 때 발생
      */
     @NonNull
-    public ItemBuilder formatName(@NonNull Object... arguments) {
+    public ItemBuilder formatName(@NonNull Object @NonNull ... arguments) {
         if (!itemMeta.hasDisplayName())
             throw new IllegalStateException("아이템의 이름이 아직 설정되지 않음");
-        itemMeta.setDisplayName(MessageFormat.format(itemMeta.getDisplayName(), arguments));
+
+        setName(MessageFormat.format(itemMeta.getDisplayName(), arguments));
         return this;
     }
 
@@ -190,7 +189,7 @@ public final class ItemBuilder {
      * @return ItemBuilder
      */
     @NonNull
-    public ItemBuilder setLore(@NonNull String... lores) {
+    public ItemBuilder setLore(@NonNull String @NonNull ... lores) {
         itemMeta.setLore(Arrays.asList(lores));
         return this;
     }
@@ -221,7 +220,7 @@ public final class ItemBuilder {
      * @return ItemBuilder
      */
     @NonNull
-    public ItemBuilder addLore(@NonNull String... lores) {
+    public ItemBuilder addLore(@NonNull String @NonNull ... lores) {
         if (!itemMeta.hasLore()) {
             setLore(lores);
             return this;
@@ -258,8 +257,8 @@ public final class ItemBuilder {
     public ItemBuilder formatLore(@NonNull Object... arguments) {
         if (!itemMeta.hasLore())
             throw new IllegalStateException("아이템의 설명이 아직 설정되지 않음");
-        String fullLore = MessageFormat.format(String.join("\n", itemMeta.getLore()), arguments);
 
+        String fullLore = MessageFormat.format(String.join("\n", itemMeta.getLore()), arguments);
         return setLore(fullLore);
     }
 
@@ -270,7 +269,7 @@ public final class ItemBuilder {
      * @return ItemBuilder
      */
     @NonNull
-    public ItemBuilder addItemFlags(@NonNull ItemFlag... itemFlags) {
+    public ItemBuilder addItemFlags(@NonNull ItemFlag @NonNull ... itemFlags) {
         itemMeta.addItemFlags(itemFlags);
         return this;
     }
@@ -282,7 +281,7 @@ public final class ItemBuilder {
      * @return ItemBuilder
      */
     @NonNull
-    public ItemBuilder removeItemFlags(@NonNull ItemFlag... itemFlags) {
+    public ItemBuilder removeItemFlags(@NonNull ItemFlag @NonNull ... itemFlags) {
         itemMeta.removeItemFlags(itemFlags);
         return this;
     }

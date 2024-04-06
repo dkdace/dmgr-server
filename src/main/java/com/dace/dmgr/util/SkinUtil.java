@@ -13,6 +13,9 @@ import org.bukkit.entity.Player;
  */
 @UtilityClass
 public final class SkinUtil {
+    /** 머리 스킨을 불러올 때 사용하는 토큰의 접두사 */
+    public static final String TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
+
     /**
      * 플레이어의 스킨을 변경한다.
      *

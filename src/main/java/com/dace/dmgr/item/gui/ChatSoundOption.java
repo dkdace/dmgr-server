@@ -8,7 +8,7 @@ import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * 메뉴 - 채팅 효과음 설정 GUI 클래스.
@@ -16,6 +16,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public final class ChatSoundOption extends Gui {
     @Getter
     private static final ChatSoundOption instance = new ChatSoundOption();
+    private static final GuiItem buttonLeft = new ButtonItem.LEFT("ChatSoundOptionLeft") {
+        @Override
+        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+            player.performCommand("설정");
+            return true;
+        }
+    };
 
     public ChatSoundOption() {
         super(2, "§8채팅 효과음 설정");
@@ -27,7 +34,7 @@ public final class ChatSoundOption extends Gui {
 
         ChatSound[] chatSounds = ChatSound.values();
 
-        guiController.fillRow(2, DisplayItem.EMPTY.getGuiItem());
+        guiController.fillRow(2, DisplayItem.EMPTY.getStaticItem());
         for (int i = 0; i < chatSounds.length; i++) {
             int index = i;
             guiController.set(i, chatSounds[i].guiItem, itemBuilder -> {
@@ -35,27 +42,7 @@ public final class ChatSoundOption extends Gui {
             });
         }
 
-        guiController.set(17, ButtonItem.LEFT.getGuiItem());
-    }
-
-    @Override
-    public void onClick(InventoryClickEvent event, @NonNull Player player, @NonNull GuiItem<?> guiItem) {
-        if (event.getClick() != ClickType.LEFT)
-            return;
-
-        if (guiItem == ButtonItem.LEFT.getGuiItem()) {
-            player.performCommand("설정");
-            return;
-        }
-
-        if (guiItem.getIdentifier() instanceof ChatSound) {
-            ChatSound chatSound = (ChatSound) guiItem.getIdentifier();
-            UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
-
-            SoundUtil.play(chatSound.getSound(), player, 1, Math.sqrt(2));
-            userConfig.setChatSound(chatSound);
-            open(player);
-        }
+        guiController.set(17, buttonLeft);
     }
 
     /**
@@ -98,21 +85,26 @@ public final class ChatSoundOption extends Gui {
         @Getter
         private final String sound;
         /** GUI 아이템 객체 */
-        private final GuiItem<ChatSound> guiItem;
+        private final GuiItem guiItem;
 
         ChatSound(String name, String sound, Material material) {
             ItemBuilder itemBuilder = new ItemBuilder(material).setName("§e§l" + name);
             this.name = name;
             this.sound = sound;
 
-            this.guiItem = new GuiItem<ChatSound>(this, itemBuilder.build()) {
+            this.guiItem = new GuiItem("ChatSound" + this, itemBuilder.build()) {
                 @Override
-                public Gui getGui() {
-                    return instance;
-                }
+                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+                    if (clickType != ClickType.LEFT)
+                        return false;
 
-                @Override
-                public boolean isClickable() {
+                    UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
+
+                    SoundUtil.play(sound, player, 1, Math.sqrt(2));
+                    userConfig.setChatSound(ChatSound.this);
+
+                    ChatSoundOption.getInstance().open(player);
+
                     return true;
                 }
             };

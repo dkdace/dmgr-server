@@ -1,43 +1,79 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
-import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * GUI에서 사용하는 클릭 가능한 버튼 아이템 목록.
  */
-@Getter
-public enum ButtonItem {
-    /** 나가기 */
-    EXIT(8, "§c§l나가기"),
-    /** 이전 */
-    LEFT(9, "§6§l이전"),
-    /** 다음 */
-    RIGHT(10, "§6§l다음"),
-    /** 위로 */
-    UP(11, "§6§l위로"),
-    /** 아래로 */
-    DOWN(12, "§6§l아래로");
+public interface ButtonItem {
+    /**
+     * 나가기 버튼.
+     */
+    class EXIT extends GuiItem {
+        protected EXIT(@NonNull String identifier) {
+            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+                    .setDamage((short) 8)
+                    .setName("§c§l나가기")
+                    .build());
+        }
 
-    /** GUI 아이템 객체 */
-    private final GuiItem<ButtonItem> guiItem;
+        @Override
+        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+            player.closeInventory();
+            return true;
+        }
+    }
 
-    ButtonItem(int damage, String name) {
-        ItemBuilder itemBuilder = new ItemBuilder(Material.CARROT_STICK)
-                .setDamage((short) damage)
-                .setName(name);
+    /**
+     * 이전 버튼.
+     */
+    abstract class LEFT extends GuiItem {
+        protected LEFT(@NonNull String identifier) {
+            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+                    .setDamage((short) 9)
+                    .setName("§6§l이전")
+                    .build());
+        }
+    }
 
-        guiItem = new GuiItem<ButtonItem>(this, itemBuilder.build()) {
-            @Override
-            public Gui getGui() {
-                return null;
-            }
+    /**
+     * 다음 버튼.
+     */
+    abstract class RIGHT extends GuiItem {
+        protected RIGHT(@NonNull String identifier) {
+            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+                    .setDamage((short) 10)
+                    .setName("§6§l다음")
+                    .build());
+        }
+    }
 
-            @Override
-            public boolean isClickable() {
-                return true;
-            }
-        };
+    /**
+     * 위 버튼.
+     */
+    abstract class UP extends GuiItem {
+        protected UP(@NonNull String identifier) {
+            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+                    .setDamage((short) 11)
+                    .setName("§6§l위로")
+                    .build());
+        }
+    }
+
+    /**
+     * 아래 버튼.
+     */
+    abstract class DOWN extends GuiItem {
+        protected DOWN(@NonNull String identifier) {
+            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+                    .setDamage((short) 12)
+                    .setName("§6§l아래로")
+                    .build());
+        }
     }
 }

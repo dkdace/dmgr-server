@@ -1153,14 +1153,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         /** 전투원 선택 */
         SELECT_CHARACTER(Material.EMERALD, (short) 0, "§f전투원 선택");
 
-        private final StaticItem<CommunicationItem> staticItem;
+        private final StaticItem staticItem;
 
         CommunicationItem(Material material, short damage, String name) {
             ItemBuilder itemBuilder = new ItemBuilder(material)
                     .setDamage(damage)
                     .setName(name);
 
-            this.staticItem = new StaticItem<>(this, itemBuilder.build());
+            this.staticItem = new StaticItem("CombatUser" + this, itemBuilder.build());
         }
     }
 }
