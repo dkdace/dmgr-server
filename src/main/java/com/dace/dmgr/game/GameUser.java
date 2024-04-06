@@ -15,6 +15,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skins;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -35,6 +37,7 @@ public final class GameUser implements Disposable {
     private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
     /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
     private static final int HEAD_REVEAL_TIME_AFTER_GAME_START = 20;
+
     /** 플레이어 객체 */
     @NonNull
     @Getter
@@ -52,7 +55,7 @@ public final class GameUser implements Disposable {
     /** 팀 */
     @NonNull
     @Getter
-    @Setter
+    @Setter(AccessLevel.PACKAGE)
     private Team team = Team.NONE;
     /** 점수 */
     @Getter
@@ -82,7 +85,7 @@ public final class GameUser implements Disposable {
     @Getter
     @Setter
     private int heal = 0;
-    /** 게임 시작 시점 */
+    /** 게임 시작 시점 (타임스탬프) */
     @Getter
     private long startTime = 0;
 
@@ -116,6 +119,7 @@ public final class GameUser implements Disposable {
      * @param user 대상 플레이어
      * @return 게임 유저 인스턴스. 존재하지 않으면 {@code null} 반환
      */
+    @Nullable
     public static GameUser fromUser(@NonNull User user) {
         return GameUserRegistry.getInstance().get(user);
     }
@@ -188,6 +192,8 @@ public final class GameUser implements Disposable {
      * 게임 시작 시 실행할 작업.
      */
     public void onGameStart() {
+        validate();
+
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
@@ -219,7 +225,6 @@ public final class GameUser implements Disposable {
         user.setTabListHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
                 "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
                 game.getTeamScore().get(Team.RED), game.getTeamScore().get(Team.BLUE)));
-        user.setTabListFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
 
         boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
                 game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
@@ -258,6 +263,8 @@ public final class GameUser implements Disposable {
      * @param increment 증가량
      */
     public void addTeamScore(int increment) {
+        validate();
+
         if (team != Team.NONE)
             game.getTeamScore().put(team, game.getTeamScore().get(team) + increment);
     }
@@ -284,7 +291,7 @@ public final class GameUser implements Disposable {
     /**
      * 해당 게임 유저의 킬/데스 를 반환한다.
      *
-     * <p>어시스트도 킬로 취급하며, 데스가 {@code 0}이면 {@code 1}로 처리한다.</p>
+     * <p>어시스트도 킬로 취급하며, 데스가 0이면 1로 처리한다.</p>
      *
      * @return (킬 + 어시스트) / 데스
      */
@@ -297,6 +304,7 @@ public final class GameUser implements Disposable {
      *
      * @return 해당 스폰 지역의 팀. 플레이어가 팀 스폰 외부에 있으면 {@code null} 반환
      */
+    @Nullable
     public Team getSpawnRegionTeam() {
         if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.REDSTONE_ORE))
             return Team.RED;

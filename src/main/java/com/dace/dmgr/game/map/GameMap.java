@@ -1,6 +1,5 @@
 package com.dace.dmgr.game.map;
 
-import com.dace.dmgr.game.GamePlayMode;
 import lombok.NonNull;
 import org.bukkit.World;
 
@@ -8,12 +7,6 @@ import org.bukkit.World;
  * 게임에 사용되는 맵을 관리하는 인터페이스.
  */
 public interface GameMap {
-    /**
-     * @return 게임 모드
-     */
-    @NonNull
-    GamePlayMode getGamePlayMode();
-
     /**
      * @return 맵 이름
      */
@@ -35,10 +28,12 @@ public interface GameMap {
     /**
      * @return 블루 팀 스폰 위치 목록
      */
+    @NonNull
     GlobalLocation @NonNull [] getBlueTeamSpawns();
 
     /**
      * @return 힐 팩 위치 목록
      */
+    @NonNull
     GlobalLocation @NonNull [] getHealPackLocations();
 }

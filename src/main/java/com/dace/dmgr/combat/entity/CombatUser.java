@@ -63,11 +63,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public static final long FASTKILL_TIME_LIMIT = (long) (2.5 * 20);
     /** 획득 점수 표시 유지시간 (tick) */
     public static final long SCORE_DISPLAY_DURATION = 100;
+    /** 힐 팩의 홀로그램 ID */
+    public static final String HOLOGRAM_ID_HEALPACK = "healpack";
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.24;
     /** 킬 로그 표시 유지시간 (tick) */
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
-
     /** 유저 정보 객체 */
     @NonNull
     @Getter
@@ -332,13 +333,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (cooldown <= 0)
                 return false;
 
-            HologramUtil.addHologram("healpack" + healPackLocation, hologramLoc,
+            HologramUtil.addHologram(HOLOGRAM_ID_HEALPACK + healPackLocation, hologramLoc,
                     MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility("healpack" + healPackLocation,
+            game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(HOLOGRAM_ID_HEALPACK + healPackLocation,
                     LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
 
             return true;
-        }, isCancalled -> HologramUtil.removeHologram("healpack" + healPackLocation),
+        }, isCancalled -> HologramUtil.removeHologram(HOLOGRAM_ID_HEALPACK + healPackLocation),
                 20, GeneralConfig.getCombatConfig().getHealPackCooldown()));
     }
 

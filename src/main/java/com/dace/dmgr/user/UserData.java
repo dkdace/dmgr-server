@@ -1,6 +1,7 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.YamlFile;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
@@ -226,7 +227,7 @@ public final class UserData extends YamlFile {
 
         if (rankRate <= Tier.STONE.getMaxScore())
             return Tier.STONE;
-        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= 5)
+        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= GeneralConfig.getConfig().getNetheriteTierMinRank())
             return Tier.NETHERITE;
 
         for (Tier tier : Tier.values()) {

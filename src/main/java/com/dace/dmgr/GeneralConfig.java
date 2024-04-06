@@ -32,6 +32,7 @@ public final class GeneralConfig extends YamlFile {
         config.chatCooldown = getLong("chatCooldown", config.chatCooldown);
         config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
         config.rankingUpdatePeriod = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriod);
+        config.netheriteTierMinRank = (int) getLong("netheriteTierMinRank", config.netheriteTierMinRank);
         config.messagePrefix = getString("messagePrefix", config.messagePrefix);
         config.adminContact = getString("adminContact", config.adminContact);
 
@@ -79,7 +80,9 @@ public final class GeneralConfig extends YamlFile {
         /** 명령어 쿨타임 */
         private long commandCooldown = 0;
         /** 랭킹 업데이트 주기 (분) */
-        private long rankingUpdatePeriod = 5;
+        private int rankingUpdatePeriod = 5;
+        /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
+        private int netheriteTierMinRank = 5;
         /** 메시지의 접두사 */
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
         /** 관리자 연락처 */

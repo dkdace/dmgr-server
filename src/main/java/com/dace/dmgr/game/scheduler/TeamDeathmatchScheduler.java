@@ -5,6 +5,7 @@ import com.dace.dmgr.game.Game;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.boss.BarColor;
 
@@ -19,7 +20,7 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
     private static final TeamDeathmatchScheduler instance = new TeamDeathmatchScheduler();
 
     @Override
-    public void onSecond(Game game) {
+    public void onSecond(@NonNull Game game) {
         broadcastBossBar(game);
     }
 
