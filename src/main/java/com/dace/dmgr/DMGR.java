@@ -4,7 +4,9 @@ import com.dace.dmgr.command.LobbyCommand;
 import com.dace.dmgr.command.MenuCommand;
 import com.dace.dmgr.command.PlayerOptionCommand;
 import com.dace.dmgr.command.QuitCommand;
-import com.dace.dmgr.command.test.*;
+import com.dace.dmgr.command.test.DummyCommand;
+import com.dace.dmgr.command.test.GameTestCommand;
+import com.dace.dmgr.command.test.SelectCharCommand;
 import com.dace.dmgr.event.EventManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
@@ -195,8 +197,6 @@ public class DMGR extends JavaPlugin {
         getCommand("선택").setExecutor(new SelectCharCommand());
         getCommand("소환").setExecutor(new DummyCommand());
         getCommand("게임").setExecutor(new GameTestCommand());
-        getCommand("랭크설정").setExecutor(new RankRateTestCommand());
-        getCommand("경험치설정").setExecutor(new XpTestCommand());
     }
 
     /**
