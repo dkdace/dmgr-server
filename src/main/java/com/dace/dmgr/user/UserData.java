@@ -6,15 +6,12 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.UUID;
 
 /**
@@ -34,7 +31,7 @@ public final class UserData extends YamlFile {
     @NonNull
     private final Config config = new Config();
     /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
-    private final HashMap<CharacterType, CharacterRecord> characterRecordMap = new HashMap<>();
+    private final EnumMap<CharacterType, CharacterRecord> characterRecordMap = new EnumMap<>(CharacterType.class);
     /** 경험치 */
     @Getter
     private int xp = 0;
@@ -356,22 +353,21 @@ public final class UserData extends YamlFile {
     /**
      * 전투원 기록 정보.
      */
-    @Getter
+    @RequiredArgsConstructor
     public final class CharacterRecord {
         /** 접두사 */
-        public static final String PREFIX = "record_";
+        private static final String PREFIX = "record_";
         /** 전투원 종류 */
         private final CharacterType characterType;
         /** 킬 */
+        @Getter
         private int kill = 0;
         /** 데스 */
+        @Getter
         private int death = 0;
         /** 플레이 시간 (분) */
+        @Getter
         private int playTime = 0;
-
-        private CharacterRecord(CharacterType characterType) {
-            this.characterType = characterType;
-        }
 
         /**
          * 데이터를 불러온다.
