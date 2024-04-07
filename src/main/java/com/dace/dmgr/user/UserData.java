@@ -45,6 +45,12 @@ public final class UserData extends YamlFile {
     private int normalPlayCount = 0;
     /** 랭크게임 플레이 판 수 */
     private int rankPlayCount = 0;
+    /** 승리 횟수 */
+    private int winCount = 0;
+    /** 패배 횟수 */
+    private int loseCount = 0;
+    /** 탈주 횟수 */
+    private int quitCount = 0;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -106,6 +112,9 @@ public final class UserData extends YamlFile {
         UserData.this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
         UserData.this.normalPlayCount = (int) getLong("normalPlayCount", normalPlayCount);
         UserData.this.rankPlayCount = (int) getLong("rankPlayCount", rankPlayCount);
+        UserData.this.winCount = (int) getLong("winCount", winCount);
+        UserData.this.loseCount = (int) getLong("loseCount", loseCount);
+        UserData.this.quitCount = (int) getLong("quitCount", quitCount);
 
         config.koreanChat = getBoolean("koreanChat", config.koreanChat);
         config.nightVision = getBoolean("nightVision", config.nightVision);
@@ -214,6 +223,21 @@ public final class UserData extends YamlFile {
     public void setRankPlayCount(int rankPlayCount) {
         this.rankPlayCount = Math.max(0, rankPlayCount);
         set("rankPlayCount", this.rankPlayCount);
+    }
+
+    public void setWinCount(int winCount) {
+        this.winCount = winCount;
+        set("winCount", this.winCount);
+    }
+
+    public void setLoseCount(int loseCount) {
+        this.loseCount = loseCount;
+        set("loseCount", this.loseCount);
+    }
+
+    public void setQuitCount(int quitCount) {
+        this.quitCount = quitCount;
+        set("quitCount", this.quitCount);
     }
 
     /**
