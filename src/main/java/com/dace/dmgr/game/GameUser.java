@@ -179,6 +179,8 @@ public final class GameUser implements Disposable {
         validate();
 
         GameUserRegistry.getInstance().remove(user);
+        if (game.getPhase() == Game.Phase.READY || game.getPhase() == Game.Phase.PLAYING)
+            UserData.fromPlayer(player).setQuitCount(UserData.fromPlayer(player).getQuitCount() + 1);
         game.removePlayer(this);
         TaskUtil.clearTask(this);
     }

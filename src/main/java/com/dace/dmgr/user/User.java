@@ -23,6 +23,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -323,10 +324,15 @@ public final class User implements Disposable {
                 Skins.getPlayer("MHF_Steve"));
         setTabListItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
                 Skins.getPlayer(player));
-        setTabListItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", 0, 0, 0),
+        setTabListItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", userData.getWinCount(), userData.getLoseCount(),
+                        (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("goldblock"));
-        setTabListItem(0, 10, "§e 탈주 §7:: §c0회 §f(0%)", Skins.getPlayer("MHF_TNT2"));
-        setTabListItem(0, 11, "§e 플레이 시간 §7:: §fnull", Skins.getPlayer("Olaf_C"));
+        setTabListItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회 §f({1}%)", userData.getQuitCount(),
+                        (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
+                Skins.getPlayer("MHF_TNT2"));
+        setTabListItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
+                        DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분")),
+                Skins.getPlayer("Olaf_C"));
 
         Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) == null && !player2.isOp())

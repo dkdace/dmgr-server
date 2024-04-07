@@ -404,6 +404,14 @@ public final class Game implements Disposable {
             else
                 updateMMR(gameUser);
 
+            UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+            if (isWinner != null) {
+                if (isWinner)
+                    userData.setWinCount(userData.getWinCount() + 1);
+                else
+                    userData.setLoseCount(userData.getLoseCount() + 1);
+            }
+
             sendResultReport(gameUser, isWinner,
                     scoreRank.get(gameUser.getTeam()).indexOf(gameUser),
                     damageRank.get(gameUser.getTeam()).indexOf(gameUser),
