@@ -2,6 +2,7 @@ package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.YamlFile;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
@@ -13,43 +14,59 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
  */
-@Getter
 public final class UserData extends YamlFile {
     /** 플레이어 UUID */
+    @Getter
     @NonNull
     private final UUID playerUUID;
     /** 플레이어 이름 */
+    @Getter
     @NonNull
     private final String playerName;
     /** 유저 개인 설정 */
+    @Getter
     @NonNull
     private final Config config = new Config();
+    /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
+    private final HashMap<CharacterType, CharacterRecord> characterRecordMap = new HashMap<>();
     /** 경험치 */
+    @Getter
     private int xp = 0;
     /** 레벨 */
+    @Getter
     private int level = 1;
     /** 돈 */
+    @Getter
     private int money = 0;
     /** 랭크 점수 (RR) */
+    @Getter
     private int rankRate = 100;
     /** 랭크게임 배치 완료 여부 */
+    @Getter
     private boolean isRanked = false;
     /** 매치메이킹 점수 (MMR) */
+    @Getter
     private int matchMakingRate = 100;
     /** 일반게임 플레이 횟수 */
+    @Getter
     private int normalPlayCount = 0;
     /** 랭크게임 플레이 판 수 */
+    @Getter
     private int rankPlayCount = 0;
     /** 승리 횟수 */
+    @Getter
     private int winCount = 0;
     /** 패배 횟수 */
+    @Getter
     private int loseCount = 0;
     /** 탈주 횟수 */
+    @Getter
     private int quitCount = 0;
 
     /**
@@ -61,6 +78,8 @@ public final class UserData extends YamlFile {
         super("User/" + playerUUID);
         this.playerUUID = playerUUID;
         this.playerName = Bukkit.getOfflinePlayer(playerUUID).getName();
+        for (CharacterType characterType : CharacterType.values())
+            characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
         UserDataRegistry.getInstance().add(playerUUID, this);
     }
@@ -120,6 +139,8 @@ public final class UserData extends YamlFile {
         config.nightVision = getBoolean("nightVision", config.nightVision);
         config.chatSound = getString("chatSound", config.chatSound);
 
+        characterRecordMap.forEach((characterType, characterRecord) -> characterRecord.load());
+
         ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
 
         Player player = Bukkit.getPlayer(playerUUID);
@@ -130,6 +151,17 @@ public final class UserData extends YamlFile {
     @Override
     protected void onInitError(Exception ex) {
         ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName);
+    }
+
+    /**
+     * 지정한 전투원의 기록 정보를 반환한다.
+     *
+     * @param characterType 전투원 종류
+     * @return 전투원 기록 정보
+     */
+    @NonNull
+    public CharacterRecord getCharacterRecord(@NonNull CharacterType characterType) {
+        return characterRecordMap.get(characterType);
     }
 
     public void setXp(int xp) {
@@ -318,6 +350,51 @@ public final class UserData extends YamlFile {
         public void setNightVision(boolean nightVision) {
             this.nightVision = nightVision;
             set("nightVision", this.nightVision);
+        }
+    }
+
+    /**
+     * 전투원 기록 정보.
+     */
+    @Getter
+    public final class CharacterRecord {
+        /** 접두사 */
+        public static final String PREFIX = "record_";
+        /** 전투원 종류 */
+        private final CharacterType characterType;
+        /** 킬 */
+        private int kill = 0;
+        /** 데스 */
+        private int death = 0;
+        /** 플레이 시간 (분) */
+        private int playTime = 0;
+
+        private CharacterRecord(CharacterType characterType) {
+            this.characterType = characterType;
+        }
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            kill = (int) getLong(PREFIX + characterType + "_kill", this.kill);
+            death = (int) getLong(PREFIX + characterType + "_death", this.death);
+            playTime = (int) getLong(PREFIX + characterType + "_playTime", this.playTime);
+        }
+
+        public void setKill(int kill) {
+            this.kill = kill;
+            set(PREFIX + characterType + "_kill", this.kill);
+        }
+
+        public void setDeath(int death) {
+            this.death = death;
+            set(PREFIX + characterType + "_death", this.death);
+        }
+
+        public void setPlayTime(int playTime) {
+            this.playTime = playTime;
+            set(PREFIX + characterType + "_playTime", this.playTime);
         }
     }
 }
