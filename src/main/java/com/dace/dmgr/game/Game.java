@@ -331,8 +331,8 @@ public final class Game implements Disposable {
      */
     private void divideTeam() {
         LinkedList<GameUser> sortedGameUsers = gameUsers.stream()
-                .sorted(Comparator.comparing(gameUser ->
-                        UserData.fromPlayer(((GameUser) gameUser).getPlayer()).getMatchMakingRate()).reversed())
+                .sorted(Comparator.comparing((GameUser gameUser) ->
+                        gameUser.getUser().getUserData().getMatchMakingRate()).reversed())
                 .collect(Collectors.toCollection(LinkedList::new));
         HashSet<GameUser> team1 = new HashSet<>();
         HashSet<GameUser> team2 = new HashSet<>();
@@ -404,7 +404,7 @@ public final class Game implements Disposable {
             else
                 updateMMR(gameUser);
 
-            UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+            UserData userData = gameUser.getUser().getUserData();
             if (isWinner != null) {
                 if (isWinner)
                     userData.setWinCount(userData.getWinCount() + 1);
@@ -530,7 +530,7 @@ public final class Game implements Disposable {
      * @return 획득한 경험치
      */
     private int updateXp(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+        UserData userData = gameUser.getUser().getUserData();
 
         int xp = userData.getXp();
         double score = gameUser.getScore();
@@ -548,7 +548,7 @@ public final class Game implements Disposable {
      * @return 획득한 돈
      */
     private int updateMoney(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+        UserData userData = gameUser.getUser().getUserData();
 
         int money = userData.getMoney();
         double score = gameUser.getScore();
@@ -564,7 +564,7 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     private void updateMMR(@NonNull GameUser gameUser) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+        UserData userData = gameUser.getUser().getUserData();
 
         int mmr = userData.getMatchMakingRate();
         int normalPlayCount = userData.getNormalPlayCount();
@@ -588,7 +588,7 @@ public final class Game implements Disposable {
      * @return 랭크 점수 획득량
      */
     private int updateRankRate(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+        UserData userData = gameUser.getUser().getUserData();
 
         int mmr = userData.getMatchMakingRate();
         int rr = userData.getRankRate();
@@ -692,7 +692,7 @@ public final class Game implements Disposable {
      */
     private double getAverageMMR() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getMatchMakingRate())
+                .mapToInt(gameUser -> gameUser.getUser().getUserData().getMatchMakingRate())
                 .average()
                 .orElse(0);
     }
@@ -704,7 +704,7 @@ public final class Game implements Disposable {
      */
     private double getAverageRankRate() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getRankRate())
+                .mapToInt(gameUser -> gameUser.getUser().getUserData().getRankRate())
                 .average()
                 .orElse(0);
     }
