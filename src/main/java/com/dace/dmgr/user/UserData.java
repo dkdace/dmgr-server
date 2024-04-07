@@ -270,6 +270,19 @@ public final class UserData extends YamlFile {
     }
 
     /**
+     * 전체 게임 플레이 시간을 반환한다.
+     *
+     * @return 게임 플레이 시간
+     */
+    public int getPlayTime() {
+        int totalPlayTime = 0;
+        for (CharacterRecord characterRecord : characterRecordMap.values())
+            totalPlayTime += characterRecord.playTime;
+
+        return totalPlayTime;
+    }
+
+    /**
      * 현재 랭크 점수에 따른 티어를 반환한다.
      *
      * @return 티어
@@ -365,7 +378,7 @@ public final class UserData extends YamlFile {
         /** 데스 */
         @Getter
         private int death = 0;
-        /** 플레이 시간 (분) */
+        /** 플레이 시간 (초) */
         @Getter
         private int playTime = 0;
 
