@@ -11,23 +11,23 @@ public final class OnPlayerInteract implements Listener {
     @EventHandler
     public static void event(PlayerInteractEvent event) {
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
+        if (combatUser == null)
+            return;
 
-        if (combatUser != null) {
-            if (event.hasBlock())
-                event.setCancelled(true);
-            if (combatUser.getCharacterType() == null)
-                return;
+        if (event.hasBlock())
+            event.setCancelled(true);
+        if (combatUser.getCharacterType() == null)
+            return;
 
-            switch (event.getAction()) {
-                case LEFT_CLICK_AIR:
-                case LEFT_CLICK_BLOCK:
-                    combatUser.useAction(ActionKey.LEFT_CLICK);
-                    break;
-                case RIGHT_CLICK_AIR:
-                case RIGHT_CLICK_BLOCK:
-                    combatUser.useAction(ActionKey.RIGHT_CLICK);
-                    break;
-            }
+        switch (event.getAction()) {
+            case LEFT_CLICK_AIR:
+            case LEFT_CLICK_BLOCK:
+                combatUser.useAction(ActionKey.LEFT_CLICK);
+                break;
+            case RIGHT_CLICK_AIR:
+            case RIGHT_CLICK_BLOCK:
+                combatUser.useAction(ActionKey.RIGHT_CLICK);
+                break;
         }
     }
 }
