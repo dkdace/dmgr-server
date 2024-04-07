@@ -33,6 +33,7 @@ import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -122,6 +123,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private CharacterType characterType = null;
     /** 선택한 전투원 */
     private Character character = null;
+    /** 선택한 전투원 기록 정보 */
+    private UserData.CharacterRecord characterRecord = null;
     /** 무기 객체 */
     @Getter
     private Weapon weapon = null;
@@ -266,6 +269,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (damageModule.isLowHealth())
             ParticleUtil.playBleedingEffect(null, entity, 0);
+
+        if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
+            characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
     }
 
     /**
@@ -655,6 +661,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);
+                characterRecord.setKill(characterRecord.getKill() + 1);
                 if (gameUser.getGame().getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
                     gameUser.addTeamScore(1);
             }
@@ -726,8 +733,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         selfHarmDamage = 0;
         damageMap.clear();
 
-        if (gameUser != null)
+        if (gameUser != null) {
             gameUser.setDeath(gameUser.getDeath() + 1);
+            characterRecord.setDeath(characterRecord.getDeath() + 1);
+        }
 
         cancelAction();
         respawn();
@@ -934,6 +943,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         this.characterType = characterType;
         this.character = realCharacter;
+        this.characterRecord = UserData.fromPlayer(entity).getCharacterRecord(characterType);
         initActions();
         if (!isActivated)
             activate();
