@@ -676,7 +676,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 처치 시 킬로그를 표시한다.
      */
     private void broadcastPlayerKillMessage() {
-        if (damageMap.isEmpty() || game == null)
+        if (game == null)
             return;
 
         Set<String> attackerNames = new HashSet<>();
