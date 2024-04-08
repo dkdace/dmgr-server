@@ -13,7 +13,6 @@ import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
@@ -77,7 +76,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             for (int i = 0; i < 8; i++) {
                 Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
                 Vector axis = VectorUtil.getPitchAxis(location);
@@ -91,12 +90,12 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 10, 0.1, 0.1, 0.1, 0.15);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
             SoundUtil.playBlockHitSound(location, hitBlock, 1);
             ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
@@ -105,7 +104,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
                     SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 

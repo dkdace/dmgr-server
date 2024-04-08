@@ -102,7 +102,7 @@ public final class SiliaTrait {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -112,12 +112,12 @@ public final class SiliaTrait {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 3, 0.05, 0.05, 0.05, 0.05);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
             SoundUtil.playBlockHitSound(location, hitBlock, 1);
 
@@ -125,7 +125,7 @@ public final class SiliaTrait {
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
                         SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
@@ -139,7 +139,7 @@ public final class SiliaTrait {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 15, 0.08, 0.08, 0.08, 0.08);
         }

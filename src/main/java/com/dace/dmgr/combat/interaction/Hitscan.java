@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 히트스캔. 광선과 같이 탄속이 무한한 총알을 관리하는 클래스.
@@ -48,23 +48,31 @@ public abstract class Hitscan extends Bullet {
      */
     @Override
     public final void shoot(@NonNull Location origin, @NonNull Vector direction) {
-        direction.normalize().multiply(HITBOX_INTERVAL);
-        Location loc = origin.clone();
-        loc.add(direction.clone().multiply(startDistance));
-        Set<CombatEntity> targets = new HashSet<>();
+        velocity = direction.clone().normalize().multiply(HITBOX_INTERVAL);
+        location = origin.clone();
+        location.add(direction.clone().multiply(startDistance));
+        HashSet<Damageable> targets = new HashSet<>();
 
-        for (int i = 0; loc.distance(origin) < maxDistance; i++) {
-            if (!LocationUtil.isNonSolid(loc) && !handleBlockCollision(loc, direction))
+        for (int i = 0; location.distance(origin) < maxDistance; i++) {
+            if (!onInterval())
                 break;
 
-            if (!findTargetAndHandleCollision(loc, direction, targets, condition))
+            if (!LocationUtil.isNonSolid(location) && !handleBlockCollision())
                 break;
 
-            loc.add(direction);
+            if (!findTargetAndHandleCollision(targets, condition))
+                break;
+
+            location.add(velocity);
             if (i % trailInterval == 0)
-                trail(loc.clone(), direction.clone().normalize());
+                trail();
         }
 
-        onDestroy(loc.clone());
+        onDestroy();
+    }
+
+    @Override
+    protected boolean onInterval() {
+        return true;
     }
 }

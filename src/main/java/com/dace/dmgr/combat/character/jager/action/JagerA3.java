@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 import java.util.function.Predicate;
 
@@ -148,25 +147,25 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             playTickEffect(location);
         }
 
         @Override
-        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, location, 0.1 + velocity.length() * 2);
+        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, location, 1 + velocity.length() * 2);
             return false;
         }
 
         @Override
-        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
             if (velocity.length() > 0.05)
                 target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
             return false;
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             explode(location.add(0, 0.1, 0), this);
         }
     }

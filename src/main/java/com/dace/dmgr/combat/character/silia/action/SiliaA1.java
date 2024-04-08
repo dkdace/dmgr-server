@@ -103,7 +103,7 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             for (int i = 0; i < 12; i++) {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
                 Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
@@ -116,7 +116,7 @@ public final class SiliaA1 extends ActiveSkill {
                             255, 255, 255);
 
                     if ((i == 0 || i == 11) && j == 1) {
-                        Vector vec2 = VectorUtil.getSpreadedVector(direction, 10);
+                        Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 10);
                         ParticleUtil.play(Particle.EXPLOSION_NORMAL, trailLoc, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
                     }
                 }
@@ -127,12 +127,12 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             return true;
         }
 

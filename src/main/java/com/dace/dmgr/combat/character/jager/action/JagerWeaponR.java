@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.util.Vector;
 
 public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     /** 주무기 객체 */
@@ -126,13 +125,13 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
                     JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);

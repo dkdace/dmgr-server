@@ -8,9 +8,9 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.interaction.GroundProjectile;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
@@ -157,7 +157,7 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -167,46 +167,46 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             return true;
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }
 
-    private class QuakerA2Projectile extends Projectile {
+    private class QuakerA2Projectile extends GroundProjectile {
         private final Set<CombatEntity> targets;
 
         private QuakerA2Projectile(Set<CombatEntity> targets) {
             super(QuakerA2.this.combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(0.5)
-                    .maxDistance(QuakerA2Info.DISTANCE).isOnGround(true).condition(QuakerA2.this.combatUser::isEnemy).build());
+                    .maxDistance(QuakerA2Info.DISTANCE).condition(QuakerA2.this.combatUser::isEnemy).build());
 
             this.targets = targets;
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
             ParticleUtil.playBlockHitEffect(location, floor, 3);
             ParticleUtil.play(Particle.CRIT, location, 20, 0.2, 0.05, 0.2, 0.25);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerA2Info.STUN_DURATION);

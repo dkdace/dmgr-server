@@ -19,7 +19,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.MagmaCube;
-import org.bukkit.util.Vector;
 
 @Getter
 public final class JagerUlt extends UltimateSkill {
@@ -92,23 +91,23 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
 
         @Override
-        protected boolean onHitBlockBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntityBouncing(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
             return false;
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
             entity = new JagerUltEntity(magmaCube, combatUser);
             entity.activate();

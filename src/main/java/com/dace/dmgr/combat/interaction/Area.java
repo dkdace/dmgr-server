@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.function.Predicate;
@@ -58,12 +57,12 @@ public abstract class Area {
         for (CombatEntity target : targets) {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override
-                protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+                protected boolean onHitBlock(@NonNull Block hitBlock) {
                     return Area.this.onHitBlock(center, location, hitBlock);
                 }
 
                 @Override
-                protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+                protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
                     Boolean canPenetrate = penetrationMap.get(target);
                     if (canPenetrate == null) {
                         canPenetrate = Area.this.onHitEntity(center, location, target);

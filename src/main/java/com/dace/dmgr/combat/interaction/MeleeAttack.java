@@ -7,10 +7,8 @@ import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 /**
  * 기본 근접 공격의 판정을 관리하는 클래스.
@@ -35,7 +33,7 @@ public final class MeleeAttack extends Hitscan {
     }
 
     @Override
-    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+    protected boolean onHitBlock(@NonNull Block hitBlock) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
         SoundUtil.playBlockHitSound(location, hitBlock, 1);
         ParticleUtil.playBlockHitEffect(location, hitBlock, 1);
@@ -44,7 +42,7 @@ public final class MeleeAttack extends Hitscan {
     }
 
     @Override
-    protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+    protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
         target.getDamageModule().damage((CombatUser) shooter, damage, DamageType.NORMAL, location, false, true);
         target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(0.3));
 

@@ -154,7 +154,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1,
@@ -164,7 +164,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (isUlt)
                 target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, false);
             else {

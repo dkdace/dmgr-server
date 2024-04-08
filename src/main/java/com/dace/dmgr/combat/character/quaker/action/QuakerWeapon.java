@@ -110,7 +110,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -120,12 +120,12 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, location);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             ParticleUtil.playBlockHitEffect(location, hitBlock, 2);
             SoundUtil.playBlockHitSound(location, hitBlock, 1);
 
@@ -133,7 +133,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
                 target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ? -0.3 : 0.3));
@@ -146,7 +146,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 30, 0.15, 0.15, 0.15, 0.05);
         }

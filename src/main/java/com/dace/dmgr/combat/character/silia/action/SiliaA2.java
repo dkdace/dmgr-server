@@ -90,7 +90,7 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             i++;
 
             Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
@@ -107,7 +107,7 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             for (int j = 0; j < 40; j++) {
                 Vector vec = VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec.getX(), vec.getY(), vec.getZ(),
@@ -116,13 +116,13 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             ParticleUtil.playBlockHitEffect(location, hitBlock, 3);
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
                     SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
             target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);

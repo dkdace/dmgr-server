@@ -22,7 +22,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 import java.util.function.Predicate;
 
@@ -82,24 +81,24 @@ public final class ArkaceA1 extends ActiveSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
                     0, 0, 0, 32, 250, 225);
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             explode(location.add(0, 0.1, 0));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
             return false;
         }

@@ -167,7 +167,7 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -177,17 +177,17 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             return true;
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy() {
             Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, trailLoc, 30, 0.15, 0.15, 0.15, 0.05);
         }
@@ -204,19 +204,19 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
-            Vector vec = VectorUtil.getSpreadedVector(direction, 15);
+        protected void trail() {
+            Vector vec = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 15);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec.getX(), vec.getY(), vec.getZ(), 1);
             ParticleUtil.play(Particle.CRIT, location, 4, 0.2, 0.2, 0.2, 0.1);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerUltInfo.STUN_DURATION);

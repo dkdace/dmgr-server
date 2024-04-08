@@ -2,8 +2,6 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import lombok.Builder;
-import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 import java.util.function.Predicate;
 
@@ -14,7 +12,7 @@ import java.util.function.Predicate;
  */
 @Builder
 public final class HitscanOption {
-    /** 트레일 이벤트 ({@link Bullet#trail(Location, Vector)})를 호출하는 주기. (단위: 판정점 개수) */
+    /** 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수) */
     @Builder.Default
     final int trailInterval = 14;
     /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */

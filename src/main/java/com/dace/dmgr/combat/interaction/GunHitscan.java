@@ -5,10 +5,8 @@ import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 /**
  * 실탄을 발사하는 화기의 총알을 관리하는 클래스.
@@ -23,7 +21,7 @@ public abstract class GunHitscan extends Hitscan {
     }
 
     @Override
-    protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+    protected boolean onHitBlock(@NonNull Block hitBlock) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, location);
         SoundUtil.playBlockHitSound(location, hitBlock, 1);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
