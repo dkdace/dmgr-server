@@ -199,7 +199,9 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 플레이어에게 화면 반동 효과를 적용한다. 총기 반동에 사용된다.
+     * 지정한 플레이어에게 화면 반동 효과를 적용한다.
+     *
+     * <p>주로 총기 반동에 사용된다.</p>
      *
      * @param combatUser      대상 플레이어
      * @param up              수직 반동
@@ -207,7 +209,7 @@ public final class CombatUtil {
      * @param upSpread        수직 반동 분산도
      * @param sideSpread      수평 반동 분산도
      * @param duration        반동 진행 시간 (tick)
-     * @param firstMultiplier 초탄 반동 계수. {@code 1}로 설정 시 차탄과 동일
+     * @param firstMultiplier 초탄 반동 계수. 1로 설정 시 차탄과 동일
      */
     public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
         final double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
