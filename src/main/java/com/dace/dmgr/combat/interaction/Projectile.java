@@ -19,15 +19,15 @@ import java.util.stream.IntStream;
  * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
  */
 public abstract class Projectile extends Bullet {
+    /** 투사체의 속력. (단위: 블록/s) */
+    protected final int speed;
+    /** 투사체가 유지되는 시간 (tick). -1로 설정 시 무한 지속 */
+    protected final long duration;
+    /** 중력 작용 여부 */
+    protected final boolean hasGravity;
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;
-    /** 투사체의 속력. (단위: 블록/s) */
-    protected int speed;
-    /** 투사체가 유지되는 시간 (tick). -1로 설정 시 무한 지속 */
-    protected long duration;
-    /** 중력 작용 여부 */
-    protected boolean hasGravity;
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -54,16 +54,12 @@ public abstract class Projectile extends Bullet {
      * @param speed   투사체의 속력. (단위: 블록/s)
      */
     protected Projectile(@NonNull CombatEntity shooter, int speed) {
-        super(shooter);
+        super(shooter, ProjectileOption.TRAIL_INTERVAL_DEFAULT, ProjectileOption.START_DISTANCE_DEFAULT, ProjectileOption.MAX_DISTANCE_DEFAULT,
+                ProjectileOption.SIZE_DEFAULT, ProjectileOption.CONDITION_DEFAULT);
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
-        ProjectileOption option = ProjectileOption.builder().build();
-        this.trailInterval = option.trailInterval;
-        this.maxDistance = option.maxDistance;
-        this.size = option.size;
-        this.condition = option.condition;
         this.speed = speed;
-        this.duration = option.duration;
-        this.hasGravity = option.hasGravity;
+        this.duration = ProjectileOption.DURATION_DEFAULT;
+        this.hasGravity = ProjectileOption.HAS_GRAVITY_DEFAULT;
     }
 
     /**

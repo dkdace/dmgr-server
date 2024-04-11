@@ -4,10 +4,8 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.LocationUtil;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -23,7 +21,6 @@ import java.util.function.Predicate;
  * @see Hitscan
  * @see Projectile
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Bullet {
     /** 궤적 상 히트박스 판정점 간 거리 기본값. (단위: 블록) */
     protected static final double HITBOX_INTERVAL = 0.125;
@@ -32,15 +29,15 @@ public abstract class Bullet {
     @Getter
     protected final CombatEntity shooter;
     /** 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수) */
-    protected int trailInterval;
+    protected final int trailInterval;
     /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
-    protected double startDistance;
+    protected final double startDistance;
     /** 총알의 최대 사거리. (단위: 블록) */
-    protected double maxDistance;
+    protected final double maxDistance;
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
-    protected double size;
+    protected final double size;
     /** 대상 엔티티를 찾는 조건 */
-    protected Predicate<CombatEntity> condition;
+    protected final Predicate<CombatEntity> condition;
     /** 투사체의 현재 위치 */
     protected Location location;
     /** 투사체의 현재 속도 */

@@ -187,7 +187,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (QuakerA3Projectile.this.targets.add(target) && targets.length > 1) {
+                if (QuakerA3Projectile.this.targets.add(target) && QuakerA3Projectile.this.targets.size() > 1) {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                     onImpact(location);
                 }

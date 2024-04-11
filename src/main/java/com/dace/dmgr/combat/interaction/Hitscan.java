@@ -32,12 +32,8 @@ public abstract class Hitscan extends Bullet {
      * @param shooter 발사자
      */
     protected Hitscan(@NonNull CombatEntity shooter) {
-        super(shooter);
-        HitscanOption hitscanOption = HitscanOption.builder().build();
-        this.trailInterval = hitscanOption.trailInterval;
-        this.maxDistance = hitscanOption.maxDistance;
-        this.size = hitscanOption.size;
-        this.condition = hitscanOption.condition;
+        super(shooter, HitscanOption.TRAIL_INTERVAL_DEFAULT, HitscanOption.START_DISTANCE_DEFAULT, HitscanOption.MAX_DISTANCE_DEFAULT,
+                HitscanOption.SIZE_DEFAULT, HitscanOption.CONDITION_DEFAULT);
     }
 
     /**

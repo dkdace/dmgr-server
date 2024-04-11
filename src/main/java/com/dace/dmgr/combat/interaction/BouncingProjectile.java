@@ -12,12 +12,12 @@ import org.bukkit.util.Vector;
  * 튕기는 투사체. 투사체 중 벽이나 엔티티에 튕기는 투사체를 관리하는 클래스.
  */
 public abstract class BouncingProjectile extends Projectile {
+    /** 투사체가 튕겼을 때의 속력 배수 */
+    protected final double bounceVelocityMultiplier;
+    /** 바닥에 닿았을 때 제거 여부 */
+    protected final boolean destroyOnHitFloor;
     /** 투사체가 튕기는 횟수. -1로 설정 시 계속 튕김 */
     protected int bouncing;
-    /** 투사체가 튕겼을 때의 속력 배수 */
-    protected double bounceVelocityMultiplier;
-    /** 바닥에 닿았을 때 제거 여부 */
-    protected boolean destroyOnHitFloor;
 
     /**
      * 튕기는 투사체 인스턴스를 생성한다.
