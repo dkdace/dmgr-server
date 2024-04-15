@@ -154,7 +154,7 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 5);
+            CombatUtil.playBlockHitEffect(location, hitBlock, 5);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 50, 0.2, 0.2, 0.2, 0.4);
             onImpact(location.add(0, 0.1, 0));
 

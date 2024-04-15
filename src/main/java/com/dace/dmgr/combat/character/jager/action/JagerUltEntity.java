@@ -188,7 +188,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
-        ParticleUtil.playBreakEffect(location, entity, damage);
+        CombatUtil.playBreakEffect(location, entity, damage);
     }
 
     @Override

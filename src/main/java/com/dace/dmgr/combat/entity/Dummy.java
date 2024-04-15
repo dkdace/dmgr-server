@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
@@ -8,7 +9,6 @@ import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Color;
@@ -92,6 +92,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         ParticleUtil.playBleedingEffect(location, entity, damage);
+        CombatUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override

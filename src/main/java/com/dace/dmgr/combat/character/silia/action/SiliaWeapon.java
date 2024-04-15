@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -97,8 +98,8 @@ public final class SiliaWeapon extends AbstractWeapon {
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
-            SoundUtil.playBlockHitSound(location, hitBlock, 1);
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
+            CombatUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(location, hitBlock, 1.5);
 
             return false;
         }

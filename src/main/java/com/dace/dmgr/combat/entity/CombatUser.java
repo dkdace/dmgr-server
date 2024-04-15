@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -266,7 +267,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            ParticleUtil.playBleedingEffect(null, entity, 0);
+            CombatUtil.playBleedingEffect(null, entity, 0);
 
         if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
             characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Barrier;
@@ -92,7 +93,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         if (location != null)
-            ParticleUtil.playBreakEffect(location, entity, damage);
+            CombatUtil.playBreakEffect(location, entity, damage);
         skill.addStateValue(-damage);
     }
 

@@ -196,7 +196,7 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected void trail() {
             Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
-            ParticleUtil.playBlockHitEffect(location, floor, 3);
+            CombatUtil.playBlockHitEffect(location, floor, 3);
             ParticleUtil.play(Particle.CRIT, location, 20, 0.2, 0.05, 0.2, 0.25);
         }
 

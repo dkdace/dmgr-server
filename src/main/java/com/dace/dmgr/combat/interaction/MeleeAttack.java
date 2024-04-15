@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.interaction;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -35,8 +36,8 @@ public final class MeleeAttack extends Hitscan {
     @Override
     protected boolean onHitBlock(@NonNull Block hitBlock) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
-        SoundUtil.playBlockHitSound(location, hitBlock, 1);
-        ParticleUtil.playBlockHitEffect(location, hitBlock, 1);
+        CombatUtil.playBlockHitSound(location, hitBlock, 1);
+        CombatUtil.playBlockHitEffect(location, hitBlock, 1);
 
         return false;
     }

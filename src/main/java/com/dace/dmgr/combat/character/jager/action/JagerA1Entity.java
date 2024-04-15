@@ -138,7 +138,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
     @Override
     public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
-        ParticleUtil.playBleedingEffect(location, entity, damage);
+        CombatUtil.playBleedingEffect(location, entity, damage);
         skill.addStateValue(-damage);
     }
 

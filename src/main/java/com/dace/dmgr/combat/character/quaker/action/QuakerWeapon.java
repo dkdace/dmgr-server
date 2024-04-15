@@ -126,8 +126,8 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 2);
-            SoundUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(location, hitBlock, 2);
+            CombatUtil.playBlockHitSound(location, hitBlock, 1);
 
             return false;
         }

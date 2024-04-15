@@ -118,8 +118,8 @@ public final class SiliaTrait {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
-            SoundUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(location, hitBlock, 1.5);
+            CombatUtil.playBlockHitSound(location, hitBlock, 1);
 
             return false;
         }

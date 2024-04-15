@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 /**
@@ -225,120 +224,5 @@ public final class SoundUtil {
     private static void validatePitch(double pitch) {
         if (pitch < 0.5 || pitch > 2)
             throw new IllegalArgumentException("'pitch'가 0.5에서 2 사이여야 함");
-    }
-
-    /**
-     * 지정한 위치에 블록 타격 효과음을 재생한다.
-     *
-     * @param location         대상 위치
-     * @param block            블록
-     * @param volumeMultiplier 음량 배수
-     */
-    public static void playBlockHitSound(@NonNull Location location, @NonNull Block block, double volumeMultiplier) {
-        switch (block.getType()) {
-            case GRASS:
-            case LEAVES:
-            case LEAVES_2:
-            case SPONGE:
-            case HAY_BLOCK:
-                play(Sound.BLOCK_GRASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case DIRT:
-            case GRAVEL:
-            case SAND:
-            case CLAY:
-                play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case STONE:
-            case COBBLESTONE:
-            case COBBLESTONE_STAIRS:
-            case BRICK:
-            case BRICK_STAIRS:
-            case SANDSTONE:
-            case SANDSTONE_STAIRS:
-            case RED_SANDSTONE:
-            case RED_SANDSTONE_STAIRS:
-            case HARD_CLAY:
-            case STAINED_CLAY:
-            case OBSIDIAN:
-            case COAL_BLOCK:
-            case QUARTZ_BLOCK:
-            case QUARTZ_STAIRS:
-            case COBBLE_WALL:
-            case SMOOTH_BRICK:
-            case SMOOTH_STAIRS:
-            case NETHER_BRICK:
-            case NETHER_FENCE:
-            case NETHER_BRICK_STAIRS:
-            case STEP:
-            case DOUBLE_STEP:
-            case STONE_SLAB2:
-            case DOUBLE_STONE_SLAB2:
-            case CONCRETE:
-                play(Sound.BLOCK_STONE_BREAK, location, 1 * volumeMultiplier, 0.9, 0.1);
-                break;
-            case IRON_BLOCK:
-            case GOLD_BLOCK:
-            case IRON_DOOR_BLOCK:
-            case ANVIL:
-            case IRON_TRAPDOOR:
-            case CAULDRON:
-            case HOPPER:
-                play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5 * volumeMultiplier, 1.95, 0.1);
-                play("random.metalhit", location, 0.8 * volumeMultiplier, 1.95, 0.1);
-                break;
-            case WOOD:
-            case LOG:
-            case LOG_2:
-            case WOOD_STAIRS:
-            case SPRUCE_WOOD_STAIRS:
-            case BIRCH_WOOD_STAIRS:
-            case JUNGLE_WOOD_STAIRS:
-            case DARK_OAK_STAIRS:
-            case ACACIA_STAIRS:
-            case WOOD_STEP:
-            case WOOD_DOUBLE_STEP:
-            case NOTE_BLOCK:
-            case JUKEBOX:
-            case FENCE:
-            case SPRUCE_FENCE:
-            case BIRCH_FENCE:
-            case JUNGLE_FENCE:
-            case DARK_OAK_FENCE:
-            case ACACIA_FENCE:
-            case FENCE_GATE:
-            case SPRUCE_FENCE_GATE:
-            case BIRCH_FENCE_GATE:
-            case JUNGLE_FENCE_GATE:
-            case DARK_OAK_FENCE_GATE:
-            case ACACIA_FENCE_GATE:
-            case WOODEN_DOOR:
-            case SPRUCE_DOOR:
-            case BIRCH_DOOR:
-            case JUNGLE_DOOR:
-            case DARK_OAK_DOOR:
-            case ACACIA_DOOR:
-            case CHEST:
-            case BOOKSHELF:
-                play(Sound.BLOCK_WOOD_BREAK, location, 0.8 * volumeMultiplier, 0.8, 0.1);
-                play("random.stab", location, 0.8 * volumeMultiplier, 1.95, 0.1);
-                break;
-            case GLASS:
-            case THIN_GLASS:
-            case STAINED_GLASS:
-            case STAINED_GLASS_PANE:
-            case ICE:
-            case PACKED_ICE:
-            case FROSTED_ICE:
-            case REDSTONE_LAMP_OFF:
-            case REDSTONE_LAMP_ON:
-            case SEA_LANTERN:
-                play(Sound.BLOCK_GLASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case WOOL:
-            case CARPET:
-                play(Sound.BLOCK_CLOTH_BREAK, location, 1 * volumeMultiplier, 0.8, 0.1);
-                break;
-        }
     }
 }

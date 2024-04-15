@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.arkace;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
@@ -9,7 +10,6 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -69,7 +69,7 @@ public final class Arkace extends Character {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
