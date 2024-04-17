@@ -1,9 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.combat.entity.AbilityStatus;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -69,6 +68,8 @@ public final class StatusEffectModule {
             statusEffect.onStart(combatEntity);
 
             TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+                if (combatEntity.isDisposed())
+                    return false;
                 if (getStatusEffectDuration(statusEffectType, statusEffect) == 0)
                     return false;
 

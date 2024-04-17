@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.TemporalEntity;
+import com.dace.dmgr.combat.entity.temporal.TemporalEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

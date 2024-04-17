@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.NamedSound;

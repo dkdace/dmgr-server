@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.character.silia;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.character.silia.action.SiliaT1Info;
 import com.dace.dmgr.combat.character.silia.action.SiliaT2Info;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;

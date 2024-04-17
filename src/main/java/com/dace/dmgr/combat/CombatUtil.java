@@ -3,7 +3,6 @@ package com.dace.dmgr.combat;
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.Cooldown;
@@ -20,6 +19,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,7 +82,7 @@ public final class CombatUtil {
      * @return 범위 내 가장 가까운 엔티티
      */
     public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
-        return Arrays.stream(CombatEntityUtil.getAllExcluded())
+        return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted() &&
@@ -129,7 +129,7 @@ public final class CombatUtil {
      */
     @NonNull
     public static CombatEntity[] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
-        return Arrays.stream(CombatEntityUtil.getAllExcluded())
+        return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted() &&
@@ -243,6 +243,26 @@ public final class CombatUtil {
 
             return true;
         }, 1, duration));
+    }
+
+    /**
+     * 엔티티를 지정한 위치에 소환한다.
+     *
+     * @param entityClass 엔티티 클래스
+     * @param location    소환할 위치
+     * @param <T>         {@link LivingEntity}를 상속받는 엔티티 타입
+     * @return 엔티티
+     */
+    @NonNull
+    public static <T extends LivingEntity> T spawnEntity(@NonNull Class<T> entityClass, @NonNull Location location) {
+        T entity = location.getWorld().spawn(location, entityClass);
+        if (entity.getVehicle() != null) {
+            entity.getVehicle().remove();
+            entity.leaveVehicle();
+        }
+        entity.getEquipment().clear();
+
+        return entity;
     }
 
     /**

@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.silia.SiliaTrait;

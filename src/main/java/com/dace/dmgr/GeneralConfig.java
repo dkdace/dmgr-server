@@ -42,6 +42,7 @@ public final class GeneralConfig extends YamlFile {
         combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
         combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
         combatConfig.jumpPadBlock = Material.valueOf(getString("jumpPadBlock", combatConfig.jumpPadBlock.toString()));
+        combatConfig.jumpPadVelocity = getDouble("jumpPadVelocity", combatConfig.jumpPadVelocity);
         combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
 
         gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
@@ -107,6 +108,8 @@ public final class GeneralConfig extends YamlFile {
         private int healPackHeal = 350;
         /** 점프대에 사용되는 블록의 타입 */
         private Material jumpPadBlock = Material.SPONGE;
+        /** 점프대 사용 시 속력 */
+        private double jumpPadVelocity = 1.4;
         /** 낙사 구역에 사용되는 블록의 타입 */
         private Material fallZoneBlock = Material.BEDROCK;
     }

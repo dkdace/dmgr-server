@@ -1,6 +1,7 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.temporal;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporalEntity<T> {
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected SummonEntity(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, boolean hideForEnemies,
-                           @NonNull Hitbox... hitboxes) {
+                           @NonNull Hitbox @NonNull ... hitboxes) {
         super(entity, name, owner.getGame(), hitboxes);
 
         this.owner = owner;

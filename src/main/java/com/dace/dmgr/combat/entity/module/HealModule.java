@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 치유를 받을 수 있는 엔티티의 모듈 클래스.
@@ -23,24 +24,26 @@ public final class HealModule extends DamageModule {
      *
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
+     * @param isShowHealthBar   생명력 홀로그램 표시 여부
      * @param maxHealth         최대 체력
      * @param defenseMultiplier 방어력 배수 기본값
      * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, int maxHealth, double defenseMultiplier) {
-        super(combatEntity, isUltProvider, maxHealth, defenseMultiplier);
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier) {
+        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier);
     }
 
     /**
      * 치유 모듈 인스턴스를 생성한다.
      *
-     * @param combatEntity  대상 엔티티
-     * @param isUltProvider 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param maxHealth     최대 체력
+     * @param combatEntity    대상 엔티티
+     * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
+     * @param isShowHealthBar 생명력 홀로그램 표시 여부
+     * @param maxHealth       최대 체력
      * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, int maxHealth) {
-        super(combatEntity, isUltProvider, maxHealth);
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth) {
+        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth);
     }
 
     /**
@@ -50,7 +53,7 @@ public final class HealModule extends DamageModule {
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
      */
-    public void heal(Healer provider, int amount, boolean isUlt) {
+    public void heal(@Nullable Healer provider, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
             return;
 

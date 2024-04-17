@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.statuseffect;
+package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -8,31 +8,28 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * 침묵 상태 효과를 처리하는 클래스.
+ * 고정 상태 효과를 처리하는 클래스.
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Silence implements StatusEffect {
+public class Grounding implements StatusEffect {
     @Getter
-    private static final Silence instance = new Silence();
+    static final Grounding instance = new Grounding();
 
     @Override
     @NonNull
     public String getName() {
-        return "침묵";
+        return "고정";
     }
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).cancelAction();
+        // 미사용
     }
 
     @Override
     public void onTick(@NonNull CombatEntity combatEntity, long i) {
-        if (combatEntity instanceof CombatUser) {
-            ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 2, 10);
-            ((CombatUser) combatEntity).getEntity().stopSound("");
-        }
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).getUser().sendTitle("§c§l고정당함!", "", 0, 2, 10);
     }
 
     @Override

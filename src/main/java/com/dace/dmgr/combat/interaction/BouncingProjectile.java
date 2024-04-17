@@ -28,7 +28,7 @@ public abstract class BouncingProjectile extends Projectile {
      *
      * @param shooter        발사자
      * @param velocity       투사체의 속력. (단위: 블록/s)
-     * @param bouncing       투사체가 튕기는 횟수. {@code -1}로 설정 시 계속 튕김
+     * @param bouncing       투사체가 튕기는 횟수. -1로 설정 시 계속 튕김
      * @param option         투사체의 선택적 옵션
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
      * @see ProjectileOption

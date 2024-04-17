@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.combat.entity.AbilityStatus;
 import com.dace.dmgr.combat.entity.Attacker;
 import lombok.Getter;
 import lombok.NonNull;

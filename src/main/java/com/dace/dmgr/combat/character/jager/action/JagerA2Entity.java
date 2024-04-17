@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.NamedSound;
@@ -19,6 +21,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 예거 - 곰덫 클래스.
@@ -59,7 +62,7 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
         knockbackModule = new KnockbackModule(this, 1);
         statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
-        damageModule = new DamageModule(this, false, JagerA2Info.HEALTH);
+        damageModule = new DamageModule(this, false, true, JagerA2Info.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
         onInit();
@@ -173,13 +176,13 @@ public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasR
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         CombatUtil.playBreakEffect(location, entity, damage);
     }
 
     @Override
-    public void onDeath(Attacker attacker) {
+    public void onDeath(@Nullable Attacker attacker) {
         dispose();
 
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,

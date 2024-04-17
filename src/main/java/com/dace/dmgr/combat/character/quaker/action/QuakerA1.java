@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
-import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
@@ -56,7 +56,7 @@ public final class QuakerA1 extends ChargeableSkill {
             combatUser.setFovValue(0.3);
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_USE, combatUser.getEntity().getLocation());
 
-            ArmorStand armorStand = CombatEntityUtil.spawn(ArmorStand.class, combatUser.getEntity().getLocation());
+            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, combatUser.getEntity().getLocation());
             entity = new QuakerA1Entity(armorStand, combatUser);
             entity.activate();
         } else

@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.NamedSound;
@@ -17,6 +19,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 예거 - 설랑 클래스.
@@ -61,7 +64,7 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
-        damageModule = new DamageModule(this, false, JagerA1Info.HEALTH);
+        damageModule = new DamageModule(this, false, true, JagerA1Info.HEALTH);
         moveModule = new JumpModule(this, entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() * 1.5);
         readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
 
@@ -136,14 +139,14 @@ public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyT
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         CombatUtil.playBleedingEffect(location, entity, damage);
         skill.addStateValue(-damage);
     }
 
     @Override
-    public void onDeath(Attacker attacker) {
+    public void onDeath(@Nullable Attacker attacker) {
         dispose();
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());

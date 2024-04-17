@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.Barrier;
+import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
@@ -19,6 +19,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 퀘이커 - 불굴의 방패 클래스.
@@ -88,7 +89,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
         super.onDamage(attacker, damage, reducedDamage, damageType, location, isCrit, isUlt);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
@@ -98,7 +99,7 @@ public final class QuakerA1Entity extends Barrier<ArmorStand> {
     }
 
     @Override
-    public void onDeath(Attacker attacker) {
+    public void onDeath(@Nullable Attacker attacker) {
         dispose();
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());

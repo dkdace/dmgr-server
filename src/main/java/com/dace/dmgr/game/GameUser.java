@@ -2,9 +2,8 @@ package com.dace.dmgr.game;
 
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.user.User;
@@ -151,8 +150,6 @@ public final class GameUser implements Disposable {
      * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickTeamSpawn() {
-        player.getInventory().setHeldItemSlot(4);
-
         if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
@@ -167,7 +164,7 @@ public final class GameUser implements Disposable {
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
-        combatUser.getDamageModule().damage((Attacker) null,
+        combatUser.getDamageModule().damage(combatUser,
                 GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.NORMAL, null, false, false);
     }
 
@@ -198,7 +195,6 @@ public final class GameUser implements Disposable {
 
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
-        player.getInventory().setItem(4, CombatUser.CommunicationItem.SELECT_CHARACTER.getStaticItem().getItemStack());
         user.teleport(getRespawnLocation());
         user.clearChat();
         HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.DamageType;
 import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.NonNull;
 import org.bukkit.Location;
 
@@ -41,5 +41,6 @@ public interface Attacker extends CombatEntity {
      * @param victim 피격자
      */
     default void onDefaultAttack(@NonNull Damageable victim) {
+        // 미사용
     }
 }

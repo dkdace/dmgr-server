@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
-import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -98,7 +98,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         setDuration();
         confirmModule.toggleCheck();
 
-        Wolf wolf = CombatEntityUtil.spawn(Wolf.class, confirmModule.getCurrentLocation());
+        Wolf wolf = CombatUtil.spawnEntity(Wolf.class, confirmModule.getCurrentLocation());
         entity = new JagerA1Entity(wolf, combatUser);
         entity.activate();
     }

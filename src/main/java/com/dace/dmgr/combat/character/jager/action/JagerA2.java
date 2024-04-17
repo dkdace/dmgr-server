@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntityUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
@@ -112,7 +112,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            MagmaCube magmaCube = CombatEntityUtil.spawn(MagmaCube.class, location);
+            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, location);
             entity = new JagerA2Entity(magmaCube, combatUser);
             entity.activate();
         }

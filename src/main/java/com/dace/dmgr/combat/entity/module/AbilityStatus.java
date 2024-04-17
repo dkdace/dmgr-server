@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.module;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +26,7 @@ public final class AbilityStatus {
      *
      * @param baseValue 기본값
      */
-    public AbilityStatus(double baseValue) {
+    AbilityStatus(double baseValue) {
         this.baseValue = baseValue;
     }
 

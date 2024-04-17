@@ -1,10 +1,12 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.temporal;
 
+import com.dace.dmgr.combat.entity.AbstractCombatEntity;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투 시스템의 일시적인 엔티티 클래스.
@@ -24,7 +26,7 @@ public abstract class TemporalEntity<T extends Entity> extends AbstractCombatEnt
      * @param hitboxes 히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected TemporalEntity(@NonNull T entity, @NonNull String name, Game game, @NonNull Hitbox... hitboxes) {
+    protected TemporalEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
         super(entity, name, game, hitboxes);
     }
 

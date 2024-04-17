@@ -126,7 +126,7 @@ public final class Game implements Disposable {
             }
 
         for (GlobalLocation healPackLocation : map.getHealPackLocations())
-            HologramUtil.removeHologram(CombatUser.HOLOGRAM_ID_HEALPACK + healPackLocation);
+            HologramUtil.removeHologram(CombatUser.HEALPACK_HOLOGRAM_ID + healPackLocation);
 
         if (world == null)
             onDispose();

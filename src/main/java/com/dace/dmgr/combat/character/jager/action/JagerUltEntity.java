@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.*;
@@ -19,6 +21,7 @@ import org.bukkit.entity.MagmaCube;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -61,7 +64,7 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
         knockbackModule = new KnockbackModule(this, 1);
         statusEffectModule = new StatusEffectModule(this, 1);
         attackModule = new AttackModule(this);
-        damageModule = new DamageModule(this, false, JagerUltInfo.HEALTH);
+        damageModule = new DamageModule(this, false, true, JagerUltInfo.HEALTH);
         readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
         onInit();
@@ -186,13 +189,13 @@ public final class JagerUltEntity extends SummonEntity<MagmaCube> implements Has
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
         CombatUtil.playBreakEffect(location, entity, damage);
     }
 
     @Override
-    public void onDeath(Attacker attacker) {
+    public void onDeath(@Nullable Attacker attacker) {
         dispose();
 
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
