@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class SiliaP2Info extends PassiveSkillInfo {
     /** 벽타기 최대 횟수 */
@@ -15,7 +16,7 @@ public final class SiliaP2Info extends PassiveSkillInfo {
     }
 
     @Override
-    public SiliaP2 createSkill(CombatUser combatUser) {
+    public @NonNull SiliaP2 createSkill(@NonNull CombatUser combatUser) {
         return new SiliaP2(combatUser);
     }
 }

@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
-import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.util.Cooldown;
@@ -20,6 +19,7 @@ import java.text.MessageFormat;
  *
  * <p>무기가 {@link Swappable}을 상속받는 클래스여야 한다.</p>
  *
+ * @param <T> {@link Weapon}을 상속받는 보조무기
  * @see Swappable
  */
 @RequiredArgsConstructor
@@ -50,11 +50,6 @@ public final class SwapModule<T extends Weapon> {
         if (targetState == Swappable.SwapState.SWAPPING)
             return;
 
-        if (weapon instanceof Reloadable)
-            ((Reloadable) weapon).getReloadModule().setReloading(false);
-        if (swapState == Swappable.SwapState.SECONDARY)
-            ((Reloadable) weapon.getSwapModule().getSubweapon()).getReloadModule().setReloading(false);
-
         swapState = Swappable.SwapState.SWAPPING;
         CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, swapDuration);
         weapon.onSwapStart(targetState);
@@ -69,12 +64,12 @@ public final class SwapModule<T extends Weapon> {
 
             return true;
         }, isCancelled -> {
-            CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
+            CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, 0);
             if (isCancelled)
                 return;
 
             swapState = targetState;
-            weapon.getCombatUser().getUser().sendActionBar("§a§l무기 교체 완료", 8);
+            weapon.getCombatUser().getUser().sendActionBar("§a§l무기 교체 완료", 6);
             weapon.onSwapFinished(targetState);
         }, 1, swapDuration));
     }

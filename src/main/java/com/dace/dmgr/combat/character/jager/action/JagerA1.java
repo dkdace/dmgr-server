@@ -19,7 +19,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     JagerA1Entity entity = null;
 
     public JagerA1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, JagerA1Info.getInstance(), 0);
+        super(combatUser, JagerA1Info.getInstance(), 0);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }
 
@@ -40,12 +40,12 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
-    public long getStateValueDecrement() {
+    public int getStateValueDecrement() {
         return 0;
     }
 
     @Override
-    public long getStateValueIncrement() {
+    public int getStateValueIncrement() {
         return JagerA1Info.HEALTH / JagerA1Info.RECOVER_DURATION / 20;
     }
 

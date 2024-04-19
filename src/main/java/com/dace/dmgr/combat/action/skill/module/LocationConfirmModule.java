@@ -78,7 +78,7 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.setAI(false);
         pointer.setMarker(true);
         pointer.setVisible(false);
-        pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false,
+        pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
                 false), true);
         pointer.setHelmet(new ItemStack(Material.HOPPER));
 

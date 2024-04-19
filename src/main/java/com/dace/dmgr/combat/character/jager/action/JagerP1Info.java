@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class JagerP1Info extends PassiveSkillInfo {
     /** 이동속도 증가량 */
@@ -17,7 +18,7 @@ public final class JagerP1Info extends PassiveSkillInfo {
     }
 
     @Override
-    public JagerP1 createSkill(CombatUser combatUser) {
+    public @NonNull JagerP1 createSkill(@NonNull CombatUser combatUser) {
         return new JagerP1(combatUser);
     }
 }

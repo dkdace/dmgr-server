@@ -16,7 +16,7 @@ public final class QuakerA1 extends ChargeableSkill {
     QuakerA1Entity entity = null;
 
     public QuakerA1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, QuakerA1Info.getInstance(), 0);
+        super(combatUser, QuakerA1Info.getInstance(), 0);
     }
 
     @Override
@@ -36,12 +36,12 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
-    public long getStateValueDecrement() {
+    public int getStateValueDecrement() {
         return 0;
     }
 
     @Override
-    public long getStateValueIncrement() {
+    public int getStateValueIncrement() {
         return QuakerA1Info.HEALTH / QuakerA1Info.RECOVER_DURATION / 20;
     }
 

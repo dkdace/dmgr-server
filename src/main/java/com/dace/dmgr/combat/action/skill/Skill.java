@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.Action;
+import lombok.NonNull;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * 스킬의 상태를 관리하는 인터페이스.
@@ -9,9 +11,10 @@ import com.dace.dmgr.combat.action.Action;
  */
 public interface Skill extends Action {
     /**
-     * @return 스킬 번호
+     * @return 스킬 아이템 객체
      */
-    int getNumber();
+    @NonNull
+    ItemStack getItemStack();
 
     /**
      * 스킬의 기본 지속시간을 반환한다.
@@ -30,7 +33,7 @@ public interface Skill extends Action {
     /**
      * 스킬의 지속시간을 설정한다.
      *
-     * @param duration 지속시간 (tick). {@code -1}로 설정 시 무한 지속
+     * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
      */
     void setDuration(long duration);
 

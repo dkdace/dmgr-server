@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Aimable;
@@ -13,6 +12,7 @@ import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
@@ -67,7 +67,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                     return;
                 }
                 if (reloadModule.getRemainingAmmo() == 0) {
-                    reloadModule.reload();
+                    onAmmoEmpty();
                     return;
                 }
 
@@ -87,6 +87,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
                     return;
 
+                onCancelled();
                 aimModule.toggleAim();
                 swapModule.swap();
 
@@ -96,7 +97,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
                     return;
 
-                reloadModule.reload();
+                onAmmoEmpty();
 
                 break;
             }
@@ -121,6 +122,10 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onAmmoEmpty() {
+        if (reloadModule.isReloading())
+            return;
+
+        onCancelled();
         reloadModule.reload();
     }
 

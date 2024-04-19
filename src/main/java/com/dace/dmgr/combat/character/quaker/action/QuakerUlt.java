@@ -30,7 +30,7 @@ import java.util.Set;
 
 public final class QuakerUlt extends UltimateSkill {
     public QuakerUlt(@NonNull CombatUser combatUser) {
-        super(4, combatUser, QuakerUltInfo.getInstance());
+        super(combatUser, QuakerUltInfo.getInstance());
     }
 
     @Override

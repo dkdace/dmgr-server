@@ -1,18 +1,16 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;
-import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -53,7 +51,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         switch (actionKey) {
             case LEFT_CLICK: {
                 if (reloadModule.getRemainingAmmo() == 0) {
-                    reload();
+                    onAmmoEmpty();
                     return;
                 }
 
@@ -69,13 +67,12 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 break;
             }
             case RIGHT_CLICK: {
-                mainWeapon.getAimModule().toggleAim();
-                mainWeapon.getSwapModule().swap();
+                onCancelled();
 
                 break;
             }
             case DROP: {
-                reload();
+                onAmmoEmpty();
 
                 break;
             }
@@ -87,16 +84,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         super.onCancelled();
         mainWeapon.getAimModule().toggleAim();
         mainWeapon.getSwapModule().swap();
-        reloadModule.setReloading(false);
-    }
-
-    private void reload() {
-        if (mainWeapon.getAimModule().isAiming()) {
-            mainWeapon.getAimModule().toggleAim();
-            mainWeapon.getSwapModule().swap();
-
-            TaskUtil.addTask(taskRunner, new DelayTask(() -> mainWeapon.getReloadModule().reload(), JagerWeaponInfo.SWAP_DURATION));
-        }
+        mainWeapon.getReloadModule().setReloading(false);
     }
 
     @Override
@@ -106,7 +94,11 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     public void onAmmoEmpty() {
-        reload();
+        if (reloadModule.isReloading())
+            return;
+
+        onCancelled();
+        mainWeapon.getReloadModule().reload();
     }
 
     @Override

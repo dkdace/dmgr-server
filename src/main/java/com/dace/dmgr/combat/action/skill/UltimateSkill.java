@@ -12,8 +12,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 public abstract class UltimateSkill extends ActiveSkill {
-    protected UltimateSkill(int number, @NonNull CombatUser combatUser, @NonNull UltimateSkillInfo ultimateSkillInfo) {
-        super(number, combatUser, ultimateSkillInfo, 3);
+    protected UltimateSkill(@NonNull CombatUser combatUser, @NonNull UltimateSkillInfo ultimateSkillInfo) {
+        super(combatUser, ultimateSkillInfo, 3);
     }
 
     @Override

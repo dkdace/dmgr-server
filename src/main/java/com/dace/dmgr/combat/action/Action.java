@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.Disposable;
-import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
@@ -13,22 +11,18 @@ import org.bukkit.inventory.ItemStack;
  */
 public interface Action extends Disposable {
     /**
+     * 동작의 사용자를 반환한다.
+     *
      * @return 플레이어 객체
      */
     @NonNull
     CombatUser getCombatUser();
 
     /**
-     * @return 동작 정보 객체
-     */
-    ActionInfo getActionInfo();
-
-    /**
-     * @return 아이템 객체
-     */
-    ItemStack getItemStack();
-
-    /**
+     * 동작 태스크 실행 객체를 반환한다.
+     *
+     * <p>쿨타임, 지속시간 등의 스케쥴러 처리를 위해 사용한다.</p>
+     *
      * @return 동작 태스크 실행 객체
      */
     @NonNull
@@ -39,9 +33,8 @@ public interface Action extends Disposable {
      *
      * <p>같은 사용 키를 가진 동작이 있을 경우 우선순위가 높은 동작이 먼저 사용된다.</p>
      *
-     * <p>기본값은 {@code 0}이며, 오버라이딩하여 재설정할 수 있다.</p>
-     *
      * @return 우선순위
+     * @implSpec 0
      */
     default int getPriority() {
         return 0;
@@ -72,7 +65,7 @@ public interface Action extends Disposable {
     /**
      * 쿨타임을 설정한다.
      *
-     * @param cooldown 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     * @param cooldown 쿨타임 (tick). -1로 설정 시 무한 지속
      */
     void setCooldown(long cooldown);
 
@@ -112,7 +105,7 @@ public interface Action extends Disposable {
     void onUse(@NonNull ActionKey actionKey);
 
     /**
-     * 동작 사용이 취소당했을 때 실행할 작업.
+     * 동작 사용이 취소되었을 때 실행할 작업.
      */
     void onCancelled();
 

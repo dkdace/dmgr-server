@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class ArkaceUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
@@ -26,7 +27,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public ArkaceUlt createSkill(CombatUser combatUser) {
+    public @NonNull ArkaceUlt createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceUlt(combatUser);
     }
 }

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class ArkaceA1Info extends ActiveSkillInfo {
     /** 쿨타임 */
@@ -32,7 +33,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     }
 
     @Override
-    public ArkaceA1 createSkill(CombatUser combatUser) {
+    public @NonNull ArkaceA1 createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceA1(combatUser);
     }
 }

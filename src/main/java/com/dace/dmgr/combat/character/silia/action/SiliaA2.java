@@ -22,7 +22,7 @@ import org.bukkit.util.Vector;
 
 public final class SiliaA2 extends ActiveSkill {
     public SiliaA2(@NonNull CombatUser combatUser) {
-        super(2, combatUser, SiliaA2Info.getInstance(), 1);
+        super(combatUser, SiliaA2Info.getInstance(), 1);
     }
 
     @Override

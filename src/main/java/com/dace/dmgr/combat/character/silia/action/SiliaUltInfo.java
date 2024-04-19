@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class SiliaUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
@@ -25,7 +26,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public SiliaUlt createSkill(CombatUser combatUser) {
+    public @NonNull SiliaUlt createSkill(@NonNull CombatUser combatUser) {
         return new SiliaUlt(combatUser);
     }
 }

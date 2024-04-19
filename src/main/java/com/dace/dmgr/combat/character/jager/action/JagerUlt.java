@@ -26,7 +26,7 @@ public final class JagerUlt extends UltimateSkill {
     JagerUltEntity entity = null;
 
     public JagerUlt(@NonNull CombatUser combatUser) {
-        super(4, combatUser, JagerUltInfo.getInstance());
+        super(combatUser, JagerUltInfo.getInstance());
     }
 
     @Override

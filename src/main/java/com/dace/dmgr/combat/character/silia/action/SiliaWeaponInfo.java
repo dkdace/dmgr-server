@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class SiliaWeaponInfo extends WeaponInfo {
     /** 피해량 */
@@ -23,7 +24,7 @@ public final class SiliaWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public SiliaWeapon createWeapon(CombatUser combatUser) {
+    public @NonNull SiliaWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new SiliaWeapon(combatUser);
     }
 

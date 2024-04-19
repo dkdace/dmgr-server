@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.quaker.action;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class QuakerWeaponInfo extends WeaponInfo {
     /** 피해량 */
@@ -19,7 +20,7 @@ public final class QuakerWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public QuakerWeapon createWeapon(CombatUser combatUser) {
+    public @NonNull QuakerWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new QuakerWeapon(combatUser);
     }
 

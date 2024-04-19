@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.quaker.action;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class QuakerA2Info extends ActiveSkillInfo {
     /** 쿨타임 */
@@ -29,7 +30,7 @@ public final class QuakerA2Info extends ActiveSkillInfo {
     }
 
     @Override
-    public QuakerA2 createSkill(CombatUser combatUser) {
+    public @NonNull QuakerA2 createSkill(@NonNull CombatUser combatUser) {
         return new QuakerA2(combatUser);
     }
 }

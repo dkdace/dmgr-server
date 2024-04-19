@@ -6,9 +6,12 @@ import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -22,40 +25,46 @@ public abstract class ActiveSkill extends AbstractSkill {
     /**
      * 액티브 스킬 인스턴스를 생성한다.
      *
-     * @param number          번호
      * @param combatUser      대상 플레이어
      * @param activeSkillInfo 액티브 스킬 정보 객체
      * @param slot            슬롯 번호
      */
-    protected ActiveSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
-        super(number, combatUser, activeSkillInfo);
+    protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+        super(combatUser, activeSkillInfo);
         this.slot = slot;
+
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onTick();
+            return true;
+        }, 1));
     }
 
-    @Override
-    protected void onCooldownTick() {
-        long cooldown = CooldownUtil.getCooldown(this, Cooldown.SKILL_COOLDOWN);
-
-        displayCooldown((int) Math.ceil(cooldown / 20.0));
+    /**
+     * 매 틱마다 실행할 작업.
+     */
+    protected void onTick() {
+        if (isDurationFinished()) {
+            if (isCooldownFinished())
+                displayReady(1);
+            else {
+                long cooldown = CooldownUtil.getCooldown(this, Cooldown.SKILL_COOLDOWN);
+                displayCooldown((int) Math.ceil(cooldown / 20.0));
+            }
+        } else {
+            long duration = CooldownUtil.getCooldown(this, Cooldown.SKILL_DURATION);
+            displayUsing((int) Math.ceil(duration / 20.0));
+        }
     }
 
     @Override
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
-        displayReady(1);
         SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override
     public boolean canUse() {
         return super.canUse() && combatUser.isGlobalCooldownFinished();
-    }
-
-    @Override
-    protected void onDurationTick() {
-        long duration = CooldownUtil.getCooldown(this, Cooldown.SKILL_DURATION);
-
-        displayUsing((int) Math.ceil(duration / 20.0));
     }
 
     @Override
@@ -72,7 +81,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayCooldown(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
+        itemStack = skillInfo.getItemStack();
         itemStack.setDurability((short) 15);
         itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
         display(amount);
@@ -84,7 +93,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayReady(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
+        itemStack = skillInfo.getItemStack();
         display(amount);
     }
 
@@ -94,7 +103,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayUsing(int amount) {
-        itemStack = actionInfo.getItemStack().clone();
+        itemStack = skillInfo.getItemStack();
         itemStack.setDurability((short) 5);
         display(amount);
     }
@@ -105,10 +114,10 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     private void display(int amount) {
-        if (slot == -1)
-            return;
-
         itemStack.setAmount(amount <= 127 ? amount : 1);
-        combatUser.getEntity().getInventory().setItem(slot, itemStack);
+
+        ItemStack slotItem = combatUser.getEntity().getInventory().getItem(slot);
+        if (slotItem == null || !slotItem.equals(itemStack))
+            combatUser.getEntity().getInventory().setItem(slot, itemStack);
     }
 }

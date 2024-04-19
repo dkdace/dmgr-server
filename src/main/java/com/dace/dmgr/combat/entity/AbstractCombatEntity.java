@@ -132,12 +132,12 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     }
 
     @Override
-    public boolean isDisposed() {
+    public final boolean isDisposed() {
         return CombatEntityRegistry.getInstance().get(entity) == null;
     }
 
     @Override
-    public boolean isEnemy(@NonNull CombatEntity combatEntity) {
+    public final boolean isEnemy(@NonNull CombatEntity combatEntity) {
         return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
     }
 

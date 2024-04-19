@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
-import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -57,7 +55,7 @@ public final class ReloadModule {
     /**
      * 지정한 양만큼 무기의 탄약을 소모한다.
      *
-     * <p>탄약을 전부 소진하면 {@link ReloadModule#reload()}를 호출한다.</p>
+     * <p>탄약을 전부 소진하면 {@link Reloadable#onAmmoEmpty()}를 호출한다.</p>
      *
      * @param amount 탄약 소모량
      */
@@ -76,16 +74,12 @@ public final class ReloadModule {
     public void reload() {
         if (!weapon.canReload() || isReloading)
             return;
-        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapModule().getSwapState() == Swappable.SwapState.SWAPPING)
-            return;
 
         isReloading = true;
         CooldownUtil.setCooldown(this, Cooldown.WEAPON_RELOAD, reloadDuration);
 
         TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
             if (!isReloading)
-                return false;
-            if (weapon instanceof Aimable && ((Aimable) weapon).getAimModule().isAiming())
                 return false;
 
             String time = String.format("%.1f", (reloadDuration - i) / 20.0);
@@ -99,7 +93,7 @@ public final class ReloadModule {
             if (isCancelled)
                 return;
 
-            weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", 8);
+            weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", 6);
 
             remainingAmmo = capacity;
             isReloading = false;

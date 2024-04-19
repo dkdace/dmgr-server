@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class ArkaceWeaponInfo extends WeaponInfo {
     /** 피해량 */
@@ -33,7 +34,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public ArkaceWeapon createWeapon(CombatUser combatUser) {
+    public @NonNull ArkaceWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new ArkaceWeapon(combatUser);
     }
 

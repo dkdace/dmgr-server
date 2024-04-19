@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 
 public final class QuakerA3 extends ActiveSkill {
     public QuakerA3(@NonNull CombatUser combatUser) {
-        super(3, combatUser, QuakerA3Info.getInstance(), 2);
+        super(combatUser, QuakerA3Info.getInstance(), 2);
     }
 
     @Override

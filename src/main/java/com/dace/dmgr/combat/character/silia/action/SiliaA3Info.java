@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class SiliaA3Info extends ActiveSkillInfo {
     /** 쿨타임 */
@@ -25,7 +26,7 @@ public final class SiliaA3Info extends ActiveSkillInfo {
     }
 
     @Override
-    public SiliaA3 createSkill(CombatUser combatUser) {
+    public @NonNull SiliaA3 createSkill(@NonNull CombatUser combatUser) {
         return new SiliaA3(combatUser);
     }
 }

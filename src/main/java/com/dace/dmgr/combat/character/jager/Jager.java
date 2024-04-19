@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
@@ -14,6 +13,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,7 +58,7 @@ public final class Jager extends Character {
                 JagerWeaponInfo.CAPACITY, '*');
         String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, JagerWeaponInfo.SCOPE.CAPACITY,
                 JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getActionInfo().toString(), (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), (int) skill1Health, skill1MaxHealth,
                 10, '■');
         if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
@@ -72,7 +72,7 @@ public final class Jager extends Character {
             skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f회수";
         text.add(skill1Display);
         if (!skill3.isDurationFinished() && skill3.isEnabled())
-            text.add(skill3.getActionInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
+            text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
 
         return text.toString();
     }

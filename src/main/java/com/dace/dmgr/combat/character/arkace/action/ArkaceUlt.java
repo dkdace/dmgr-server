@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 public final class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt(@NonNull CombatUser combatUser) {
-        super(4, combatUser, ArkaceUltInfo.getInstance());
+        super(combatUser, ArkaceUltInfo.getInstance());
     }
 
     @Override

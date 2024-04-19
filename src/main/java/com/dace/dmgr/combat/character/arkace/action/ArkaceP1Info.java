@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class ArkaceP1Info extends PassiveSkillInfo {
     /** 이동속도 증가량 */
@@ -20,7 +21,7 @@ public final class ArkaceP1Info extends PassiveSkillInfo {
     }
 
     @Override
-    public ArkaceP1 createSkill(CombatUser combatUser) {
+    public @NonNull ArkaceP1 createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceP1(combatUser);
     }
 }

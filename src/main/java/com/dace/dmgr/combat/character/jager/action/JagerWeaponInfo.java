@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class JagerWeaponInfo extends WeaponInfo {
     /** 피해량 */
@@ -34,7 +35,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public JagerWeaponL createWeapon(CombatUser combatUser) {
+    public @NonNull JagerWeaponL createWeapon(@NonNull CombatUser combatUser) {
         return new JagerWeaponL(combatUser);
     }
 

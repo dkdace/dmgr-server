@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
     public SiliaP1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, SiliaP1Info.getInstance());
+        super(combatUser, SiliaP1Info.getInstance());
     }
 
     @Override

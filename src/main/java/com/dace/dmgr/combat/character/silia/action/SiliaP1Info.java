@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class SiliaP1Info extends PassiveSkillInfo {
     @Getter
@@ -13,7 +14,7 @@ public final class SiliaP1Info extends PassiveSkillInfo {
     }
 
     @Override
-    public SiliaP1 createSkill(CombatUser combatUser) {
+    public @NonNull SiliaP1 createSkill(@NonNull CombatUser combatUser) {
         return new SiliaP1(combatUser);
     }
 }

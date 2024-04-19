@@ -21,7 +21,7 @@ public final class MeleeAttackAction extends AbstractAction {
      * @param combatUser 대상 플레이어
      */
     public MeleeAttackAction(@NonNull CombatUser combatUser) {
-        super(combatUser, null);
+        super(combatUser);
     }
 
     @Override

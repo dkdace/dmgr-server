@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.quaker;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
@@ -9,6 +8,7 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -44,7 +44,7 @@ public final class Quaker extends Character {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getActionInfo().toString(), (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), (int) skill1Health, skill1MaxHealth,
                 10, '■');
 
         if (!skill1.isDurationFinished())

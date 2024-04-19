@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.quaker.action;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class QuakerUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
@@ -29,7 +30,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public QuakerUlt createSkill(CombatUser combatUser) {
+    public @NonNull QuakerUlt createSkill(@NonNull CombatUser combatUser) {
         return new QuakerUlt(combatUser);
     }
 }

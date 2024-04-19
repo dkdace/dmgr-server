@@ -47,8 +47,6 @@ public class ConfirmModule {
                 if (!isChecking)
                     return false;
 
-                skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
-                        acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
                 skill.onCheckTick(i);
                 ConfirmModule.this.onCheckTick(i);
 
@@ -74,7 +72,8 @@ public class ConfirmModule {
      * @param i 인덱스
      */
     protected void onCheckTick(long i) {
-        // 미사용
+        skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
+                acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
     }
 
     /**

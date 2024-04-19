@@ -16,7 +16,6 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
@@ -1063,7 +1062,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
 
-        TaskUtil.addTask(weapon, new IntervalTask(new Function<Long, Boolean>() {
+        TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(new Function<Long, Boolean>() {
             int j = 0;
 
             @Override
@@ -1071,9 +1070,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) == 0)
                     return false;
 
-                if (j > 0 && weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
-                    return true;
-                if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(entity.getTicksLived())) {
+                if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
                     j++;
                     weapon.onUse(actionKey);
                 }

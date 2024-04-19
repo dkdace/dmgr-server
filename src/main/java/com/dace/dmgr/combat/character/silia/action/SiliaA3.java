@@ -13,7 +13,7 @@ import lombok.NonNull;
 @Getter
 public final class SiliaA3 extends ChargeableSkill {
     public SiliaA3(@NonNull CombatUser combatUser) {
-        super(3, combatUser, SiliaA3Info.getInstance(), 2);
+        super(combatUser, SiliaA3Info.getInstance(), 2);
     }
 
     @Override
@@ -33,12 +33,12 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
-    public long getStateValueDecrement() {
+    public int getStateValueDecrement() {
         return 1;
     }
 
     @Override
-    public long getStateValueIncrement() {
+    public int getStateValueIncrement() {
         return 1;
     }
 

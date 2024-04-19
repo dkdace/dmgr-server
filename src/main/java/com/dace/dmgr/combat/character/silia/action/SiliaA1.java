@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 
 public final class SiliaA1 extends ActiveSkill {
     public SiliaA1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, SiliaA1Info.getInstance(), 0);
+        super(combatUser, SiliaA1Info.getInstance(), 0);
     }
 
     @Override

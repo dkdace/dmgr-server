@@ -20,7 +20,7 @@ public final class SiliaUlt extends UltimateSkill {
     private boolean isEnabled = false;
 
     public SiliaUlt(@NonNull CombatUser combatUser) {
-        super(4, combatUser, SiliaUltInfo.getInstance());
+        super(combatUser, SiliaUltInfo.getInstance());
     }
 
     @Override

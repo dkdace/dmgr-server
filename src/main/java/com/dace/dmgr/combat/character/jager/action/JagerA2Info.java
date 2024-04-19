@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class JagerA2Info extends ActiveSkillInfo {
     /** 쿨타임 */
@@ -27,7 +28,7 @@ public final class JagerA2Info extends ActiveSkillInfo {
     }
 
     @Override
-    public JagerA2 createSkill(CombatUser combatUser) {
+    public @NonNull JagerA2 createSkill(@NonNull CombatUser combatUser) {
         return new JagerA2(combatUser);
     }
 }

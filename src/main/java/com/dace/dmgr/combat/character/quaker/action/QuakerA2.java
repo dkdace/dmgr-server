@@ -30,7 +30,7 @@ import java.util.Set;
 
 public final class QuakerA2 extends ActiveSkill {
     public QuakerA2(@NonNull CombatUser combatUser) {
-        super(2, combatUser, QuakerA2Info.getInstance(), 1);
+        super(combatUser, QuakerA2Info.getInstance(), 1);
     }
 
     @Override

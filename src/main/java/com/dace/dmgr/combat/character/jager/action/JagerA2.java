@@ -26,7 +26,7 @@ public final class JagerA2 extends ActiveSkill {
     JagerA2Entity entity = null;
 
     public JagerA2(@NonNull CombatUser combatUser) {
-        super(2, combatUser, JagerA2Info.getInstance(), 1);
+        super(combatUser, JagerA2Info.getInstance(), 1);
     }
 
     @Override

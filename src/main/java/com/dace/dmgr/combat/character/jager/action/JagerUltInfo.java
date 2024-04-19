@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class JagerUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
@@ -35,7 +36,7 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public JagerUlt createSkill(CombatUser combatUser) {
+    public @NonNull JagerUlt createSkill(@NonNull CombatUser combatUser) {
         return new JagerUlt(combatUser);
     }
 }

@@ -52,7 +52,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         switch (actionKey) {
             case RIGHT_CLICK: {
                 if (reloadModule.getRemainingAmmo() == 0) {
-                    reloadModule.reload();
+                    onAmmoEmpty();
                     return;
                 }
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
@@ -81,7 +81,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 break;
             }
             case DROP: {
-                reloadModule.reload();
+                onAmmoEmpty();
 
                 break;
             }
@@ -101,6 +101,10 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public void onAmmoEmpty() {
+        if (reloadModule.isReloading())
+            return;
+
+        onCancelled();
         reloadModule.reload();
     }
 
