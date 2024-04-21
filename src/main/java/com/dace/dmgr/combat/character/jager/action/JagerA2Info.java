@@ -23,12 +23,13 @@ public final class JagerA2Info extends ActiveSkillInfo {
     @Getter
     private static final JagerA2Info instance = new JagerA2Info();
 
-    public JagerA2Info() {
+    private JagerA2Info() {
         super(2, "곰덫");
     }
 
     @Override
-    public @NonNull JagerA2 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public JagerA2 createSkill(@NonNull CombatUser combatUser) {
         return new JagerA2(combatUser);
     }
 }

@@ -21,12 +21,13 @@ public final class SiliaUltInfo extends UltimateSkillInfo {
     @Getter
     private static final SiliaUltInfo instance = new SiliaUltInfo();
 
-    public SiliaUltInfo() {
+    private SiliaUltInfo() {
         super("폭풍의 부름");
     }
 
     @Override
-    public @NonNull SiliaUlt createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public SiliaUlt createSkill(@NonNull CombatUser combatUser) {
         return new SiliaUlt(combatUser);
     }
 }

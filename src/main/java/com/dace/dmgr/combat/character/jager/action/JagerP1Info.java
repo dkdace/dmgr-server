@@ -13,12 +13,13 @@ public final class JagerP1Info extends PassiveSkillInfo {
     @Getter
     private static final JagerP1Info instance = new JagerP1Info();
 
-    public JagerP1Info() {
+    private JagerP1Info() {
         super(1, "사냥의 미학");
     }
 
     @Override
-    public @NonNull JagerP1 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public JagerP1 createSkill(@NonNull CombatUser combatUser) {
         return new JagerP1(combatUser);
     }
 }

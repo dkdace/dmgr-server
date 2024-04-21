@@ -19,12 +19,13 @@ public final class QuakerA1Info extends ActiveSkillInfo {
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 
-    public QuakerA1Info() {
+    private QuakerA1Info() {
         super(1, "불굴의 방패");
     }
 
     @Override
-    public @NonNull QuakerA1 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public QuakerA1 createSkill(@NonNull CombatUser combatUser) {
         return new QuakerA1(combatUser);
     }
 }

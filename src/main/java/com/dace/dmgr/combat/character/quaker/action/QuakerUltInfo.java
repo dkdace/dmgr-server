@@ -25,12 +25,13 @@ public final class QuakerUltInfo extends UltimateSkillInfo {
     @Getter
     private static final QuakerUltInfo instance = new QuakerUltInfo();
 
-    public QuakerUltInfo() {
+    private QuakerUltInfo() {
         super("심판의 문지기");
     }
 
     @Override
-    public @NonNull QuakerUlt createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public QuakerUlt createSkill(@NonNull CombatUser combatUser) {
         return new QuakerUlt(combatUser);
     }
 }

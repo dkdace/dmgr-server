@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -14,7 +14,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo {
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();
 
-    public ArkaceUltInfo() {
+    private ArkaceUltInfo() {
         super("인피니버스터",
                 "",
                 "§6" + TextIcon.DURATION + " 지속시간§f동안 기본 무기에 장탄수 무한, 탄퍼짐 제거, 거리별",
@@ -27,7 +27,8 @@ public final class ArkaceUltInfo extends UltimateSkillInfo {
     }
 
     @Override
-    public @NonNull ArkaceUlt createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public ArkaceUlt createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceUlt(combatUser);
     }
 }

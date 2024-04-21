@@ -19,12 +19,13 @@ public final class SiliaWeaponInfo extends WeaponInfo {
     @Getter
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();
 
-    public SiliaWeaponInfo() {
+    private SiliaWeaponInfo() {
         super(RESOURCE.DEFAULT, "접이식 마체테");
     }
 
     @Override
-    public @NonNull SiliaWeapon createWeapon(@NonNull CombatUser combatUser) {
+    @NonNull
+    public SiliaWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new SiliaWeapon(combatUser);
     }
 

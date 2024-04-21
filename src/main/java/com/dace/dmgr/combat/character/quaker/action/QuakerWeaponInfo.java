@@ -15,12 +15,13 @@ public final class QuakerWeaponInfo extends WeaponInfo {
     @Getter
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 
-    public QuakerWeaponInfo() {
+    private QuakerWeaponInfo() {
         super(RESOURCE.DEFAULT, "타바르진");
     }
 
     @Override
-    public @NonNull QuakerWeapon createWeapon(@NonNull CombatUser combatUser) {
+    @NonNull
+    public QuakerWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new QuakerWeapon(combatUser);
     }
 

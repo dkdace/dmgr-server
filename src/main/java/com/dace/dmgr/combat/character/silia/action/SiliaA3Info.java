@@ -21,12 +21,13 @@ public final class SiliaA3Info extends ActiveSkillInfo {
     @Getter
     private static final SiliaA3Info instance = new SiliaA3Info();
 
-    public SiliaA3Info() {
+    private SiliaA3Info() {
         super(3, "폭풍전야");
     }
 
     @Override
-    public @NonNull SiliaA3 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public SiliaA3 createSkill(@NonNull CombatUser combatUser) {
         return new SiliaA3(combatUser);
     }
 }

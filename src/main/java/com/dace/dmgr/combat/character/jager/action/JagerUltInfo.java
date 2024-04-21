@@ -31,12 +31,13 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     @Getter
     private static final JagerUltInfo instance = new JagerUltInfo();
 
-    public JagerUltInfo() {
+    private JagerUltInfo() {
         super("백야의 눈폭풍");
     }
 
     @Override
-    public @NonNull JagerUlt createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public JagerUlt createSkill(@NonNull CombatUser combatUser) {
         return new JagerUlt(combatUser);
     }
 }

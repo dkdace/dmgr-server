@@ -20,7 +20,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
-    public ArkaceWeaponInfo() {
+    private ArkaceWeaponInfo() {
         super(RESOURCE.DEFAULT, "HLN-12",
                 "",
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
@@ -34,7 +34,8 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     }
 
     @Override
-    public @NonNull ArkaceWeapon createWeapon(@NonNull CombatUser combatUser) {
+    @NonNull
+    public ArkaceWeapon createWeapon(@NonNull CombatUser combatUser) {
         return new ArkaceWeapon(combatUser);
     }
 

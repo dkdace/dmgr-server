@@ -27,12 +27,13 @@ public final class JagerA3Info extends ActiveSkillInfo {
     @Getter
     private static final JagerA3Info instance = new JagerA3Info();
 
-    public JagerA3Info() {
+    private JagerA3Info() {
         super(3, "빙결 수류탄");
     }
 
     @Override
-    public @NonNull JagerA3 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public JagerA3 createSkill(@NonNull CombatUser combatUser) {
         return new JagerA3(combatUser);
     }
 }

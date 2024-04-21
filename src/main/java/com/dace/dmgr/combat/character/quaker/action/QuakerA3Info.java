@@ -23,12 +23,13 @@ public final class QuakerA3Info extends ActiveSkillInfo {
     @Getter
     private static final QuakerA3Info instance = new QuakerA3Info();
 
-    public QuakerA3Info() {
+    private QuakerA3Info() {
         super(3, "돌풍 강타");
     }
 
     @Override
-    public @NonNull QuakerA3 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public QuakerA3 createSkill(@NonNull CombatUser combatUser) {
         return new QuakerA3(combatUser);
     }
 }

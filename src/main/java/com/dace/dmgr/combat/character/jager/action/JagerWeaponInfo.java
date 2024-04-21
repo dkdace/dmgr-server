@@ -30,12 +30,13 @@ public final class JagerWeaponInfo extends WeaponInfo {
     @Getter
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
-    public JagerWeaponInfo() {
+    private JagerWeaponInfo() {
         super(RESOURCE.DEFAULT, "MK.73 ELNR");
     }
 
     @Override
-    public @NonNull JagerWeaponL createWeapon(@NonNull CombatUser combatUser) {
+    @NonNull
+    public JagerWeaponL createWeapon(@NonNull CombatUser combatUser) {
         return new JagerWeaponL(combatUser);
     }
 

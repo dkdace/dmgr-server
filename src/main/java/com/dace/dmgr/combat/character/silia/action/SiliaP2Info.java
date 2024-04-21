@@ -11,12 +11,13 @@ public final class SiliaP2Info extends PassiveSkillInfo {
     @Getter
     private static final SiliaP2Info instance = new SiliaP2Info();
 
-    public SiliaP2Info() {
+    private SiliaP2Info() {
         super(2, "상승 기류");
     }
 
     @Override
-    public @NonNull SiliaP2 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public SiliaP2 createSkill(@NonNull CombatUser combatUser) {
         return new SiliaP2(combatUser);
     }
 }

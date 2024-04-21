@@ -20,7 +20,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 
-    public ArkaceA1Info() {
+    private ArkaceA1Info() {
         super(1, "다이아코어 미사일",
                 "",
                 "§f소형 미사일을 3회 연속으로 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
@@ -33,7 +33,8 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     }
 
     @Override
-    public @NonNull ArkaceA1 createSkill(@NonNull CombatUser combatUser) {
+    @NonNull
+    public ArkaceA1 createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceA1(combatUser);
     }
 }
