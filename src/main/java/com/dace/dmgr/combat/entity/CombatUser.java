@@ -221,10 +221,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setCanSprint();
         adjustWalkSpeed();
         changeFov(fovValue);
-
-        user.clearSidebar();
-        if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) > 0)
-            sendScoreSidebar();
     }
 
     /**
@@ -288,20 +284,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         text.add(character.getActionbarString(this));
 
         user.sendActionBar(text.toString());
-    }
-
-    /**
-     * 사이드바에 획득 점수 목록을 출력한다.
-     */
-    private void sendScoreSidebar() {
-        if (scoreMap.isEmpty())
-            return;
-
-        int i = 0;
-        user.setSidebarName(MessageFormat.format("{0}+{1}", "§a", (int) scoreStreakSum));
-        user.editSidebar(i++, "");
-        for (Map.Entry<String, Double> entry : scoreMap.entrySet())
-            user.editSidebar(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));
     }
 
     /**
@@ -836,17 +818,32 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 
-        if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION) == 0) {
-            scoreStreakSum = 0;
-            scoreMap.clear();
-        }
-
         CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION);
         if (scoreMap.size() > 5)
             scoreMap.remove(scoreMap.keySet().iterator().next());
 
         scoreStreakSum += score;
         scoreMap.put(context, scoreMap.getOrDefault(context, 0.0) + score);
+
+        user.clearSidebar();
+        sendScoreSidebar();
+        TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION) != 0,
+                isCancelled -> {
+                    scoreStreakSum = 0;
+                    scoreMap.clear();
+                    user.clearSidebar();
+                }, 1));
+    }
+
+    /**
+     * 사이드바에 획득 점수 목록을 출력한다.
+     */
+    private void sendScoreSidebar() {
+        int i = 0;
+        user.setSidebarName(MessageFormat.format("{0}+{1}", "§a", (int) scoreStreakSum));
+        user.editSidebar(i++, "");
+        for (Map.Entry<String, Double> entry : scoreMap.entrySet())
+            user.editSidebar(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));
     }
 
     /**
