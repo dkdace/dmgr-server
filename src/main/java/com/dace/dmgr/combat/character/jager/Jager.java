@@ -18,6 +18,7 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -41,6 +42,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
         JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();
@@ -49,7 +51,7 @@ public final class Jager extends Character {
 
         int weapon1Ammo = weapon1.getReloadModule().getRemainingAmmo();
         int weapon2Ammo = weapon2.getReloadModule().getRemainingAmmo();
-        double skill1Health = skill1.getStateValue();
+        int skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
@@ -58,7 +60,7 @@ public final class Jager extends Character {
                 JagerWeaponInfo.CAPACITY, '*');
         String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, JagerWeaponInfo.SCOPE.CAPACITY,
                 JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), skill1Health, skill1MaxHealth,
                 10, '■');
         if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
@@ -95,7 +97,7 @@ public final class Jager extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
@@ -127,6 +129,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -137,6 +140,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

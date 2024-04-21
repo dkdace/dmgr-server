@@ -14,6 +14,7 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -35,6 +36,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
         ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());
@@ -68,7 +70,7 @@ public final class Arkace extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
@@ -99,6 +101,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -109,6 +112,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

@@ -9,7 +9,7 @@ import org.bukkit.Material;
  * 특성 정보를 관리하는 클래스.
  */
 @Getter
-public abstract class TraitInfo extends ActionInfo {
+public class TraitInfo extends ActionInfo {
     /** 특성 아이템 타입 */
     public static final Material MATERIAL = Material.STAINED_GLASS_PANE;
     /** 특성 이름의 접두사 */

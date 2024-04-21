@@ -15,6 +15,7 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -36,15 +37,16 @@ public final class Quaker extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         QuakerA1 skill1 = (QuakerA1) combatUser.getSkill(QuakerA1Info.getInstance());
 
-        double skill1Health = skill1.getStateValue();
+        int skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), skill1Health, skill1MaxHealth,
                 10, '■');
 
         if (!skill1.isDurationFinished())
@@ -67,7 +69,7 @@ public final class Quaker extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
@@ -100,6 +102,7 @@ public final class Quaker extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             default:
@@ -108,6 +111,7 @@ public final class Quaker extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

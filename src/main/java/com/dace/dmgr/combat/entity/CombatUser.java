@@ -768,6 +768,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         return CooldownUtil.getCooldown(this, Cooldown.RESPAWN_TIME) > 0;
     }
 
+    /**
+     * 지정한 스킬 정보에 해당하는 스킬을 반환한다.
+     *
+     * @param skillInfo 스킬 정보 객체
+     * @return 스킬 객체
+     */
     public Skill getSkill(@NonNull SkillInfo skillInfo) {
         return skillMap.get(skillInfo);
     }

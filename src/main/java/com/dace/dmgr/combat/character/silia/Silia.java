@@ -14,6 +14,7 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -37,11 +38,12 @@ public final class Silia extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
         SiliaUlt skill4 = (SiliaUlt) combatUser.getSkill(SiliaUltInfo.getInstance());
 
-        double skill3Duration = skill3.getStateValue() / 20;
+        double skill3Duration = skill3.getStateValue() / 20.0;
         double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
         double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
@@ -64,7 +66,7 @@ public final class Silia extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
@@ -109,6 +111,7 @@ public final class Silia extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -121,6 +124,7 @@ public final class Silia extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
