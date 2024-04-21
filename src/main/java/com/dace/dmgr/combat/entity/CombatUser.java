@@ -140,6 +140,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     private Weapon weapon = null;
 
+    /** 연사 무기 사용을 처리하는 태스크 */
+    private IntervalTask fullAutoTask = null;
+
     @Getter
     @Setter
     private long time = System.currentTimeMillis();
@@ -1058,29 +1061,34 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param weapon    무기
      */
     private void handleUseFullAutoWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
-        if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0) {
+        if (fullAutoTask == null || fullAutoTask.isDisposed())
+            fullAutoTask = null;
+        else if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) > 0) {
             CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
             return;
         }
 
         CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN);
 
-        TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(new Function<Long, Boolean>() {
-            int j = 0;
+        if (fullAutoTask == null) {
+            fullAutoTask = new IntervalTask(new Function<Long, Boolean>() {
+                int j = 0;
 
-            @Override
-            public Boolean apply(Long i) {
-                if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) == 0)
-                    return false;
+                @Override
+                public Boolean apply(Long i) {
+                    if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO_COOLDOWN) == 0)
+                        return false;
 
-                if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
-                    j++;
-                    weapon.onUse(actionKey);
+                    if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
+                        j++;
+                        weapon.onUse(actionKey);
+                    }
+
+                    return true;
                 }
-
-                return true;
-            }
-        }, 1));
+            }, 1);
+            TaskUtil.addTask(weapon.getTaskRunner(), fullAutoTask);
+        }
     }
 
     /**
