@@ -92,7 +92,7 @@ public abstract class Projectile extends Bullet {
                     if (!LocationUtil.isNonSolid(location) && !handleBlockCollision())
                         return false;
 
-                    if (!findTargetAndHandleCollision(targets, condition))
+                    if (!findTargetAndHandleCollision(targets))
                         return false;
 
                     if (hasGravity && LocationUtil.isNonSolid(location.clone().subtract(0, 0.1, 0)))

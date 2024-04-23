@@ -38,9 +38,9 @@ public abstract class Bullet {
     protected final double size;
     /** 대상 엔티티를 찾는 조건 */
     protected final Predicate<CombatEntity> condition;
-    /** 투사체의 현재 위치 */
+    /** 총알의 현재 위치 */
     protected Location location;
-    /** 투사체의 현재 속도 */
+    /** 총알의 현재 속도 */
     protected Vector velocity;
 
     /**
@@ -64,7 +64,7 @@ public abstract class Bullet {
     }
 
     /**
-     * 투사체의 현재 위치를 반환한다.
+     * 총알의 현재 위치를 반환한다.
      *
      * @return 현재 위치
      */
@@ -74,7 +74,7 @@ public abstract class Bullet {
     }
 
     /**
-     * 투사체의 현재 속도를 반환한다.
+     * 총알의 현재 속도를 반환한다.
      *
      * @return 현재 속도
      */
@@ -140,12 +140,10 @@ public abstract class Bullet {
      * 총알 주변의 지정한 조건을 만족하는 엔티티를 찾고 피격 로직을 처리한다.
      *
      * @param targets   피격자 목록
-     * @param condition 대상 엔티티를 찾는 조건
      * @return {@link Bullet#onHitEntity(Damageable, boolean)}의 반환값
      */
-    protected final boolean findTargetAndHandleCollision(@NonNull HashSet<Damageable> targets, @NonNull Predicate<CombatEntity> condition) {
-        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), location, size,
-                condition.and(Damageable.class::isInstance));
+    protected final boolean findTargetAndHandleCollision(@NonNull HashSet<Damageable> targets) {
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), location, size, condition.and(Damageable.class::isInstance));
 
         if (target != null && targets.add(target)) {
             boolean isCrit = false;
@@ -160,6 +158,13 @@ public abstract class Bullet {
     }
 
     /**
+     * 매 판정점마다 실행할 작업.
+     *
+     * @return 소멸 여부. {@code false} 반환 시 소멸
+     */
+    protected abstract boolean onInterval();
+
+    /**
      * 트레일 주기 ({@link Bullet#trailInterval})마다 실행될 작업.
      *
      * <p>주로 파티클을 남길 때 사용한다.</p>
@@ -167,13 +172,6 @@ public abstract class Bullet {
     protected void trail() {
         // 미사용
     }
-
-    /**
-     * 매 판정점마다 실행할 작업.
-     *
-     * @return 소멸 여부. {@code false} 반환 시 소멸
-     */
-    protected abstract boolean onInterval();
 
     /**
      * 총알이 블록에 맞았을 때 실행될 작업.
