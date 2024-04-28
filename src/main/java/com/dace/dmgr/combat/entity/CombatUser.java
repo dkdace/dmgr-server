@@ -637,7 +637,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-        character.onKill(this, victim);
+        character.onKill(this, victim, true);
 
         playKillEffect();
         if (victim instanceof CombatUser) {
@@ -710,12 +710,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker))) {
                 int score = Math.round(((float) damage / totalDamage) * 100);
 
+                attacker2.character.onKill(attacker2, this, false);
                 attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 attacker2.playKillEffect();
 
-                if (attacker2.gameUser != null)
+                if (attacker2.gameUser != null) {
                     attacker2.gameUser.setAssist(attacker2.gameUser.getAssist() + 1);
-
+                    attacker2.characterRecord.setKill(attacker2.characterRecord.getKill() + 1);
+                }
             }
         });
 
@@ -823,7 +825,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param context 항목
      * @param score   점수 증가량
      */
-    private void addScore(@NonNull String context, double score) {
+    public void addScore(@NonNull String context, double score) {
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 

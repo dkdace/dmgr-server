@@ -3,8 +3,7 @@ package com.dace.dmgr.combat.character.silia;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.character.Scuffler;
 import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -29,12 +28,12 @@ import java.util.StringJoiner;
  * @see SiliaA3
  * @see SiliaUlt
  */
-public final class Silia extends Character {
+public final class Silia extends Scuffler {
     @Getter
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super("실리아", "DVSilia", Role.ASSASSIN, '\u32D1', 1000, 1.0, 1.0);
+        super("실리아", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
     }
 
     @Override
@@ -71,9 +70,11 @@ public final class Silia extends Character {
     }
 
     @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
         if (!(victim instanceof CombatUser))
             return;
+
+        super.onKill(attacker, victim, isFinalHit);
 
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());

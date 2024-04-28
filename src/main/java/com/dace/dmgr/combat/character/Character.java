@@ -32,9 +32,9 @@ public abstract class Character {
     private final char icon;
     /** 체력 */
     private final int health;
-    /** 이동속도 계수 */
+    /** 이동속도 배수 */
     private final double speedMultiplier;
-    /** 히트박스 크기 계수 */
+    /** 히트박스 크기 배수 */
     private final double hitboxMultiplier;
 
     /**
@@ -126,11 +126,12 @@ public abstract class Character {
     /**
      * 전투원으로 다른 엔티티를 죽였을 때 실행될 작업.
      *
-     * @param attacker 공격자
-     * @param victim   피격자
+     * @param attacker   공격자
+     * @param victim     피격자
+     * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
      * @see Character#onDeath(CombatUser, Attacker)
      */
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
         // 미사용
     }
 
@@ -139,7 +140,7 @@ public abstract class Character {
      *
      * @param victim   피격자
      * @param attacker 공격자
-     * @see Character#onKill(CombatUser, Damageable)
+     * @see Character#onKill(CombatUser, Damageable, boolean)
      */
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
         // 미사용
