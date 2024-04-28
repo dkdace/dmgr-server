@@ -1,15 +1,14 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.silia.SiliaTrait;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;
@@ -23,11 +22,10 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 public final class SiliaA1 extends ActiveSkill {
-    public SiliaA1(@NonNull CombatUser combatUser) {
+    SiliaA1(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA1Info.getInstance(), 0);
     }
 
@@ -54,21 +52,22 @@ public final class SiliaA1 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().setCooldown(0);
-        combatUser.setGlobalCooldown(6);
         setDuration();
+        combatUser.getWeapon().setCooldown(0);
         combatUser.getWeapon().setVisible(false);
+        combatUser.setGlobalCooldown((int) SiliaA1Info.DURATION);
         combatUser.playMeleeAttackAnimation(-3, 6, true);
 
         Location location = combatUser.getEntity().getLocation();
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A1_USE, location);
-        Set<CombatEntity> targets = new HashSet<>();
+        HashSet<CombatEntity> targets = new HashSet<>();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
             combatUser.push(loc.getDirection().multiply(2.5), true);
 
-            new SiliaA1Hitscan(targets).shoot();
+            new SiliaA1Attack(targets).shoot();
+
             CombatUtil.setYawAndPitch(combatUser.getEntity(), location.getYaw(), location.getPitch());
 
             TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
@@ -81,9 +80,9 @@ public final class SiliaA1 extends ActiveSkill {
 
             return true;
         }, isCancelled -> {
-            combatUser.push(new Vector(), true);
             onCancelled();
-        }, 1, 6));
+            combatUser.push(new Vector(), true);
+        }, 1, SiliaA1Info.DURATION));
     }
 
     @Override
@@ -94,11 +93,11 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.getWeapon().setVisible(true);
     }
 
-    private class SiliaA1Hitscan extends Hitscan {
-        private final Set<CombatEntity> targets;
+    private final class SiliaA1Attack extends Hitscan {
+        private final HashSet<CombatEntity> targets;
 
-        public SiliaA1Hitscan(Set<CombatEntity> targets) {
-            super(SiliaA1.this.combatUser, HitscanOption.builder().trailInterval(12).maxDistance(3).condition(SiliaA1.this.combatUser::isEnemy).build());
+        private SiliaA1Attack(HashSet<CombatEntity> targets) {
+            super(combatUser, HitscanOption.builder().trailInterval(12).maxDistance(SiliaA1Info.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;
         }
 
@@ -111,13 +110,13 @@ public final class SiliaA1 extends ActiveSkill {
 
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 15 * (i - 5.5));
                 for (int j = 0; j < 3; j++) {
-                    Location trailLoc = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0,
+                    Location loc2 = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
                             255, 255, 255);
 
                     if ((i == 0 || i == 11) && j == 1) {
                         Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 10);
-                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, trailLoc, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
+                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
                     }
                 }
             }
@@ -136,9 +135,9 @@ public final class SiliaA1 extends ActiveSkill {
             return true;
         }
 
-        private class SiliaA1Area extends Area {
+        private final class SiliaA1Area extends Area {
             private SiliaA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(SiliaA1.this.combatUser, SiliaA1Info.RADIUS, condition, targets);
+                super(combatUser, SiliaA1Info.RADIUS, condition, targets);
             }
 
             @Override
@@ -148,9 +147,9 @@ public final class SiliaA1 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (SiliaA1Hitscan.this.targets.add(target)) {
+                if (targets.add(target)) {
                     target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
-                            SiliaTrait.isBackAttack(LocationUtil.getDirection(center, location), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+                            SiliaT1.isBackAttack(LocationUtil.getDirection(center, location), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
                     ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
                 }
 

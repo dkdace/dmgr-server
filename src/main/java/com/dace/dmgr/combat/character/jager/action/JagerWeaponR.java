@@ -24,7 +24,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     @NonNull
     private final ReloadModule reloadModule;
 
-    public JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
+    JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
         this.mainWeapon = mainWeapon;
         reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
@@ -55,14 +55,15 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                     return;
                 }
 
-                new JagerWeaponRHitscan().shoot();
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE_SCOPE, combatUser.getEntity().getLocation());
+                setCooldown();
 
-                CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                new JagerWeaponRHitscan().shoot();
+                reloadModule.consume(1);
+
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE_SCOPE, combatUser.getEntity().getLocation());
+                CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_NO_SPRINT, 7);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
-                setCooldown();
-                reloadModule.consume(1);
 
                 break;
             }
@@ -82,6 +83,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         mainWeapon.getAimModule().toggleAim();
         mainWeapon.getSwapModule().swap();
         mainWeapon.getReloadModule().setReloading(false);
@@ -111,22 +113,30 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         // 미사용
     }
 
-    private class JagerWeaponRHitscan extends GunHitscan {
+    private final class JagerWeaponRHitscan extends GunHitscan {
+        private double distance = 0;
+
         private JagerWeaponRHitscan() {
-            super(JagerWeaponR.this.combatUser, HitscanOption.builder().trailInterval(12).condition(JagerWeaponR.this.combatUser::isEnemy).build());
+            super(combatUser, HitscanOption.builder().trailInterval(12).condition(combatUser::isEnemy).build());
+        }
+
+        @Override
+        protected boolean onInterval() {
+            distance += velocity.length();
+            return true;
         }
 
         @Override
         protected void trail() {
-            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
-            ParticleUtil.play(Particle.CRIT, trailLoc, 1, 0, 0, 0, 0);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
+            ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            int damage = CombatUtil.getDistantDamage(combatUser.getEntity().getLocation(), location, JagerWeaponInfo.SCOPE.DAMAGE,
-                    JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
+            int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+
             return false;
         }
     }

@@ -32,10 +32,10 @@ public enum Cooldown {
     WEAPON_FULLAUTO_COOLDOWN(6),
     /** 연사가 가능한 총기류의 탄퍼짐 회복 시간 */
     WEAPON_FULLAUTO_RECOVERY_DELAY(4),
-    /** 재장전 */
+    /** 무기 재장전 시간 */
     WEAPON_RELOAD(0),
-    /** 달리기 금지 */
-    NO_SPRINT(0),
+    /** 무기 사용 시 달리기 금지 시간 */
+    WEAPON_NO_SPRINT(7),
     /** 전역 쿨타임 */
     GLOBAL_COOLDOWN(0),
     /** 스킬 쿨타임 */

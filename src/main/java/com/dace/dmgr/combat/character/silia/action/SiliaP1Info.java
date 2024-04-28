@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.NonNull;
 
 public final class SiliaP1Info extends PassiveSkillInfo {
+    /** 수직 이동 강도 */
+    public static final double PUSH_UP = 0.55;
+    /** 수평 이동 강도 */
+    public static final double PUSH_SIDE = 0.35;
     @Getter
     private static final SiliaP1Info instance = new SiliaP1Info();
 

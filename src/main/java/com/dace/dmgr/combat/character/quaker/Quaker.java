@@ -31,6 +31,8 @@ import java.util.StringJoiner;
 public final class Quaker extends Character {
     @Getter
     private static final Quaker instance = new Quaker();
+    /** 특성 수정자 */
+    private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
         super("퀘이커", "DVQuaker", Role.GUARDIAN, '\u32D3', 2500, 0.85, 1.8);
@@ -58,7 +60,7 @@ public final class Quaker extends Character {
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier("QuakerT1", QuakerT1Info.STATUS_EFFECT_RESISTANCE);
+        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER_ID, QuakerT1Info.STATUS_EFFECT_RESISTANCE);
     }
 
     @Override

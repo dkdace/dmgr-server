@@ -7,16 +7,20 @@ import lombok.Getter;
 import lombok.NonNull;
 
 public final class ArkaceA1Info extends ActiveSkillInfo {
-    /** 쿨타임 */
+    /** 쿨타임 (tick) */
     public static final long COOLDOWN = 7 * 20;
+    /** 전역 쿨타임 (tick) */
+    public static final int GLOBAL_COOLDOWN = (int) (0.5 * 20);
     /** 피해량 (폭발) */
     public static final int DAMAGE_EXPLODE = 100;
     /** 피해량 (직격) */
     public static final int DAMAGE_DIRECT = 50;
-    /** 투사체 속력 */
+    /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
-    /** 피해 범위 */
+    /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3;
+    /** 넉백 강도 */
+    public static final double KNOCKBACK = 0.25;
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 

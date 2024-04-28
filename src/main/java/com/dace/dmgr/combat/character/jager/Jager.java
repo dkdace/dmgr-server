@@ -90,10 +90,10 @@ public final class Jager extends Character {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
-        if (!skill1.isDurationFinished() && victim instanceof Living)
-            skill1.getEntity().getEntity().setTarget(victim.getEntity());
+        if (skill1.getSummonEntity() != null && victim instanceof Living)
+            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
 
-        return skillUlt.getEntity() == null;
+        return skillUlt.getSummonEntity() == null;
     }
 
     @Override
@@ -109,7 +109,7 @@ public final class Jager extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getWeapon()).getReloadModule().isReloading() && !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
     }
 
     @Override

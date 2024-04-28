@@ -9,7 +9,6 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.module.SwapModule;
-import com.dace.dmgr.combat.character.jager.JagerTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -25,6 +24,8 @@ import org.bukkit.util.Vector;
 
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "JagerWeaponL";
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -35,7 +36,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @NonNull
     private final AimModule aimModule;
 
-    public JagerWeaponL(@NonNull CombatUser combatUser) {
+    JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
@@ -55,38 +56,34 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse() {
-        return super.canUse() && swapModule.getSwapState() != SwapState.SWAPPING && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse() && swapModule.getSwapState() != SwapState.SWAPPING &&
+                !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking()) {
-                    ((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).onAccept();
-                    return;
-                }
                 if (reloadModule.getRemainingAmmo() == 0) {
                     onAmmoEmpty();
                     return;
                 }
 
+                setCooldown();
+
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
                 new JagerWeaponLProjectile().shoot(dir);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
+                reloadModule.consume(1);
 
-                CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 7);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
+                CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_NO_SPRINT);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                setCooldown();
-                reloadModule.consume(1);
 
                 break;
             }
             case RIGHT_CLICK: {
-                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
-                    return;
-
                 onCancelled();
                 aimModule.toggleAim();
                 swapModule.swap();
@@ -94,9 +91,6 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 break;
             }
             case DROP: {
-                if (((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking())
-                    return;
-
                 onAmmoEmpty();
 
                 break;
@@ -131,8 +125,6 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadTick(long i) {
-        CooldownUtil.setCooldown(combatUser, Cooldown.NO_SPRINT, 3);
-
         switch ((int) i) {
             case 3:
                 SoundUtil.play(Sound.ENTITY_WOLF_HOWL, combatUser.getEntity().getLocation(), 0.6, 1.7);
@@ -182,13 +174,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onAimEnable() {
         combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier("JagerWeaponL", -JagerWeaponInfo.AIM_SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -JagerWeaponInfo.AIM_SLOW);
     }
 
     @Override
     public void onAimDisable() {
         combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerWeaponL");
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 
     @Override
@@ -199,16 +191,16 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
     }
 
-    private class JagerWeaponLProjectile extends Projectile {
+    private final class JagerWeaponLProjectile extends Projectile {
         private JagerWeaponLProjectile() {
-            super(JagerWeaponL.this.combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
-                    .maxDistance(JagerWeaponInfo.DISTANCE).condition(JagerWeaponL.this.combatUser::isEnemy).build());
+            super(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
+                    .maxDistance(JagerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
         @Override
         protected void trail() {
-            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0, 137, 185, 240);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 137, 185, 240);
         }
 
         @Override
@@ -219,7 +211,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
-            JagerTrait.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+            JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+
             return false;
         }
     }

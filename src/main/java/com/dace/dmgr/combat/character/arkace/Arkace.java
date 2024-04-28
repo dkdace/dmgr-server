@@ -81,7 +81,7 @@ public final class Arkace extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
+        return !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
     }
 
     @Override

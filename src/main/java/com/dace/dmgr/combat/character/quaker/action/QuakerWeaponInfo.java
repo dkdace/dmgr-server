@@ -6,12 +6,18 @@ import lombok.Getter;
 import lombok.NonNull;
 
 public final class QuakerWeaponInfo extends WeaponInfo {
+    /** 쿨타임 (tick) */
+    public static final long COOLDOWN = (long) (1.1 * 20);
+    /** 전역 쿨타임 (tick) */
+    public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
     /** 피해량 */
     public static final int DAMAGE = 320;
-    /** 사거리 */
+    /** 사거리 (단위: 블록) */
     public static final double DISTANCE = 3.5;
-    /** 쿨타임 */
-    public static final long COOLDOWN = (long) (1.1 * 20);
+    /** 판정 크기 (단위: 블록) */
+    public static final double SIZE = 0.5;
+    /** 넉백 강도 */
+    public static final double KNOCKBACK = 0.3;
     @Getter
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 

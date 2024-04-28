@@ -8,13 +8,13 @@ import lombok.NonNull;
 public final class SiliaWeaponInfo extends WeaponInfo {
     /** 피해량 */
     public static final int DAMAGE = 200;
-    /** 사거리 */
+    /** 사거리 (단위: 블록) */
     public static final double DISTANCE = 12;
-    /** 투사체 속력 */
+    /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 35;
-    /** 투사체 크기 */
+    /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 0.5;
-    /** 쿨타임 */
+    /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.9 * 20);
     @Getter
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();

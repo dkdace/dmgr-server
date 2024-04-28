@@ -26,7 +26,7 @@ import org.bukkit.block.Block;
 import java.util.function.Predicate;
 
 public final class ArkaceA1 extends ActiveSkill {
-    public ArkaceA1(@NonNull CombatUser combatUser) {
+    ArkaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceA1Info.getInstance(), 1);
     }
 
@@ -53,19 +53,19 @@ public final class ArkaceA1 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(10);
         setDuration();
+        combatUser.getWeapon().onCancelled();
+        combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                    combatUser.getEntity().getLocation().getDirection(), -0.2, 0, 0);
+                    -0.2, 0, 0);
             new ArkaceA1Projectile().shoot(loc);
+
             SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_USE, loc);
 
             return true;
-        }, isCancelled ->
-                TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
+        }, isCancelled -> TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
     }
 
     @Override
@@ -74,10 +74,9 @@ public final class ArkaceA1 extends ActiveSkill {
         setDuration(0);
     }
 
-    private class ArkaceA1Projectile extends Projectile {
+    private final class ArkaceA1Projectile extends Projectile {
         private ArkaceA1Projectile() {
-            super(ArkaceA1.this.combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(10)
-                    .condition(ArkaceA1.this.combatUser::isEnemy).build());
+            super(combatUser, ArkaceA1Info.VELOCITY, ProjectileOption.builder().trailInterval(10).condition(combatUser::isEnemy).build());
         }
 
         @Override
@@ -89,7 +88,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected void onHit() {
-            explode(location.add(0, 0.1, 0));
+            explode();
         }
 
         @Override
@@ -103,35 +102,35 @@ public final class ArkaceA1 extends ActiveSkill {
             return false;
         }
 
-        private void explode(Location location) {
-            Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable &&
-                    (combatEntity.isEnemy(combatUser) || combatEntity == combatUser);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, ArkaceA1Info.RADIUS, condition);
+        private void explode() {
+            Location loc = location.clone().add(0, 0.1, 0);
+            Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
+            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, ArkaceA1Info.RADIUS, condition);
+            new ArkaceA1Area(condition, targets).emit(loc);
 
-            new ArkaceA1Area(condition, targets).emit(location);
-
-            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_EXPLODE, location);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 200,
+            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_EXPLODE, loc);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 200,
                     2.5, 2.5, 2.5, 32, 250, 225);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 40, 0.2, 0.2, 0.2, 0.2);
-        }
-    }
-
-    private class ArkaceA1Area extends Area {
-        private ArkaceA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(ArkaceA1.this.combatUser, ArkaceA1Info.RADIUS, condition, targets);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 40, 0.2, 0.2, 0.2, 0.2);
         }
 
-        @Override
-        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
-            return false;
-        }
+        private final class ArkaceA1Area extends Area {
+            private ArkaceA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
+                super(combatUser, ArkaceA1Info.RADIUS, condition, targets);
+            }
 
-        @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, null, false, true);
-            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(0.25));
-            return !(target instanceof Barrier);
+            @Override
+            protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
+                return false;
+            }
+
+            @Override
+            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+                target.getDamageModule().damage(combatUser, ArkaceA1Info.DAMAGE_EXPLODE, DamageType.NORMAL, null, false, true);
+                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK));
+
+                return !(target instanceof Barrier);
+            }
         }
     }
 }

@@ -9,14 +9,14 @@ import lombok.NonNull;
 public final class ArkaceWeaponInfo extends WeaponInfo {
     /** 피해량 */
     public static final int DAMAGE = 75;
-    /** 피해량 감소 시작 거리 */
-    public static final double DAMAGE_DISTANCE = 25;
-    /** 쿨타임 */
-    public static final long COOLDOWN = (long) (0.1 * 20);
+    /** 피해량 감소 시작 거리 (단위: 블록) */
+    public static final double DAMAGE_WEAKENING_DISTANCE = 25;
     /** 장탄수 */
     public static final int CAPACITY = 30;
-    /** 재장전 시간 */
+    /** 재장전 시간 (tick) */
     public static final long RELOAD_DURATION = (long) (1.5 * 20);
+    /** 달리기 중 시전 시간 (tick) */
+    public static final long SPRINT_READY_DURATION = (long) (0.25 * 20);
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
@@ -26,7 +26,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
                 "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
                 "",
-                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_DISTANCE * 2 + "m)",
+                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_WEAKENING_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_WEAKENING_DISTANCE * 2 + "m)",
                 "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
                 "§f" + TextIcon.CAPACITY + "§f 30발",
                 "",

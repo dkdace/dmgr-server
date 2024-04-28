@@ -9,7 +9,7 @@ import lombok.NonNull;
 public final class ArkaceUltInfo extends UltimateSkillInfo {
     /** 궁극기 필요 충전량 */
     public static final int COST = 7000;
-    /** 지속시간 */
+    /** 지속시간 (tick) */
     public static final long DURATION = (long) 12 * 20;
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();

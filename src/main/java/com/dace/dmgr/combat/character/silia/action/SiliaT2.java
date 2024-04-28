@@ -1,11 +1,11 @@
-package com.dace.dmgr.combat.character.silia;
+package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.character.silia.action.SiliaT1Info;
-import com.dace.dmgr.combat.character.silia.action.SiliaT2Info;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;
@@ -19,41 +19,21 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Set;
 
-/**
- * 전투원 - 실리아 특성 클래스.
- */
 @UtilityClass
-public final class SiliaTrait {
-    /**
-     * 공격의 백어택(치명타) 여부를 확인한다.
-     *
-     * @param direction 공격 방향
-     * @param victim    피격자
-     * @return 백어택 여부
-     */
-    public static boolean isBackAttack(@NonNull Vector direction, @NonNull Damageable victim) {
-        Vector dir = direction.clone().normalize().setY(0).normalize();
-        Location vloc = victim.getEntity().getLocation();
-        vloc.setPitch(0);
-        Vector vdir = vloc.getDirection();
-
-        return victim instanceof Living && dir.distance(vdir) < 0.6;
-    }
-
+public final class SiliaT2 {
     /**
      * 실리아의 일격을 사용한다.
      *
      * @param combatUser 대상 플레이어
      * @param isOpposite 반대 방향 여부
      */
-    public static void strike(@NonNull CombatUser combatUser, boolean isOpposite) {
-        combatUser.setGlobalCooldown(6);
+    static void strike(@NonNull CombatUser combatUser, boolean isOpposite) {
+        combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-2, 6, isOpposite);
 
-        Set<CombatEntity> targets = new HashSet<>();
+        HashSet<CombatEntity> targets = new HashSet<>();
 
         int delay = 0;
         for (int i = 0; i < 8; i++) {
@@ -78,8 +58,8 @@ public final class SiliaTrait {
 
                 vec = VectorUtil.getRotatedVector(vec, axis, (isOpposite ? 90 - 16 * (index - 3.5) : 90 + 16 * (index - 3.5)));
                 new SiliaWeaponStrikeAttack(combatUser, targets).shoot(loc, vec);
-                CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
 
+                CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
                 if (index < 3)
                     SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_T2_USE, loc.add(vec), 1, index * 0.12);
                 if (index == 7) {
@@ -90,12 +70,12 @@ public final class SiliaTrait {
         }
     }
 
-    private class SiliaWeaponStrikeAttack extends Hitscan {
+    private final class SiliaWeaponStrikeAttack extends Hitscan {
         private final CombatUser combatUser;
-        private final Set<CombatEntity> targets;
+        private final HashSet<CombatEntity> targets;
 
-        public SiliaWeaponStrikeAttack(CombatUser combatUser, Set<CombatEntity> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(5).size(0.5).maxDistance(SiliaT2Info.DISTANCE)
+        private SiliaWeaponStrikeAttack(CombatUser combatUser, HashSet<CombatEntity> targets) {
+            super(combatUser, HitscanOption.builder().trailInterval(5).size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE)
                     .condition(combatUser::isEnemy).build());
 
             this.combatUser = combatUser;
@@ -129,8 +109,8 @@ public final class SiliaTrait {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
-                target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()));
+                        SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+                target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()).multiply(SiliaT2Info.KNOCKBACK));
 
                 ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
@@ -141,8 +121,8 @@ public final class SiliaTrait {
 
         @Override
         protected void onDestroy() {
-            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, trailLoc, 15, 0.08, 0.08, 0.08, 0.08);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            ParticleUtil.play(Particle.CRIT, loc, 15, 0.08, 0.08, 0.08, 0.08);
         }
     }
 }

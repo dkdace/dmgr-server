@@ -7,26 +7,26 @@ import lombok.Getter;
 import lombok.NonNull;
 
 public final class JagerWeaponInfo extends WeaponInfo {
+    /** 쿨타임 (tick) */
+    public static final long COOLDOWN = (long) (0.25 * 20);
     /** 피해량 */
     public static final int DAMAGE = 100;
-    /** 사거리 */
+    /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 20;
-    /** 투사체 속력 */
+    /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 80;
     /** 탄퍼짐 */
     public static final double SPREAD = 5;
     /** 빙결량 */
     public static final int FREEZE = 15;
-    /** 쿨타임 */
-    public static final long COOLDOWN = (long) (0.25 * 20);
     /** 장탄수 */
     public static final int CAPACITY = 8;
-    /** 재장전 시간 */
+    /** 재장전 시간 (tick) */
     public static final long RELOAD_DURATION = 2 * 20;
-    /** 무기 교체 시간 */
+    /** 무기 교체 시간 (tick) */
     public static final long SWAP_DURATION = (long) (0.25 * 20);
     /** 조준 시 이동속도 감소량 */
-    public static final int AIM_SPEED = 30;
+    public static final int AIM_SLOW = 30;
     @Getter
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
@@ -44,12 +44,12 @@ public final class JagerWeaponInfo extends WeaponInfo {
      * 정조준 상태의 정보.
      */
     public interface SCOPE {
+        /** 쿨타임 (tick) */
+        long COOLDOWN = (long) (0.25 * 20);
         /** 피해량 */
         int DAMAGE = 250;
-        /** 피해량 감소 시작 거리 */
+        /** 피해량 감소 시작 거리 (단위: 블록) */
         int DAMAGE_DISTANCE = 30;
-        /** 쿨타임 */
-        long COOLDOWN = (long) (0.25 * 20);
         /** 장탄수 */
         int CAPACITY = 6;
         /** 확대 레벨 */

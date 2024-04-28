@@ -16,10 +16,12 @@ import org.bukkit.Particle;
 
 @Getter
 public final class SiliaUlt extends UltimateSkill {
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "SiliaUlt";
     /** 일격 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public SiliaUlt(@NonNull CombatUser combatUser) {
+    SiliaUlt(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaUltInfo.getInstance());
     }
 
@@ -42,11 +44,11 @@ public final class SiliaUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        combatUser.setGlobalCooldown((int) SiliaUltInfo.READY_DURATION);
         setDuration(-1);
+        combatUser.setGlobalCooldown((int) SiliaUltInfo.READY_DURATION);
+        combatUser.getWeapon().setVisible(false);
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
-        combatUser.getWeapon().setVisible(false);
 
         float yaw = combatUser.getEntity().getLocation().getYaw();
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -55,7 +57,6 @@ public final class SiliaUlt extends UltimateSkill {
 
             return true;
         }, isCancelled -> {
-            isEnabled = true;
             onCancelled();
             onReady();
         }, 1, SiliaUltInfo.READY_DURATION));
@@ -65,6 +66,7 @@ public final class SiliaUlt extends UltimateSkill {
     public void onCancelled() {
         if (!isEnabled) {
             super.onCancelled();
+
             setDuration(0);
             combatUser.getWeapon().setVisible(true);
         }
@@ -107,21 +109,22 @@ public final class SiliaUlt extends UltimateSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
+        isEnabled = true;
+
         setDuration();
-        ((SiliaWeapon) combatUser.getWeapon()).isStrike = true;
+        ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
         combatUser.getWeapon().setVisible(true);
         combatUser.getWeapon().setGlowing(true);
         combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-        combatUser.getMoveModule().getSpeedStatus().addModifier("SiliaUlt", SiliaUltInfo.SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
+
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(SiliaUlt.this, new IntervalTask(i -> !isDurationFinished(), isCancelled2 -> {
+        TaskUtil.addTask(this, new IntervalTask(i -> !isDurationFinished(), isCancelled2 -> {
             isEnabled = false;
-            ((SiliaWeapon) combatUser.getWeapon()).isStrike = false;
-            combatUser.getWeapon().setGlowing(false);
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier("SiliaUlt");
+            ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }, 1));
     }
 }

@@ -39,26 +39,19 @@ public final class CombatUtil {
      *
      * <pre>{@code
      * // 최종 피해량 : 10 (20m) ~ 5 (40m)
-     * int damage = getDistantDamage(loc1, loc2, 10, 20, true)
+     * int damage = getDistantDamage(10, distance, 20, true)
      * // 최종 피해량 : 20 (10m) ~ 10 (20m) ~ 0 (30m)
-     * int damage = getDistantDamage(loc1, loc2, 20, 10, false)
+     * int damage = getDistantDamage(20, distance, 10, false)
      * }</pre>
      *
-     * @param start             시작 위치
-     * @param end               끝 위치
      * @param damage            피해량
+     * @param distance          거리 (단위: 블록)
      * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록)
      * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소,
      *                          {@code false}면 최소 피해량이 0이 될 때까지 감소
      * @return 최종 피해량
-     * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있으면 발생
      */
-    public static int getDistantDamage(@NonNull Location start, @NonNull Location end, int damage, double weakeningDistance, boolean isHalf) {
-        if (start.getWorld() != end.getWorld())
-            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
-
-        double distance = start.distance(end);
-
+    public static int getDistantDamage(int damage, double distance, double weakeningDistance, boolean isHalf) {
         if (distance > weakeningDistance) {
             distance = distance - weakeningDistance;
             int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
@@ -104,7 +97,7 @@ public final class CombatUtil {
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
      */
-    public static CombatEntity getNearCombatEntity(Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
         if (game == null)
             return getNearCombatEntity(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())
@@ -150,7 +143,7 @@ public final class CombatUtil {
      * @return 범위 내 모든 엔티티
      */
     @NonNull
-    public static CombatEntity[] getNearCombatEntities(Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity[] getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
         if (game == null)
             return getNearCombatEntities(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())

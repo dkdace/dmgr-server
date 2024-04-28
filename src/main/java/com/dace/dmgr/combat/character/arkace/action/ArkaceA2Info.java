@@ -7,11 +7,11 @@ import lombok.Getter;
 import lombok.NonNull;
 
 public final class ArkaceA2Info extends ActiveSkillInfo {
-    /** 쿨타임 */
+    /** 쿨타임 (tick) */
     public static final int COOLDOWN = 12 * 20;
     /** 치유량 */
     public static final int HEAL = 350;
-    /** 지속시간 */
+    /** 지속시간 (tick) */
     public static final long DURATION = (long) (2.5 * 20);
     @Getter
     private static final ArkaceA2Info instance = new ArkaceA2Info();

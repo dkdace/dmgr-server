@@ -456,7 +456,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
                 statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
             return false;
-        if (CooldownUtil.getCooldown(this, Cooldown.NO_SPRINT) > 0)
+        if (CooldownUtil.getCooldown(this, Cooldown.WEAPON_NO_SPRINT) > 0)
             return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;

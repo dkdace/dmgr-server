@@ -2,17 +2,16 @@ package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
+import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -26,10 +25,12 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public final class QuakerUlt extends UltimateSkill {
-    public QuakerUlt(@NonNull CombatUser combatUser) {
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "QuakerUlt";
+
+    QuakerUlt(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerUltInfo.getInstance());
     }
 
@@ -57,11 +58,11 @@ public final class QuakerUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(16);
         setDuration();
-        combatUser.getMoveModule().getSpeedStatus().addModifier("QuakerUlt", -100);
+        combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
+        combatUser.setGlobalCooldown(16);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
         combatUser.playMeleeAttackAnimation(-10, 16, false);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
@@ -88,8 +89,8 @@ public final class QuakerUlt extends UltimateSkill {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (index + 1) * 20);
                     new QuakerUltEffect().shoot(loc, vec);
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
 
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
                     if (index % 2 == 0)
                         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
@@ -105,8 +106,9 @@ public final class QuakerUlt extends UltimateSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier("QuakerUlt");
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -118,7 +120,7 @@ public final class QuakerUlt extends UltimateSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_ULT_USE_READY, loc);
         ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
                 0.2, 0.2, 0.2, 0.6);
-        Set<CombatEntity> targets = new HashSet<>();
+        HashSet<CombatEntity> targets = new HashSet<>();
 
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 4; j++) {
@@ -139,32 +141,31 @@ public final class QuakerUlt extends UltimateSkill {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class QuakerUltSlow extends Slow {
+    private static final class QuakerUltSlow extends Slow {
         private static final QuakerUltSlow instance = new QuakerUltSlow();
 
         @Override
         @NonNull
         public String getName() {
-            return super.getName() + "QuakerUlt";
+            return super.getName() + MODIFIER_ID;
         }
 
         @Override
         public void onStart(@NonNull CombatEntity combatEntity) {
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("QuakerUlt", -QuakerUltInfo.SLOW);
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerUltInfo.SLOW);
         }
 
         @Override
         public void onEnd(@NonNull CombatEntity combatEntity) {
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("QuakerUlt");
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
     }
 
-    private class QuakerUltEffect extends Hitscan {
-        public QuakerUltEffect() {
-            super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE)
-                    .condition(combatUser::isEnemy).build());
+    private final class QuakerUltEffect extends Hitscan {
+        private QuakerUltEffect() {
+            super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
         @Override
@@ -194,12 +195,12 @@ public final class QuakerUlt extends UltimateSkill {
         }
     }
 
-    private class QuakerUltProjectile extends Projectile {
-        private final Set<CombatEntity> targets;
+    private final class QuakerUltProjectile extends Projectile {
+        private final HashSet<CombatEntity> targets;
 
-        private QuakerUltProjectile(Set<CombatEntity> targets) {
-            super(QuakerUlt.this.combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(1)
-                    .maxDistance(QuakerUltInfo.DISTANCE).condition(QuakerUlt.this.combatUser::isEnemy).build());
+        private QuakerUltProjectile(HashSet<CombatEntity> targets) {
+            super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(QuakerUltInfo.SIZE)
+                    .maxDistance(QuakerUltInfo.DISTANCE).condition(combatUser::isEnemy).build());
 
             this.targets = targets;
         }
@@ -223,7 +224,7 @@ public final class QuakerUlt extends UltimateSkill {
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerUltInfo.STUN_DURATION);
                 target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
-                        target.getEntity().getLocation().add(0, 1, 0)).multiply(3), true);
+                        target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK), true);
 
                 ParticleUtil.play(Particle.CRIT, location, 60, 0, 0, 0, 0.4);
             }

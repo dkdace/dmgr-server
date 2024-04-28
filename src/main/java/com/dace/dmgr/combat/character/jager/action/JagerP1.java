@@ -10,7 +10,10 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 public final class JagerP1 extends AbstractSkill {
-    public JagerP1(@NonNull CombatUser combatUser) {
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "JagerP1";
+
+    JagerP1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerP1Info.getInstance());
     }
 
@@ -43,8 +46,8 @@ public final class JagerP1 extends AbstractSkill {
     private boolean canActivate() {
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
 
-        if (!skill1.isDurationFinished() && skill1.entity != null) {
-            JagerA1Entity jagerA1Entity = skill1.entity;
+        if (!skill1.isDurationFinished() && skill1.getSummonEntity() != null) {
+            JagerA1.JagerA1Entity jagerA1Entity = skill1.getSummonEntity();
 
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(combatUser.getGame(), combatUser.getEntity().getLocation(),
                     JagerP1Info.DETECT_RADIUS, combatEntity -> combatEntity == jagerA1Entity);
@@ -58,11 +61,11 @@ public final class JagerP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getMoveModule().getSpeedStatus().addModifier("JagerP1", JagerP1Info.SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, JagerP1Info.SPEED);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> canActivate(), isCancelled -> {
             setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier("JagerP1");
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }, 1));
     }
 }
