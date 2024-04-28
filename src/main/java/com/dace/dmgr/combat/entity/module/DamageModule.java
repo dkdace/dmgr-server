@@ -175,9 +175,7 @@ public class DamageModule {
 
         damage *= (int) critMultiplier;
 
-        int finalDamage = (int) (damage * (1 + damageMultiplier - defenseMultiplier));
-        if (getHealth() - finalDamage < 0)
-            finalDamage = getHealth();
+        int finalDamage = Math.max(0, (int) (damage * (1 + damageMultiplier - defenseMultiplier)));
         int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
         if (getHealth() - reducedDamage < 0)
             reducedDamage = getHealth();

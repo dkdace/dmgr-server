@@ -320,6 +320,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
+        character.onUseHealPack(this);
         SoundUtil.playNamedSound(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
@@ -331,7 +332,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return false;
 
             HologramUtil.editHologram(HEALPACK_HOLOGRAM_ID + healPackLocation,
-                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.floor(cooldown / 20.0)));
+                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
             game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(HEALPACK_HOLOGRAM_ID + healPackLocation,
                     LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
 

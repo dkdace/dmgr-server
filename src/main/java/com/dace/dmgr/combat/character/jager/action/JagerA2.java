@@ -118,8 +118,8 @@ public final class JagerA2 extends ActiveSkill {
                     true,
                     new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
             );
-            knockbackModule = new KnockbackModule(this, 1);
-            statusEffectModule = new StatusEffectModule(this, 1);
+            knockbackModule = new KnockbackModule(this, 2);
+            statusEffectModule = new StatusEffectModule(this, 2);
             attackModule = new AttackModule(this);
             damageModule = new DamageModule(this, false, true, JagerA2Info.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);

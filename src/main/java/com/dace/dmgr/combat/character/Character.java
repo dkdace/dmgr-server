@@ -124,6 +124,15 @@ public abstract class Character {
     }
 
     /**
+     * 전투원으로 힐 팩을 사용했을 때 실행될 작업.
+     *
+     * @param combatUser 대상 플레이어
+     */
+    public void onUseHealPack(@NonNull CombatUser combatUser) {
+        // 미사용
+    }
+
+    /**
      * 전투원으로 다른 엔티티를 죽였을 때 실행될 작업.
      *
      * @param attacker   공격자

@@ -3,8 +3,7 @@ package com.dace.dmgr.combat.character.quaker;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -28,14 +27,14 @@ import java.util.StringJoiner;
  * @see QuakerA3
  * @see QuakerUlt
  */
-public final class Quaker extends Character {
+public final class Quaker extends Guardian {
     @Getter
     private static final Quaker instance = new Quaker();
     /** 특성 수정자 */
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
-        super("퀘이커", "DVQuaker", Role.GUARDIAN, '\u32D3', 2500, 0.85, 1.8);
+        super("퀘이커", "DVQuaker", '\u32D3', 2500, 0.85, 1.8);
     }
 
     @Override
@@ -60,6 +59,7 @@ public final class Quaker extends Character {
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
         combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER_ID, QuakerT1Info.STATUS_EFFECT_RESISTANCE);
     }
 

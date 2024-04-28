@@ -16,7 +16,7 @@ import lombok.NonNull;
 @Getter
 public final class StatusEffectModule {
     /** 상태 효과 저항 기본값 */
-    private static final double DEFAULT_VALUE = 0;
+    private static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
     @NonNull
     private final CombatEntity combatEntity;
@@ -55,7 +55,7 @@ public final class StatusEffectModule {
      * @param duration         지속시간 (tick)
      */
     public void applyStatusEffect(@NonNull StatusEffectType statusEffectType, @NonNull StatusEffect statusEffect, long duration) {
-        long finalDuration = (long) (duration * (1.0 - resistanceStatus.getValue()));
+        long finalDuration = (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
         if (finalDuration == 0)
             return;
 
