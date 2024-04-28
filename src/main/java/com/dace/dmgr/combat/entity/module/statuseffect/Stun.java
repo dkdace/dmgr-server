@@ -16,9 +16,8 @@ public class Stun implements StatusEffect {
     static final Stun instance = new Stun();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "기절";
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

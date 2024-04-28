@@ -63,14 +63,14 @@ public final class StatusEffectModule {
             CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString(), finalDuration);
 
         if (getStatusEffectDuration(statusEffectType, statusEffect) == 0) {
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.getName(), finalDuration);
+            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString(), finalDuration);
 
             statusEffect.onStart(combatEntity);
 
             TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
                 if (combatEntity.isDisposed())
                     return false;
-                if (getStatusEffectDuration(statusEffectType, statusEffect) == 0)
+                if (getStatusEffectDuration(statusEffectType) == 0 || getStatusEffectDuration(statusEffectType, statusEffect) == 0)
                     return false;
 
                 statusEffect.onTick(combatEntity, i);
@@ -78,7 +78,7 @@ public final class StatusEffectModule {
                 return true;
             }, isCancelled -> statusEffect.onEnd(combatEntity), 1));
         } else if (getStatusEffectDuration(statusEffectType, statusEffect) < finalDuration)
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.getName(), finalDuration);
+            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString(), finalDuration);
     }
 
     /**
@@ -112,7 +112,7 @@ public final class StatusEffectModule {
      * @return 남은 시간 (tick)
      */
     private long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType, @NonNull StatusEffect statusEffect) {
-        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.getName());
+        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString());
     }
 
     /**
@@ -132,5 +132,26 @@ public final class StatusEffectModule {
      */
     public void removeStatusEffect(@NonNull StatusEffectType statusEffectType) {
         CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+    }
+
+    /**
+     * 엔티티의 상태 효과를 모두 제거한다.
+     */
+    public void clearStatusEffect() {
+        for (StatusEffectType statusEffectType : StatusEffectType.values()) {
+            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+        }
+    }
+
+    /**
+     * 엔티티의 이로운/해로운 상태 효과를 모두 제거한다.
+     *
+     * @param isPositive {@code true}로 지정 시 이로운 효과, {@code false}로 지정 시 해로운 효과만 제거
+     */
+    public void clearStatusEffect(boolean isPositive) {
+        for (StatusEffectType statusEffectType : StatusEffectType.values()) {
+            if (statusEffectType.getStatusEffect().isPositive() == isPositive)
+                CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+        }
     }
 }

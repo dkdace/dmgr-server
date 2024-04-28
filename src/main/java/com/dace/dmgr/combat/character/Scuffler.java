@@ -76,12 +76,6 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
         @Override
-        @NonNull
-        public String getName() {
-            return super.getName() + MODIFIER_ID;
-        }
-
-        @Override
         public void onStart(@NonNull CombatEntity combatEntity) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait2Info.SPEED);

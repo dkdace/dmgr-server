@@ -38,12 +38,6 @@ public final class JagerT1 {
         private static final String MODIFIER_ID = "JagerT1";
 
         @Override
-        @NonNull
-        public String getName() {
-            return super.getName() + MODIFIER_ID;
-        }
-
-        @Override
         public void onTick(@NonNull CombatEntity combatEntity, long i) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
                     1, 0.25, 0, 0.25, 0);

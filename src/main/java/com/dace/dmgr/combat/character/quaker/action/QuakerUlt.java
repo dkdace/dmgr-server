@@ -145,12 +145,6 @@ public final class QuakerUlt extends UltimateSkill {
         private static final QuakerUltSlow instance = new QuakerUltSlow();
 
         @Override
-        @NonNull
-        public String getName() {
-            return super.getName() + MODIFIER_ID;
-        }
-
-        @Override
         public void onStart(@NonNull CombatEntity combatEntity) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerUltInfo.SLOW);

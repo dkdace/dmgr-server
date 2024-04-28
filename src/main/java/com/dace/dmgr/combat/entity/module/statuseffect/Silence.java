@@ -16,9 +16,8 @@ public class Silence implements StatusEffect {
     static final Silence instance = new Silence();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "침묵";
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

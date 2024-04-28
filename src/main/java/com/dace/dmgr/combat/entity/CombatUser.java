@@ -704,6 +704,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onDeath(this, attacker);
 
         damageModule.setHealth(damageModule.getMaxHealth());
+        statusEffectModule.clearStatusEffect();
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
         damageMap.forEach((CombatUser attacker2, Integer damage) -> {

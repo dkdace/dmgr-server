@@ -16,9 +16,8 @@ public class Speed implements StatusEffect {
     static final Speed instance = new Speed();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "속도 증가";
+    public final boolean isPositive() {
+        return true;
     }
 
     @Override
