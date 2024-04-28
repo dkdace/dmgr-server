@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.silia;
 
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Character;
@@ -9,11 +9,12 @@ import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -37,25 +38,26 @@ public final class Silia extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
         SiliaUlt skill4 = (SiliaUlt) combatUser.getSkill(SiliaUltInfo.getInstance());
 
-        double skill3Duration = skill3.getStateValue() / 20;
+        double skill3Duration = skill3.getStateValue() / 20.0;
         double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
         double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill3Display = StringFormUtil.getActionbarDurationBar(skill3.getActionInfo().toString(), skill3Duration, skill3MaxDuration,
+        String skill3Display = StringFormUtil.getActionbarDurationBar(skill3.getSkillInfo().toString(), skill3Duration, skill3MaxDuration,
                 10, '■');
 
         if (!skill3.isDurationFinished())
             skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
         text.add(skill3Display);
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getActionInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -64,8 +66,8 @@ public final class Silia extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -109,6 +111,7 @@ public final class Silia extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -121,6 +124,7 @@ public final class Silia extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

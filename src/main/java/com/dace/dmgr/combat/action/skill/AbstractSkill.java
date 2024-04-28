@@ -9,26 +9,31 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
  */
 @Getter
 public abstract class AbstractSkill extends AbstractAction implements Skill {
-    /** 스킬 번호 */
-    private final int number;
+    /** 스킬 정보 객체 */
+    @NonNull
+    protected final SkillInfo skillInfo;
+    /** 스킬 아이템 객체 */
+    @NonNull
+    protected ItemStack itemStack;
 
     /**
      * 스킬 인스턴스를 생성한다.
      *
-     * @param number     번호
      * @param combatUser 대상 플레이어
      * @param skillInfo  스킬 정보 객체
      */
-    protected AbstractSkill(int number, @NonNull CombatUser combatUser, @NonNull SkillInfo skillInfo) {
-        super(combatUser, skillInfo);
+    protected AbstractSkill(@NonNull CombatUser combatUser, @NonNull SkillInfo skillInfo) {
+        super(combatUser);
 
-        this.number = number;
+        this.skillInfo = skillInfo;
+        this.itemStack = skillInfo.getItemStack();
         setCooldown(getDefaultCooldown());
     }
 
@@ -70,8 +75,6 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
      */
     private void runDuration() {
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onDurationTick();
-
             if (isDurationFinished()) {
                 onDurationFinished();
                 return false;
@@ -79,13 +82,6 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
             return true;
         }, 1));
-    }
-
-    /**
-     * 지속시간이 진행할 때 (매 tick마다) 실행할 작업.
-     */
-    protected void onDurationTick() {
-        // 미사용
     }
 
     /**

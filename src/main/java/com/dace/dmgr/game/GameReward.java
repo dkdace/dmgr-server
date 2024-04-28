@@ -2,6 +2,7 @@ package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 게임 결과에 따른 보상을 계산하는 클래스.
@@ -16,7 +17,7 @@ final class GameReward {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 경험치
      */
-    static int getFinalXp(int xp, double score, Boolean isWinner) {
+    static int getFinalXp(int xp, double score, @Nullable Boolean isWinner) {
         int finalScore = (int) (xp + 50 + score * 0.2);
         if (isWinner != null && isWinner)
             finalScore += 200;
@@ -32,7 +33,7 @@ final class GameReward {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 금액
      */
-    static int getFinalMoney(int money, double score, Boolean isWinner) {
+    static int getFinalMoney(int money, double score, @Nullable Boolean isWinner) {
         int finalScore = (int) (money + 50 + score * 0.2);
         if (isWinner != null && isWinner)
             finalScore += 200;
@@ -87,7 +88,7 @@ final class GameReward {
      * @param isWinner  승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 최종 랭크 점수
      */
-    static int getFinalRankRateRanked(int mmr, int rr, double kda, double score, int playTime, int averageRR, Boolean isWinner) {
+    static int getFinalRankRateRanked(int mmr, int rr, double kda, double score, int playTime, int averageRR, @Nullable Boolean isWinner) {
         return (int) (rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime) +
                 getWinCorrection(isWinner) + getPointCorrection(mmr, rr, averageRR)));
     }
@@ -119,7 +120,7 @@ final class GameReward {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 승패 보정치
      */
-    static double getWinCorrection(Boolean isWinner) {
+    static double getWinCorrection(@Nullable Boolean isWinner) {
         if (isWinner == null)
             return 0;
         return isWinner ? 10 : -8;

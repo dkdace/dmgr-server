@@ -23,20 +23,19 @@ public final class OnPlayServerEntityMetadata extends PacketAdapter {
         Player player = event.getPlayer();
         Entity entity = packet.getEntity(event);
 
-        WrappedWatchableObject metadata = packet.getMetadata().get(0);
+        for (WrappedWatchableObject wo : packet.getMetadata()) {
+            if (wo.getIndex() != 0 || entity == null)
+                continue;
+            if (entity instanceof ArmorStand && ((ArmorStand) entity).isSmall())
+                continue;
 
-        if (metadata == null || metadata.getIndex() != 0 || entity == null)
-            return;
+            WrappedDataWatcher dw = WrappedDataWatcher.getEntityWatcher(entity);
+            dw.deepClone();
 
-        if (entity instanceof ArmorStand && ((ArmorStand) entity).isSmall())
-            return;
-
-        WrappedDataWatcher dw = WrappedDataWatcher.getEntityWatcher(entity);
-        dw.deepClone();
-
-        if (GlowUtil.isGlowing(entity, player))
-            metadata.setValue((byte) ((byte) metadata.getValue() | (1 << 6)));
-        else
-            metadata.setValue((byte) ((byte) metadata.getValue() & ~(1 << 6)));
+            if (GlowUtil.isGlowing(entity, player))
+                wo.setValue((byte) ((byte) wo.getValue() | (1 << 6)));
+            else
+                wo.setValue((byte) ((byte) wo.getValue() & ~(1 << 6)));
+        }
     }
 }

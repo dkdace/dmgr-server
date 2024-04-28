@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.statuseffect;
+package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -14,7 +14,7 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Snare implements StatusEffect {
     @Getter
-    private static final Snare instance = new Snare();
+    static final Snare instance = new Snare();
 
     @Override
     @NonNull

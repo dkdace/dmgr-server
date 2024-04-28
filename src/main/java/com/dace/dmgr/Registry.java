@@ -1,6 +1,7 @@
 package com.dace.dmgr;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -43,6 +44,7 @@ public abstract class Registry<K, V> {
      * @param key 키
      * @return 값
      */
+    @Nullable
     public final V get(@NonNull K key) {
         return getMap().get(key);
     }

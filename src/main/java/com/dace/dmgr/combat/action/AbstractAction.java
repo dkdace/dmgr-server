@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.action;
 
-import com.dace.dmgr.combat.action.info.ActionInfo;
+import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -10,7 +10,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -22,27 +21,31 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class AbstractAction implements Action {
     /** 플레이어 객체 */
+    @NonNull
     protected final CombatUser combatUser;
-    /** 동작 정보 객체 */
-    protected final ActionInfo actionInfo;
-    /** 동작 태스크 실행 객체 */
-    protected final Object taskRunner = new Object();
-    /** 아이템 */
-    protected ItemStack itemStack;
     /** 비활성화 여부 */
     private boolean isDisposed = false;
+    /** 동작 태스크 실행 객체 */
+    @NonNull
+    protected final Disposable taskRunner = new Disposable() {
+        @Override
+        public void dispose() {
+            throw new UnsupportedOperationException("TaskRunner는 폐기될 수 없음");
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return AbstractAction.this.isDisposed();
+        }
+    };
 
     /**
      * 동작 인스턴스를 생성한다.
      *
      * @param combatUser 대상 플레이어
-     * @param actionInfo 동작 정보
      */
-    protected AbstractAction(@NonNull CombatUser combatUser, ActionInfo actionInfo) {
+    protected AbstractAction(@NonNull CombatUser combatUser) {
         this.combatUser = combatUser;
-        this.actionInfo = actionInfo;
-        if (actionInfo != null)
-            this.itemStack = actionInfo.getItemStack().clone();
     }
 
     @Override
@@ -75,8 +78,6 @@ public abstract class AbstractAction implements Action {
      */
     private void runCooldown() {
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onCooldownTick();
-
             if (isCooldownFinished()) {
                 onCooldownFinished();
                 return false;
@@ -90,13 +91,6 @@ public abstract class AbstractAction implements Action {
      * 쿨타임을 설정했을 때 실행할 작업.
      */
     protected void onCooldownSet() {
-        // 미사용
-    }
-
-    /**
-     * 쿨타임이 진행할 때 (매 tick마다) 실행할 작업.
-     */
-    protected void onCooldownTick() {
         // 미사용
     }
 
@@ -132,7 +126,7 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void dispose() {
-        checkAccess();
+        validate();
 
         reset();
         TaskUtil.clearTask(taskRunner);

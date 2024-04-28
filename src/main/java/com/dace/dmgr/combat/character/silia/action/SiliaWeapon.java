@@ -1,30 +1,31 @@
 package com.dace.dmgr.combat.character.silia.action;
 
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.character.silia.SiliaTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class SiliaWeapon extends AbstractWeapon {
     /** 일격 사용 가능 여부 */
-    boolean isStrike = false;
+    @Getter
+    private boolean isStrike = false;
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    public SiliaWeapon(@NonNull CombatUser combatUser) {
+    SiliaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaWeaponInfo.getInstance());
     }
 
@@ -49,15 +50,17 @@ public final class SiliaWeapon extends AbstractWeapon {
         isOpposite = !isOpposite;
 
         if (isStrike) {
-            SiliaTrait.strike(combatUser, isOpposite);
             if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
                 setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
+
+            SiliaT2.strike(combatUser, isOpposite);
         } else {
             setCooldown();
+            combatUser.playMeleeAttackAnimation(-4, 10, true);
 
             new SiliaWeaponProjectile().shoot();
-            combatUser.playMeleeAttackAnimation(-4, 10, true);
-            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
+
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
         }
 
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
@@ -70,14 +73,31 @@ public final class SiliaWeapon extends AbstractWeapon {
         setVisible(true);
     }
 
-    private class SiliaWeaponProjectile extends Projectile {
+    /**
+     * 일격 사용 가능 여부를 설정한다.
+     *
+     * @param isStrike 일격 사용 가능 여부
+     */
+    public void setStrike(boolean isStrike) {
+        if (isStrike) {
+            this.isStrike = true;
+            combatUser.getWeapon().setGlowing(true);
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+        } else {
+            this.isStrike = false;
+            combatUser.getWeapon().setGlowing(false);
+            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+        }
+    }
+
+    private final class SiliaWeaponProjectile extends Projectile {
         private SiliaWeaponProjectile() {
-            super(SiliaWeapon.this.combatUser, SiliaWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).size(SiliaWeaponInfo.SIZE)
-                    .maxDistance(SiliaWeaponInfo.DISTANCE).condition(SiliaWeapon.this.combatUser::isEnemy).build());
+            super(combatUser, SiliaWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).size(SiliaWeaponInfo.SIZE)
+                    .maxDistance(SiliaWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             for (int i = 0; i < 8; i++) {
                 Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
                 Vector axis = VectorUtil.getPitchAxis(location);
@@ -91,26 +111,26 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 10, 0.1, 0.1, 0.1, 0.15);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            SoundUtil.play(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
-            SoundUtil.playBlockHitSound(location, hitBlock, 1);
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 1.5);
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
+            CombatUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(location, hitBlock, 1.5);
 
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             target.getDamageModule().damage(combatUser, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
-                    SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+                    SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
             ParticleUtil.play(Particle.CRIT, location, 15, 0, 0, 0, 0.4);
-            SoundUtil.play(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
 
             return false;
         }

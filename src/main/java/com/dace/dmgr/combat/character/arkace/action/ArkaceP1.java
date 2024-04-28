@@ -6,8 +6,11 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 
 public final class ArkaceP1 extends AbstractSkill {
-    public ArkaceP1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, ArkaceP1Info.getInstance());
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "ArkaceP1";
+
+    ArkaceP1(@NonNull CombatUser combatUser) {
+        super(combatUser, ArkaceP1Info.getInstance());
     }
 
     @Override
@@ -30,11 +33,11 @@ public final class ArkaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.getMoveModule().getSpeedStatus().addModifier("ArkaceP1", ArkaceP1Info.SPRINT_SPEED);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, ArkaceP1Info.SPRINT_SPEED);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
         } else {
             setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier("ArkaceP1");
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
         }
     }

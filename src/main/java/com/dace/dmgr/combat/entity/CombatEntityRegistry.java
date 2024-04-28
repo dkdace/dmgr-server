@@ -26,7 +26,7 @@ final class CombatEntityRegistry extends Registry<Entity, CombatEntity> {
      * @return 게임에 소속되지 않은 모든 엔티티
      */
     @NonNull
-    public CombatEntity[] getAllExcluded() {
+    public CombatEntity @NonNull [] getAllExcluded() {
         return map.values().stream().filter(combatEntity -> combatEntity.getGame() == null)
                 .toArray(CombatEntity[]::new);
     }

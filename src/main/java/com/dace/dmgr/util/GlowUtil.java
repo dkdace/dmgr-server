@@ -46,7 +46,7 @@ public final class GlowUtil {
         packet1.setMode(0);
 
         packet2.setMode(2);
-        packet2.setNameTagVisibility("always");
+        packet2.setNameTagVisibility("never");
         packet2.setCollisionRule("never");
         packet2.setPrefix(color + "");
         packet2.setColor(color.ordinal());

@@ -1,7 +1,7 @@
 package com.dace.dmgr.command.test;
 
-import com.dace.dmgr.combat.entity.CombatEntityUtil;
-import com.dace.dmgr.combat.entity.Dummy;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.entity.temporal.Dummy;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,7 @@ public class DummyCommand implements CommandExecutor {
 
         int health = Integer.parseInt(args[0]);
 
-        Zombie entity = CombatEntityUtil.spawn(Zombie.class, player.getLocation());
+        Zombie entity = CombatUtil.spawnEntity(Zombie.class, player.getLocation());
         new Dummy(entity, health).activate();
 
         return true;

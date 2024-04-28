@@ -18,8 +18,8 @@ public final class SiliaP2 extends AbstractSkill {
     /** 벽타기 남은 횟수 */
     private int wallRideCount;
 
-    public SiliaP2(@NonNull CombatUser combatUser) {
-        super(1, combatUser, SiliaP1Info.getInstance());
+    SiliaP2(@NonNull CombatUser combatUser) {
+        super(combatUser, SiliaP1Info.getInstance());
         wallRideCount = SiliaP2Info.USE_COUNT;
     }
 
@@ -80,12 +80,13 @@ public final class SiliaP2 extends AbstractSkill {
             if (wallRideCount <= 0)
                 return false;
 
-            combatUser.push(new Vector(0, 0.45, 0), true);
+            combatUser.push(new Vector(0, SiliaP2Info.PUSH, 0), true);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
+
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
             else
-                SoundUtil.play(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
 
             return true;
         }, isCancelled -> {
@@ -93,7 +94,8 @@ public final class SiliaP2 extends AbstractSkill {
 
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
-            combatUser.push(loc.getDirection().multiply(0.55), true);
+            combatUser.push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);
+
             TaskUtil.addTask(SiliaP2.this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
                     isCancelled2 -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
         }, 3, 10));
@@ -102,6 +104,7 @@ public final class SiliaP2 extends AbstractSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         setDuration(0);
         combatUser.getWeapon().setVisible(true);
     }

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action.info;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,11 +17,18 @@ public abstract class WeaponInfo extends ActionInfo {
     /** 무기 이름의 접두사 */
     private static final String PREFIX = "§e§l[기본무기] §f";
 
-    protected WeaponInfo(short resource, String name, String... lore) {
+    /**
+     * 무기 정보 인스턴스를 생성한다.
+     *
+     * @param resource 리소스 (내구도)
+     * @param name     이름
+     * @param lores    설명 목록
+     */
+    protected WeaponInfo(short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
         super(name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage(resource)
-                .setLore(lore)
+                .setLore(lores)
                 .build());
 
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -30,11 +38,17 @@ public abstract class WeaponInfo extends ActionInfo {
         itemStack.setItemMeta(itemMeta);
     }
 
+    @Override
+    public String toString() {
+        return "§f［" + name + "］";
+    }
+
     /**
      * 무기 인스턴스를 생성하여 반환한다.
      *
      * @param combatUser 플레이어 객체
      * @return 무기 객체
      */
-    public abstract Weapon createWeapon(CombatUser combatUser);
+    @NonNull
+    public abstract Weapon createWeapon(@NonNull CombatUser combatUser);
 }

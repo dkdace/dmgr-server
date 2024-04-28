@@ -16,9 +16,8 @@ public interface Reloadable extends Weapon {
     /**
      * 무기를 재장전할 수 있는 지 확인한다.
      *
-     * <p>기본값은 {@code true}이며, 오버라이딩하여 재설정할 수 있다.</p>
-     *
      * @return 재장전 가능 여부
+     * @implSpec {@code true}
      */
     default boolean canReload() {
         return true;

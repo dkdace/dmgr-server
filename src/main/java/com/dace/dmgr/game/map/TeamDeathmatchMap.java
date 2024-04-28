@@ -1,6 +1,5 @@
 package com.dace.dmgr.game.map;
 
-import com.dace.dmgr.game.GamePlayMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -12,7 +11,7 @@ import org.bukkit.World;
 @AllArgsConstructor
 @Getter
 public enum TeamDeathmatchMap implements GameMap {
-    TESTMAP(GamePlayMode.TEAM_DEATHMATCH, "테스트맵", Bukkit.getWorld("TestMap"),
+    TESTMAP("테스트맵", Bukkit.getWorld("TestMap"),
             new GlobalLocation[]{new GlobalLocation(19.5, 63, 52.5, 180, 0)},
             new GlobalLocation[]{new GlobalLocation(-114.5, 64, 53.5, -90, 0)},
             new GlobalLocation[]{
@@ -30,8 +29,6 @@ public enum TeamDeathmatchMap implements GameMap {
             }
     );
 
-    /** 게임 모드 */
-    private final GamePlayMode gamePlayMode;
     /** 맵 이름 */
     private final String name;
     /** 맵 월드 */

@@ -1,6 +1,7 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
 import org.bukkit.Material;
 
@@ -24,24 +25,14 @@ public enum DisplayItem {
     /** 활성화 */
     ENABLED(7);
 
-    /** GUI 아이템 객체 */
-    private final GuiItem<DisplayItem> guiItem;
+    /** 정적 아이템 객체 */
+    private final StaticItem staticItem;
 
     DisplayItem(int damage) {
         ItemBuilder itemBuilder = new ItemBuilder(Material.CARROT_STICK)
                 .setDamage((short) damage)
                 .setName("§f");
 
-        guiItem = new GuiItem<DisplayItem>(this, itemBuilder.build()) {
-            @Override
-            public Gui getGui() {
-                return null;
-            }
-
-            @Override
-            public boolean isClickable() {
-                return false;
-            }
-        };
+        staticItem = new StaticItem("DisplayItem" + this, itemBuilder.build());
     }
 }

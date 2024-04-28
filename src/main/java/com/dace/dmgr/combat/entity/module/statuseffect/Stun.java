@@ -1,36 +1,36 @@
-package com.dace.dmgr.combat.entity.statuseffect;
+package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.Material;
 
 /**
- * 둔화 상태 효과를 처리하는 클래스.
+ * 기절 상태 효과를 처리하는 클래스.
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Slow implements StatusEffect {
+public class Stun implements StatusEffect {
     @Getter
-    private static final Slow instance = new Slow();
+    static final Stun instance = new Stun();
 
     @Override
     @NonNull
     public String getName() {
-        return "둔화";
+        return "기절";
     }
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
-        // 미사용
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).cancelAction();
     }
 
     @Override
     public void onTick(@NonNull CombatEntity combatEntity, long i) {
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
-                3, 0.3, 0, 0.3, 0);
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).getUser().sendTitle("§c§l기절함!", "", 0, 2, 10);
     }
 
     @Override

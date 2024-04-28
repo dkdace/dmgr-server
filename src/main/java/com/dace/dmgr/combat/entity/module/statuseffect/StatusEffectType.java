@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.statuseffect;
+package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,10 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.temporal;
 
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
@@ -8,7 +12,6 @@ import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Color;
@@ -19,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +50,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
      * @param entity    대상 엔티티
      * @param maxHealth 최대 체력
      */
-    public Dummy(Zombie entity, int maxHealth) {
+    public Dummy(@NonNull Zombie entity, int maxHealth) {
         super(entity, "훈련용 봇", null,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
@@ -55,7 +59,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         );
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
-        damageModule = new DamageModule(this, true, maxHealth);
+        damageModule = new DamageModule(this, true, true, maxHealth);
         critHitbox = hitboxes[3];
 
         onInit();
@@ -81,7 +85,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         entity.getEquipment().setLeggings(equipment.get(1));
         entity.getEquipment().setBoots(equipment.get(2));
         entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.SLOW, 99999, 5, false, false));
+                new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 5, false, false));
     }
 
     @Override
@@ -90,12 +94,12 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     }
 
     @Override
-    public void onDamage(Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
-        ParticleUtil.playBleedingEffect(location, entity, damage);
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+        CombatUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override
-    public void onDeath(Attacker attacker) {
+    public void onDeath(@Nullable Attacker attacker) {
         dispose();
     }
 }

@@ -1,13 +1,12 @@
-package com.dace.dmgr.combat.character.jager;
+package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.statuseffect.Slow;
-import com.dace.dmgr.combat.entity.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,18 +15,15 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 
-/**
- * 전투원 - 예거 특성 클래스.
- */
 @UtilityClass
-public final class JagerTrait {
+public final class JagerT1 {
     /**
      * 피격자의 빙결 수치를 증가시킨다.
      *
      * @param victim 피격자
      * @param amount 증가량
      */
-    public static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
+    static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
         victim.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, FreezeValue.instance, JagerT1Info.DURATION);
     }
@@ -36,18 +32,15 @@ public final class JagerTrait {
      * 빙결 수치 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FreezeValue extends Slow {
+    public static final class FreezeValue extends Slow {
         private static final FreezeValue instance = new FreezeValue();
+        /** 수정자 ID */
+        private static final String MODIFIER_ID = "JagerT1";
 
         @Override
         @NonNull
         public String getName() {
-            return super.getName() + "JagerTrait";
-        }
-
-        @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
-            // 미사용
+            return super.getName() + MODIFIER_ID;
         }
 
         @Override
@@ -56,7 +49,7 @@ public final class JagerTrait {
                     1, 0.25, 0, 0.25, 0);
 
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("JagerT1",
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID,
                         -combatEntity.getPropertyManager().getValue(Property.FREEZE));
         }
 
@@ -64,7 +57,7 @@ public final class JagerTrait {
         public void onEnd(@NonNull CombatEntity combatEntity) {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("JagerT1");
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
     }
 
@@ -72,7 +65,7 @@ public final class JagerTrait {
      * 빙결 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Freeze extends Snare {
+    public static final class Freeze extends Snare {
         @Getter
         private static final Freeze instance = new Freeze();
 

@@ -15,8 +15,4 @@ public enum Property {
 
     /** 최댓값 */
     private final int max;
-
-    Property() {
-        max = Integer.MAX_VALUE;
-    }
 }

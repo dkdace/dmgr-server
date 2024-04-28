@@ -77,7 +77,7 @@ public final class VectorUtil {
      * 벡터의 Yaw 값을 반환한다.
      *
      * @param vector 대상 벡터
-     * @return Yaw 값
+     * @return Yaw 값 (60분법)
      */
     public static double getYaw(@NonNull Vector vector) {
         if (vector.getX() == 0 && vector.getZ() == 0)
@@ -94,7 +94,7 @@ public final class VectorUtil {
      * 벡터의 Pitch 값을 반환한다.
      *
      * @param vector 대상 벡터
-     * @return Pitch 값
+     * @return Pitch 값 (60분법)
      */
     public static double getPitch(@NonNull Vector vector) {
         double xy = Math.sqrt(vector.getX() * vector.getX() + vector.getZ() * vector.getZ());

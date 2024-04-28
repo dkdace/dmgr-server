@@ -32,7 +32,9 @@ public final class GeneralConfig extends YamlFile {
         config.chatCooldown = getLong("chatCooldown", config.chatCooldown);
         config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
         config.rankingUpdatePeriod = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriod);
+        config.netheriteTierMinRank = (int) getLong("netheriteTierMinRank", config.netheriteTierMinRank);
         config.messagePrefix = getString("messagePrefix", config.messagePrefix);
+        config.adminContact = getString("adminContact", config.adminContact);
 
         combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
         combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
@@ -40,6 +42,7 @@ public final class GeneralConfig extends YamlFile {
         combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
         combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
         combatConfig.jumpPadBlock = Material.valueOf(getString("jumpPadBlock", combatConfig.jumpPadBlock.toString()));
+        combatConfig.jumpPadVelocity = getDouble("jumpPadVelocity", combatConfig.jumpPadVelocity);
         combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
 
         gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
@@ -78,9 +81,13 @@ public final class GeneralConfig extends YamlFile {
         /** 명령어 쿨타임 */
         private long commandCooldown = 0;
         /** 랭킹 업데이트 주기 (분) */
-        private long rankingUpdatePeriod = 5;
+        private int rankingUpdatePeriod = 5;
+        /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
+        private int netheriteTierMinRank = 5;
         /** 메시지의 접두사 */
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
+        /** 관리자 연락처 */
+        private String adminContact = "디스코드 dkdace (DarkDace＃4671)";
     }
 
     /**
@@ -101,6 +108,8 @@ public final class GeneralConfig extends YamlFile {
         private int healPackHeal = 350;
         /** 점프대에 사용되는 블록의 타입 */
         private Material jumpPadBlock = Material.SPONGE;
+        /** 점프대 사용 시 속력 */
+        private double jumpPadVelocity = 1.4;
         /** 낙사 구역에 사용되는 블록의 타입 */
         private Material fallZoneBlock = Material.BEDROCK;
     }

@@ -14,8 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class ArkaceA2 extends ActiveSkill {
-    public ArkaceA2(@NonNull CombatUser combatUser) {
-        super(2, combatUser, ArkaceA2Info.getInstance(), 2);
+    ArkaceA2(@NonNull CombatUser combatUser) {
+        super(combatUser, ArkaceA2Info.getInstance(), 2);
     }
 
     @Override
@@ -42,17 +42,17 @@ public final class ArkaceA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        SoundUtil.play(NamedSound.COMBAT_ARKACE_A2_USE, combatUser.getEntity().getLocation());
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
-            loc.setPitch(0);
-            playTickEffect(i, loc);
-
             int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
             if (i == 0)
                 amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
             combatUser.getDamageModule().heal(combatUser, amount, true);
+
+            Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+            loc.setPitch(0);
+            playTickEffect(i, loc);
 
             return true;
         }, 1, ArkaceA2Info.DURATION));

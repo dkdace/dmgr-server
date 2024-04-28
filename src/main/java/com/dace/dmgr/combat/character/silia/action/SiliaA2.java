@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.silia.SiliaTrait;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
@@ -20,8 +20,8 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class SiliaA2 extends ActiveSkill {
-    public SiliaA2(@NonNull CombatUser combatUser) {
-        super(2, combatUser, SiliaA2Info.getInstance(), 1);
+    SiliaA2(@NonNull CombatUser combatUser) {
+        super(combatUser, SiliaA2Info.getInstance(), 1);
     }
 
     @Override
@@ -48,11 +48,12 @@ public final class SiliaA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.setGlobalCooldown(20);
         setDuration();
+        combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
         if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
-        SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -71,7 +72,7 @@ public final class SiliaA2 extends ActiveSkill {
 
             new SiliaA2Projectile().shoot();
 
-            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
     }
 
@@ -81,16 +82,16 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration(0);
     }
 
-    private class SiliaA2Projectile extends Projectile {
+    private final class SiliaA2Projectile extends Projectile {
         int i = 0;
 
         private SiliaA2Projectile() {
-            super(SiliaA2.this.combatUser, SiliaA2Info.VELOCITY, ProjectileOption.builder().trailInterval(4).size(SiliaA2Info.SIZE)
-                    .maxDistance(SiliaA2Info.DISTANCE).condition(SiliaA2.this.combatUser::isEnemy).build());
+            super(combatUser, SiliaA2Info.VELOCITY, ProjectileOption.builder().trailInterval(4).size(SiliaA2Info.SIZE)
+                    .maxDistance(SiliaA2Info.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
         @Override
-        protected void trail(@NonNull Location location, @NonNull Vector direction) {
+        protected void trail() {
             i++;
 
             Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
@@ -107,7 +108,7 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected void onHit(@NonNull Location location) {
+        protected void onHit() {
             for (int j = 0; j < 40; j++) {
                 Vector vec = VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec.getX(), vec.getY(), vec.getZ(),
@@ -116,26 +117,25 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
-            ParticleUtil.playBlockHitEffect(location, hitBlock, 3);
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
+            CombatUtil.playBlockHitEffect(location, hitBlock, 3);
             return false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
-                    SiliaTrait.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
-            target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);
-
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             setCooldown(getDefaultCooldown() / 2);
+
+            target.getDamageModule().damage(combatUser, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
+                    SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+            target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);
 
             Location loc = target.getEntity().getLocation();
             loc.setPitch(0);
             loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
-            for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5)) {
+            for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
                 ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
-            }
-            SoundUtil.play(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
             if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                 combatUser.getUser().teleport(loc);

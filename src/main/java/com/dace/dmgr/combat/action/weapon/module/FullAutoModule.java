@@ -32,7 +32,7 @@ public class FullAutoModule {
      * @param tick 기준 틱
      * @return 발사 가능 여부
      */
-    public final boolean isFireTick(int tick) {
+    public final boolean isFireTick(long tick) {
         tick = tick % 20;
 
         return (fireRate.getTickFlag() & (1 << tick)) != 0;

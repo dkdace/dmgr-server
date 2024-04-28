@@ -6,19 +6,21 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
-import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.*;
-import org.bukkit.Bukkit;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -43,10 +45,10 @@ public final class Game implements Disposable {
     private final int maxPlayerCount;
     /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
     @Getter
-    private final EnumMap<@NonNull Team, @NonNull ArrayList<GameUser>> teamUserMap = new EnumMap<>(Team.class);
+    private final EnumMap<@NonNull Team, @NonNull ArrayList<@NonNull GameUser>> teamUserMap = new EnumMap<>(Team.class);
     /** 팀별 점수 (팀 : 점수) */
     @Getter
-    private final EnumMap<@NonNull Team, Integer> teamScore = new EnumMap<>(Team.class);
+    private final EnumMap<@NonNull Team, @NonNull Integer> teamScore = new EnumMap<>(Team.class);
     /** 게임 모드 */
     @NonNull
     @Getter
@@ -56,9 +58,10 @@ public final class Game implements Disposable {
     @Getter
     private final GameMap map;
     /** 전장 월드 */
+    @Nullable
     @Getter
     private World world;
-    /** 게임 시작 시점 ({@link Phase#READY}가 된 시점) */
+    /** 게임 시작 시점 ({@link Phase#READY}가 된 시점, 타임스탬프) */
     @Getter
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 (초) */
@@ -77,21 +80,20 @@ public final class Game implements Disposable {
      * @throws IllegalStateException 해당 {@code isRanked}, {@code number}의 Game이 이미 존재하면 발생
      */
     public Game(boolean isRanked, int number) {
-        Game game = GameRegistry.getInstance().get(new KeyPair(isRanked, number));
+        Game game = GameRegistry.getInstance().get(new GameRegistry.KeyPair(isRanked, number));
         if (game != null)
             throw new IllegalStateException(MessageFormat.format("랭크 여부 {0}, 방 번호 {1}의 Game이 이미 생성됨", isRanked, number));
 
         this.number = number;
-        this.gamePlayMode = GameUtil.getRandomGamePlayMode(isRanked);
-        this.map = GameUtil.getRandomMap(gamePlayMode);
-        this.world = Bukkit.getWorld(MessageFormat.format("_{0}-{1}-{2}", map.getWorld().getName(), gamePlayMode, number));
+        this.gamePlayMode = GamePlayMode.getRandomGamePlayMode(isRanked);
+        this.map = gamePlayMode.getRandomMap();
         minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
         for (Team team : Team.values()) {
             this.teamUserMap.put(team, new ArrayList<>());
             this.teamScore.put(team, 0);
         }
-        GameRegistry.getInstance().add(new KeyPair(isRanked, number), this);
+        GameRegistry.getInstance().add(new GameRegistry.KeyPair(isRanked, number), this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
             onSecond();
@@ -106,13 +108,14 @@ public final class Game implements Disposable {
      * @param number   방 번호
      * @return 게임 인스턴스. 존재하지 않으면 {@code null} 반환
      */
+    @Nullable
     public static Game fromNumber(boolean isRanked, int number) {
-        return GameRegistry.getInstance().get(new KeyPair(isRanked, number));
+        return GameRegistry.getInstance().get(new GameRegistry.KeyPair(isRanked, number));
     }
 
     @Override
     public void dispose() {
-        checkAccess();
+        validate();
 
         if (!gameUsers.isEmpty())
             for (GameUser gameUser : new ArrayList<>(gameUsers)) {
@@ -123,18 +126,26 @@ public final class Game implements Disposable {
             }
 
         for (GlobalLocation healPackLocation : map.getHealPackLocations())
-            HologramUtil.removeHologram("healpack" + healPackLocation);
+            HologramUtil.removeHologram(CombatUser.HEALPACK_HOLOGRAM_ID + healPackLocation);
 
+        if (world == null)
+            onDispose();
+        else
+            TaskUtil.addTask(this, WorldUtil.removeWorld(world).onFinish(this::onDispose));
+    }
+
+    /**
+     * 게임 폐기 완료 시 실행할 작업.
+     */
+    private void onDispose() {
+        world = null;
+        GameRegistry.getInstance().remove(new GameRegistry.KeyPair(gamePlayMode.isRanked(), number));
         TaskUtil.clearTask(this);
-        removeWorld().onFinish(() -> {
-            world = null;
-            GameRegistry.getInstance().remove(new KeyPair(gamePlayMode.isRanked(), number));
-        });
     }
 
     @Override
     public boolean isDisposed() {
-        return GameRegistry.getInstance().get(new KeyPair(gamePlayMode.isRanked(), number)) == null;
+        return GameRegistry.getInstance().get(new GameRegistry.KeyPair(gamePlayMode.isRanked(), number)) == null;
     }
 
     /**
@@ -143,7 +154,7 @@ public final class Game implements Disposable {
      * @return 게임에 속한 모든 엔티티
      */
     @NonNull
-    public CombatEntity[] getAllCombatEntities() {
+    public CombatEntity @NonNull [] getAllCombatEntities() {
         return combatEntitySet.toArray(new CombatEntity[0]);
     }
 
@@ -153,6 +164,7 @@ public final class Game implements Disposable {
      * @param combatEntity 전투 시스템의 엔티티 객체
      */
     public void addCombatEntity(@NonNull CombatEntity combatEntity) {
+        validate();
         combatEntitySet.add(combatEntity);
     }
 
@@ -162,30 +174,8 @@ public final class Game implements Disposable {
      * @param combatEntity 전투 시스템의 엔티티 객체
      */
     public void removeCombatEntity(@NonNull CombatEntity combatEntity) {
+        validate();
         combatEntitySet.remove(combatEntity);
-    }
-
-    /**
-     * 전장으로 사용할 월드를 생성한다.
-     */
-    @NonNull
-    private AsyncTask<World> createWorld() {
-        if (world == null)
-            return WorldUtil.duplicateWorld(map.getWorld(), MessageFormat.format("_{0}-{1}-{2}",
-                    map.getWorld().getName(), gamePlayMode, number));
-
-        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(world));
-    }
-
-    /**
-     * 전장 월드를 제거한다.
-     */
-    @NonNull
-    private AsyncTask<Void> removeWorld() {
-        if (world != null)
-            return WorldUtil.removeWorld(world.getName());
-
-        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
     }
 
     /**
@@ -258,7 +248,7 @@ public final class Game implements Disposable {
     private void onSecondReady() {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
             });
         }
@@ -268,7 +258,7 @@ public final class Game implements Disposable {
             remainingTime = gamePlayMode.getPlayDuration();
 
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
             });
         }
@@ -282,7 +272,7 @@ public final class Game implements Disposable {
 
         if (remainingTime > 0 && remainingTime <= 10) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.play(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
             });
         }
@@ -308,7 +298,8 @@ public final class Game implements Disposable {
     private void onReady() {
         gameUsers.forEach(gameUser -> gameUser.getUser().sendMessageInfo("월드 불러오는 중..."));
 
-        createWorld().onFinish(newWorld -> {
+        WorldUtil.duplicateWorld(map.getWorld(), MessageFormat.format("_{0}-{1}-{2}",
+                map.getWorld().getName(), gamePlayMode, number)).onFinish(newWorld -> {
             world = newWorld;
             remainingTime = gamePlayMode.getReadyDuration();
             startTime = System.currentTimeMillis();
@@ -340,8 +331,8 @@ public final class Game implements Disposable {
      */
     private void divideTeam() {
         LinkedList<GameUser> sortedGameUsers = gameUsers.stream()
-                .sorted(Comparator.comparing(gameUser ->
-                        UserData.fromPlayer(((GameUser) gameUser).getPlayer()).getMatchMakingRate()).reversed())
+                .sorted(Comparator.comparing((GameUser gameUser) ->
+                        gameUser.getUser().getUserData().getMatchMakingRate()).reversed())
                 .collect(Collectors.toCollection(LinkedList::new));
         HashSet<GameUser> team1 = new HashSet<>();
         HashSet<GameUser> team2 = new HashSet<>();
@@ -413,7 +404,7 @@ public final class Game implements Disposable {
             else
                 updateMMR(gameUser);
 
-            UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+            UserData userData = gameUser.getUser().getUserData();
             if (isWinner != null) {
                 if (isWinner)
                     userData.setWinCount(userData.getWinCount() + 1);
@@ -444,8 +435,8 @@ public final class Game implements Disposable {
      * @param xpEarned    획득한 경험치
      * @param rankEarned  획득한 랭크 점수
      */
-    private void sendResultReport(@NonNull GameUser gameUser, Boolean isWinner, int scoreRank, int damageRank, int killRank, int defendRank, int healRank,
-                                  int moneyEarned, int xpEarned, int rankEarned) {
+    private void sendResultReport(@NonNull GameUser gameUser, @Nullable Boolean isWinner, int scoreRank, int damageRank, int killRank, int defendRank,
+                                  int healRank, int moneyEarned, int xpEarned, int rankEarned) {
         ChatColor[] rankColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY, ChatColor.DARK_GRAY};
         ChatColor winColor;
         String winText;
@@ -503,8 +494,8 @@ public final class Game implements Disposable {
     private void playWinEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_WIN, gameUser.getPlayer());
-        }, 40).run();
+            SoundUtil.playNamedSound(NamedSound.GAME_WIN, gameUser.getPlayer());
+        }, 40);
     }
 
     /**
@@ -515,8 +506,8 @@ public final class Game implements Disposable {
     private void playLoseEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_LOSE, gameUser.getPlayer());
-        }, 40).run();
+            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, gameUser.getPlayer());
+        }, 40);
     }
 
     /**
@@ -527,8 +518,8 @@ public final class Game implements Disposable {
     private void playDrawEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
-            SoundUtil.play(NamedSound.GAME_DRAW, gameUser.getPlayer());
-        }, 40).run();
+            SoundUtil.playNamedSound(NamedSound.GAME_DRAW, gameUser.getPlayer());
+        }, 40);
     }
 
     /**
@@ -538,8 +529,8 @@ public final class Game implements Disposable {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 획득한 경험치
      */
-    private int updateXp(@NonNull GameUser gameUser, Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+    private int updateXp(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
+        UserData userData = gameUser.getUser().getUserData();
 
         int xp = userData.getXp();
         double score = gameUser.getScore();
@@ -556,8 +547,8 @@ public final class Game implements Disposable {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 획득한 돈
      */
-    private int updateMoney(@NonNull GameUser gameUser, Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+    private int updateMoney(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
+        UserData userData = gameUser.getUser().getUserData();
 
         int money = userData.getMoney();
         double score = gameUser.getScore();
@@ -573,7 +564,7 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     private void updateMMR(@NonNull GameUser gameUser) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+        UserData userData = gameUser.getUser().getUserData();
 
         int mmr = userData.getMatchMakingRate();
         int normalPlayCount = userData.getNormalPlayCount();
@@ -596,8 +587,8 @@ public final class Game implements Disposable {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 랭크 점수 획득량
      */
-    private int updateRankRate(@NonNull GameUser gameUser, Boolean isWinner) {
-        UserData userData = UserData.fromPlayer(gameUser.getPlayer());
+    private int updateRankRate(@NonNull GameUser gameUser, @Nullable Boolean isWinner) {
+        UserData userData = gameUser.getUser().getUserData();
 
         int mmr = userData.getMatchMakingRate();
         int rr = userData.getRankRate();
@@ -654,6 +645,8 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     void addPlayer(@NonNull GameUser gameUser) {
+        validate();
+
         if (!canJoin())
             return;
 
@@ -680,6 +673,8 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     void removePlayer(@NonNull GameUser gameUser) {
+        validate();
+
         gameUser.getUser().clearBossBar();
 
         gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
@@ -697,7 +692,7 @@ public final class Game implements Disposable {
      */
     private double getAverageMMR() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getMatchMakingRate())
+                .mapToInt(gameUser -> gameUser.getUser().getUserData().getMatchMakingRate())
                 .average()
                 .orElse(0);
     }
@@ -709,7 +704,7 @@ public final class Game implements Disposable {
      */
     private double getAverageRankRate() {
         return gameUsers.stream()
-                .mapToInt(gameUser -> UserData.fromPlayer(gameUser.getPlayer()).getRankRate())
+                .mapToInt(gameUser -> gameUser.getUser().getUserData().getRankRate())
                 .average()
                 .orElse(0);
     }
@@ -730,17 +725,5 @@ public final class Game implements Disposable {
         END("종료됨");
 
         private final String name;
-    }
-
-    /**
-     * {@link GameRegistry}에서 키 값으로 사용되는 클래스.
-     */
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @EqualsAndHashCode
-    public static final class KeyPair {
-        /** 랭크 여부 */
-        private final boolean isRanked;
-        /** 방 번호 */
-        private final int number;
     }
 }

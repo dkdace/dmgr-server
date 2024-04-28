@@ -9,6 +9,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
@@ -17,11 +18,22 @@ import org.bukkit.util.Vector;
  */
 public interface CombatEntity extends Disposable {
     /**
+     * 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     *
+     * @return 게임에 소속되지 않은 모든 엔티티
+     */
+    @NonNull
+    static CombatEntity @NonNull [] getAllExcluded() {
+        return CombatEntityRegistry.getInstance().getAllExcluded();
+    }
+
+    /**
      * 지정한 엔티티의 전투 시스템 엔티티 인스턴스를 반환한다.
      *
      * @param entity 대상 엔티티
      * @return 전투 시스템의 엔티티 인스턴스. 존재하지 않으면 {@code null} 반환
      */
+    @Nullable
     static CombatEntity fromEntity(@NonNull Entity entity) {
         return CombatEntityRegistry.getInstance().get(entity);
     }
@@ -30,7 +42,8 @@ public interface CombatEntity extends Disposable {
      * @param <T> {@link Entity}를 상속받는 엔티티 타입
      * @return 엔티티 객체
      */
-    @NonNull <T extends Entity> T getEntity();
+    @NonNull
+    <T extends Entity> T getEntity();
 
     /**
      * @return 속성 목록 관리 객체
@@ -42,7 +55,7 @@ public interface CombatEntity extends Disposable {
      * @return 히트박스 객체 목록
      */
     @NonNull
-    Hitbox[] getHitboxes();
+    Hitbox @NonNull [] getHitboxes();
 
     /**
      * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
@@ -62,6 +75,7 @@ public interface CombatEntity extends Disposable {
     /**
      * @return 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
      */
+    @Nullable
     Game getGame();
 
     /**
@@ -70,6 +84,7 @@ public interface CombatEntity extends Disposable {
      * <p>시스템에서 적과 아군을 구별하기 위해 사용한다.</p>
      *
      * @return 팀 식별자
+     * @see CombatEntity#isEnemy(CombatEntity)
      */
     @NonNull
     String getTeamIdentifier();

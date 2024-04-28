@@ -13,8 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
-    public SiliaP1(@NonNull CombatUser combatUser) {
-        super(1, combatUser, SiliaP1Info.getInstance());
+    SiliaP1(@NonNull CombatUser combatUser) {
+        super(combatUser, SiliaP1Info.getInstance());
     }
 
     @Override
@@ -41,19 +41,21 @@ public final class SiliaP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         Location location = combatUser.getEntity().getLocation();
         if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P1_USE, location);
         else
-            SoundUtil.play(NamedSound.COMBAT_SILIA_P1_USE, location, 0.1, 0.2);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P1_USE, location, 0.1, 0.2);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation();
 
             if (location.distance(loc) > 0) {
                 location.setY(loc.getY());
-                Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) : LocationUtil.getDirection(location, loc).multiply(0.35);
-                vec.setY(0.55);
+                Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) :
+                        LocationUtil.getDirection(location, loc).multiply(SiliaP1Info.PUSH_SIDE);
+                vec.setY(SiliaP1Info.PUSH_UP);
 
                 combatUser.push(vec, true);
 
@@ -61,9 +63,7 @@ public final class SiliaP1 extends AbstractSkill {
             }
 
             return true;
-        }, isCancelled -> {
-            TaskUtil.addTask(SiliaP1.this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                    isCancelled2 -> setDuration(0), 1));
-        }, 1, 2));
+        }, isCancelled -> TaskUtil.addTask(SiliaP1.this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
+                isCancelled2 -> setDuration(0), 1)), 1, 2));
     }
 }

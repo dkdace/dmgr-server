@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -9,11 +9,12 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -35,6 +36,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
         ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());
@@ -54,12 +56,12 @@ public final class Arkace extends Character {
         text.add(weaponDisplay);
         text.add("");
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getActionInfo().toString(), skill2Duration,
+            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
                     skill2MaxDuration, 10, '■');
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getActionInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -68,8 +70,8 @@ public final class Arkace extends Character {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        ParticleUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -79,7 +81,7 @@ public final class Arkace extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
+        return !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
     }
 
     @Override
@@ -99,6 +101,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -109,6 +112,7 @@ public final class Arkace extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

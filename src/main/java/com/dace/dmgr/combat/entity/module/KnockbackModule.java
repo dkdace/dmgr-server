@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.combat.entity.AbilityStatus;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;

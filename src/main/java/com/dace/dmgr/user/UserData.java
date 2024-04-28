@@ -1,6 +1,7 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.YamlFile;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
@@ -113,7 +114,7 @@ public final class UserData extends YamlFile {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    public static UserData[] getAllUserDatas() {
+    public static UserData @NonNull [] getAllUserDatas() {
         return UserDataRegistry.getInstance().getAllUserDatas();
     }
 
@@ -139,10 +140,6 @@ public final class UserData extends YamlFile {
         characterRecordMap.forEach((characterType, characterRecord) -> characterRecord.load());
 
         ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
-
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player != null)
-            User.fromPlayer(player).onDataInit();
     }
 
     @Override
@@ -292,11 +289,11 @@ public final class UserData extends YamlFile {
         if (!isRanked)
             return Tier.NONE;
 
-        int rank = RankUtil.getRankIndex(RankUtil.Sector.RANK_RATE, this);
+        int rank = RankUtil.getRankIndex(RankUtil.Indicator.RANK_RATE, this);
 
         if (rankRate <= Tier.STONE.getMaxScore())
             return Tier.STONE;
-        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= 5)
+        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= GeneralConfig.getConfig().getNetheriteTierMinRank())
             return Tier.NETHERITE;
 
         for (Tier tier : Tier.values()) {

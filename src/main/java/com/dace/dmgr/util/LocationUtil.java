@@ -23,6 +23,8 @@ import java.util.List;
 public final class LocationUtil {
     /** 로비 스폰 위치 */
     private static final Location lobbyLocation = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
+    /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
+    private static final double CAN_PASS_INTERVAL = 0.25;
 
     /**
      * 로비 스폰 위치를 반환한다.
@@ -134,7 +136,7 @@ public final class LocationUtil {
         if (start.getWorld() != end.getWorld())
             throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
 
-        Vector direction = getDirection(start, end).multiply(0.25);
+        Vector direction = getDirection(start, end).multiply(CAN_PASS_INTERVAL);
         Location loc = start.clone();
         double distance = start.distance(end);
 
@@ -153,12 +155,18 @@ public final class LocationUtil {
      * @param end      끝 위치
      * @param interval 위치 간 간격
      * @return 해당 위치 목록
+     * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있거나 {@code interval}이 0 이하이면 발생
      */
     @NonNull
-    public static List<Location> getLine(Location start, Location end, double interval) {
+    public static List<@NonNull Location> getLine(@NonNull Location start, @NonNull Location end, double interval) {
+        if (interval <= 0)
+            throw new IllegalArgumentException("'interval'이 0 초과여야 함");
+        if (start.getWorld() != end.getWorld())
+            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+
         Vector direction = getDirection(start, end).multiply(interval);
         Location loc = start.clone();
-        List<Location> locs = new ArrayList<>();
+        ArrayList<Location> locs = new ArrayList<>();
         double distance = start.distance(end);
 
         while (loc.distance(start) < distance) {

@@ -3,25 +3,20 @@ package com.dace.dmgr.item.gui;
 import com.dace.dmgr.event.EventUtil;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
 /**
- * GUI(인벤토리) 기능을 제공하는 클래스.
+ * GUI(상자 인벤토리) 기능을 제공하는 클래스.
  *
  * <p>해당 클래스를 상속받아 GUI를 구현할 수 있다.</p>
  */
@@ -59,30 +54,6 @@ public abstract class Gui implements Listener {
         onOpen(player, new GuiController(inventory));
     }
 
-    @EventHandler
-    public final void event(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        ItemStack itemStack = event.getCurrentItem();
-        if (itemStack == null || itemStack.getType() == Material.AIR)
-            return;
-
-        if (event.getInventory().getTitle().equals(name)) {
-            event.setCancelled(true);
-
-            StaticItem<?> staticItem = StaticItem.fromItemStack(itemStack);
-            if (!(staticItem instanceof GuiItem) || event.getClick() == ClickType.DOUBLE_CLICK)
-                return;
-            if (((GuiItem<?>) staticItem).getGui() != null && ((GuiItem<?>) staticItem).getGui() != this)
-                return;
-
-            if (((GuiItem<?>) staticItem).isClickable()) {
-                SoundUtil.play(NamedSound.GENERAL_GUI_CLICK, player);
-
-                onClick(event, player, (GuiItem<?>) staticItem);
-            }
-        }
-    }
-
     /**
      * GUI를 열었을 때 실행할 작업.
      *
@@ -91,14 +62,11 @@ public abstract class Gui implements Listener {
      */
     protected abstract void onOpen(@NonNull Player player, @NonNull GuiController guiController);
 
-    /**
-     * GUI 아이템 클릭 시 실행할 작업.
-     *
-     * @param event   이벤트 객체
-     * @param player  클릭한 플레이어
-     * @param guiItem 클릭한 GUI 아이템
-     */
-    protected abstract void onClick(InventoryClickEvent event, @NonNull Player player, @NonNull GuiItem<?> guiItem);
+    @EventHandler
+    public final void event(InventoryClickEvent event) {
+        if (event.getInventory().getTitle().equals(name))
+            event.setCancelled(true);
+    }
 
     /**
      * GUI 내부의 아이템을 제어하는 클래스.
@@ -109,30 +77,31 @@ public abstract class Gui implements Listener {
         private final Inventory inventory;
 
         /**
-         * 지정한 칸에 GUI 아이템을 배치한다.
+         * 지정한 칸에 정적 아이템을 배치한다.
          *
-         * @param index   칸 번호
-         * @param guiItem GUI 아이템
+         * @param index      칸 번호
+         * @param staticItem 정적 아이템
          * @throws IndexOutOfBoundsException {@code index}가 인벤토리의 유효 범위를 초과하면 발생
          */
-        public void set(int index, @NonNull GuiItem<?> guiItem) {
+        public void set(int index, @NonNull StaticItem staticItem) {
             if (index < 0 || index > inventory.getSize() - 1)
                 throw new IndexOutOfBoundsException("'index'가 인벤토리의 유효 범위를 초과함");
-            inventory.setItem(index, guiItem.getItemStack());
+            inventory.setItem(index, staticItem.getItemStack());
         }
 
         /**
-         * 지정한 칸에 GUI 아이템을 배치한다.
+         * 지정한 칸에 정적 아이템을 배치한다.
          *
          * @param index         칸 번호
-         * @param guiItem       GUI 아이템
-         * @param itemConverter 아이템 변환에 실행할 작업. {@link GuiItem#toItemBuilder()}를 인자로 받아 아이템 빌더의 아이템으로 변환한다.
+         * @param staticItem    정적 아이템
+         * @param itemConverter 아이템 변환에 실행할 작업. {@link StaticItem#toItemBuilder()}를
+         *                      인자로 받아 아이템 빌더의 아이템으로 변환한다.
          * @throws IndexOutOfBoundsException {@code index}가 인벤토리의 유효 범위를 초과하면 발생
          */
-        public void set(int index, @NonNull GuiItem<?> guiItem, @NonNull Consumer<ItemBuilder> itemConverter) {
+        public void set(int index, @NonNull StaticItem staticItem, @NonNull Consumer<ItemBuilder> itemConverter) {
             if (index < 0 || index > inventory.getSize() - 1)
                 throw new IndexOutOfBoundsException("'index'가 인벤토리의 유효 범위를 초과함");
-            ItemBuilder itemBuilder = guiItem.toItemBuilder();
+            ItemBuilder itemBuilder = staticItem.toItemBuilder();
             itemConverter.accept(itemBuilder);
             inventory.setItem(index, itemBuilder.build());
         }
@@ -140,40 +109,40 @@ public abstract class Gui implements Listener {
         /**
          * GUI의 모든 칸을 지정한 아이템으로 채운다.
          *
-         * @param guiItem GUI 아이템
+         * @param staticItem 정적 아이템
          */
-        public void fillAll(@NonNull GuiItem<?> guiItem) {
+        public void fillAll(@NonNull StaticItem staticItem) {
             for (int i = 0; i < inventory.getSize(); i++) {
-                set(i, guiItem);
+                set(i, staticItem);
             }
         }
 
         /**
          * 지정한 행을 특정 아이템으로 채운다.
          *
-         * @param row     행 번호. 1~6 사이의 값
-         * @param guiItem GUI 아이템
+         * @param row        행 번호. 1~6 사이의 값
+         * @param staticItem 정적 아이템
          * @throws IllegalArgumentException {@code row}가 1~6 사이가 아니면 발생
          */
-        public void fillRow(int row, @NonNull GuiItem<?> guiItem) {
+        public void fillRow(int row, @NonNull StaticItem staticItem) {
             if (row < 1 || row > 6)
                 throw new IllegalArgumentException("'row'가 1에서 6 사이여야 함");
             for (int i = 0; i < 9; i++)
-                set((row - 1) * 9 + i, guiItem);
+                set((row - 1) * 9 + i, staticItem);
         }
 
         /**
          * 지정한 열을 특정 아이템으로 채운다.
          *
-         * @param column  열 번호. 1~9 사이의 값
-         * @param guiItem GUI 아이템
+         * @param column     열 번호. 1~9 사이의 값
+         * @param staticItem 정적 아이템
          * @throws IllegalArgumentException {@code column}가 1~9 사이가 아니면 발생
          */
-        public void fillColumn(int column, @NonNull GuiItem<?> guiItem) {
+        public void fillColumn(int column, @NonNull StaticItem staticItem) {
             if (column < 1 || column > 9)
                 throw new IllegalArgumentException("'column'이 1에서 9 사이여야 함");
             for (int i = 0; i < 6; i++)
-                set((column - 1) + i * 9, guiItem);
+                set((column - 1) + i * 9, staticItem);
         }
 
         /**
@@ -185,7 +154,7 @@ public abstract class Gui implements Listener {
          * @throws IndexOutOfBoundsException {@code index}가 인벤토리의 유효 범위를 초과하면 발생
          */
         public void setToggleState(int index, boolean isEnabled) {
-            set(index, isEnabled ? DisplayItem.ENABLED.getGuiItem() : DisplayItem.DISABLED.getGuiItem());
+            set(index, isEnabled ? DisplayItem.ENABLED.getStaticItem() : DisplayItem.DISABLED.getStaticItem());
         }
     }
 }

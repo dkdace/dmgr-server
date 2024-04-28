@@ -9,13 +9,13 @@ import org.bukkit.event.server.TabCompleteEvent;
 public final class OnTabComplete implements Listener {
     @EventHandler
     public static void event(TabCompleteEvent event) {
-        if (event.getSender() instanceof Player) {
-            Player player = (Player) event.getSender();
+        if (!(event.getSender() instanceof Player))
+            return;
 
-            if (!player.isOp() && event.getBuffer().split(" ").length == 1) {
-                User.fromPlayer(player).sendMessageWarn("금지된 행동입니다.");
-                event.setCancelled(true);
-            }
+        Player player = (Player) event.getSender();
+        if (!player.isOp() && event.getBuffer().split(" ").length == 1) {
+            User.fromPlayer(player).sendMessageWarn("금지된 행동입니다.");
+            event.setCancelled(true);
         }
     }
 }
