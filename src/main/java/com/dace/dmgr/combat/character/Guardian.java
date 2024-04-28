@@ -13,9 +13,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public abstract class Guardian extends Character {
     /** 넉백 저항 수정자 ID */
-    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait2Knockback";
+    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait1Knockback";
     /** 방어력 수정자 ID */
-    private static final String DEFENSE_MODIFIER_ID = "RoleTrait2Defense";
+    private static final String DEFENSE_MODIFIER_ID = "RoleTrait1Defense";
 
     /**
      * 수호 역할군 전투원 정보 인스턴스를 생성한다.

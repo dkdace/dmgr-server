@@ -11,9 +11,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public abstract class Vanguard extends Character {
     /** 넉백 저항 수정자 ID */
-    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait2Knockback";
+    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait1Knockback";
     /** 상태 효과 저항 수정자 ID */
-    private static final String STATUS_RESISTANCE_MODIFIER_ID = "RoleTrait2Status";
+    private static final String STATUS_RESISTANCE_MODIFIER_ID = "RoleTrait1Status";
 
     /**
      * 돌격 역할군 전투원 정보 인스턴스를 생성한다.
