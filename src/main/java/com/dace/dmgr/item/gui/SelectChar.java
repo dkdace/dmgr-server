@@ -37,22 +37,22 @@ public final class SelectChar extends Gui {
             int j = 0;
 
             switch (characterType.getCharacter().getRole()) {
-                case ASSASSIN:
+                case SCUFFLER:
                     j = role1i++;
                     break;
-                case SCUFFLER:
+                case MARKSMAN:
                     j = role2i++;
                     break;
-                case MARKSMAN:
+                case VANGUARD:
                     j = role3i++;
                     break;
-                case VANGUARD:
+                case GUARDIAN:
                     j = role4i++;
                     break;
-                case GUARDIAN:
+                case SUPPORT:
                     j = role5i++;
                     break;
-                case SUPPORTER:
+                case CONTROLLER:
                     j = role6i++;
                     break;
             }
@@ -75,12 +75,12 @@ public final class SelectChar extends Gui {
     }
 
     private enum SelectCharInfoItem {
-        ASSASSIN(Material.DIAMOND_HOE, 4, Role.ASSASSIN),
-        SCUFFLER(Material.IRON_SWORD, 0, Role.SCUFFLER),
+        ASSASSIN(Material.DIAMOND_HOE, 4, Role.SCUFFLER),
+        SCUFFLER(Material.IRON_SWORD, 0, Role.CONTROLLER),
         MARKSMAN(Material.BOW, 0, Role.MARKSMAN),
         VANGUARD(Material.IRON_CHESTPLATE, 0, Role.VANGUARD),
         GUARDIAN(Material.SHIELD, 0, Role.GUARDIAN),
-        SUPPORTER(Material.END_CRYSTAL, 0, Role.SUPPORTER);
+        SUPPORTER(Material.END_CRYSTAL, 0, Role.SUPPORT);
 
         /** 정적 아이템 객체 */
         private final StaticItem staticItem;

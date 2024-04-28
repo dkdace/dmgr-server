@@ -10,12 +10,12 @@ import org.bukkit.ChatColor;
 @AllArgsConstructor
 @Getter
 public enum Role {
-    ASSASSIN("암살", ChatColor.RED, new String[]{"§f역할군 설명"}),
-    SCUFFLER("근접", ChatColor.YELLOW, new String[]{"§f역할군 설명"}),
-    MARKSMAN("사격", ChatColor.GREEN, new String[]{"§f역할군 설명"}),
-    VANGUARD("돌격", ChatColor.AQUA, new String[]{"§f역할군 설명"}),
-    GUARDIAN("수호", ChatColor.BLUE, new String[]{"§f역할군 설명"}),
-    SUPPORTER("지원", ChatColor.LIGHT_PURPLE, new String[]{"§f역할군 설명"});
+    SCUFFLER("근접", ChatColor.RED, new String[]{"§f역할군 설명"}),
+    MARKSMAN("사격", ChatColor.YELLOW, new String[]{"§f역할군 설명"}),
+    VANGUARD("돌격", ChatColor.GREEN, new String[]{"§f역할군 설명"}),
+    GUARDIAN("수호", ChatColor.AQUA, new String[]{"§f역할군 설명"}),
+    SUPPORT("지원", ChatColor.BLUE, new String[]{"§f역할군 설명"}),
+    CONTROLLER("제어", ChatColor.LIGHT_PURPLE, new String[]{"§f역할군 설명"});
 
     /** 이름 */
     private final String name;
