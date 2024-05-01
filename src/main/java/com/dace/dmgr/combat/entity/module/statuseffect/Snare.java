@@ -17,9 +17,8 @@ public class Snare implements StatusEffect {
     static final Snare instance = new Snare();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "속박";
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

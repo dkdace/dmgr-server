@@ -48,8 +48,8 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
     protected Barrier(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, int maxHealth, @NonNull Hitbox @NonNull ... hitboxes) {
         super(entity, name, owner, false, hitboxes);
 
-        knockbackModule = new KnockbackModule(this, 1);
-        statusEffectModule = new StatusEffectModule(this, 1);
+        knockbackModule = new KnockbackModule(this, 2);
+        statusEffectModule = new StatusEffectModule(this, 2);
         damageModule = new DamageModule(this, false, false, maxHealth);
     }
 

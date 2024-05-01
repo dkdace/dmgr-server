@@ -16,9 +16,8 @@ public class Grounding implements StatusEffect {
     static final Grounding instance = new Grounding();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "고정";
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

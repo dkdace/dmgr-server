@@ -135,12 +135,6 @@ public final class QuakerA2 extends ActiveSkill {
         private static final QuakerA2Slow instance = new QuakerA2Slow();
 
         @Override
-        @NonNull
-        public String getName() {
-            return super.getName() + MODIFIER_ID;
-        }
-
-        @Override
         public void onStart(@NonNull CombatEntity combatEntity) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA2Info.SLOW);

@@ -1,35 +1,34 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * 기절 상태 효과를 처리하는 클래스.
+ * 속도 증가 상태 효과를 처리하는 클래스.
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Stun implements StatusEffect {
+public class Speed implements StatusEffect {
     @Getter
-    static final Stun instance = new Stun();
+    static final Speed instance = new Speed();
 
     @Override
     public final boolean isPositive() {
-        return false;
+        return true;
     }
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).cancelAction();
+        // 미사용
     }
 
     @Override
     public void onTick(@NonNull CombatEntity combatEntity, long i) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getUser().sendTitle("§c§l기절함!", "", 0, 2, 10);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB_AMBIENT, combatEntity.getEntity().getLocation().add(0, 0.1, 0),
+                3, 0.3, 0, 0.3, 200, 255, 255);
     }
 
     @Override

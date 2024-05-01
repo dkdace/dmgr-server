@@ -6,8 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -33,12 +32,12 @@ import java.util.StringJoiner;
  * @see JagerA3
  * @see JagerUlt
  */
-public final class Jager extends Character {
+public final class Jager extends Marksman {
     @Getter
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", Role.MARKSMAN, '\u32D2', 1000, 1.0, 1.0);
+        super("예거", "DVJager", '\u32D2', 1000, 1.0, 1.0);
     }
 
     @Override
@@ -81,6 +80,8 @@ public final class Jager extends Character {
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
     }

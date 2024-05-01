@@ -11,6 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum StatusEffectType {
+    /** 속도 증가 */
+    SPEED(Speed.getInstance()),
     /** 둔화 */
     SLOW(Slow.getInstance()),
     /** 기절 */

@@ -147,8 +147,8 @@ public final class JagerUlt extends UltimateSkill {
                     true,
                     new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
             );
-            knockbackModule = new KnockbackModule(this, 1);
-            statusEffectModule = new StatusEffectModule(this, 1);
+            knockbackModule = new KnockbackModule(this, 2);
+            statusEffectModule = new StatusEffectModule(this, 2);
             attackModule = new AttackModule(this);
             damageModule = new DamageModule(this, false, true, JagerUltInfo.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);

@@ -320,6 +320,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
+        character.onUseHealPack(this);
         SoundUtil.playNamedSound(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
@@ -331,7 +332,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return false;
 
             HologramUtil.editHologram(HEALPACK_HOLOGRAM_ID + healPackLocation,
-                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.floor(cooldown / 20.0)));
+                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
             game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(HEALPACK_HOLOGRAM_ID + healPackLocation,
                     LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
 
@@ -637,7 +638,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-        character.onKill(this, victim);
+        character.onKill(this, victim, true);
 
         playKillEffect();
         if (victim instanceof CombatUser) {
@@ -703,6 +704,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onDeath(this, attacker);
 
         damageModule.setHealth(damageModule.getMaxHealth());
+        statusEffectModule.clearStatusEffect();
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
         damageMap.forEach((CombatUser attacker2, Integer damage) -> {
@@ -710,12 +712,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker))) {
                 int score = Math.round(((float) damage / totalDamage) * 100);
 
+                attacker2.character.onKill(attacker2, this, false);
                 attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 attacker2.playKillEffect();
 
-                if (attacker2.gameUser != null)
+                if (attacker2.gameUser != null) {
                     attacker2.gameUser.setAssist(attacker2.gameUser.getAssist() + 1);
-
+                    attacker2.characterRecord.setKill(attacker2.characterRecord.getKill() + 1);
+                }
             }
         });
 
@@ -823,7 +827,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param context 항목
      * @param score   점수 증가량
      */
-    private void addScore(@NonNull String context, double score) {
+    public void addScore(@NonNull String context, double score) {
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 

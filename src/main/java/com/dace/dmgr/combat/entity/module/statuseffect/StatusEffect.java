@@ -8,10 +8,11 @@ import lombok.NonNull;
  */
 public interface StatusEffect {
     /**
-     * @return 상태 효과 이름
+     * 상태 효과가 이로운 효과인 지 확인한다.
+     *
+     * @return {@code true} 반환 시 이로운 효과, {@code false} 반환 시 해로운 효과
      */
-    @NonNull
-    String getName();
+    boolean isPositive();
 
     /**
      * 상태 효과 적용 시 실행할 작업.

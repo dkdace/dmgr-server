@@ -4,8 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -27,12 +26,12 @@ import java.util.StringJoiner;
  * @see ArkaceA2
  * @see ArkaceUlt
  */
-public final class Arkace extends Character {
+public final class Arkace extends Marksman {
     @Getter
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super("아케이스", "DVArkace", Role.MARKSMAN, '\u32D0', 1000, 1.0, 1.0);
+        super("아케이스", "DVArkace", '\u32D0', 1000, 1.0, 1.0);
     }
 
     @Override

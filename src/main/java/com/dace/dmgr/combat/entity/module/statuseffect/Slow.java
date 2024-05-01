@@ -17,9 +17,8 @@ public class Slow implements StatusEffect {
     static final Slow instance = new Slow();
 
     @Override
-    @NonNull
-    public String getName() {
-        return "둔화";
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override
