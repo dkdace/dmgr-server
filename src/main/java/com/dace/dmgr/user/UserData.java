@@ -365,8 +365,8 @@ public final class UserData extends YamlFile {
      */
     @RequiredArgsConstructor
     public final class CharacterRecord {
-        /** 접두사 */
-        private static final String PREFIX = "record_";
+        /** 섹션 이름 */
+        private static final String SECTION = "record";
         /** 전투원 종류 */
         private final CharacterType characterType;
         /** 킬 */
@@ -383,24 +383,24 @@ public final class UserData extends YamlFile {
          * 데이터를 불러온다.
          */
         private void load() {
-            kill = (int) getLong(PREFIX + characterType + "_kill", this.kill);
-            death = (int) getLong(PREFIX + characterType + "_death", this.death);
-            playTime = (int) getLong(PREFIX + characterType + "_playTime", this.playTime);
+            kill = (int) getLong(SECTION + "." + characterType + ".kill", this.kill);
+            death = (int) getLong(SECTION + "." + characterType + ".death", this.death);
+            playTime = (int) getLong(SECTION + "." + characterType + ".playTime", this.playTime);
         }
 
         public void setKill(int kill) {
             this.kill = kill;
-            set(PREFIX + characterType + "_kill", this.kill);
+            set(SECTION + "." + characterType + ".kill", this.kill);
         }
 
         public void setDeath(int death) {
             this.death = death;
-            set(PREFIX + characterType + "_death", this.death);
+            set(SECTION + "." + characterType + ".death", this.death);
         }
 
         public void setPlayTime(int playTime) {
             this.playTime = playTime;
-            set(PREFIX + characterType + "_playTime", this.playTime);
+            set(SECTION + "." + characterType + ".playTime", this.playTime);
         }
     }
 }

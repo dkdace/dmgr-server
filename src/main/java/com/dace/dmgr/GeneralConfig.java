@@ -4,6 +4,7 @@ import com.dace.dmgr.game.Tier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Material;
 
 /**
@@ -13,52 +14,36 @@ public final class GeneralConfig extends YamlFile {
     @Getter
     private static final GeneralConfig instance = new GeneralConfig();
     /** 일반 설정 */
-    @Getter
-    private static final Config config = new Config();
+    private final Config config = new Config();
     /** 전투 시스템 관련 설정 */
-    @Getter
-    private static final CombatConfig combatConfig = new CombatConfig();
+    private final CombatConfig combatConfig = new CombatConfig();
     /** 게임 관련 설정 */
-    @Getter
-    private static final GameConfig gameConfig = new GameConfig();
+    private final GameConfig gameConfig = new GameConfig();
 
     private GeneralConfig() {
         super("config", true);
     }
 
+    @NonNull
+    public static Config getConfig() {
+        return instance.config;
+    }
+
+    @NonNull
+    public static CombatConfig getCombatConfig() {
+        return instance.combatConfig;
+    }
+
+    @NonNull
+    public static GameConfig getGameConfig() {
+        return instance.gameConfig;
+    }
+
     @Override
     protected void onInitFinish() {
-        config.resourcePackUrl = getString("resourcePackUrl", config.resourcePackUrl);
-        config.chatCooldown = getLong("chatCooldown", config.chatCooldown);
-        config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
-        config.rankingUpdatePeriodMinutes = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriodMinutes);
-        config.netheriteTierMinRank = (int) getLong("netheriteTierMinRank", config.netheriteTierMinRank);
-        config.messagePrefix = getString("messagePrefix", config.messagePrefix);
-        config.adminContact = getString("adminContact", config.adminContact);
-
-        combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
-        combatConfig.respawnTime = getLong("respawnTime", combatConfig.respawnTime);
-        combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
-        combatConfig.healPackCooldown = getLong("healPackCooldown", combatConfig.healPackCooldown);
-        combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
-        combatConfig.jumpPadBlock = Material.valueOf(getString("jumpPadBlock", combatConfig.jumpPadBlock.toString()));
-        combatConfig.jumpPadVelocity = getDouble("jumpPadVelocity", combatConfig.jumpPadVelocity);
-        combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
-
-        gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
-        gameConfig.normalMinPlayerCount = (int) getLong("normalMinPlayerCount", gameConfig.normalMinPlayerCount);
-        gameConfig.normalMaxPlayerCount = (int) getLong("normalMaxPlayerCount", gameConfig.normalMaxPlayerCount);
-        gameConfig.rankMinPlayerCount = (int) getLong("rankMinPlayerCount", gameConfig.rankMinPlayerCount);
-        gameConfig.rankMaxPlayerCount = (int) getLong("rankMaxPlayerCount", gameConfig.rankMaxPlayerCount);
-        gameConfig.rankPlacementPlayCount = (int) getLong("rankPlacementPlayCount", gameConfig.rankPlacementPlayCount);
-        gameConfig.waitingTimeSeconds = (int) getLong("waitingTime", gameConfig.waitingTimeSeconds);
-        gameConfig.teamSpawnHealPerSecond = (int) getLong("teamSpawnHealPerSecond", gameConfig.teamSpawnHealPerSecond);
-        gameConfig.oppositeSpawnDamagePerSecond = (int) getLong("oppositeSpawnDamagePerSecond", gameConfig.oppositeSpawnDamagePerSecond);
-        gameConfig.expectedAverageRankRate = (int) getLong("expectedAverageKDARatio", gameConfig.expectedAverageRankRate);
-        gameConfig.expectedAverageKDARatio = getDouble("expectedAverageKDARatio", gameConfig.expectedAverageKDARatio);
-        gameConfig.expectedAverageScorePerMin = (int) getLong("expectedAverageScorePerMin", gameConfig.expectedAverageScorePerMin);
-        gameConfig.maxPlacementRankRate = (int) getLong("maxPlacementRankRate", gameConfig.maxPlacementRankRate);
-        gameConfig.mmrPlayCountThreshold = (int) getLong("mmrPlayCountThreshold", gameConfig.mmrPlayCountThreshold);
+        config.load();
+        combatConfig.load();
+        gameConfig.load();
 
         ConsoleLogger.info("전역 설정 불러오기 완료");
     }
@@ -73,7 +58,9 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class Config {
+    public final class Config {
+        /** 섹션 이름 */
+        private static final String SECTION = "default";
         /** 리소스팩 URL */
         private String resourcePackUrl = "";
         /** 채팅 쿨타임 (tick) */
@@ -88,6 +75,19 @@ public final class GeneralConfig extends YamlFile {
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
         /** 관리자 연락처 */
         private String adminContact = "디스코드 dkdace (DarkDace＃4671)";
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
+            chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
+            commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
+            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriod", rankingUpdatePeriodMinutes);
+            netheriteTierMinRank = (int) getLong(SECTION + ".netheriteTierMinRank", netheriteTierMinRank);
+            messagePrefix = getString(SECTION + ".messagePrefix", messagePrefix);
+            adminContact = getString(SECTION + ".adminContact", adminContact);
+        }
     }
 
     /**
@@ -95,7 +95,9 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class CombatConfig {
+    public final class CombatConfig {
+        /** 섹션 이름 */
+        private static final String SECTION = "combat";
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
         /** 리스폰 시간 (tick) */
@@ -112,6 +114,20 @@ public final class GeneralConfig extends YamlFile {
         private double jumpPadVelocity = 1.4;
         /** 낙사 구역에 사용되는 블록의 타입 */
         private Material fallZoneBlock = Material.BEDROCK;
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            idleUltChargePerSecond = (int) getLong(SECTION + ".idleUltChargePerSecond", idleUltChargePerSecond);
+            respawnTime = getLong(SECTION + ".respawnTime", respawnTime);
+            healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
+            healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
+            healPackHeal = (int) getLong(SECTION + ".healPackHeal", healPackHeal);
+            jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
+            jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
+            fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));
+        }
     }
 
     /**
@@ -119,7 +135,9 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class GameConfig {
+    public final class GameConfig {
+        /** 섹션 이름 */
+        private static final String SECTION = "game";
         /** 일반 게임과 랭크 게임의 최대 방 갯수 */
         private int maxRoomCount = 5;
         /** 게임을 시작하기 위한 최소 인원 수 (일반) */
@@ -148,5 +166,25 @@ public final class GeneralConfig extends YamlFile {
         private int maxPlacementRankRate = Tier.EMERALD.getMinScore() - 1;
         /** MMR 수치에 영향을 미치는 플레이 횟수 */
         private int mmrPlayCountThreshold = 25;
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            maxRoomCount = (int) getLong(SECTION + ".maxRoomCount", maxRoomCount);
+            normalMinPlayerCount = (int) getLong(SECTION + ".normalMinPlayerCount", normalMinPlayerCount);
+            normalMaxPlayerCount = (int) getLong(SECTION + ".normalMaxPlayerCount", normalMaxPlayerCount);
+            rankMinPlayerCount = (int) getLong(SECTION + ".rankMinPlayerCount", rankMinPlayerCount);
+            rankMaxPlayerCount = (int) getLong(SECTION + ".rankMaxPlayerCount", rankMaxPlayerCount);
+            rankPlacementPlayCount = (int) getLong(SECTION + ".rankPlacementPlayCount", rankPlacementPlayCount);
+            waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
+            teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
+            oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
+            expectedAverageRankRate = (int) getLong(SECTION + ".expectedAverageKDARatio", expectedAverageRankRate);
+            expectedAverageKDARatio = getDouble(SECTION + ".expectedAverageKDARatio", expectedAverageKDARatio);
+            expectedAverageScorePerMin = (int) getLong(SECTION + ".expectedAverageScorePerMin", expectedAverageScorePerMin);
+            maxPlacementRankRate = (int) getLong(SECTION + ".maxPlacementRankRate", maxPlacementRankRate);
+            mmrPlayCountThreshold = (int) getLong(SECTION + ".mmrPlayCountThreshold", mmrPlayCountThreshold);
+        }
     }
 }
