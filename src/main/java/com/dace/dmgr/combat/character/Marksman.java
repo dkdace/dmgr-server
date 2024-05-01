@@ -42,6 +42,9 @@ public abstract class Marksman extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
+        if (!(victim instanceof CombatUser))
+            return;
+
         if (isFinalHit) {
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
             attacker.addScore("결정타", FINAL_HIT_SCORE);

@@ -71,10 +71,10 @@ public final class Silia extends Scuffler {
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
+        super.onKill(attacker, victim, isFinalHit);
+
         if (!(victim instanceof CombatUser))
             return;
-
-        super.onKill(attacker, victim, isFinalHit);
 
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
