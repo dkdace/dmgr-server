@@ -22,10 +22,11 @@ public final class OnPlayerJoin implements Listener {
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
         user.init();
+        user.reset();
 
         event.setJoinMessage(StringFormUtil.ADD_PREFIX + player.getName());
 
-        user.sendTitle("§bWelcome!", "", 0, 50, 40);
+        user.sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", 0, 100, 60);
         TaskUtil.addTask(user, new DelayTask(user::clearChat, 10));
 
         new DelayTask(() -> {

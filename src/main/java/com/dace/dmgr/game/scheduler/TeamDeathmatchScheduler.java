@@ -42,7 +42,7 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
                 DurationFormatUtils.formatDuration(game.getRemainingTime() * 1000L, "mm:ss", true);
 
         game.getGameUsers().forEach(gameUser ->
-                gameUser.getUser().addBossBar("remainingTime", MessageFormat.format("§b남은 시간 : {0}", displayTime),
+                gameUser.getUser().addBossBar("RemainingTime", MessageFormat.format("§b남은 시간 : {0}", displayTime),
                         BarColor.BLUE, WrapperPlayServerBoss.BarStyle.PROGRESS, (double) game.getRemainingTime() / game.getGamePlayMode().getPlayDuration()));
     }
 }
