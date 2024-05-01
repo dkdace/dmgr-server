@@ -2,10 +2,10 @@ package com.dace.dmgr.game;
 
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.GlowUtil;
@@ -246,7 +246,7 @@ public final class GameUser implements Disposable {
                     user.removeTabListItem(column, (i + 1) * 3 - 1);
                 } else {
                     user.setTabListItem(column, (i + 1) * 3 - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
-                            this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("question_mark_"));
+                            this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
                     user.setTabListItem(column, (i + 1) * 3 - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
                             teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
                             "✔", teamUsers[i].getAssist()), null);
