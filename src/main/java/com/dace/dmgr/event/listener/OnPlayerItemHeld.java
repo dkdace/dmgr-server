@@ -2,8 +2,6 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,13 +12,8 @@ public final class OnPlayerItemHeld implements Listener {
     public static void event(PlayerItemHeldEvent event) {
         User user = User.fromPlayer(event.getPlayer());
         CombatUser combatUser = CombatUser.fromUser(user);
-        GameUser gameUser = GameUser.fromUser(user);
         int newSlot = event.getNewSlot();
 
-        if (gameUser != null && gameUser.getGame().getPhase() == Game.Phase.READY) {
-            event.setCancelled(true);
-            return;
-        }
         if (combatUser != null) {
             event.setCancelled(true);
 
