@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 
 @Getter
 public final class JagerA3 extends ActiveSkill {
+    /** 쿨타임 ID */
+    private static final String COOLDOWN_ID = "ExplodeDuration";
     /** 수류탄 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -64,7 +66,7 @@ public final class JagerA3 extends ActiveSkill {
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
-                CooldownUtil.setCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION);
+                CooldownUtil.setCooldown(combatUser, COOLDOWN_ID, JagerA3Info.EXPLODE_DURATION);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
 
                 TaskUtil.addTask(JagerA3.this, new IntervalTask(i -> {
@@ -141,7 +143,7 @@ public final class JagerA3 extends ActiveSkill {
     private final class JagerA3Projectile extends BouncingProjectile {
         private JagerA3Projectile() {
             super(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownUtil.getCooldown(combatUser, Cooldown.JAGER_A3_EXPLODE_DURATION)).hasGravity(true)
+                    .duration(CooldownUtil.getCooldown(combatUser, COOLDOWN_ID)).hasGravity(true)
                     .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
         }
 

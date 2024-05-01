@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -36,8 +35,9 @@ public class DamageModule {
     /** 치명타 배수 기본값 */
     public static final double DEFAULT_CRIT_MULTIPLIER = 2;
     /** 생명력 홀로그램 ID */
-    public static final String HEALTH_HOLOGRAM_ID = "hitHealth";
-
+    public static final String HEALTH_HOLOGRAM_ID = "HitHealth";
+    /** 피격 시 애니메이션 쿨타임 ID */
+    private static final String COOLDOWN_ID = "DamageAnimation";
     /** 엔티티 객체 */
     @NonNull
     protected final Damageable combatEntity;
@@ -265,8 +265,8 @@ public class DamageModule {
      * 엔티티의 피격 효과를 재생한다.
      */
     private void playHitEffect() {
-        if (CooldownUtil.getCooldown(this, Cooldown.DAMAGE_ANIMATION) == 0) {
-            CooldownUtil.setCooldown(this, Cooldown.DAMAGE_ANIMATION);
+        if (CooldownUtil.getCooldown(this, COOLDOWN_ID) == 0) {
+            CooldownUtil.setCooldown(this, COOLDOWN_ID, 6);
             WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
             packet.setEntityID(combatEntity.getEntity().getEntityId());

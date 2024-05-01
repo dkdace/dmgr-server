@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -24,6 +23,8 @@ import java.text.MessageFormat;
  */
 @RequiredArgsConstructor
 public final class SwapModule<T extends Weapon> {
+    /** 쿨타임 ID */
+    private static final String COOLDOWN_ID = "Swap";
     /** 무기 객체 */
     @NonNull
     private final Swappable<T> weapon;
@@ -51,7 +52,7 @@ public final class SwapModule<T extends Weapon> {
             return;
 
         swapState = Swappable.SwapState.SWAPPING;
-        CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, swapDuration);
+        CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, swapDuration);
         weapon.onSwapStart(targetState);
 
         TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
@@ -64,7 +65,7 @@ public final class SwapModule<T extends Weapon> {
 
             return true;
         }, isCancelled -> {
-            CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_SWAP, 0);
+            CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, 0);
             if (isCancelled)
                 return;
 

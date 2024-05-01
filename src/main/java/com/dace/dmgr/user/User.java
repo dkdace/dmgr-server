@@ -54,6 +54,11 @@ public final class User implements Disposable {
             "\n§7오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
     /** 리소스팩 적용 시간 제한 (tick) */
     private static final long RESOURCE_PACK_TIMEOUT = 8 * 20;
+    /** 액션바 쿨타임 ID */
+    private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
+    /** 타이틀 쿨타임 ID */
+    private static final String TITLE_COOLDOWN_ID = "Title";
+
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
     /** 플레이어 객체 */
@@ -535,8 +540,8 @@ public final class User implements Disposable {
      */
     public void sendActionBar(@NonNull String message, long overrideTicks) {
         if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, Cooldown.ACTION_BAR, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, Cooldown.ACTION_BAR) > 0)
+            CooldownUtil.setCooldown(this, ACTION_BAR_COOLDOWN_ID, overrideTicks);
+        else if (CooldownUtil.getCooldown(this, ACTION_BAR_COOLDOWN_ID) > 0)
             return;
 
         TextComponent actionBar = new TextComponent(message);
@@ -584,8 +589,8 @@ public final class User implements Disposable {
      */
     public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut, long overrideTicks) {
         if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, Cooldown.TITLE, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, Cooldown.TITLE) > 0)
+            CooldownUtil.setCooldown(this, TITLE_COOLDOWN_ID, overrideTicks);
+        else if (CooldownUtil.getCooldown(this, TITLE_COOLDOWN_ID) > 0)
             return;
 
         player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
@@ -624,8 +629,10 @@ public final class User implements Disposable {
     public void editSidebar(int line, @NonNull String content) {
         if (line < 0 || line > 14)
             throw new IllegalArgumentException("'line'가 0에서 14 사이여야 함");
+
+        ChatColor[] chatColors = ChatColor.values();
         if (sidebar != null)
-            sidebar.set(content, 14 - line);
+            sidebar.set(content.isEmpty() ? String.valueOf(chatColors[line]) : content, 14 - line);
     }
 
     /**

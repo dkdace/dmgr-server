@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -16,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
  */
 @Getter
 public abstract class AbstractSkill extends AbstractAction implements Skill {
+    /** 스킬 지속시간 쿨타임 ID */
+    protected static final String SKILL_DURATION_COOLDOWN_ID = "SkillDuration";
     /** 스킬 정보 객체 */
     @NonNull
     protected final SkillInfo skillInfo;
@@ -45,16 +46,16 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
     @Override
     public final long getDuration() {
-        return CooldownUtil.getCooldown(this, Cooldown.SKILL_DURATION);
+        return CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
     }
 
     @Override
     public final void setDuration(long duration) {
         if (isDurationFinished()) {
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_DURATION, duration);
+            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
             runDuration();
         } else {
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_DURATION, duration);
+            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
             if (duration == 0)
                 onDurationFinished();
         }

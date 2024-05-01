@@ -4,7 +4,6 @@ import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -20,6 +19,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class AbstractAction implements Action {
+    /** 동작 쿨타임 ID */
+    protected static final String ACTION_COOLDOWN_ID = "ActionCooldown";
     /** 플레이어 객체 */
     @NonNull
     protected final CombatUser combatUser;
@@ -50,17 +51,17 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final long getCooldown() {
-        return CooldownUtil.getCooldown(this, Cooldown.SKILL_COOLDOWN);
+        return CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
     }
 
     @Override
     public final void setCooldown(long cooldown) {
         if (isCooldownFinished()) {
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, ACTION_COOLDOWN_ID, cooldown);
             runCooldown();
             onCooldownSet();
         } else
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, ACTION_COOLDOWN_ID, cooldown);
     }
 
     @Override

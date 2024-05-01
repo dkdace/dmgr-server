@@ -3,8 +3,6 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -143,7 +141,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
+        if (!getKnockbackModule().isKnockbacked() && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
             entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
     }
 

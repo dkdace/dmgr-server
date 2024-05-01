@@ -5,7 +5,6 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -32,6 +31,9 @@ import java.util.function.Predicate;
  */
 @UtilityClass
 public final class CombatUtil {
+    /** 총기의 초탄 반동 딜레이 쿨타임 ID */
+    private static final String WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID = "WeaponFirstRecoilDelay";
+
     /**
      * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
      *
@@ -215,8 +217,8 @@ public final class CombatUtil {
     public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
         final double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
         final double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
-        final boolean first = CooldownUtil.getCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY) == 0;
-        CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_FIRST_RECOIL_DELAY);
+        final boolean first = CooldownUtil.getCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID) == 0;
+        CooldownUtil.setCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID, 4);
 
         int sum = 0;
         for (int i = 1; i <= duration; i++) {

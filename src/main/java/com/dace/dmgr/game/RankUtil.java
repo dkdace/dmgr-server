@@ -34,7 +34,7 @@ public final class RankUtil {
                     .onError(ex -> ConsoleLogger.severe("전체 랭킹 업데이트 실패", ex));
 
             return true;
-        }, GeneralConfig.getConfig().getRankingUpdatePeriod() * 60 * 20L);
+        }, GeneralConfig.getConfig().getRankingUpdatePeriodMinutes() * 60 * 20L);
     }
 
     /**

@@ -37,12 +37,11 @@ public final class GlowUtil {
 
         sendAddTeamPacket(entity, color, player);
 
-        String id = COOLDOWN_ID + player;
-        if (CooldownUtil.getCooldown(entity, Cooldown.STATUS_EFFECT, id) == 0) {
-            CooldownUtil.setCooldown(entity, Cooldown.STATUS_EFFECT, id, duration);
+        if (CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) == 0) {
+            CooldownUtil.setCooldown(entity, COOLDOWN_ID + player, duration);
 
             new IntervalTask(i -> {
-                if (!entity.isValid() || !player.isValid() || CooldownUtil.getCooldown(entity, Cooldown.STATUS_EFFECT, id) == 0)
+                if (!entity.isValid() || !player.isValid() || CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) == 0)
                     return false;
 
                 sendGlowingPakcet(entity, player, true);
@@ -52,8 +51,8 @@ public final class GlowUtil {
                 sendGlowingPakcet(entity, player, false);
                 sendRemoveTeamPacket(entity, player);
             }, 1);
-        } else if (CooldownUtil.getCooldown(entity, Cooldown.STATUS_EFFECT, id) < duration)
-            CooldownUtil.setCooldown(entity, Cooldown.STATUS_EFFECT, id, duration);
+        } else if (CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) < duration)
+            CooldownUtil.setCooldown(entity, COOLDOWN_ID + player, duration);
     }
 
     /**
@@ -75,7 +74,7 @@ public final class GlowUtil {
      * @return 대상 플레이어에게 발광 상태면 {@code true} 반환
      */
     public static boolean isGlowing(@NonNull Entity entity, @NonNull Player player) {
-        return CooldownUtil.getCooldown(entity, Cooldown.STATUS_EFFECT, COOLDOWN_ID + player) > 0;
+        return CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) > 0;
     }
 
     /**
@@ -85,7 +84,7 @@ public final class GlowUtil {
      * @param player 대상 플레이어
      */
     public static void removeGlowing(@NonNull Entity entity, @NonNull Player player) {
-        CooldownUtil.setCooldown(entity, Cooldown.STATUS_EFFECT, COOLDOWN_ID + player, 0);
+        CooldownUtil.setCooldown(entity, COOLDOWN_ID + player, 0);
     }
 
     /**

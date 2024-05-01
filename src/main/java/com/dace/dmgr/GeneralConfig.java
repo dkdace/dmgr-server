@@ -31,15 +31,15 @@ public final class GeneralConfig extends YamlFile {
         config.resourcePackUrl = getString("resourcePackUrl", config.resourcePackUrl);
         config.chatCooldown = getLong("chatCooldown", config.chatCooldown);
         config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
-        config.rankingUpdatePeriod = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriod);
+        config.rankingUpdatePeriodMinutes = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriodMinutes);
         config.netheriteTierMinRank = (int) getLong("netheriteTierMinRank", config.netheriteTierMinRank);
         config.messagePrefix = getString("messagePrefix", config.messagePrefix);
         config.adminContact = getString("adminContact", config.adminContact);
 
         combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
-        combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
+        combatConfig.respawnTime = getLong("respawnTime", combatConfig.respawnTime);
         combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
-        combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
+        combatConfig.healPackCooldown = getLong("healPackCooldown", combatConfig.healPackCooldown);
         combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
         combatConfig.jumpPadBlock = Material.valueOf(getString("jumpPadBlock", combatConfig.jumpPadBlock.toString()));
         combatConfig.jumpPadVelocity = getDouble("jumpPadVelocity", combatConfig.jumpPadVelocity);
@@ -51,7 +51,7 @@ public final class GeneralConfig extends YamlFile {
         gameConfig.rankMinPlayerCount = (int) getLong("rankMinPlayerCount", gameConfig.rankMinPlayerCount);
         gameConfig.rankMaxPlayerCount = (int) getLong("rankMaxPlayerCount", gameConfig.rankMaxPlayerCount);
         gameConfig.rankPlacementPlayCount = (int) getLong("rankPlacementPlayCount", gameConfig.rankPlacementPlayCount);
-        gameConfig.waitingTime = (int) getLong("waitingTime", gameConfig.waitingTime);
+        gameConfig.waitingTimeSeconds = (int) getLong("waitingTime", gameConfig.waitingTimeSeconds);
         gameConfig.teamSpawnHealPerSecond = (int) getLong("teamSpawnHealPerSecond", gameConfig.teamSpawnHealPerSecond);
         gameConfig.oppositeSpawnDamagePerSecond = (int) getLong("oppositeSpawnDamagePerSecond", gameConfig.oppositeSpawnDamagePerSecond);
         gameConfig.expectedAverageRankRate = (int) getLong("expectedAverageKDARatio", gameConfig.expectedAverageRankRate);
@@ -76,12 +76,12 @@ public final class GeneralConfig extends YamlFile {
     public static final class Config {
         /** 리소스팩 URL */
         private String resourcePackUrl = "";
-        /** 채팅 쿨타임 */
+        /** 채팅 쿨타임 (tick) */
         private long chatCooldown = 0;
-        /** 명령어 쿨타임 */
+        /** 명령어 쿨타임 (tick) */
         private long commandCooldown = 0;
         /** 랭킹 업데이트 주기 (분) */
-        private int rankingUpdatePeriod = 5;
+        private int rankingUpdatePeriodMinutes = 5;
         /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
         private int netheriteTierMinRank = 5;
         /** 메시지의 접두사 */
@@ -98,12 +98,12 @@ public final class GeneralConfig extends YamlFile {
     public static final class CombatConfig {
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
-        /** 리스폰 시간 (틱) */
-        private int respawnTime = 200;
+        /** 리스폰 시간 (tick) */
+        private long respawnTime = 200;
         /** 힐 팩에 사용되는 블록의 타입 */
         private Material healPackBlock = Material.NETHERRACK;
-        /** 힐 팩 쿨타임 (초) */
-        private int healPackCooldown = 15;
+        /** 힐 팩 쿨타임 (tick) */
+        private long healPackCooldown = 15 * 20;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
         /** 점프대에 사용되는 블록의 타입 */
@@ -133,7 +133,7 @@ public final class GeneralConfig extends YamlFile {
         /** 랭크가 결정되는 배치 판 수 */
         private int rankPlacementPlayCount = 5;
         /** 게임 시작까지 필요한 대기 시간 (초) */
-        private int waitingTime = 30;
+        private int waitingTimeSeconds = 30;
         /** 팀 스폰 입장 시 초당 회복량 */
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */

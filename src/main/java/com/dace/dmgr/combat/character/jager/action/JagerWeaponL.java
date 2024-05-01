@@ -77,7 +77,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 reloadModule.consume(1);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
-                CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_NO_SPRINT);
+                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
 

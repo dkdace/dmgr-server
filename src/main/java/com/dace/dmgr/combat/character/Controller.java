@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import lombok.Getter;
@@ -51,14 +50,14 @@ public abstract class Controller extends Character {
                     });
         }
 
-        if (CooldownUtil.getCooldown(combatUser, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID) == 0)
+        if (CooldownUtil.getCooldown(combatUser, HEAL_COOLDOWN_ID) == 0)
             combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20, false);
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CooldownUtil.setCooldown(victim, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID, RoleTrait2Info.ACTIVATE_DURATION);
+        CooldownUtil.setCooldown(victim, HEAL_COOLDOWN_ID, RoleTrait2Info.ACTIVATE_DURATION);
     }
 
     public static final class RoleTrait1Info extends TraitInfo {

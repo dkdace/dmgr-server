@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -53,15 +52,15 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
-        if (CooldownUtil.getCooldown(provider, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID) == 0) {
-            CooldownUtil.setCooldown(provider, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+        if (CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) == 0) {
+            CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
 
             TaskUtil.addTask(provider, new IntervalTask(i -> {
                 provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20, false);
-                return CooldownUtil.getCooldown(provider, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID) > 0;
+                return CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) > 0;
             }, 2));
         } else
-            CooldownUtil.setCooldown(provider, Cooldown.STATUS_EFFECT, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+            CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
 
         return true;
     }

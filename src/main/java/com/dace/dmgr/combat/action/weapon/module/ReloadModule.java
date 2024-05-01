@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -21,6 +20,8 @@ import java.text.MessageFormat;
  * @see Reloadable
  */
 public final class ReloadModule {
+    /** 쿨타임 ID */
+    private static final String COOLDOWN_ID = "Reload";
     /** 무기 객체 */
     @NonNull
     private final Reloadable weapon;
@@ -76,7 +77,7 @@ public final class ReloadModule {
             return;
 
         isReloading = true;
-        CooldownUtil.setCooldown(this, Cooldown.WEAPON_RELOAD, reloadDuration);
+        CooldownUtil.setCooldown(this, COOLDOWN_ID, reloadDuration);
 
         TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
             if (!isReloading)
@@ -89,7 +90,7 @@ public final class ReloadModule {
 
             return true;
         }, isCancelled -> {
-            CooldownUtil.setCooldown(weapon.getCombatUser(), Cooldown.WEAPON_RELOAD, 0);
+            CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, 0);
             if (isCancelled)
                 return;
 

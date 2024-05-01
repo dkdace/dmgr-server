@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
@@ -47,11 +46,11 @@ public abstract class ActiveSkill extends AbstractSkill {
             if (isCooldownFinished())
                 displayReady(1);
             else {
-                long cooldown = CooldownUtil.getCooldown(this, Cooldown.SKILL_COOLDOWN);
+                long cooldown = CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
                 displayCooldown((int) Math.ceil(cooldown / 20.0));
             }
         } else {
-            long duration = CooldownUtil.getCooldown(this, Cooldown.SKILL_DURATION);
+            long duration = CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
             displayUsing((int) Math.ceil(duration / 20.0));
         }
     }

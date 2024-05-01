@@ -124,7 +124,7 @@ public final class QuakerA1 extends ChargeableSkill {
             entity.setAI(false);
             entity.setMarker(true);
             entity.setVisible(false);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 0, false,
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
                     false), true);
             entity.setItemInHand(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
             damageModule.setHealth(getStateValue());

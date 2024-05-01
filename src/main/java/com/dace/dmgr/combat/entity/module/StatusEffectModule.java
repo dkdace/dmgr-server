@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity.module;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -15,6 +14,8 @@ import lombok.NonNull;
  */
 @Getter
 public final class StatusEffectModule {
+    /** 쿨타임 ID */
+    private static final String COOLDOWN_ID = "StatusEffect";
     /** 상태 효과 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
     /** 엔티티 객체 */
@@ -60,10 +61,10 @@ public final class StatusEffectModule {
             return;
 
         if (!hasStatusEffect(statusEffectType) || getStatusEffectDuration(statusEffectType) < finalDuration)
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString(), finalDuration);
+            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType, finalDuration);
 
         if (getStatusEffectDuration(statusEffectType, statusEffect) == 0) {
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString(), finalDuration);
+            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType + statusEffect, finalDuration);
 
             statusEffect.onStart(combatEntity);
 
@@ -78,7 +79,7 @@ public final class StatusEffectModule {
                 return true;
             }, isCancelled -> statusEffect.onEnd(combatEntity), 1));
         } else if (getStatusEffectDuration(statusEffectType, statusEffect) < finalDuration)
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString(), finalDuration);
+            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType + statusEffect, finalDuration);
     }
 
     /**
@@ -101,7 +102,7 @@ public final class StatusEffectModule {
      * @return 남은 시간 (tick)
      */
     public long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType) {
-        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+        return CooldownUtil.getCooldown(this, COOLDOWN_ID + statusEffectType);
     }
 
     /**
@@ -112,7 +113,7 @@ public final class StatusEffectModule {
      * @return 남은 시간 (tick)
      */
     private long getStatusEffectDuration(@NonNull StatusEffectType statusEffectType, @NonNull StatusEffect statusEffect) {
-        return CooldownUtil.getCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType + statusEffect.toString());
+        return CooldownUtil.getCooldown(this, COOLDOWN_ID + statusEffectType + statusEffect);
     }
 
     /**
@@ -131,7 +132,7 @@ public final class StatusEffectModule {
      * @param statusEffectType 제거할 상태 효과 종류
      */
     public void removeStatusEffect(@NonNull StatusEffectType statusEffectType) {
-        CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+        CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType, 0);
     }
 
     /**
@@ -139,7 +140,7 @@ public final class StatusEffectModule {
      */
     public void clearStatusEffect() {
         for (StatusEffectType statusEffectType : StatusEffectType.values()) {
-            CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType, 0);
         }
     }
 
@@ -151,7 +152,7 @@ public final class StatusEffectModule {
     public void clearStatusEffect(boolean isPositive) {
         for (StatusEffectType statusEffectType : StatusEffectType.values()) {
             if (statusEffectType.getStatusEffect().isPositive() == isPositive)
-                CooldownUtil.setCooldown(this, Cooldown.STATUS_EFFECT, statusEffectType.toString());
+                CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffectType, 0);
         }
     }
 }

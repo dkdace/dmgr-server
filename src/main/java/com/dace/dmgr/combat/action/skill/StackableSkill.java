@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
@@ -17,6 +16,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class StackableSkill extends ActiveSkill {
+    /** 스킬 스택 충전 쿨타임 ID */
+    protected static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
     /** 스킬 스택 수 */
     protected int stack = 0;
 
@@ -68,7 +69,7 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 스택 충전 쿨타임 (tick)
      */
     public final long getStackCooldown() {
-        return CooldownUtil.getCooldown(this, Cooldown.SKILL_STACK_COOLDOWN);
+        return CooldownUtil.getCooldown(this, SKILL_STACK_COOLDOWN_ID);
     }
 
     /**
@@ -81,10 +82,10 @@ public abstract class StackableSkill extends ActiveSkill {
             return;
 
         if (isStackCooldownFinished()) {
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
             runStackCooldown(cooldown);
         } else
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, cooldown);
     }
 
     /**

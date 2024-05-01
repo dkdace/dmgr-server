@@ -56,7 +56,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     return;
                 }
 
-                CooldownUtil.setCooldown(combatUser, Cooldown.WEAPON_NO_SPRINT);
+                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
 
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
                     setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);

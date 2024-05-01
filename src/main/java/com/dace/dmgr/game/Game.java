@@ -66,7 +66,7 @@ public final class Game implements Disposable {
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 (초) */
     @Getter
-    private int remainingTime = GeneralConfig.getGameConfig().getWaitingTime();
+    private int remainingTime = GeneralConfig.getGameConfig().getWaitingTimeSeconds();
     /** 게임 진행 단계 */
     @NonNull
     @Getter
@@ -126,7 +126,7 @@ public final class Game implements Disposable {
             }
 
         for (GlobalLocation healPackLocation : map.getHealPackLocations())
-            HologramUtil.removeHologram(CombatUser.HEALPACK_HOLOGRAM_ID + healPackLocation);
+            HologramUtil.removeHologram(CombatUser.Cooldown.HEAL_PACK.getId() + healPackLocation);
 
         if (world == null)
             onDispose();
@@ -219,7 +219,7 @@ public final class Game implements Disposable {
                 onReady();
             }
         } else
-            remainingTime = GeneralConfig.getGameConfig().getWaitingTime();
+            remainingTime = GeneralConfig.getGameConfig().getWaitingTimeSeconds();
     }
 
     /**
@@ -239,7 +239,7 @@ public final class Game implements Disposable {
                         maxPlayerCount),
                 BarColor.GREEN,
                 WrapperPlayServerBoss.BarStyle.PROGRESS,
-                canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTime() : 1);
+                canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTimeSeconds() : 1);
     }
 
     /**
