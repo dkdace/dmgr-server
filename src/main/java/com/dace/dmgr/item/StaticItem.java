@@ -52,7 +52,7 @@ public class StaticItem {
      */
     @Nullable
     public static StaticItem fromItemStack(@NonNull ItemStack itemStack) {
-        return StaticItemRegistry.getInstance().get(itemStack.getItemMeta().getLocalizedName());
+        return StaticItemRegistry.getInstance().get(itemStack.getItemMeta().hasLocalizedName() ? itemStack.getItemMeta().getLocalizedName() : "");
     }
 
     /**
