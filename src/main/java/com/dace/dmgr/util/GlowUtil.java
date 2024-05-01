@@ -10,13 +10,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.WeakHashMap;
 
 /**
  * 발광 효과 재생 기능을 제공하는 클래스.
  */
 @UtilityClass
 public final class GlowUtil {
+    /** 플레이어별 발광 엔티티 목록. (플레이어 : (발광 엔티티 : 색상)) */
+    private final WeakHashMap<Player, WeakHashMap<Entity, ChatColor>> glowingMap = new WeakHashMap<>();
     /** 쿨타임 ID */
     private static final String COOLDOWN_ID = "Glow";
 
@@ -109,7 +112,11 @@ public final class GlowUtil {
      * @param player 대상 플레이어
      */
     private static void sendAddTeamPacket(@NonNull Entity entity, @NonNull ChatColor color, @NonNull Player player) {
-//        sendRemoveTeamPacket(entity, player);
+        glowingMap.putIfAbsent(player, new WeakHashMap<>());
+        sendRemoveTeamPacket(entity, player);
+        WeakHashMap<Entity, ChatColor> glowings = glowingMap.get(player);
+
+        glowings.put(entity, color);
 
         WrapperPlayServerScoreboardTeam packet1 = new WrapperPlayServerScoreboardTeam();
         WrapperPlayServerScoreboardTeam packet2 = new WrapperPlayServerScoreboardTeam();
@@ -127,7 +134,7 @@ public final class GlowUtil {
         packet2.setColor(color.ordinal());
 
         packet3.setMode(3);
-        packet3.setPlayers(Arrays.asList(entity instanceof Player ? entity.getName() : entity.getUniqueId().toString()));
+        packet3.setPlayers(Collections.singletonList(entity instanceof Player ? entity.getName() : entity.getUniqueId().toString()));
 
         packet1.sendPacket(player);
         packet2.sendPacket(player);
@@ -141,14 +148,19 @@ public final class GlowUtil {
      * @param player 대상 플레이어
      */
     private static void sendRemoveTeamPacket(@NonNull Entity entity, @NonNull Player player) {
-        for (ChatColor chatColor : ChatColor.values()) {
-            WrapperPlayServerScoreboardTeam packet = new WrapperPlayServerScoreboardTeam();
+        WeakHashMap<Entity, ChatColor> glowings = glowingMap.get(player);
+        ChatColor color = glowings.get(entity);
+        if (color == null)
+            return;
 
-            packet.setMode(4);
-            packet.setName(COOLDOWN_ID + chatColor.ordinal());
-            packet.setPlayers(Arrays.asList(entity instanceof Player ? entity.getName() : entity.getUniqueId().toString()));
+        glowings.remove(entity);
 
-            packet.sendPacket(player);
-        }
+        WrapperPlayServerScoreboardTeam packet = new WrapperPlayServerScoreboardTeam();
+
+        packet.setMode(4);
+        packet.setName(COOLDOWN_ID + color.ordinal());
+        packet.setPlayers(Collections.singletonList(entity instanceof Player ? entity.getName() : entity.getUniqueId().toString()));
+
+        packet.sendPacket(player);
     }
 }
