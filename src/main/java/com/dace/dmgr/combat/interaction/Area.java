@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.function.Predicate;
@@ -22,23 +21,22 @@ public abstract class Area {
     @NonNull
     @Getter
     protected final CombatEntity shooter;
-    /** 예상 피격자 목록 */
-    protected final CombatEntity[] targets;
     /** 범위 (반지름). (단위: 블록) */
-    private final double radius;
+    protected final double radius;
     /** 대상 엔티티를 찾는 조건 */
-    private final Predicate<CombatEntity> condition;
+    protected final Predicate<CombatEntity> condition;
+    /** 예상 피격자 목록 */
+    private final CombatEntity[] targets;
     /** 피격자별 관통 가능 여부 목록. (피격자 : 관통 가능 여부) */
     private final HashMap<CombatEntity, Boolean> penetrationMap = new HashMap<>();
 
     /**
      * 광역 판정 인스턴스를 생성한다.
      *
-     * <p>선택적 옵션은 {@link HitscanOption} 객체를 통해 전달받는다.</p>
-     *
-     * @param shooter 발사자
-     * @param radius  범위 (반지름). (단위: 블록)
-     * @param targets 예상 피격자 목록
+     * @param shooter   발사자
+     * @param radius    범위 (반지름). (단위: 블록)
+     * @param condition 대상 엔티티를 찾는 조건
+     * @param targets   예상 피격자 목록
      */
     protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<CombatEntity> condition, @NonNull CombatEntity[] targets) {
         this.shooter = shooter;
@@ -55,16 +53,16 @@ public abstract class Area {
      *
      * @param center 판정 중심지
      */
-    public void emit(@NonNull Location center) {
+    public final void emit(@NonNull Location center) {
         for (CombatEntity target : targets) {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override
-                protected boolean onHitBlock(@NonNull Location location, @NonNull Vector velocity, @NonNull Block hitBlock) {
+                protected boolean onHitBlock(@NonNull Block hitBlock) {
                     return Area.this.onHitBlock(center, location, hitBlock);
                 }
 
                 @Override
-                protected boolean onHitEntity(@NonNull Location location, @NonNull Vector velocity, @NonNull Damageable target, boolean isCrit) {
+                protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
                     Boolean canPenetrate = penetrationMap.get(target);
                     if (canPenetrate == null) {
                         canPenetrate = Area.this.onHitEntity(center, location, target);

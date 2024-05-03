@@ -1,6 +1,9 @@
 package com.dace.dmgr.combat.entity.module;
 
+import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.Jumpable;
+import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -32,10 +35,10 @@ public final class JumpModule extends MoveModule {
             throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
 
         TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
-            if (combatEntity.canJump())
+            if (canJump() && combatEntity.canJump())
                 ((LivingEntity) combatEntity.getEntity()).removePotionEffect(PotionEffectType.JUMP);
             else
-                ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 9999, -6,
+                ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6,
                         false, false), true);
 
             return true;
@@ -51,5 +54,17 @@ public final class JumpModule extends MoveModule {
     public JumpModule(@NonNull Jumpable combatEntity) {
         this(combatEntity, (combatEntity.getEntity() instanceof Attributable) ?
                 ((Attributable) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() : 0);
+    }
+
+    /**
+     * 엔티티가 점프할 수 있는 기본 조건을 확인한다.
+     *
+     * @return 점프 가능 여부
+     */
+    private boolean canJump() {
+        if (combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.STUN) || combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE) ||
+                combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.GROUNDING))
+            return false;
+        return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
     }
 }

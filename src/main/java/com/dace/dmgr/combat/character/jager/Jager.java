@@ -1,20 +1,23 @@
 package com.dace.dmgr.combat.character.jager;
 
-import com.dace.dmgr.combat.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.jager.action.*;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
 
@@ -29,23 +32,25 @@ import java.util.StringJoiner;
  * @see JagerA3
  * @see JagerUlt
  */
-public final class Jager extends Character {
+public final class Jager extends Marksman {
     @Getter
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", Role.MARKSMAN, 1000, 1.0, 1.0);
+        super("예거", "DVJager", '\u32D2', 1000, 1.0, 1.0);
     }
 
     @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
         JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();
         JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
+        JagerA3 skill3 = (JagerA3) combatUser.getSkill(JagerA3Info.getInstance());
 
         int weapon1Ammo = weapon1.getReloadModule().getRemainingAmmo();
         int weapon2Ammo = weapon2.getReloadModule().getRemainingAmmo();
-        double skill1Health = skill1.getStateValue();
+        int skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
@@ -54,22 +59,29 @@ public final class Jager extends Character {
                 JagerWeaponInfo.CAPACITY, '*');
         String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, JagerWeaponInfo.SCOPE.CAPACITY,
                 JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar("§e[설랑]", (int) skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), skill1Health, skill1MaxHealth,
                 10, '■');
         if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
             weapon1Display = "§a" + weapon1Display;
         else if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
             weapon2Display = "§a" + weapon2Display;
+
         text.add(weapon1Display);
         text.add(weapon2Display);
         text.add("");
+        if (!skill1.isDurationFinished())
+            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f회수";
         text.add(skill1Display);
+        if (!skill3.isDurationFinished() && skill3.isEnabled())
+            text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
 
         return text.toString();
     }
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
     }
@@ -79,10 +91,15 @@ public final class Jager extends Character {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
-        if (!skill1.isDurationFinished() && victim instanceof Living)
-            skill1.getEntity().getEntity().setTarget(victim.getEntity());
+        if (skill1.getSummonEntity() != null && victim instanceof Living)
+            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
 
-        return skillUlt.getEntity() == null;
+        return skillUlt.getSummonEntity() == null;
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -93,7 +110,12 @@ public final class Jager extends Character {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getWeapon()).getReloadModule().isReloading() && !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+    }
+
+    @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return false;
     }
 
     @Override
@@ -108,6 +130,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
@@ -118,6 +141,7 @@ public final class Jager extends Character {
     }
 
     @Override
+    @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
             case 1:

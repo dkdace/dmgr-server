@@ -15,23 +15,23 @@ public final class OnPlayerResourcePackStatus implements Listener {
             "\n" +
             "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
             "\n" +
-            "\n§7다운로드 오류 문의 : 디스코드 DarkDace＃4671";
+            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
     /** 리소스팩 오류로 강제퇴장 시 표시되는 메시지 */
-    public static final String MESSAGE_KICK_ERR = "§c리소스팩 적용 중 오류가 발생했습니다." +
+    private static final String MESSAGE_KICK_ERR = "§c리소스팩 적용 중 오류가 발생했습니다." +
             "\n" +
             "\n§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오." +
             "\n" +
-            "\n§7다운로드 오류 문의 : 디스코드 DarkDace＃4671";
+            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
 
     @EventHandler
     public static void event(PlayerResourcePackStatusEvent event) {
         Player player = event.getPlayer();
         User user = User.fromPlayer(player);
 
-        user.setResourcePackStatus(event.getStatus());
+        user.setResourcePackAccepted(event.getStatus() == PlayerResourcePackStatusEvent.Status.ACCEPTED ||
+                event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED);
 
-        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD) {
+        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
             player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR);
-        }
     }
 }

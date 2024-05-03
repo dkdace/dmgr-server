@@ -2,8 +2,9 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -15,12 +16,25 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class StackableSkill extends ActiveSkill {
+    /** 스킬 스택 충전 쿨타임 ID */
+    protected static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
     /** 스킬 스택 수 */
     protected int stack = 0;
 
-    protected StackableSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
-        super(number, combatUser, activeSkillInfo, slot);
+    protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+        super(combatUser, activeSkillInfo, slot);
         setStackCooldown(getDefaultStackCooldown());
+    }
+
+    @Override
+    protected void onTick() {
+        if (stack > 0) {
+            if (isDurationFinished())
+                displayReady(stack);
+            else
+                displayUsing(stack);
+        } else
+            displayCooldown(1);
     }
 
     @Override
@@ -30,12 +44,7 @@ public abstract class StackableSkill extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return isCooldownFinished() && stack > 0;
-    }
-
-    @Override
-    protected void onDurationTick() {
-        displayUsing(stack);
+        return super.canUse() && stack > 0;
     }
 
     @Override
@@ -50,7 +59,7 @@ public abstract class StackableSkill extends ActiveSkill {
     /**
      * 기본 스택 충전 쿨타임을 반환한다.
      *
-     * @return 최대 스택 충전량
+     * @return 스택 충전 쿨타임 (tick)
      */
     public abstract long getDefaultStackCooldown();
 
@@ -60,34 +69,32 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 스택 충전 쿨타임 (tick)
      */
     public final long getStackCooldown() {
-        return CooldownUtil.getCooldown(this, Cooldown.SKILL_STACK_COOLDOWN);
+        return CooldownUtil.getCooldown(this, SKILL_STACK_COOLDOWN_ID);
     }
 
     /**
      * 스킬의 스택 충전 쿨타임을 설정한다.
      *
-     * @param cooldown 스택 충전 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     * @param cooldown 스택 충전 쿨타임 (tick). -1로 설정 시 무한 지속
      */
     public final void setStackCooldown(long cooldown) {
         if (stack >= getMaxStack())
             return;
 
         if (isStackCooldownFinished()) {
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
             runStackCooldown(cooldown);
         } else
-            CooldownUtil.setCooldown(this, Cooldown.SKILL_STACK_COOLDOWN, cooldown);
+            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, cooldown);
     }
 
     /**
      * 스킬의 스택 충전 쿨타임 스케쥴러를 실행한다.
      *
-     * @param cooldown 스택 충전 쿨타임 (tick). {@code -1}로 설정 시 무한 지속
+     * @param cooldown 스택 충전 쿨타임 (tick). -1로 설정 시 무한 지속
      */
     private void runStackCooldown(long cooldown) {
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            onCooldownTick();
-
             if (isStackCooldownFinished()) {
                 onStackCooldownFinished();
 
@@ -105,8 +112,9 @@ public abstract class StackableSkill extends ActiveSkill {
     /**
      * 스택 충전 쿨타임이 끝났을 때 실행할 작업.
      */
+    @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
-        playCooldownFinishSound();
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
     }
 
     /**
@@ -124,16 +132,8 @@ public abstract class StackableSkill extends ActiveSkill {
     public final void addStack(int amount) {
         stack = Math.min(Math.max(0, stack + amount), getMaxStack());
 
-        if (stack > 0) {
-            if (isStackCooldownFinished())
-                setStackCooldown(getDefaultStackCooldown());
-
-            if (isDurationFinished())
-                displayReady(stack);
-            else
-                displayUsing(stack);
-        } else
-            displayCooldown(1);
+        if (stack > 0 && isStackCooldownFinished())
+            setStackCooldown(getDefaultStackCooldown());
     }
 
     /**

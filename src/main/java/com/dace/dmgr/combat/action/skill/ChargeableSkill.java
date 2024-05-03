@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -14,16 +15,25 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class ChargeableSkill extends ActiveSkill {
     /** 상태 변수 */
-    private double stateValue = 0;
+    private int stateValue = 0;
 
-    protected ChargeableSkill(int number, @NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
-        super(number, combatUser, activeSkillInfo, slot);
+    protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+        super(combatUser, activeSkillInfo, slot);
     }
 
     @Override
-    protected void onDurationTick() {
-        super.onDurationTick();
-        addStateValue(-getStateValueDecrement());
+    protected void onTick() {
+        if (isDurationFinished()) {
+            if (isCooldownFinished())
+                displayReady(1);
+            else {
+                long cooldown = CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
+                displayCooldown((int) Math.ceil(cooldown / 20.0));
+            }
+        } else {
+            displayUsing(1);
+            addStateValue(-getStateValueDecrement());
+        }
     }
 
     @Override
@@ -64,9 +74,11 @@ public abstract class ChargeableSkill extends ActiveSkill {
     public abstract int getMaxStateValue();
 
     /**
+     * 스킬의 상태 변수를 설정한다.
+     *
      * @param stateValue 상태 변수
      */
-    public final void setStateValue(double stateValue) {
+    public final void setStateValue(int stateValue) {
         this.stateValue = Math.min(Math.max(0, stateValue), getMaxStateValue());
     }
 
@@ -75,7 +87,7 @@ public abstract class ChargeableSkill extends ActiveSkill {
      *
      * @param increment 증가량
      */
-    public final void addStateValue(double increment) {
+    public final void addStateValue(int increment) {
         setStateValue(stateValue + increment);
     }
 
@@ -84,12 +96,12 @@ public abstract class ChargeableSkill extends ActiveSkill {
      *
      * @return 상태 변수의 틱당 충전량
      */
-    protected abstract long getStateValueIncrement();
+    protected abstract int getStateValueIncrement();
 
     /**
      * 상태 변수의 틱당 소모량을 반환한다.
      *
      * @return 상태 변수의 틱당 소모량
      */
-    protected abstract long getStateValueDecrement();
+    protected abstract int getStateValueDecrement();
 }

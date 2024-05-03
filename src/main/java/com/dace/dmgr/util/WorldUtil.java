@@ -17,6 +17,7 @@ import org.bukkit.World;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 /**
@@ -57,6 +58,32 @@ public final class WorldUtil {
                 onError.accept(ex);
             } finally {
                 CommandManager.getInstance().getWorldsInUse().remove(targetWorldName);
+            }
+        });
+    }
+
+    /**
+     * 지정한 월드를 삭제한다.
+     *
+     * @param world 삭제할 월드
+     */
+    @NonNull
+    public static AsyncTask<Void> removeWorld(@NonNull World world) {
+        String worldName = world.getName();
+        File file = new File(Bukkit.getWorldContainer(), MessageFormat.format("{0}/{1}.slime",
+                ConfigManager.getDatasourcesConfig().getFileConfig().getPath(), worldName));
+
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                Bukkit.unloadWorld(world, false);
+                Files.delete(Paths.get(file.getPath()));
+
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("월드 삭제 실패 : {0}", ex, worldName);
+                onError.accept(ex);
+            } finally {
+                CommandManager.getInstance().getWorldsInUse().remove(worldName);
             }
         });
     }

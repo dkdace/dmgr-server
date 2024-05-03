@@ -1,50 +1,71 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.YamlFile;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
+import java.util.EnumMap;
 import java.util.UUID;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
  */
-@Getter
 public final class UserData extends YamlFile {
     /** 플레이어 UUID */
+    @Getter
     @NonNull
     private final UUID playerUUID;
     /** 플레이어 이름 */
+    @Getter
     @NonNull
     private final String playerName;
     /** 유저 개인 설정 */
+    @Getter
     @NonNull
     private final Config config = new Config();
+    /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
+    private final EnumMap<CharacterType, CharacterRecord> characterRecordMap = new EnumMap<>(CharacterType.class);
     /** 경험치 */
+    @Getter
     private int xp = 0;
     /** 레벨 */
+    @Getter
     private int level = 1;
     /** 돈 */
+    @Getter
     private int money = 0;
     /** 랭크 점수 (RR) */
+    @Getter
     private int rankRate = 100;
     /** 랭크게임 배치 완료 여부 */
+    @Getter
     private boolean isRanked = false;
     /** 매치메이킹 점수 (MMR) */
+    @Getter
     private int matchMakingRate = 100;
     /** 일반게임 플레이 횟수 */
+    @Getter
     private int normalPlayCount = 0;
     /** 랭크게임 플레이 판 수 */
+    @Getter
     private int rankPlayCount = 0;
+    /** 승리 횟수 */
+    @Getter
+    private int winCount = 0;
+    /** 패배 횟수 */
+    @Getter
+    private int loseCount = 0;
+    /** 탈주 횟수 */
+    @Getter
+    private int quitCount = 0;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -55,6 +76,8 @@ public final class UserData extends YamlFile {
         super("User/" + playerUUID);
         this.playerUUID = playerUUID;
         this.playerName = Bukkit.getOfflinePlayer(playerUUID).getName();
+        for (CharacterType characterType : CharacterType.values())
+            characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
         UserDataRegistry.getInstance().add(playerUUID, this);
     }
@@ -91,7 +114,7 @@ public final class UserData extends YamlFile {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    public static UserData[] getAllUserDatas() {
+    public static UserData @NonNull [] getAllUserDatas() {
         return UserDataRegistry.getInstance().getAllUserDatas();
     }
 
@@ -106,21 +129,33 @@ public final class UserData extends YamlFile {
         UserData.this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
         UserData.this.normalPlayCount = (int) getLong("normalPlayCount", normalPlayCount);
         UserData.this.rankPlayCount = (int) getLong("rankPlayCount", rankPlayCount);
+        UserData.this.winCount = (int) getLong("winCount", winCount);
+        UserData.this.loseCount = (int) getLong("loseCount", loseCount);
+        UserData.this.quitCount = (int) getLong("quitCount", quitCount);
 
         config.koreanChat = getBoolean("koreanChat", config.koreanChat);
         config.nightVision = getBoolean("nightVision", config.nightVision);
         config.chatSound = getString("chatSound", config.chatSound);
 
-        ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
+        characterRecordMap.forEach((characterType, characterRecord) -> characterRecord.load());
 
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player != null)
-            User.fromPlayer(player).onDataInit();
+        ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
     }
 
     @Override
     protected void onInitError(Exception ex) {
         ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName);
+    }
+
+    /**
+     * 지정한 전투원의 기록 정보를 반환한다.
+     *
+     * @param characterType 전투원 종류
+     * @return 전투원 기록 정보
+     */
+    @NonNull
+    public CharacterRecord getCharacterRecord(@NonNull CharacterType characterType) {
+        return characterRecordMap.get(characterType);
     }
 
     public void setXp(int xp) {
@@ -216,6 +251,34 @@ public final class UserData extends YamlFile {
         set("rankPlayCount", this.rankPlayCount);
     }
 
+    public void setWinCount(int winCount) {
+        this.winCount = winCount;
+        set("winCount", this.winCount);
+    }
+
+    public void setLoseCount(int loseCount) {
+        this.loseCount = loseCount;
+        set("loseCount", this.loseCount);
+    }
+
+    public void setQuitCount(int quitCount) {
+        this.quitCount = quitCount;
+        set("quitCount", this.quitCount);
+    }
+
+    /**
+     * 전체 게임 플레이 시간을 반환한다.
+     *
+     * @return 게임 플레이 시간
+     */
+    public int getPlayTime() {
+        int totalPlayTime = 0;
+        for (CharacterRecord characterRecord : characterRecordMap.values())
+            totalPlayTime += characterRecord.playTime;
+
+        return totalPlayTime;
+    }
+
     /**
      * 현재 랭크 점수에 따른 티어를 반환한다.
      *
@@ -226,11 +289,11 @@ public final class UserData extends YamlFile {
         if (!isRanked)
             return Tier.NONE;
 
-        int rank = RankUtil.getRankIndex(RankUtil.Sector.RANK_RATE, this);
+        int rank = RankUtil.getRankIndex(RankUtil.Indicator.RANK_RATE, this);
 
         if (rankRate <= Tier.STONE.getMaxScore())
             return Tier.STONE;
-        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= 5)
+        else if (rankRate >= Tier.DIAMOND.getMinScore() && rank > 0 && rank <= GeneralConfig.getConfig().getNetheriteTierMinRank())
             return Tier.NETHERITE;
 
         for (Tier tier : Tier.values()) {
@@ -294,6 +357,50 @@ public final class UserData extends YamlFile {
         public void setNightVision(boolean nightVision) {
             this.nightVision = nightVision;
             set("nightVision", this.nightVision);
+        }
+    }
+
+    /**
+     * 전투원 기록 정보.
+     */
+    @RequiredArgsConstructor
+    public final class CharacterRecord {
+        /** 섹션 이름 */
+        private static final String SECTION = "record";
+        /** 전투원 종류 */
+        private final CharacterType characterType;
+        /** 킬 */
+        @Getter
+        private int kill = 0;
+        /** 데스 */
+        @Getter
+        private int death = 0;
+        /** 플레이 시간 (초) */
+        @Getter
+        private int playTime = 0;
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            kill = (int) getLong(SECTION + "." + characterType + ".kill", this.kill);
+            death = (int) getLong(SECTION + "." + characterType + ".death", this.death);
+            playTime = (int) getLong(SECTION + "." + characterType + ".playTime", this.playTime);
+        }
+
+        public void setKill(int kill) {
+            this.kill = kill;
+            set(SECTION + "." + characterType + ".kill", this.kill);
+        }
+
+        public void setDeath(int death) {
+            this.death = death;
+            set(SECTION + "." + characterType + ".death", this.death);
+        }
+
+        public void setPlayTime(int playTime) {
+            this.playTime = playTime;
+            set(SECTION + "." + characterType + ".playTime", this.playTime);
         }
     }
 }

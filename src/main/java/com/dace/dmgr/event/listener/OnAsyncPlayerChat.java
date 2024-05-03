@@ -1,8 +1,8 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.Cooldown;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.SoundUtil;
 import org.bukkit.Bukkit;
@@ -14,6 +14,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.text.MessageFormat;
 
 public final class OnAsyncPlayerChat implements Listener {
+    /** 쿨타임 ID */
+    private static final String COOLDOWN_ID = "Chat";
+
     @EventHandler
     public static void event(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
@@ -23,11 +26,11 @@ public final class OnAsyncPlayerChat implements Listener {
         UserData userData = UserData.fromPlayer(player);
 
         if (!player.isOp()) {
-            if (CooldownUtil.getCooldown(user, Cooldown.CHAT) > 0) {
+            if (CooldownUtil.getCooldown(user, COOLDOWN_ID) > 0) {
                 user.sendMessageWarn("채팅을 천천히 하십시오.");
                 return;
             }
-            CooldownUtil.setCooldown(user, Cooldown.CHAT);
+            CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
         }
 
         Bukkit.getServer().broadcastMessage(MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage()));

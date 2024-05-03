@@ -3,6 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.item.gui.SelectChar;
 import com.dace.dmgr.user.User;
 import org.bukkit.entity.Player;
@@ -24,7 +25,12 @@ public final class OnPlayerSwapHandItems implements Listener {
             SelectChar.getInstance().open(player);
             return;
         }
-        if (combatUser != null && combatUser.getCharacterType() != null)
+        if (combatUser != null && combatUser.getCharacterType() != null) {
             combatUser.useAction(ActionKey.SWAP_HAND);
+            return;
+        }
+
+        Menu menu = Menu.getInstance();
+        menu.open(player);
     }
 }

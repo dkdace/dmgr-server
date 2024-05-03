@@ -31,6 +31,7 @@ public final class EventManager {
         EventUtil.registerListener(new OnEntityTarget());
         EventUtil.registerListener(new OnPlayerSwapHandItems());
         EventUtil.registerListener(new OnPlayerToggleSprint());
+        EventUtil.registerListener(new OnPlayerToggleFlight());
         EventUtil.registerListener(new OnPlayerDropItem());
         EventUtil.registerListener(new OnTabComplete());
         EventUtil.registerListener(new OnPlayerCommandPreprocess());
@@ -38,13 +39,13 @@ public final class EventManager {
         EventUtil.registerListener(new OnPlayerBucketEmpty());
         EventUtil.registerListener(new OnPlayerBucketFill());
         EventUtil.registerListener(new OnPlayerInteract());
+        EventUtil.registerListener(new OnPlayerInteractEntity());
 
         EventUtil.registerPacketListener(new OnPlayClientUseEntity());
         EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
         EventUtil.registerPacketListener(new OnPlayServerNamedSoundEffect());
 //        EventUtil.registerPacketListener(new OnPlayClientLook());
 //        EventUtil.registerPacketListener(new OnPlayClientPositionLook());
-        EventUtil.registerPacketListener(new OnPlayServerEntityMetadata());
         EventUtil.registerPacketListener(new OnPlayServerPlayerInfo());
 
         ConsoleLogger.info("이벤트 등록 완료");

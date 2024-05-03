@@ -3,17 +3,17 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
-import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 public abstract class UltimateSkill extends ActiveSkill {
-    protected UltimateSkill(int number, @NonNull CombatUser combatUser, @NonNull UltimateSkillInfo ultimateSkillInfo) {
-        super(number, combatUser, ultimateSkillInfo, 3);
+    protected UltimateSkill(@NonNull CombatUser combatUser, @NonNull UltimateSkillInfo ultimateSkillInfo) {
+        super(combatUser, ultimateSkillInfo, 3);
     }
 
     @Override
@@ -28,15 +28,16 @@ public abstract class UltimateSkill extends ActiveSkill {
     }
 
     @Override
-    protected void playCooldownFinishSound() {
-        SoundUtil.play(Sound.ENTITY_PLAYER_LEVELUP, combatUser.getEntity(), 0.5, 2);
+    protected void onCooldownFinished() {
+        super.onCooldownFinished();
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_READY, combatUser.getEntity());
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.setUltGaugePercent(0);
-        SoundUtil.play(Sound.ENTITY_WITHER_SPAWN, combatUser.getEntity().getLocation(), 10, 2);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_USE, combatUser.getEntity().getLocation());
     }
 
     /**

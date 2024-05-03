@@ -28,7 +28,7 @@ public final class OnPlayerQuit implements Listener {
             DMGR.getPlugin().getServer().broadcastMessage(MessageFormat.format("{0}현재 인원수는 §3§l{1}명§b입니다.",
                     StringFormUtil.REMOVE_PREFIX, Bukkit.getOnlinePlayers().size()));
             playQuitSound();
-        }, 1).run();
+        }, 1);
     }
 
     /**
@@ -38,14 +38,14 @@ public final class OnPlayerQuit implements Listener {
         new IntervalTask(i -> {
             switch (i.intValue()) {
                 case 0:
-                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000F, 0.8);
+                    Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, -4 / 12.0)));
                     break;
                 case 3:
-                    SoundUtil.broadcast(Sound.BLOCK_NOTE_PLING, 1000F, 0.525);
+                    Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, -11 / 12.0)));
                     break;
             }
 
             return true;
-        }, 1, 4).run();
+        }, 1, 4);
     }
 }

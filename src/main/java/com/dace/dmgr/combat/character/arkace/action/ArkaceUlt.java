@@ -2,13 +2,12 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 
 public final class ArkaceUlt extends UltimateSkill {
-    public ArkaceUlt(@NonNull CombatUser combatUser) {
-        super(4, combatUser, ArkaceUltInfo.getInstance());
+    ArkaceUlt(@NonNull CombatUser combatUser) {
+        super(combatUser, ArkaceUltInfo.getInstance());
     }
 
     @Override
@@ -30,7 +29,7 @@ public final class ArkaceUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        ((Reloadable) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
         setDuration();
+        ((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
     }
 }

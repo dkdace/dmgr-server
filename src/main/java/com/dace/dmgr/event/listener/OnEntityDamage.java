@@ -12,7 +12,6 @@ public final class OnEntityDamage implements Listener {
     public static void event(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         CombatEntity combatEntity = CombatEntity.fromEntity(entity);
-
         if (combatEntity == null)
             return;
 

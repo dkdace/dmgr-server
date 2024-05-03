@@ -5,6 +5,7 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,7 +13,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 
@@ -22,6 +23,13 @@ import java.util.Arrays;
 public final class SelectGame extends Gui {
     @Getter
     private static final SelectGame instance = new SelectGame();
+    private static final GuiItem buttonLeft = new ButtonItem.LEFT("SelectGameLeft") {
+        @Override
+        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+            player.performCommand("메뉴");
+            return true;
+        }
+    };
 
     public SelectGame() {
         super(2, "§8게임 시작");
@@ -98,46 +106,16 @@ public final class SelectGame extends Gui {
 
     @Override
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
-        guiController.fillAll(DisplayItem.EMPTY.getGuiItem());
+        guiController.fillAll(DisplayItem.EMPTY.getStaticItem());
 
-        guiController.set(0, SelectGameInfoItem.NORMAL.guiItem);
-        guiController.set(9, SelectGameInfoItem.RANK.guiItem, itemBuilder ->
+        guiController.set(0, SelectGameInfoItem.NORMAL.staticItem);
+        guiController.set(9, SelectGameInfoItem.RANK.staticItem, itemBuilder ->
                 itemBuilder.formatLore(GeneralConfig.getGameConfig().getRankPlacementPlayCount()));
-        guiController.set(17, ButtonItem.LEFT.getGuiItem());
+        guiController.set(17, buttonLeft);
 
         displayNormalRooms(guiController);
         displayRankRooms(guiController);
 
-    }
-
-    @Override
-    public void onClick(InventoryClickEvent event, @NonNull Player player, @NonNull GuiItem<?> guiItem) {
-        if (event.getClick() != ClickType.LEFT)
-            return;
-
-        if (guiItem.getGui() == null) {
-            if (guiItem == ButtonItem.LEFT.getGuiItem())
-                player.performCommand("메뉴");
-
-            return;
-        }
-
-        if (guiItem.getIdentifier() instanceof SelectGameItem) {
-            String[] splittedClickItemName = event.getCurrentItem().getItemMeta().getDisplayName().split(" ");
-            int number = Integer.parseInt(splittedClickItemName[2]);
-            boolean isRanked = guiItem.getIdentifier() == SelectGameItem.RANK;
-
-            User user = User.fromPlayer(player);
-            GameUser gameUser = GameUser.fromUser(user);
-            Game game = Game.fromNumber(isRanked, number);
-            if (gameUser == null) {
-                if (game == null)
-                    game = new Game(isRanked, number);
-                new GameUser(user, game);
-            }
-
-            player.closeInventory();
-        }
     }
 
     private enum SelectGameInfoItem {
@@ -150,8 +128,8 @@ public final class SelectGame extends Gui {
                 "",
                 "§f다음 게임 모드 중에서 무작위로 선택됨 :");
 
-        /** GUI 아이템 객체 */
-        private final GuiItem<SelectGameInfoItem> guiItem;
+        /** 정적 아이템 객체 */
+        private final StaticItem staticItem;
 
         SelectGameInfoItem(Material material, String name, String... lores) {
             ItemBuilder itemBuilder = new ItemBuilder(material).setName(name);
@@ -164,17 +142,7 @@ public final class SelectGame extends Gui {
                             .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
             itemBuilder.addLore(gamePlayModeNames);
 
-            this.guiItem = new GuiItem<SelectGameInfoItem>(this, itemBuilder.build()) {
-                @Override
-                public Gui getGui() {
-                    return instance;
-                }
-
-                @Override
-                public boolean isClickable() {
-                    return false;
-                }
-            };
+            this.staticItem = new StaticItem("SelectGameInfoItem" + this, itemBuilder.build());
         }
     }
 
@@ -183,10 +151,10 @@ public final class SelectGame extends Gui {
         RANK(Material.STAINED_GLASS_PANE, ((short) 5), "§6랭크 게임 {0}");
 
         /** GUI 아이템 객체 */
-        private final GuiItem<SelectGameItem> guiItem;
+        private final GuiItem guiItem;
 
         SelectGameItem(Material material, int damage, String name) {
-            this.guiItem = new GuiItem<SelectGameItem>(this, new ItemBuilder(material)
+            this.guiItem = new GuiItem("SelectGameItem" + this, new ItemBuilder(material)
                     .setDamage((short) damage)
                     .setName(name)
                     .setLore("§e인원 수 : §f[{0}§f/{1} 명]",
@@ -195,12 +163,25 @@ public final class SelectGame extends Gui {
                             "§e경과 시간 : §f{4}")
                     .build()) {
                 @Override
-                public Gui getGui() {
-                    return instance;
-                }
+                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+                    if (clickType != ClickType.LEFT)
+                        return false;
 
-                @Override
-                public boolean isClickable() {
+                    String[] splittedClickItemName = clickItem.getItemMeta().getDisplayName().split(" ");
+                    int number = Integer.parseInt(splittedClickItemName[2]);
+                    boolean isRanked = SelectGameItem.this == SelectGameItem.RANK;
+
+                    User user = User.fromPlayer(player);
+                    GameUser gameUser = GameUser.fromUser(user);
+                    Game game = Game.fromNumber(isRanked, number);
+                    if (gameUser == null) {
+                        if (game == null)
+                            game = new Game(isRanked, number);
+                        new GameUser(user, game);
+
+                        player.closeInventory();
+                    }
+
                     return true;
                 }
             };

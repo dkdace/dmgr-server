@@ -1,21 +1,22 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.action.TextIcon;
 import lombok.Getter;
+import lombok.NonNull;
 
 public final class ArkaceA2Info extends ActiveSkillInfo {
-    /** 쿨타임 */
+    /** 쿨타임 (tick) */
     public static final int COOLDOWN = 12 * 20;
     /** 치유량 */
     public static final int HEAL = 350;
-    /** 지속시간 */
+    /** 지속시간 (tick) */
     public static final long DURATION = (long) (2.5 * 20);
     @Getter
     private static final ArkaceA2Info instance = new ArkaceA2Info();
 
-    public ArkaceA2Info() {
+    private ArkaceA2Info() {
         super(2, "생체 회복막",
                 "",
                 "§6" + TextIcon.DURATION + " 지속시간§f동안 회복막을 활성화하여 §a" + TextIcon.HEAL + " 회복§f합니다.",
@@ -28,7 +29,8 @@ public final class ArkaceA2Info extends ActiveSkillInfo {
     }
 
     @Override
-    public ArkaceA2 createSkill(CombatUser combatUser) {
+    @NonNull
+    public ArkaceA2 createSkill(@NonNull CombatUser combatUser) {
         return new ArkaceA2(combatUser);
     }
 }

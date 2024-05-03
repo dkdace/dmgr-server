@@ -2,15 +2,12 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 /**
  * 전투원 선택 GUI 클래스.
@@ -40,22 +37,22 @@ public final class SelectChar extends Gui {
             int j = 0;
 
             switch (characterType.getCharacter().getRole()) {
-                case ASSASSIN:
+                case SCUFFLER:
                     j = role1i++;
                     break;
-                case SCUFFLER:
+                case MARKSMAN:
                     j = role2i++;
                     break;
-                case MARKSMAN:
+                case VANGUARD:
                     j = role3i++;
                     break;
-                case VANGUARD:
+                case GUARDIAN:
                     j = role4i++;
                     break;
-                case GUARDIAN:
+                case SUPPORT:
                     j = role5i++;
                     break;
-                case SUPPORTER:
+                case CONTROLLER:
                     j = role6i++;
                     break;
             }
@@ -66,61 +63,34 @@ public final class SelectChar extends Gui {
 
     @Override
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
-        guiController.fillColumn(2, DisplayItem.EMPTY.getGuiItem());
-        guiController.set(0, SelectCharInfoItem.ASSASSIN.guiItem);
-        guiController.set(9, SelectCharInfoItem.SCUFFLER.guiItem);
-        guiController.set(18, SelectCharInfoItem.MARKSMAN.guiItem);
-        guiController.set(27, SelectCharInfoItem.VANGUARD.guiItem);
-        guiController.set(36, SelectCharInfoItem.GUARDIAN.guiItem);
-        guiController.set(45, SelectCharInfoItem.SUPPORTER.guiItem);
+        guiController.fillColumn(2, DisplayItem.EMPTY.getStaticItem());
+        guiController.set(0, SelectCharInfoItem.ASSASSIN.staticItem);
+        guiController.set(9, SelectCharInfoItem.SCUFFLER.staticItem);
+        guiController.set(18, SelectCharInfoItem.MARKSMAN.staticItem);
+        guiController.set(27, SelectCharInfoItem.VANGUARD.staticItem);
+        guiController.set(36, SelectCharInfoItem.GUARDIAN.staticItem);
+        guiController.set(45, SelectCharInfoItem.SUPPORTER.staticItem);
 
         displayCharacters(guiController);
     }
 
-    @Override
-    protected void onClick(InventoryClickEvent event, @NonNull Player player, @NonNull GuiItem<?> guiItem) {
-        if (event.getCurrentItem().getType() != Material.SKULL_ITEM)
-            return;
-
-        if (event.getClick() == ClickType.LEFT) {
-            String name = event.getCurrentItem().getItemMeta().getLore().get(1);
-            CharacterType characterType = CharacterType.valueOf(name);
-
-            CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-            if (combatUser != null)
-                combatUser.setCharacterType(characterType);
-
-            player.closeInventory();
-        }
-    }
-
     private enum SelectCharInfoItem {
-        ASSASSIN(Material.DIAMOND_HOE, 4, Role.ASSASSIN),
-        SCUFFLER(Material.IRON_SWORD, 0, Role.SCUFFLER),
+        ASSASSIN(Material.DIAMOND_HOE, 4, Role.SCUFFLER),
+        SCUFFLER(Material.IRON_SWORD, 0, Role.CONTROLLER),
         MARKSMAN(Material.BOW, 0, Role.MARKSMAN),
         VANGUARD(Material.IRON_CHESTPLATE, 0, Role.VANGUARD),
         GUARDIAN(Material.SHIELD, 0, Role.GUARDIAN),
-        SUPPORTER(Material.END_CRYSTAL, 0, Role.SUPPORTER);
+        SUPPORTER(Material.END_CRYSTAL, 0, Role.SUPPORT);
 
-        /** GUI 아이템 객체 */
-        private final GuiItem<SelectCharInfoItem> guiItem;
+        /** 정적 아이템 객체 */
+        private final StaticItem staticItem;
 
         SelectCharInfoItem(Material material, int damage, Role role) {
-            this.guiItem = new GuiItem<SelectCharInfoItem>(this, new ItemBuilder(material)
+            this.staticItem = new StaticItem("SelectCharInfo" + this, new ItemBuilder(material)
                     .setDamage((short) damage)
                     .setName(role.getColor() + "§l" + role.getName())
                     .setLore(role.getDescription())
-                    .build()) {
-                @Override
-                public Gui getGui() {
-                    return instance;
-                }
-
-                @Override
-                public boolean isClickable() {
-                    return false;
-                }
-            };
+                    .build());
         }
     }
 }

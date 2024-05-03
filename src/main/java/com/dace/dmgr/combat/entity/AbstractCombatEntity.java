@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.util.Cooldown;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -15,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ import java.util.Comparator;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 @Getter
-abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
+public abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     /** 엔티티 객체 */
     @NonNull
     protected final T entity;
@@ -40,7 +39,7 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     protected final Game game;
     /** 히트박스 객체 목록 */
     @NonNull
-    protected final Hitbox[] hitboxes;
+    protected final Hitbox @NonNull [] hitboxes;
     /** 활성화 여부 */
     protected boolean isActivated = false;
     /** 히트박스의 가능한 최대 크기. (단위: 블록) */
@@ -55,7 +54,7 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
      * @param hitboxes 히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, Game game, @NonNull Hitbox... hitboxes) {
+    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
         CombatEntity combatEntity = CombatEntityRegistry.getInstance().get(entity);
         if (combatEntity != null)
             throw new IllegalStateException(MessageFormat.format("엔티티 {0}의 CombatEntity가 이미 생성됨", name));
@@ -115,13 +114,13 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
         return Arrays.stream(hitboxes).map(hitbox -> hitbox.getNearestLocation(location))
                 .min(Comparator.comparing(loc -> loc.distance(location)))
-                .get();
+                .orElseThrow(() -> new IllegalStateException("가장 가까운 위치를 찾을 수 없음"));
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void dispose() {
-        checkAccess();
+        validate();
 
         CombatEntityRegistry.getInstance().remove(entity);
         if (game != null)
@@ -131,18 +130,18 @@ abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     }
 
     @Override
-    public boolean isDisposed() {
+    public final boolean isDisposed() {
         return CombatEntityRegistry.getInstance().get(entity) == null;
     }
 
     @Override
-    public boolean isEnemy(@NonNull CombatEntity combatEntity) {
+    public final boolean isEnemy(@NonNull CombatEntity combatEntity) {
         return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
     }
 
     @Override
     public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (CooldownUtil.getCooldown(this, Cooldown.KNOCKBACK) == 0 && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
+        if (!getKnockbackModule().isKnockbacked() && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
             entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
     }
 

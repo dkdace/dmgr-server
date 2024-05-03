@@ -4,6 +4,7 @@ import com.dace.dmgr.game.Tier;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Material;
 
 /**
@@ -13,48 +14,36 @@ public final class GeneralConfig extends YamlFile {
     @Getter
     private static final GeneralConfig instance = new GeneralConfig();
     /** 일반 설정 */
-    @Getter
-    private static final Config config = new Config();
+    private final Config config = new Config();
     /** 전투 시스템 관련 설정 */
-    @Getter
-    private static final CombatConfig combatConfig = new CombatConfig();
+    private final CombatConfig combatConfig = new CombatConfig();
     /** 게임 관련 설정 */
-    @Getter
-    private static final GameConfig gameConfig = new GameConfig();
+    private final GameConfig gameConfig = new GameConfig();
 
     private GeneralConfig() {
         super("config", true);
     }
 
+    @NonNull
+    public static Config getConfig() {
+        return instance.config;
+    }
+
+    @NonNull
+    public static CombatConfig getCombatConfig() {
+        return instance.combatConfig;
+    }
+
+    @NonNull
+    public static GameConfig getGameConfig() {
+        return instance.gameConfig;
+    }
+
     @Override
     protected void onInitFinish() {
-        config.resourcePackUrl = getString("resourcePackUrl", config.resourcePackUrl);
-        config.chatCooldown = getLong("chatCooldown", config.chatCooldown);
-        config.commandCooldown = getLong("commandCooldown", config.commandCooldown);
-        config.rankingUpdatePeriod = (int) getLong("rankingUpdatePeriod", config.rankingUpdatePeriod);
-        config.messagePrefix = getString("messagePrefix", config.messagePrefix);
-
-        combatConfig.idleUltChargePerSecond = (int) getLong("idleUltChargePerSecond", combatConfig.idleUltChargePerSecond);
-        combatConfig.respawnTime = (int) getLong("respawnTime", combatConfig.respawnTime);
-        combatConfig.healPackBlock = Material.valueOf(getString("healPackBlock", combatConfig.healPackBlock.toString()));
-        combatConfig.healPackCooldown = (int) getLong("healPackCooldown", combatConfig.healPackCooldown);
-        combatConfig.healPackHeal = (int) getLong("healPackHeal", combatConfig.healPackHeal);
-        combatConfig.fallZoneBlock = Material.valueOf(getString("fallZoneBlock", combatConfig.fallZoneBlock.toString()));
-
-        gameConfig.maxRoomCount = (int) getLong("maxRoomCount", gameConfig.maxRoomCount);
-        gameConfig.normalMinPlayerCount = (int) getLong("normalMinPlayerCount", gameConfig.normalMinPlayerCount);
-        gameConfig.normalMaxPlayerCount = (int) getLong("normalMaxPlayerCount", gameConfig.normalMaxPlayerCount);
-        gameConfig.rankMinPlayerCount = (int) getLong("rankMinPlayerCount", gameConfig.rankMinPlayerCount);
-        gameConfig.rankMaxPlayerCount = (int) getLong("rankMaxPlayerCount", gameConfig.rankMaxPlayerCount);
-        gameConfig.rankPlacementPlayCount = (int) getLong("rankPlacementPlayCount", gameConfig.rankPlacementPlayCount);
-        gameConfig.waitingTime = (int) getLong("waitingTime", gameConfig.waitingTime);
-        gameConfig.teamSpawnHealPerSecond = (int) getLong("teamSpawnHealPerSecond", gameConfig.teamSpawnHealPerSecond);
-        gameConfig.oppositeSpawnDamagePerSecond = (int) getLong("oppositeSpawnDamagePerSecond", gameConfig.oppositeSpawnDamagePerSecond);
-        gameConfig.expectedAverageRankRate = (int) getLong("expectedAverageKDARatio", gameConfig.expectedAverageRankRate);
-        gameConfig.expectedAverageKDARatio = getDouble("expectedAverageKDARatio", gameConfig.expectedAverageKDARatio);
-        gameConfig.expectedAverageScorePerMin = (int) getLong("expectedAverageScorePerMin", gameConfig.expectedAverageScorePerMin);
-        gameConfig.maxPlacementRankRate = (int) getLong("maxPlacementRankRate", gameConfig.maxPlacementRankRate);
-        gameConfig.mmrPlayCountThreshold = (int) getLong("mmrPlayCountThreshold", gameConfig.mmrPlayCountThreshold);
+        config.load();
+        combatConfig.load();
+        gameConfig.load();
 
         ConsoleLogger.info("전역 설정 불러오기 완료");
     }
@@ -69,17 +58,36 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class Config {
+    public final class Config {
+        /** 섹션 이름 */
+        private static final String SECTION = "default";
         /** 리소스팩 URL */
         private String resourcePackUrl = "";
-        /** 채팅 쿨타임 */
+        /** 채팅 쿨타임 (tick) */
         private long chatCooldown = 0;
-        /** 명령어 쿨타임 */
+        /** 명령어 쿨타임 (tick) */
         private long commandCooldown = 0;
         /** 랭킹 업데이트 주기 (분) */
-        private long rankingUpdatePeriod = 5;
+        private int rankingUpdatePeriodMinutes = 5;
+        /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
+        private int netheriteTierMinRank = 5;
         /** 메시지의 접두사 */
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
+        /** 관리자 연락처 */
+        private String adminContact = "디스코드 dkdace (DarkDace＃4671)";
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
+            chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
+            commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
+            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriod", rankingUpdatePeriodMinutes);
+            netheriteTierMinRank = (int) getLong(SECTION + ".netheriteTierMinRank", netheriteTierMinRank);
+            messagePrefix = getString(SECTION + ".messagePrefix", messagePrefix);
+            adminContact = getString(SECTION + ".adminContact", adminContact);
+        }
     }
 
     /**
@@ -87,19 +95,39 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class CombatConfig {
+    public final class CombatConfig {
+        /** 섹션 이름 */
+        private static final String SECTION = "combat";
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
-        /** 리스폰 시간 (틱) */
-        private int respawnTime = 200;
+        /** 리스폰 시간 (tick) */
+        private long respawnTime = 200;
         /** 힐 팩에 사용되는 블록의 타입 */
         private Material healPackBlock = Material.NETHERRACK;
-        /** 힐 팩 쿨타임 (초) */
-        private int healPackCooldown = 15;
+        /** 힐 팩 쿨타임 (tick) */
+        private long healPackCooldown = 15 * 20;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
+        /** 점프대에 사용되는 블록의 타입 */
+        private Material jumpPadBlock = Material.SPONGE;
+        /** 점프대 사용 시 속력 */
+        private double jumpPadVelocity = 1.4;
         /** 낙사 구역에 사용되는 블록의 타입 */
         private Material fallZoneBlock = Material.BEDROCK;
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            idleUltChargePerSecond = (int) getLong(SECTION + ".idleUltChargePerSecond", idleUltChargePerSecond);
+            respawnTime = getLong(SECTION + ".respawnTime", respawnTime);
+            healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
+            healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
+            healPackHeal = (int) getLong(SECTION + ".healPackHeal", healPackHeal);
+            jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
+            jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
+            fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));
+        }
     }
 
     /**
@@ -107,7 +135,9 @@ public final class GeneralConfig extends YamlFile {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class GameConfig {
+    public final class GameConfig {
+        /** 섹션 이름 */
+        private static final String SECTION = "game";
         /** 일반 게임과 랭크 게임의 최대 방 갯수 */
         private int maxRoomCount = 5;
         /** 게임을 시작하기 위한 최소 인원 수 (일반) */
@@ -121,7 +151,7 @@ public final class GeneralConfig extends YamlFile {
         /** 랭크가 결정되는 배치 판 수 */
         private int rankPlacementPlayCount = 5;
         /** 게임 시작까지 필요한 대기 시간 (초) */
-        private int waitingTime = 30;
+        private int waitingTimeSeconds = 30;
         /** 팀 스폰 입장 시 초당 회복량 */
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */
@@ -136,5 +166,25 @@ public final class GeneralConfig extends YamlFile {
         private int maxPlacementRankRate = Tier.EMERALD.getMinScore() - 1;
         /** MMR 수치에 영향을 미치는 플레이 횟수 */
         private int mmrPlayCountThreshold = 25;
+
+        /**
+         * 데이터를 불러온다.
+         */
+        private void load() {
+            maxRoomCount = (int) getLong(SECTION + ".maxRoomCount", maxRoomCount);
+            normalMinPlayerCount = (int) getLong(SECTION + ".normalMinPlayerCount", normalMinPlayerCount);
+            normalMaxPlayerCount = (int) getLong(SECTION + ".normalMaxPlayerCount", normalMaxPlayerCount);
+            rankMinPlayerCount = (int) getLong(SECTION + ".rankMinPlayerCount", rankMinPlayerCount);
+            rankMaxPlayerCount = (int) getLong(SECTION + ".rankMaxPlayerCount", rankMaxPlayerCount);
+            rankPlacementPlayCount = (int) getLong(SECTION + ".rankPlacementPlayCount", rankPlacementPlayCount);
+            waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
+            teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
+            oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
+            expectedAverageRankRate = (int) getLong(SECTION + ".expectedAverageKDARatio", expectedAverageRankRate);
+            expectedAverageKDARatio = getDouble(SECTION + ".expectedAverageKDARatio", expectedAverageKDARatio);
+            expectedAverageScorePerMin = (int) getLong(SECTION + ".expectedAverageScorePerMin", expectedAverageScorePerMin);
+            maxPlacementRankRate = (int) getLong(SECTION + ".maxPlacementRankRate", maxPlacementRankRate);
+            mmrPlayCountThreshold = (int) getLong(SECTION + ".mmrPlayCountThreshold", mmrPlayCountThreshold);
+        }
     }
 }

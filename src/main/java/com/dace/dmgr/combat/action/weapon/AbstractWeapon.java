@@ -3,13 +3,26 @@ package com.dace.dmgr.combat.action.weapon;
 import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * {@link Weapon}의 기본 구현체, 모든 무기의 기반 클래스.
  */
+@Getter
 public abstract class AbstractWeapon extends AbstractAction implements Weapon {
+    /** 투명 아이템의 내구도 */
+    private static final short INVISIBLE_ITEM_DURABILITY = 1561;
+    /** 무기 정보 객체 */
+    @NonNull
+    protected final WeaponInfo weaponInfo;
+    /** 무기 아이템 객체 */
+    @NonNull
+    protected ItemStack itemStack;
+
     /**
      * 무기 인스턴스를 생성한다.
      *
@@ -17,8 +30,10 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
      * @param weaponInfo 무기 정보 객체
      */
     protected AbstractWeapon(@NonNull CombatUser combatUser, @NonNull WeaponInfo weaponInfo) {
-        super(combatUser, weaponInfo);
+        super(combatUser);
 
+        this.weaponInfo = weaponInfo;
+        this.itemStack = weaponInfo.getItemStack();
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
@@ -43,6 +58,25 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
     @Override
     public final void displayDurability(short durability) {
         itemStack.setDurability(durability);
-        combatUser.getEntity().getInventory().setItem(4, itemStack);
+        if (combatUser.getEntity().getInventory().getItem(4).getDurability() != INVISIBLE_ITEM_DURABILITY)
+            combatUser.getEntity().getInventory().setItem(4, itemStack);
+    }
+
+    @Override
+    public final void setGlowing(boolean isGlowing) {
+        if (isGlowing)
+            itemStack.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);
+        else
+            itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
+        if (combatUser.getEntity().getInventory().getItem(4).getDurability() != INVISIBLE_ITEM_DURABILITY)
+            combatUser.getEntity().getInventory().setItem(4, itemStack);
+    }
+
+    @Override
+    public final void setVisible(boolean isVisible) {
+        ItemStack invisibleItem = itemStack.clone();
+        invisibleItem.setDurability(INVISIBLE_ITEM_DURABILITY);
+
+        combatUser.getEntity().getInventory().setItem(4, isVisible ? itemStack : invisibleItem);
     }
 }

@@ -78,9 +78,9 @@ public class Hitbox {
      * @param offsetX     중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록)
      * @param offsetY     중앙 위치 오프셋. 아래(-) / 위(+). (단위 : 블록)
      * @param offsetZ     중앙 위치 오프셋. 뒤(-) / 앞(+). (단위 : 블록)
-     * @param axisOffsetX 축 기준 중앙 오프셋. -X / +X. (단위 : 블록)
-     * @param axisOffsetY 축 기준 중앙 위치 오프셋. 아래(-) / 위(+). (단위 : 블록)
-     * @param axisOffsetZ 축 기준 중앙 위치 오프셋. 뒤(-) / 앞(+). (단위 : 블록)
+     * @param axisOffsetX 축 기준 중앙 위치 오프셋. -X / +X. (단위 : 블록)
+     * @param axisOffsetY 축 기준 중앙 위치 오프셋. -Y / +Y. (단위 : 블록)
+     * @param axisOffsetZ 축 기준 중앙 위치 오프셋. -Z / +Z. (단위 : 블록)
      */
     public Hitbox(@NonNull Location location, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ,
                   double axisOffsetX, double axisOffsetY, double axisOffsetZ) {

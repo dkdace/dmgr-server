@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -35,9 +33,6 @@ public final class AimModule {
      * 무기 정조준을 활성화 또는 비활성화한다.
      */
     public void toggleAim() {
-        if (weapon instanceof Swappable && ((Swappable<?>) weapon).getSwapModule().getSwapState() == Swappable.SwapState.SWAPPING)
-            return;
-
         isAiming = !isAiming;
 
         if (isAiming) {
@@ -45,8 +40,6 @@ public final class AimModule {
 
             TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
                 if (!isAiming)
-                    return false;
-                if (weapon instanceof Reloadable && ((Reloadable) weapon).getReloadModule().isReloading())
                     return false;
 
                 weapon.getCombatUser().setFovValue(zoomLevel.getValue());

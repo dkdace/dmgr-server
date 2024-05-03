@@ -1,0 +1,149 @@
+package com.dace.dmgr.combat.character.silia;
+
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.Scuffler;
+import com.dace.dmgr.combat.character.silia.action.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.StringFormUtil;
+import lombok.Getter;
+import lombok.NonNull;
+import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.StringJoiner;
+
+/**
+ * 전투원 - 실리아 클래스.
+ *
+ * @see SiliaWeapon
+ * @see SiliaP1
+ * @see SiliaP2
+ * @see SiliaA1
+ * @see SiliaA2
+ * @see SiliaA3
+ * @see SiliaUlt
+ */
+public final class Silia extends Scuffler {
+    @Getter
+    private static final Silia instance = new Silia();
+
+    private Silia() {
+        super("실리아", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
+    }
+
+    @Override
+    @NonNull
+    public String getActionbarString(@NonNull CombatUser combatUser) {
+        SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
+        SiliaUlt skill4 = (SiliaUlt) combatUser.getSkill(SiliaUltInfo.getInstance());
+
+        double skill3Duration = skill3.getStateValue() / 20.0;
+        double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
+
+        StringJoiner text = new StringJoiner("    ");
+
+        String skill3Display = StringFormUtil.getActionbarDurationBar(skill3.getSkillInfo().toString(), skill3Duration, skill3MaxDuration,
+                10, '■');
+
+        if (!skill3.isDurationFinished())
+            skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
+        text.add(skill3Display);
+        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
+
+        return text.toString();
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
+        super.onKill(attacker, victim, isFinalHit);
+
+        if (!(victim instanceof CombatUser))
+            return;
+
+        SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
+        SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
+
+        if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
+            skill1.setCooldown(2);
+        if (!skillUlt.isDurationFinished())
+            skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
+    }
+
+    @Override
+    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
+    public boolean canSprint(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(SiliaP1Info.getInstance()).canUse();
+    }
+
+    @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    @Override
+    @NonNull
+    public SiliaWeaponInfo getWeaponInfo() {
+        return SiliaWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+        switch (number) {
+            case 1:
+                return SiliaP1Info.getInstance();
+            case 2:
+                return SiliaP2Info.getInstance();
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    @Nullable
+    public ActiveSkillInfo getActiveSkillInfo(int number) {
+        switch (number) {
+            case 1:
+                return SiliaA1Info.getInstance();
+            case 2:
+                return SiliaA2Info.getInstance();
+            case 3:
+                return SiliaA3Info.getInstance();
+            case 4:
+                return SiliaUltInfo.getInstance();
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    @NonNull
+    public SiliaUltInfo getUltimateSkillInfo() {
+        return SiliaUltInfo.getInstance();
+    }
+}

@@ -4,10 +4,11 @@ import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.nio.file.Files;
 
 /**
  * Yaml 파일을 관리하는 클래스.
@@ -76,7 +77,7 @@ public abstract class YamlFile implements Initializable<Void> {
     @NonNull
     public final AsyncTask<Void> init() {
         if (isInitialized)
-            throw new CannotAccessException();
+            throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -88,13 +89,14 @@ public abstract class YamlFile implements Initializable<Void> {
                 config.load(file);
                 isInitialized = true;
 
-                onFinish.accept(null);
+                onFinish.andThen(v -> onInitFinish()).accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-                onInitError(ex);
 
+                onInitError(ex);
+                onError.andThen(this::onInitError).accept(ex);
             }
-        }).onFinish(this::onInitFinish).onError(this::onInitError);
+        });
     }
 
     /**
@@ -110,34 +112,11 @@ public abstract class YamlFile implements Initializable<Void> {
     protected abstract void onInitError(Exception ex);
 
     /**
-     * 파일을 삭제한다.
-     *
-     * @throws IllegalStateException 읽기 전용으로 호출 시 발생
-     */
-    @NonNull
-    public final AsyncTask<Void> delete() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
-
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                Files.delete(file.toPath());
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 삭제 실패 : {0}", ex, file);
-                onError.accept(ex);
-            }
-        });
-    }
-
-    /**
      * 파일을 다시 불러온다.
      */
     @NonNull
     public final AsyncTask<Void> reload() {
-        checkAccess();
+        validate();
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -159,10 +138,8 @@ public abstract class YamlFile implements Initializable<Void> {
      */
     @NonNull
     public final AsyncTask<Void> save() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+        validate();
+        validateReadOnly();
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -183,10 +160,8 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalStateException 읽기 전용으로 호출 시 발생
      */
     public final void saveSync() {
-        checkAccess();
-
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+        validate();
+        validateReadOnly();
 
         try {
             config.save(file);
@@ -196,111 +171,278 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
+     * 섹션에서 실제 키 값을 반환한다.
+     *
+     * @param key 섹션이 포함된 키
+     * @return 실제 키
+     */
+    private String getLastKey(@NonNull String key) {
+        String[] sections = key.split("\\.");
+        return sections[sections.length - 1];
+    }
+
+    /**
+     * 섹션이 포함된 키에서 가장 깊은 섹션을 반환한다.
+     *
+     * @param key 섹션이 포함된 키
+     * @return 가장 깊은 섹션
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
+     */
+    private ConfigurationSection getDeepestSection(@NonNull String key) {
+        if (key.startsWith(".") || key.endsWith(".") || key.contains(".."))
+            throw new IllegalArgumentException("'key'가 유효하지 않음");
+
+        ConfigurationSection configurationSection = config;
+        String[] sections = key.split("\\.");
+        for (int i = 0; i < sections.length - 1; i++) {
+            if (configurationSection.getConfigurationSection(sections[i]) == null)
+                configurationSection = configurationSection.createSection(sections[i]);
+            else
+                configurationSection = configurationSection.getConfigurationSection(sections[i]);
+        }
+
+        return configurationSection;
+    }
+
+    /**
      * 파일에 값을 저장한다.
+     *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
      *
      * <p>읽기 전용으로 지정된 경우 사용할 수 없다.</p>
      *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'에 값 1234 저장
+     * yamlFile.set("test", 1234);
+     * // 섹션 'user'의 키 'test'에 값 true 저장
+     * yamlFile.set("user.test", true);
+     * }</pre>
+     *
      * @param key   키
      * @param value 값
-     * @throws IllegalStateException 읽기 전용으로 호출 시 발생
+     * @throws IllegalStateException    읽기 전용으로 호출 시 발생
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final void set(@NonNull String key, Object value) {
-        checkAccess();
+        validate();
+        validateReadOnly();
 
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
-
-        config.set(key, value);
+        if (key.contains("."))
+            getDeepestSection(key).set(getLastKey(key), value);
+        else
+            config.set(key, value);
     }
 
     /**
      * 파일에서 정수 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * long value = yamlFile.getLong("test", 0);
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * long value = yamlFile.getLong("user.test", 0);
+     * }</pre>
+     *
      * @param key          키
      * @param defaultValue 기본값
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final long getLong(@NonNull String key, long defaultValue) {
-        checkAccess();
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getLong(getLastKey(key), defaultValue);
+
         return config.getLong(key, defaultValue);
     }
 
     /**
      * 파일에서 정수 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * long value = yamlFile.getLong("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * long value = yamlFile.getLong("user.test");
+     * }</pre>
+     *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 0 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final long getLong(@NonNull String key) {
-        checkAccess();
+        validate();
         return getLong(key, 0);
     }
 
     /**
      * 파일에서 실수 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * double value = yamlFile.getDouble("test", 2.5);
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * double value = yamlFile.getDouble("user.test", 2.5);
+     * }</pre>
+     *
      * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final double getDouble(@NonNull String key, double defaultValue) {
-        checkAccess();
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getDouble(getLastKey(key), defaultValue);
+
         return config.getDouble(key, defaultValue);
     }
 
     /**
      * 파일에서 실수 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * double value = yamlFile.getDouble("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * double value = yamlFile.getDouble("user.test");
+     * }</pre>
+     *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 0 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final double getDouble(@NonNull String key) {
-        checkAccess();
+        validate();
         return getDouble(key, 0);
     }
 
     /**
      * 파일에서 문자열 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * String value = yamlFile.getString("test", "Default");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * String value = yamlFile.getString("user.test", "Default");
+     * }</pre>
+     *
      * @param key          키
      * @param defaultValue 기본값
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
-    protected final String getString(@NonNull String key, String defaultValue) {
-        checkAccess();
+    protected final String getString(@NonNull String key, @Nullable String defaultValue) {
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getString(getLastKey(key), defaultValue);
+
         return config.getString(key, defaultValue);
     }
 
     /**
      * 파일에서 문자열 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * String value = yamlFile.getString("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * String value = yamlFile.getString("user.test");
+     * }</pre>
+     *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final String getString(@NonNull String key) {
-        checkAccess();
+        validate();
         return getString(key, null);
     }
 
     /**
      * 파일에서 부울 값을 불러온다.
      *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * boolean value = yamlFile.getBoolean("test", false);
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * boolean value = yamlFile.getBoolean("user.test", true);
+     * }</pre>
+     *
      * @param key          키
      * @param defaultValue 기본값
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final boolean getBoolean(@NonNull String key, boolean defaultValue) {
-        checkAccess();
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getBoolean(getLastKey(key), defaultValue);
+
         return config.getBoolean(key, defaultValue);
     }
 
     /**
      * 파일에서 부울 값을 불러온다.
      *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * boolean value = yamlFile.getBoolean("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * boolean value = yamlFile.getBoolean("user.test");
+     * }</pre>
+     *
      * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @return 값. 데이터가 존재하지 않으면 {@code false} 반환
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     protected final boolean getBoolean(@NonNull String key) {
-        checkAccess();
+        validate();
         return getBoolean(key, false);
+    }
+
+    /**
+     * 인스턴스가 읽기 전용으로 생성되었으면 예외를 발생시킨다.
+     *
+     * @throws IllegalStateException 인스턴스가 읽기 전용으로 생성되었으면 발생
+     */
+    private void validateReadOnly() {
+        if (isReadOnly)
+            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
     }
 }
