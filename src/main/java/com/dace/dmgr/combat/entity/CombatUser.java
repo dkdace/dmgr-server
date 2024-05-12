@@ -443,8 +443,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canSprint(this))
             return false;
-        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
-                statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
+        if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
+                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
             return false;
         if (CooldownUtil.getCooldown(this, Cooldown.WEAPON_NO_SPRINT.id) > 0)
             return false;
@@ -464,8 +464,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canFly(this))
             return false;
-        if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN) || statusEffectModule.hasStatusEffect(StatusEffectType.SNARE) ||
-                statusEffectModule.hasStatusEffect(StatusEffectType.GROUNDING))
+        if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
+                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
             return false;
 
         return true;
@@ -1016,7 +1016,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actions.forEach(action -> {
             if (isDead() || action == null)
                 return;
-            if (statusEffectModule.hasStatusEffect(StatusEffectType.STUN))
+            if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN))
                 return;
 
             if (action instanceof MeleeAttackAction && action.canUse()) {
@@ -1092,7 +1092,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse() || statusEffectModule.hasStatusEffect(StatusEffectType.SILENCE))
+        if (!skill.canUse() || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
             return;
 
         skill.onUse(actionKey);

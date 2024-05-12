@@ -45,7 +45,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketAdapter {
         if (combatUser == null)
             return false;
 
-        if (combatUser.getStatusEffectModule().hasStatusEffect(StatusEffectType.SILENCE))
+        if (combatUser.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SILENCE))
             return true;
 
         Player targetPlayer = (Player) location.getWorld().getNearbyEntities(location, 0.3, 0.3, 0.3).stream()

@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Speed;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +44,7 @@ public abstract class Scuffler extends Character {
             attacker.addScore("결정타", FINAL_HIT_SCORE);
         }
 
-        attacker.getStatusEffectModule().applyStatusEffect(StatusEffectType.SPEED, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        attacker.getStatusEffectModule().applyStatusEffect(RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
     }
 
     public static final class RoleTrait1Info extends TraitInfo {

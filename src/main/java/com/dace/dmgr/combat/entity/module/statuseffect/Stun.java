@@ -16,6 +16,12 @@ public class Stun implements StatusEffect {
     static final Stun instance = new Stun();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.STUN;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }

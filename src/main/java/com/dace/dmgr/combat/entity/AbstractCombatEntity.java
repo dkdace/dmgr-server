@@ -141,7 +141,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (!getKnockbackModule().isKnockbacked() && !getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE))
+        if (!getKnockbackModule().isKnockbacked() && !getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) &&
+                !getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
             entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
     }
 
