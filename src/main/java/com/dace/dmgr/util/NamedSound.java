@@ -334,6 +334,15 @@ public enum NamedSound {
             new DefinedSound("random.swordhit", 2, 0.7),
             new DefinedSound("new.item.trident.return", 2.5, 1.4),
             new DefinedSound("new.item.trident.return", 2.5, 1.2)
+    ),
+    /** 전투 - '니스' 무기 - 사용 */
+    COMBAT_NEACE_WEAPON_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8, 1.8),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 1, 1.5)
+    ),
+    /** 전투 - '니스' 무기 - 사용 (치유 광선) */
+    COMBAT_NEACE_WEAPON_USE_HEAL(
+            new DefinedSound(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2)
     );
 
     /** 지정된 효과음 목록 */
