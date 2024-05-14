@@ -37,6 +37,8 @@ public final class NeaceWeaponInfo extends WeaponInfo {
         int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
         int MAX_DISTANCE = 15;
+        /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
+        long BLOCK_RESET_DELAY = 2 * 20;
     }
 
     /**

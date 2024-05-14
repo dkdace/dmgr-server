@@ -18,8 +18,10 @@ import org.bukkit.block.Block;
 
 @Getter
 public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "TargetResetDelay";
+    /** 대상 초기화 딜레이 쿨타임 ID */
+    private static final String TARGET_RESET_DELAY_COOLDOWN_ID = "TargetResetDelay";
+    /** 대상 위치 통과 불가 시 초기화 딜레이 쿨타임 ID */
+    private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
     /** 연사 모듈 */
     @NonNull
     private final FullAutoModule fullAutoModule;
@@ -50,8 +52,12 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             case PERIODIC_1: {
                 new NeaceTarget().shoot();
 
+                Location loc = combatUser.getEntity().getEyeLocation();
                 if (target != null) {
-                    if (CooldownUtil.getCooldown(this, COOLDOWN_ID) == 0)
+                    Location targetLoc = target.getNearestLocationOfHitboxes(loc);
+                    if (CooldownUtil.getCooldown(this, TARGET_RESET_DELAY_COOLDOWN_ID) == 0 ||
+                            CooldownUtil.getCooldown(this, BLOCK_RESET_DELAY_COOLDOWN_ID) == 0 ||
+                            targetLoc.distance(loc) > NeaceWeaponInfo.HEAL.MAX_DISTANCE)
                         target = null;
                 } else if (sightTarget != null)
                     GlowUtil.setGlowing(sightTarget.getEntity(), ChatColor.GREEN, combatUser.getEntity(), 3);
@@ -75,12 +81,15 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         return;
                 }
 
-                CooldownUtil.setCooldown(this, COOLDOWN_ID, 4);
+                CooldownUtil.setCooldown(this, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
                 combatUser.getUser().sendTitle("", "§a" + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(), 0, 5, 5);
                 target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
 
                 Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
+                if (LocationUtil.canPass(location, target.getNearestLocationOfHitboxes(location)))
+                    CooldownUtil.setCooldown(this, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
+
                 for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.8)) {
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
                             255, 255, 140);
