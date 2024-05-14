@@ -1,19 +1,27 @@
 package com.dace.dmgr.combat.character.neace;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Support;
+import com.dace.dmgr.combat.character.neace.action.NeaceA1;
+import com.dace.dmgr.combat.character.neace.action.NeaceA1Info;
 import com.dace.dmgr.combat.character.neace.action.NeaceWeapon;
 import com.dace.dmgr.combat.character.neace.action.NeaceWeaponInfo;
 import com.dace.dmgr.combat.character.quaker.action.QuakerUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.util.GlowUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -22,6 +30,7 @@ import java.util.StringJoiner;
  * 전투원 - 니스 클래스.
  *
  * @see NeaceWeapon
+ * @see NeaceA1
  */
 public final class Neace extends Support {
     @Getter
@@ -34,12 +43,7 @@ public final class Neace extends Support {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        NeaceWeapon weapon = (NeaceWeapon) combatUser.getWeapon();
-
         StringJoiner text = new StringJoiner("    ");
-
-        if (weapon.getTarget() == null && weapon.getSightTarget() != null)
-            text.add(weapon.getWeaponInfo() + "  §7[" + weapon.getDefaultActionKeys()[1].getName() + "] §f치유");
 
         return text.toString();
     }
@@ -48,7 +52,7 @@ public final class Neace extends Support {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        combatUser.useAction(ActionKey.PERIODIC_1);
+        new NeaceTarget(combatUser).shoot();
     }
 
     @Override
@@ -95,6 +99,8 @@ public final class Neace extends Support {
     @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return NeaceA1Info.getInstance();
             case 4:
                 return QuakerUltInfo.getInstance();
             default:
@@ -106,5 +112,24 @@ public final class Neace extends Support {
     @NonNull
     public QuakerUltInfo getUltimateSkillInfo() {
         return QuakerUltInfo.getInstance();
+    }
+
+    private static final class NeaceTarget extends Hitscan {
+        private NeaceTarget(CombatUser combatUser) {
+            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
+                    .condition(combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(combatUser) &&
+                            combatEntity != combatUser).build());
+        }
+
+        @Override
+        protected boolean onHitBlock(@NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
+            return false;
+        }
     }
 }

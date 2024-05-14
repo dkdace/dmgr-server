@@ -10,13 +10,13 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-@Getter
 public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     /** 대상 초기화 딜레이 쿨타임 ID */
     private static final String TARGET_RESET_DELAY_COOLDOWN_ID = "TargetResetDelay";
@@ -24,9 +24,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
     /** 연사 모듈 */
     @NonNull
+    @Getter
     private final FullAutoModule fullAutoModule;
-    /** 시야 대상 */
-    private Healable sightTarget = null;
     /** 현재 사용 대상 */
     private Healable target = null;
 
@@ -38,7 +37,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.PERIODIC_1};
+        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK};
     }
 
     @Override
@@ -49,21 +48,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
-            case PERIODIC_1: {
-                new NeaceTarget().shoot();
-
-                Location loc = combatUser.getEntity().getEyeLocation();
-                if (target != null) {
-                    Location targetLoc = target.getNearestLocationOfHitboxes(loc);
-                    if (CooldownUtil.getCooldown(this, TARGET_RESET_DELAY_COOLDOWN_ID) == 0 ||
-                            CooldownUtil.getCooldown(this, BLOCK_RESET_DELAY_COOLDOWN_ID) == 0 ||
-                            targetLoc.distance(loc) > NeaceWeaponInfo.HEAL.MAX_DISTANCE)
-                        target = null;
-                } else if (sightTarget != null)
-                    GlowUtil.setGlowing(sightTarget.getEntity(), ChatColor.GREEN, combatUser.getEntity(), 3);
-
-                break;
-            }
             case LEFT_CLICK: {
                 setCooldown();
                 combatUser.playMeleeAttackAnimation(-3, 6, true);
@@ -76,20 +60,21 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             }
             case RIGHT_CLICK: {
                 if (target == null) {
-                    target = sightTarget;
-                    if (sightTarget == null)
+                    new NeaceTarget().shoot();
+
+                    if (target == null)
                         return;
                 }
 
-                CooldownUtil.setCooldown(this, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
+                CooldownUtil.setCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
                 combatUser.getUser().sendTitle("", "§a" + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(), 0, 5, 5);
                 target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
 
-                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-                if (LocationUtil.canPass(location, target.getNearestLocationOfHitboxes(location)))
-                    CooldownUtil.setCooldown(this, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
+                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getNearestLocationOfHitboxes(combatUser.getEntity().getEyeLocation())))
+                    CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
+                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
                 for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.8)) {
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
                             255, 255, 140);
@@ -101,8 +86,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     }
 
     private final class NeaceTarget extends Hitscan {
-        private Healable target = null;
-
         private NeaceTarget() {
             super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceWeaponInfo.HEAL.MAX_DISTANCE)
                     .condition(combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(NeaceWeapon.this.combatUser) &&
@@ -116,13 +99,18 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            this.target = (Healable) target;
-            return false;
-        }
+            NeaceWeapon.this.target = (Healable) target;
 
-        @Override
-        protected void onDestroy() {
-            sightTarget = target;
+            TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> {
+                Location loc = combatUser.getEntity().getEyeLocation();
+                Location targetLoc = NeaceWeapon.this.target.getNearestLocationOfHitboxes(loc);
+
+                return CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&
+                        CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0 &&
+                        targetLoc.distance(loc) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE;
+            }, isCancelled -> NeaceWeapon.this.target = null, 1));
+
+            return false;
         }
     }
 

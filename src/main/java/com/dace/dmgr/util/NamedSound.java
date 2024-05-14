@@ -343,6 +343,13 @@ public enum NamedSound {
     /** 전투 - '니스' 무기 - 사용 (치유 광선) */
     COMBAT_NEACE_WEAPON_USE_HEAL(
             new DefinedSound(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2)
+    ),
+    /** 전투 - '니스' 액티브 1번 - 사용 */
+    COMBAT_NEACE_A1_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 1.4),
+            new DefinedSound("new.block.note_block.chime", 2, 1.6),
+            new DefinedSound("new.block.note_block.chime", 2, 1.2)
     );
 
     /** 지정된 효과음 목록 */
