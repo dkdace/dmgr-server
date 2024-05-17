@@ -4,10 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Support;
-import com.dace.dmgr.combat.character.neace.action.NeaceA1;
-import com.dace.dmgr.combat.character.neace.action.NeaceA1Info;
-import com.dace.dmgr.combat.character.neace.action.NeaceWeapon;
-import com.dace.dmgr.combat.character.neace.action.NeaceWeaponInfo;
+import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.character.quaker.action.QuakerUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -31,6 +28,7 @@ import java.util.StringJoiner;
  *
  * @see NeaceWeapon
  * @see NeaceA1
+ * @see NeaceA2
  */
 public final class Neace extends Support {
     @Getter
@@ -43,7 +41,12 @@ public final class Neace extends Support {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
+        NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
+
         StringJoiner text = new StringJoiner("    ");
+
+        if (!skill2.isDurationFinished())
+            text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
 
         return text.toString();
     }
@@ -101,6 +104,8 @@ public final class Neace extends Support {
         switch (number) {
             case 1:
                 return NeaceA1Info.getInstance();
+            case 2:
+                return NeaceA2Info.getInstance();
             case 4:
                 return QuakerUltInfo.getInstance();
             default:

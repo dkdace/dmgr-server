@@ -153,7 +153,7 @@ public final class JagerA3 extends ActiveSkill {
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                     combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
-                    0.4F, 0.8F, 0.4F, 120, 220, 240);
+                    0.4, 0.8, 0.4, 120, 220, 240);
         }
     }
 

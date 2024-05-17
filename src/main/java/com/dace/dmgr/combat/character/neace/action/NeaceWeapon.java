@@ -66,18 +66,28 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         return;
                 }
 
+                boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
                 CooldownUtil.setCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
-                combatUser.getUser().sendTitle("", "§a" + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(), 0, 5, 5);
+
                 target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
+                if (isAmplifying)
+                    target.getStatusEffectModule().applyStatusEffect(NeaceA2.NeaceA2Buff.instance, 4);
+
+                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
+                combatUser.getUser().sendTitle("", (isAmplifying ? "§b" : "§a") + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(),
+                        0, 5, 5);
 
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getNearestLocationOfHitboxes(combatUser.getEntity().getEyeLocation())))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
                 Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
                 for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.8)) {
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                            255, 255, 140);
+                    if (isAmplifying)
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
+                                140, 255, 245);
+                    else
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
+                                255, 255, 140);
                 }
 
                 break;

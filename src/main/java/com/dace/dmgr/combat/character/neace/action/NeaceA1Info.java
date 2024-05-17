@@ -16,7 +16,6 @@ public final class NeaceA1Info extends ActiveSkillInfo {
     public static final int MAX_DISTANCE = 30;
     /** 지속시간 (tick) */
     public static final long DURATION = 15 * 20;
-
     @Getter
     private static final NeaceA1Info instance = new NeaceA1Info();
 

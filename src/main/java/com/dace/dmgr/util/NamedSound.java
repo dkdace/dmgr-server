@@ -350,6 +350,13 @@ public enum NamedSound {
             new DefinedSound("new.block.respawn_anchor.charge", 2, 1.4),
             new DefinedSound("new.block.note_block.chime", 2, 1.6),
             new DefinedSound("new.block.note_block.chime", 2, 1.2)
+    ),
+    /** 전투 - '니스' 액티브 2번 - 사용 */
+    COMBAT_NEACE_A2_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.5),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
+            new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.4)
     );
 
     /** 지정된 효과음 목록 */

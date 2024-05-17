@@ -43,19 +43,8 @@ public final class NeaceA1 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished();
-    }
-
-    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         new NeaceTarget().shoot();
-    }
-
-    @Override
-    public void onCancelled() {
-        super.onCancelled();
-        setDuration(0);
     }
 
     private final class NeaceTarget extends Hitscan {
