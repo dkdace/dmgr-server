@@ -357,6 +357,12 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
             new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
             new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.4)
+    ),
+    /** 전투 - '니스' 액티브 3번 - 사용 */
+    COMBAT_NEACE_A3_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 1.2, 1.8),
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.2, 1.6),
+            new DefinedSound(Sound.ENTITY_FIREWORK_LAUNCH, 1.2, 0.7)
     );
 
     /** 지정된 효과음 목록 */

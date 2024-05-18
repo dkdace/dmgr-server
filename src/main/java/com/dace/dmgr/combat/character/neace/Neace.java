@@ -29,6 +29,7 @@ import java.util.StringJoiner;
  * @see NeaceWeapon
  * @see NeaceA1
  * @see NeaceA2
+ * @see NeaceA3
  */
 public final class Neace extends Support {
     @Getter
@@ -106,6 +107,8 @@ public final class Neace extends Support {
                 return NeaceA1Info.getInstance();
             case 2:
                 return NeaceA2Info.getInstance();
+            case 3:
+                return NeaceA3Info.getInstance();
             case 4:
                 return QuakerUltInfo.getInstance();
             default:
