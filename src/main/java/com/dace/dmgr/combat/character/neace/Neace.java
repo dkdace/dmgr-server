@@ -27,6 +27,7 @@ import java.util.StringJoiner;
  * 전투원 - 니스 클래스.
  *
  * @see NeaceWeapon
+ * @see NeaceP1
  * @see NeaceA1
  * @see NeaceA2
  * @see NeaceA3
@@ -43,11 +44,14 @@ public final class Neace extends Support {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
+        NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());
 
         StringJoiner text = new StringJoiner("    ");
 
         if (!skill2.isDurationFinished())
             text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill3.isDurationFinished())
+            text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
 
         return text.toString();
     }
@@ -62,6 +66,7 @@ public final class Neace extends Support {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CooldownUtil.setCooldown(victim, NeaceP1.COOLDOWN_ID, NeaceP1Info.ACTIVATE_DURATION);
     }
 
     @Override
@@ -94,6 +99,8 @@ public final class Neace extends Support {
     @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return NeaceP1Info.getInstance();
             default:
                 return null;
         }

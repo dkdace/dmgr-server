@@ -54,7 +54,7 @@ public final class NeaceA3 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setCooldown();
     }
 
     private final class NeaceTarget extends Hitscan {
