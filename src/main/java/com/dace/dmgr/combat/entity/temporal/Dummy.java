@@ -1,13 +1,14 @@
 package com.dace.dmgr.combat.entity.temporal;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.entity.Living;
-import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -31,7 +32,7 @@ import java.util.List;
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 @Getter
-public final class Dummy extends TemporalEntity<Zombie> implements Damageable, Living, HasCritHitbox {
+public final class Dummy extends TemporalEntity<Zombie> implements Healable, Living, HasCritHitbox {
     /** 넉백 모듈 */
     @NonNull
     private final KnockbackModule knockbackModule;
@@ -40,17 +41,20 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     private final StatusEffectModule statusEffectModule;
     /** 피해 모듈 */
     @NonNull
-    private final DamageModule damageModule;
+    private final HealModule damageModule;
     /** 치명타 히트박스 객체 */
     private final Hitbox critHitbox;
+    /** 팀 식별자 */
+    private final String teamIdentifier;
 
     /**
      * 더미 인스턴스를 생성한다.
      *
-     * @param entity    대상 엔티티
-     * @param maxHealth 최대 체력
+     * @param entity         대상 엔티티
+     * @param maxHealth      최대 체력
+     * @param teamIdentifier 팀 식별자
      */
-    public Dummy(@NonNull Zombie entity, int maxHealth) {
+    public Dummy(@NonNull Zombie entity, int maxHealth, @NonNull String teamIdentifier) {
         super(entity, "훈련용 봇", null,
                 new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
                 new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
@@ -59,10 +63,21 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
         );
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
-        damageModule = new DamageModule(this, true, true, maxHealth);
+        damageModule = new HealModule(this, true, true, maxHealth);
         critHitbox = hitboxes[3];
+        this.teamIdentifier = teamIdentifier;
 
         onInit();
+    }
+
+    /**
+     * 더미 인스턴스를 생성한다.
+     *
+     * @param entity    대상 엔티티
+     * @param maxHealth 최대 체력
+     */
+    public Dummy(@NonNull Zombie entity, int maxHealth) {
+        this(entity, maxHealth, "Dummy");
     }
 
     private void onInit() {
@@ -96,6 +111,11 @@ public final class Dummy extends TemporalEntity<Zombie> implements Damageable, L
     @Override
     public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
         CombatUtil.playBleedingEffect(location, entity, damage);
+    }
+
+    @Override
+    public void onTakeHeal(@Nullable Healer provider, int amount, boolean isUlt) {
+        // 미사용
     }
 
     @Override
