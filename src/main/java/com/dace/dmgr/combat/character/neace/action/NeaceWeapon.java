@@ -77,7 +77,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 combatUser.getUser().sendTitle("", (isAmplifying ? "§b" : "§a") + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(),
                         0, 5, 5);
 
-                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getNearestLocationOfHitboxes(combatUser.getEntity().getEyeLocation())))
+                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, 1, 0)))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
                 Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
@@ -115,7 +115,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 Location targetLoc = NeaceWeapon.this.target.getNearestLocationOfHitboxes(loc);
 
-                return CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&
+                return target.canBeTargeted() && !target.isDisposed() &&
+                        CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&
                         CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0 &&
                         targetLoc.distance(loc) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE;
             }, isCancelled -> NeaceWeapon.this.target = null, 1));
