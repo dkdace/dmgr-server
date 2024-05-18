@@ -57,11 +57,8 @@ public final class NeaceA2 extends ActiveSkill {
                         combatUser.getEntity().getLocation().add(0, combatUser.getEntity().getHeight() / 2, 0), 3,
                         1, 1.5, 1, 140, 255, 245);
                 if (i < 12)
-                    for (int j = 0; j < 3; j++) {
-                        Location loc = combatUser.getEntity().getLocation().add(0, (i * 3 + j) * 0.05, 0);
-                        loc.setPitch(0);
-                        playTickEffect(i, loc);
-                    }
+                    for (int j = 0; j < 3; j++)
+                        playTickEffect(i);
 
                 return true;
             }, isCancelled -> combatUser.getWeapon().setGlowing(false), 1));
@@ -72,25 +69,25 @@ public final class NeaceA2 extends ActiveSkill {
     /**
      * 사용 중 효과를 재생한다.
      *
-     * @param i        인덱스
-     * @param location 사용 위치
+     * @param i 인덱스
      */
-    private void playTickEffect(long i, Location location) {
-        Vector vector = VectorUtil.getRollAxis(location).multiply(1.3);
-        Vector axis = VectorUtil.getYawAxis(location);
+    private void playTickEffect(long i) {
+        double angle = i * 14;
 
-        Vector vec1 = VectorUtil.getRotatedVector(vector, axis, i * 14);
-        Vector vec2 = VectorUtil.getRotatedVector(vector, axis, i * 14 + 90);
-        Vector vec3 = VectorUtil.getRotatedVector(vector, axis, i * 14 + 180);
-        Vector vec4 = VectorUtil.getRotatedVector(vector, axis, i * 14 + 270);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec1), 3,
-                0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec2), 3,
-                0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec3), 3,
-                0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec4), 3,
-                0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
+        Location loc = combatUser.getEntity().getLocation();
+        loc.setYaw(0);
+        loc.setPitch(0);
+        Vector vector = VectorUtil.getRollAxis(loc).multiply(1.3);
+        Vector axis = VectorUtil.getYawAxis(loc);
+
+        for (int j = 0; j < 4; j++) {
+            double up = (i * 3 + j) * 0.05;
+            angle += 90;
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 3,
+                    0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
