@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.character.neace;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
-import com.dace.dmgr.combat.character.quaker.action.QuakerUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,6 +32,7 @@ import java.util.StringJoiner;
  * @see NeaceA1
  * @see NeaceA2
  * @see NeaceA3
+ * @see NeaceUlt
  */
 public final class Neace extends Support {
     @Getter
@@ -61,6 +63,9 @@ public final class Neace extends Support {
         super.onTick(combatUser, i);
 
         new NeaceTarget(combatUser).shoot();
+
+        if (i % 5 == 0)
+            combatUser.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -76,7 +81,9 @@ public final class Neace extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
+        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+
+        return skill4.isDurationFinished() || skill4.isEnabled();
     }
 
     @Override
@@ -86,7 +93,9 @@ public final class Neace extends Support {
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
+        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+
+        return skill4.isDurationFinished() || skill4.isEnabled();
     }
 
     @Override
@@ -117,7 +126,7 @@ public final class Neace extends Support {
             case 3:
                 return NeaceA3Info.getInstance();
             case 4:
-                return QuakerUltInfo.getInstance();
+                return NeaceUltInfo.getInstance();
             default:
                 return null;
         }
@@ -125,8 +134,8 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
-    public QuakerUltInfo getUltimateSkillInfo() {
-        return QuakerUltInfo.getInstance();
+    public NeaceUltInfo getUltimateSkillInfo() {
+        return NeaceUltInfo.getInstance();
     }
 
     private static final class NeaceTarget extends Hitscan {

@@ -363,6 +363,17 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 1.2, 1.8),
             new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.2, 1.6),
             new DefinedSound(Sound.ENTITY_FIREWORK_LAUNCH, 1.2, 0.7)
+    ),
+    /** 전투 - '니스' 궁극기 - 사용 */
+    COMBAT_NEACE_ULT_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 0.7)
+    ),
+    /** 전투 - '니스' 궁극기 - 사용 준비 */
+    COMBAT_NEACE_ULT_USE_READY(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1)
     );
 
     /** 지정된 효과음 목록 */
