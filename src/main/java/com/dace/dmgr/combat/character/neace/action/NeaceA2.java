@@ -55,7 +55,7 @@ public final class NeaceA2 extends ActiveSkill {
 
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                         combatUser.getEntity().getLocation().add(0, combatUser.getEntity().getHeight() / 2, 0), 3,
-                        0.6, 1, 0.6, 140, 255, 245);
+                        1, 1.5, 1, 140, 255, 245);
                 if (i < 12)
                     for (int j = 0; j < 3; j++) {
                         Location loc = combatUser.getEntity().getLocation().add(0, (i * 3 + j) * 0.05, 0);
