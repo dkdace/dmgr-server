@@ -106,11 +106,11 @@ public final class NeaceUlt extends UltimateSkill {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : angle2);
 
             ParticleUtil.play(Particle.VILLAGER_HAPPY, loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0),
-                    3, 0, 0, 0, 0);
+                    3, 0.05, 0.05, 0.05, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0),
                     1, 0, 0, 0, 215, 255, 130);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.GRASS, 0,
-                    loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0), 3, 0, 0, 0, 0);
+                    loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0), 1, 0, 0, 0, 0);
         }
     }
 
