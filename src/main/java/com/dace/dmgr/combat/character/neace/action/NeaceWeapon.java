@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
@@ -82,7 +83,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 combatUser.getUser().sendTitle("", (isAmplifying ? "§b" : "§a") + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(),
                         0, 5, 5);
 
-                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, 1, 0)))
+                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
                 Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
@@ -103,8 +104,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     private final class NeaceTarget extends Hitscan {
         private NeaceTarget() {
             super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceWeaponInfo.HEAL.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(NeaceWeapon.this.combatUser) &&
-                            combatEntity != NeaceWeapon.this.combatUser).build());
+                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceWeapon.this.combatUser, combatEntity)).build());
         }
 
         @Override

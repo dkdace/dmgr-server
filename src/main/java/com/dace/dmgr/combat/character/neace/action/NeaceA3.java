@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
@@ -62,8 +63,7 @@ public final class NeaceA3 extends ActiveSkill {
 
         private NeaceTarget() {
             super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(NeaceA3.this.combatUser) &&
-                            combatEntity != NeaceA3.this.combatUser).build());
+                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA3.this.combatUser, combatEntity)).build());
         }
 
         @Override

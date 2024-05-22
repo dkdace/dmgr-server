@@ -6,15 +6,13 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -40,6 +38,18 @@ public final class Neace extends Support {
 
     private Neace() {
         super("니스", "DVNis", '\u32D5', 1000, 1.0, 1.0);
+    }
+
+    /**
+     * 대상 타겟팅이 가능한 동작의 사용 조건을 반환한다.
+     *
+     * @param combatUser 플레이어
+     * @param target     사용 대상
+     */
+    public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
+        return target instanceof Healable && !target.isEnemy(combatUser) &&
+                target != combatUser && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(),
+                target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0));
     }
 
     @Override
@@ -141,8 +151,7 @@ public final class Neace extends Support {
     private static final class NeaceTarget extends Hitscan {
         private NeaceTarget(CombatUser combatUser) {
             super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(combatUser) &&
-                            combatEntity != combatUser).build());
+                    .condition(combatEntity -> getTargetedActionCondition(combatUser, combatEntity)).build());
         }
 
         @Override
