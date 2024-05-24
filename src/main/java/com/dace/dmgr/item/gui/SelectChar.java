@@ -64,23 +64,23 @@ public final class SelectChar extends Gui {
     @Override
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         guiController.fillColumn(2, DisplayItem.EMPTY.getStaticItem());
-        guiController.set(0, SelectCharInfoItem.ASSASSIN.staticItem);
-        guiController.set(9, SelectCharInfoItem.SCUFFLER.staticItem);
-        guiController.set(18, SelectCharInfoItem.MARKSMAN.staticItem);
-        guiController.set(27, SelectCharInfoItem.VANGUARD.staticItem);
-        guiController.set(36, SelectCharInfoItem.GUARDIAN.staticItem);
-        guiController.set(45, SelectCharInfoItem.SUPPORTER.staticItem);
+        guiController.set(0, SelectCharInfoItem.SCUFFLER.staticItem);
+        guiController.set(9, SelectCharInfoItem.MARKSMAN.staticItem);
+        guiController.set(18, SelectCharInfoItem.VANGUARD.staticItem);
+        guiController.set(27, SelectCharInfoItem.GUARDIAN.staticItem);
+        guiController.set(36, SelectCharInfoItem.SUPPORT.staticItem);
+        guiController.set(45, SelectCharInfoItem.CONTROLLER.staticItem);
 
         displayCharacters(guiController);
     }
 
     private enum SelectCharInfoItem {
-        ASSASSIN(Material.DIAMOND_HOE, 4, Role.SCUFFLER),
-        SCUFFLER(Material.IRON_SWORD, 0, Role.CONTROLLER),
+        SCUFFLER(Material.IRON_SWORD, 4, Role.SCUFFLER),
         MARKSMAN(Material.BOW, 0, Role.MARKSMAN),
         VANGUARD(Material.IRON_CHESTPLATE, 0, Role.VANGUARD),
         GUARDIAN(Material.SHIELD, 0, Role.GUARDIAN),
-        SUPPORTER(Material.END_CRYSTAL, 0, Role.SUPPORT);
+        SUPPORT(Material.END_CRYSTAL, 0, Role.SUPPORT),
+        CONTROLLER(Material.EYE_OF_ENDER, 0, Role.CONTROLLER);
 
         /** 정적 아이템 객체 */
         private final StaticItem staticItem;
