@@ -16,6 +16,12 @@ public class Grounding implements StatusEffect {
     static final Grounding instance = new Grounding();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.GROUNDING;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }

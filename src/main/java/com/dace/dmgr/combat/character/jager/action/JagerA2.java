@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
@@ -207,7 +207,7 @@ public final class JagerA2 extends ActiveSkill {
         private void onCatchEnemy(@NonNull Damageable target) {
             target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
                     false, true);
-            target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
+            target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
 
             dispose();

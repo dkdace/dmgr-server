@@ -63,7 +63,7 @@ public final class JagerP1 extends AbstractSkill {
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, JagerP1Info.SPEED);
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> canActivate(), isCancelled -> {
+        TaskUtil.addTask(this, new IntervalTask(i -> canActivate(), isCancelled -> {
             setDuration(0);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }, 1));

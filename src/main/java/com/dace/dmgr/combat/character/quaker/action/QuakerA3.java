@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
@@ -201,7 +201,7 @@ public final class QuakerA3 extends ActiveSkill {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                 }
                 target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
-                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, QuakerA3Info.SNARE_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);
             }

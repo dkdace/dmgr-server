@@ -248,7 +248,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @Override
         public void onDefaultAttack(@NonNull Damageable victim) {
             victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, null,
-                    victim.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE), true);
+                    victim.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE), true);
         }
 
         @Override

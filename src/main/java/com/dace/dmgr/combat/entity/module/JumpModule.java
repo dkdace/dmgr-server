@@ -62,8 +62,9 @@ public final class JumpModule extends MoveModule {
      * @return 점프 가능 여부
      */
     private boolean canJump() {
-        if (combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.STUN) || combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE) ||
-                combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.GROUNDING))
+        if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) ||
+                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
+                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
             return false;
         return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
     }

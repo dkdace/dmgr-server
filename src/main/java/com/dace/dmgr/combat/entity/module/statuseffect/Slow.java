@@ -17,6 +17,12 @@ public class Slow implements StatusEffect {
     static final Slow instance = new Slow();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SLOW;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }

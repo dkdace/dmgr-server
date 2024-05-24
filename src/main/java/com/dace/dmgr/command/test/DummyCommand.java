@@ -23,7 +23,10 @@ public class DummyCommand implements CommandExecutor {
         int health = Integer.parseInt(args[0]);
 
         Zombie entity = CombatUtil.spawnEntity(Zombie.class, player.getLocation());
-        new Dummy(entity, health).activate();
+        if (args.length > 1)
+            new Dummy(entity, health, args[1]).activate();
+        else
+            new Dummy(entity, health).activate();
 
         return true;
     }

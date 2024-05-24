@@ -16,6 +16,12 @@ public class Silence implements StatusEffect {
     static final Silence instance = new Silence();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SILENCE;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }

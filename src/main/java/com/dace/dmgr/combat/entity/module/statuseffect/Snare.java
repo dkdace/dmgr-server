@@ -17,6 +17,12 @@ public class Snare implements StatusEffect {
     static final Snare instance = new Snare();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SNARE;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }

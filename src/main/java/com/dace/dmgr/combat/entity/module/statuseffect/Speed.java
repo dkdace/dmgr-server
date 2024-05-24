@@ -16,6 +16,12 @@ public class Speed implements StatusEffect {
     static final Speed instance = new Speed();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SPEED;
+    }
+
+    @Override
     public final boolean isPositive() {
         return true;
     }

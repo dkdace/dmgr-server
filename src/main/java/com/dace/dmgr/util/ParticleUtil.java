@@ -3,12 +3,13 @@ package com.dace.dmgr.util;
 import com.comphenix.packetwrapper.WrapperPlayServerWorldParticles;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.util.task.DelayTask;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 /**
  * 입자 생성 기능을 제공하는 클래스.
@@ -163,6 +164,42 @@ public final class ParticleUtil {
                 offsetY, offsetZ, (float) speed);
 
         packet.sendPacket(player);
+    }
+
+    /**
+     * 지정한 위치에 폭죽 효과를 생성한다.
+     *
+     * @param location   대상 위치
+     * @param red        빨강. 0~255 사이의 값
+     * @param green      초록. 0~255 사이의 값
+     * @param blue       파랑. 0~255 사이의 값
+     * @param fadeRed    빨강 (사라지는 색). 0~255 사이의 값
+     * @param fadeGreen  초록 (사라지는 색). 0~255 사이의 값
+     * @param fadeBlue   파랑 (사라지는 색). 0~255 사이의 값
+     * @param type       폭죽 효과 타입
+     * @param hasTrail   잔상 여부
+     * @param hasFlicker 반짝임 여부
+     * @throws IllegalArgumentException {@code red}, {@code green}, {@code blue}, {@code fadeRed},
+     *                                  {@code fadeGreen} 또는 {@code fadeBlue}가 0~255 사이가 아니면 발생
+     */
+    public static void playFirework(@NonNull Location location, int red, int green, int blue, int fadeRed, int fadeGreen, int fadeBlue,
+                                    FireworkEffect.Type type, boolean hasTrail, boolean hasFlicker) {
+        validateRGB(red, green, blue);
+        validateRGB(fadeRed, fadeGreen, fadeBlue);
+
+        Firework firework = location.getWorld().spawn(location, Firework.class);
+
+        firework.setSilent(true);
+        FireworkMeta fireworkMeta = firework.getFireworkMeta();
+        fireworkMeta.addEffect(FireworkEffect.builder().with(type)
+                .withColor(Color.fromRGB(red, green, blue))
+                .withFade(Color.fromRGB(fadeRed, fadeGreen, fadeBlue))
+                .trail(hasTrail)
+                .flicker(hasFlicker)
+                .build());
+        firework.setFireworkMeta(fireworkMeta);
+
+        new DelayTask(firework::detonate, 1);
     }
 
     /**

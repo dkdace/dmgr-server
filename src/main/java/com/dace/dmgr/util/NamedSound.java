@@ -334,6 +334,46 @@ public enum NamedSound {
             new DefinedSound("random.swordhit", 2, 0.7),
             new DefinedSound("new.item.trident.return", 2.5, 1.4),
             new DefinedSound("new.item.trident.return", 2.5, 1.2)
+    ),
+    /** 전투 - '니스' 무기 - 사용 */
+    COMBAT_NEACE_WEAPON_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8, 1.8),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 1, 1.5)
+    ),
+    /** 전투 - '니스' 무기 - 사용 (치유 광선) */
+    COMBAT_NEACE_WEAPON_USE_HEAL(
+            new DefinedSound(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2)
+    ),
+    /** 전투 - '니스' 액티브 1번 - 사용 */
+    COMBAT_NEACE_A1_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 1.4),
+            new DefinedSound("new.block.note_block.chime", 2, 1.6),
+            new DefinedSound("new.block.note_block.chime", 2, 1.2)
+    ),
+    /** 전투 - '니스' 액티브 2번 - 사용 */
+    COMBAT_NEACE_A2_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.5),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.4),
+            new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.4)
+    ),
+    /** 전투 - '니스' 액티브 3번 - 사용 */
+    COMBAT_NEACE_A3_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 1.2, 1.8),
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.2, 1.6),
+            new DefinedSound(Sound.ENTITY_FIREWORK_LAUNCH, 1.2, 0.7)
+    ),
+    /** 전투 - '니스' 궁극기 - 사용 */
+    COMBAT_NEACE_ULT_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 0.7)
+    ),
+    /** 전투 - '니스' 궁극기 - 사용 준비 */
+    COMBAT_NEACE_ULT_USE_READY(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1)
     );
 
     /** 지정된 효과음 목록 */

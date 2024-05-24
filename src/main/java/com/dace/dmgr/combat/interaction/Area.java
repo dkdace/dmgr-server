@@ -71,7 +71,7 @@ public abstract class Area {
 
                     return canPenetrate;
                 }
-            }.shoot(center, LocationUtil.getDirection(center, target.getNearestLocationOfHitboxes(center).add(0, 0.1, 0)));
+            }.shoot(center, LocationUtil.getDirection(center, target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)));
         }
     }
 
