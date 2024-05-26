@@ -1,6 +1,7 @@
-package com.dace.dmgr.game.map;
+package com.dace.dmgr;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,6 +12,7 @@ import org.bukkit.World;
  * <p>월드 복제 시 동일한 위치를 나타내기 위해 사용한다.</p>
  */
 @AllArgsConstructor
+@EqualsAndHashCode
 public final class GlobalLocation {
     /** X 좌표 */
     private final double x;

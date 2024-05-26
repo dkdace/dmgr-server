@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.Action;
@@ -32,7 +33,6 @@ import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
@@ -305,29 +305,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 현재 위치의 힐 팩을 확인한다.
+     * 현재 위치의 힐 팩을 확인 및 사용한다.
      */
     private void checkHealPack() {
-        if (gameUser == null)
-            return;
-
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
         if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getHealPackBlock())
             return;
 
-        Arrays.stream(game.getMap().getHealPackLocations())
-                .filter(globalLocation -> globalLocation.isSameLocation(location))
-                .findFirst()
-                .ifPresent(healPackLoc -> useHealPack(location, healPackLoc));
-    }
+        GlobalLocation healPackLocation = new GlobalLocation(location.getX(), location.getY(), location.getZ());
 
-    /**
-     * 지정한 위치의 힐 팩을 사용한다.
-     *
-     * @param location         실제 위치
-     * @param healPackLocation 힐 팩 위치
-     */
-    private void useHealPack(@NonNull Location location, @NonNull GlobalLocation healPackLocation) {
         if (CooldownUtil.getCooldown(healPackLocation, Cooldown.HEAL_PACK.id) > 0)
             return;
         if (damageModule.getHealth() == damageModule.getMaxHealth())
@@ -341,18 +327,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
         HologramUtil.addHologram(Cooldown.HEAL_PACK.id + healPackLocation, hologramLoc, MessageFormat.format("§f§l[ §6{0} 0 §f§l]", TextIcon.COOLDOWN));
 
-        TaskUtil.addTask(game, new IntervalTask(i -> {
+        boolean isGame = game != null;
+        new IntervalTask(i -> {
             long cooldown = CooldownUtil.getCooldown(healPackLocation, Cooldown.HEAL_PACK.id);
             if (cooldown <= 0)
+                return false;
+            if (isGame && game.isDisposed())
                 return false;
 
             HologramUtil.editHologram(Cooldown.HEAL_PACK.id + healPackLocation,
                     MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                    LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
+            if (isGame)
+                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
+                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
+            else
+                Bukkit.getOnlinePlayers().forEach(player ->
+                        HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation, LocationUtil.canPass(player.getEyeLocation(), hologramLoc),
+                                player));
 
             return true;
-        }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5));
+        }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5);
     }
 
     /**

@@ -2,7 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.game.map.GlobalLocation;
+import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
