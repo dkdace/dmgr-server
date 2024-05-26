@@ -204,7 +204,7 @@ public final class GameUser implements Disposable {
         user.clearTabListItems();
 
         if (combatUser == null)
-            combatUser = new CombatUser(user);
+            combatUser = new CombatUser(this);
 
         for (GameUser gameUser2 : game.getGameUsers()) {
             if (gameUser2.team != team)

@@ -5,6 +5,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.MeleeAttackAction;
@@ -74,10 +75,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final User user;
-    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
-    @Nullable
-    @Getter
-    private final GameUser gameUser;
     /** 넉백 모듈 */
     @NonNull
     @Getter
@@ -110,6 +107,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final HashMap<@NonNull SkillInfo, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final HashMap<@NonNull String, Double> scoreMap = new LinkedHashMap<>();
+    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Nullable
+    @Getter
+    private GameUser gameUser;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
     private int selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
@@ -139,18 +140,43 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /**
      * 전투 시스템의 플레이어 인스턴스를 생성한다.
      *
+     * @param gameUser 대상 게임 유저 객체
+     * @throws IllegalStateException 해당 {@code user}의 CombatUser가 이미 존재하면 발생
+     */
+    public CombatUser(@NonNull GameUser gameUser) {
+        super(gameUser.getPlayer(), gameUser.getPlayer().getName(), gameUser.getGame(),
+                new FixedPitchHitbox(gameUser.getPlayer().getLocation(), 0.5, 0.7, 0.3, 0, 0, 0, 0, 0.35, 0),
+                new FixedPitchHitbox(gameUser.getPlayer().getLocation(), 0.8, 0.7, 0.45, 0, 0, 0, 0, 1.05, 0),
+                new Hitbox(gameUser.getPlayer().getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.4, 0),
+                new Hitbox(gameUser.getPlayer().getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
+        );
+        this.user = gameUser.getUser();
+        this.gameUser = gameUser;
+
+        knockbackModule = new KnockbackModule(this);
+        statusEffectModule = new StatusEffectModule(this);
+        attackModule = new AttackModule(this);
+        damageModule = new HealModule(this, true, true, 1000);
+        moveModule = new JumpModule(this, DEFAULT_SPEED);
+        critHitbox = hitboxes[3];
+        user.clearSidebar();
+    }
+
+    /**
+     * 전투 시스템의 플레이어 인스턴스를 생성한다.
+     *
      * @param user 대상 플레이어
      * @throws IllegalStateException 해당 {@code user}의 CombatUser가 이미 존재하면 발생
      */
     public CombatUser(@NonNull User user) {
-        super(user.getPlayer(), user.getPlayer().getName(), GameUser.fromUser(user) == null ? null : GameUser.fromUser(user).getGame(),
+        super(user.getPlayer(), user.getPlayer().getName(), null,
                 new FixedPitchHitbox(user.getPlayer().getLocation(), 0.5, 0.7, 0.3, 0, 0, 0, 0, 0.35, 0),
                 new FixedPitchHitbox(user.getPlayer().getLocation(), 0.8, 0.7, 0.45, 0, 0, 0, 0, 1.05, 0),
                 new Hitbox(user.getPlayer().getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.4, 0),
                 new Hitbox(user.getPlayer().getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
         );
         this.user = user;
-        this.gameUser = GameUser.fromUser(user);
+        this.gameUser = null;
 
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
@@ -407,6 +433,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!isActivated)
             return false;
         if (gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam())
+            return false;
+        if (LocationUtil.isInRegion(entity, "BattlePVP"))
             return false;
 
         return !isDead();
@@ -729,7 +757,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Location deadLocation = (gameUser == null ? LocationUtil.getLobbyLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
+        Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
         CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, Cooldown.RESPAWN.duration);
