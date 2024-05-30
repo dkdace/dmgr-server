@@ -1,5 +1,6 @@
 package com.dace.dmgr.game.map;
 
+import com.dace.dmgr.GlobalLocation;
 import lombok.NonNull;
 import org.bukkit.World;
 
@@ -30,10 +31,4 @@ public interface GameMap {
      */
     @NonNull
     GlobalLocation @NonNull [] getBlueTeamSpawns();
-
-    /**
-     * @return 힐 팩 위치 목록
-     */
-    @NonNull
-    GlobalLocation @NonNull [] getHealPackLocations();
 }

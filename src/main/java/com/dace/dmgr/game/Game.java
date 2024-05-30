@@ -6,11 +6,12 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
-import com.dace.dmgr.game.map.GlobalLocation;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -124,9 +125,6 @@ public final class Game implements Disposable {
 
                 gameUser.dispose();
             }
-
-        for (GlobalLocation healPackLocation : map.getHealPackLocations())
-            HologramUtil.removeHologram(CombatUser.Cooldown.HEAL_PACK.getId() + healPackLocation);
 
         if (world == null)
             onDispose();
