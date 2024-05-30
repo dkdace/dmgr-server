@@ -42,6 +42,9 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     protected final Hitbox @NonNull [] hitboxes;
     /** 활성화 여부 */
     protected boolean isActivated = false;
+    /** 히트박스의 중앙 위치 */
+    @NonNull
+    private Location hitboxLocation;
     /** 히트박스의 가능한 최대 크기. (단위: 블록) */
     private double maxHitboxSize = 0;
 
@@ -63,6 +66,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         this.name = name;
         this.game = game;
         this.hitboxes = hitboxes;
+        hitboxLocation = entity.getLocation();
 
         for (Hitbox hitbox : hitboxes) {
             double hitboxMaxSize = Math.max(hitbox.getSizeX(), Math.max(hitbox.getSizeY(), hitbox.getSizeZ()));
@@ -104,7 +108,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             for (Hitbox hitbox : hitboxes) {
-                hitbox.setCenter(oldLoc);
+                hitboxLocation = oldLoc;
+                hitbox.setCenter(hitboxLocation);
             }
         }, 3));
     }

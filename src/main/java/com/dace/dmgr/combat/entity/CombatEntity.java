@@ -58,6 +58,14 @@ public interface CombatEntity extends Disposable {
     Hitbox @NonNull [] getHitboxes();
 
     /**
+     * 히트박스의 현재 중앙 위치를 반환한다.
+     *
+     * @return 히트박스의 중앙 위치
+     */
+    @NonNull
+    Location getHitboxLocation();
+
+    /**
      * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
      *
      * @param location 대상 위치
