@@ -205,8 +205,10 @@ public final class JagerA2 extends ActiveSkill {
          * @param target 대상 엔티티
          */
         private void onCatchEnemy(@NonNull Damageable target) {
-            target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
-                    false, true);
+            if (!target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
+                    false, true))
+                return;
+
             target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
 

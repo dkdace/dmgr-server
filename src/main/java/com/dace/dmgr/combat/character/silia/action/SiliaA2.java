@@ -126,20 +126,21 @@ public final class SiliaA2 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             setCooldown(getDefaultCooldown() / 2);
 
-            target.getDamageModule().damage(combatUser, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
-                    SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
-            target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);
+            if (target.getDamageModule().damage(combatUser, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
+                    SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);
 
-            Location loc = target.getEntity().getLocation();
-            loc.setPitch(0);
-            loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
-            for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
-                ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
+                Location loc = target.getEntity().getLocation();
+                loc.setPitch(0);
+                loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
+                for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
+                    ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
-            if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
-                combatUser.getUser().teleport(loc);
-                combatUser.push(new Vector(0, 0.8, 0), true);
+                if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
+                    combatUser.getUser().teleport(loc);
+                    combatUser.push(new Vector(0, 0.8, 0), true);
+                }
             }
 
             return false;

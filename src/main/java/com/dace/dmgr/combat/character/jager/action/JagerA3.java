@@ -206,15 +206,19 @@ public final class JagerA3 extends ActiveSkill {
             double distance = center.distance(target.getEntity().getLocation());
             int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0, true);
             int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0, true);
+            boolean isDamaged;
             if (projectile == null)
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
+                isDamaged = target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
             else
-                target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
-            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
-            JagerT1.addFreezeValue(target, freeze);
+                isDamaged = target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
-            if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
-                target.getStatusEffectModule().applyStatusEffect(Freeze.instance, JagerA3Info.SNARE_DURATION);
+            if (isDamaged) {
+                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
+                JagerT1.addFreezeValue(target, freeze);
+
+                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
+                    target.getStatusEffectModule().applyStatusEffect(Freeze.instance, JagerA3Info.SNARE_DURATION);
+            }
 
             return !(target instanceof Barrier);
         }

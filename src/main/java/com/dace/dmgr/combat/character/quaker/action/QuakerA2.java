@@ -204,9 +204,10 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true);
-                target.getStatusEffectModule().applyStatusEffect(Stun.getInstance(), QuakerA2Info.STUN_DURATION);
-                target.getStatusEffectModule().applyStatusEffect(QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+                if (target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                    target.getStatusEffectModule().applyStatusEffect(Stun.getInstance(), QuakerA2Info.STUN_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+                }
 
                 ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
             }
