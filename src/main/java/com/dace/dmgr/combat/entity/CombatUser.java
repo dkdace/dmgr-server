@@ -649,7 +649,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-        character.onKill(this, victim, true);
 
         playKillEffect();
         if (victim instanceof CombatUser) {
@@ -657,6 +656,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
             int score = Math.round(((float) damage / totalDamage) * 100);
 
+            character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
 
             if (gameUser != null) {
@@ -666,6 +666,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     gameUser.addTeamScore(1);
             }
         } else {
+            character.onKill(this, victim, -1, true);
+
             if (victim instanceof Dummy)
                 addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), 100);
         }
@@ -723,7 +725,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker))) {
                 int score = Math.round(((float) damage / totalDamage) * 100);
 
-                attacker2.character.onKill(attacker2, this, false);
+                attacker2.character.onKill(attacker2, this, score, false);
                 attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 attacker2.playKillEffect();
 
@@ -843,7 +845,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 
-        CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
+        if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id) == 0) {
+            CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
+
+            TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) != 0,
+                    isCancelled -> {
+                        scoreStreakSum = 0;
+                        scoreMap.clear();
+                        user.clearSidebar();
+                    }, 1));
+        } else
+            CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
+
         if (scoreMap.size() > 5)
             scoreMap.remove(scoreMap.keySet().iterator().next());
 
@@ -852,12 +865,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         user.clearSidebar();
         sendScoreSidebar();
-        TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) != 0,
-                isCancelled -> {
-                    scoreStreakSum = 0;
-                    scoreMap.clear();
-                    user.clearSidebar();
-                }, 1));
     }
 
     /**
@@ -865,7 +872,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void sendScoreSidebar() {
         int i = 0;
-        user.setSidebarName(MessageFormat.format("{0}+{1}", "§a", (int) scoreStreakSum));
+        user.setSidebarName("§a+" + (int) scoreStreakSum);
         user.editSidebar(i++, "");
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
             user.editSidebar(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));

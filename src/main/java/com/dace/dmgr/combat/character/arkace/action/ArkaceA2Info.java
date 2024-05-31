@@ -13,6 +13,9 @@ public final class ArkaceA2Info extends ActiveSkillInfo {
     public static final int HEAL = 350;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) (2.5 * 20);
+
+    /** 치유 점수 */
+    public static final int HEAL_SCORE = 8;
     @Getter
     private static final ArkaceA2Info instance = new ArkaceA2Info();
 
