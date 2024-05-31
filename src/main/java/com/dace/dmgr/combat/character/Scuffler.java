@@ -17,7 +17,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public abstract class Scuffler extends Character {
     /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 30;
+    private static final int FINAL_HIT_SCORE = 20;
 
     /**
      * 근접 역할군 전투원 정보 인스턴스를 생성한다.

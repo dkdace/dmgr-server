@@ -12,7 +12,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public abstract class Marksman extends Character {
     /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 30;
+    private static final int FINAL_HIT_SCORE = 20;
     /** 수정자 ID */
     private static final String MODIFIER_ID = "RoleTrait2";
 
