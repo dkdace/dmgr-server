@@ -36,8 +36,6 @@ public interface Swappable<T extends Weapon> extends Weapon {
         /** 주무기 사용 중 */
         PRIMARY,
         /** 보조무기 사용 중 */
-        SECONDARY,
-        /** 교체 중 */
-        SWAPPING,
+        SECONDARY
     }
 }
