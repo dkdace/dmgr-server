@@ -16,9 +16,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 역할군이 '근접'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Scuffler extends Character {
-    /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 20;
-
     /**
      * 근접 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -39,10 +36,8 @@ public abstract class Scuffler extends Character {
         if (!(victim instanceof CombatUser))
             return;
 
-        if (isFinalHit) {
+        if (isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-            attacker.addScore("결정타", FINAL_HIT_SCORE);
-        }
 
         attacker.getStatusEffectModule().applyStatusEffect(RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
     }

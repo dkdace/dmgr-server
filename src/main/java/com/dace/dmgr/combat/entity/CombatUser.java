@@ -70,6 +70,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final double DEFAULT_SPEED = 0.12;
     /** 킬 로그 표시 유지시간 (tick) */
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
+    /** 결정타 점수 */
+    private static final int FINAL_HIT_SCORE = 20;
 
     /** 유저 정보 객체 */
     @NonNull
@@ -649,7 +651,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-
         playKillEffect();
         if (victim instanceof CombatUser) {
             int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
@@ -658,6 +659,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
+            addScore("결정타", FINAL_HIT_SCORE);
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);
@@ -669,7 +671,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             character.onKill(this, victim, -1, true);
 
             if (victim instanceof Dummy)
-                addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), 100);
+                addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), 0);
         }
     }
 

@@ -11,8 +11,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 역할군이 '사격'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Marksman extends Character {
-    /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 20;
     /** 수정자 ID */
     private static final String MODIFIER_ID = "RoleTrait2";
 
@@ -45,10 +43,8 @@ public abstract class Marksman extends Character {
         if (!(victim instanceof CombatUser))
             return;
 
-        if (isFinalHit) {
+        if (isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-            attacker.addScore("결정타", FINAL_HIT_SCORE);
-        }
     }
 
     public static final class RoleTrait1Info extends TraitInfo {
