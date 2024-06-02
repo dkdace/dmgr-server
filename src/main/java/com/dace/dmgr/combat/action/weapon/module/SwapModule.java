@@ -9,6 +9,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.ChatColor;
 
 import java.text.MessageFormat;
@@ -35,6 +36,10 @@ public final class SwapModule<T extends Weapon> {
     /** 무기 교체시간 */
     private final long swapDuration;
 
+    /** 무기 전환 중 여부 */
+    @Getter
+    @Setter
+    private boolean isSwapping = false;
     /** 무기 전환 상태 */
     @NonNull
     @Getter
@@ -45,18 +50,16 @@ public final class SwapModule<T extends Weapon> {
      *
      * @param targetState 변경할 상태
      */
-    public void swapTo(@NonNull Swappable.SwapState targetState) {
-        if (getSwapState() == targetState || swapState == Swappable.SwapState.SWAPPING)
-            return;
-        if (targetState == Swappable.SwapState.SWAPPING)
+    private void swapTo(@NonNull Swappable.SwapState targetState) {
+        if (getSwapState() == targetState || isSwapping)
             return;
 
-        swapState = Swappable.SwapState.SWAPPING;
+        isSwapping = true;
         CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, swapDuration);
         weapon.onSwapStart(targetState);
 
-        TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
-            if (getSwapState() != Swappable.SwapState.SWAPPING)
+        TaskUtil.addTask(weapon, new IntervalTask(i -> {
+            if (!isSwapping)
                 return false;
 
             String time = String.format("%.1f", (swapDuration - i) / 20.0);
@@ -70,6 +73,7 @@ public final class SwapModule<T extends Weapon> {
                 return;
 
             swapState = targetState;
+            isSwapping = false;
             weapon.getCombatUser().getUser().sendActionBar("§a§l무기 교체 완료", 6);
             weapon.onSwapFinished(targetState);
         }, 1, swapDuration));
