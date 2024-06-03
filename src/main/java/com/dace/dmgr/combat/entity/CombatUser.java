@@ -953,10 +953,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
 
         double hitboxMultiplier = realCharacter.getHitboxMultiplier();
-        for (Hitbox hitbox : hitboxes) {
-            hitbox.setSizeX(hitbox.getSizeX() * hitboxMultiplier);
-            hitbox.setSizeZ(hitbox.getSizeZ() * hitboxMultiplier);
-        }
+        for (Hitbox hitbox : hitboxes)
+            hitbox.setSizeMultiplier(hitboxMultiplier);
 
         this.characterType = characterType;
         this.character = realCharacter;

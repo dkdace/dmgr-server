@@ -15,7 +15,6 @@ import org.bukkit.util.Vector;
  */
 public class Hitbox {
     /** 가로. (단위: 블록) */
-    @Getter
     @Setter
     protected double sizeX;
     /** 높이. (단위: 블록) */
@@ -23,9 +22,12 @@ public class Hitbox {
     @Setter
     protected double sizeY;
     /** 세로. (단위: 블록) */
-    @Getter
     @Setter
     protected double sizeZ;
+    /** 가로/세로 크기 배수 */
+    @Getter
+    @Setter
+    protected double sizeMultiplier = 1;
     /** 중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록) */
     @Getter
     @Setter
@@ -112,6 +114,20 @@ public class Hitbox {
     }
 
     /**
+     * @return 가로. (단위: 블록)
+     */
+    public final double getSizeX() {
+        return sizeX * sizeMultiplier;
+    }
+
+    /**
+     * @return 세로. (단위: 블록)
+     */
+    public final double getSizeZ() {
+        return sizeZ * sizeMultiplier;
+    }
+
+    /**
      * 히트박스 안에서 지정한 위치까지 가장 가까운 위치를 반환한다.
      *
      * @param location 확인할 위치
@@ -124,9 +140,9 @@ public class Hitbox {
                 new Vector(1, 0, 0), -center.getPitch());
         Location rotLoc = center.clone().add(rotVec);
         Location cuboidEdge = center.clone().add(
-                (rotLoc.getX() > center.getX() ? 1 : -1) * Math.min(sizeX / 2, Math.abs(rotLoc.getX() - center.getX())),
-                (rotLoc.getY() > center.getY() ? 1 : -1) * Math.min(sizeY / 2, Math.abs(rotLoc.getY() - center.getY())),
-                (rotLoc.getZ() > center.getZ() ? 1 : -1) * Math.min(sizeZ / 2, Math.abs(rotLoc.getZ() - center.getZ()))
+                (rotLoc.getX() > center.getX() ? 1 : -1) * Math.min(getSizeX() / 2, Math.abs(rotLoc.getX() - center.getX())),
+                (rotLoc.getY() > center.getY() ? 1 : -1) * Math.min(getSizeY() / 2, Math.abs(rotLoc.getY() - center.getY())),
+                (rotLoc.getZ() > center.getZ() ? 1 : -1) * Math.min(getSizeZ() / 2, Math.abs(rotLoc.getZ() - center.getZ()))
         );
 
         Vector retVec = VectorUtil.getRotatedVector(
