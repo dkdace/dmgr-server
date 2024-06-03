@@ -24,6 +24,13 @@ public final class JagerA1Info extends ActiveSkillInfo {
     public static final double LOW_HEALTH_DETECT_RADIUS = 20;
     /** 체력 최대 회복 시간 (tick) */
     public static final int RECOVER_DURATION = 6 * 20;
+
+    /** 처치 점수 */
+    public static final int KILL_SCORE = 15;
+    /** 처치 점수 제한시간 (tick) */
+    public static final long KILL_SCORE_TIME_LIMIT = 10 * 20;
+    /** 사망 점수 */
+    public static final int DEATH_SCORE = 15;
     @Getter
     private static final JagerA1Info instance = new JagerA1Info();
 

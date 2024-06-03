@@ -11,10 +11,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.GlowUtil;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -26,12 +23,15 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
+    /** 처치 점수 제한시간 쿨타임 ID */
+    public static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
     /** 소환한 엔티티 */
     @Nullable
     private JagerA1Entity summonEntity = null;
+
 
     JagerA1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA1Info.getInstance(), 0);
@@ -238,6 +238,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @Override
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
+            CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override
@@ -265,6 +266,9 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);
+
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f처치", JagerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
         }

@@ -211,6 +211,8 @@ public final class JagerA2 extends ActiveSkill {
 
             target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
+            if (target instanceof CombatUser)
+                combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
 
             dispose();
         }
@@ -245,6 +247,9 @@ public final class JagerA2 extends ActiveSkill {
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
+
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerA2Info.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);

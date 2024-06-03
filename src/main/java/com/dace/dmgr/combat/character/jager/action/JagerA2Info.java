@@ -20,6 +20,11 @@ public final class JagerA2Info extends ActiveSkillInfo {
     public static final int DAMAGE = 300;
     /** 속박 시간 (tick) */
     public static final long SNARE_DURATION = 3 * 20;
+
+    /** 속박 점수 */
+    public static final int SNARE_SCORE = 20;
+    /** 파괴 점수 */
+    public static final int DEATH_SCORE = 10;
     @Getter
     private static final JagerA2Info instance = new JagerA2Info();
 

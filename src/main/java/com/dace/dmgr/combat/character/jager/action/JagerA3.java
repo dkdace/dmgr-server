@@ -216,8 +216,11 @@ public final class JagerA3 extends ActiveSkill {
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
                 JagerT1.addFreezeValue(target, freeze);
 
-                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
+                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().applyStatusEffect(Freeze.instance, JagerA3Info.SNARE_DURATION);
+                    if (target instanceof CombatUser)
+                        combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
+                }
             }
 
             return !(target instanceof Barrier);

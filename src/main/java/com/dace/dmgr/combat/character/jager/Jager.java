@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -95,6 +96,19 @@ public final class Jager extends Marksman {
             skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
 
         return skillUlt.getSummonEntity() == null;
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        super.onKill(attacker, victim, score, isFinalHit);
+
+        if (!(victim instanceof CombatUser))
+            return;
+
+        if (CooldownUtil.getCooldown(attacker, JagerA1.KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
+        if (CooldownUtil.getCooldown(attacker, JagerUlt.KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override
