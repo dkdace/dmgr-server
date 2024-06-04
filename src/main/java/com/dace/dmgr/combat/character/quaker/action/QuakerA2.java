@@ -27,6 +27,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 
 public final class QuakerA2 extends ActiveSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA2";
 
@@ -207,6 +209,10 @@ public final class QuakerA2 extends ActiveSkill {
                 if (target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
                     target.getStatusEffectModule().applyStatusEffect(Stun.getInstance(), QuakerA2Info.STUN_DURATION);
                     target.getStatusEffectModule().applyStatusEffect(QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+                    if (target instanceof CombatUser) {
+                        combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
+                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerA2Info.SLOW_DURATION);
+                    }
                 }
 
                 ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);

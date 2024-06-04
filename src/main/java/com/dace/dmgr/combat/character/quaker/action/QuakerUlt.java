@@ -27,6 +27,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 
 public final class QuakerUlt extends UltimateSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerUlt";
 
@@ -219,6 +221,10 @@ public final class QuakerUlt extends UltimateSkill {
                     target.getStatusEffectModule().applyStatusEffect(QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
                             target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK), true);
+                    if (target instanceof CombatUser) {
+                        combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
+                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerUltInfo.SLOW_DURATION);
+                    }
                 }
 
                 ParticleUtil.play(Particle.CRIT, location, 60, 0, 0, 0, 0.4);

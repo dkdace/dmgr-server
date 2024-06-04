@@ -22,6 +22,9 @@ public final class QuakerA3Info extends ActiveSkillInfo {
     public static final long SNARE_DURATION = (long) (0.3 * 20);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 2;
+
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 6;
     @Getter
     private static final QuakerA3Info instance = new QuakerA3Info();
 

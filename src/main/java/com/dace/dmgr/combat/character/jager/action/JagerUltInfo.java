@@ -32,7 +32,7 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 30;
     /** 궁극기 처치 점수 제한시간 (tick) */
-    public static final long KILL_SCORE_TIME_LIMIT = 5 * 20;
+    public static final long KILL_SCORE_TIME_LIMIT = 2 * 20;
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 25;
     @Getter
