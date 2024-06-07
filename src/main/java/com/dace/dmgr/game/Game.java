@@ -471,7 +471,7 @@ public final class Game implements Disposable {
                         "\n§e▶ 경험치 획득 §7:: §6+{19}" +
                         "\n§7==============================",
                 winColor, winText,
-                rankColors[scoreRank], gameUser.getScore(), scoreRank + 1,
+                rankColors[scoreRank], (int) gameUser.getScore(), scoreRank + 1,
                 rankColors[damageRank], gameUser.getDamage(), damageRank + 1,
                 rankColors[killRank], gameUser.getKill(), killRank + 1,
                 rankColors[defendRank], gameUser.getDefend(), defendRank + 1,
