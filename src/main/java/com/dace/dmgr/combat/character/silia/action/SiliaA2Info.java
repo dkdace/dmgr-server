@@ -19,7 +19,7 @@ public final class SiliaA2Info extends ActiveSkillInfo {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 25;
     /** 투사체 크기 (단위: 블록) */
-    public static final double SIZE = 1.5;
+    public static final double SIZE = 1;
     @Getter
     private static final SiliaA2Info instance = new SiliaA2Info();
 
