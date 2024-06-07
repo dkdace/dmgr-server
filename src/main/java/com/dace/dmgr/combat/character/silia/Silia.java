@@ -65,6 +65,14 @@ public final class Silia extends Scuffler {
     }
 
     @Override
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+        if (victim instanceof CombatUser && isCrit)
+            attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
+
+        return true;
+    }
+
+    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
@@ -81,8 +89,10 @@ public final class Silia extends Scuffler {
 
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
-        if (!skillUlt.isDurationFinished())
+        if (!skillUlt.isDurationFinished()) {
             skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
+            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * score / 100.0);
+        }
     }
 
     @Override

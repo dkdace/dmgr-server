@@ -72,6 +72,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
+    /** 암살 점수 */
+    private static final int FASTKILL_SCORE = 20;
 
     /** 유저 정보 객체 */
     @NonNull
@@ -660,6 +662,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
             addScore("결정타", FINAL_HIT_SCORE);
+            if (CooldownUtil.getCooldown(this, Cooldown.FASTKILL_TIME_LIMIT.id + victim) > 0)
+                addScore("암살", FASTKILL_SCORE);
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);

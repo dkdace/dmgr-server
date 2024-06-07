@@ -20,6 +20,9 @@ public final class SiliaA2Info extends ActiveSkillInfo {
     public static final int VELOCITY = 25;
     /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 0.8;
+
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 8;
     @Getter
     private static final SiliaA2Info instance = new SiliaA2Info();
 
