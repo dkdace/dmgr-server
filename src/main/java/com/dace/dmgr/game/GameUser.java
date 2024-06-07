@@ -5,6 +5,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -212,7 +213,7 @@ public final class GameUser implements Disposable {
 
             GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
             if (gameUser2 != this)
-                HologramUtil.setHologramVisibility("hitHealth" + combatUser, true, gameUser2.player);
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, gameUser2.player);
         }
     }
 
