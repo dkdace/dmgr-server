@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -87,6 +88,8 @@ public final class Silia extends Scuffler {
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
 
+        if (CooldownUtil.getCooldown(attacker, CombatUser.Cooldown.FASTKILL_TIME_LIMIT.getId() + victim) > 0)
+            attacker.addScore("암살", CombatUser.FASTKILL_SCORE);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
         if (!skillUlt.isDurationFinished()) {

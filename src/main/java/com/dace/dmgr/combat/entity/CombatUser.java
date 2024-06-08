@@ -66,14 +66,14 @@ import java.util.function.Function;
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Jumpable {
+    /** 암살 점수 */
+    public static final int FASTKILL_SCORE = 20;
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.12;
     /** 킬 로그 표시 유지시간 (tick) */
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
-    /** 암살 점수 */
-    private static final int FASTKILL_SCORE = 20;
 
     /** 넉백 모듈 */
     @NonNull
@@ -684,8 +684,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
             addScore("결정타", FINAL_HIT_SCORE);
-            if (CooldownUtil.getCooldown(this, Cooldown.FASTKILL_TIME_LIMIT.id + victim) > 0)
-                addScore("암살", FASTKILL_SCORE);
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);
