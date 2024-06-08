@@ -74,6 +74,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final long KILL_LOG_DISPLAY_DURATION = 80;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
+    /** 추락사 점수 */
+    private static final int FALL_ZONE_KILL_SCORE = 30;
 
     /** 넉백 모듈 */
     @NonNull
@@ -380,6 +382,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getFallZoneBlock())
             return;
 
+        CooldownUtil.setCooldown(this, Cooldown.FALL_ZONE.id, 10);
         onDeath(null);
     }
 
@@ -751,6 +754,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
                 attacker2.killSupporterMap.forEach((attacker3, scores) ->
                         scores.values().forEach(supportScore -> attacker3.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore)));
+                if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
+                    attacker2.addScore("추락사", FALL_ZONE_KILL_SCORE);
 
                 if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
                     int score = Math.round(((float) damage / totalDamage) * 100);
@@ -1293,6 +1298,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         FASTKILL_TIME_LIMIT("FastkillTimeLimit", (long) (2.5 * 20)),
         /** 리스폰 시간 */
         RESPAWN("Respawn", GeneralConfig.getCombatConfig().getRespawnTime()),
+        /** 추락사 */
+        FALL_ZONE("FallZone", 0),
         /** 동작 전역 쿨타임 */
         ACTION_GLOBAL_COOLDOWN("ActionGlobalCooldown", 0),
         /** 획득 점수 표시 유지시간 (tick) */
