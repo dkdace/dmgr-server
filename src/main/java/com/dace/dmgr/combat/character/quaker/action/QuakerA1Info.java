@@ -21,6 +21,8 @@ public final class QuakerA1Info extends ActiveSkillInfo {
 
     /** 방어 점수 */
     public static final int BLOCK_SCORE = 75;
+    /** 파괴 점수 */
+    public static final int DEATH_SCORE = 20;
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 

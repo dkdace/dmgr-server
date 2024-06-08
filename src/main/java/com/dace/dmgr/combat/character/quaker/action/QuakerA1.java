@@ -166,6 +166,9 @@ public final class QuakerA1 extends ChargeableSkill {
             onCancelled();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", QuakerA1Info.DEATH_SCORE);
+
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
