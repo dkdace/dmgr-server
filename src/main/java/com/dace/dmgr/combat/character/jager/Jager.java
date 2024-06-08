@@ -99,6 +99,11 @@ public final class Jager extends Marksman {
     }
 
     @Override
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    }
+
+    @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
@@ -109,11 +114,6 @@ public final class Jager extends Marksman {
             attacker.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
         if (CooldownUtil.getCooldown(attacker, JagerUlt.KILL_SCORE_COOLDOWN_ID + victim) > 0)
             attacker.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override

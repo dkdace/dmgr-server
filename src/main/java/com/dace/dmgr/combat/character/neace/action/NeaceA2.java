@@ -18,6 +18,8 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ActiveSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
