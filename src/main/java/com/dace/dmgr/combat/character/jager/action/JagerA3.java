@@ -221,7 +221,7 @@ public final class JagerA3 extends ActiveSkill {
 
                 if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Freeze.instance, JagerA3Info.SNARE_DURATION);
-                    if (target instanceof CombatUser)
+                    if (target != combatUser && target instanceof CombatUser)
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
                 }
             }
