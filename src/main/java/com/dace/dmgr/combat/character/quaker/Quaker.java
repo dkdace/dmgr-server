@@ -7,7 +7,9 @@ import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -73,6 +75,17 @@ public final class Quaker extends Guardian {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        if (!(victim instanceof CombatUser) || score >= 100)
+            return;
+
+        if (CooldownUtil.getCooldown(attacker, QuakerA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", QuakerA2Info.ASSIST_SCORE);
+        if (CooldownUtil.getCooldown(attacker, QuakerUlt.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", QuakerUltInfo.ASSIST_SCORE);
     }
 
     @Override

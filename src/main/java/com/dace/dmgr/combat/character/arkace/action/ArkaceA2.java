@@ -48,14 +48,18 @@ public final class ArkaceA2 extends ActiveSkill {
             int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
             if (i == 0)
                 amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
-            combatUser.getDamageModule().heal(combatUser, amount, true);
+            if (combatUser.getDamageModule().heal(combatUser, amount, true))
+                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
 
-            Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
-            loc.setPitch(0);
-            playTickEffect(i, loc);
+            playTickEffect(i);
 
             return true;
         }, 1, ArkaceA2Info.DURATION));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override
@@ -67,21 +71,25 @@ public final class ArkaceA2 extends ActiveSkill {
     /**
      * 사용 중 효과를 재생한다.
      *
-     * @param i        인덱스
-     * @param location 사용 위치
+     * @param i 인덱스
      */
-    private void playTickEffect(long i, Location location) {
-        Vector vector = VectorUtil.getRollAxis(location);
-        Vector axis = VectorUtil.getYawAxis(location);
+    private void playTickEffect(long i) {
+        long angle = i * 10;
 
-        Vector vec1 = VectorUtil.getRotatedVector(vector, axis, i * 10);
-        Vector vec2 = VectorUtil.getRotatedVector(vector, axis, i * 10 + 120);
-        Vector vec3 = VectorUtil.getRotatedVector(vector, axis, i * 10 + 240);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec1), 3,
+        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+        loc.setYaw(0);
+        loc.setPitch(0);
+        Vector vector = VectorUtil.getRollAxis(loc);
+        Vector axis = VectorUtil.getYawAxis(loc);
+
+        Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
+        Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 120);
+        Vector vec3 = VectorUtil.getRotatedVector(vector, axis, angle + 240);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 3,
                 0, 0.4, 0, 220, 255, 36);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec2), 3,
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec2), 3,
                 0, 0.4, 0, 190, 255, 36);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec3), 3,
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec3), 3,
                 0, 0.4, 0, 160, 255, 36);
     }
 }

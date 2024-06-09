@@ -7,14 +7,16 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -103,11 +105,14 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isEnabled && !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
-        if (!isEnabled) {
-            super.onCancelled();
-            setDuration(0);
-        }
+        super.onCancelled();
+        setDuration(0);
     }
 
     /**
@@ -138,6 +143,21 @@ public final class JagerA3 extends ActiveSkill {
                 300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
         ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 200, 0, 0, 0, 0.3);
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    private static final class Freeze extends Snare {
+        private static final Freeze instance = new Freeze();
+
+        @Override
+        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+            if (combatEntity instanceof CombatUser)
+                ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
+
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
+                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
+                    0.4, 0.8, 0.4, 120, 220, 240);
+        }
     }
 
     private final class JagerA3Projectile extends BouncingProjectile {
@@ -186,18 +206,25 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            double distance = center.distance(target.getEntity().getLocation());
+            double distance = center.distance(location);
             int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0, true);
             int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0, true);
+            boolean isDamaged;
             if (projectile == null)
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
+                isDamaged = target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
             else
-                target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
-            target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
-            JagerT1.addFreezeValue(target, freeze);
+                isDamaged = target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
-            if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
-                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerT1.Freeze.getInstance(), JagerA3Info.SNARE_DURATION);
+            if (isDamaged) {
+                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
+                JagerT1.addFreezeValue(target, freeze);
+
+                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, Freeze.instance, JagerA3Info.SNARE_DURATION);
+                    if (target != combatUser && target instanceof CombatUser)
+                        combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
+                }
+            }
 
             return !(target instanceof Barrier);
         }

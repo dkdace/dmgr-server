@@ -105,6 +105,16 @@ public interface Action extends Disposable {
     void onUse(@NonNull ActionKey actionKey);
 
     /**
+     * 사용 중인 동작을 강제로 취소할 수 있는 지 확인한다.
+     *
+     * @return 강제 취소 가능 여부
+     * @implSpec {@code true}
+     */
+    default boolean isCancellable() {
+        return true;
+    }
+
+    /**
      * 동작 사용이 취소되었을 때 실행할 작업.
      */
     void onCancelled();

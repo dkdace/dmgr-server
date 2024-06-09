@@ -17,24 +17,30 @@ public class Snare implements StatusEffect {
     static final Snare instance = new Snare();
 
     @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SNARE;
+    }
+
+    @Override
     public final boolean isPositive() {
         return false;
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity) {
+    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("Snare", -100);
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, long i) {
+    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l속박당함!", "", 0, 2, 10);
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity) {
+    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
     }

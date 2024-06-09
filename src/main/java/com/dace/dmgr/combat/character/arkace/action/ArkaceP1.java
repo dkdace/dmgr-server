@@ -35,10 +35,21 @@ public final class ArkaceP1 extends AbstractSkill {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, ArkaceP1Info.SPRINT_SPEED);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
-        } else {
-            setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-            combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
-        }
+        } else
+            onCancelled();
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished() && combatUser.getEntity().isSprinting();
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+
+        setDuration(0);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
     }
 }

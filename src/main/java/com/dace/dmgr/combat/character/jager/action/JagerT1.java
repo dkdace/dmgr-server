@@ -1,15 +1,11 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
-import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -25,7 +21,7 @@ public final class JagerT1 {
      */
     static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
-        victim.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, FreezeValue.instance, JagerT1Info.DURATION);
+        victim.getStatusEffectModule().applyStatusEffect(victim, FreezeValue.instance, JagerT1Info.DURATION);
     }
 
     /**
@@ -38,7 +34,7 @@ public final class JagerT1 {
         private static final String MODIFIER_ID = "JagerT1";
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, long i) {
+        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
                     1, 0.25, 0, 0.25, 0);
 
@@ -48,29 +44,10 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-        }
-    }
-
-    /**
-     * 빙결 상태 효과 클래스.
-     */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Freeze extends Snare {
-        @Getter
-        private static final Freeze instance = new Freeze();
-
-        @Override
-        public void onTick(@NonNull CombatEntity combatEntity, long i) {
-            if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
-
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0), 5,
-                    0.4F, 0.8F, 0.4F, 120, 220, 240);
         }
     }
 }

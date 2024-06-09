@@ -51,7 +51,8 @@ public final class Menu extends Gui {
     private enum MenuItem {
         GAME_START(Material.IRON_SWORD, "게임 시작", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.",
                 player -> SelectGame.getInstance().open(player)),
-        WARP(Material.LEATHER_BOOTS, "이동", "원하는 장소로 이동합니다.", player -> player.performCommand("이동")),
+        WARP(Material.LEATHER_BOOTS, "이동", "원하는 장소로 이동합니다.",
+                player -> Warp.getInstance().open(player)),
         RECORD(Material.NAME_TAG, "전적", "개인 전적을 확인합니다.", player -> player.performCommand("전적")),
         ACHIEVEMENT(Material.BOOK, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
         OPTION(Material.REDSTONE_COMPARATOR, "설정", "설정 관련 메뉴를 확인합니다.", player -> player.performCommand("설정")),

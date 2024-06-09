@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
@@ -27,6 +27,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 
 public final class QuakerUlt extends UltimateSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerUlt";
 
@@ -104,6 +106,11 @@ public final class QuakerUlt extends UltimateSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
@@ -145,13 +152,13 @@ public final class QuakerUlt extends UltimateSkill {
         private static final QuakerUltSlow instance = new QuakerUltSlow();
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerUltInfo.SLOW);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
@@ -214,11 +221,16 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false);
-                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.STUN, QuakerUltInfo.STUN_DURATION);
-                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SLOW, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
-                target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
-                        target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK), true);
+                if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
+                    target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
+                            target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK), true);
+                    if (target instanceof CombatUser) {
+                        combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
+                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerUltInfo.SLOW_DURATION);
+                    }
+                }
 
                 ParticleUtil.play(Particle.CRIT, location, 60, 0, 0, 0, 0.4);
             }

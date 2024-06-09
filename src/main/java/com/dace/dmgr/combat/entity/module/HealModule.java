@@ -52,10 +52,11 @@ public final class HealModule extends DamageModule {
      * @param provider 제공자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
+     * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      */
-    public void heal(@Nullable Healer provider, int amount, boolean isUlt) {
+    public boolean heal(@Nullable Healer provider, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
-            return;
+            return false;
 
         int finalAmount = amount;
         if (getHealth() + finalAmount > getMaxHealth())
@@ -66,6 +67,8 @@ public final class HealModule extends DamageModule {
         ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
 
         setHealth(getHealth() + finalAmount);
+
+        return true;
     }
 
     /**
@@ -74,10 +77,13 @@ public final class HealModule extends DamageModule {
      * @param projectile 제공자가 발사한 투사체
      * @param amount     치유량
      * @param isUlt      궁극기 충전 여부
+     * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      */
-    public void heal(@NonNull Projectile projectile, int amount, boolean isUlt) {
+    public boolean heal(@NonNull Projectile projectile, int amount, boolean isUlt) {
         CombatEntity provider = projectile.getShooter();
         if (provider instanceof Healer)
-            heal((Healer) provider, amount, isUlt);
+            return heal((Healer) provider, amount, isUlt);
+
+        return false;
     }
 }

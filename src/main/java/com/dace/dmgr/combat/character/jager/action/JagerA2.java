@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
@@ -73,6 +73,11 @@ public final class JagerA2 extends ActiveSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
         }, JagerA2Info.READY_DURATION));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override
@@ -205,10 +210,14 @@ public final class JagerA2 extends ActiveSkill {
          * @param target 대상 엔티티
          */
         private void onCatchEnemy(@NonNull Damageable target) {
-            target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
-                    false, true);
-            target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, JagerA2Info.SNARE_DURATION);
+            if (!target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
+                    false, true))
+                return;
+
+            target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
+            if (target instanceof CombatUser)
+                combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
 
             dispose();
         }
@@ -243,6 +252,9 @@ public final class JagerA2 extends ActiveSkill {
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
+
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerA2Info.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);

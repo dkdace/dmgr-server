@@ -11,6 +11,9 @@ public final class ArkaceUltInfo extends UltimateSkillInfo {
     public static final int COST = 7000;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) 12 * 20;
+
+    /** 궁극기 처치 점수 */
+    public static final int KILL_SCORE = 40;
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();
 

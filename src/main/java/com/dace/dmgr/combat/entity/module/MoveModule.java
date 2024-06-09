@@ -67,7 +67,7 @@ public class MoveModule {
      * @return 이동 가능 여부
      */
     private boolean canMove() {
-        return !combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.STUN) &&
-                !combatEntity.getStatusEffectModule().hasStatusEffect(StatusEffectType.SNARE);
+        return !combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) &&
+                !combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE);
     }
 }

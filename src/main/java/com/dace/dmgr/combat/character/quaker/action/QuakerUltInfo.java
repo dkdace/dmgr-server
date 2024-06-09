@@ -26,6 +26,11 @@ public final class QuakerUltInfo extends UltimateSkillInfo {
     public static final long SLOW_DURATION = 12 * 20;
     /** 넉백 강도 */
     public static final double KNOCKBACK = 3;
+
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 15;
+    /** 처치 지원 점수 */
+    public static final int ASSIST_SCORE = 30;
     @Getter
     private static final QuakerUltInfo instance = new QuakerUltInfo();
 

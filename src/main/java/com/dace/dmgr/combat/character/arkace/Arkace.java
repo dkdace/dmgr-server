@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -71,6 +72,19 @@ public final class Arkace extends Marksman {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        super.onKill(attacker, victim, score, isFinalHit);
+
+        if (!(victim instanceof CombatUser))
+            return;
+
+        ArkaceUlt skillUlt = (ArkaceUlt) attacker.getSkill(ArkaceUltInfo.getInstance());
+
+        if (!skillUlt.isDurationFinished())
+            attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override

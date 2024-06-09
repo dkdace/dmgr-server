@@ -27,6 +27,8 @@ import java.util.function.Predicate;
 
 @Getter
 public final class JagerUlt extends UltimateSkill {
+    /** 처치 점수 제한시간 쿨타임 ID */
+    public static final String KILL_SCORE_COOLDOWN_ID = "JagerUltKillScoreTimeLimit";
     /** 소환한 엔티티 */
     private JagerUltEntity summonEntity = null;
 
@@ -71,6 +73,11 @@ public final class JagerUlt extends UltimateSkill {
 
             onCancelled();
         }, JagerUltInfo.READY_DURATION));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override
@@ -263,6 +270,7 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
+            CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override
@@ -279,6 +287,9 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
+
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerUltInfo.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
                     0.1, 0.1, 0.1, 0.15);
@@ -299,9 +310,9 @@ public final class JagerUlt extends UltimateSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.NORMAL,
-                        null, false, false);
-                JagerT1.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
+                if (target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20, DamageType.NORMAL,
+                        null, false, false))
+                    JagerT1.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 
                 return true;
             }

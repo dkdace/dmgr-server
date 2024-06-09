@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
@@ -79,6 +79,11 @@ public final class QuakerA3 extends ActiveSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE_READY, combatUser.getEntity().getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override
@@ -174,8 +179,10 @@ public final class QuakerA3 extends ActiveSkill {
 
         private void onImpact(@NonNull Location location) {
             for (Damageable target2 : targets) {
-                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
-                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true);
+                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
+                        target2.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
+                        target2 instanceof CombatUser)
+                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
@@ -201,7 +208,7 @@ public final class QuakerA3 extends ActiveSkill {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                 }
                 target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
-                target.getStatusEffectModule().applyStatusEffect(StatusEffectType.SNARE, QuakerA3Info.SNARE_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);
             }

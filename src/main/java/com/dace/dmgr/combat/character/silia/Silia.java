@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -65,13 +66,21 @@ public final class Silia extends Scuffler {
     }
 
     @Override
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+        if (victim instanceof CombatUser && isCrit)
+            attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
+
+        return true;
+    }
+
+    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
-        super.onKill(attacker, victim, isFinalHit);
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        super.onKill(attacker, victim, score, isFinalHit);
 
         if (!(victim instanceof CombatUser))
             return;
@@ -79,10 +88,14 @@ public final class Silia extends Scuffler {
         SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
 
+        if (CooldownUtil.getCooldown(attacker, CombatUser.Cooldown.FASTKILL_TIME_LIMIT.getId() + victim) > 0)
+            attacker.addScore("암살", CombatUser.FASTKILL_SCORE);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
-        if (!skillUlt.isDurationFinished())
+        if (!skillUlt.isDurationFinished()) {
             skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
+            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * score / 100.0);
+        }
     }
 
     @Override

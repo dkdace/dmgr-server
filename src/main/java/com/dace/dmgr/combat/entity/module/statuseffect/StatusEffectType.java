@@ -11,19 +11,18 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum StatusEffectType {
+    /** 미분류 */
+    NONE,
     /** 속도 증가 */
-    SPEED(Speed.getInstance()),
+    SPEED,
     /** 둔화 */
-    SLOW(Slow.getInstance()),
+    SLOW,
     /** 기절 */
-    STUN(Stun.getInstance()),
+    STUN,
     /** 속박 */
-    SNARE(Snare.getInstance()),
+    SNARE,
     /** 고정 */
-    GROUNDING(Grounding.getInstance()),
+    GROUNDING,
     /** 침묵 */
-    SILENCE(Silence.getInstance());
-
-    /** 기본 상태 효과 정보 */
-    private final StatusEffect statusEffect;
+    SILENCE
 }
