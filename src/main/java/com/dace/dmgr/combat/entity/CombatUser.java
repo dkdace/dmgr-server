@@ -78,6 +78,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final int FINAL_HIT_SCORE = 20;
     /** 추락사 점수 */
     private static final int FALL_ZONE_KILL_SCORE = 30;
+    /** 연속 처치 점수 */
+    private static final int KILLSTREAK_SCORE = 25;
 
     /** 넉백 모듈 */
     @NonNull
@@ -126,6 +128,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private int selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
     private double scoreStreakSum = 0;
+    /** 연속 처치 횟수 */
+    private int killStreak = 0;
     /** 시야각 값 */
     @Getter
     @Setter
@@ -689,6 +693,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
             addScore("결정타", FINAL_HIT_SCORE);
+
+            if (CooldownUtil.getCooldown(this, Cooldown.KILLSTREAK_TIME_LIMIT.id) == 0)
+                killStreak = 0;
+            CooldownUtil.setCooldown(this, Cooldown.KILLSTREAK_TIME_LIMIT.id, Cooldown.KILLSTREAK_TIME_LIMIT.duration);
+            if (killStreak++ > 0)
+                addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1));
+
             if (!((CombatUser) victim).getSkill(((CombatUser) victim).character.getUltimateSkillInfo()).isDurationFinished())
                 addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
 
@@ -1297,6 +1308,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         HIT_HEALTH_HOLOGRAM("HitHealthHologram", 20),
         /** 적 처치 기여 (데미지 누적) 제한시간 */
         DAMAGE_SUM_TIME_LIMIT("DamageSumTimeLimit", 10 * 20),
+        /** 연속 처치 제한시간 */
+        KILLSTREAK_TIME_LIMIT("KillstreakTimeLimit", 8 * 20),
         /** 적 처치 지원 제한시간 */
         KILL_SUPPORT_TIME_LIMIT("KillSupportTimeLimit", 0),
         /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 (tick) */
