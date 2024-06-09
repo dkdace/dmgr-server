@@ -173,8 +173,6 @@ public final class Neace extends Support {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (GlowUtil.isGlowing(target.getEntity(), shooter.getEntity()))
-                GlowUtil.removeGlowing(target.getEntity(), shooter.getEntity());
             GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
             return false;
         }
