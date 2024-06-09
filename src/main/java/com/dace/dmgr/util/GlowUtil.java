@@ -44,11 +44,11 @@ public final class GlowUtil {
                 if (!entity.isValid() || !player.isValid() || CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) == 0)
                     return false;
 
-                sendGlowingPakcet(entity, player, true);
+                sendGlowingPacket(entity, player, true);
 
                 return true;
             }, isCancelled -> {
-                sendGlowingPakcet(entity, player, false);
+                sendGlowingPacket(entity, player, false);
                 sendRemoveTeamPacket(entity, player);
             }, 1);
         } else if (CooldownUtil.getCooldown(entity, COOLDOWN_ID + player) < duration)
@@ -92,7 +92,7 @@ public final class GlowUtil {
      *
      * @param isEnabled 활성화 여부
      */
-    private static void sendGlowingPakcet(@NonNull Entity entity, @NonNull Player player, boolean isEnabled) {
+    private static void sendGlowingPacket(@NonNull Entity entity, @NonNull Player player, boolean isEnabled) {
         WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata();
 
         packet.setEntityID(entity.getEntityId());
