@@ -143,6 +143,12 @@ public final class GameUser implements Disposable {
         } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
             user.teleport(getRespawnLocation());
 
+        if (i % 5 == 0) {
+            for (GameUser gameUser2 : game.getGameUsers()) {
+                if (gameUser2.team == team)
+                    GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+            }
+        }
         if (i % 20 == 0)
             updateGameTablist();
     }
