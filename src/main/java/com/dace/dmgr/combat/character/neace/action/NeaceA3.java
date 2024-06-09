@@ -53,6 +53,11 @@ public final class NeaceA3 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         setCooldown();

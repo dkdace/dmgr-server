@@ -26,6 +26,9 @@ public final class JagerA3Info extends ActiveSkillInfo {
     public static final long SNARE_DURATION = (long) (1.2 * 20);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.6;
+
+    /** 속박 점수 */
+    public static final int SNARE_SCORE = 8;
     @Getter
     private static final JagerA3Info instance = new JagerA3Info();
 

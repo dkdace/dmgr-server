@@ -56,8 +56,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse() {
-        return super.canUse() && swapModule.getSwapState() != SwapState.SWAPPING &&
-                !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -105,6 +104,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         else {
             super.onCancelled();
             reloadModule.setReloading(false);
+            swapModule.setSwapping(false);
+            aimModule.setAiming(false);
         }
     }
 

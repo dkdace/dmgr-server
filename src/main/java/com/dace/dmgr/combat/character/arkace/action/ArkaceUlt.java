@@ -32,4 +32,9 @@ public final class ArkaceUlt extends UltimateSkill {
         setDuration();
         ((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
     }
+
+    @Override
+    public boolean isCancellable() {
+        return false;
+    }
 }

@@ -21,6 +21,9 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     public static final double RADIUS = 3;
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.25;
+
+    /** 직격 점수 */
+    public static final int DIRECT_HIT_SCORE = 3;
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 

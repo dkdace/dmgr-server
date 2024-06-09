@@ -86,6 +86,11 @@ public final class SiliaA1 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         if (!isDurationFinished())

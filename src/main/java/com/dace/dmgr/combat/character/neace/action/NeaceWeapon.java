@@ -76,8 +76,11 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 CooldownUtil.setCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
 
                 target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
-                if (isAmplifying)
-                    target.getStatusEffectModule().applyStatusEffect(NeaceA2.NeaceA2Buff.instance, 4);
+                if (isAmplifying) {
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
+                    if (target instanceof CombatUser)
+                        ((CombatUser) target).addDamageSupport(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+                }
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
                 combatUser.getUser().sendTitle("", (isAmplifying ? "§b" : "§a") + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(),

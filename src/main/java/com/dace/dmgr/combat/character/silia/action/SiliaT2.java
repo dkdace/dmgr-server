@@ -109,8 +109,11 @@ public final class SiliaT2 {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true))
+                        SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                     target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()).multiply(SiliaT2Info.KNOCKBACK));
+                    if (target instanceof CombatUser)
+                        combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                }
 
                 ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);

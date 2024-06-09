@@ -52,15 +52,17 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
-        if (CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) == 0) {
-            CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+        if (provider != target) {
+            if (CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) == 0) {
+                CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
 
-            TaskUtil.addTask(provider, new IntervalTask(i -> {
-                provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20, false);
-                return CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) > 0;
-            }, 2));
-        } else
-            CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+                TaskUtil.addTask(provider, new IntervalTask(i -> {
+                    provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20, false);
+                    return CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) > 0;
+                }, 2));
+            } else
+                CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+        }
 
         return true;
     }

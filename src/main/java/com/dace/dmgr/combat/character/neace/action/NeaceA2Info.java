@@ -16,6 +16,9 @@ public final class NeaceA2Info extends ActiveSkillInfo {
     public static final int SPEED = 10;
     /** 지속시간 (tick) */
     public static final long DURATION = 8 * 20;
+
+    /** 처치 지원 점수 */
+    public static final int ASSIST_SCORE = 20;
     @Getter
     private static final NeaceA2Info instance = new NeaceA2Info();
 

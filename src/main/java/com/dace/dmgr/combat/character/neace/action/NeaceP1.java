@@ -42,12 +42,23 @@ public final class NeaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) > 0)
                 return false;
 
-            combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20, true);
+            combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20, false);
             return true;
-        }, isCancelled -> setDuration(0), 1));
+        }, isCancelled -> onCancelled(), 1));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        setDuration(0);
     }
 }

@@ -77,6 +77,11 @@ public final class SiliaA2 extends ActiveSkill {
     }
 
     @Override
+    public boolean isDisposed() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
@@ -137,9 +142,12 @@ public final class SiliaA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
-                if (target instanceof Living && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
+                if (target instanceof Living && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc.clone().add(0, target.getEntity().getHeight() / 2, 0)) &&
+                        (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                     combatUser.getUser().teleport(loc);
                     combatUser.push(new Vector(0, 0.8, 0), true);
+                    if (target instanceof CombatUser)
+                        combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
                 }
             }
 

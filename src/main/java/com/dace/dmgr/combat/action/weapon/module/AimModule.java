@@ -38,7 +38,7 @@ public final class AimModule {
         if (isAiming) {
             weapon.onAimEnable();
 
-            TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
+            TaskUtil.addTask(weapon, new IntervalTask(i -> {
                 if (!isAiming)
                     return false;
 

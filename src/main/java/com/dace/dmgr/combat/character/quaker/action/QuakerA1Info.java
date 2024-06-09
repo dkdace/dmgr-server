@@ -18,6 +18,11 @@ public final class QuakerA1Info extends ActiveSkillInfo {
     public static final int RECOVER_DURATION = 12 * 20;
     /** 사용 중 이동속도 감소량 */
     public static final int USE_SLOW = 25;
+
+    /** 방어 점수 */
+    public static final int BLOCK_SCORE = 75;
+    /** 파괴 점수 */
+    public static final int DEATH_SCORE = 20;
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 

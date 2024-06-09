@@ -82,6 +82,11 @@ public final class QuakerA3 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
@@ -174,8 +179,10 @@ public final class QuakerA3 extends ActiveSkill {
 
         private void onImpact(@NonNull Location location) {
             for (Damageable target2 : targets) {
-                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
-                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true);
+                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
+                        target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
+                        target2 instanceof CombatUser)
+                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
@@ -201,7 +208,7 @@ public final class QuakerA3 extends ActiveSkill {
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                 }
                 target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
-                target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
+                target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);
             }

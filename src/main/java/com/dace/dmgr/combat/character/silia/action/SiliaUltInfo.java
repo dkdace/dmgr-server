@@ -18,6 +18,9 @@ public final class SiliaUltInfo extends UltimateSkillInfo {
     public static final int SPEED = 30;
     /** 일격 쿨타임 (tick) */
     public static final long STRIKE_COOLDOWN = (long) (0.7 * 20);
+
+    /** 궁극기 처치 점수 */
+    public static final int KILL_SCORE = 25;
     @Getter
     private static final SiliaUltInfo instance = new SiliaUltInfo();
 

@@ -47,9 +47,9 @@ public final class LocationUtil {
             return true;
 
         MaterialData materialData = block.getState().getData();
-        if (materialData instanceof Step && block.getType().isOccluding())
+        if ((materialData instanceof Step || materialData instanceof WoodenStep) && block.getType().isOccluding())
             return false;
-        if (materialData instanceof Step || materialData instanceof Stairs || materialData instanceof Gate ||
+        if (materialData instanceof Step || materialData instanceof WoodenStep || materialData instanceof Stairs || materialData instanceof Gate ||
                 materialData instanceof Door || materialData instanceof TrapDoor)
             return true;
 
@@ -60,12 +60,20 @@ public final class LocationUtil {
             case SPRUCE_FENCE:
             case BIRCH_FENCE:
             case JUNGLE_FENCE:
-            case ACACIA_FENCE_GATE:
+            case ACACIA_FENCE:
             case DARK_OAK_FENCE:
+            case NETHER_FENCE:
             case IRON_FENCE:
             case COBBLE_WALL:
             case SIGN_POST:
             case WALL_SIGN:
+            case BANNER:
+            case WALL_BANNER:
+            case STANDING_BANNER:
+            case WOOD_PLATE:
+            case STONE_PLATE:
+            case IRON_PLATE:
+            case GOLD_PLATE:
                 return true;
             default:
                 return false;
@@ -90,6 +98,11 @@ public final class LocationUtil {
 
             if (materialData instanceof Step) {
                 if (((Step) materialData).isInverted())
+                    return location.getY() - Math.floor(location.getY()) < 0.5;
+                else
+                    return location.getY() - Math.floor(location.getY()) > 0.5;
+            } else if (materialData instanceof WoodenStep) {
+                if (((WoodenStep) materialData).isInverted())
                     return location.getY() - Math.floor(location.getY()) < 0.5;
                 else
                     return location.getY() - Math.floor(location.getY()) > 0.5;
