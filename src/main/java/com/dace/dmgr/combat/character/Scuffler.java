@@ -39,7 +39,7 @@ public abstract class Scuffler extends Character {
         if (isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-        attacker.getStatusEffectModule().applyStatusEffect(RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
     }
 
     public static final class RoleTrait1Info extends TraitInfo {
@@ -73,13 +73,13 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait2Info.SPEED);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }

@@ -68,6 +68,11 @@ public final class NeaceA2 extends ActiveSkill {
             setCooldown();
     }
 
+    @Override
+    public boolean isCancellable() {
+        return false;
+    }
+
     /**
      * 사용 중 효과를 재생한다.
      *
@@ -108,7 +113,7 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
             if (combatEntity instanceof Damageable)
@@ -118,12 +123,12 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, long i) {
+        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Damageable)

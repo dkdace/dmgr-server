@@ -76,6 +76,11 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
@@ -209,7 +214,7 @@ public final class JagerA2 extends ActiveSkill {
                     false, true))
                 return;
 
-            target.getStatusEffectModule().applyStatusEffect(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
+            target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
             if (target instanceof CombatUser)
                 combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);

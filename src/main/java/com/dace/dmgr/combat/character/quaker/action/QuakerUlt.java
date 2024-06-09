@@ -106,6 +106,11 @@ public final class QuakerUlt extends UltimateSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
@@ -147,13 +152,13 @@ public final class QuakerUlt extends UltimateSkill {
         private static final QuakerUltSlow instance = new QuakerUltSlow();
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerUltInfo.SLOW);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
@@ -217,8 +222,8 @@ public final class QuakerUlt extends UltimateSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 if (target.getDamageModule().damage(combatUser, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
-                    target.getStatusEffectModule().applyStatusEffect(Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
-                    target.getStatusEffectModule().applyStatusEffect(QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
                             target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK), true);
                     if (target instanceof CombatUser) {

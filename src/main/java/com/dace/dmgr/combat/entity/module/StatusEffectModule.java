@@ -56,10 +56,11 @@ public final class StatusEffectModule {
      * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이
      * 남은 시간보다 길 경우에만 적용한다.</p>
      *
+     * @param provider     제공자
      * @param statusEffect 적용할 상태 효과
      * @param duration     지속시간 (tick)
      */
-    public void applyStatusEffect(@NonNull StatusEffect statusEffect, long duration) {
+    public void applyStatusEffect(@NonNull CombatEntity provider, @NonNull StatusEffect statusEffect, long duration) {
         long finalDuration = (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
         if (finalDuration == 0)
             return;
@@ -68,7 +69,7 @@ public final class StatusEffectModule {
             CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
             statusEffects.add(statusEffect);
 
-            statusEffect.onStart(combatEntity);
+            statusEffect.onStart(combatEntity, provider);
 
             TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
                 if (combatEntity.isDisposed())
@@ -78,11 +79,11 @@ public final class StatusEffectModule {
                 if (!statusEffects.contains(statusEffect))
                     return false;
 
-                statusEffect.onTick(combatEntity, i);
+                statusEffect.onTick(combatEntity, provider, i);
 
                 return true;
             }, isCancelled -> {
-                statusEffect.onEnd(combatEntity);
+                statusEffect.onEnd(combatEntity, provider);
 
                 CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, 0);
                 statusEffects.remove(statusEffect);

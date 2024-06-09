@@ -21,7 +21,7 @@ public final class JagerT1 {
      */
     static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
-        victim.getStatusEffectModule().applyStatusEffect(FreezeValue.instance, JagerT1Info.DURATION);
+        victim.getStatusEffectModule().applyStatusEffect(victim, FreezeValue.instance, JagerT1Info.DURATION);
     }
 
     /**
@@ -34,7 +34,7 @@ public final class JagerT1 {
         private static final String MODIFIER_ID = "JagerT1";
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, long i) {
+        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
                     1, 0.25, 0, 0.25, 0);
 
@@ -44,7 +44,7 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);

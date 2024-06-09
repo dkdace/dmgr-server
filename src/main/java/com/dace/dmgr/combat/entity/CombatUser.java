@@ -68,6 +68,8 @@ import java.util.function.Function;
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Jumpable {
     /** 암살 점수 */
     public static final int FASTKILL_SCORE = 20;
+    /** 궁극기 차단 점수 */
+    public static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.12;
     /** 킬 로그 표시 유지시간 (tick) */
@@ -687,6 +689,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
             addScore("결정타", FINAL_HIT_SCORE);
+            if (!((CombatUser) victim).getSkill(((CombatUser) victim).character.getUltimateSkillInfo()).isDurationFinished())
+                addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
 
             if (gameUser != null) {
                 gameUser.setKill(gameUser.getKill() + 1);
@@ -1186,9 +1190,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사용 중인 모든 동작을 강제로 취소시킨다.
      */
     public void cancelAction() {
-        weapon.onCancelled();
+        if (weapon.isCancellable())
+            weapon.onCancelled();
         skillMap.forEach((skillInfo, skill) -> {
-            if (!skill.isDurationFinished())
+            if (skill.isCancellable())
                 skill.onCancelled();
         });
     }

@@ -63,13 +63,16 @@ public final class SiliaUlt extends UltimateSkill {
     }
 
     @Override
-    public void onCancelled() {
-        if (!isEnabled) {
-            super.onCancelled();
+    public boolean isCancellable() {
+        return !isEnabled && !isDurationFinished();
+    }
 
-            setDuration(0);
-            combatUser.getWeapon().setVisible(true);
-        }
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+
+        setDuration(0);
+        combatUser.getWeapon().setVisible(true);
     }
 
     /**

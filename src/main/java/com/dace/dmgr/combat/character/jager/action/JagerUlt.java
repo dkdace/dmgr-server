@@ -76,6 +76,11 @@ public final class JagerUlt extends UltimateSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);

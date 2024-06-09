@@ -7,6 +7,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.text.MessageFormat;
 
@@ -31,6 +32,7 @@ public class ConfirmModule {
 
     /** 확인 중 상태 */
     @Getter
+    @Setter
     protected boolean isChecking = false;
 
     /**

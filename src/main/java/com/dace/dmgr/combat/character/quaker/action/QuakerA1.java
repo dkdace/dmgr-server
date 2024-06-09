@@ -81,6 +81,11 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 

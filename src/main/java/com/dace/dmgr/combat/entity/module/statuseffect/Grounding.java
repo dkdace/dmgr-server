@@ -27,18 +27,18 @@ public class Grounding implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity) {
+    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, long i) {
+    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l고정당함!", "", 0, 2, 10);
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity) {
+    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 }

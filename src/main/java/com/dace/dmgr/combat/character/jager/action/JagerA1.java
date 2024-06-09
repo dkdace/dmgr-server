@@ -99,10 +99,15 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
+    public boolean isCancellable() {
+        return confirmModule.isChecking();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
-        if (confirmModule.isChecking())
-            confirmModule.toggleCheck();
+
+        confirmModule.setChecking(false);
     }
 
     @Override

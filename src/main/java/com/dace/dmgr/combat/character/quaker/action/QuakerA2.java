@@ -99,6 +99,11 @@ public final class QuakerA2 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
@@ -137,13 +142,13 @@ public final class QuakerA2 extends ActiveSkill {
         private static final QuakerA2Slow instance = new QuakerA2Slow();
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA2Info.SLOW);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
@@ -207,8 +212,8 @@ public final class QuakerA2 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
                 if (target.getDamageModule().damage(combatUser, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                    target.getStatusEffectModule().applyStatusEffect(Stun.getInstance(), QuakerA2Info.STUN_DURATION);
-                    target.getStatusEffectModule().applyStatusEffect(QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
                         CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerA2Info.SLOW_DURATION);
