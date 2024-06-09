@@ -161,7 +161,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+            target.getDamageModule().damage(this, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
             return false;
         }
     }
