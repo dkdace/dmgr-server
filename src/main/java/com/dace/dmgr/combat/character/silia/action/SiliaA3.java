@@ -82,6 +82,11 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 

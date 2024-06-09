@@ -48,12 +48,18 @@ public final class ArkaceA2 extends ActiveSkill {
             int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
             if (i == 0)
                 amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
-            combatUser.getDamageModule().heal(combatUser, amount, true);
+            if (combatUser.getDamageModule().heal(combatUser, amount, true))
+                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
 
             playTickEffect(i);
 
             return true;
         }, 1, ArkaceA2Info.DURATION));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override

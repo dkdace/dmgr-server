@@ -81,6 +81,11 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
@@ -151,6 +156,8 @@ public final class QuakerA1 extends ChargeableSkill {
 
             addStateValue(-damage);
 
+            combatUser.addScore("피해 막음", (double) (damage * QuakerA1Info.BLOCK_SCORE) / QuakerA1Info.HEALTH);
+
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
                 CombatUtil.playBreakEffect(location, entity, damage);
@@ -163,6 +170,9 @@ public final class QuakerA1 extends ChargeableSkill {
             setStateValue(0);
             onCancelled();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
+
+            if (attacker instanceof CombatUser)
+                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", QuakerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
             for (int i = 0; i < 3; i++) {

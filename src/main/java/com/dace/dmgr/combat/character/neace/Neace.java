@@ -33,6 +33,8 @@ import java.util.StringJoiner;
  * @see NeaceUlt
  */
 public final class Neace extends Support {
+    /** 치유 점수 */
+    public static final int HEAL_SCORE = 60;
     @Getter
     private static final Neace instance = new Neace();
 
@@ -82,6 +84,16 @@ public final class Neace extends Support {
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
         CooldownUtil.setCooldown(victim, NeaceP1.COOLDOWN_ID, NeaceP1Info.ACTIVATE_DURATION);
+    }
+
+    @Override
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+        super.onGiveHeal(provider, target, amount);
+
+        if (provider != target && target instanceof CombatUser)
+            provider.addScore("치유", (double) (HEAL_SCORE * amount) / target.getDamageModule().getMaxHealth());
+
+        return true;
     }
 
     @Override
@@ -161,6 +173,8 @@ public final class Neace extends Support {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+            if (GlowUtil.isGlowing(target.getEntity(), shooter.getEntity()))
+                GlowUtil.removeGlowing(target.getEntity(), shooter.getEntity());
             GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
             return false;
         }

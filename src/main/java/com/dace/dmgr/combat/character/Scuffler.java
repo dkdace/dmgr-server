@@ -16,9 +16,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 역할군이 '근접'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Scuffler extends Character {
-    /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 30;
-
     /**
      * 근접 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -35,16 +32,14 @@ public abstract class Scuffler extends Character {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         if (!(victim instanceof CombatUser))
             return;
 
-        if (isFinalHit) {
+        if (isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-            attacker.addScore("결정타", FINAL_HIT_SCORE);
-        }
 
-        attacker.getStatusEffectModule().applyStatusEffect(RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
     }
 
     public static final class RoleTrait1Info extends TraitInfo {
@@ -78,13 +73,13 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity) {
+        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait2Info.SPEED);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity) {
+        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }

@@ -69,6 +69,11 @@ public final class ArkaceA1 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
@@ -98,7 +103,10 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+            if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true) &&
+                    target instanceof CombatUser)
+                combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+
             return false;
         }
 

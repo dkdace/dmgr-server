@@ -27,13 +27,18 @@ public class Silence implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).cancelAction();
+    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        if (!(combatEntity instanceof CombatUser))
+            return;
+
+        if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
+                ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
+            ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
+        ((CombatUser) combatEntity).cancelAction();
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, long i) {
+    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser) {
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 2, 10);
             ((CombatUser) combatEntity).getEntity().stopSound("");
@@ -41,7 +46,7 @@ public class Silence implements StatusEffect {
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity) {
+    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 }

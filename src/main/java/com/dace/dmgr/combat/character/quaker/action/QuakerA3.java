@@ -174,8 +174,10 @@ public final class QuakerA3 extends ActiveSkill {
 
         private void onImpact(@NonNull Location location) {
             for (Damageable target2 : targets) {
-                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE)
-                    target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true);
+                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
+                        target2.getDamageModule().damage(combatUser, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
+                        target2 instanceof CombatUser)
+                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);

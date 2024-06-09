@@ -79,7 +79,7 @@ public final class ReloadModule {
         isReloading = true;
         CooldownUtil.setCooldown(this, COOLDOWN_ID, reloadDuration);
 
-        TaskUtil.addTask(weapon.getTaskRunner(), new IntervalTask(i -> {
+        TaskUtil.addTask(weapon, new IntervalTask(i -> {
             if (!isReloading)
                 return false;
 

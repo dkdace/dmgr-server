@@ -14,6 +14,9 @@ public final class SiliaT2Info extends TraitInfo {
     public static final double SIZE = 0.5;
     /** 넉백 강도 */
     public static final double KNOCKBACK = 1;
+
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 8;
     @Getter
     private static final SiliaT2Info instance = new SiliaT2Info();
 

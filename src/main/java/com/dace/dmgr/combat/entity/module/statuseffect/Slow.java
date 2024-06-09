@@ -28,18 +28,18 @@ public class Slow implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity) {
+    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, long i) {
+    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12, combatEntity.getEntity().getLocation().add(0, 0.5, 0),
                 3, 0.3, 0, 0.3, 0);
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity) {
+    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 }

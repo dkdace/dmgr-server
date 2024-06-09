@@ -70,13 +70,16 @@ public final class NeaceUlt extends UltimateSkill {
     }
 
     @Override
-    public void onCancelled() {
-        if (!isEnabled) {
-            super.onCancelled();
+    public boolean isCancellable() {
+        return !isEnabled && !isDurationFinished();
+    }
 
-            setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-        }
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+
+        setDuration(0);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 
     /**
@@ -183,8 +186,11 @@ public final class NeaceUlt extends UltimateSkill {
             boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
 
             ((Healable) target).getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, false);
-            if (isAmplifying)
-                target.getStatusEffectModule().applyStatusEffect(NeaceA2.NeaceA2Buff.instance, 4);
+            if (isAmplifying) {
+                target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
+                if (target instanceof CombatUser)
+                    ((CombatUser) target).addDamageSupport(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+            }
 
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
             for (Location trailLoc : LocationUtil.getLine(loc, target.getEntity().getLocation().add(0, 1, 0), 0.8)) {

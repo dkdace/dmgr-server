@@ -5,6 +5,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -212,7 +213,7 @@ public final class GameUser implements Disposable {
 
             GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
             if (gameUser2 != this)
-                HologramUtil.setHologramVisibility("hitHealth" + combatUser, true, gameUser2.player);
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, gameUser2.player);
         }
     }
 
@@ -248,7 +249,7 @@ public final class GameUser implements Disposable {
                     user.setTabListItem(column, (i + 1) * 3 - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
                             this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
                     user.setTabListItem(column, (i + 1) * 3 - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
-                            teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
+                            (int) teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
                             "✔", teamUsers[i].getAssist()), null);
                 }
             }

@@ -137,10 +137,11 @@ public abstract class Character {
      *
      * @param attacker   공격자
      * @param victim     피격자
+     * @param score      점수 (처치 기여도). -1이면 플레이어가 아닌 적
      * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
      * @see Character#onDeath(CombatUser, Attacker)
      */
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isFinalHit) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         // 미사용
     }
 
@@ -149,7 +150,7 @@ public abstract class Character {
      *
      * @param victim   피격자
      * @param attacker 공격자
-     * @see Character#onKill(CombatUser, Damageable, boolean)
+     * @see Character#onKill(CombatUser, Damageable, int, boolean)
      */
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
         // 미사용

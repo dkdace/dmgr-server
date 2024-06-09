@@ -105,11 +105,14 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isEnabled && !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
-        if (!isEnabled) {
-            super.onCancelled();
-            setDuration(0);
-        }
+        super.onCancelled();
+        setDuration(0);
     }
 
     /**
@@ -147,7 +150,7 @@ public final class JagerA3 extends ActiveSkill {
         private static final Freeze instance = new Freeze();
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, long i) {
+        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
@@ -216,8 +219,11 @@ public final class JagerA3 extends ActiveSkill {
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
                 JagerT1.addFreezeValue(target, freeze);
 
-                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX)
-                    target.getStatusEffectModule().applyStatusEffect(Freeze.instance, JagerA3Info.SNARE_DURATION);
+                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, Freeze.instance, JagerA3Info.SNARE_DURATION);
+                    if (target != combatUser && target instanceof CombatUser)
+                        combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
+                }
             }
 
             return !(target instanceof Barrier);

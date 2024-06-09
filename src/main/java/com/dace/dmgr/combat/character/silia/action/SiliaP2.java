@@ -95,10 +95,12 @@ public final class SiliaP2 extends AbstractSkill {
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
             combatUser.push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);
-
-            TaskUtil.addTask(SiliaP2.this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                    isCancelled2 -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
         }, 3, 10));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return !isDurationFinished();
     }
 
     @Override
@@ -107,5 +109,8 @@ public final class SiliaP2 extends AbstractSkill {
 
         setDuration(0);
         combatUser.getWeapon().setVisible(true);
+
+        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
+                isCancelled2 -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }
 }
