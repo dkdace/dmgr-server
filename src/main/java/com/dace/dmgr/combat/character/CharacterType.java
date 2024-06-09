@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.character.quaker.Quaker;
 import com.dace.dmgr.combat.character.silia.Silia;
+import com.dace.dmgr.combat.character.vellion.Vellion;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
@@ -27,7 +28,8 @@ public enum CharacterType {
     JAGER(Jager.getInstance()),
     QUAKER(Quaker.getInstance()),
     SILIA(Silia.getInstance()),
-    NEACE(Neace.getInstance());
+    NEACE(Neace.getInstance()),
+    VELLION(Vellion.getInstance());
 
     /** 전투원 정보 */
     private final Character character;

@@ -374,6 +374,12 @@ public enum NamedSound {
     COMBAT_NEACE_ULT_USE_READY(
             new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1),
             new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1)
+    ),
+    /** 전투 - '벨리온' 무기 - 사용 */
+    COMBAT_VELLION_WEAPON_USE(
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_HURT, 0.8, 0.5),
+            new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.8),
+            new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.9)
     );
 
     /** 지정된 효과음 목록 */
