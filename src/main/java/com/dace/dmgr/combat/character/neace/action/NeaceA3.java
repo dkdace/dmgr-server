@@ -85,8 +85,8 @@ public final class NeaceA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A3_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                Location loc = combatUser.getEntity().getLocation().add(0, 0.2, 0);
-                Location targetLoc = target.getEntity().getLocation().add(0, 1, 0);
+                Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+                Location targetLoc = target.getEntity().getLocation().add(0, 1.5, 0);
                 Vector vec = LocationUtil.getDirection(loc, targetLoc).multiply(NeaceA3Info.PUSH);
 
                 if (!target.canBeTargeted() || target.isDisposed())
@@ -98,15 +98,11 @@ public final class NeaceA3 extends ActiveSkill {
                     return false;
                 }
 
-                if (i == 0)
-                    combatUser.push(new Vector(0, 0.5, 0), false);
-                else
-                    combatUser.push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
-                combatUser.getEntity().setGliding(true);
+                combatUser.push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
                 ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
-                    Location loc2 = combatUser.getEntity().getLocation().add(0, 0.2, 0);
+                    Location loc2 = combatUser.getEntity().getLocation().add(0, 1, 0);
                     for (Location trailLoc : LocationUtil.getLine(loc, loc2, 0.4))
                         ParticleUtil.play(Particle.END_ROD, trailLoc, 1, 0.02, 0.02, 0.02, 0);
                 }, 1));
