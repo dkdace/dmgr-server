@@ -1,16 +1,15 @@
 package com.dace.dmgr.combat.character.vellion;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.silia.action.SiliaUltInfo;
-import com.dace.dmgr.combat.character.vellion.action.VellionP1;
-import com.dace.dmgr.combat.character.vellion.action.VellionP1Info;
-import com.dace.dmgr.combat.character.vellion.action.VellionWeapon;
-import com.dace.dmgr.combat.character.vellion.action.VellionWeaponInfo;
+import com.dace.dmgr.combat.character.vellion.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -24,6 +23,8 @@ import java.util.StringJoiner;
  * 전투원 - 벨리온 클래스.
  *
  * @see VellionWeapon
+ * @see VellionP1
+ * @see VellionP2
  */
 public final class Vellion extends Controller {
     @Getter
@@ -55,6 +56,15 @@ public final class Vellion extends Controller {
         text.add(skillp1Display);
 
         return text.toString();
+    }
+
+    @Override
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+        VellionP2 skillp2 = (VellionP2) attacker.getSkill(VellionP2Info.getInstance());
+        skillp2.setDamageAmount(damage);
+        attacker.useAction(ActionKey.PERIODIC_1);
+
+        return true;
     }
 
     @Override
@@ -96,6 +106,8 @@ public final class Vellion extends Controller {
         switch (number) {
             case 1:
                 return VellionP1Info.getInstance();
+            case 2:
+                return VellionP2Info.getInstance();
             default:
                 return null;
         }
