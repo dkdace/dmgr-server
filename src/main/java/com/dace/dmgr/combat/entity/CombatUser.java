@@ -265,7 +265,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
 
         packet.setCanFly(isActivated && canFly());
+        packet.setFlying(entity.isFlying());
         packet.setWalkingSpeed((float) (moveModule.getSpeedStatus().getValue() * 2 * value));
+        packet.setFlyingSpeed(entity.getFlySpeed());
 
         packet.sendPacket(entity);
     }
@@ -282,6 +284,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 speed *= speed / DEFAULT_SPEED;
         }
 
+        entity.setFlySpeed((float) (speed * 0.25));
         moveModule.getSpeedStatus().setBaseValue(speed);
     }
 

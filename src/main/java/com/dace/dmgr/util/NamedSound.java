@@ -380,6 +380,17 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_ENDERDRAGON_HURT, 0.8, 0.5),
             new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.8),
             new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.9)
+    ),
+    /** 전투 - '벨리온' 패시브 1번 - 사용 */
+    COMBAT_VELLION_P1_USE(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.4),
+            new DefinedSound("new.entity.phantom.flap", 1, 1.6),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 0.6, 0.7)
+    ),
+    /** 전투 - '벨리온' 패시브 1번 - 해제 */
+    COMBAT_VELLION_P1_DISABLE(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.5),
+            new DefinedSound("new.entity.phantom.flap", 1, 1.7)
     );
 
     /** 지정된 효과음 목록 */

@@ -5,11 +5,14 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.silia.action.SiliaUltInfo;
+import com.dace.dmgr.combat.character.vellion.action.VellionP1;
+import com.dace.dmgr.combat.character.vellion.action.VellionP1Info;
 import com.dace.dmgr.combat.character.vellion.action.VellionWeapon;
 import com.dace.dmgr.combat.character.vellion.action.VellionWeaponInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -33,7 +36,23 @@ public final class Vellion extends Controller {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
+        VellionP1 skillp1 = (VellionP1) combatUser.getSkill(VellionP1Info.getInstance());
+
+        double skillp1Cooldown = skillp1.getCooldown() / 20.0;
+        double skillp1MaxCooldown = skillp1.getDefaultCooldown() / 20.0;
+        double skillp1Duration = skillp1.getDuration() / 20.0;
+        double skillp1MaxDuration = skillp1.getDefaultDuration() / 20.0;
+
         StringJoiner text = new StringJoiner("    ");
+
+        String skillp1Display;
+        if (skillp1.isDurationFinished())
+            skillp1Display = StringFormUtil.getActionbarCooldownBar(skillp1.getSkillInfo().toString(), skillp1Cooldown, skillp1MaxCooldown,
+                    10, '■');
+        else
+            skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration, skillp1MaxDuration,
+                    10, '■') + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
+        text.add(skillp1Display);
 
         return text.toString();
     }
@@ -57,7 +76,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        return true;
+        return combatUser.getSkill(VellionP1Info.getInstance()).isCooldownFinished();
     }
 
     @Override
@@ -75,6 +94,8 @@ public final class Vellion extends Controller {
     @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return VellionP1Info.getInstance();
             default:
                 return null;
         }

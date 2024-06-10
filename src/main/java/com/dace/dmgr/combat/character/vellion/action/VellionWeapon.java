@@ -50,7 +50,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
     private final class VellionWeaponProjectile extends Projectile {
         private VellionWeaponProjectile() {
-            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(VellionWeaponInfo.SIZE)
+            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(13).size(VellionWeaponInfo.SIZE)
                     .maxDistance(VellionWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
