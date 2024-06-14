@@ -391,7 +391,21 @@ public enum NamedSound {
     COMBAT_VELLION_P1_DISABLE(
             new DefinedSound("new.entity.phantom.flap", 1, 1.5),
             new DefinedSound("new.entity.phantom.flap", 1, 1.7)
-    );
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 사용 */
+    COMBAT_VELLION_A1_USE(
+            new DefinedSound(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
+            new DefinedSound(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
+            new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2, 1.5)
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 사용 준비 */
+    COMBAT_VELLION_A1_USE_READY(
+            new DefinedSound(Sound.ENTITY_SHULKER_SHOOT, 2, 0.7),
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR, 2, 1.2),
+            new DefinedSound(Sound.ENTITY_ELDER_GUARDIAN_DEATH, 2, 1.8)
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 엔티티 타격 */
+    COMBAT_VELLION_A1_HIT_ENTITY(new DefinedSound(Sound.ENTITY_ZOMBIE_INFECT, 1, 0.7, 0.05));
 
     /** 지정된 효과음 목록 */
     private final DefinedSound[] definedSounds;

@@ -25,6 +25,7 @@ import java.util.StringJoiner;
  * @see VellionWeapon
  * @see VellionP1
  * @see VellionP2
+ * @see VellionA1
  */
 public final class Vellion extends Controller {
     @Getter
@@ -81,7 +82,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !combatUser.getEntity().isFlying();
+        return !combatUser.getEntity().isFlying() && combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -91,7 +92,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
+        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -117,6 +118,8 @@ public final class Vellion extends Controller {
     @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return VellionA1Info.getInstance();
             case 4:
                 return SiliaUltInfo.getInstance();
             default:

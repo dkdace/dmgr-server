@@ -24,5 +24,7 @@ public enum StatusEffectType {
     /** 고정 */
     GROUNDING,
     /** 침묵 */
-    SILENCE
+    SILENCE,
+    /** 독 */
+    POISON
 }
