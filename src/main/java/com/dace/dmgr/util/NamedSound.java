@@ -405,7 +405,20 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_ELDER_GUARDIAN_DEATH, 2, 1.8)
     ),
     /** 전투 - '벨리온' 액티브 1번 - 엔티티 타격 */
-    COMBAT_VELLION_A1_HIT_ENTITY(new DefinedSound(Sound.ENTITY_ZOMBIE_INFECT, 1, 0.7, 0.05));
+    COMBAT_VELLION_A1_HIT_ENTITY(new DefinedSound(Sound.ENTITY_ZOMBIE_INFECT, 1, 0.7, 0.05)),
+    /** 전투 - '벨리온' 액티브 2번 - 사용 */
+    COMBAT_VELLION_A2_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound("new.entity.squid.squirt", 2, 1.2)
+    ),
+    /** 전투 - '벨리온' 액티브 2번 - 사용 준비 */
+    COMBAT_VELLION_A2_USE_READY(
+            new DefinedSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 2, 1),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 0.8)
+    ),
+    /** 전투 - '벨리온' 액티브 2번 - 발동 */
+    COMBAT_VELLION_A2_TRIGGER(new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 0.6, 0.7, 0.1));
 
     /** 지정된 효과음 목록 */
     private final DefinedSound[] definedSounds;

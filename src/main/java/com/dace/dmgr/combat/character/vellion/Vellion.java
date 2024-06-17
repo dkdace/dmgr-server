@@ -26,6 +26,7 @@ import java.util.StringJoiner;
  * @see VellionP1
  * @see VellionP2
  * @see VellionA1
+ * @see VellionA2
  */
 public final class Vellion extends Controller {
     @Getter
@@ -39,6 +40,7 @@ public final class Vellion extends Controller {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         VellionP1 skillp1 = (VellionP1) combatUser.getSkill(VellionP1Info.getInstance());
+        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
 
         double skillp1Cooldown = skillp1.getCooldown() / 20.0;
         double skillp1MaxCooldown = skillp1.getDefaultCooldown() / 20.0;
@@ -55,6 +57,8 @@ public final class Vellion extends Controller {
             skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration, skillp1MaxDuration,
                     10, '■') + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
         text.add(skillp1Display);
+        if (!skill2.isDurationFinished() && skill2.isEnabled())
+            text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
 
         return text.toString();
     }
@@ -120,6 +124,8 @@ public final class Vellion extends Controller {
         switch (number) {
             case 1:
                 return VellionA1Info.getInstance();
+            case 2:
+                return VellionA2Info.getInstance();
             case 4:
                 return SiliaUltInfo.getInstance();
             default:
