@@ -33,6 +33,11 @@ public final class VellionWeapon extends AbstractWeapon {
     }
 
     @Override
+    public boolean canUse() {
+        return super.canUse() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {

@@ -60,7 +60,7 @@ public final class VellionA1 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished();
+        return super.canUse() && isDurationFinished() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
     }
 
     @Override

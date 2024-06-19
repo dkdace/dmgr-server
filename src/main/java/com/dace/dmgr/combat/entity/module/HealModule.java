@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity.module;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,6 +57,8 @@ public final class HealModule extends DamageModule {
      */
     public boolean heal(@Nullable Healer provider, int amount, boolean isUlt) {
         if (getHealth() == getMaxHealth())
+            return false;
+        if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
             return false;
 
         int finalAmount = amount;

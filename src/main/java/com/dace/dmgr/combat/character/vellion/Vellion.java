@@ -27,6 +27,7 @@ import java.util.StringJoiner;
  * @see VellionP2
  * @see VellionA1
  * @see VellionA2
+ * @see VellionA3
  */
 public final class Vellion extends Controller {
     @Getter
@@ -81,7 +82,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
+        return !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
     }
 
     @Override
@@ -126,6 +127,8 @@ public final class Vellion extends Controller {
                 return VellionA1Info.getInstance();
             case 2:
                 return VellionA2Info.getInstance();
+            case 3:
+                return VellionA3Info.getInstance();
             case 4:
                 return SiliaUltInfo.getInstance();
             default:

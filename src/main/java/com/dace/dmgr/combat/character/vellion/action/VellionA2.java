@@ -60,6 +60,11 @@ public final class VellionA2 extends ActiveSkill {
     }
 
     @Override
+    public boolean canUse() {
+        return super.canUse() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished())
             new VellionTarget().shoot();
@@ -70,7 +75,9 @@ public final class VellionA2 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         setDuration(0);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 
     @Override
@@ -122,6 +129,8 @@ public final class VellionA2 extends ActiveSkill {
 
         @Override
         public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+            if (combatEntity instanceof CombatUser)
+                ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", 0, 5, 10);
             if (combatEntity instanceof Damageable)
                 ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, -VellionA2Info.DEFENSE_DECREMENT);
         }
@@ -163,6 +172,7 @@ public final class VellionA2 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             setDuration();
             combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
 
             this.target = target;
 
@@ -185,10 +195,9 @@ public final class VellionA2 extends ActiveSkill {
 
                 return canKeep(combatUser, target) && target.canBeTargeted();
             }, isCancelled -> {
-                if (isCancelled) {
-                    onCancelled();
+                onCancelled();
+                if (isCancelled)
                     return;
-                }
 
                 setDuration();
 
@@ -210,18 +219,12 @@ public final class VellionA2 extends ActiveSkill {
                     if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
                         CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
 
-                    if (target instanceof CombatUser)
-                        ((CombatUser) target).getUser().sendTitle("§5§l저주받음!", "", 0, 5, 10);
-
                     if (i % 10 == 0) {
                         Location loc2 = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
                         Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) && combatEntity != target &&
                                 combatEntity instanceof Damageable;
                         CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc2, VellionA2Info.RADIUS, condition);
                         new VellionA2Area(condition, areaTargets).emit(loc2);
-
-                        if (areaTargets.length > 0)
-                            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_TRIGGER, loc2);
                     }
 
                     return canKeep(combatUser, target);
@@ -255,6 +258,8 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         private final class VellionA2Area extends Area {
+            private boolean isActivated = false;
+
             private VellionA2Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
                 super(combatUser, VellionA2Info.RADIUS, condition, targets);
             }
@@ -272,6 +277,10 @@ public final class VellionA2 extends ActiveSkill {
                 for (Location trailLoc : LocationUtil.getLine(center, location, 0.4))
                     ParticleUtil.play(Particle.SMOKE_NORMAL, trailLoc, 1, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.CRIT_MAGIC, location, 15, 0, 0, 0, 0.3);
+                if (!isActivated) {
+                    isActivated = true;
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_TRIGGER, center);
+                }
 
                 return !(target instanceof Barrier);
             }
