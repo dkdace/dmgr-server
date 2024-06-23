@@ -85,16 +85,18 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
     @Override
     public boolean isCancellable() {
-        return confirmModule.isChecking();
+        return confirmModule.isChecking() || !isDurationFinished();
     }
 
     @Override
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
         confirmModule.setChecking(false);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        if (!isDurationFinished()) {
+            setDuration(0);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        }
     }
 
     @Override
