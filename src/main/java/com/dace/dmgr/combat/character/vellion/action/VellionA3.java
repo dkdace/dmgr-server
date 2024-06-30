@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.*;
@@ -151,8 +150,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
      */
     private void onReady(Location location) {
         Location loc = location.clone().add(0, 0.1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A3_USE_READY, loc);
 
@@ -179,6 +176,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
      * @param location 사용 위치
      */
     private void playTickEffect(long i, Location location) {
+        location.setYaw(0);
+        location.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(location);
         Vector axis = VectorUtil.getYawAxis(location);
 
@@ -226,13 +225,13 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, 1, DamageType.NORMAL, null,
+            if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, HealBlock.getInstance(), 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Silence.getInstance(), 10);
             }
 
-            return !(target instanceof Barrier);
+            return true;
         }
     }
 }

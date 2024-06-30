@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.Controller;
-import com.dace.dmgr.combat.character.silia.action.SiliaUltInfo;
 import com.dace.dmgr.combat.character.vellion.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -28,6 +27,7 @@ import java.util.StringJoiner;
  * @see VellionA1
  * @see VellionA2
  * @see VellionA3
+ * @see VellionUlt
  */
 public final class Vellion extends Controller {
     @Getter
@@ -42,11 +42,14 @@ public final class Vellion extends Controller {
     public String getActionbarString(@NonNull CombatUser combatUser) {
         VellionP1 skillp1 = (VellionP1) combatUser.getSkill(VellionP1Info.getInstance());
         VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
+        VellionUlt skill4 = (VellionUlt) combatUser.getSkill(VellionUltInfo.getInstance());
 
         double skillp1Cooldown = skillp1.getCooldown() / 20.0;
         double skillp1MaxCooldown = skillp1.getDefaultCooldown() / 20.0;
         double skillp1Duration = skillp1.getDuration() / 20.0;
         double skillp1MaxDuration = skillp1.getDefaultDuration() / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
@@ -60,6 +63,11 @@ public final class Vellion extends Controller {
         text.add(skillp1Display);
         if (!skill2.isDurationFinished() && skill2.isEnabled())
             text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
 
         return text.toString();
     }
@@ -87,17 +95,20 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !combatUser.getEntity().isFlying() && combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished();
+        return !combatUser.getEntity().isFlying() && combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(VellionA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(VellionP1Info.getInstance()).isCooldownFinished();
+        return combatUser.getSkill(VellionP1Info.getInstance()).isCooldownFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished();
+        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionA2Info.getInstance()).isDurationFinished() &&
+                combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -130,7 +141,7 @@ public final class Vellion extends Controller {
             case 3:
                 return VellionA3Info.getInstance();
             case 4:
-                return SiliaUltInfo.getInstance();
+                return VellionUltInfo.getInstance();
             default:
                 return null;
         }
@@ -138,7 +149,7 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    public SiliaUltInfo getUltimateSkillInfo() {
-        return SiliaUltInfo.getInstance();
+    public VellionUltInfo getUltimateSkillInfo() {
+        return VellionUltInfo.getInstance();
     }
 }

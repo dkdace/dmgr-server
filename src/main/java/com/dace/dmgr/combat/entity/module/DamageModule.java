@@ -174,8 +174,12 @@ public class DamageModule {
      */
     private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
+        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
+                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.INVULNERABLE))
             return false;
+
+        if (damage == 0)
+            return true;
 
         damage *= (int) critMultiplier;
 

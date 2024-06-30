@@ -372,8 +372,8 @@ public enum NamedSound {
     ),
     /** 전투 - '니스' 궁극기 - 사용 준비 */
     COMBAT_NEACE_ULT_USE_READY(
-            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1),
-            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1)
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1)
     ),
     /** 전투 - '벨리온' 무기 - 사용 */
     COMBAT_VELLION_WEAPON_USE(
@@ -430,6 +430,25 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 2, 0.9),
             new DefinedSound("new.block.respawn_anchor.set_spawn", 2, 0.6),
             new DefinedSound("new.block.respawn_anchor.set_spawn", 2, 0.7)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 사용 */
+    COMBAT_VELLION_ULT_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.ENTITY_GUARDIAN_HURT, 2, 1.8)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 사용 준비 */
+    COMBAT_VELLION_ULT_USE_READY(
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 3, 0.7),
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK, 3, 0.85),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 0.7)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 폭발 */
+    COMBAT_VELLION_ULT_EXPLODE(
+            new DefinedSound("new.block.conduit.deactivate", 3, 0.6),
+            new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.6),
+            new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.8)
     );
 
     /** 지정된 효과음 목록 */

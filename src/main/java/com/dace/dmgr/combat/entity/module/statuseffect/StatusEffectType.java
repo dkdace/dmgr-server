@@ -15,6 +15,8 @@ public enum StatusEffectType {
     NONE,
     /** 속도 증가 */
     SPEED,
+    /** 무적 */
+    INVULNERABLE,
     /** 둔화 */
     SLOW,
     /** 기절 */

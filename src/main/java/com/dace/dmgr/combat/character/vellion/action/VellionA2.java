@@ -73,16 +73,16 @@ public final class VellionA2 extends ActiveSkill {
     }
 
     @Override
+    public boolean isCancellable() {
+        return !isEnabled && !isDurationFinished();
+    }
+
+    @Override
     public void onCancelled() {
         super.onCancelled();
 
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-    }
-
-    @Override
-    public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
     }
 
     /**
