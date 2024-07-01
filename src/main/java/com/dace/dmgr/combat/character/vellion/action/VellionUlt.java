@@ -56,7 +56,8 @@ public final class VellionUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration(-1);
-        combatUser.getSkill(VellionP1Info.getInstance()).onCancelled();
+        if (combatUser.getSkill(VellionP1Info.getInstance()).isCancellable())
+            combatUser.getSkill(VellionP1Info.getInstance()).onCancelled();
         combatUser.setGlobalCooldown((int) VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
 
@@ -156,18 +157,18 @@ public final class VellionUlt extends UltimateSkill {
             }
         }
 
-        double angle = i * 30.4;
-        double angle2 = i * -30.4;
-        for (int j = 0; j < 6; j++) {
-            angle += 120;
-            angle2 += 120;
+        long angle = i * 4;
+        long angle2 = i * -4;
+        for (int j = 0; j < 8; j++) {
+            angle += 90;
+            angle2 += 90;
 
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : angle2).multiply(8);
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : angle2).multiply(8);
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec), 3, 0.1, 0.1, 0.1,
                     90, 0, 55);
-            ParticleUtil.play(Particle.SMOKE_LARGE, loc.clone().add(vec).add(0, 1.5, 0), 8, 0.05, 1, 0.05,
-                    0.03);
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.MYCEL, 0, loc.clone().add(vec).add(0, 2, 0),
+                    4, 0.15, 0.4, 0.15, 0);
         }
     }
 
