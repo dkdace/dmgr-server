@@ -9,7 +9,9 @@ import com.dace.dmgr.combat.character.vellion.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,6 +32,8 @@ import java.util.StringJoiner;
  * @see VellionUlt
  */
 public final class Vellion extends Controller {
+    /** 치유 점수 */
+    public static final int HEAL_SCORE = 40;
     @Getter
     private static final Vellion instance = new Vellion();
 
@@ -86,6 +90,29 @@ public final class Vellion extends Controller {
         super.onDamage(victim, attacker, damage, damageType, location, isCrit);
 
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        if (!(victim instanceof CombatUser) || score >= 100)
+            return;
+
+        if (CooldownUtil.getCooldown(attacker, VellionA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", VellionA2Info.ASSIST_SCORE);
+        if (CooldownUtil.getCooldown(attacker, VellionA3.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", VellionA3Info.ASSIST_SCORE);
+        if (CooldownUtil.getCooldown(attacker, VellionUlt.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", VellionUltInfo.ASSIST_SCORE);
+    }
+
+    @Override
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+        super.onGiveHeal(provider, target, amount);
+
+        if (provider != target && target instanceof CombatUser)
+            provider.addScore("치유", (double) (HEAL_SCORE * amount) / target.getDamageModule().getMaxHealth());
+
+        return true;
     }
 
     @Override

@@ -30,6 +30,8 @@ import org.bukkit.util.Vector;
 import java.util.function.Predicate;
 
 public final class VellionA2 extends ActiveSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA2AssistScoreTimeLimit";
     /** 대상 위치 통과 불가 시 초기화 딜레이 쿨타임 ID */
     private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
     /** 수정자 ID */
@@ -215,6 +217,8 @@ public final class VellionA2 extends ActiveSkill {
                     isEnabled = true;
                     target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
                     GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 4);
+                    if (target instanceof CombatUser)
+                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
 
                     if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
                         CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);

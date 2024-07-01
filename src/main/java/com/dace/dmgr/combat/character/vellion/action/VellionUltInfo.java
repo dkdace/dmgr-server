@@ -21,8 +21,10 @@ public final class VellionUltInfo extends UltimateSkillInfo {
     /** 기절 시간 (tick) */
     public static final long STUN_DURATION = 1 * 20;
 
-    /** 궁극기 처치 점수 */
-    public static final int KILL_SCORE = 30;
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 15;
+    /** 처치 지원 점수 */
+    public static final int ASSIST_SCORE = 25;
     @Getter
     private static final VellionUltInfo instance = new VellionUltInfo();
 

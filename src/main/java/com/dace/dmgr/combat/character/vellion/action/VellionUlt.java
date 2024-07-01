@@ -27,6 +27,8 @@ import java.util.function.Predicate;
 
 @Getter
 public final class VellionUlt extends UltimateSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionUlt";
     /** 활성화 완료 여부 */
@@ -248,6 +250,8 @@ public final class VellionUlt extends UltimateSkill {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, VellionUltSlow.instance, 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+                if (target instanceof CombatUser)
+                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
             }
 
             return true;
@@ -267,8 +271,13 @@ public final class VellionUlt extends UltimateSkill {
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, (int) (target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO), DamageType.NORMAL,
-                    null, false, true))
+                    null, false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), VellionUltInfo.STUN_DURATION);
+                if (target instanceof CombatUser) {
+                    combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
+                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, VellionUltInfo.STUN_DURATION);
+                }
+            }
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
             for (Location trailLoc : LocationUtil.getLine(loc, target.getEntity().getLocation().add(0, 1, 0), 0.4))

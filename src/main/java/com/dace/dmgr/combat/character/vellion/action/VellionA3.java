@@ -26,8 +26,8 @@ import java.util.function.Predicate;
 
 @Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable {
-    /** 처치 점수 제한시간 쿨타임 ID */
-    public static final String KILL_SCORE_COOLDOWN_ID = "VellionA3KillScoreTimeLimit";
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA3AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA3";
     /** 위치 확인 모듈 */
@@ -229,6 +229,10 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, HealBlock.getInstance(), 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Silence.getInstance(), 10);
+                if (target instanceof CombatUser) {
+                    combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
+                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
+                }
             }
 
             return true;
