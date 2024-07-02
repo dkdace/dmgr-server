@@ -57,14 +57,15 @@ public final class Vellion extends Controller {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skillp1Display;
-        if (skillp1.isDurationFinished())
-            skillp1Display = StringFormUtil.getActionbarCooldownBar(skillp1.getSkillInfo().toString(), skillp1Cooldown, skillp1MaxCooldown,
-                    10, '■');
-        else
-            skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration, skillp1MaxDuration,
+        if (!skillp1.isDurationFinished()) {
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration, skillp1MaxDuration,
                     10, '■') + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
-        text.add(skillp1Display);
+            text.add(skillp1Display);
+        } else if (!skillp1.isCooldownFinished()) {
+            String skillp1Display = StringFormUtil.getActionbarCooldownBar(skillp1.getSkillInfo().toString(), skillp1Cooldown, skillp1MaxCooldown,
+                    10, '■');
+            text.add(skillp1Display);
+        }
         if (!skill2.isDurationFinished() && skill2.isEnabled())
             text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
@@ -122,8 +123,10 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
+        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
+
         return !combatUser.getEntity().isFlying() && combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(VellionA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() &&
+                (skill2.isDurationFinished() || skill2.isEnabled()) && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() &&
                 combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
@@ -134,7 +137,9 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionA2Info.getInstance()).isDurationFinished() &&
+        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
+
+        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled()) &&
                 combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
