@@ -197,12 +197,12 @@ public final class VellionA2 extends ActiveSkill {
 
                 return canKeep(combatUser, target) && target.canBeTargeted();
             }, isCancelled -> {
-                onCancelled();
-                if (isCancelled)
+                if (isCancelled) {
+                    onCancelled();
                     return;
+                }
 
-                setDuration();
-
+                combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
                 Location targetLoc = target.getEntity().getLocation().add(0, 1, 0);
 
