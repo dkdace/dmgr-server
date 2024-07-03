@@ -31,7 +31,7 @@ public final class ArkaceP1 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (isDurationFinished()) {
+        if (isDurationFinished() && !combatUser.getEntity().isSprinting()) {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, ArkaceP1Info.SPRINT_SPEED);
             combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
