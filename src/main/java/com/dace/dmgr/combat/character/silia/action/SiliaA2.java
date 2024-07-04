@@ -77,7 +77,7 @@ public final class SiliaA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean isDisposed() {
+    public boolean isCancellable() {
         return !isDurationFinished();
     }
 
