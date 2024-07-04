@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.CooldownUtil;
@@ -112,6 +113,8 @@ public class DamageModule {
                 color = ChatColor.YELLOW;
             else
                 color = ChatColor.GREEN;
+            if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
+                color = ChatColor.DARK_PURPLE;
 
             HologramUtil.editHologram(HEALTH_HOLOGRAM_ID + combatEntity, StringFormUtil.getProgressBar(current, max, color));
 
@@ -171,8 +174,12 @@ public class DamageModule {
      */
     private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
+        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
+                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.INVULNERABLE))
             return false;
+
+        if (damage == 0)
+            return true;
 
         damage *= (int) critMultiplier;
 

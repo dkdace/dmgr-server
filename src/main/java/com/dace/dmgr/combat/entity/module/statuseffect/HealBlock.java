@@ -6,19 +6,22 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
- * 침묵 상태 효과를 처리하는 클래스.
+ * 회복 차단 상태 효과를 처리하는 클래스.
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Silence implements StatusEffect {
+public class HealBlock implements StatusEffect {
     @Getter
-    static final Silence instance = new Silence();
+    static final HealBlock instance = new HealBlock();
 
     @Override
     @NonNull
     public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.SILENCE;
+        return StatusEffectType.HEAL_BLOCK;
     }
 
     @Override
@@ -28,20 +31,15 @@ public class Silence implements StatusEffect {
 
     @Override
     public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-        if (!(combatEntity instanceof CombatUser))
-            return;
-
-        ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 5, 10);
-        if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
-                ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
-            ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-        ((CombatUser) combatEntity).cancelAction();
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", 0, 5, 10);
     }
 
     @Override
     public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getEntity().stopSound("");
+        if (combatEntity.getEntity() instanceof LivingEntity)
+            ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WITHER,
+                    4, 0, false, false), true);
     }
 
     @Override

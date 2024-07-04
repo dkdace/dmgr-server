@@ -372,8 +372,83 @@ public enum NamedSound {
     ),
     /** 전투 - '니스' 궁극기 - 사용 준비 */
     COMBAT_NEACE_ULT_USE_READY(
-            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1),
-            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 2, 1.1)
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1)
+    ),
+    /** 전투 - '벨리온' 무기 - 사용 */
+    COMBAT_VELLION_WEAPON_USE(
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_HURT, 0.8, 0.5),
+            new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.8),
+            new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.9)
+    ),
+    /** 전투 - '벨리온' 패시브 1번 - 사용 */
+    COMBAT_VELLION_P1_USE(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.4),
+            new DefinedSound("new.entity.phantom.flap", 1, 1.6),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 0.6, 0.7)
+    ),
+    /** 전투 - '벨리온' 패시브 1번 - 해제 */
+    COMBAT_VELLION_P1_DISABLE(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.5),
+            new DefinedSound("new.entity.phantom.flap", 1, 1.7)
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 사용 */
+    COMBAT_VELLION_A1_USE(
+            new DefinedSound(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
+            new DefinedSound(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
+            new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2, 1.5)
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 사용 준비 */
+    COMBAT_VELLION_A1_USE_READY(
+            new DefinedSound(Sound.ENTITY_SHULKER_SHOOT, 2, 0.7),
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR, 2, 1.2),
+            new DefinedSound(Sound.ENTITY_ELDER_GUARDIAN_DEATH, 2, 1.8)
+    ),
+    /** 전투 - '벨리온' 액티브 1번 - 엔티티 타격 */
+    COMBAT_VELLION_A1_HIT_ENTITY(new DefinedSound(Sound.ENTITY_ZOMBIE_INFECT, 1, 0.7, 0.05)),
+    /** 전투 - '벨리온' 액티브 2번 - 사용 */
+    COMBAT_VELLION_A2_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound("new.entity.squid.squirt", 2, 1.2)
+    ),
+    /** 전투 - '벨리온' 액티브 2번 - 사용 준비 */
+    COMBAT_VELLION_A2_USE_READY(
+            new DefinedSound(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 2, 1),
+            new DefinedSound("new.block.respawn_anchor.charge", 2, 0.8)
+    ),
+    /** 전투 - '벨리온' 액티브 2번 - 발동 */
+    COMBAT_VELLION_A2_TRIGGER(new DefinedSound(Sound.BLOCK_END_PORTAL_FRAME_FILL, 0.6, 0.7, 0.1)),
+    /** 전투 - '벨리온' 액티브 3번 - 사용 */
+    COMBAT_VELLION_A3_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
+            new DefinedSound(Sound.ENTITY_GUARDIAN_HURT, 2, 2)
+    ),
+    /** 전투 - '벨리온' 액티브 3번 - 사용 준비 */
+    COMBAT_VELLION_A3_USE_READY(
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 2, 0.9),
+            new DefinedSound("new.block.respawn_anchor.set_spawn", 2, 0.6),
+            new DefinedSound("new.block.respawn_anchor.set_spawn", 2, 0.7)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 사용 */
+    COMBAT_VELLION_ULT_USE(
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+            new DefinedSound(Sound.ENTITY_GUARDIAN_HURT, 2, 1.8)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 사용 준비 */
+    COMBAT_VELLION_ULT_USE_READY(
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 3, 0.7),
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK, 3, 0.85),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 0.7)
+    ),
+    /** 전투 - '벨리온' 궁극기 - 폭발 */
+    COMBAT_VELLION_ULT_EXPLODE(
+            new DefinedSound("new.block.conduit.deactivate", 3, 0.6),
+            new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.6),
+            new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.8)
     );
 
     /** 지정된 효과음 목록 */
