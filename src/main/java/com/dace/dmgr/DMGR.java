@@ -1,9 +1,6 @@
 package com.dace.dmgr;
 
-import com.dace.dmgr.command.LobbyCommand;
-import com.dace.dmgr.command.MenuCommand;
-import com.dace.dmgr.command.PlayerOptionCommand;
-import com.dace.dmgr.command.QuitCommand;
+import com.dace.dmgr.command.*;
 import com.dace.dmgr.command.test.DummyCommand;
 import com.dace.dmgr.command.test.GameTestCommand;
 import com.dace.dmgr.command.test.SelectCharCommand;
@@ -188,6 +185,7 @@ public class DMGR extends JavaPlugin {
         getCommand("메뉴").setExecutor(new MenuCommand());
         getCommand("설정").setExecutor(new PlayerOptionCommand());
         getCommand("퇴장").setExecutor(new QuitCommand());
+        getCommand("명령어").setExecutor(new HelpCommand());
     }
 
     /**

@@ -33,6 +33,11 @@ commands:
       - xhlwkd
       - quit
       - q
+  명령어:
+    description: DMGR Command
+    aliases:
+      - audfuddj
+      - command
   선택:
     permission: admin
     description: DMGR Test command

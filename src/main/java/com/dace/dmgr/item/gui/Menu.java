@@ -57,7 +57,10 @@ public final class Menu extends Gui {
         ACHIEVEMENT(Material.BOOK, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
         OPTION(Material.REDSTONE_COMPARATOR, "설정", "설정 관련 메뉴를 확인합니다.", player -> player.performCommand("설정")),
         CORE(Material.FIREWORK_CHARGE, "코어 확인", "전투원에 할당된 코어를 확인합니다.", player -> player.performCommand("코어")),
-        COMMAND(Material.COMMAND, "명령어 목록", "서버 명령어 목록을 확인합니다.", player -> player.performCommand("명령어")),
+        COMMAND(Material.COMMAND, "명령어 목록", "서버 명령어 목록을 확인합니다.", player -> {
+            player.performCommand("명령어");
+            player.closeInventory();
+        }),
         CHAT_BLOCK(Material.BARRIER, "차단 목록", "차단된 플레이어 목록을 확인합니다.", player -> player.performCommand("차단 목록")),
         EXIT(new ButtonItem.EXIT("MenuExit"));
 
