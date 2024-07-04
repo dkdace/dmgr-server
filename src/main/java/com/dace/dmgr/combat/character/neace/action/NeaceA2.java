@@ -59,8 +59,7 @@ public final class NeaceA2 extends ActiveSkill {
                         combatUser.getEntity().getLocation().add(0, combatUser.getEntity().getHeight() / 2, 0), 3,
                         1, 1.5, 1, 140, 255, 245);
                 if (i < 12)
-                    for (int j = 0; j < 3; j++)
-                        playTickEffect(i);
+                    playTickEffect(i);
 
                 return true;
             }, isCancelled -> combatUser.getWeapon().setGlowing(false), 1));
@@ -88,11 +87,11 @@ public final class NeaceA2 extends ActiveSkill {
         Vector axis = VectorUtil.getYawAxis(loc);
 
         for (int j = 0; j < 4; j++) {
-            double up = (i * 3 + j) * 0.05;
+            double up = (i * 4 + j) * 0.05;
             angle += 90;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 3,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 6,
                     0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
         }
     }
