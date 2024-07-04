@@ -109,7 +109,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         setDuration(0);
         combatUser.resetGlobalCooldown();
-        combatUser.setGlobalCooldown(20);
+        combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         combatUser.getWeapon().setVisible(true);
     }
