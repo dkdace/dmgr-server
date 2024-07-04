@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -59,13 +60,27 @@ public final class Neace extends Support {
     public String getActionbarString(@NonNull CombatUser combatUser) {
         NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
         NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());
+        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+
+        double skill2Duration = skill2.getDuration() / 20.0;
+        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
-        if (!skill2.isDurationFinished())
-            text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill2.isDurationFinished()) {
+            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+                    skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
+            text.add(skill2Display);
+        }
         if (!skill3.isDurationFinished())
             text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
 
         return text.toString();
     }
