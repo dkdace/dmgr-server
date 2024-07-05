@@ -13,7 +13,8 @@ public final class OnTabComplete implements Listener {
             return;
 
         Player player = (Player) event.getSender();
-        if (!player.isOp() && event.getBuffer().split(" ").length == 1) {
+
+        if (!player.isOp() && !event.getBuffer().contains(" ")) {
             User.fromPlayer(player).sendMessageWarn("금지된 행동입니다.");
             event.setCancelled(true);
         }

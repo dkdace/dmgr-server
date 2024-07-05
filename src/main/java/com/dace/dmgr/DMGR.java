@@ -185,6 +185,8 @@ public class DMGR extends JavaPlugin {
         getCommand("메뉴").setExecutor(MenuCommand.getInstance());
         getCommand("퇴장").setExecutor(QuitCommand.getInstance());
         getCommand("명령어").setExecutor(HelpCommand.getInstance());
+        getCommand("전적").setExecutor(StatCommand.getInstance());
+        getCommand("전적").setTabCompleter(StatCommand.Tab.getInstance());
     }
 
     /**

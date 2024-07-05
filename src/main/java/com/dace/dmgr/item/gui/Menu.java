@@ -32,10 +32,14 @@ public final class Menu extends Gui {
     @Override
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         guiController.fillAll(DisplayItem.EMPTY.getStaticItem());
-        guiController.set(4, playerInto, itemBuilder -> {
-            UserData userData = UserData.fromPlayer(player);
-            ((SkullMeta) itemBuilder.setName(userData.getDisplayName()).getItemMeta()).setOwningPlayer(player);
-        });
+
+        new AsyncTask<Void>((onFinish, onError) ->
+                guiController.set(4, playerInto, itemBuilder -> {
+                    UserData userData = UserData.fromPlayer(player);
+                    ((SkullMeta) itemBuilder.setName(userData.getDisplayName()).getItemMeta()).setOwningPlayer(player);
+                })
+        );
+
         guiController.set(19, MenuItem.GAME_START.guiItem);
         guiController.set(21, MenuItem.WARP.guiItem);
         guiController.set(23, MenuItem.RECORD.guiItem);

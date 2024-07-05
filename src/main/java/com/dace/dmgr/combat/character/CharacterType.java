@@ -47,11 +47,12 @@ public enum CharacterType {
                 if (clickType != ClickType.LEFT)
                     return false;
 
-                CharacterType characterType = CharacterType.valueOf(CharacterType.this.toString());
-
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-                if (combatUser != null)
-                    combatUser.setCharacterType(characterType);
+                if (combatUser == null)
+                    return false;
+
+                CharacterType characterType = CharacterType.valueOf(CharacterType.this.toString());
+                combatUser.setCharacterType(characterType);
 
                 player.closeInventory();
 

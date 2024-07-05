@@ -32,6 +32,11 @@ commands:
     aliases:
       - audfuddj
       - command
+  전적:
+    description: DMGR Command
+    aliases:
+      - wjswjr
+      - stat
   선택:
     permission: admin
     description: DMGR Test command
