@@ -3,6 +3,7 @@ package com.dace.dmgr.item.gui;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.task.AsyncTask;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,7 +23,6 @@ public final class Menu extends Gui {
     private static final Menu instance = new Menu();
     private static final StaticItem playerInto = new StaticItem("MenuPlayer", new ItemBuilder(Material.SKULL_ITEM)
             .setDamage((short) 3)
-            .setName("{0} §f{1}")
             .build());
 
     public Menu() {
@@ -55,7 +55,10 @@ public final class Menu extends Gui {
                 player -> Warp.getInstance().open(player)),
         RECORD(Material.NAME_TAG, "전적", "개인 전적을 확인합니다.", player -> player.performCommand("전적")),
         ACHIEVEMENT(Material.BOOK, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
-        OPTION(Material.REDSTONE_COMPARATOR, "설정", "설정 관련 메뉴를 확인합니다.", player -> player.performCommand("설정")),
+        OPTION(Material.REDSTONE_COMPARATOR, "설정", "설정 관련 메뉴를 확인합니다.", player -> {
+            PlayerOption playerOption = PlayerOption.getInstance();
+            playerOption.open(player);
+        }),
         CORE(Material.FIREWORK_CHARGE, "코어 확인", "전투원에 할당된 코어를 확인합니다.", player -> player.performCommand("코어")),
         COMMAND(Material.COMMAND, "명령어 목록", "서버 명령어 목록을 확인합니다.", player -> {
             player.performCommand("명령어");

@@ -21,12 +21,6 @@ commands:
     aliases:
       - apsb
       - menu
-  설정:
-    description: DMGR Command
-    aliases:
-      - tjfwjd
-      - option
-      - config
   퇴장:
     description: DMGR Command
     aliases:

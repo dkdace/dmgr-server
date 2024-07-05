@@ -181,20 +181,19 @@ public class DMGR extends JavaPlugin {
      * 모든 명령어를 등록한다.
      */
     private void registerCommands() {
-        getCommand("스폰").setExecutor(new LobbyCommand());
-        getCommand("메뉴").setExecutor(new MenuCommand());
-        getCommand("설정").setExecutor(new PlayerOptionCommand());
-        getCommand("퇴장").setExecutor(new QuitCommand());
-        getCommand("명령어").setExecutor(new HelpCommand());
+        getCommand("스폰").setExecutor(LobbyCommand.getInstance());
+        getCommand("메뉴").setExecutor(MenuCommand.getInstance());
+        getCommand("퇴장").setExecutor(QuitCommand.getInstance());
+        getCommand("명령어").setExecutor(HelpCommand.getInstance());
     }
 
     /**
      * 모든 테스트용 명령어를 등록한다.
      */
     private void registerTestCommands() {
-        getCommand("선택").setExecutor(new SelectCharCommand());
-        getCommand("소환").setExecutor(new DummyCommand());
-        getCommand("게임").setExecutor(new GameTestCommand());
+        getCommand("선택").setExecutor(SelectCharCommand.getInstance());
+        getCommand("소환").setExecutor(DummyCommand.getInstance());
+        getCommand("게임").setExecutor(GameTestCommand.getInstance());
     }
 
     /**
