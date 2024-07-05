@@ -59,8 +59,9 @@ public class StatCommand implements CommandExecutor {
 
         @Override
         public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+            String[] completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
             if (args.length == 1)
-                return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+                return Arrays.stream(completions).filter(completion -> completion.startsWith(args[0])).collect(Collectors.toList());
 
             return Collections.emptyList();
         }
