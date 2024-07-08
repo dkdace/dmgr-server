@@ -34,7 +34,7 @@ public class StatCommand implements CommandExecutor {
         User user = User.fromPlayer(player);
 
         UserData targetUserData = user.getUserData();
-        if (args.length > 0) {
+        if (args.length == 1) {
             targetUserData = Arrays.stream(UserData.getAllUserDatas())
                     .filter(userData -> userData.getPlayerName().equalsIgnoreCase(args[0]))
                     .findFirst()
@@ -44,6 +44,9 @@ public class StatCommand implements CommandExecutor {
                 user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
                 return true;
             }
+        } else if (args.length > 1) {
+            user.sendMessageWarn("올바른 사용법: §n'/(전적|stat) [플레이어]'");
+            return true;
         }
 
         Stat stat = new Stat(targetUserData);
