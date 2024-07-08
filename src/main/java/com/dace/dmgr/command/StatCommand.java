@@ -33,20 +33,20 @@ public class StatCommand implements CommandExecutor {
         Player player = (Player) sender;
         User user = User.fromPlayer(player);
 
-        UserData target = user.getUserData();
+        UserData targetUserData = user.getUserData();
         if (args.length > 0) {
-            target = Arrays.stream(UserData.getAllUserDatas())
+            targetUserData = Arrays.stream(UserData.getAllUserDatas())
                     .filter(userData -> userData.getPlayerName().equalsIgnoreCase(args[0]))
                     .findFirst()
                     .orElse(null);
 
-            if (target == null) {
+            if (targetUserData == null) {
                 user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
                 return true;
             }
         }
 
-        Stat stat = new Stat(target);
+        Stat stat = new Stat(targetUserData);
         stat.open(player);
 
         return true;
@@ -61,7 +61,7 @@ public class StatCommand implements CommandExecutor {
         public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
             String[] completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
             if (args.length == 1)
-                return Arrays.stream(completions).filter(completion -> completion.startsWith(args[0])).collect(Collectors.toList());
+                return Arrays.stream(completions).filter(completion -> completion.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 
             return Collections.emptyList();
         }
