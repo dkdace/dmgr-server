@@ -21,6 +21,7 @@ public class HelpCommand implements CommandExecutor {
             "\n§a§l/(스폰|spawn|exit) - §a스폰(로비)으로 이동합니다." +
             "\n§a§l/(퇴장|quit) - §a현재 입장한 게임에서 나갑니다." +
             "\n§a§l/(전적|stat) [플레이어] - §a자신 또는 대상 플레이어의 개인 전적을 확인합니다." +
+            "\n§a§l/(귓[속말]|dm) <플레이어> - §a대상 플레이어와의 개인 대화를 시작합니다." +
             "\n§7==============================";
     @Getter
     private static final HelpCommand instance = new HelpCommand();

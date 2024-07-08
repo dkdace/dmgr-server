@@ -37,6 +37,17 @@ commands:
     aliases:
       - wjswjr
       - stat
+  귓:
+    description: DMGR Command
+    aliases:
+      - rnlt
+      - 귓말
+      - rnltakf
+      - 귓속말
+      - rnltthrakf
+      - w
+      - tell
+      - dm
   선택:
     permission: admin
     description: DMGR Test command

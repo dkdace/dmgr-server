@@ -82,6 +82,11 @@ public final class User implements Disposable {
     /** 리소스팩 적용 수락 여부 */
     @Setter
     private boolean isResourcePackAccepted = false;
+    /** 현재 귓속말 대상 */
+    @Nullable
+    @Getter
+    @Setter
+    private User messageTarget;
 
     /**
      * 유저 인스턴스를 생성한다.
