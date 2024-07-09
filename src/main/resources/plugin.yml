@@ -48,6 +48,11 @@ commands:
       - w
       - tell
       - dm
+  차단:
+    description: DMGR Command
+    aliases:
+      - ckeks
+      - block
   선택:
     permission: admin
     description: DMGR Test command
