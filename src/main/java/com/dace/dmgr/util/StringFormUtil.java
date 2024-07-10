@@ -17,6 +17,8 @@ public final class StringFormUtil {
     public static final String ADD_PREFIX = "§f§l[§a§l+§f§l] §b";
     /** 제거 접두사 */
     public static final String REMOVE_PREFIX = "§f§l[§6§l-§f§l] §b";
+    /** 구분선 */
+    public static final String BAR = "§7========================================";
     /** 진행 막대의 기본 기호 */
     private static final char PROGRESS_DEFAULT_SYMBOL = '■';
 

@@ -3,6 +3,7 @@ package com.dace.dmgr.command;
 import com.dace.dmgr.item.gui.BlockList;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,11 +27,11 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockCommand implements CommandExecutor {
     /** 도움말 메시지 */
-    public static final String MESSAGE_HELP = "§7==============================" +
+    private static final String MESSAGE_HELP = StringFormUtil.BAR +
             "\n§a§l/(차단|block) <플레이어> - §a플레이어의 채팅을 차단하거나 차단 해제합니다." +
             "\n§a§l/(차단|block) (목록|list) - §a차단 목록을 확인합니다." +
             "\n§a§l/(차단|block) (초기화|clear) - §a차단 목록을 초기화합니다." +
-            "\n§7==============================";
+            "\n" + StringFormUtil.BAR;
     @Getter
     private static final BlockCommand instance = new BlockCommand();
 
@@ -87,7 +88,7 @@ public class BlockCommand implements CommandExecutor {
                 }
             }
         } else
-            user.getPlayer().sendMessage(MESSAGE_HELP);
+            user.sendMessageInfo(MESSAGE_HELP);
 
         return true;
     }
