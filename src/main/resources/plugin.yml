@@ -53,6 +53,12 @@ commands:
     aliases:
       - ckeks
       - block
+  랭킹:
+    description: DMGR Command
+    aliases:
+      - fodzld
+      - rank
+      - ranking
   선택:
     permission: admin
     description: DMGR Test command

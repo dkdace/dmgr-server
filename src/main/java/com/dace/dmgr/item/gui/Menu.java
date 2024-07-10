@@ -47,7 +47,7 @@ public final class Menu extends Gui {
         guiController.set(37, MenuItem.OPTION.guiItem);
         guiController.set(39, MenuItem.CORE.guiItem);
         guiController.set(41, MenuItem.COMMAND.guiItem);
-        guiController.set(43, MenuItem.CHAT_BLOCK.guiItem);
+        guiController.set(43, MenuItem.RANKING.guiItem);
         guiController.set(53, MenuItem.EXIT.guiItem);
     }
 
@@ -68,7 +68,10 @@ public final class Menu extends Gui {
             player.performCommand("명령어");
             player.closeInventory();
         }),
-        CHAT_BLOCK(Material.BARRIER, "차단 목록", "차단된 플레이어 목록을 확인합니다.", player -> player.performCommand("차단 목록")),
+        RANKING(Material.DIAMOND, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.", player -> {
+            Ranking ranking = Ranking.getInstance();
+            ranking.open(player);
+        }),
         EXIT(new ButtonItem.EXIT("MenuExit"));
 
         /** GUI 아이템 객체 */
