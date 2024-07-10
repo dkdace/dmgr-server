@@ -25,7 +25,7 @@ public final class Menu extends Gui {
             .setDamage((short) 3)
             .build());
 
-    public Menu() {
+    private Menu() {
         super(6, "§8메뉴");
     }
 

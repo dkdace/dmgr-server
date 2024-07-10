@@ -16,7 +16,7 @@ public final class SelectChar extends Gui {
     @Getter
     private static final SelectChar instance = new SelectChar();
 
-    public SelectChar() {
+    private SelectChar() {
         super(6, "§c§l전투원 선택");
     }
 

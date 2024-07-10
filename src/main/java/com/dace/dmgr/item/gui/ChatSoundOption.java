@@ -25,7 +25,7 @@ public final class ChatSoundOption extends Gui {
         }
     };
 
-    public ChatSoundOption() {
+    private ChatSoundOption() {
         super(2, "§8채팅 효과음 설정");
     }
 

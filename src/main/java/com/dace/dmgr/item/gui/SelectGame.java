@@ -31,7 +31,7 @@ public final class SelectGame extends Gui {
         }
     };
 
-    public SelectGame() {
+    private SelectGame() {
         super(2, "§8게임 시작");
     }
 

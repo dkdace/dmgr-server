@@ -30,7 +30,7 @@ public final class BlockList extends Gui {
     @Getter
     private static final BlockList instance = new BlockList();
 
-    public BlockList() {
+    private BlockList() {
         super(3, "§8차단 목록");
     }
 
