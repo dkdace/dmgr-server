@@ -193,6 +193,7 @@ public class DMGR extends JavaPlugin {
         getCommand("차단").setTabCompleter(BlockCommand.Tab.getInstance());
         getCommand("랭킹").setExecutor(RankingCommand.getInstance());
         getCommand("랭킹").setTabCompleter(RankingCommand.Tab.getInstance());
+        getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
     }
 
     /**
