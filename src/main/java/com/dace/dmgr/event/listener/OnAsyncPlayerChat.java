@@ -42,21 +42,18 @@ public final class OnAsyncPlayerChat implements Listener {
         if (user.getMessageTarget() == null) {
             GameUser gameUser = GameUser.fromUser(user);
 
-            if (gameUser == null) {
+            if (gameUser == null || (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING)) {
                 Bukkit.getOnlinePlayers().forEach((Player player2) ->
                         sendMessage(user, User.fromPlayer(player2), MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage())));
-            } else if (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING) {
+            } else {
                 CombatUser combatUser = CombatUser.fromUser(user);
 
-                ArrayList<GameUser> targets;
-                if (gameUser.isTeamChat())
-                    targets = gameUser.getGame().getTeamUserMap().get(gameUser.getTeam());
-                else
-                    targets = gameUser.getGame().getGameUsers();
-
+                ArrayList<GameUser> targets = gameUser.isTeamChat() ?
+                        gameUser.getGame().getTeamUserMap().get(gameUser.getTeam()) : gameUser.getGame().getGameUsers();
                 targets.forEach(gameUser2 -> sendMessage(user, gameUser2.getUser(), MessageFormat.format("§7§l[{0}] §f<{1}§l[{2}]§f{3}> {4}",
                         gameUser.isTeamChat() ? "팀" : "전체", gameUser.getTeam().getColor(),
-                        combatUser == null ? "미선택" : combatUser.getCharacterType().getCharacter().getName(), player.getName(), event.getMessage())));
+                        (combatUser == null || !combatUser.isActivated() ? "미선택" : combatUser.getCharacterType().getCharacter().getName()),
+                        player.getName(), event.getMessage())));
             }
         } else {
             sendMessage(user, user, MessageFormat.format("<{0}> §7{1}", userData.getDisplayName(), event.getMessage()));
