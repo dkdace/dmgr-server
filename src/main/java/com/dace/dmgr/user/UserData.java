@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -66,6 +67,8 @@ public final class UserData extends YamlFile {
     /** 탈주 횟수 */
     @Getter
     private int quitCount = 0;
+    /** 차단한 플레이어의 UUID 목록 */
+    private List<String> blockedPlayers;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -121,17 +124,18 @@ public final class UserData extends YamlFile {
     @Override
     protected void onInitFinish() {
         set("playerName", playerName);
-        UserData.this.xp = (int) getLong("xp", xp);
-        UserData.this.level = (int) getLong("level", level);
-        UserData.this.money = (int) getLong("money", money);
-        UserData.this.rankRate = (int) getLong("rankRate", rankRate);
-        UserData.this.isRanked = getBoolean("isRanked", isRanked);
-        UserData.this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
-        UserData.this.normalPlayCount = (int) getLong("normalPlayCount", normalPlayCount);
-        UserData.this.rankPlayCount = (int) getLong("rankPlayCount", rankPlayCount);
-        UserData.this.winCount = (int) getLong("winCount", winCount);
-        UserData.this.loseCount = (int) getLong("loseCount", loseCount);
-        UserData.this.quitCount = (int) getLong("quitCount", quitCount);
+        this.xp = (int) getLong("xp", xp);
+        this.level = (int) getLong("level", level);
+        this.money = (int) getLong("money", money);
+        this.rankRate = (int) getLong("rankRate", rankRate);
+        this.isRanked = getBoolean("isRanked", isRanked);
+        this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
+        this.normalPlayCount = (int) getLong("normalPlayCount", normalPlayCount);
+        this.rankPlayCount = (int) getLong("rankPlayCount", rankPlayCount);
+        this.winCount = (int) getLong("winCount", winCount);
+        this.loseCount = (int) getLong("loseCount", loseCount);
+        this.quitCount = (int) getLong("quitCount", quitCount);
+        this.blockedPlayers = getStringList("blockedPlayers");
 
         config.koreanChat = getBoolean("koreanChat", config.koreanChat);
         config.nightVision = getBoolean("nightVision", config.nightVision);
@@ -264,6 +268,54 @@ public final class UserData extends YamlFile {
     public void setQuitCount(int quitCount) {
         this.quitCount = quitCount;
         set("quitCount", this.quitCount);
+    }
+
+    /**
+     * 차단한 플레이어 목록을 반환한다.
+     *
+     * @return 차단한 플레이어 목록의 유저 데이터 정보
+     */
+    @NonNull
+    public UserData[] getBlockedPlayers() {
+        return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
+    }
+
+    /**
+     * 지정한 플레이어가 차단되었는 지 확인한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     * @return 차단 여부
+     */
+    public boolean isBlockedPlayer(@NonNull UserData userData) {
+        return this.blockedPlayers.contains(userData.getPlayerUUID().toString());
+    }
+
+    /**
+     * 지정한 플레이어를 차단 목록에 추가한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     */
+    public void addBlockedPlayer(@NonNull UserData userData) {
+        this.blockedPlayers.add(userData.getPlayerUUID().toString());
+        set("blockedPlayers", this.blockedPlayers);
+    }
+
+    /**
+     * 지정한 플레이어를 차단 목록에서 제거한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     */
+    public void removeBlockedPlayer(@NonNull UserData userData) {
+        this.blockedPlayers.remove(userData.getPlayerUUID().toString());
+        set("blockedPlayers", this.blockedPlayers);
+    }
+
+    /**
+     * 차단 목록을 초기화한다.
+     */
+    public void clearBlockedPlayers() {
+        this.blockedPlayers.clear();
+        set("blockedPlayers", this.blockedPlayers);
     }
 
     /**

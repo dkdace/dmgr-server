@@ -2,6 +2,9 @@ package com.dace.dmgr.command.test;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.temporal.Dummy;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +18,11 @@ import org.bukkit.entity.Zombie;
  *
  * @see Dummy
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DummyCommand implements CommandExecutor {
+    @Getter
+    private static final DummyCommand instance = new DummyCommand();
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;

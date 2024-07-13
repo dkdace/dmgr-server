@@ -3,6 +3,9 @@ package com.dace.dmgr.command;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +18,11 @@ import org.bukkit.entity.Player;
  *
  * @see GameUser#dispose()
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuitCommand implements CommandExecutor {
+    @Getter
+    private static final QuitCommand instance = new QuitCommand();
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;

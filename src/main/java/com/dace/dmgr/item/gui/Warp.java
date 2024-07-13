@@ -20,7 +20,7 @@ public final class Warp extends Gui {
     @Getter
     private static final Warp instance = new Warp();
 
-    public Warp() {
+    private Warp() {
         super(1, "§8이동");
     }
 

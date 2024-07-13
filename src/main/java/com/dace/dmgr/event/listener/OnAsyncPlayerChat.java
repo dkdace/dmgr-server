@@ -33,10 +33,26 @@ public final class OnAsyncPlayerChat implements Listener {
             CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
         }
 
-        Bukkit.getServer().broadcastMessage(MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage()));
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            UserData userData2 = UserData.fromPlayer(player2);
-            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), player2, 1000, Math.sqrt(2));
-        });
+        Bukkit.getServer().getConsoleSender().sendMessage(MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage()));
+        if (user.getMessageTarget() == null) {
+            Bukkit.getOnlinePlayers().forEach((Player player2) -> {
+                UserData userData2 = UserData.fromPlayer(player2);
+                if (!userData2.isBlockedPlayer(userData)) {
+                    player2.sendMessage(MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage()));
+                    SoundUtil.play(userData2.getConfig().getChatSound().getSound(), player2, 1000, Math.sqrt(2));
+                }
+            });
+        } else {
+            User targetUser = user.getMessageTarget();
+            UserData targetUserData = targetUser.getUserData();
+
+            player.sendMessage(MessageFormat.format("<{0}> §7{1}", userData.getDisplayName(), event.getMessage()));
+            SoundUtil.play(userData.getConfig().getChatSound().getSound(), player, 1000, Math.sqrt(2));
+
+            if (!targetUserData.isBlockedPlayer(userData)) {
+                targetUser.getPlayer().sendMessage(MessageFormat.format("<{0} §7님의 개인 메시지§f> §7{1}", userData.getDisplayName(), event.getMessage()));
+                SoundUtil.play(targetUserData.getConfig().getChatSound().getSound(), targetUser.getPlayer(), 1000, Math.sqrt(2));
+            }
+        }
     }
 }
