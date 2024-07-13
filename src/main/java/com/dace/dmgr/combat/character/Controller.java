@@ -46,7 +46,8 @@ public abstract class Controller extends Character {
                         CombatUser target = (CombatUser) CombatUtil.getNearCombatEntity(combatUser.getGame(), combatUser2.getEntity().getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
 
-                        GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
+                        if (target != null)
+                            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
                     });
         }
 
