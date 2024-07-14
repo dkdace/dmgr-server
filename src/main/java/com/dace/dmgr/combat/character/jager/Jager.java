@@ -43,6 +43,41 @@ public final class Jager extends Marksman {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "젠장, 의무병 녀석들은 죄다 어디로 간거야!",
+                "여기는 예거, 부상이다. 속히 지원을 요청한다!",
+                "여기는 예거, 지원 바람."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "충전 중. 시간이 필요하다.",
+                "거의 충전되었다.",
+                "큰거 한 방 준비 완료!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "여기는 예거, 집결을 요청한다!",
+                "뭐하나! 어서 여기로 모여!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "저놈들의 머리를 좀 식혀주지.";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
         JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();

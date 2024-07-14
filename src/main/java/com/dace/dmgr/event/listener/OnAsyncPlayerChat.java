@@ -1,7 +1,6 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
@@ -15,15 +14,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 
 public final class OnAsyncPlayerChat implements Listener {
     /** 쿨타임 ID */
     private static final String COOLDOWN_ID = "Chat";
-    /** 일반 채팅의 메시지 포맷 */
+    /** 채팅의 메시지 포맷 */
     private static final String CHAT_FORMAT = "<{0}> {1}";
-    /** 게임 채팅의 메시지 포맷 */
-    private static final String CHAT_FORMAT_GAME = "§7§l[{0}] §f<{1}§l[{2}]§f{3}> {4}";
 
     @EventHandler
     public static void event(AsyncPlayerChatEvent event) {
@@ -50,14 +46,10 @@ public final class OnAsyncPlayerChat implements Listener {
                 Bukkit.getOnlinePlayers().forEach((Player player2) ->
                         sendMessage(user, User.fromPlayer(player2), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
             } else {
-                CombatUser combatUser = CombatUser.fromUser(user);
-
-                ArrayList<GameUser> targets = gameUser.isTeamChat() ?
-                        gameUser.getGame().getTeamUserMap().get(gameUser.getTeam()) : gameUser.getGame().getGameUsers();
-                targets.forEach(gameUser2 -> sendMessage(user, gameUser2.getUser(), MessageFormat.format(CHAT_FORMAT_GAME,
-                        gameUser.isTeamChat() ? "팀" : "전체", gameUser.getTeam().getColor(),
-                        (combatUser == null || !combatUser.isActivated() ? "미선택" : combatUser.getCharacterType().getCharacter().getName()),
-                        player.getName(), event.getMessage())));
+                if (gameUser.isTeamChat())
+                    gameUser.sendTeamMessage(event.getMessage());
+                else
+                    gameUser.sendAllMessage(event.getMessage());
             }
         } else {
             sendMessage(user, user, MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), "§7" + event.getMessage()));

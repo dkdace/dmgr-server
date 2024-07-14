@@ -328,6 +328,48 @@ public final class GameUser implements Disposable {
     }
 
     /**
+     * 게임에 참여한 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
+     *
+     * @param message 메시지
+     */
+    public void sendAllMessage(String message) {
+        if (team == Team.NONE)
+            return;
+
+        String fullMessage = MessageFormat.format("§7§l[전체] §f<{0}§l[{1}]§f{2}> §f{3}", team.getColor(),
+                (combatUser == null || !combatUser.isActivated() ? "미선택" :
+                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
+                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
+                player.getName(), message);
+        game.getGameUsers().forEach(gameUser2 -> {
+            UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
+            gameUser2.getUser().getPlayer().sendMessage(fullMessage);
+            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
+        });
+    }
+
+    /**
+     * 소속된 팀의 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
+     *
+     * @param message 메시지
+     */
+    public void sendTeamMessage(String message) {
+        if (team == Team.NONE)
+            return;
+
+        String fullMessage = MessageFormat.format("§7§l[팀] §f<{0}§l[{1}]§f{2}> §f{3}", team.getColor(),
+                (combatUser == null || !combatUser.isActivated() ? "미선택" :
+                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
+                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
+                player.getName(), message);
+        game.getTeamUserMap().get(team).forEach(gameUser2 -> {
+            UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
+            gameUser2.getUser().getPlayer().sendMessage(fullMessage);
+            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
+        });
+    }
+
+    /**
      * 의사소통 GUI 아이템 목록.
      */
     @Getter
@@ -335,33 +377,31 @@ public final class GameUser implements Disposable {
         /** 치료 요청 */
         REQ_HEAL("§a치료 요청", (gameUser, combatUser) -> {
             String state;
-            String[] ments;
+            String ment;
             if (combatUser.getDamageModule().isLowHealth()) {
                 state = "치명상";
-                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[0];
+                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[0];
             } else if (combatUser.getDamageModule().getHealth() <= combatUser.getDamageModule().getMaxHealth() / 2) {
                 state = "체력 낮음";
-                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[1];
+                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[1];
             } else {
                 state = "치료 요청";
-                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[2];
+                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[2];
             }
 
-            int index = DMGR.getRandom().nextInt(ments.length);
-            return MessageFormat.format("§7[{0}] §f§l{1}", state, ments[index]);
+            return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
         }),
         /** 궁극기 상태 */
         SHOW_ULT("§a궁극기 상태", (gameUser, combatUser) -> {
-            String[] ments;
+            String ment;
             if (combatUser.getUltGaugePercent() < 0.9)
-                ments = combatUser.getCharacterType().getCharacter().getUltMent()[0];
+                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[0];
             else if (combatUser.getUltGaugePercent() < 1)
-                ments = combatUser.getCharacterType().getCharacter().getUltMent()[1];
+                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[1];
             else
-                ments = combatUser.getCharacterType().getCharacter().getUltMent()[2];
+                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[2];
 
-            int index = DMGR.getRandom().nextInt(ments.length);
-            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(combatUser.getUltGaugePercent() * 100), ments[index]);
+            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(combatUser.getUltGaugePercent() * 100), ment);
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", (gameUser, combatUser) -> {
@@ -391,7 +431,7 @@ public final class GameUser implements Disposable {
                     if (combatUser == null)
                         return false;
                     GameUser gameUser = GameUser.fromUser(user);
-                    if (gameUser == null || (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING))
+                    if (gameUser == null || gameUser.getTeam() == Team.NONE)
                         return false;
 
                     if (!player.isOp()) {
@@ -400,14 +440,7 @@ public final class GameUser implements Disposable {
                         CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
                     }
 
-                    String message = MessageFormat.format("§f<{0}§l[{1}]§f{2}> {3}", gameUser.getTeam().getColor(),
-                            combatUser.getCharacterType().getCharacter().getName(), player.getName(), action.apply(gameUser, combatUser));
-                    gameUser.getGame().getTeamUserMap().get(gameUser.getTeam()).forEach(gameUser2 -> {
-                        UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
-                        gameUser2.getUser().getPlayer().sendMessage(message);
-                        SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
-                    });
-
+                    gameUser.sendTeamMessage(action.apply(gameUser, combatUser));
                     player.closeInventory();
 
                     return true;

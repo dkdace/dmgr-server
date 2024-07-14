@@ -37,6 +37,41 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "여기는 아케이스, 신속한 치료가 필요하다!",
+                "부상 발생, 치료를 요청한다!",
+                "아직은 더 버틸 수 있다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "에너지 충전 중이다.",
+                "에너지 충전이 얼마 남지 않았다.",
+                "에너지 증폭이 준비되었다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "여기는 아케이스, 지원을 요청한다.",
+                "화력 지원 바란다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "에너지 증폭 활성화.";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
         ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());

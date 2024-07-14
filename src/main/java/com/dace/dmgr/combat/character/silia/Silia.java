@@ -39,6 +39,42 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "팔라스 언니? 거기 누구 없어...?",
+                "아직 멀쩡해! 아마도...?",
+                "난 괜찮아! 문제 없다구!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "바람이 모이고 있어! 조금만 기다려!",
+                "곧 폭풍이 몰아칠 거야!",
+                "준비 됐어? 다들 날아가지 않게 꽉 잡아!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "나랑 같이 놀 사람~ 여기여기 붙어라!",
+                "이리 와서 나랑 같이 놀자!",
+                "거기 너! 나랑 같이 놀래?"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "시원하게 날려버리자!";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
         SiliaUlt skill4 = (SiliaUlt) combatUser.getSkill(SiliaUltInfo.getInstance());

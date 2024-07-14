@@ -41,6 +41,41 @@ public final class Quaker extends Guardian {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "재정비가 시급하다!",
+                "퀘이커, 치유를 요청한다!",
+                "갑옷에 기름칠좀 해야겠군."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "아직 준비 중이다.",
+                "거의 다 준비됐다!",
+                "어서 저 놈들을 쓸어버리자고!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "이곳을 점거해야 한다!",
+                "방패 뒤로!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "다 쓸어버리겠다!";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         QuakerA1 skill1 = (QuakerA1) combatUser.getSkill(QuakerA1Info.getInstance());
 

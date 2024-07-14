@@ -57,6 +57,41 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "조금... 아주 조금만 쉬어도 될까요?",
+                "이 정도 상처는 좀 있으면 낫는답니다.",
+                "아직 더 버틸 수 있어요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "희망을 잃지 말아요.",
+                "조금만 더 기다려줘요.",
+                "제가 당신을 지켜드릴게요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "흩어지지 말아요.",
+                "제 곁에 있으면 안전해요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "모든 것은 평화를 위하여!";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
         NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());

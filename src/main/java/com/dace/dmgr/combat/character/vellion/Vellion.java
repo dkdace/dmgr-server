@@ -40,6 +40,41 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "날 치료해, 당장.",
+                "어서 날 치료해.",
+                "치유 좀 부탁해."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "뭐가?",
+                "어서 준비하지 않고 뭐해?",
+                "때가 되면 시작할테니깐 기다리고 있어."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "나에게 모여라!",
+                "함께 모여 저들에게 파멸과 죽음을!",
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "어디 한번 날뛰어봐. 할 수 있다면 말이야.";
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         VellionP1 skillp1 = (VellionP1) combatUser.getSkill(VellionP1Info.getInstance());
         VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
