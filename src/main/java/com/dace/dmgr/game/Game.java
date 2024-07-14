@@ -258,6 +258,9 @@ public final class Game implements Disposable {
             gameUsers.forEach(gameUser -> {
                 SoundUtil.playNamedSound(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
+                gameUser.getUser().sendMessageInfo("");
+                gameUser.getUser().sendMessageInfo("§n'/전체'§r 또는 §n'/tc'§r를 입력하여 팀/전체 채팅을 전환할 수 있습니다.");
+                gameUser.getUser().sendMessageInfo("");
             });
         }
     }
