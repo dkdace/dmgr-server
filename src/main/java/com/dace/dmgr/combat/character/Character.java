@@ -86,6 +86,24 @@ public abstract class Character {
     public abstract String getUltUseMent();
 
     /**
+     * 전투원 처치 시 대사를 반환한다.
+     *
+     * @param characterType 피격자의 전투원 종류
+     * @return 전투원 처치 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getKillMent(@NonNull CharacterType characterType);
+
+    /**
+     * 사망 시 대사를 반환한다.
+     *
+     * @param characterType 공격자의 전투원 종류
+     * @return 전투원 사망 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getDeathMent(@NonNull CharacterType characterType);
+
+    /**
      * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
      *
      * @param combatUser 대상 플레이어

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.vellion.action.*;
 import com.dace.dmgr.combat.entity.*;
@@ -71,6 +72,33 @@ public final class Vellion extends Controller {
     @NonNull
     public String getUltUseMent() {
         return "어디 한번 날뛰어봐. 할 수 있다면 말이야.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            case SILIA:
+                return new String[]{
+                        "거슬리게 하지 말고 꺼져.",
+                        "건방지긴."
+                };
+            default:
+                return new String[]{
+                        "내 계획의 일부분이 되어라.",
+                        "너희들은 울부짖으며 쓰러져갈 뿐이다.",
+                        "나락으로 떨어져라."
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "안돼... 안돼, 아직 계획이..!",
+                "망할...이 무식한 자식들!"
+        };
     }
 
     @Override

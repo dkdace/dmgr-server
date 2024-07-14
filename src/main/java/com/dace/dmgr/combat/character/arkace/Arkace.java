@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -68,6 +69,36 @@ public final class Arkace extends Marksman {
     @NonNull
     public String getUltUseMent() {
         return "에너지 증폭 활성화.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            case SILIA:
+                return new String[]{"그 원시적인 무기로 뭘 하겠다고 그러나?"};
+            case JAGER:
+                return new String[]{
+                        "총은 그렇게 쓰는 물건이 아니다.",
+                        "끈질긴 놈이군."
+                };
+            default:
+                return new String[]{
+                        "똑바로 해라.",
+                        "연습이 아닌 실전이다.",
+                        "적을 사살했다."
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "제법..이군..",
+                "운수 한 번... 안 좋은 날이군...",
+                "여기서... 끝인 건가..."
+        };
     }
 
     @Override

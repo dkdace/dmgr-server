@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
@@ -88,6 +89,25 @@ public final class Neace extends Support {
     @NonNull
     public String getUltUseMent() {
         return "모든 것은 평화를 위하여!";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "살짝 겁만 주려 했는데...",
+                "내가...내 손으로...",
+                "...미안해요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "어떻게 이런 짓을...",
+                "이런 야만적인..."
+        };
     }
 
     @Override

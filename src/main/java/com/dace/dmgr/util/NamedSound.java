@@ -16,6 +16,8 @@ public enum NamedSound {
     GENERAL_GUI_CLICK(new DefinedSound(Sound.UI_BUTTON_CLICK, 1, 1)),
     /** 경고 액션바 */
     GENERAL_ALERT(new DefinedSound("new.block.note_block.bit", 0.25, 0.7)),
+    /** 타자기 효과 타이틀 */
+    TYPEWRITER_TITLE(new DefinedSound("new.block.note_block.bass", 1, 1.5)),
 
     /** 게임 - 타이머 효과음 */
     GAME_TIMER(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 1)),

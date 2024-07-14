@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -74,6 +75,26 @@ public final class Jager extends Marksman {
     @NonNull
     public String getUltUseMent() {
         return "저놈들의 머리를 좀 식혀주지.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "별 거 없군.",
+                "체크 메이트.",
+                "사냥 완료."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "...제길!",
+                "젠장...",
+                "뒤를...부탁하지."
+        };
     }
 
     @Override

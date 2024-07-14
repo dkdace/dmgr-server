@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.quaker;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -72,6 +73,32 @@ public final class Quaker extends Guardian {
     @NonNull
     public String getUltUseMent() {
         return "다 쓸어버리겠다!";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            case ARKACE:
+                return new String[]{
+                        "조국의 방패는 납덩어리에 굴복하지 않는다!"
+                };
+            default:
+                return new String[]{
+                        "적을 제거했다!",
+                        "방해꾼을 처리했다!",
+                        "어딜 방어선을 넘보는가!"
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "나는 굴복하지 않는다!",
+                "죽어도 항복은 없다!"
+        };
     }
 
     @Override

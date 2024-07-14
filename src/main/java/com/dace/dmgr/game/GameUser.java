@@ -332,7 +332,7 @@ public final class GameUser implements Disposable {
      *
      * @param message 메시지
      */
-    public void sendAllMessage(String message) {
+    public void sendAllMessage(@NonNull String message) {
         if (team == Team.NONE)
             return;
 
@@ -353,7 +353,7 @@ public final class GameUser implements Disposable {
      *
      * @param message 메시지
      */
-    public void sendTeamMessage(String message) {
+    public void sendTeamMessage(@NonNull String message) {
         if (team == Team.NONE)
             return;
 
@@ -406,8 +406,8 @@ public final class GameUser implements Disposable {
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", (gameUser, combatUser) -> {
             String[] ments = combatUser.getCharacterType().getCharacter().getReqRallyMent();
-            int index = DMGR.getRandom().nextInt(ments.length);
-            return MessageFormat.format("§7[집결 요청] §f§l{0}", ments[index]);
+            String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+            return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
         });
 
         /** 쿨타임 ID */

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Scuffler;
 import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -71,6 +72,29 @@ public final class Silia extends Scuffler {
     @NonNull
     public String getUltUseMent() {
         return "시원하게 날려버리자!";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            default:
+                return new String[]{
+                        "잡았다! 이번엔 내가 이겼네?",
+                        "바람 앞에서는 도망칠 수 없다구!",
+                        "짜잔! 응? 벌써 끝난거야?"
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "으... 눈이... 감겨..",
+                "피곤해... 잠시 쉬어야겠어...",
+                "미안해... 얘들아..."
+        };
     }
 
     @Override
