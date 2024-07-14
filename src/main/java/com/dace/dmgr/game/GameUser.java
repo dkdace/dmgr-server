@@ -361,7 +361,7 @@ public final class GameUser implements Disposable {
                 ments = combatUser.getCharacterType().getCharacter().getUltMent()[2];
 
             int index = DMGR.getRandom().nextInt(ments.length);
-            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", combatUser.getUltGaugePercent(), ments[index]);
+            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(combatUser.getUltGaugePercent() * 100), ments[index]);
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", (gameUser, combatUser) -> {
