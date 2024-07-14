@@ -59,6 +59,13 @@ commands:
       - fodzld
       - rank
       - ranking
+  채팅:
+    description: DMGR Command
+    aliases:
+      - coxld
+      - 전체
+      - wjscp
+      - tc
   선택:
     permission: admin
     description: DMGR Test command

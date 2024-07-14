@@ -88,6 +88,10 @@ public final class GameUser implements Disposable {
     /** 게임 시작 시점 (타임스탬프) */
     @Getter
     private long startTime = 0;
+    /** 팀 채팅 활성화 여부 */
+    @Getter
+    @Setter
+    private boolean isTeamChat = true;
 
     /**
      * 게임 시스템의 플레이어 인스턴스를 생성하고, 게임의 소속 유저 목록({@link Game#getGameUsers()})에 추가한다.
