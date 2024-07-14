@@ -38,6 +38,60 @@ public abstract class Character {
     private final double hitboxMultiplier;
 
     /**
+     * 치료 요청 대사를 반환한다.
+     *
+     * <p>반환값의 각 인덱스는 다음을 의미한다.</p>
+     *
+     * <ol>
+     * <li>0번째 인덱스 : 치명상일 때의 대사 목록</li>
+     * <li>1번째 인덱스 : 체력이 절반 이하일 때의 대사 목록</li>
+     * <li>2번째 인덱스 : 체력이 충분할 때의 대사 목록</li>
+     * </ol>
+     *
+     * @return 치료 요청 대사 목록.
+     */
+    @NonNull
+    public String @NonNull [] @NonNull [] getReqHealMent() {
+        return new String[][]{
+                new String[]{"치료 요청 치명상"},
+                new String[]{"치료 요청 체력 낮음"},
+                new String[]{"치료 요청 일반"}
+        };
+    }
+
+    /**
+     * 궁극기 상태 대사를 반환한다.
+     *
+     * <p>반환값의 각 인덱스는 다음을 의미한다.</p>
+     *
+     * <ol>
+     * <li>0번째 인덱스 : 궁극기 게이지가 0~89%일 때의 대사 목록</li>
+     * <li>1번째 인덱스 : 궁극기 게이지가 90~99일 때의 대사 목록</li>
+     * <li>2번째 인덱스 : 궁극기가 충전 상태일 때의 대사 목록</li>
+     * </ol>
+     *
+     * @return 궁극기 상태 대사 목록
+     */
+    @NonNull
+    public String @NonNull [] @NonNull [] getUltMent() {
+        return new String[][]{
+                new String[]{"궁극기 일반"},
+                new String[]{"궁극기 충전 임박"},
+                new String[]{"궁극기 충전 완료"}
+        };
+    }
+
+    /**
+     * 집결 요청 대사를 반환한다.
+     *
+     * @return 집결 요청 대사 목록
+     */
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{"집결 요청"};
+    }
+
+    /**
      * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
      *
      * @param combatUser 대상 플레이어

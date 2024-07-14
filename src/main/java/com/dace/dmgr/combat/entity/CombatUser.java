@@ -33,8 +33,6 @@ import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
@@ -50,8 +48,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -59,7 +55,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -1029,9 +1024,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setMaxHealth(realCharacter.getHealth());
         damageModule.setHealth(realCharacter.getHealth());
         moveModule.getSpeedStatus().setBaseValue(DEFAULT_SPEED * realCharacter.getSpeedMultiplier());
-        entity.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
-        entity.getInventory().setItem(10, CommunicationItem.SHOW_ULT.guiItem.getItemStack());
-        entity.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
+        entity.getInventory().setItem(9, GameUser.CommunicationItem.REQ_HEAL.getGuiItem().getItemStack());
+        entity.getInventory().setItem(10, GameUser.CommunicationItem.SHOW_ULT.getGuiItem().getItemStack());
+        entity.getInventory().setItem(11, GameUser.CommunicationItem.REQ_RALLY.getGuiItem().getItemStack());
 
         double hitboxMultiplier = realCharacter.getHitboxMultiplier();
         for (Hitbox hitbox : hitboxes)
@@ -1263,44 +1258,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet3.setAnimation(isRight ? 0 : 3);
         packet3.setEntityID(entity.getEntityId());
         packet3.broadcastPacket();
-    }
-
-    /**
-     * 의사소통 GUI 아이템 목록.
-     */
-    @Getter
-    public enum CommunicationItem {
-        /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", player -> {
-        }),
-        /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", player -> {
-        }),
-        /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", player -> {
-        });
-
-        /** GUI 아이템 객체 */
-        private final GuiItem guiItem;
-
-        CommunicationItem(String name, Consumer<Player> action) {
-            ItemBuilder itemBuilder = new ItemBuilder(Material.STAINED_GLASS_PANE)
-                    .setDamage((short) 5)
-                    .setName(name);
-
-            this.guiItem = new GuiItem("CombatUser" + this, itemBuilder.build()) {
-                @Override
-                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                    if (clickType != ClickType.LEFT)
-                        return false;
-
-                    action.accept(player);
-                    player.closeInventory();
-
-                    return true;
-                }
-            };
-        }
     }
 
     /**

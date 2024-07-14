@@ -1,5 +1,6 @@
 package com.dace.dmgr.game;
 
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.TextIcon;
@@ -7,11 +8,11 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.GlowUtil;
-import com.dace.dmgr.util.HologramUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skins;
@@ -24,10 +25,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
+import java.util.function.BiFunction;
 
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
@@ -321,5 +325,94 @@ public final class GameUser implements Disposable {
             return Team.BLUE;
 
         return null;
+    }
+
+    /**
+     * 의사소통 GUI 아이템 목록.
+     */
+    @Getter
+    public enum CommunicationItem {
+        /** 치료 요청 */
+        REQ_HEAL("§a치료 요청", (gameUser, combatUser) -> {
+            String state;
+            String[] ments;
+            if (combatUser.getDamageModule().isLowHealth()) {
+                state = "치명상";
+                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[0];
+            } else if (combatUser.getDamageModule().getHealth() <= combatUser.getDamageModule().getMaxHealth() / 2) {
+                state = "체력 낮음";
+                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[1];
+            } else {
+                state = "치료 요청";
+                ments = combatUser.getCharacterType().getCharacter().getReqHealMent()[2];
+            }
+
+            int index = DMGR.getRandom().nextInt(ments.length);
+            return MessageFormat.format("§7[{0}] §f§l{1}", state, ments[index]);
+        }),
+        /** 궁극기 상태 */
+        SHOW_ULT("§a궁극기 상태", (gameUser, combatUser) -> {
+            String[] ments;
+            if (combatUser.getUltGaugePercent() < 0.9)
+                ments = combatUser.getCharacterType().getCharacter().getUltMent()[0];
+            else if (combatUser.getUltGaugePercent() < 1)
+                ments = combatUser.getCharacterType().getCharacter().getUltMent()[1];
+            else
+                ments = combatUser.getCharacterType().getCharacter().getUltMent()[2];
+
+            int index = DMGR.getRandom().nextInt(ments.length);
+            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", combatUser.getUltGaugePercent(), ments[index]);
+        }),
+        /** 집결 요청 */
+        REQ_RALLY("§a집결 요청", (gameUser, combatUser) -> {
+            String[] ments = combatUser.getCharacterType().getCharacter().getReqRallyMent();
+            int index = DMGR.getRandom().nextInt(ments.length);
+            return MessageFormat.format("§7[집결 요청] §f§l{0}", ments[index]);
+        });
+
+        /** 쿨타임 ID */
+        private static final String COOLDOWN_ID = "Communication";
+        /** GUI 아이템 객체 */
+        private final GuiItem guiItem;
+
+        CommunicationItem(String name, BiFunction<GameUser, CombatUser, String> action) {
+            ItemBuilder itemBuilder = new ItemBuilder(Material.STAINED_GLASS_PANE)
+                    .setDamage((short) 5)
+                    .setName(name);
+
+            this.guiItem = new GuiItem("CommunicationItem" + this, itemBuilder.build()) {
+                @Override
+                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
+                    if (clickType != ClickType.LEFT)
+                        return false;
+
+                    User user = User.fromPlayer(player);
+                    CombatUser combatUser = CombatUser.fromUser(user);
+                    if (combatUser == null)
+                        return false;
+                    GameUser gameUser = GameUser.fromUser(user);
+                    if (gameUser == null || (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING))
+                        return false;
+
+                    if (!player.isOp()) {
+                        if (CooldownUtil.getCooldown(user, COOLDOWN_ID) > 0)
+                            return false;
+                        CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
+                    }
+
+                    String message = MessageFormat.format("§f<{0}§l[{1}]§f{2}> {3}", gameUser.getTeam().getColor(),
+                            combatUser.getCharacterType().getCharacter().getName(), player.getName(), action.apply(gameUser, combatUser));
+                    gameUser.getGame().getTeamUserMap().get(gameUser.getTeam()).forEach(gameUser2 -> {
+                        UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
+                        gameUser2.getUser().getPlayer().sendMessage(message);
+                        SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
+                    });
+
+                    player.closeInventory();
+
+                    return true;
+                }
+            };
+        }
     }
 }
