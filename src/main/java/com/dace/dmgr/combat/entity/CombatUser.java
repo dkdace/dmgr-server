@@ -225,6 +225,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
             if (combatEntity instanceof Damageable)
                 HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, false, entity);
+
+            if (combatEntity instanceof CombatUser)
+                HologramUtil.setHologramVisibility(combatEntity.getEntity().getName(), false, entity);
         }
     }
 
