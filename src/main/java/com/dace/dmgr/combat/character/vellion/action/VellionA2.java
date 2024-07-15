@@ -158,7 +158,7 @@ public final class VellionA2 extends ActiveSkill {
         private Damageable target = null;
 
         private VellionTarget() {
-            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(VellionA2Info.MAX_DISTANCE)
+            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(VellionA2Info.MAX_DISTANCE)
                     .condition(combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(VellionA2.this.combatUser) &&
                             LocationUtil.canPass(VellionA2.this.combatUser.getEntity().getEyeLocation(),
                                     combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0)) &&

@@ -232,7 +232,7 @@ public final class Neace extends Support {
 
     private static final class NeaceTarget extends Hitscan {
         private NeaceTarget(CombatUser combatUser) {
-            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
+            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
                     .condition(combatEntity -> getTargetedActionCondition(combatUser, combatEntity)).build());
         }
 

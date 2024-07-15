@@ -106,7 +106,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     private final class NeaceTarget extends Hitscan {
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceWeaponInfo.HEAL.MAX_DISTANCE)
+            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceWeaponInfo.HEAL.MAX_DISTANCE)
                     .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceWeapon.this.combatUser, combatEntity)).build());
         }
 

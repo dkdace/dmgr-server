@@ -16,6 +16,7 @@ public final class HitscanOption {
     public static final double START_DISTANCE_DEFAULT = 0.5;
     public static final double MAX_DISTANCE_DEFAULT = 70;
     public static final double SIZE_DEFAULT = 0.05;
+    public static final double TARGET_SIZE_DEFAULT = 1;
     public static final Predicate<CombatEntity> CONDITION_DEFAULT = combatEntity -> true;
 
     /** 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수) */
