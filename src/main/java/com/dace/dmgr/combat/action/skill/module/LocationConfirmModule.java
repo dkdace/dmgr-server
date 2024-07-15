@@ -64,7 +64,8 @@ public final class LocationConfirmModule extends ConfirmModule {
     public boolean isValid() {
         if (!isChecking)
             return false;
-        return currentLocation.getBlock().isEmpty() && !currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
+        return !currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) && currentLocation.getBlock().isEmpty() &&
+                !currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
     }
 
     @Override
@@ -81,6 +82,7 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
                 false), true);
         pointer.setHelmet(new ItemStack(Material.HOPPER));
+        currentLocation = skill.getCombatUser().getEntity().getLocation();
 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{pointer.getEntityId()});
