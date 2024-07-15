@@ -181,6 +181,12 @@ public class DamageModule {
         if (damage == 0)
             return true;
 
+        if (damageType == DamageType.IGNORE_DEFENSE || damageType == DamageType.FIXED) {
+            defenseMultiplier = 1;
+            if (damageType == DamageType.FIXED)
+                damageMultiplier = 1;
+        }
+
         damage *= (int) critMultiplier;
 
         int finalDamage = Math.max(0, (int) (damage * (1 + damageMultiplier - defenseMultiplier)));
@@ -216,10 +222,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      */
     public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        double damageMultiplier = attacker == null || damageType == DamageType.AREA ?
-                1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
-        double defenseMultiplier = attacker == null ?
-                1 : defenseMultiplierStatus.getValue();
+        double damageMultiplier = attacker == null ? 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
+        double defenseMultiplier = defenseMultiplierStatus.getValue();
 
         return handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
     }

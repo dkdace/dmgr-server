@@ -6,6 +6,8 @@ package com.dace.dmgr.combat.interaction;
 public enum DamageType {
     /** 기본 */
     NORMAL,
-    /** 지역(장판) 피해 */
-    AREA,
+    /** 방어력 무시 */
+    IGNORE_DEFENSE,
+    /** 고정 피해 */
+    FIXED
 }

@@ -179,7 +179,7 @@ public final class VellionA1 extends ActiveSkill {
 
             if (i % 10 == 0 && combatEntity instanceof Damageable && combatEntity instanceof Living && provider instanceof Attacker)
                 ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, VellionA1Info.POISON_DAMAGE_PER_SECOND * 10 / 20,
-                        DamageType.NORMAL, null, false, true);
+                        DamageType.IGNORE_DEFENSE, null, false, true);
         }
     }
 
