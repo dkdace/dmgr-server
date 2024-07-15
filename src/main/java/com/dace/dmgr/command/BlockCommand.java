@@ -77,10 +77,10 @@ public class BlockCommand implements CommandExecutor {
                     }
 
                     if (userData.isBlockedPlayer(targetUserData)) {
-                        user.sendMessageInfo("§e§n" + targetUserData.getPlayerName() + "§r님의 채팅 차단을 해제했습니다.");
+                        user.sendMessageInfo("§e§n{0}§r님의 채팅 차단을 해제했습니다.", targetUserData.getPlayerName());
                         userData.removeBlockedPlayer(targetUserData);
                     } else {
-                        user.sendMessageInfo("§e§n" + targetUserData.getPlayerName() + "§r님의 채팅을 차단했습니다.");
+                        user.sendMessageInfo("§e§n{0}§r님의 채팅을 차단했습니다.", targetUserData.getPlayerName());
                         userData.addBlockedPlayer(targetUserData);
                     }
 

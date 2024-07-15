@@ -39,7 +39,7 @@ public class DMCommand implements CommandExecutor {
 
             user.setMessageTarget(User.fromPlayer(target));
             user.sendMessageInfo("");
-            user.sendMessageInfo("§e§n" + target.getName() + "§f님과의 대화가 시작되었습니다.");
+            user.sendMessageInfo("§e§n{0}§r님과의 대화가 시작되었습니다.", target.getName());
             user.sendMessageInfo("종료하려면 §n'/(귓[속말]|dm)'§r을 다시 입력하십시오.");
             user.sendMessageInfo("");
         } else {

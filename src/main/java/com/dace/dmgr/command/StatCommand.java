@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
  * 전적 명령어 클래스.
  *
  * <p>Usage: /전적 [플레이어]</p>
+ *
+ * @see Stat
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatCommand implements CommandExecutor {
