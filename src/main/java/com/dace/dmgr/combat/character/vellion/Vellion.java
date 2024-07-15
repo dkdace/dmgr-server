@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.vellion.action.*;
 import com.dace.dmgr.combat.entity.*;
@@ -36,6 +37,68 @@ public final class Vellion extends Controller {
 
     private Vellion() {
         super("벨리온", "DVVellion", '\u32D6', 1000, 1.0, 1.0);
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "날 치료해, 당장.",
+                "어서 날 치료해.",
+                "치유 좀 부탁해."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "뭐가?",
+                "어서 준비하지 않고 뭐해?",
+                "때가 되면 시작할테니깐 기다리고 있어."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "나에게 모여라!",
+                "함께 모여 저들에게 파멸과 죽음을!",
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "어디 한번 날뛰어봐. 할 수 있다면 말이야.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            case SILIA:
+                return new String[]{
+                        "거슬리게 하지 말고 꺼져.",
+                        "건방지긴."
+                };
+            default:
+                return new String[]{
+                        "내 계획의 일부분이 되어라.",
+                        "너희들은 울부짖으며 쓰러져갈 뿐이다.",
+                        "나락으로 떨어져라."
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "안돼... 안돼, 아직 계획이..!",
+                "망할...이 무식한 자식들!"
+        };
     }
 
     @Override
