@@ -21,18 +21,51 @@ commands:
     aliases:
       - apsb
       - menu
-  설정:
-    description: DMGR Command
-    aliases:
-      - tjfwjd
-      - option
-      - config
   퇴장:
     description: DMGR Command
     aliases:
       - xhlwkd
       - quit
       - q
+  명령어:
+    description: DMGR Command
+    aliases:
+      - audfuddj
+      - command
+  전적:
+    description: DMGR Command
+    aliases:
+      - wjswjr
+      - stat
+  귓:
+    description: DMGR Command
+    aliases:
+      - rnlt
+      - 귓말
+      - rnltakf
+      - 귓속말
+      - rnltthrakf
+      - w
+      - tell
+      - dm
+  차단:
+    description: DMGR Command
+    aliases:
+      - ckeks
+      - block
+  랭킹:
+    description: DMGR Command
+    aliases:
+      - fodzld
+      - rank
+      - ranking
+  채팅:
+    description: DMGR Command
+    aliases:
+      - coxld
+      - 전체
+      - wjscp
+      - tc
   선택:
     permission: admin
     description: DMGR Test command

@@ -19,7 +19,7 @@ public final class PlayerOption extends Gui {
     @Getter
     private static final PlayerOption instance = new PlayerOption();
 
-    public PlayerOption() {
+    private PlayerOption() {
         super(2, "§8설정");
     }
 

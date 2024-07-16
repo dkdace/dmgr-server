@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.character.quaker.Quaker;
 import com.dace.dmgr.combat.character.silia.Silia;
+import com.dace.dmgr.combat.character.vellion.Vellion;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
@@ -27,7 +28,8 @@ public enum CharacterType {
     JAGER(Jager.getInstance()),
     QUAKER(Quaker.getInstance()),
     SILIA(Silia.getInstance()),
-    NEACE(Neace.getInstance());
+    NEACE(Neace.getInstance()),
+    VELLION(Vellion.getInstance());
 
     /** 전투원 정보 */
     private final Character character;
@@ -42,14 +44,15 @@ public enum CharacterType {
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (clickType != ClickType.LEFT)
+                if (clickType != ClickType.LEFT || !clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
+                    return false;
+
+                CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+                if (combatUser == null)
                     return false;
 
                 CharacterType characterType = CharacterType.valueOf(CharacterType.this.toString());
-
-                CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-                if (combatUser != null)
-                    combatUser.setCharacterType(characterType);
+                combatUser.setCharacterType(characterType);
 
                 player.closeInventory();
 

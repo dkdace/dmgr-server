@@ -103,7 +103,7 @@ public final class NeaceA1 extends ActiveSkill {
         private Healable target = null;
 
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
+            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
                     .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
                             !combatEntity.getStatusEffectModule().hasStatusEffect(neaceA1Mark)).build());
         }

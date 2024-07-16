@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Scuffler;
 import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -35,6 +36,65 @@ public final class Silia extends Scuffler {
 
     private Silia() {
         super("실리아", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "팔라스 언니? 거기 누구 없어...?",
+                "아직 멀쩡해! 아마도...?",
+                "난 괜찮아! 문제 없다구!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "바람이 모이고 있어! 조금만 기다려!",
+                "곧 폭풍이 몰아칠 거야!",
+                "준비 됐어? 다들 날아가지 않게 꽉 잡아!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "나랑 같이 놀 사람~ 여기여기 붙어라!",
+                "이리 와서 나랑 같이 놀자!",
+                "거기 너! 나랑 같이 놀래?"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "시원하게 날려버리자!";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            default:
+                return new String[]{
+                        "잡았다! 이번엔 내가 이겼네?",
+                        "바람 앞에서는 도망칠 수 없다구!",
+                        "짜잔! 응? 벌써 끝난거야?"
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "으... 눈이... 감겨..",
+                "피곤해... 잠시 쉬어야겠어...",
+                "미안해... 얘들아..."
+        };
     }
 
     @Override

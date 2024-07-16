@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
@@ -13,6 +14,7 @@ import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -56,16 +58,84 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "조금... 아주 조금만 쉬어도 될까요?",
+                "이 정도 상처는 좀 있으면 낫는답니다.",
+                "아직 더 버틸 수 있어요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "희망을 잃지 말아요.",
+                "조금만 더 기다려줘요.",
+                "제가 당신을 지켜드릴게요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "흩어지지 말아요.",
+                "제 곁에 있으면 안전해요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "모든 것은 평화를 위하여!";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "살짝 겁만 주려 했는데...",
+                "내가...내 손으로...",
+                "...미안해요."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "어떻게 이런 짓을...",
+                "이런 야만적인..."
+        };
+    }
+
+    @Override
+    @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
         NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());
+        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+
+        double skill2Duration = skill2.getDuration() / 20.0;
+        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
-        if (!skill2.isDurationFinished())
-            text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill2.isDurationFinished()) {
+            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+                    skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
+            text.add(skill2Display);
+        }
         if (!skill3.isDurationFinished())
             text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
+        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
 
         return text.toString();
     }
@@ -162,7 +232,7 @@ public final class Neace extends Support {
 
     private static final class NeaceTarget extends Hitscan {
         private NeaceTarget(CombatUser combatUser) {
-            super(combatUser, HitscanOption.builder().size(0.8).maxDistance(NeaceA1Info.MAX_DISTANCE)
+            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
                     .condition(combatEntity -> getTargetedActionCondition(combatUser, combatEntity)).build());
         }
 

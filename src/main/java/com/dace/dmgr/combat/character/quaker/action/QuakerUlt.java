@@ -63,7 +63,7 @@ public final class QuakerUlt extends UltimateSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(16);
+        combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
         combatUser.playMeleeAttackAnimation(-10, 16, false);
 

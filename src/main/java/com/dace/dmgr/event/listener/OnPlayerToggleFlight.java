@@ -12,9 +12,7 @@ public final class OnPlayerToggleFlight implements Listener {
     public static void event(PlayerToggleFlightEvent event) {
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
 
-        if (combatUser != null && combatUser.getCharacterType() != null) {
-            event.setCancelled(true);
+        if (combatUser != null && combatUser.getCharacterType() != null)
             combatUser.useAction(ActionKey.SPACE);
-        }
     }
 }

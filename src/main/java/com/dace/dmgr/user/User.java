@@ -46,6 +46,8 @@ import java.util.UUID;
  * 유저 정보 및 상태를 관리하는 클래스.
  */
 public final class User implements Disposable {
+    /** 타자기 효과 타이틀 쿨타임 ID */
+    public static final String TYPEWRITER_TITLE_COOLDOWN_ID = "TypewriterTitle";
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
             "\n" +
@@ -58,7 +60,6 @@ public final class User implements Disposable {
     private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
     /** 타이틀 쿨타임 ID */
     private static final String TITLE_COOLDOWN_ID = "Title";
-
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
     /** 플레이어 객체 */
@@ -82,6 +83,11 @@ public final class User implements Disposable {
     /** 리소스팩 적용 수락 여부 */
     @Setter
     private boolean isResourcePackAccepted = false;
+    /** 현재 귓속말 대상 */
+    @Nullable
+    @Getter
+    @Setter
+    private User messageTarget;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -607,6 +613,38 @@ public final class User implements Disposable {
      */
     public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut) {
         sendTitle(title, subtitle, fadeIn, stay, fadeOut, 0);
+    }
+
+    /**
+     * 플레이어에게 타자기 효과 타이틀을 전송한다.
+     *
+     * <p>순차적으로 한 글자씩 나타나는 효과이다.</p>
+     *
+     * @param prefix  접두사
+     * @param message 메시지
+     */
+    public void sendTypewriterTitle(@NonNull String prefix, @NonNull String message) {
+        int delay = 0;
+        StringBuilder text = new StringBuilder();
+
+        for (int i = 0; i < message.length(); i++) {
+            char nextChar = message.charAt(i);
+
+            TaskUtil.addTask(this, new DelayTask(() -> {
+                text.append(nextChar);
+                CooldownUtil.setCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID, 50);
+
+                sendTitle("", prefix + " §f" + text, 0, 40, 10);
+                SoundUtil.playNamedSound(NamedSound.TYPEWRITER_TITLE, player);
+            }, delay));
+
+            if (nextChar == '.' || nextChar == ',')
+                delay += 4;
+            else if (nextChar == ' ')
+                delay += 2;
+            else
+                delay += 1;
+        }
     }
 
     /**

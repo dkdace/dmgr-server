@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -33,6 +34,71 @@ public final class Arkace extends Marksman {
 
     private Arkace() {
         super("아케이스", "DVArkace", '\u32D0', 1000, 1.0, 1.0);
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "여기는 아케이스, 신속한 치료가 필요하다!",
+                "부상 발생, 치료를 요청한다!",
+                "아직은 더 버틸 수 있다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "에너지 충전 중이다.",
+                "에너지 충전이 얼마 남지 않았다.",
+                "에너지 증폭이 준비되었다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "여기는 아케이스, 지원을 요청한다.",
+                "화력 지원 바란다."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "에너지 증폭 활성화.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        switch (characterType) {
+            case SILIA:
+                return new String[]{"그 원시적인 무기로 뭘 하겠다고 그러나?"};
+            case JAGER:
+                return new String[]{
+                        "총은 그렇게 쓰는 물건이 아니다.",
+                        "끈질긴 놈이군."
+                };
+            default:
+                return new String[]{
+                        "똑바로 해라.",
+                        "연습이 아닌 실전이다.",
+                        "적을 사살했다."
+                };
+        }
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "제법..이군..",
+                "운수 한 번... 안 좋은 날이군...",
+                "여기서... 끝인 건가..."
+        };
     }
 
     @Override

@@ -224,12 +224,21 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             if (!readyTimeModule.isReady())
                 return;
 
-            if (i % 10 == 0 && entity.getTarget() == null) {
-                Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                        combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this) &&
-                                ((Damageable) combatEntity).getDamageModule().isLowHealth());
-                if (target != null)
-                    entity.setTarget(target.getEntity());
+            if (i % 10 == 0) {
+                if (entity.getTarget() == null) {
+                    Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
+                            combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living &&
+                                    combatEntity.isEnemy(this) && ((Damageable) combatEntity).getDamageModule().isLowHealth());
+                    if (target != null)
+                        entity.setTarget(target.getEntity());
+                } else {
+                    CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
+                    if (targetCombatEntity == null)
+                        return;
+
+                    if ((targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()) || targetCombatEntity.isDisposed())
+                        entity.setTarget(null);
+                }
             }
         }
 

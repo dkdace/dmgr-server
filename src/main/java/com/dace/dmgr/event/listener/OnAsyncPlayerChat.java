@@ -1,6 +1,8 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.CooldownUtil;
@@ -16,6 +18,8 @@ import java.text.MessageFormat;
 public final class OnAsyncPlayerChat implements Listener {
     /** 쿨타임 ID */
     private static final String COOLDOWN_ID = "Chat";
+    /** 채팅의 메시지 포맷 */
+    private static final String CHAT_FORMAT = "<{0}> {1}";
 
     @EventHandler
     public static void event(AsyncPlayerChatEvent event) {
@@ -33,10 +37,40 @@ public final class OnAsyncPlayerChat implements Listener {
             CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
         }
 
-        Bukkit.getServer().broadcastMessage(MessageFormat.format("<{0}> {1}", userData.getDisplayName(), event.getMessage()));
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            UserData userData2 = UserData.fromPlayer(player2);
-            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), player2, 1000, Math.sqrt(2));
-        });
+        Bukkit.getServer().getConsoleSender().sendMessage(MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage()));
+
+        if (user.getMessageTarget() == null) {
+            GameUser gameUser = GameUser.fromUser(user);
+
+            if (gameUser == null || (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING)) {
+                Bukkit.getOnlinePlayers().forEach((Player player2) ->
+                        sendMessage(user, User.fromPlayer(player2), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
+            } else {
+                if (gameUser.isTeamChat())
+                    gameUser.sendTeamMessage(event.getMessage());
+                else
+                    gameUser.sendAllMessage(event.getMessage());
+            }
+        } else {
+            sendMessage(user, user, MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), "§7" + event.getMessage()));
+            sendMessage(user, user.getMessageTarget(), MessageFormat.format("<{0} §7님의 개인 메시지§f> §7{1}", userData.getDisplayName(), event.getMessage()));
+        }
+    }
+
+    /**
+     * 대상 플레이어에게 메시지를 전송하고 효과음을 재생한다.
+     *
+     * @param sender   발신 플레이어
+     * @param receiver 수신 플레이어
+     * @param message  메시지
+     */
+    private static void sendMessage(User sender, User receiver, String message) {
+        UserData receiverUserData = receiver.getUserData();
+
+        if (receiverUserData.isBlockedPlayer(sender.getUserData()))
+            return;
+
+        receiver.getPlayer().sendMessage(message);
+        SoundUtil.play(receiverUserData.getConfig().getChatSound().getSound(), receiver.getPlayer(), 1000, Math.sqrt(2));
     }
 }

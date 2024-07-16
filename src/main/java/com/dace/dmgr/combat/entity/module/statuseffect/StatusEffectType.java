@@ -15,6 +15,8 @@ public enum StatusEffectType {
     NONE,
     /** 속도 증가 */
     SPEED,
+    /** 무적 */
+    INVULNERABLE,
     /** 둔화 */
     SLOW,
     /** 기절 */
@@ -24,5 +26,9 @@ public enum StatusEffectType {
     /** 고정 */
     GROUNDING,
     /** 침묵 */
-    SILENCE
+    SILENCE,
+    /** 독 */
+    POISON,
+    /** 회복 차단 */
+    HEAL_BLOCK
 }

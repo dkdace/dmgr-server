@@ -137,9 +137,10 @@ public final class SoundUtil {
         for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
             String soundName = definedSound.getSound();
             if (soundName.toUpperCase().equals(soundName))
-                play(Sound.valueOf(soundName), location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder);
+                play(Sound.valueOf(soundName), location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder,
+                        definedSound.getPitchSpreadRange());
             else
-                play(soundName, location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+                play(soundName, location, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch(), definedSound.getPitchSpreadRange());
         }
     }
 
@@ -166,9 +167,10 @@ public final class SoundUtil {
         for (NamedSound.DefinedSound definedSound : namedSound.getDefinedSounds()) {
             String soundName = definedSound.getSound();
             if (soundName.toUpperCase().equals(soundName))
-                play(Sound.valueOf(soundName), player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder);
+                play(Sound.valueOf(soundName), player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch() + pitchAdder,
+                        definedSound.getPitchSpreadRange());
             else
-                play(soundName, player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch());
+                play(soundName, player, definedSound.getVolume() * volumeMultiplier, definedSound.getPitch(), definedSound.getPitchSpreadRange());
         }
     }
 

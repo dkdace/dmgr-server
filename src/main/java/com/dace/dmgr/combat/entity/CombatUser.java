@@ -33,8 +33,6 @@ import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
@@ -46,12 +44,13 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -59,7 +58,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -80,6 +78,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final int FALL_ZONE_KILL_SCORE = 30;
     /** 연속 처치 점수 */
     private static final int KILLSTREAK_SCORE = 25;
+    /** 사망 대사 홀로그램 ID */
+    private static final String DEATH_MENT_HOLOGRAM_ID = "DeathMent";
 
     /** 넉백 모듈 */
     @NonNull
@@ -221,6 +221,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void activate() {
         reset();
         super.activate();
+
+        for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
+            if (combatEntity instanceof Damageable)
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, false, entity);
+
+            if (combatEntity instanceof CombatUser)
+                HologramUtil.setHologramVisibility(combatEntity.getEntity().getName(), false, entity);
+        }
     }
 
     @Override
@@ -265,7 +273,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
 
         packet.setCanFly(isActivated && canFly());
+        packet.setFlying(entity.isFlying());
         packet.setWalkingSpeed((float) (moveModule.getSpeedStatus().getValue() * 2 * value));
+        packet.setFlyingSpeed(entity.getFlySpeed());
 
         packet.sendPacket(entity);
     }
@@ -283,6 +293,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         moveModule.getSpeedStatus().setBaseValue(speed);
+        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.2));
     }
 
     /**
@@ -356,9 +367,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
                         LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
             else
-                Bukkit.getOnlinePlayers().forEach(player ->
-                        HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation, LocationUtil.canPass(player.getEyeLocation(), hologramLoc),
-                                player));
+                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
+                    if (combatEntity instanceof CombatUser)
+                        HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
+                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
+                }
 
             return true;
         }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5);
@@ -503,7 +516,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (!character.canFly(this))
             return false;
         if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
-                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
+                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING) || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
             return false;
 
         return true;
@@ -709,6 +722,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 if (gameUser.getGame().getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
                     gameUser.addTeamScore(1);
             }
+
+            sendPlayerKillMent((CombatUser) victim);
+            ((CombatUser) victim).sendPlayerDeathMent(this);
         } else {
             character.onKill(this, victim, -1, true);
 
@@ -743,12 +759,68 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         game.getGameUsers().forEach(gameUser2 -> {
             gameUser2.getUser().addBossBar("CombatKill" + this,
-                    MessageFormat.format("{0} §4§l-> {1}", String.join(" ,", attackerNames), victimName),
+                    MessageFormat.format("{0} §4§l-> {1}", String.join(", ", attackerNames), victimName),
                     BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
 
             TaskUtil.addTask(gameUser2, new DelayTask(() ->
                     gameUser2.getUser().removeBossBar("CombatKill" + this), KILL_LOG_DISPLAY_DURATION));
         });
+    }
+
+    /**
+     * 적 처치 시 피격자에게 처치 대사를 전송한다.
+     *
+     * @param victim 피격자
+     */
+    private void sendPlayerKillMent(@NonNull CombatUser victim) {
+        String[] ments = character.getKillMent(victim.characterType);
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+
+        sendMessage(victim, "§f§l" + ment);
+
+        TaskUtil.addTask(this, new DelayTask(() ->
+                victim.getUser().sendTypewriterTitle(String.valueOf(character.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
+    }
+
+    /**
+     * 사망 시 공격자에게 사망 대사를 전송하고 사망 위치에 홀로그램을 표시한다.
+     *
+     * @param attacker 공격자
+     */
+    private void sendPlayerDeathMent(@NonNull CombatUser attacker) {
+        String[] ments = character.getDeathMent(attacker.characterType);
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+
+        sendMessage(attacker, "§f§l" + ment);
+
+        Location hologramLoc = entity.getLocation();
+        for (int i = 0; i < 100; i++) {
+            if (!LocationUtil.isNonSolid(hologramLoc.subtract(0, 0.1, 0)))
+                break;
+        }
+        hologramLoc.add(0, 1.2, 0);
+        HologramUtil.addHologram(DEATH_MENT_HOLOGRAM_ID + this, hologramLoc, MessageFormat.format("§f{0} \"{1}\"", character.getIcon(), ment));
+
+        boolean isGame = game != null;
+        new IntervalTask(i -> {
+            long cooldown = CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id);
+            if (cooldown <= 0)
+                return false;
+            if (isGame && game.isDisposed())
+                return false;
+
+            if (isGame)
+                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
+                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
+            else
+                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
+                    if (combatEntity instanceof CombatUser)
+                        HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
+                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
+                }
+
+            return true;
+        }, isCancelled -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);
     }
 
     @Override
@@ -816,8 +888,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (cooldown <= 0)
                 return false;
 
-            user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
-                    String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
+            if (CooldownUtil.getCooldown(user, User.TYPEWRITER_TITLE_COOLDOWN_ID) == 0)
+                user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
+                        String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
             user.teleport(deadLocation);
 
             return true;
@@ -1018,9 +1091,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setMaxHealth(realCharacter.getHealth());
         damageModule.setHealth(realCharacter.getHealth());
         moveModule.getSpeedStatus().setBaseValue(DEFAULT_SPEED * realCharacter.getSpeedMultiplier());
-        entity.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
-        entity.getInventory().setItem(10, CommunicationItem.SHOW_ULT.guiItem.getItemStack());
-        entity.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
+        entity.getInventory().setItem(9, GameUser.CommunicationItem.REQ_HEAL.getGuiItem().getItemStack());
+        entity.getInventory().setItem(10, GameUser.CommunicationItem.SHOW_ULT.getGuiItem().getItemStack());
+        entity.getInventory().setItem(11, GameUser.CommunicationItem.REQ_RALLY.getGuiItem().getItemStack());
 
         double hitboxMultiplier = realCharacter.getHitboxMultiplier();
         for (Hitbox hitbox : hitboxes)
@@ -1255,42 +1328,21 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 의사소통 GUI 아이템 목록.
+     * 지정한 플레이어에게 메시지(전투원 대사)를 전송한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @param message    메시지
      */
-    @Getter
-    public enum CommunicationItem {
-        /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", player -> {
-        }),
-        /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", player -> {
-        }),
-        /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", player -> {
-        });
+    public void sendMessage(@NonNull CombatUser combatUser, @NonNull String message) {
+        ChatColor color = gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getColor();
+        String fullMessage = MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
+                (!combatUser.isActivated() ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),
+                entity.getName(), message);
 
-        /** GUI 아이템 객체 */
-        private final GuiItem guiItem;
-
-        CommunicationItem(String name, Consumer<Player> action) {
-            ItemBuilder itemBuilder = new ItemBuilder(Material.STAINED_GLASS_PANE)
-                    .setDamage((short) 5)
-                    .setName(name);
-
-            this.guiItem = new GuiItem("CombatUser" + this, itemBuilder.build()) {
-                @Override
-                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                    if (clickType != ClickType.LEFT)
-                        return false;
-
-                    action.accept(player);
-                    player.closeInventory();
-
-                    return true;
-                }
-            };
-        }
+        entity.sendMessage(fullMessage);
+        combatUser.getEntity().sendMessage(fullMessage);
     }
+
 
     /**
      * 쿨타임 ID 및 기본 지속시간 목록.

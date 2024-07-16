@@ -1,0 +1,49 @@
+package com.dace.dmgr.combat.entity.module.statuseffect;
+
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+/**
+ * 회복 차단 상태 효과를 처리하는 클래스.
+ */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class HealBlock implements StatusEffect {
+    @Getter
+    static final HealBlock instance = new HealBlock();
+
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.HEAL_BLOCK;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
+    }
+
+    @Override
+    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", 0, 5, 10);
+    }
+
+    @Override
+    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        if (combatEntity.getEntity() instanceof LivingEntity)
+            ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WITHER,
+                    4, 0, false, false), true);
+    }
+
+    @Override
+    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        // 미사용
+    }
+}

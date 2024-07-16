@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.character.jager.action.JagerP1Info;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -14,7 +13,7 @@ public final class NeaceP1 extends AbstractSkill {
     public static final String COOLDOWN_ID = "NeaceP1";
 
     NeaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerP1Info.getInstance());
+        super(combatUser, NeaceP1Info.getInstance());
     }
 
     @Override

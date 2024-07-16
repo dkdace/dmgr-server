@@ -55,7 +55,7 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(16);
+        combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
         combatUser.playMeleeAttackAnimation(-7, 12, true);
 

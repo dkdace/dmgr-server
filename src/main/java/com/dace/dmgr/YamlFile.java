@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Yaml 파일을 관리하는 클래스.
@@ -264,6 +265,33 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
+     * 파일에서 정수 값 목록을 불러온다.
+     *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * List<Long> values = yamlFile.getLong("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * List<Long> values = yamlFile.getLong("user.test");
+     * }</pre>
+     *
+     * @param key 키
+     * @return 값 목록
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
+     */
+    protected final List<Long> getLongList(@NonNull String key) {
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getLongList(getLastKey(key));
+
+        return config.getLongList(key);
+    }
+
+    /**
      * 파일에서 정수 값을 불러온다.
      *
      * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
@@ -311,6 +339,33 @@ public abstract class YamlFile implements Initializable<Void> {
             return getDeepestSection(key).getDouble(getLastKey(key), defaultValue);
 
         return config.getDouble(key, defaultValue);
+    }
+
+    /**
+     * 파일에서 실수 값 목록을 불러온다.
+     *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * List<Double> values = yamlFile.getDouble("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * List<Double> values = yamlFile.getDouble("user.test");
+     * }</pre>
+     *
+     * @param key 키
+     * @return 값 목록
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
+     */
+    protected final List<Double> getDoubleList(@NonNull String key) {
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getDoubleList(getLastKey(key));
+
+        return config.getDoubleList(key);
     }
 
     /**
@@ -365,6 +420,33 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
+     * 파일에서 문자열 값 목록을 불러온다.
+     *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * List<String> values = yamlFile.getStringList("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * List<String> values = yamlFile.getStringList("user.test");
+     * }</pre>
+     *
+     * @param key 키
+     * @return 값 목록
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
+     */
+    protected final List<String> getStringList(@NonNull String key) {
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getStringList(getLastKey(key));
+
+        return config.getStringList(key);
+    }
+
+    /**
      * 파일에서 문자열 값을 불러온다.
      *
      * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
@@ -413,6 +495,33 @@ public abstract class YamlFile implements Initializable<Void> {
             return getDeepestSection(key).getBoolean(getLastKey(key), defaultValue);
 
         return config.getBoolean(key, defaultValue);
+    }
+
+    /**
+     * 파일에서 부울 값 목록을 불러온다.
+     *
+     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>{@code
+     * // 키 'test'의 값 불러오기
+     * List<Boolean> values = yamlFile.getBooleanList("test");
+     * // 섹션 'user'의 키 'test'의 값 불러오기
+     * List<Boolean> values = yamlFile.getBooleanList("user.test");
+     * }</pre>
+     *
+     * @param key 키
+     * @return 값 목록
+     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
+     */
+    protected final List<Boolean> getBooleanList(@NonNull String key) {
+        validate();
+
+        if (key.contains("."))
+            return getDeepestSection(key).getBooleanList(getLastKey(key));
+
+        return config.getBooleanList(key);
     }
 
     /**

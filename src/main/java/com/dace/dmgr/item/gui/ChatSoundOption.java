@@ -19,12 +19,13 @@ public final class ChatSoundOption extends Gui {
     private static final GuiItem buttonLeft = new ButtonItem.LEFT("ChatSoundOptionLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            player.performCommand("설정");
+            PlayerOption playerOption = PlayerOption.getInstance();
+            playerOption.open(player);
             return true;
         }
     };
 
-    public ChatSoundOption() {
+    private ChatSoundOption() {
         super(2, "§8채팅 효과음 설정");
     }
 

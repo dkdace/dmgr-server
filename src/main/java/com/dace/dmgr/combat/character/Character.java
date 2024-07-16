@@ -38,6 +38,72 @@ public abstract class Character {
     private final double hitboxMultiplier;
 
     /**
+     * 치료 요청 대사를 반환한다.
+     *
+     * <p>반환값의 각 인덱스는 다음을 의미한다.</p>
+     *
+     * <ol>
+     * <li>0번째 인덱스 : 치명상일 때의 대사</li>
+     * <li>1번째 인덱스 : 체력이 절반 이하일 때의 대사</li>
+     * <li>2번째 인덱스 : 체력이 충분할 때의 대사</li>
+     * </ol>
+     *
+     * @return 치료 요청 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getReqHealMent();
+
+    /**
+     * 궁극기 상태 대사를 반환한다.
+     *
+     * <p>반환값의 각 인덱스는 다음을 의미한다.</p>
+     *
+     * <ol>
+     * <li>0번째 인덱스 : 궁극기 게이지가 0~89%일 때의 대사</li>
+     * <li>1번째 인덱스 : 궁극기 게이지가 90~99일 때의 대사</li>
+     * <li>2번째 인덱스 : 궁극기가 충전 상태일 때의 대사</li>
+     * </ol>
+     *
+     * @return 궁극기 상태 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getUltStateMent();
+
+    /**
+     * 집결 요청 대사를 반환한다.
+     *
+     * @return 집결 요청 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getReqRallyMent();
+
+    /**
+     * 궁극기 사용 대사를 반환한다.
+     *
+     * @return 궁극기 사용 대사
+     */
+    @NonNull
+    public abstract String getUltUseMent();
+
+    /**
+     * 전투원 처치 시 대사를 반환한다.
+     *
+     * @param characterType 피격자의 전투원 종류
+     * @return 전투원 처치 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getKillMent(@NonNull CharacterType characterType);
+
+    /**
+     * 사망 시 대사를 반환한다.
+     *
+     * @param characterType 공격자의 전투원 종류
+     * @return 전투원 사망 대사 목록
+     */
+    @NonNull
+    public abstract String @NonNull [] getDeathMent(@NonNull CharacterType characterType);
+
+    /**
      * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
      *
      * @param combatUser 대상 플레이어

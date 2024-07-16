@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -39,6 +40,61 @@ public final class Jager extends Marksman {
 
     private Jager() {
         super("예거", "DVJager", '\u32D2', 1000, 1.0, 1.0);
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqHealMent() {
+        return new String[]{
+                "젠장, 의무병 녀석들은 죄다 어디로 간거야!",
+                "여기는 예거, 부상이다. 속히 지원을 요청한다!",
+                "여기는 예거, 지원 바람."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getUltStateMent() {
+        return new String[]{
+                "충전 중. 시간이 필요하다.",
+                "거의 충전되었다.",
+                "큰거 한 방 준비 완료!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getReqRallyMent() {
+        return new String[]{
+                "여기는 예거, 집결을 요청한다!",
+                "뭐하나! 어서 여기로 모여!"
+        };
+    }
+
+    @Override
+    @NonNull
+    public String getUltUseMent() {
+        return "저놈들의 머리를 좀 식혀주지.";
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "별 거 없군.",
+                "체크 메이트.",
+                "사냥 완료."
+        };
+    }
+
+    @Override
+    @NonNull
+    public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
+        return new String[]{
+                "...제길!",
+                "젠장...",
+                "뒤를...부탁하지."
+        };
     }
 
     @Override

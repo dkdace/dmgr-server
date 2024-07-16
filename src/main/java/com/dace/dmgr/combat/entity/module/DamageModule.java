@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.CooldownUtil;
@@ -112,6 +113,8 @@ public class DamageModule {
                 color = ChatColor.YELLOW;
             else
                 color = ChatColor.GREEN;
+            if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
+                color = ChatColor.DARK_PURPLE;
 
             HologramUtil.editHologram(HEALTH_HOLOGRAM_ID + combatEntity, StringFormUtil.getProgressBar(current, max, color));
 
@@ -171,8 +174,18 @@ public class DamageModule {
      */
     private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage())
+        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
+                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.INVULNERABLE))
             return false;
+
+        if (damage == 0)
+            return true;
+
+        if (damageType == DamageType.IGNORE_DEFENSE || damageType == DamageType.FIXED) {
+            defenseMultiplier = 1;
+            if (damageType == DamageType.FIXED)
+                damageMultiplier = 1;
+        }
 
         damage *= (int) critMultiplier;
 
@@ -209,10 +222,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      */
     public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        double damageMultiplier = attacker == null || damageType == DamageType.AREA ?
-                1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
-        double defenseMultiplier = attacker == null ?
-                1 : defenseMultiplierStatus.getValue();
+        double damageMultiplier = attacker == null ? 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
+        double defenseMultiplier = defenseMultiplierStatus.getValue();
 
         return handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
     }

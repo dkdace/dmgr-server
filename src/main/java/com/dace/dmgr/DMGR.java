@@ -1,9 +1,6 @@
 package com.dace.dmgr;
 
-import com.dace.dmgr.command.LobbyCommand;
-import com.dace.dmgr.command.MenuCommand;
-import com.dace.dmgr.command.PlayerOptionCommand;
-import com.dace.dmgr.command.QuitCommand;
+import com.dace.dmgr.command.*;
 import com.dace.dmgr.command.test.DummyCommand;
 import com.dace.dmgr.command.test.GameTestCommand;
 import com.dace.dmgr.command.test.SelectCharCommand;
@@ -184,19 +181,28 @@ public class DMGR extends JavaPlugin {
      * 모든 명령어를 등록한다.
      */
     private void registerCommands() {
-        getCommand("스폰").setExecutor(new LobbyCommand());
-        getCommand("메뉴").setExecutor(new MenuCommand());
-        getCommand("설정").setExecutor(new PlayerOptionCommand());
-        getCommand("퇴장").setExecutor(new QuitCommand());
+        getCommand("스폰").setExecutor(LobbyCommand.getInstance());
+        getCommand("메뉴").setExecutor(MenuCommand.getInstance());
+        getCommand("퇴장").setExecutor(QuitCommand.getInstance());
+        getCommand("명령어").setExecutor(HelpCommand.getInstance());
+        getCommand("전적").setExecutor(StatCommand.getInstance());
+        getCommand("전적").setTabCompleter(StatCommand.Tab.getInstance());
+        getCommand("귓속말").setExecutor(DMCommand.getInstance());
+        getCommand("귓속말").setTabCompleter(DMCommand.Tab.getInstance());
+        getCommand("차단").setExecutor(BlockCommand.getInstance());
+        getCommand("차단").setTabCompleter(BlockCommand.Tab.getInstance());
+        getCommand("랭킹").setExecutor(RankingCommand.getInstance());
+        getCommand("랭킹").setTabCompleter(RankingCommand.Tab.getInstance());
+        getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
     }
 
     /**
      * 모든 테스트용 명령어를 등록한다.
      */
     private void registerTestCommands() {
-        getCommand("선택").setExecutor(new SelectCharCommand());
-        getCommand("소환").setExecutor(new DummyCommand());
-        getCommand("게임").setExecutor(new GameTestCommand());
+        getCommand("선택").setExecutor(SelectCharCommand.getInstance());
+        getCommand("소환").setExecutor(DummyCommand.getInstance());
+        getCommand("게임").setExecutor(GameTestCommand.getInstance());
     }
 
     /**

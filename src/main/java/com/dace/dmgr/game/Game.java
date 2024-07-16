@@ -258,6 +258,9 @@ public final class Game implements Disposable {
             gameUsers.forEach(gameUser -> {
                 SoundUtil.playNamedSound(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
+                gameUser.getUser().sendMessageInfo("");
+                gameUser.getUser().sendMessageInfo("§n'/전체'§r 또는 §n'/tc'§r를 입력하여 팀/전체 채팅을 전환할 수 있습니다.");
+                gameUser.getUser().sendMessageInfo("");
             });
         }
     }
@@ -453,7 +456,7 @@ public final class Game implements Disposable {
         }
 
         gameUser.getUser().sendMessageInfo(
-                "§7==============================" +
+                StringFormUtil.BAR +
                         "\n§d§l플레이 정보 {0}§l[{1}]" +
                         "\n" +
                         "\n{2}§l■ {2}점수 : {3} §l[{4}위]" +
@@ -467,7 +470,7 @@ public final class Game implements Disposable {
                         "\n" +
                         "\n§e▶ CP 획득 §7:: §6+{18}" +
                         "\n§e▶ 경험치 획득 §7:: §6+{19}" +
-                        "\n§7==============================",
+                        "\n" + StringFormUtil.BAR,
                 winColor, winText,
                 rankColors[scoreRank], (int) gameUser.getScore(), scoreRank + 1,
                 rankColors[damageRank], gameUser.getDamage(), damageRank + 1,
@@ -480,7 +483,7 @@ public final class Game implements Disposable {
                     "\n§d§l랭크" +
                             "\n" +
                             "\n§e▶ 랭크 점수 §7:: {0}{1}" +
-                            "\n§7==============================",
+                            "\n" + StringFormUtil.BAR,
                     winColor + (rankEarned >= 0 ? "+" : ""), rankEarned);
     }
 

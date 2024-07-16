@@ -95,7 +95,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Healable, Liv
             itemStack.setItemMeta(leatherArmorMeta);
         });
 
-        entity.getEquipment().setHelmet(new ItemBuilder(Material.STAINED_GLASS).setDamage((short) 15).build());
+        entity.getEquipment().setHelmet(new ItemBuilder(Material.STAINED_GLASS).setDamage((short) (teamIdentifier.equals("Dummy") ? 14 : 15)).build());
         entity.getEquipment().setChestplate(equipment.get(0));
         entity.getEquipment().setLeggings(equipment.get(1));
         entity.getEquipment().setBoots(equipment.get(2));
