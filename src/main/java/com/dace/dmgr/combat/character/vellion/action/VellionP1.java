@@ -64,7 +64,7 @@ public final class VellionP1 extends AbstractSkill {
                 return true;
             }, 1, 2));
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (isDurationFinished())
+                if (isDurationFinished() || !combatUser.getEntity().isFlying())
                     return false;
 
                 combatUser.getEntity().setFallDistance(0);
