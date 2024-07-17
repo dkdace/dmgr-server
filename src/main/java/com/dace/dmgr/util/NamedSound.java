@@ -72,6 +72,8 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2, 1.25),
             new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1.25)
     ),
+    /** 전투 - 피해 (화염) */
+    COMBAT_DAMAGE_BURNING(new DefinedSound(Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7, 1, 0.1)),
     /** 전투 - 근접 공격 - 사용 */
     COMBAT_MELEE_ATTACK_USE(new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.6, 1.1, 0.1)),
     /** 전투 - 근접 공격 - 블록 타격 */
@@ -451,6 +453,24 @@ public enum NamedSound {
             new DefinedSound("new.block.conduit.deactivate", 3, 0.6),
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.6),
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.8)
+    ),
+    /** 전투 - '인페르노' 무기 - 사용 */
+    COMBAT_INFERNO_WEAPON_USE(
+            new DefinedSound(Sound.ENTITY_HORSE_BREATHE, 1.5, 0.7),
+            new DefinedSound(Sound.ENTITY_HORSE_BREATHE, 1.5, 1.3),
+            new DefinedSound("new.block.soul_sand.fall", 1.5, 0.5)
+    ),
+    /** 전투 - '인페르노' 무기 - 사용 (화염탄) */
+    COMBAT_INFERNO_WEAPON_USE_FIREBALL(
+            new DefinedSound(Sound.ENTITY_SHULKER_SHOOT, 2, 1.5),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 2, 1.1),
+            new DefinedSound("random.gun.grenade", 2, 0.9)
+    ),
+    /** 전투 - '인페르노' 무기 - 폭발 (화염탄) */
+    COMBAT_INFERNO_WEAPON_FIREBALL_EXPLODE(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4),
+            new DefinedSound("random.gun_reverb2", 5, 1)
     );
 
     /** 지정된 효과음 목록 */

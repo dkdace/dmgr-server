@@ -1,14 +1,18 @@
 package com.dace.dmgr.combat.character.inferno;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Vanguard;
-import com.dace.dmgr.combat.character.arkace.action.*;
+import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
+import com.dace.dmgr.combat.character.inferno.action.InfernoWeapon;
+import com.dace.dmgr.combat.character.inferno.action.InfernoWeaponInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -18,6 +22,8 @@ import java.util.StringJoiner;
 
 /**
  * 전투원 - 인페르노 클래스.
+ *
+ * @see InfernoWeapon
  */
 public final class Inferno extends Vanguard {
     @Getter
@@ -85,8 +91,16 @@ public final class Inferno extends Vanguard {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
+        InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
+
+        int capacity = weapon.getReloadModule().getRemainingAmmo();
+
         StringJoiner text = new StringJoiner("    ");
 
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, InfernoWeaponInfo.CAPACITY,
+                10, '■');
+
+        text.add(weaponDisplay);
         text.add("");
 
         return text.toString();
@@ -104,7 +118,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
+        return !((InfernoWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
     }
 
     @Override
@@ -119,8 +133,8 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public ArkaceWeaponInfo getWeaponInfo() {
-        return ArkaceWeaponInfo.getInstance();
+    public InfernoWeaponInfo getWeaponInfo() {
+        return InfernoWeaponInfo.getInstance();
     }
 
     @Override
