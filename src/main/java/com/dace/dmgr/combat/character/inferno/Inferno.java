@@ -7,10 +7,7 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Vanguard;
 import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
-import com.dace.dmgr.combat.character.inferno.action.InfernoA1;
-import com.dace.dmgr.combat.character.inferno.action.InfernoA1Info;
-import com.dace.dmgr.combat.character.inferno.action.InfernoWeapon;
-import com.dace.dmgr.combat.character.inferno.action.InfernoWeaponInfo;
+import com.dace.dmgr.combat.character.inferno.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -28,6 +25,7 @@ import java.util.StringJoiner;
  * 전투원 - 인페르노 클래스.
  *
  * @see InfernoWeapon
+ * @see InfernoP1
  * @see InfernoA1
  */
 public final class Inferno extends Vanguard {
@@ -97,8 +95,12 @@ public final class Inferno extends Vanguard {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
+        InfernoP1 skillp1 = (InfernoP1) combatUser.getSkill(InfernoP1Info.getInstance());
+        InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
+        double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
+        double skillp1MaxDuration = InfernoP1Info.DURATION / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
@@ -107,6 +109,11 @@ public final class Inferno extends Vanguard {
 
         text.add(weaponDisplay);
         text.add("");
+        if (combatUser.getStatusEffectModule().hasStatusEffect(skillp1buff)) {
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration,
+                    skillp1MaxDuration, 10, '■');
+            text.add(skillp1Display);
+        }
 
         return text.toString();
     }
@@ -151,6 +158,8 @@ public final class Inferno extends Vanguard {
     @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return InfernoP1Info.getInstance();
             default:
                 return null;
         }

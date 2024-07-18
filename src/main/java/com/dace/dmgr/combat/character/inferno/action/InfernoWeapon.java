@@ -195,14 +195,18 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
+            ParticleUtil.play(Particle.DRIP_LAVA, location, 2, 0.07, 0.07, 0.07, 0);
             return false;
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20, DamageType.NORMAL, null,
-                    false, true))
+                    false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, InfernoWeaponInfo.FIRE_DURATION);
+
+                combatUser.useAction(ActionKey.PERIODIC_1);
+            }
 
             ParticleUtil.play(Particle.SMOKE_NORMAL, location, 3, 0.2, 0.2, 0.2, 0.05);
 
@@ -230,8 +234,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location,
-                    false, true);
+            if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location,
+                    false, true))
+                combatUser.useAction(ActionKey.PERIODIC_1);
 
             return false;
         }
@@ -272,6 +277,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, burning);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
                             .multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK));
+
+                    if (target != combatUser)
+                        combatUser.useAction(ActionKey.PERIODIC_1);
                 }
 
                 return !(target instanceof Barrier);
