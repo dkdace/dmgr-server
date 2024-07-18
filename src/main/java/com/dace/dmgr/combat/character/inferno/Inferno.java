@@ -7,6 +7,8 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Vanguard;
 import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
+import com.dace.dmgr.combat.character.inferno.action.InfernoA1;
+import com.dace.dmgr.combat.character.inferno.action.InfernoA1Info;
 import com.dace.dmgr.combat.character.inferno.action.InfernoWeapon;
 import com.dace.dmgr.combat.character.inferno.action.InfernoWeaponInfo;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -26,6 +28,7 @@ import java.util.StringJoiner;
  * 전투원 - 인페르노 클래스.
  *
  * @see InfernoWeapon
+ * @see InfernoA1
  */
 public final class Inferno extends Vanguard {
     @Getter
@@ -135,7 +138,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
+        return combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -157,6 +160,8 @@ public final class Inferno extends Vanguard {
     @Nullable
     public ActiveSkillInfo getActiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return InfernoA1Info.getInstance();
             case 4:
                 return ArkaceUltInfo.getInstance();
             default:

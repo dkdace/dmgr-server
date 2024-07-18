@@ -170,10 +170,10 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
             super.onTick(combatEntity, provider, i);
 
-            if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker)
-                if (((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND * 10 / 20,
-                        DamageType.NORMAL, null, false, true))
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
+            if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker &&
+                    ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND * 10 / 20,
+                            DamageType.NORMAL, null, false, true))
+                SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
         }
     }
 

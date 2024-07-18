@@ -476,6 +476,19 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 3, 0.8),
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4),
             new DefinedSound("random.gun_reverb2", 5, 1)
+    ),
+    /** 전투 - '인페르노' 액티브 1번 - 사용 */
+    COMBAT_INFERNO_A1_USE(
+            new DefinedSound(Sound.ENTITY_WITHER_SHOOT, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 3, 0.8),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.6)
+    ),
+    /** 전투 - '인페르노' 액티브 1번 - 착지 */
+    COMBAT_INFERNO_A1_LAND(
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+            new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.7),
+            new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.5),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.3)
     );
 
     /** 지정된 효과음 목록 */
