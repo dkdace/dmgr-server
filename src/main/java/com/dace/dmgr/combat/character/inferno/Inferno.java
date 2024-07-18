@@ -12,6 +12,8 @@ import com.dace.dmgr.combat.character.inferno.action.InfernoWeaponInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -104,6 +106,11 @@ public final class Inferno extends Vanguard {
         text.add("");
 
         return text.toString();
+    }
+
+    @Override
+    public void onFootstep(@NonNull CombatUser combatUser, double volume) {
+        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
     }
 
     @Override

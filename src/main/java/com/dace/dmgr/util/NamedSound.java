@@ -454,6 +454,11 @@ public enum NamedSound {
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.6),
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.8)
     ),
+    /** 전투 - '인페르노' 발소리 */
+    COMBAT_INFERNO_FOOTSTEP(
+            new DefinedSound("new.entity.panda.step", 0.4, 0.9, 0.1),
+            new DefinedSound(Sound.ENTITY_LLAMA_STEP, 0.3, 0.7, 0.1)
+    ),
     /** 전투 - '인페르노' 무기 - 사용 */
     COMBAT_INFERNO_WEAPON_USE(
             new DefinedSound(Sound.ENTITY_HORSE_BREATHE, 1.5, 0.7),
