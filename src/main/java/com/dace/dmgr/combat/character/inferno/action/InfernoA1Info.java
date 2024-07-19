@@ -11,9 +11,9 @@ public final class InfernoA1Info extends ActiveSkillInfo {
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
     /** 수직 이동 강도 */
-    public static final double PUSH_UP = 0.6;
+    public static final double PUSH_UP = 0.5;
     /** 수평 이동 강도 */
-    public static final double PUSH_SIDE = 1.8;
+    public static final double PUSH_SIDE = 1.6;
     /** 피해량 */
     public static final int DAMAGE = 200;
     /** 피해 범위 (단위: 블록) */
