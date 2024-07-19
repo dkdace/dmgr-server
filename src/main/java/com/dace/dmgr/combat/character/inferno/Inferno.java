@@ -27,6 +27,7 @@ import java.util.StringJoiner;
  * @see InfernoWeapon
  * @see InfernoP1
  * @see InfernoA1
+ * @see InfernoA2
  */
 public final class Inferno extends Vanguard {
     @Getter
@@ -171,6 +172,8 @@ public final class Inferno extends Vanguard {
         switch (number) {
             case 1:
                 return InfernoA1Info.getInstance();
+            case 2:
+                return InfernoA2Info.getInstance();
             case 4:
                 return ArkaceUltInfo.getInstance();
             default:

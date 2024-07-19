@@ -489,6 +489,16 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.7),
             new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.5),
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.3)
+    ),
+    /** 전투 - '인페르노' 액티브 2번 - 사용 */
+    COMBAT_INFERNO_A2_USE(
+            new DefinedSound(Sound.BLOCK_PISTON_CONTRACT, 2, 0.5),
+            new DefinedSound(Sound.BLOCK_PISTON_CONTRACT, 2, 0.6)
+    ),
+    /** 전투 - '인페르노' 액티브 2번 - 틱 효과음 */
+    COMBAT_INFERNO_A2_TICK(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.55, 0.1),
+            new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
     );
 
     /** 지정된 효과음 목록 */
