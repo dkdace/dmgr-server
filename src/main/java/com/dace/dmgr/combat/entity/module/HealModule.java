@@ -84,7 +84,7 @@ public final class HealModule extends DamageModule {
             return false;
 
         double healMultiplier = healMultiplierStatus.getValue();
-        int finalAmount = Math.max(0, (int) (amount * (1 + healMultiplier)));
+        int finalAmount = Math.max(0, (int) (amount * healMultiplier));
         if (getHealth() + finalAmount > getMaxHealth())
             finalAmount = getMaxHealth() - getHealth();
 
