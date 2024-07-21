@@ -64,8 +64,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     return;
                 }
 
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
-
                 Location loc = combatUser.getEntity().getLocation();
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
                 new InfernoWeaponRProjectile().shoot(dir);
@@ -82,7 +80,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 }
 
                 setCooldown();
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
 
                 Location loc = combatUser.getEntity().getLocation();
                 new InfernoWeaponLProjectile().shoot();
