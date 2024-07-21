@@ -20,6 +20,28 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 public final class HealModule extends DamageModule {
+    /** 회복량 배수 기본값 */
+    public static final double DEFAULT_VALUE = 1;
+    /** 회복량 배수 값 */
+    @NonNull
+    private final AbilityStatus healMultiplierStatus;
+
+    /**
+     * 치유 모듈 인스턴스를 생성한다.
+     *
+     * @param combatEntity      대상 엔티티
+     * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
+     * @param isShowHealthBar   생명력 홀로그램 표시 여부
+     * @param maxHealth         최대 체력
+     * @param defenseMultiplier 방어력 배수 기본값
+     * @param healMultiplier    회복량 배수 기본값
+     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     */
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier, double healMultiplier) {
+        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier);
+        this.healMultiplierStatus = new AbilityStatus(healMultiplier);
+    }
+
     /**
      * 치유 모듈 인스턴스를 생성한다.
      *
@@ -31,7 +53,7 @@ public final class HealModule extends DamageModule {
      * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier) {
-        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier);
+        this(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier, DEFAULT_VALUE);
     }
 
     /**
@@ -44,7 +66,7 @@ public final class HealModule extends DamageModule {
      * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth) {
-        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth);
+        this(combatEntity, isUltProvider, isShowHealthBar, maxHealth, DamageModule.DEFAULT_VALUE);
     }
 
     /**
@@ -61,7 +83,8 @@ public final class HealModule extends DamageModule {
         if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
             return false;
 
-        int finalAmount = amount;
+        double healMultiplier = healMultiplierStatus.getValue();
+        int finalAmount = Math.max(0, (int) (amount * (1 + healMultiplier)));
         if (getHealth() + finalAmount > getMaxHealth())
             finalAmount = getMaxHealth() - getHealth();
 
