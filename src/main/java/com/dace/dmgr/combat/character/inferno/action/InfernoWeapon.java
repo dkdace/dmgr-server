@@ -193,12 +193,13 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) > 5)
+            double distance = location.distance(combatUser.getEntity().getEyeLocation());
+            if (distance > 5)
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.1);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.25);
+            ParticleUtil.play(Particle.FLAME, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.3 - distance * 0.1);
+            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.45);
         }
 
         @Override
