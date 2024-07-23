@@ -58,13 +58,15 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.setGlobalCooldown((int) SiliaA1Info.DURATION);
         combatUser.playMeleeAttackAnimation(-3, 6, true);
 
-        Location location = combatUser.getEntity().getLocation();
+        Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
+
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A1_USE, location);
+
         HashSet<CombatEntity> targets = new HashSet<>();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-            combatUser.push(loc.getDirection().multiply(2.5), true);
+            combatUser.push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
 
             new SiliaA1Attack(targets).shoot();
 
@@ -72,9 +74,9 @@ public final class SiliaA1 extends ActiveSkill {
 
             TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-                for (Location trailLoc : LocationUtil.getLine(loc, loc2, 0.3)) {
-                    ParticleUtil.play(Particle.CRIT, trailLoc, 3, 0.02, 0.02, 0.02, 0);
-                    ParticleUtil.play(Particle.END_ROD, trailLoc, 1, 0.02, 0.02, 0.02, 0);
+                for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3)) {
+                    ParticleUtil.play(Particle.CRIT, loc3, 3, 0.02, 0.02, 0.02, 0);
+                    ParticleUtil.play(Particle.END_ROD, loc3, 1, 0.02, 0.02, 0.02, 0);
                 }
             }, 1));
 
@@ -93,6 +95,7 @@ public final class SiliaA1 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         if (!isDurationFinished())
             setDuration(0);
         combatUser.getWeapon().setVisible(true);
@@ -108,11 +111,11 @@ public final class SiliaA1 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            for (int i = 0; i < 12; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
-                Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
-                Vector axis = VectorUtil.getYawAxis(loc);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
+            Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
+            Vector axis = VectorUtil.getYawAxis(loc);
 
+            for (int i = 0; i < 12; i++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 15 * (i - 5.5));
                 for (int j = 0; j < 3; j++) {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
@@ -125,8 +128,8 @@ public final class SiliaA1 extends ActiveSkill {
                     }
                 }
             }
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, SiliaA1Info.RADIUS, condition);
 
+            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, SiliaA1Info.RADIUS, condition);
             new SiliaA1Area(condition, areaTargets).emit(location);
         }
 

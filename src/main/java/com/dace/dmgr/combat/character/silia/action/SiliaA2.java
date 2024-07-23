@@ -56,14 +56,13 @@ public final class SiliaA2 extends ActiveSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
-            Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
-            Vector axis = VectorUtil.getRollAxis(location);
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
+            Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
+            Vector axis = VectorUtil.getRollAxis(loc);
 
             for (int j = 0; j < 6; j++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, i * 23 + j * 60).multiply(1.6 - i * 0.2);
-                Location loc = location.clone().add(vec);
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, vec.getX(), vec.getY(), vec.getZ(), 0.2);
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec), 0, vec.getX(), vec.getY(), vec.getZ(), 0.2);
             }
 
             return true;
@@ -102,14 +101,16 @@ public final class SiliaA2 extends ActiveSkill {
             Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
             Vector axis = VectorUtil.getRollAxis(location);
 
-            Vector vec1 = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, i * 12), 8);
-            Vector vec2 = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, 180 + i * 12), 8);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location.clone().add(vec1), 0, vec1.getX(), vec1.getY(), vec1.getZ(), 0.25);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location.clone().add(vec2), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 0.25);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec1), 3,
-                    0.3, 0.3, 0.3, 255, 255, 255);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec2), 3,
-                    0.3, 0.3, 0.3, 255, 255, 255);
+            int angle = i * 12;
+            for (int j = 0; j < 2; j++) {
+                angle += 180;
+                Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
+                Location loc = location.clone().add(vec);
+
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, vec.getX(), vec.getY(), vec.getZ(), 0.25);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 3,
+                        0.3, 0.3, 0.3, 255, 255, 255);
+            }
         }
 
         @Override
@@ -133,19 +134,19 @@ public final class SiliaA2 extends ActiveSkill {
 
             if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
                     SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                target.getKnockbackModule().knockback(new Vector(0, 0.8, 0), true);
+                target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
                 Location loc = target.getEntity().getLocation();
                 loc.setPitch(0);
                 loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
-                for (Location trailLoc : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
-                    ParticleUtil.play(Particle.END_ROD, trailLoc.add(0, 1, 0), 3, 0, 0, 0, 0.05);
+                for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
+                    ParticleUtil.play(Particle.END_ROD, loc2.add(0, 1, 0), 3, 0, 0, 0, 0.05);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, location);
 
-                if (target instanceof Living && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc.clone().add(0, target.getEntity().getHeight() / 2, 0)) &&
+                if (target instanceof Living && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()) &&
                         (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                     combatUser.getUser().teleport(loc);
-                    combatUser.push(new Vector(0, 0.8, 0), true);
+                    combatUser.push(new Vector(0, SiliaA2Info.PUSH, 0), true);
                     if (target instanceof CombatUser)
                         combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
                 }

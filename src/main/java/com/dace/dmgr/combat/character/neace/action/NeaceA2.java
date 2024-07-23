@@ -55,8 +55,7 @@ public final class NeaceA2 extends ActiveSkill {
                 if (isDurationFinished())
                     return false;
 
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                        combatUser.getEntity().getLocation().add(0, combatUser.getEntity().getHeight() / 2, 0), 3,
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 3,
                         1, 1.5, 1, 140, 255, 245);
                 if (i < 12)
                     playTickEffect(i);
@@ -64,7 +63,7 @@ public final class NeaceA2 extends ActiveSkill {
                 return true;
             }, isCancelled -> combatUser.getWeapon().setGlowing(false), 1));
         } else
-            setCooldown();
+            setDuration(0);
     }
 
     @Override
@@ -78,17 +77,16 @@ public final class NeaceA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        double angle = i * 14;
-
         Location loc = combatUser.getEntity().getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(1.3);
         Vector axis = VectorUtil.getYawAxis(loc);
 
+        long angle = i * 14;
         for (int j = 0; j < 4; j++) {
-            double up = (i * 4 + j) * 0.05;
             angle += 90;
+            double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 6,
@@ -96,6 +94,9 @@ public final class NeaceA2 extends ActiveSkill {
         }
     }
 
+    /**
+     * 축복 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class NeaceA2Buff implements StatusEffect {
         static final NeaceA2Buff instance = new NeaceA2Buff();

@@ -18,6 +18,8 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.text.MessageFormat;
+
 public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     /** 대상 초기화 딜레이 쿨타임 ID */
     private static final String TARGET_RESET_DELAY_COOLDOWN_ID = "TargetResetDelay";
@@ -72,35 +74,48 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         return;
                 }
 
-                boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
                 CooldownUtil.setCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
-
-                target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
-                if (isAmplifying) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
-                    if (target instanceof CombatUser)
-                        ((CombatUser) target).addDamageSupport(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
-                }
-
-                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
-                combatUser.getUser().sendTitle("", (isAmplifying ? "§b" : "§a") + TextIcon.HEAL + " §f치유 중 : §e" + target.getName(),
-                        0, 5, 5);
-
-                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
+                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
-                Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-                for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.8)) {
-                    if (isAmplifying)
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                                140, 255, 245);
-                    else
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                                255, 255, 140);
-                }
+                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
+                combatUser.getUser().sendTitle("", MessageFormat.format("{0}{1} §f치유 중 : {2}§e{3}",
+                                (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished() ? "§a" : "§b"),
+                                TextIcon.HEAL,
+                                (target instanceof CombatUser ? ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : ""),
+                                target.getName()),
+                        0, 5, 5);
+
+                healTarget(target);
 
                 break;
             }
+        }
+    }
+
+    /**
+     * 대상에게 치유 광선을 사용한다.
+     *
+     * @param target 치유 대상
+     */
+    void healTarget(Healable target) {
+        boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
+
+        target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
+        if (isAmplifying) {
+            target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
+            if (target instanceof CombatUser)
+                ((CombatUser) target).addDamageSupport(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+        }
+
+        Location location = combatUser.getArmLocation(true);
+        for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8)) {
+            if (isAmplifying)
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
+                        140, 255, 245);
+            else
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
+                        255, 255, 140);
         }
     }
 
@@ -119,15 +134,11 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             NeaceWeapon.this.target = (Healable) target;
 
-            TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                Location targetLoc = NeaceWeapon.this.target.getNearestLocationOfHitboxes(loc);
-
-                return target.canBeTargeted() && !target.isDisposed() &&
-                        CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&
-                        CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0 &&
-                        targetLoc.distance(loc) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE;
-            }, isCancelled -> NeaceWeapon.this.target = null, 1));
+            TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed() &&
+                    CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&
+                    CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0 &&
+                    combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
+                    isCancelled -> NeaceWeapon.this.target = null, 1));
 
             return false;
         }

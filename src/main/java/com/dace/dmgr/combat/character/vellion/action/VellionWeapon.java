@@ -40,23 +40,17 @@ public final class VellionWeapon extends AbstractWeapon {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                setCooldown();
-                combatUser.playMeleeAttackAnimation(-4, 8, true);
+        setCooldown();
+        combatUser.playMeleeAttackAnimation(-4, 8, true);
 
-                new VellionWeaponProjectile().shoot();
+        new VellionWeaponProjectile().shoot();
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_WEAPON_USE, combatUser.getEntity().getLocation());
-
-                break;
-            }
-        }
+        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_WEAPON_USE, combatUser.getEntity().getLocation());
     }
 
     private final class VellionWeaponProjectile extends Projectile {
         private VellionWeaponProjectile() {
-            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(13).size(VellionWeaponInfo.SIZE)
+            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(12).size(VellionWeaponInfo.SIZE)
                     .maxDistance(VellionWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 

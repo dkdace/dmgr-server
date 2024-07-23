@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 public final class NeaceA1 extends ActiveSkill {
     private final NeaceA1Mark neaceA1Mark = new NeaceA1Mark();
@@ -50,6 +51,9 @@ public final class NeaceA1 extends ActiveSkill {
         return false;
     }
 
+    /**
+     * 치유 표식 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class NeaceA1Mark implements StatusEffect {
         private int healAmount = 0;
@@ -77,17 +81,15 @@ public final class NeaceA1 extends ActiveSkill {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     1, 0, 0, 0, 215, 255, 130);
 
-            if (!(combatEntity instanceof Healable))
+            if (!(combatEntity instanceof Healable) || !(provider instanceof Healer))
                 return;
             if (((Healable) combatEntity).getDamageModule().getHealth() == ((Healable) combatEntity).getDamageModule().getMaxHealth())
                 return;
+
             if (healAmount >= NeaceA1Info.MAX_HEAL) {
                 combatEntity.getStatusEffectModule().removeStatusEffect(this);
                 return;
             }
-
-            if (!(provider instanceof Healer))
-                return;
 
             if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, NeaceA1Info.HEAL_PER_SECOND / 20, true))
                 healAmount += NeaceA1Info.HEAL_PER_SECOND / 20;
@@ -121,26 +123,31 @@ public final class NeaceA1 extends ActiveSkill {
             target.getStatusEffectModule().applyStatusEffect(combatUser, neaceA1Mark, NeaceA1Info.DURATION);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A1_USE, combatUser.getEntity().getLocation());
+            playUseEffect(target);
 
-            Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-            for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.4)) {
+            return false;
+        }
+
+        private void playUseEffect(@NotNull Damageable target) {
+            Location location = combatUser.getArmLocation(true);
+            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,
                         215, 255, 130);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0);
             }
 
-            Location location2 = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 1.5);
+            Location location2 = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
             Vector vector = VectorUtil.getYawAxis(location2).multiply(0.8);
             Vector axis = VectorUtil.getRollAxis(location2);
 
             for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 5; j++) {
-                    Vector vec1 = VectorUtil.getRotatedVector(vector, axis, i * 10 + j * 72).multiply(1 + i * 0.2);
-                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, i * -10 + j * 72).multiply(1 + i * 0.2);
-                    Location loc1 = location2.clone().add(vec1);
-                    Location loc2 = location2.clone().add(vec2);
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
+                int angle = i * 10;
+
+                for (int j = 0; j < 10; j++) {
+                    angle += 72;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
+
+                    ParticleUtil.play(Particle.VILLAGER_HAPPY, location2.clone().add(vec), 2, 0, 0, 0, 0);
                 }
             }
             for (int i = 0; i < 7; i++) {
@@ -149,8 +156,6 @@ public final class NeaceA1 extends ActiveSkill {
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
             }
-
-            return false;
         }
 
         @Override

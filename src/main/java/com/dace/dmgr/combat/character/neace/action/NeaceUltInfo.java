@@ -10,6 +10,8 @@ public final class NeaceUltInfo extends UltimateSkillInfo {
     public static final int COST = 6000;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.8 * 20);
+    /** 시전 중 이동속도 감소량 */
+    public static final int READY_SLOW = 70;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) 12 * 20;
     @Getter

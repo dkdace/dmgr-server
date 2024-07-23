@@ -62,11 +62,11 @@ public final class QuakerA3 extends ActiveSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            for (int j = 0; j < i; j++) {
-                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
-                Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(loc);
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
+            Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
+            Vector axis = VectorUtil.getPitchAxis(loc);
 
+            for (int j = 0; j < i; j++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (j - 2));
                 new QuakerA3Effect().shoot(loc.add(vec), vec);
             }
@@ -102,15 +102,11 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            Location loc1 = LocationUtil.getLocationFromOffset(location, -0.25, 0, 0);
-            Location loc2 = LocationUtil.getLocationFromOffset(location, 0, 0, 0);
-            Location loc3 = LocationUtil.getLocationFromOffset(location, 0.25, 0, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc1, 2, 0.12, 0.12, 0.12,
-                    200, 200, 200);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 2, 0.12, 0.12, 0.12,
-                    200, 200, 200);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc3, 2, 0.12, 0.12, 0.12,
-                    200, 200, 200);
+            for (int i = 0; i < 3; i++) {
+                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.12, 0.12, 0.12,
+                        200, 200, 200);
+            }
         }
 
         @Override
@@ -125,12 +121,10 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            Location loc1 = LocationUtil.getLocationFromOffset(location, -0.25, 0, 0);
-            Location loc2 = LocationUtil.getLocationFromOffset(location, 0, 0, 0);
-            Location loc3 = LocationUtil.getLocationFromOffset(location, 0.25, 0, 0);
-            ParticleUtil.play(Particle.CRIT, loc1, 3, 0.07, 0.07, 0.07, 0);
-            ParticleUtil.play(Particle.CRIT, loc2, 3, 0.07, 0.07, 0.07, 0);
-            ParticleUtil.play(Particle.CRIT, loc3, 3, 0.07, 0.07, 0.07, 0);
+            for (int i = 0; i < 3; i++) {
+                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
+                ParticleUtil.play(Particle.CRIT, loc, 3, 0.07, 0.07, 0.07, 0);
+            }
         }
     }
 
@@ -144,10 +138,10 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            for (int i = 0; i < 8; i++) {
-                Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(location);
+            Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
+            Vector axis = VectorUtil.getPitchAxis(location);
 
+            for (int i = 0; i < 8; i++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (i - 2)).multiply(0.6);
                 Location loc = location.clone().add(vec);
                 new QuakerA3Effect().shoot(loc, vec);
@@ -158,7 +152,6 @@ public final class QuakerA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, location);
 
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, size, condition);
-
             new QuakerA3Area(condition, areaTargets).emit(location);
         }
 

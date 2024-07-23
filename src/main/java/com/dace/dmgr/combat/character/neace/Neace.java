@@ -52,8 +52,7 @@ public final class Neace extends Support {
      */
     public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
         return target instanceof Healable && !target.isEnemy(combatUser) &&
-                target != combatUser && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(),
-                target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0));
+                target != combatUser && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation());
     }
 
     @Override

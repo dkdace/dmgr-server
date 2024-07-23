@@ -49,7 +49,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
         /** 피해량 */
         int DAMAGE = 250;
         /** 피해량 감소 시작 거리 (단위: 블록) */
-        int DAMAGE_DISTANCE = 30;
+        int DAMAGE_WEAKENING_DISTANCE = 30;
         /** 장탄수 */
         int CAPACITY = 6;
         /** 확대 레벨 */

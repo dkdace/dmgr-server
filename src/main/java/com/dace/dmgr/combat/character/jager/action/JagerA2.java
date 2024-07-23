@@ -8,7 +8,10 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporal.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -67,8 +70,7 @@ public final class JagerA2 extends ActiveSkill {
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                    combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
+            Location loc = combatUser.getArmLocation(true);
             new JagerA2Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
@@ -181,27 +183,15 @@ public final class JagerA2 extends ActiveSkill {
          * 덫 표시 효과를 재생한다.
          */
         private void playTickEffect() {
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.4, 0, 0.6), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.55, 0, 0.4), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.4, 0, 0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.55, 0, 0), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.4, 0, -0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.55, 0, -0.4), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0.4, 0, -0.6), 1, 0, 0, 0, 0);
-
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.4, 0, 0.6), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.55, 0, 0.4), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.4, 0, 0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.55, 0, 0), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.4, 0, -0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.55, 0, -0.4), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(-0.4, 0, -0.6), 1, 0, 0, 0, 0);
-
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, 0.4), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, 0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, 0), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, -0.2), 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, -0.4), 1, 0, 0, 0, 0);
+            for (int i = 0; i < 7; i++) {
+                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2), 1,
+                        0, 0, 0, 0);
+                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2), 1,
+                        0, 0, 0, 0);
+            }
+            for (int i = 0; i < 5; i++)
+                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, 0.4 - i * 0.2), 1,
+                        0, 0, 0, 0);
         }
 
         /**
@@ -210,14 +200,14 @@ public final class JagerA2 extends ActiveSkill {
          * @param target 대상 엔티티
          */
         private void onCatchEnemy(@NonNull Damageable target) {
-            if (!target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
-                    false, true))
-                return;
+            if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
+                    false, true)) {
+                target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
+                if (target instanceof CombatUser)
+                    combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
+            }
 
-            target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
-            if (target instanceof CombatUser)
-                combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
 
             dispose();
         }
@@ -244,7 +234,8 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                             boolean isCrit, boolean isUlt) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             CombatUtil.playBreakEffect(location, entity, damage);
         }

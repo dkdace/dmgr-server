@@ -267,7 +267,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                             boolean isCrit, boolean isUlt) {
             addStateValue(-damage);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);

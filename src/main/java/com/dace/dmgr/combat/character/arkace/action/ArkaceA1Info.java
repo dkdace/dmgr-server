@@ -12,9 +12,9 @@ public final class ArkaceA1Info extends ActiveSkillInfo {
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.5 * 20);
     /** 피해량 (폭발) */
-    public static final int DAMAGE_EXPLODE = 100;
+    public static final int DAMAGE_EXPLODE = 120;
     /** 피해량 (직격) */
-    public static final int DAMAGE_DIRECT = 50;
+    public static final int DAMAGE_DIRECT = 40;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
     /** 피해 범위 (단위: 블록) */

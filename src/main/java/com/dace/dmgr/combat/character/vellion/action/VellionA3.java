@@ -128,9 +128,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A3_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-            for (Location trailLoc : LocationUtil.getLine(loc, location, 0.7))
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0,
+            Location loc = combatUser.getArmLocation(true);
+            for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
                         156, 60, 130);
             ParticleUtil.play(Particle.SMOKE_LARGE, location, 30, 0.5, 0.3, 0.5, 0.15);
             ParticleUtil.play(Particle.SPELL_WITCH, location, 70, 1, 0.5, 1, 0.2);
@@ -162,8 +162,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 3, 0.4, 0, 0.4,
                     156, 60, 130);
-            for (int j = 0; j < 2; j++)
-                playTickEffect(i * 2 + j, loc);
+            playTickEffect(i, loc);
 
             return true;
         }, 1, VellionA3Info.DURATION));
@@ -181,35 +180,32 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         Vector vector = VectorUtil.getRollAxis(location);
         Vector axis = VectorUtil.getYawAxis(location);
 
-        double distance = i * 0.2 % 5;
-        long angle = i * 3;
+        for (int j = 0; j < 2; j++) {
+            long index = i * 2 + j;
+            long angle = index * 3;
+            double distance = index * 0.2 % 5;
 
-        for (int j = 0; j < 6; j++) {
-            angle += distance > 3 ? 90 : 60;
+            for (int k = 0; k < 12; k++) {
+                angle += distance > 3 ? 90 : 60;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(distance);
+                Location loc = location.clone().add(vec);
 
-            Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
-            Vector vec2 = VectorUtil.getRotatedVector(vector, axis, -angle);
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, vec.getX(), 0.4, vec.getZ(), 0.1);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
+                        0, 0, 0, 156, 60, 130);
+            }
+            double distance2 = index * 0.1 % 2.5;
+            long angle2 = index * 44;
+            for (int k = 0; k < 3; k++) {
+                angle2 += 120;
 
-            ParticleUtil.play(Particle.SMOKE_NORMAL, location.clone().add(vec1.clone().multiply(distance)), 0,
-                    vec1.getX(), 0.4, vec1.getZ(), 0.1);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, location.clone().subtract(vec2.clone().multiply(distance)), 0,
-                    vec2.getZ(), 0.4, vec2.getZ(), 0.1);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec1.clone().multiply(distance)), 1,
-                    0, 0, 0, 156, 60, 130);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().subtract(vec2.clone().multiply(distance)), 1,
-                    0, 0, 0, 156, 60, 130);
-        }
+                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle2);
+                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
+                Vector dir = LocationUtil.getDirection(location.clone().add(vec1), location.clone().add(vec2));
 
-        double distance2 = i * 0.1 % 2.5;
-        long angle2 = i * 44;
-        for (int j = 0; j < 3; j++) {
-            angle2 += 120;
-
-            Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle2);
-            Vector vec2 = LocationUtil.getDirection(location.clone().add(vec1), location.clone().add(VectorUtil.getRotatedVector(vector, axis, angle2 + 20)));
-
-            ParticleUtil.play(Particle.SMOKE_LARGE, location.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
-                    0, vec2.getX(), distance2 * 0.1, vec2.getZ(), 0.3);
+                ParticleUtil.play(Particle.SMOKE_LARGE, location.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
+                        0, dir.getX(), distance2 * 0.1, dir.getZ(), 0.3);
+            }
         }
     }
 

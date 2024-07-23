@@ -52,8 +52,7 @@ public final class SiliaUlt extends UltimateSkill {
 
         float yaw = combatUser.getEntity().getLocation().getYaw();
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
-            playUseTickEffect(i, loc, yaw);
+            playUseTickEffect(i, yaw);
 
             return true;
         }, isCancelled -> {
@@ -78,33 +77,36 @@ public final class SiliaUlt extends UltimateSkill {
     /**
      * 사용 시 효과를 재생한다.
      *
-     * @param i        인덱스
-     * @param location 사용 위치
-     * @param locYaw   원본 Yaw 값
+     * @param i   인덱스
+     * @param yaw 원본 Yaw 값
      */
-    private void playUseTickEffect(long i, Location location, float locYaw) {
+    private void playUseTickEffect(long i, float yaw) {
+        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+
         for (int j = 0; j < 6; j++) {
             long index = i * 6 + j;
             double forward = -1;
-            float yaw;
+            double angle;
 
             if (i > 11) {
                 long subIndex = (index - 12 * 6);
                 forward += 0.0025 * subIndex;
-                yaw = index * 1.7F - subIndex * 4;
-                location.setPitch(index * 4 + subIndex);
+                angle = index * 1.7 - subIndex * 4;
+                loc.setPitch(index * 4 + subIndex);
             } else {
-                yaw = index * 1.7F;
-                location.setPitch(index * 4);
+                angle = index * 1.7;
+                loc.setPitch(index * 4);
             }
-            location.setYaw(locYaw + yaw);
+            loc.setYaw((float) (yaw + angle));
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, LocationUtil.getLocationFromOffset(location, 0, 0, forward),
-                    2, 0.15, 0.15, 0.15, 255, 255, 255);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, LocationUtil.getLocationFromOffset(location, 0, 0, forward - 0.4),
-                    2, 0.15, 0.15, 0.15, 255, 255, 255);
-            ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(location, 0, 0, forward - 0.8), 2,
-                    0.08, 0.08, 0.08, 0.08);
+            for (int k = 0; k < 3; k++) {
+                Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, forward - 0.4 * k);
+                if (k == 2)
+                    ParticleUtil.play(Particle.CRIT, loc2, 2, 0.08, 0.08, 0.08, 0.08);
+                else
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 2,
+                            0.15, 0.15, 0.15, 255, 255, 255);
+            }
         }
     }
 

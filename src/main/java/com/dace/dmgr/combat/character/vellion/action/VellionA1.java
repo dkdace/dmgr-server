@@ -78,7 +78,7 @@ public final class VellionA1 extends ActiveSkill {
         }, isCancelled -> {
             onCancelled();
 
-            Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
+            Location loc = combatUser.getArmLocation(true);
             ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, loc);
             summonEntity = new VellionA1Entity(armorStand, combatUser);
             summonEntity.activate();
@@ -114,29 +114,30 @@ public final class VellionA1 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, -0.4, 1.5);
+        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
         Vector vector = VectorUtil.getYawAxis(loc);
         Vector axis = VectorUtil.getRollAxis(loc);
 
         for (int j = 0; j < i; j++) {
-            for (int k = 0; k < 6; k++) {
-                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, j * 8 + k * 60).multiply(0.8 + j * 0.25);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, j * -8 + k * 60).multiply(0.8 + j * 0.25);
-                Location loc1 = loc.clone().add(vec1);
-                Location loc2 = loc.clone().add(vec2);
-                if (i == 9) {
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc1, 1, 0, 0, 0, 0);
+            int angle = j * 8;
+
+            for (int k = 0; k < 12; k++) {
+                angle += 60;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(0.8 + j * 0.25);
+                Location loc2 = loc.clone().add(vec);
+
+                if (i == 9)
                     ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
-                } else {
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc1, 1, 0, 0, 0,
-                            (int) (45 + i * 8), 0, (int) (240 - i * 6));
+                else
                     ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
                             (int) (45 + i * 8), 0, (int) (240 - i * 6));
-                }
             }
         }
     }
 
+    /**
+     * 회복 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class VellionA1Heal implements StatusEffect {
         private static final VellionA1Heal instance = new VellionA1Heal();
@@ -169,30 +170,29 @@ public final class VellionA1 extends ActiveSkill {
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    /**
+     * 독 상태 효과 클래스.
+     */
     private static final class VellionA1Poison extends Poison {
         private static final VellionA1Poison instance = new VellionA1Poison();
 
-        @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-            super.onTick(combatEntity, provider, i);
-
-            if (i % 10 == 0 && combatEntity instanceof Damageable && combatEntity instanceof Living && provider instanceof Attacker)
-                ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, VellionA1Info.POISON_DAMAGE_PER_SECOND * 10 / 20,
-                        DamageType.IGNORE_DEFENSE, null, false, true);
+        private VellionA1Poison() {
+            super(VellionA1Info.POISON_DAMAGE_PER_SECOND);
         }
     }
 
-    @Getter
+    /**
+     * 벨리온 - 마력 응집체 클래스.
+     */
     public final class VellionA1Entity extends SummonEntity<ArmorStand> {
         /** 넉백 모듈 */
         @NonNull
+        @Getter
         private final KnockbackModule knockbackModule;
         /** 상태 효과 모듈 */
         @NonNull
+        @Getter
         private final StatusEffectModule statusEffectModule;
-        /** 원점 */
-        private final Location origin;
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */
         private long returnTime = VellionA1Info.RETURN_DURATION;
@@ -200,14 +200,13 @@ public final class VellionA1 extends ActiveSkill {
         private VellionA1Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
             super(
                     entity,
-                    owner.getName() + "의 마력 응집",
+                    owner.getName() + "의 마력 응집체",
                     owner,
                     true,
-                    new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0, 0)
+                    new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
             );
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this, 2);
-            origin = entity.getLocation();
 
             onInit();
         }
@@ -244,7 +243,6 @@ public final class VellionA1 extends ActiveSkill {
             Predicate<CombatEntity> condition = combatEntity -> combatEntity != combatUser && combatEntity instanceof Damageable &&
                     combatEntity instanceof Living;
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA1Info.RADIUS, condition);
-
             new VellionA1Area(condition, areaTargets).emit(loc);
         }
 
@@ -282,7 +280,7 @@ public final class VellionA1 extends ActiveSkill {
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (targets.add(target)) {
                     if (target.isEnemy(combatUser)) {
-                        if (target.getDamageModule().damage(combatUser, 1, DamageType.NORMAL, null,
+                        if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                                 false, true)) {
                             target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA1Poison.instance,
                                     target.getStatusEffectModule().getStatusEffectDuration(VellionA1Poison.instance) + VellionA1Info.EFFECT_DURATION);

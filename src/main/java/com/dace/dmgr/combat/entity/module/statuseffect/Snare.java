@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 속박 상태 효과를 처리하는 클래스.
@@ -28,6 +29,7 @@ public class Snare implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("Snare", -100);
@@ -40,6 +42,7 @@ public class Snare implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");

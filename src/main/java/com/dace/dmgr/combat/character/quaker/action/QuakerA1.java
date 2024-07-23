@@ -151,7 +151,8 @@ public final class QuakerA1 extends ChargeableSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                             boolean isCrit, boolean isUlt) {
             super.onDamage(attacker, damage, reducedDamage, damageType, location, isCrit, isUlt);
 
             addStateValue(-damage);

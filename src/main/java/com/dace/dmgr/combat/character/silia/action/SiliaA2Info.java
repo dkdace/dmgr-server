@@ -14,6 +14,8 @@ public final class SiliaA2Info extends ActiveSkillInfo {
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 피해량 */
     public static final int DAMAGE = 100;
+    /** 이동 강도 */
+    public static final double PUSH = 0.8;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 15;
     /** 투사체 속력 (단위: 블록/s) */

@@ -66,6 +66,14 @@ public interface CombatEntity extends Disposable {
     Location getHitboxLocation();
 
     /**
+     * 엔티티의 중심 위치를 반환한다.
+     *
+     * @return 엔티티의 중심 위치
+     */
+    @NonNull
+    Location getCenterLocation();
+
+    /**
      * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
      *
      * @param location 대상 위치

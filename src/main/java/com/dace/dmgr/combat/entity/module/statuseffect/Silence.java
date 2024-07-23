@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 침묵 상태 효과를 처리하는 클래스.
@@ -27,15 +28,15 @@ public class Silence implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-        if (!(combatEntity instanceof CombatUser))
-            return;
-
-        ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 5, 10);
-        if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
-                ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
-            ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-        ((CombatUser) combatEntity).cancelAction();
+        if (combatEntity instanceof CombatUser) {
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 5, 10);
+            if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
+                    ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
+                ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
+            ((CombatUser) combatEntity).cancelAction();
+        }
     }
 
     @Override
@@ -45,6 +46,7 @@ public class Silence implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }

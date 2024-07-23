@@ -570,8 +570,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 if (cooldown <= 0 || victim.isDisposed())
                     return false;
 
-                Location loc = victim.getEntity().getLocation().add(0, victim.getEntity().getHeight(), 0);
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim, LocationUtil.canPass(entity.getEyeLocation(), loc), entity);
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim,
+                        LocationUtil.canPass(entity.getEyeLocation(), victim.getCenterLocation()), entity);
 
                 return true;
             }, isCancelled -> HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim, false, entity), 4));
@@ -650,7 +650,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt) {
-        isUlt = isUlt && character.onGiveHeal(this, target, amount);
+        isUlt = isUlt && skillMap.get(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
 
         if (target.getDamageModule().isUltProvider() && isUlt) {
             int ultAmount = amount;
@@ -910,6 +910,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     public boolean isDead() {
         return CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id) > 0;
+    }
+
+    /**
+     * 플레이어의 왼손 또는 오른손의 위치를 반환한다.
+     *
+     * @param isRight 왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로 지정 시 오른손
+     * @return 해당 위치
+     */
+    @NonNull
+    public Location getArmLocation(boolean isRight) {
+        return LocationUtil.getLocationFromOffset(entity.getEyeLocation().subtract(0, 0.4, 0), isRight ? 0.2 : -0.2, 0, 0);
     }
 
     /**

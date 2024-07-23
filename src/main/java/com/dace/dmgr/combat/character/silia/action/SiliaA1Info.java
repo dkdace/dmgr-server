@@ -10,6 +10,8 @@ public final class SiliaA1Info extends ActiveSkillInfo {
     public static final long COOLDOWN = 8 * 20;
     /** 이동 거리 (단위: 블록) */
     public static final int MOVE_DISTANCE = 15;
+    /** 이동 강도 */
+    public static final double PUSH = 2.5;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) (0.3 * 20);
     /** 피해량 */

@@ -42,12 +42,11 @@ public final class ArkaceA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
-            if (i == 0)
-                amount += (int) (ArkaceA2Info.HEAL % ArkaceA2Info.DURATION);
             if (combatUser.getDamageModule().heal(combatUser, amount, true))
                 combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
 
@@ -74,22 +73,21 @@ public final class ArkaceA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        long angle = i * 10;
-
         Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
-        Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 120);
-        Vector vec3 = VectorUtil.getRotatedVector(vector, axis, angle + 240);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 3,
-                0, 0.4, 0, 220, 255, 36);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec2), 3,
-                0, 0.4, 0, 190, 255, 36);
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec3), 3,
-                0, 0.4, 0, 160, 255, 36);
+        long angle = i * 10;
+        int red = 250;
+        for (int j = 0; j < 3; j++) {
+            angle += 120;
+            red -= 30;
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec), 3,
+                    0, 0.4, 0, red, 255, 36);
+        }
     }
 }

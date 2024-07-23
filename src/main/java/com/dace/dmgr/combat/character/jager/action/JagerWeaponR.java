@@ -56,12 +56,12 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 }
 
                 setCooldown();
+                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
 
                 new JagerWeaponRHitscan().shoot();
                 reloadModule.consume(1);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE_SCOPE, combatUser.getEntity().getLocation());
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
 
@@ -135,7 +135,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_DISTANCE, true);
+            int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE, true);
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
 
             return false;

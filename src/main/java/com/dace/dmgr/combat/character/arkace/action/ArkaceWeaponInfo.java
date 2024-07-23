@@ -2,11 +2,14 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
 public final class ArkaceWeaponInfo extends WeaponInfo {
+    /** 연사속도 */
+    public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_600;
     /** 피해량 */
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 (단위: 블록) */

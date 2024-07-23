@@ -49,7 +49,7 @@ public final class NeaceA3 extends ActiveSkill {
         if (isDurationFinished()) {
             new NeaceTarget().shoot();
         } else
-            setCooldown();
+            onCancelled();
     }
 
     @Override
@@ -60,7 +60,7 @@ public final class NeaceA3 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setCooldown();
+        setDuration(0);
     }
 
     private final class NeaceTarget extends Hitscan {
@@ -85,16 +85,17 @@ public final class NeaceA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A3_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+                if (combatUser.getKnockbackModule().isKnockbacked() || !target.canBeTargeted() || target.isDisposed())
+                    return false;
+
                 Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
                 Location targetLoc = target.getEntity().getLocation().add(0, 1.5, 0);
                 Vector vec = LocationUtil.getDirection(loc, targetLoc).multiply(NeaceA3Info.PUSH);
 
-                if (!target.canBeTargeted() || target.isDisposed())
-                    return false;
                 if (targetLoc.distance(loc) < 1.5)
                     return false;
                 if (isDurationFinished()) {
-                    combatUser.push(vec.clone().multiply(0.5), true);
+                    combatUser.push(vec.multiply(0.5), true);
                     return false;
                 }
 
@@ -103,8 +104,8 @@ public final class NeaceA3 extends ActiveSkill {
                 ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
                     Location loc2 = combatUser.getEntity().getLocation().add(0, 1, 0);
-                    for (Location trailLoc : LocationUtil.getLine(loc, loc2, 0.4))
-                        ParticleUtil.play(Particle.END_ROD, trailLoc, 1, 0.02, 0.02, 0.02, 0);
+                    for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
+                        ParticleUtil.play(Particle.END_ROD, loc3, 1, 0.02, 0.02, 0.02, 0);
                 }, 1));
 
                 return true;

@@ -32,7 +32,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600, ArkaceWeaponInfo.SPREAD.INCREMENT,
+        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
                 ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
     }
 
@@ -74,6 +74,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
                 } else {
                     new ArkaceWeaponHitscan(true).shoot();
+
                     SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
                 }
 

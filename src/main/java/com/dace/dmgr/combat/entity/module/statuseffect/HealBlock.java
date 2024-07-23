@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Living;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 회복 차단 상태 효과를 처리하는 클래스.
@@ -36,8 +38,9 @@ public class HealBlock implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity.getEntity() instanceof LivingEntity)
+        if (combatEntity instanceof Living && combatEntity.getEntity() instanceof LivingEntity)
             ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WITHER,
                     4, 0, false, false), true);
     }

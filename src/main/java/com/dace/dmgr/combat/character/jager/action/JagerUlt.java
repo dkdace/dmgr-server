@@ -65,8 +65,7 @@ public final class JagerUlt extends UltimateSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
-                    combatUser.getEntity().getLocation().getDirection(), 0.2, 0, 0);
+            Location loc = combatUser.getArmLocation(true);
             new JagerUltProjectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
@@ -208,7 +207,7 @@ public final class JagerUlt extends UltimateSkill {
             playTickEffect(i, range);
 
             if (i % 4 == 0) {
-                Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && combatEntity.isEnemy(this) &&
+                Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(this) &&
                         combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY();
                 CombatEntity[] targets = CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition);
                 new JagerUltArea(condition, targets, range).emit(entity.getLocation());
@@ -234,29 +233,26 @@ public final class JagerUlt extends UltimateSkill {
          * @param range 현재 범위. (단위: 블록)
          */
         private void playTickEffect(long i, double range) {
-            long angle = i * 14;
             if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_TICK, entity.getLocation());
 
+            Location loc = entity.getLocation();
+            loc.setYaw(0);
+            loc.setPitch(0);
+            Vector vector = VectorUtil.getRollAxis(loc);
+            Vector axis = VectorUtil.getYawAxis(loc);
+
+            long angle = i * 14;
             for (int j = 1; j <= 6; j++) {
-                Location loc = entity.getLocation();
-                loc.setYaw(0);
-                loc.setPitch(0);
-                Vector vector = VectorUtil.getRollAxis(loc);
-                Vector axis = VectorUtil.getYawAxis(loc);
-
                 angle += 19;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-                double distance = range / 6 * j;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(range / 6 * j);
+                Location loc1 = loc.clone().add(vec);
+                Location loc2 = loc.clone().subtract(vec);
 
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec.clone().multiply(distance)), 0,
-                        vec.getX(), -0.6, vec.getZ(), 0.05 * (7 - j));
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().subtract(vec.clone().multiply(distance)), 0,
-                        vec.getX(), 0.6, vec.getZ(), -0.05 * (7 - j));
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc.clone().add(vec.clone().multiply(distance)).subtract(0, 2.5, 0),
-                        5, 0, 1.4, 0, 0.04);
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc.clone().subtract(vec.clone().multiply(distance)).subtract(0, 2.5, 0),
-                        5, 0, 1.4, 0, 0.04);
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc1, 0, vec.getX(), -0.6, vec.getZ(), 0.05 * (7 - j));
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, vec.getX(), 0.6, vec.getZ(), -0.05 * (7 - j));
+                ParticleUtil.play(Particle.SNOW_SHOVEL, loc1.subtract(0, 2.5, 0), 5, 0, 1.4, 0, 0.04);
+                ParticleUtil.play(Particle.SNOW_SHOVEL, loc2.subtract(0, 2.5, 0), 5, 0, 1.4, 0, 0.04);
             }
         }
 
@@ -279,7 +275,8 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                             boolean isCrit, boolean isUlt) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             CombatUtil.playBreakEffect(location, entity, damage);
         }

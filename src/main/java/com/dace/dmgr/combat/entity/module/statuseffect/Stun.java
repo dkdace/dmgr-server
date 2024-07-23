@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 기절 상태 효과를 처리하는 클래스.
@@ -27,14 +28,14 @@ public class Stun implements StatusEffect {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-        if (!(combatEntity instanceof CombatUser))
-            return;
-
-        if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
-                ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
-            ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-        ((CombatUser) combatEntity).cancelAction();
+        if (combatEntity instanceof CombatUser) {
+            if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
+                    ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
+                ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
+            ((CombatUser) combatEntity).cancelAction();
+        }
     }
 
     @Override
