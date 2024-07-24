@@ -1276,6 +1276,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void cancelAction() {
         if (weapon.isCancellable())
             weapon.onCancelled();
+        cancelSkill();
+    }
+
+    /**
+     * 사용 중인 모든 스킬을 강제로 취소시킨다.
+     */
+    public void cancelSkill() {
         skillMap.forEach((skillInfo, skill) -> {
             if (skill.isCancellable())
                 skill.onCancelled();
