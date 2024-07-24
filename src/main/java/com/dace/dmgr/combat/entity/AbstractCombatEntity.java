@@ -107,7 +107,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         Location oldLoc = entity.getLocation();
 
         TaskUtil.addTask(this, new DelayTask(() -> {
-            for (Hitbox hitbox : hitboxes) {
+            for (Hitbox hitbox : getHitboxes()) {
                 hitboxLocation = oldLoc;
                 hitbox.setCenter(hitboxLocation);
             }
@@ -117,7 +117,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Override
     @NonNull
     public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
-        return Arrays.stream(hitboxes).map(hitbox -> hitbox.getNearestLocation(location))
+        return Arrays.stream(getHitboxes()).map(hitbox -> hitbox.getNearestLocation(location))
                 .min(Comparator.comparing(loc -> loc.distance(location)))
                 .orElseThrow(() -> new IllegalStateException("가장 가까운 위치를 찾을 수 없음"));
     }

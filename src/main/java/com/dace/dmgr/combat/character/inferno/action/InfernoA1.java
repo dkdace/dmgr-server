@@ -90,6 +90,8 @@ public final class InfernoA1 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
         setDuration(0);
+        if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+            setCooldown(getDefaultCooldown() - InfernoUltInfo.A1_COOLDOWN_DECREMENT);
     }
 
     /**

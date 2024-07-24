@@ -499,6 +499,24 @@ public enum NamedSound {
     COMBAT_INFERNO_A2_TICK(
             new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.55, 0.1),
             new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 사용 */
+    COMBAT_INFERNO_ULT_USE(
+            new DefinedSound("new.block.respawn_anchor.ambient", 3, 1.2)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 틱 효과음 */
+    COMBAT_INFERNO_ULT_TICK(
+            new DefinedSound(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 피격 */
+    COMBAT_INFERNO_ULT_DAMAGE(
+            new DefinedSound(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 파괴 */
+    COMBAT_INFERNO_ULT_DEATH(
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+            new DefinedSound("new.block.conduit.deactivate", 3, 0.8)
     );
 
     /** 지정된 효과음 목록 */

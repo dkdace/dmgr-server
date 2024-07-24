@@ -67,7 +67,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 Location loc = combatUser.getEntity().getLocation();
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
                 new InfernoWeaponRProjectile().shoot(dir);
-                reloadModule.consume(1);
+                if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                    reloadModule.consume(1);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE, loc);
 
@@ -83,7 +84,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 Location loc = combatUser.getEntity().getLocation();
                 new InfernoWeaponLProjectile().shoot();
-                reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
+                if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                    reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, loc);
                 CombatUtil.setRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,

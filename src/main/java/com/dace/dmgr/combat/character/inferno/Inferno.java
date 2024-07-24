@@ -6,17 +6,18 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Vanguard;
-import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.inferno.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -28,6 +29,7 @@ import java.util.StringJoiner;
  * @see InfernoP1
  * @see InfernoA1
  * @see InfernoA2
+ * @see InfernoUlt
  */
 public final class Inferno extends Vanguard {
     @Getter
@@ -98,10 +100,13 @@ public final class Inferno extends Vanguard {
         InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
         InfernoP1 skillp1 = (InfernoP1) combatUser.getSkill(InfernoP1Info.getInstance());
         InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
+        InfernoUlt skill4 = (InfernoUlt) combatUser.getSkill(InfernoUltInfo.getInstance());
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
         double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
         double skillp1MaxDuration = InfernoP1Info.DURATION / 20.0;
+        double skill4Duration = skill4.getDuration() / 20.0;
+        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
         StringJoiner text = new StringJoiner("    ");
 
@@ -115,6 +120,11 @@ public final class Inferno extends Vanguard {
                     skillp1MaxDuration, 10, '■');
             text.add(skillp1Display);
         }
+        if (!skill4.isDurationFinished()) {
+            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+                    skill4MaxDuration, 10, '■');
+            text.add(skill4Display);
+        }
 
         return text.toString();
     }
@@ -126,7 +136,14 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+            CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        else {
+            SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DAMAGE, victim.getEntity().getLocation(), 1 + damage * 0.001);
+            if (location != null)
+                ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
+                        0, 0, 0, 0.1);
+        }
     }
 
     @Override
@@ -175,7 +192,7 @@ public final class Inferno extends Vanguard {
             case 2:
                 return InfernoA2Info.getInstance();
             case 4:
-                return ArkaceUltInfo.getInstance();
+                return InfernoUltInfo.getInstance();
             default:
                 return null;
         }
@@ -183,7 +200,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public ArkaceUltInfo getUltimateSkillInfo() {
-        return ArkaceUltInfo.getInstance();
+    public InfernoUltInfo getUltimateSkillInfo() {
+        return InfernoUltInfo.getInstance();
     }
 }
