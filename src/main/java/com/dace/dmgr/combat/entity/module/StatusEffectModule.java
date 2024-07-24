@@ -61,7 +61,7 @@ public final class StatusEffectModule {
      * @param duration     지속시간 (tick)
      */
     public void applyStatusEffect(@NonNull CombatEntity provider, @NonNull StatusEffect statusEffect, long duration) {
-        long finalDuration = (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
+        long finalDuration = statusEffect.isPositive() ? duration : (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
         if (finalDuration == 0)
             return;
 
