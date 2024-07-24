@@ -144,7 +144,7 @@ public final class SiliaA2 extends ActiveSkill {
 
                 if (target instanceof Living && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc.clone().add(0, target.getEntity().getHeight() / 2, 0)) &&
                         (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
-                    combatUser.getUser().teleport(loc);
+                    combatUser.teleport(loc);
                     combatUser.push(new Vector(0, 0.8, 0), true);
                     if (target instanceof CombatUser)
                         combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
