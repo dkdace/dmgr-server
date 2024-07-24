@@ -833,6 +833,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onDeath(this, attacker);
 
         damageModule.setHealth(damageModule.getMaxHealth());
+        damageModule.clearShield();
         statusEffectModule.clearStatusEffect();
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
@@ -896,6 +897,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancelled -> {
             damageModule.setHealth(damageModule.getMaxHealth());
+            damageModule.clearShield();
             entity.setGameMode(GameMode.SURVIVAL);
 
             weapon.reset();
@@ -1127,6 +1129,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setFlying(false);
         entity.setGameMode(GameMode.SURVIVAL);
         fovValue = 0;
+        damageModule.clearShield();
         changeFov(0);
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);

@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
+import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -21,6 +22,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
  *
@@ -29,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see Damageable
  */
-@Getter
 public class DamageModule {
     /** 방어력 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
@@ -39,17 +42,30 @@ public class DamageModule {
     public static final String HEALTH_HOLOGRAM_ID = "HitHealth";
     /** 피격 시 애니메이션 쿨타임 ID */
     private static final String COOLDOWN_ID = "DamageAnimation";
+
+    /** NMS 플레이어 반환 메소드 객체 */
+    private static Method getHandleMethod;
+    /** 플레이어 보호막 설정 메소드 객체 */
+    private static Method setAbsorptionHeartsMethod;
+
     /** 엔티티 객체 */
     @NonNull
+    @Getter
     protected final Damageable combatEntity;
     /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부 */
+    @Getter
     protected final boolean isUltProvider;
     /** 생명력 홀로그램 표시 여부 */
+    @Getter
     protected final boolean isShowHealthBar;
     /** 방어력 배수 값 */
     @NonNull
+    @Getter
     private final AbilityStatus defenseMultiplierStatus;
+    /** 보호막 목록 (보호막 ID : 보호막 양) */
+    private final HashMap<String, Integer> shieldMap = new HashMap<>();
     /** 최대 체력 */
+    @Getter
     protected int maxHealth;
 
     /**
@@ -160,6 +176,64 @@ public class DamageModule {
     }
 
     /**
+     * 엔티티의 보호막을 반환한다.
+     *
+     * @return 실제 보호막×50 (체력 1줄 기준 1000)
+     */
+    public final int getShield() {
+        return shieldMap.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * 엔티티의 보호막을 반환한다.
+     *
+     * @param id 보호막 ID
+     * @return 실제 보호막×50 (체력 1줄 기준 1000)
+     */
+    public final int getShield(@NonNull String id) {
+        return shieldMap.getOrDefault(id, 0);
+    }
+
+    /**
+     * 엔티티의 보호막을 설정한다.
+     *
+     * @param id     보호막 ID
+     * @param shield 실제 보호막×50 (체력 1줄 기준 1000)
+     */
+    public final void setShield(@NonNull String id, int shield) {
+        if (shield <= 0)
+            shieldMap.remove(id);
+        else
+            shieldMap.put(id, shield);
+
+        if (!(combatEntity.getEntity() instanceof Player))
+            return;
+
+        try {
+            if (getHandleMethod == null) {
+                getHandleMethod = combatEntity.getEntity().getClass().getMethod("getHandle");
+                getHandleMethod.setAccessible(true);
+            }
+
+            Object nmsPlayer = getHandleMethod.invoke(combatEntity.getEntity());
+            if (setAbsorptionHeartsMethod == null)
+                setAbsorptionHeartsMethod = nmsPlayer.getClass().getMethod("setAbsorptionHearts", Float.TYPE);
+
+            setAbsorptionHeartsMethod.invoke(nmsPlayer, getShield() / 50F);
+        } catch (Exception ex) {
+            ConsoleLogger.severe("보호막을 표시할 수 없음", ex);
+        }
+    }
+
+    /**
+     * 엔티티의 보호막을 초기화한다.
+     */
+    public final void clearShield() {
+        shieldMap.clear();
+        setShield("", 0);
+    }
+
+    /**
      * 엔티티의 피해 로직을 처리한다.
      *
      * @param attacker          공격자
@@ -188,11 +262,21 @@ public class DamageModule {
         }
 
         damage *= (int) critMultiplier;
-
         int finalDamage = Math.max(0, (int) (damage * (1 + damageMultiplier - defenseMultiplier)));
-        int reducedDamage = ((int) (damage * damageMultiplier)) - finalDamage;
-        if (getHealth() - reducedDamage < 0)
-            reducedDamage = getHealth();
+
+        if (getShield() > 0 && damageType != DamageType.IGNORE_DEFENSE)
+            for (String id : shieldMap.keySet()) {
+                if (getShield(id) > finalDamage) {
+                    setShield(id, getShield() - finalDamage);
+                    finalDamage = 0;
+                    break;
+                }
+
+                finalDamage -= getShield(id);
+                setShield(id, 0);
+            }
+
+        int reducedDamage = Math.max(0, (int) (damage * damageMultiplier) - finalDamage);
 
         if (attacker != null)
             attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
