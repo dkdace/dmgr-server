@@ -124,6 +124,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final GameUser gameUser;
+    /** 임시 히트박스 객체 목록 */
+    @Nullable
+    @Setter
+    private Hitbox[] temporalHitboxes = null;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
     private int selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
@@ -229,6 +233,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (combatEntity instanceof CombatUser)
                 HologramUtil.setHologramVisibility(combatEntity.getEntity().getName(), false, entity);
         }
+    }
+
+    @Override
+    @NonNull
+    public Hitbox @NonNull [] getHitboxes() {
+        return temporalHitboxes == null ? super.getHitboxes() : temporalHitboxes;
     }
 
     @Override
@@ -833,6 +843,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onDeath(this, attacker);
 
         damageModule.setHealth(damageModule.getMaxHealth());
+        damageModule.clearShield();
         statusEffectModule.clearStatusEffect();
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
@@ -896,6 +907,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancelled -> {
             damageModule.setHealth(damageModule.getMaxHealth());
+            damageModule.clearShield();
             entity.setGameMode(GameMode.SURVIVAL);
 
             weapon.reset();
@@ -1138,6 +1150,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setFlying(false);
         entity.setGameMode(GameMode.SURVIVAL);
         fovValue = 0;
+        damageModule.clearShield();
         changeFov(0);
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
