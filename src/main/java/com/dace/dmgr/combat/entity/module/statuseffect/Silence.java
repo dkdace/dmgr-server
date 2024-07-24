@@ -35,7 +35,7 @@ public class Silence implements StatusEffect {
             if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
                     ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
                 ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-            ((CombatUser) combatEntity).cancelAction();
+            ((CombatUser) combatEntity).cancelSkill();
         }
     }
 

@@ -203,6 +203,7 @@ public final class VellionA2 extends ActiveSkill {
                 }
 
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+                target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE_READY, combatUser.getEntity().getLocation());
 
@@ -211,7 +212,7 @@ public final class VellionA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
 
                 TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
-                    if (isDurationFinished())
+                    if (isDurationFinished() || !target.getStatusEffectModule().hasStatusEffect(vellionA2Mark))
                         return false;
 
                     isEnabled = true;

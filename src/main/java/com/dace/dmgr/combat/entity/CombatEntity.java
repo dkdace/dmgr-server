@@ -159,6 +159,13 @@ public interface CombatEntity extends Disposable {
     void push(@NonNull Vector velocity);
 
     /**
+     * 엔티티를 지정한 위치로 순간이동 시킨다.
+     *
+     * @param location 이동할 위치
+     */
+    void teleport(@NonNull Location location);
+
+    /**
      * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.
      *
      * @return 지정할 수 있으면 {@code true} 반환
