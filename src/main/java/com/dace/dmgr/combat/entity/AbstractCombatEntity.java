@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -11,6 +12,7 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -154,5 +156,17 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Override
     public final void push(@NonNull Vector velocity) {
         push(velocity, false);
+    }
+
+    @Override
+    public final void teleport(@NonNull Location location) {
+        if (getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) || getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
+            return;
+
+        if (entity instanceof Player) {
+            User user = User.fromPlayer((Player) entity);
+            user.teleport(location);
+        } else
+            entity.teleport(location);
     }
 }
