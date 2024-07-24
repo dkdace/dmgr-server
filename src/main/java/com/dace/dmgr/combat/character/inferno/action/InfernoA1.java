@@ -65,14 +65,16 @@ public final class InfernoA1 extends ActiveSkill {
         combatUser.push(vec, true);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (i < 15)
+            if (i < 15) {
+                Location loc = combatUser.getEntity().getLocation();
+                loc.setPitch(0);
+
                 for (int j = 0; j < 2; j++) {
-                    Location loc = combatUser.getEntity().getLocation();
-                    loc.setPitch(0);
-                    loc = LocationUtil.getLocationFromOffset(loc, -0.3 + j * 0.6, 0.8, -0.5);
-                    ParticleUtil.play(Particle.FLAME, loc, 4, 0, 0.15, 0, 0.02);
-                    ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, 0, -1, 0, 0.3);
+                    Location loc2 = LocationUtil.getLocationFromOffset(loc, -0.3 + j * 0.6, 0.8, -0.5);
+                    ParticleUtil.play(Particle.FLAME, loc2, 4, 0, 0.15, 0, 0.02);
+                    ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, 0, -1, 0, 0.3);
                 }
+            }
 
             return !combatUser.getEntity().isOnGround();
         }, isCancelled -> {
@@ -89,6 +91,7 @@ public final class InfernoA1 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
+
         setDuration(0);
         if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             setCooldown(getDefaultCooldown() - InfernoUltInfo.A1_COOLDOWN_DECREMENT);
@@ -116,10 +119,12 @@ public final class InfernoA1 extends ActiveSkill {
         for (int j = 0; j < 18; j++) {
             int angle = 360 / 18 * j;
             Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
+            Location loc2 = loc.clone().add(vec.clone().multiply(1.5));
+            Location loc3 = loc.clone().add(vec);
 
-            ParticleUtil.play(Particle.FLAME, loc.clone().add(vec.clone().multiply(1.5)), 5, 0, 0, 0, 0.05);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec), 0, vec.getX(), vec.getY() + 0.1, vec.getZ(), 0.35);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec), 0, vec.getX(), vec.getY() + 0.2, vec.getZ(), 0.35);
+            ParticleUtil.play(Particle.FLAME, loc2, 5, 0, 0, 0, 0.05);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc3, 0, vec.getX(), vec.getY() + 0.1, vec.getZ(), 0.35);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc3, 0, vec.getX(), vec.getY() + 0.2, vec.getZ(), 0.35);
         }
     }
 

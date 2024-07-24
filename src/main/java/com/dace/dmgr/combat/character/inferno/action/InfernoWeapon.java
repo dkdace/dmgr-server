@@ -7,7 +7,10 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -15,9 +18,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.*;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -64,13 +65,12 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     return;
                 }
 
-                Location loc = combatUser.getEntity().getLocation();
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
                 new InfernoWeaponRProjectile().shoot(dir);
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE, loc);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE, combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -82,12 +82,11 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 setCooldown();
 
-                Location loc = combatUser.getEntity().getLocation();
                 new InfernoWeaponLProjectile().shoot();
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, loc);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, combatUser.getEntity().getLocation());
                 CombatUtil.setRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
                         InfernoWeaponInfo.FIREBALL.RECOIL.UP_SPREAD, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE_SPREAD, 3, 1);
 
@@ -160,24 +159,20 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         reloadModule.setRemainingAmmo(InfernoWeaponInfo.CAPACITY);
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    /**
+     * 화염 및 융해 상태 효과 클래스.
+     */
     private static final class InfernoWeaponBurning extends Burning {
         private static final InfernoWeaponBurning instance = new InfernoWeaponBurning();
+
+        private InfernoWeaponBurning() {
+            super(InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND);
+        }
 
         @Override
         public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Healable)
                 ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER_ID, -InfernoT1Info.HEAL_DECREMENT);
-        }
-
-        @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-            super.onTick(combatEntity, provider, i);
-
-            if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker &&
-                    ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND * 10 / 20,
-                            DamageType.NORMAL, null, false, true))
-                SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
         }
 
         @Override

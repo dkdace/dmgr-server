@@ -44,6 +44,9 @@ public final class InfernoP1 extends AbstractSkill {
         return false;
     }
 
+    /**
+     * 불꽃의 용기 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class InfernoP1Buff implements StatusEffect {
         @Getter

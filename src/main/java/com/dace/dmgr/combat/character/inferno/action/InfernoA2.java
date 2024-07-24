@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.inferno.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -17,8 +16,6 @@ import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -69,8 +66,7 @@ public final class InfernoA2 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_TICK, combatUser.getEntity().getLocation());
             ParticleUtil.play(Particle.FLAME, combatUser.getEntity().getLocation().add(0, 1, 0), 2,
                     0.1, 0.1, 0.1, 0.2);
-            for (int j = 0; j < 3; j++)
-                playTickEffect(i * 3 + j);
+            playTickEffect(i);
 
             return true;
         }, 1, InfernoA2Info.DURATION));
@@ -93,44 +89,37 @@ public final class InfernoA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        long yaw = i * 5;
-        long pitch = i * 7;
-
         Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        Vector vec1 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch + 240);
-        Vector vec2 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw + 120), pitch + 120);
-        Vector vec3 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw + 240), pitch);
-        ParticleUtil.play(Particle.SMOKE_NORMAL, loc.clone().add(vec1.clone().multiply(1.8)), 0,
-                vec1.getX(), vec1.getY(), vec1.getZ(), 0.32);
-        ParticleUtil.play(Particle.SMOKE_NORMAL, loc.clone().add(vec2.clone().multiply(1.8)), 0,
-                vec2.getX(), vec2.getY(), vec2.getZ(), 0.32);
-        ParticleUtil.play(Particle.SMOKE_NORMAL, loc.clone().add(vec3.clone().multiply(1.8)), 0,
-                vec3.getX(), vec3.getY(), vec3.getZ(), 0.32);
-        ParticleUtil.play(Particle.FLAME, loc.clone().add(vec1.clone().multiply(1.8)), 0,
-                vec1.getX(), vec1.getY(), vec1.getZ(), 0.2);
-        ParticleUtil.play(Particle.FLAME, loc.clone().add(vec2.clone().multiply(1.8)), 0,
-                vec2.getX(), vec2.getY(), vec2.getZ(), 0.2);
-        ParticleUtil.play(Particle.FLAME, loc.clone().add(vec3.clone().multiply(1.8)), 0,
-                vec3.getX(), vec3.getY(), vec3.getZ(), 0.2);
+        for (int j = 0; j < 3; j++) {
+            long index = i * 3 + j;
+            long yaw = index * 5;
+            long pitch = index * 7;
+
+            for (int k = 0; k < 3; k++) {
+                yaw += 120;
+                pitch -= 120;
+                Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
+                Location loc2 = loc.clone().add(vec.clone().multiply(1.8));
+
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 0, vec.getX(), vec.getY(), vec.getZ(), 0.32);
+                ParticleUtil.play(Particle.FLAME, loc2, 0, vec.getX(), vec.getY(), vec.getZ(), 0.2);
+            }
+        }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    /**
+     * 화염 상태 효과 클래스.
+     */
     private static final class InfernoA2Burning extends Burning {
         private static final InfernoA2Burning instance = new InfernoA2Burning();
 
-        @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-            super.onTick(combatEntity, provider, i);
-
-            if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker &&
-                    ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, InfernoA2Info.FIRE_DAMAGE_PER_SECOND * 10 / 20,
-                            DamageType.NORMAL, null, false, true))
-                SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
+        private InfernoA2Burning() {
+            super(InfernoA2Info.FIRE_DAMAGE_PER_SECOND);
         }
     }
 

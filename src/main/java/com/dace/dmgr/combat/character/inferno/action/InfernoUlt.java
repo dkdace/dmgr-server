@@ -59,14 +59,12 @@ public final class InfernoUlt extends UltimateSkill {
                 SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_USE, combatUser.getEntity().getLocation(), 1, i * 0.02);
                 ParticleUtil.play(Particle.LAVA, combatUser.getEntity().getLocation().add(0, 1, 0), 3,
                         1, 1.5, 1, 0.2);
-                for (int j = 0; j < 3; j++)
-                    playUseTickEffect(i * 3 + j);
+                playUseTickEffect(i);
             }
 
+            playTickEffect(i);
             if (i % 12 == 0)
                 SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_TICK, combatUser.getEntity().getLocation());
-            for (int j = 0; j < 2; j++)
-                playTickEffect(i * 2 + j);
 
             return true;
         }, isCancelled -> {
@@ -95,23 +93,28 @@ public final class InfernoUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        long yaw = i * 6;
-        long pitch = i * 5;
-
         Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 6; j++) {
-            yaw += 60;
-            Vector vec1 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch).multiply(2.5);
-            Vector vec2 = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(VectorUtil.getRotatedVector(axis,
-                    VectorUtil.getRotatedVector(vector, axis, yaw + 5), pitch + 5).multiply(2.5)));
+        for (int j = 0; j < 3; j++) {
+            long index = i * 3 + j;
+            long yaw = index * 6;
+            long pitch = index * 5;
 
-            ParticleUtil.play(Particle.FLAME, loc.clone().add(vec1), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 0.2);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc.clone().add(vec1), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 0.2);
+            for (int k = 0; k < 6; k++) {
+                yaw += 60;
+
+                Vector vec1 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
+                Vector vec2 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw + 10.0), pitch + 10.0);
+                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
+                Location loc2 = loc.clone().add(vec1.clone().multiply(2.5));
+
+                ParticleUtil.play(Particle.FLAME, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), 0.2);
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), 0.2);
+            }
         }
     }
 
@@ -121,24 +124,29 @@ public final class InfernoUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        long angle = i * 7;
-        double up = i * 0.04 % 1;
-
         Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(2);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 4; j++) {
-            angle += 90;
-            Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
-            Vector vec2 = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(VectorUtil.getRotatedVector(vector, axis, angle + 10)));
+        for (int j = 0; j < 2; j++) {
+            long index = i * 2 + j;
+            long angle = index * 7;
+            double up = index * 0.04 % 1;
 
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc.clone().add(vec1).add(0, up - 0.5, 0), 0,
-                    vec2.getX(), vec2.getY(), vec2.getZ(), 0.15);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 3, 0, 1, 0,
-                    255, 70, 0);
+            for (int k = 0; k < 4; k++) {
+                angle += 90;
+                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
+                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
+                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
+                Location loc2 = loc.clone().add(vec1);
+
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2.clone().add(0, up - 0.5, 0), 0,
+                        dir.getX(), dir.getY(), dir.getZ(), 0.15);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 3, 0, 1, 0,
+                        255, 70, 0);
+            }
         }
     }
 }
