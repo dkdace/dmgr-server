@@ -9,7 +9,7 @@ public final class InfernoWeaponInfo extends WeaponInfo {
     /** 초당 피해량 */
     public static final int DAMAGE_PER_SECOND = 150;
     /** 초당 화염 피해량 */
-    public static final int FIRE_DAMAGE_PER_SECOND = 50;
+    public static final int FIRE_DAMAGE_PER_SECOND = 40;
     /** 화염 지속 시간 (tick) */
     public static final long FIRE_DURATION = (long) (2.5 * 20);
     /** 사거리 (단위: 블록) */
@@ -44,7 +44,7 @@ public final class InfernoWeaponInfo extends WeaponInfo {
         /** 쿨타임 (tick) */
         long COOLDOWN = 1 * 20;
         /** 피해량 (폭발) */
-        int DAMAGE_EXPLODE = 110;
+        int DAMAGE_EXPLODE = 100;
         /** 피해량 (직격) */
         int DAMAGE_DIRECT = 40;
         /** 사거리 (단위: 블록) */
