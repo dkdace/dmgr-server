@@ -187,8 +187,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
             for (int k = 0; k < 12; k++) {
                 angle += distance > 3 ? 90 : 60;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(distance);
-                Location loc = location.clone().add(vec);
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
+                Location loc = location.clone().add(vec.clone().multiply(distance));
 
                 ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, vec.getX(), 0.4, vec.getZ(), 0.1);
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,

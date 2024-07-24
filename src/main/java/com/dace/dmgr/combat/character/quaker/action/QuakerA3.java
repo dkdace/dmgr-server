@@ -68,7 +68,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             for (int j = 0; j < i; j++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (j - 2));
-                new QuakerA3Effect().shoot(loc.add(vec), vec);
+                new QuakerA3Effect().shoot(loc.clone().add(vec), vec);
             }
 
             return true;

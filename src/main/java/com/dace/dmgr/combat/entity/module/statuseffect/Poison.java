@@ -49,8 +49,8 @@ public abstract class Poison implements StatusEffect {
 
             if (i % 2 == 0)
                 ParticleUtil.play(Particle.DAMAGE_INDICATOR, combatEntity.getCenterLocation(),
-                        1, combatEntity.getEntity().getWidth() / 2, combatEntity.getEntity().getHeight() / 2,
-                        combatEntity.getEntity().getWidth() / 2, 0.3);
+                        1, combatEntity.getEntity().getWidth() / 4, combatEntity.getEntity().getHeight() / 4,
+                        combatEntity.getEntity().getWidth() / 4, 0.3);
 
             if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker)
                 ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, dps * 10 / 20,

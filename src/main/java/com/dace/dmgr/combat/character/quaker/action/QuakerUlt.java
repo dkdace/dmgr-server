@@ -132,9 +132,9 @@ public final class QuakerUlt extends UltimateSkill {
 
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 4; j++) {
-                axis = VectorUtil.getRotatedVector(axis, vector, 13 * (j - 1.5));
-                vector = VectorUtil.getRotatedVector(vector, vector, 13 * (j - 1.5));
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 12 * (i - 3.5));
+                Vector axis2 = VectorUtil.getRotatedVector(axis, vector, 13 * (j - 1.5));
+                Vector vector2 = VectorUtil.getRotatedVector(vector, vector, 13 * (j - 1.5));
+                Vector vec = VectorUtil.getRotatedVector(vector2, axis2, 90 + 12 * (i - 3.5));
                 new QuakerUltProjectile(targets).shoot(loc, vec);
             }
         }

@@ -43,7 +43,7 @@ public abstract class Slow implements StatusEffect {
         if (combatEntity instanceof Living)
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12,
                     combatEntity.getEntity().getLocation().add(0, 0.5, 0), 3,
-                    combatEntity.getEntity().getWidth() / 2, 0, combatEntity.getEntity().getWidth() / 2, 0);
+                    combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4, 0);
     }
 
     @Override

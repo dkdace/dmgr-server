@@ -245,9 +245,9 @@ public final class JagerUlt extends UltimateSkill {
             long angle = i * 14;
             for (int j = 1; j <= 6; j++) {
                 angle += 19;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(range / 6 * j);
-                Location loc1 = loc.clone().add(vec);
-                Location loc2 = loc.clone().subtract(vec);
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc1 = loc.clone().add(vec.clone().multiply(range / 6 * j));
+                Location loc2 = loc.clone().subtract(vec.clone().multiply(range / 6 * j));
 
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc1, 0, vec.getX(), -0.6, vec.getZ(), 0.05 * (7 - j));
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, vec.getX(), 0.6, vec.getZ(), -0.05 * (7 - j));

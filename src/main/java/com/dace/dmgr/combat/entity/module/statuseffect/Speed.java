@@ -41,7 +41,7 @@ public abstract class Speed implements StatusEffect {
     public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof Living)
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB_AMBIENT, combatEntity.getEntity().getLocation().add(0, 0.1, 0),
-                    3, combatEntity.getEntity().getWidth() / 2, 0, combatEntity.getEntity().getWidth() / 2,
+                    3, combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4,
                     200, 255, 255);
     }
 
