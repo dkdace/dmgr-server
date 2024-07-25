@@ -8,14 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 public final class OnPlayerResourcePackStatus implements Listener {
-    /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
-    public static final String MESSAGE_KICK_DENY = "§c리소스팩 적용을 활성화 하십시오." +
-            "\n" +
-            "\n§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용" +
-            "\n" +
-            "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
-            "\n" +
-            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
     /** 리소스팩 오류로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c리소스팩 적용 중 오류가 발생했습니다." +
             "\n" +

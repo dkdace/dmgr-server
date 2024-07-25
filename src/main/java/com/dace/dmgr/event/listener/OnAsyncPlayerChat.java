@@ -7,7 +7,9 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.SoundUtil;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,9 +44,9 @@ public final class OnAsyncPlayerChat implements Listener {
         if (user.getMessageTarget() == null) {
             GameUser gameUser = GameUser.fromUser(user);
 
-            if (gameUser == null || (gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING)) {
-                Bukkit.getOnlinePlayers().forEach((Player player2) ->
-                        sendMessage(user, User.fromPlayer(player2), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
+            if (gameUser == null || gameUser.getGame().getPhase() != Game.Phase.WAITING) {
+                Bukkit.getOnlinePlayers().forEach((Player target) ->
+                        sendMessage(user, User.fromPlayer(target), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
             } else {
                 if (gameUser.isTeamChat())
                     gameUser.sendTeamMessage(event.getMessage());
@@ -53,7 +55,8 @@ public final class OnAsyncPlayerChat implements Listener {
             }
         } else {
             sendMessage(user, user, MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), "§7" + event.getMessage()));
-            sendMessage(user, user.getMessageTarget(), MessageFormat.format("<{0} §7님의 개인 메시지§f> §7{1}", userData.getDisplayName(), event.getMessage()));
+            sendMessage(user, user.getMessageTarget(), MessageFormat.format(CHAT_FORMAT,
+                    userData.getDisplayName() + " §7님의 개인 메시지§f", ChatColor.GRAY + event.getMessage()));
         }
     }
 
@@ -64,7 +67,7 @@ public final class OnAsyncPlayerChat implements Listener {
      * @param receiver 수신 플레이어
      * @param message  메시지
      */
-    private static void sendMessage(User sender, User receiver, String message) {
+    private static void sendMessage(@NonNull User sender, @NonNull User receiver, @NonNull String message) {
         UserData receiverUserData = receiver.getUserData();
 
         if (receiverUserData.isBlockedPlayer(sender.getUserData()))

@@ -162,6 +162,13 @@ public final class UserData extends YamlFile {
         return characterRecordMap.get(characterType);
     }
 
+    /**
+     * 플레이어의 경험치를 설정하고 필요 경험치를 충족했을 경우 레벨을 증가시킨다.
+     *
+     * <p>레벨이 증가했을 경우 {@link User#playLevelUpEffect()}를 호출한다.</p>
+     *
+     * @param xp 경험치
+     */
     public void setXp(int xp) {
         boolean levelup = false;
 
@@ -218,6 +225,14 @@ public final class UserData extends YamlFile {
         set("money", this.money);
     }
 
+    /**
+     * 플레이어의 랭크 점수를 설정한다.
+     *
+     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는
+     * {@link User#playTierDownEffect()}를 호출한다.</p>
+     *
+     * @param rankRate 랭크 점수 (RR)
+     */
     public void setRankRate(int rankRate) {
         Tier tier = getTier();
 
@@ -256,17 +271,17 @@ public final class UserData extends YamlFile {
     }
 
     public void setWinCount(int winCount) {
-        this.winCount = winCount;
+        this.winCount = Math.max(0, winCount);
         set("winCount", this.winCount);
     }
 
     public void setLoseCount(int loseCount) {
-        this.loseCount = loseCount;
+        this.loseCount = Math.max(0, loseCount);
         set("loseCount", this.loseCount);
     }
 
     public void setQuitCount(int quitCount) {
-        this.quitCount = quitCount;
+        this.quitCount = Math.max(0, quitCount);
         set("quitCount", this.quitCount);
     }
 
@@ -276,7 +291,7 @@ public final class UserData extends YamlFile {
      * @return 차단한 플레이어 목록의 유저 데이터 정보
      */
     @NonNull
-    public UserData[] getBlockedPlayers() {
+    public UserData @NonNull [] getBlockedPlayers() {
         return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
     }
 
@@ -321,7 +336,7 @@ public final class UserData extends YamlFile {
     /**
      * 전체 게임 플레이 시간을 반환한다.
      *
-     * @return 게임 플레이 시간
+     * @return 게임 플레이 시간 (초)
      */
     public int getPlayTime() {
         int totalPlayTime = 0;
@@ -420,6 +435,7 @@ public final class UserData extends YamlFile {
         /** 섹션 이름 */
         private static final String SECTION = "record";
         /** 전투원 종류 */
+        @NonNull
         private final CharacterType characterType;
         /** 킬 */
         @Getter

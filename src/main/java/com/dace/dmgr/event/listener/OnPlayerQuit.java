@@ -43,6 +43,8 @@ public final class OnPlayerQuit implements Listener {
                 case 3:
                     Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, -11 / 12.0)));
                     break;
+                default:
+                    break;
             }
 
             return true;
