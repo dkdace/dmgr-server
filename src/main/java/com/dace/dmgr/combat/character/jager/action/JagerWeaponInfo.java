@@ -16,7 +16,9 @@ public final class JagerWeaponInfo extends WeaponInfo {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 80;
     /** 탄퍼짐 */
-    public static final double SPREAD = 5;
+    public static final double SPREAD = 3;
+    /** 달리기 탄퍼짐 배수 */
+    public static final double SPREAD_SPRINT_MULTIPLIER = 1.5;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 장탄수 */
