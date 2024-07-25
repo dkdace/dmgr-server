@@ -17,6 +17,7 @@ public abstract class Registry<K, V> {
     /**
      * @return Map 객체
      */
+    @NonNull
     protected abstract Map<K, V> getMap();
 
     /**

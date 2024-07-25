@@ -110,7 +110,7 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * @param ex 발생한 예외
      */
-    protected abstract void onInitError(Exception ex);
+    protected abstract void onInitError(@NonNull Exception ex);
 
     /**
      * 파일을 다시 불러온다.
@@ -154,7 +154,7 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
-     * 파일을 저장한다. (동기)
+     * 파일을 저장한다. (동기 실행).
      *
      * <p>읽기 전용으로 지정된 경우 사용할 수 없다.</p>
      *
@@ -189,6 +189,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 가장 깊은 섹션
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     private ConfigurationSection getDeepestSection(@NonNull String key) {
         if (key.startsWith(".") || key.endsWith(".") || key.contains(".."))
             throw new IllegalArgumentException("'key'가 유효하지 않음");
@@ -226,7 +227,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalStateException    읽기 전용으로 호출 시 발생
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
-    protected final void set(@NonNull String key, Object value) {
+    protected final void set(@NonNull String key, @Nullable Object value) {
         validate();
         validateReadOnly();
 
@@ -282,6 +283,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값 목록
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     protected final List<Long> getLongList(@NonNull String key) {
         validate();
 
@@ -359,6 +361,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값 목록
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     protected final List<Double> getDoubleList(@NonNull String key) {
         validate();
 
@@ -410,7 +413,8 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
-    protected final String getString(@NonNull String key, @Nullable String defaultValue) {
+    @NonNull
+    protected final String getString(@NonNull String key, @NonNull String defaultValue) {
         validate();
 
         if (key.contains("."))
@@ -437,6 +441,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값 목록
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     protected final List<String> getStringList(@NonNull String key) {
         validate();
 
@@ -461,12 +466,13 @@ public abstract class YamlFile implements Initializable<Void> {
      * }</pre>
      *
      * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code null} 반환
+     * @return 값. 데이터가 존재하지 않으면 빈 문자열 반환
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     protected final String getString(@NonNull String key) {
         validate();
-        return getString(key, null);
+        return getString(key, "");
     }
 
     /**
@@ -515,6 +521,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @return 값 목록
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
+    @NonNull
     protected final List<Boolean> getBooleanList(@NonNull String key) {
         validate();
 
@@ -547,8 +554,6 @@ public abstract class YamlFile implements Initializable<Void> {
 
     /**
      * 인스턴스가 읽기 전용으로 생성되었으면 예외를 발생시킨다.
-     *
-     * @throws IllegalStateException 인스턴스가 읽기 전용으로 생성되었으면 발생
      */
     private void validateReadOnly() {
         if (isReadOnly)

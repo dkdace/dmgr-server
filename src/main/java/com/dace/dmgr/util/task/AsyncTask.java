@@ -156,7 +156,7 @@ public final class AsyncTask<T> extends Task {
      * @return AsyncTask
      */
     @NonNull
-    public AsyncTask<T> onError(@NonNull Consumer<Exception> action) {
+    public AsyncTask<T> onError(@NonNull Consumer<@NonNull Exception> action) {
         CompletableFuture<T> nextFuture = future.exceptionally(ex -> {
             action.accept((Exception) ex);
             return null;

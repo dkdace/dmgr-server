@@ -21,16 +21,16 @@ import java.util.UUID;
  */
 public final class UserData extends YamlFile {
     /** 플레이어 UUID */
-    @Getter
     @NonNull
+    @Getter
     private final UUID playerUUID;
     /** 플레이어 이름 */
-    @Getter
     @NonNull
+    @Getter
     private final String playerName;
     /** 유저 개인 설정 */
-    @Getter
     @NonNull
+    @Getter
     private final Config config = new Config();
     /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
     private final EnumMap<CharacterType, CharacterRecord> characterRecordMap = new EnumMap<>(CharacterType.class);
@@ -147,7 +147,7 @@ public final class UserData extends YamlFile {
     }
 
     @Override
-    protected void onInitError(Exception ex) {
+    protected void onInitError(@NonNull Exception ex) {
         ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName);
     }
 

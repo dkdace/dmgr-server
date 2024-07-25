@@ -17,7 +17,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class TaskUtil {
     /** 태스크 목록 (실행 주체 : 태스크 목록) */
-    private static final WeakHashMap<@NonNull Disposable, HashSet<Task>> taskMap = new WeakHashMap<>();
+    private static final WeakHashMap<Disposable, HashSet<Task>> taskMap = new WeakHashMap<>();
 
     /**
      * 지정한 객체가 실행하는 태스크를 추가한다.

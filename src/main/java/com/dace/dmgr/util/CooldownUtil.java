@@ -12,7 +12,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class CooldownUtil {
     /** 진행중인 쿨타임 목록 (실행 주체 : (쿨타임 ID : 종료 시점)) */
-    private static final WeakHashMap<@NonNull Object, HashMap<@NonNull String, Long>> cooldownMap = new WeakHashMap<>();
+    private static final WeakHashMap<Object, HashMap<String, Long>> cooldownMap = new WeakHashMap<>();
 
     /**
      * 지정한 객체가 실행하는 쿨타임을 설정한다.

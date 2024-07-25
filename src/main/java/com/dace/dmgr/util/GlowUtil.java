@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class GlowUtil {
     /** 플레이어별 발광 엔티티 목록. (플레이어 : (발광 엔티티 : 색상)) */
-    private final WeakHashMap<@NonNull Player, WeakHashMap<@NonNull Entity, ChatColor>> glowingMap = new WeakHashMap<>();
+    private final WeakHashMap<Player, WeakHashMap<Entity, ChatColor>> glowingMap = new WeakHashMap<>();
     /** 쿨타임 ID */
     private static final String COOLDOWN_ID = "Glow";
 
