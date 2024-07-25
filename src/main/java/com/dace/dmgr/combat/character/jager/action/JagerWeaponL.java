@@ -70,7 +70,6 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 }
 
                 setCooldown();
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
 
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), JagerWeaponInfo.SPREAD);
                 new JagerWeaponLProjectile().shoot(dir);

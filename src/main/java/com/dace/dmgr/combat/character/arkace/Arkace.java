@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.arkace;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -136,6 +137,14 @@ public final class Arkace extends Marksman {
     }
 
     @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
+        if (combatUser.getEntity().isSprinting())
+            combatUser.useAction(ActionKey.PERIODIC_1);
+    }
+
+    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
@@ -160,7 +169,7 @@ public final class Arkace extends Marksman {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
+        return true;
     }
 
     @Override

@@ -180,7 +180,7 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getWeapon()).getReloadModule().isReloading() && !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
     }
 
     @Override

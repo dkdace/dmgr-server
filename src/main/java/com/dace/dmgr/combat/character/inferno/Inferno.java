@@ -153,7 +153,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((InfernoWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
+        return true;
     }
 
     @Override
