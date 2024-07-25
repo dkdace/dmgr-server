@@ -3,6 +3,7 @@ package com.dace.dmgr.util;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Sound;
 
 /**
@@ -520,9 +521,10 @@ public enum NamedSound {
     );
 
     /** 지정된 효과음 목록 */
-    private final DefinedSound[] definedSounds;
+    @NonNull
+    private final DefinedSound @NonNull [] definedSounds;
 
-    NamedSound(DefinedSound... definedSounds) {
+    NamedSound(DefinedSound @NonNull ... definedSounds) {
         this.definedSounds = definedSounds;
     }
 
@@ -533,6 +535,7 @@ public enum NamedSound {
     @Getter
     static class DefinedSound {
         /** 소리 이름 */
+        @NonNull
         private final String sound;
         /** 음량 */
         private final double volume;
@@ -541,15 +544,15 @@ public enum NamedSound {
         /** 음정의 분산도 */
         private final double pitchSpreadRange;
 
-        private DefinedSound(String sound, double volume, double pitch) {
+        private DefinedSound(@NonNull String sound, double volume, double pitch) {
             this(sound, volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch) {
             this(sound.toString(), volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch, double pitchSpreadRange) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch, double pitchSpreadRange) {
             this(sound.toString(), volume, pitch, pitchSpreadRange);
         }
     }

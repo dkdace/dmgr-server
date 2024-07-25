@@ -19,7 +19,7 @@ import java.util.HashMap;
 @UtilityClass
 public final class HologramUtil {
     /** 생성된 홀로그램 목록 (홀로그램 ID : 홀로그램 객체) */
-    private static final HashMap<String, Hologram> hologramMap = new HashMap<>();
+    private static final HashMap<@NonNull String, Hologram> hologramMap = new HashMap<>();
 
     /**
      * 지정한 위치에 홀로그램을 생성한다.
@@ -35,9 +35,8 @@ public final class HologramUtil {
 
         hologram.getVisibilitySettings().setGlobalVisibility(VisibilitySettings.Visibility.VISIBLE);
         hologram.getLines().clear();
-        for (String content : contents) {
+        for (String content : contents)
             hologram.getLines().appendText(content);
-        }
     }
 
     /**
@@ -47,9 +46,9 @@ public final class HologramUtil {
      *
      * @param id       홀로그램 ID
      * @param entity   고정할 엔티티
-     * @param offsetX  X 오프셋. (단위 : 블록)
-     * @param offsetY  Y 오프셋. (단위 : 블록)
-     * @param offsetZ  Z 오프셋. (단위 : 블록)
+     * @param offsetX  X 오프셋. (단위: 블록)
+     * @param offsetY  Y 오프셋. (단위: 블록)
+     * @param offsetZ  Z 오프셋. (단위: 블록)
      * @param contents 내용 목록
      */
     public void addHologram(@NonNull String id, @NonNull Entity entity,

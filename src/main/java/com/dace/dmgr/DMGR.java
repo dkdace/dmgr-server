@@ -35,11 +35,12 @@ import java.util.UUID;
  */
 public class DMGR extends JavaPlugin {
     /** 일시적인 엔티티의 사용자 지정 이름 */
-    public static final String TEMPORAL_ENTITY_CUSTOM_NAME = "temporal";
+    public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporal";
     /** 난수 생성 객체 */
     @NonNull
     @Getter
     private static final Random random = new Random();
+
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;
     /** 홀로그램 관리 객체 */
@@ -52,6 +53,7 @@ public class DMGR extends JavaPlugin {
      *
      * @return DMGR
      */
+    @NonNull
     public static DMGR getPlugin() {
         return JavaPlugin.getPlugin(DMGR.class);
     }
@@ -173,7 +175,7 @@ public class DMGR extends JavaPlugin {
      */
     private void clearUnusedEntities() {
         Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
-                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORAL_ENTITY_CUSTOM_NAME))
+                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
     }
 

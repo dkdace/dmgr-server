@@ -42,9 +42,7 @@ import java.util.function.Supplier;
 public final class AsyncTask<T> extends Task {
     /** 메서드 체이닝을 위해 사용하는 Future 객체 */
     private final CompletableFuture<T> future;
-    /**
-     * 실행할 비동기 작업.
-     */
+    /** 실행할 비동기 작업 */
     private Runnable action;
 
     /**
@@ -61,12 +59,14 @@ public final class AsyncTask<T> extends Task {
         run();
     }
 
-    private AsyncTask(CompletableFuture<T> future) {
+    private AsyncTask(@NonNull CompletableFuture<T> future) {
         this.future = future;
     }
 
     /**
      * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
+     *
+     * @param asyncTasks 비동기 태스크 목록
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull AsyncTask<?> @NonNull ... asyncTasks) {
@@ -76,6 +76,8 @@ public final class AsyncTask<T> extends Task {
 
     /**
      * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
+     *
+     * @param asyncTasks 비동기 태스크 목록
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull List<@NonNull AsyncTask<?>> asyncTasks) {
@@ -196,6 +198,6 @@ public final class AsyncTask<T> extends Task {
          * @param onFinish 작업 성공 시 호출해야 한다.
          * @param onError  작업 실패(예외 발생) 시 호출해야 한다.
          */
-        void run(@NonNull Consumer<T> onFinish, @NonNull Consumer<Exception> onError);
+        void run(@NonNull Consumer<T> onFinish, @NonNull Consumer<@NonNull Exception> onError);
     }
 }

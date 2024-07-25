@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class GlowUtil {
     /** 플레이어별 발광 엔티티 목록. (플레이어 : (발광 엔티티 : 색상)) */
-    private final WeakHashMap<Player, WeakHashMap<Entity, ChatColor>> glowingMap = new WeakHashMap<>();
+    private final WeakHashMap<@NonNull Player, WeakHashMap<@NonNull Entity, ChatColor>> glowingMap = new WeakHashMap<>();
     /** 쿨타임 ID */
     private static final String COOLDOWN_ID = "Glow";
 
@@ -30,10 +30,13 @@ public final class GlowUtil {
      * @param color    색상
      * @param player   대상 플레이어
      * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void setGlowing(@NonNull Entity entity, @NonNull ChatColor color, @NonNull Player player, long duration) {
+        if (duration < -1)
+            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
         if (duration == -1)
-            duration = Integer.MAX_VALUE;
+            duration = Long.MAX_VALUE;
 
         sendAddTeamPacket(entity, color, player);
 

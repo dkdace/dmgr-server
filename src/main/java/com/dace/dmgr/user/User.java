@@ -207,7 +207,7 @@ public final class User implements Disposable {
     private void updateNameTagHider() {
         if (nameTagHider == null) {
             nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
-            nameTagHider.setCustomName(DMGR.TEMPORAL_ENTITY_CUSTOM_NAME);
+            nameTagHider.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
             nameTagHider.setSilent(true);
             nameTagHider.setInvulnerable(true);
             nameTagHider.setGravity(false);

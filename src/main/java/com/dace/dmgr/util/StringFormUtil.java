@@ -35,12 +35,16 @@ public final class StringFormUtil {
      * @param current 현재 값
      * @param max     최대 값
      * @param color   막대 색
-     * @param length  막대 길이 (글자 수)
+     * @param length  막대 길이 (글자 수). 1 이상의 값
      * @param symbol  막대 기호
      * @return 진행 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color, int length, char symbol) {
+        if (length < 1)
+            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+
         if (current < 0) current = 0;
 
         char[] filler = new char[length];
@@ -75,6 +79,7 @@ public final class StringFormUtil {
      * @param color   막대 색
      * @param length  막대 길이 (글자 수)
      * @return 진행 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color, int length) {
@@ -117,12 +122,16 @@ public final class StringFormUtil {
      * @param prefix  접두사
      * @param current 현재 값
      * @param max     최대 값
-     * @param length  막대 길이 (글자 수)
+     * @param length  막대 길이 (글자 수). 1 이상의 값
      * @param symbol  막대 기호
      * @return 액션바 진행 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static String getActionbarProgressBar(@NonNull String prefix, int current, int max, int length, char symbol) {
+        if (length < 1)
+            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.RED;
@@ -160,12 +169,16 @@ public final class StringFormUtil {
      * @param prefix  접두사
      * @param current 남은 시간 (tick)
      * @param max     최대 시간 (tick)
-     * @param length  막대 길이 (글자 수)
+     * @param length  막대 길이 (글자 수). 1 이상의 값
      * @param symbol  막대 기호
      * @return 액션바 남은 시간 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static String getActionbarDurationBar(@NonNull String prefix, double current, double max, int length, char symbol) {
+        if (length < 1)
+            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.RED;
@@ -199,12 +212,16 @@ public final class StringFormUtil {
      * @param prefix  접두사
      * @param current 남은 시간 (tick)
      * @param max     최대 시간 (tick)
-     * @param length  막대 길이 (글자 수)
+     * @param length  막대 길이 (글자 수). 1 이상의 값
      * @param symbol  막대 기호
      * @return 액션바 남은 시간 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static String getActionbarCooldownBar(@NonNull String prefix, double current, double max, int length, char symbol) {
+        if (length < 1)
+            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.WHITE;

@@ -21,11 +21,12 @@ public final class ParticleUtil {
      *
      * @param particle 입자 종류
      * @param location 대상 위치
-     * @param count    입자의 양
+     * @param count    입자의 양. 0 이상의 값
      * @param offsetX  입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY  입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ  입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed    입자의 속도
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void play(@NonNull Particle particle, @NonNull Location location, int count, double offsetX,
                             double offsetY, double offsetZ, double speed) {
@@ -39,12 +40,13 @@ public final class ParticleUtil {
      *
      * @param particle 입자 종류
      * @param location 대상 위치
-     * @param count    입자의 양
+     * @param count    입자의 양. 0 이상의 값
      * @param offsetX  입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY  입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ  입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed    입자의 속도
      * @param player   대상 플레이어
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void play(@NonNull Particle particle, @NonNull Location location, int count, double offsetX,
                             double offsetY, double offsetZ, double speed, @NonNull Player player) {
@@ -58,17 +60,19 @@ public final class ParticleUtil {
      *
      * @param coloredParticle 색 입자 종류
      * @param location        대상 위치
-     * @param count           입자의 양
+     * @param count           입자의 양. 0 이상의 값
      * @param offsetX         입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY         입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ         입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param red             빨강. 0~255 사이의 값
      * @param green           초록. 0~255 사이의 값
      * @param blue            파랑. 0~255 사이의 값
-     * @throws IllegalArgumentException {@code red}, {@code green} 또는 {@code blue}가 0~255 사이가 아니면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void playRGB(@NonNull ColoredParticle coloredParticle, @NonNull Location location, int count,
                                double offsetX, double offsetY, double offsetZ, int red, int green, int blue) {
+        if (count < 0)
+            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
         validateRGB(red, green, blue);
 
         for (int i = 0; i < count; i++) {
@@ -84,7 +88,7 @@ public final class ParticleUtil {
      *
      * @param coloredParticle 색 입자 종류
      * @param location        대상 위치
-     * @param count           입자의 양
+     * @param count           입자의 양. 0 이상의 값
      * @param offsetX         입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY         입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ         입자가 Z축으로 퍼지는 범위. (단위: 블록)
@@ -92,10 +96,12 @@ public final class ParticleUtil {
      * @param green           초록. 0~255 사이의 값
      * @param blue            파랑. 0~255 사이의 값
      * @param player          대상 플레이어
-     * @throws IllegalArgumentException {@code red}, {@code green} 또는 {@code blue}가 0~255 사이가 아니면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void playRGB(@NonNull ColoredParticle coloredParticle, @NonNull Location location, int count,
                                double offsetX, double offsetY, double offsetZ, int red, int green, int blue, @NonNull Player player) {
+        if (count < 0)
+            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
         validateRGB(red, green, blue);
 
         for (int i = 0; i < count; i++) {
@@ -112,7 +118,6 @@ public final class ParticleUtil {
      * @param red   빨강
      * @param green 초록
      * @param blue  파랑
-     * @throws IllegalArgumentException {@code red}, {@code green} 또는 {@code blue}가 0~255 사이가 아니면 발생
      */
     private static void validateRGB(int red, int green, int blue) {
         if (red < 0 || red > 255)
@@ -130,11 +135,12 @@ public final class ParticleUtil {
      * @param material      블록 종류
      * @param data          블록의 데이터. 나무의 종류나 양털의 색 등
      * @param location      대상 위치
-     * @param count         입자의 양
+     * @param count         입자의 양. 0 이상의 값
      * @param offsetX       입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY       입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ       입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed         입자의 속도
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void playBlock(@NonNull BlockParticle blockParticle, @NonNull Material material, int data,
                                  @NonNull Location location, int count, double offsetX, double offsetY, double offsetZ, double speed) {
@@ -151,12 +157,13 @@ public final class ParticleUtil {
      * @param material      블록 종류
      * @param data          블록의 데이터. 나무의 종류나 양털의 색 등
      * @param location      대상 위치
-     * @param count         입자의 양
+     * @param count         입자의 양. 0 이상의 값
      * @param offsetX       입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY       입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ       입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed         입자의 속도
      * @param player        대상 플레이어
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void playBlock(@NonNull BlockParticle blockParticle, @NonNull Material material, int data,
                                  @NonNull Location location, int count, double offsetX, double offsetY, double offsetZ, double speed, @NonNull Player player) {
@@ -179,11 +186,10 @@ public final class ParticleUtil {
      * @param type       폭죽 효과 타입
      * @param hasTrail   잔상 여부
      * @param hasFlicker 반짝임 여부
-     * @throws IllegalArgumentException {@code red}, {@code green}, {@code blue}, {@code fadeRed},
-     *                                  {@code fadeGreen} 또는 {@code fadeBlue}가 0~255 사이가 아니면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void playFirework(@NonNull Location location, int red, int green, int blue, int fadeRed, int fadeGreen, int fadeBlue,
-                                    FireworkEffect.Type type, boolean hasTrail, boolean hasFlicker) {
+                                    @NonNull FireworkEffect.Type type, boolean hasTrail, boolean hasFlicker) {
         validateRGB(red, green, blue);
         validateRGB(fadeRed, fadeGreen, fadeBlue);
 
@@ -207,15 +213,19 @@ public final class ParticleUtil {
      *
      * @param particle 입자 종류
      * @param location 대상 위치
-     * @param count    입자의 양
+     * @param count    입자의 양. 0 이상의 값
      * @param offsetX  입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY  입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ  입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed    입자의 속도
      * @return 입자 패킷
      */
+    @NonNull
     private static WrapperPlayServerWorldParticles getParticlePacket(@NonNull Particle particle, @NonNull Location location,
                                                                      int count, double offsetX, double offsetY, double offsetZ, float speed) {
+        if (count < 0)
+            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
         packet.setParticleType(EnumWrappers.Particle.valueOf(particle.toString()));
@@ -245,6 +255,7 @@ public final class ParticleUtil {
      * @param blue            파랑. 0~255 사이의 값
      * @return 입자 패킷
      */
+    @NonNull
     private static WrapperPlayServerWorldParticles getRGBParticlePacket(@NonNull ColoredParticle coloredParticle, @NonNull Location location,
                                                                         double offsetX, double offsetY, double offsetZ, int red, int green, int blue) {
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
@@ -253,9 +264,9 @@ public final class ParticleUtil {
         double finalOffsetY = (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * offsetY;
         double finalOffsetZ = (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * offsetZ;
         packet.setParticleType(EnumWrappers.Particle.valueOf(coloredParticle.toString()));
-        packet.setX((float) ((float) location.getX() + finalOffsetX));
-        packet.setY((float) ((float) location.getY() + finalOffsetY));
-        packet.setZ((float) ((float) location.getZ() + finalOffsetZ));
+        packet.setX((float) (location.getX() + finalOffsetX));
+        packet.setY((float) (location.getY() + finalOffsetY));
+        packet.setZ((float) (location.getZ() + finalOffsetZ));
         packet.setNumberOfParticles(0);
         packet.setOffsetX(red / 255F);
         packet.setOffsetY(green / 255F);
@@ -273,15 +284,19 @@ public final class ParticleUtil {
      * @param material      블록 종류
      * @param data          블록의 데이터. 나무의 종류나 양털의 색 등
      * @param location      대상 위치
-     * @param count         입자의 양
+     * @param count         입자의 양. 0 이상의 값
      * @param offsetX       입자가 X축으로 퍼지는 범위. (단위: 블록)
      * @param offsetY       입자가 Y축으로 퍼지는 범위. (단위: 블록)
      * @param offsetZ       입자가 Z축으로 퍼지는 범위. (단위: 블록)
      * @param speed         입자의 속도
      * @return 입자 패킷
      */
-    private static WrapperPlayServerWorldParticles getBlockParticlePacket(@NonNull BlockParticle blockParticle, @NonNull Material material,
-                                                                          int data, Location location, int count, double offsetX, double offsetY, double offsetZ, float speed) {
+    @NonNull
+    private static WrapperPlayServerWorldParticles getBlockParticlePacket(@NonNull BlockParticle blockParticle, @NonNull Material material, int data,
+                                                                          @NonNull Location location, int count, double offsetX, double offsetY, double offsetZ, float speed) {
+        if (count < 0)
+            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
         packet.setParticleType(EnumWrappers.Particle.valueOf(blockParticle.toString()));

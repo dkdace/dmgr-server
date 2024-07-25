@@ -17,9 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
  * }</pre>
  */
 public final class DelayTask extends Task {
-    /**
-     * 태스크가 끝났을 때 실행할 작업.
-     */
+    /** 태스크가 끝났을 때 실행할 작업 */
     @NonNull
     private final Runnable onFinish;
     /** 딜레이 (tick) */

@@ -12,7 +12,7 @@ import java.util.WeakHashMap;
 @UtilityClass
 public final class CooldownUtil {
     /** 진행중인 쿨타임 목록 (실행 주체 : (쿨타임 ID : 종료 시점)) */
-    private static final WeakHashMap<Object, HashMap<String, Long>> cooldownMap = new WeakHashMap<>();
+    private static final WeakHashMap<@NonNull Object, HashMap<@NonNull String, Long>> cooldownMap = new WeakHashMap<>();
 
     /**
      * 지정한 객체가 실행하는 쿨타임을 설정한다.
@@ -22,8 +22,14 @@ public final class CooldownUtil {
      * @param object   쿹라임을 적용할 대상
      * @param id       쿨타임 ID
      * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void setCooldown(@NonNull Object object, @NonNull String id, long duration) {
+        if (duration < -1)
+            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
+        if (duration == -1)
+            duration = Long.MAX_VALUE;
+
         cooldownMap.putIfAbsent(object, new HashMap<>());
         HashMap<String, Long> idMap = cooldownMap.get(object);
         if (duration == 0) {
@@ -32,9 +38,6 @@ public final class CooldownUtil {
 
             return;
         }
-
-        if (duration == -1)
-            duration = Long.MAX_VALUE;
 
         long time = System.currentTimeMillis() / 50 + duration;
         idMap.put(id, time);
