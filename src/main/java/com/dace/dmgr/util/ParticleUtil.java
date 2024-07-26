@@ -71,8 +71,7 @@ public final class ParticleUtil {
      */
     public static void playRGB(@NonNull ColoredParticle coloredParticle, @NonNull Location location, int count,
                                double offsetX, double offsetY, double offsetZ, int red, int green, int blue) {
-        if (count < 0)
-            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+        validateArgs(count);
         validateRGB(red, green, blue);
 
         for (int i = 0; i < count; i++) {
@@ -100,8 +99,7 @@ public final class ParticleUtil {
      */
     public static void playRGB(@NonNull ColoredParticle coloredParticle, @NonNull Location location, int count,
                                double offsetX, double offsetY, double offsetZ, int red, int green, int blue, @NonNull Player player) {
-        if (count < 0)
-            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+        validateArgs(count);
         validateRGB(red, green, blue);
 
         for (int i = 0; i < count; i++) {
@@ -110,22 +108,6 @@ public final class ParticleUtil {
 
             packet.sendPacket(player);
         }
-    }
-
-    /**
-     * RGB 색상 인자값이 유효하지 않으면 예외를 발생시킨다.
-     *
-     * @param red   빨강
-     * @param green 초록
-     * @param blue  파랑
-     */
-    private static void validateRGB(int red, int green, int blue) {
-        if (red < 0 || red > 255)
-            throw new IllegalArgumentException("'red'가 0에서 255 사이여야 함");
-        else if (blue < 0 || blue > 255)
-            throw new IllegalArgumentException("'green'이 0에서 255 사이여야 함");
-        else if (green < 0 || green > 255)
-            throw new IllegalArgumentException("'blue'가 0에서 255 사이여야 함");
     }
 
     /**
@@ -223,8 +205,7 @@ public final class ParticleUtil {
     @NonNull
     private static WrapperPlayServerWorldParticles getParticlePacket(@NonNull Particle particle, @NonNull Location location,
                                                                      int count, double offsetX, double offsetY, double offsetZ, float speed) {
-        if (count < 0)
-            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+        validateArgs(count);
 
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
@@ -294,8 +275,7 @@ public final class ParticleUtil {
     @NonNull
     private static WrapperPlayServerWorldParticles getBlockParticlePacket(@NonNull BlockParticle blockParticle, @NonNull Material material, int data,
                                                                           @NonNull Location location, int count, double offsetX, double offsetY, double offsetZ, float speed) {
-        if (count < 0)
-            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+        validateArgs(count);
 
         WrapperPlayServerWorldParticles packet = new WrapperPlayServerWorldParticles();
 
@@ -312,6 +292,32 @@ public final class ParticleUtil {
         packet.setLongDistance(true);
 
         return packet;
+    }
+
+    /**
+     * 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param count 입자의 양
+     */
+    private static void validateArgs(int count) {
+        if (count < 0)
+            throw new IllegalArgumentException("'count'가 0 이상이어야 함");
+    }
+
+    /**
+     * RGB 색상 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param red   빨강
+     * @param green 초록
+     * @param blue  파랑
+     */
+    private static void validateRGB(int red, int green, int blue) {
+        if (red < 0 || red > 255)
+            throw new IllegalArgumentException("'red'가 0에서 255 사이여야 함");
+        else if (blue < 0 || blue > 255)
+            throw new IllegalArgumentException("'green'이 0에서 255 사이여야 함");
+        else if (green < 0 || green > 255)
+            throw new IllegalArgumentException("'blue'가 0에서 255 사이여야 함");
     }
 
     /**

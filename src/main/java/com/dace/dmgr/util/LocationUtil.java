@@ -127,8 +127,7 @@ public final class LocationUtil {
      */
     @NonNull
     public static Vector getDirection(@NonNull Location start, @NonNull Location end) {
-        if (start.getWorld() != end.getWorld())
-            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+        validateLocation(start, end);
 
         return end.toVector().subtract(start.toVector()).normalize();
     }
@@ -144,8 +143,7 @@ public final class LocationUtil {
      * @throws IllegalArgumentException 두 위치가 서로 다른 월드에 있으면 발생
      */
     public static boolean canPass(@NonNull Location start, @NonNull Location end) {
-        if (start.getWorld() != end.getWorld())
-            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
+        validateLocation(start, end);
 
         Vector direction = getDirection(start, end).multiply(CAN_PASS_INTERVAL);
         Location loc = start.clone();
@@ -170,10 +168,9 @@ public final class LocationUtil {
      */
     @NonNull
     public static List<@NonNull Location> getLine(@NonNull Location start, @NonNull Location end, double interval) {
+        validateLocation(start, end);
         if (interval <= 0)
             throw new IllegalArgumentException("'interval'이 0을 초과헤야 함");
-        if (start.getWorld() != end.getWorld())
-            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
 
         Vector direction = getDirection(start, end).multiply(interval);
         Location loc = start.clone();
@@ -275,5 +272,16 @@ public final class LocationUtil {
         Location loc = location.clone();
         loc.setY(yCoordinate);
         return loc.getBlock().getType() == material;
+    }
+
+    /**
+     * 두 위치가 서로 다른 월드에 있으면 예외를 발생시킨다.
+     *
+     * @param start 시작 위치
+     * @param end   끝 위치
+     */
+    private static void validateLocation(@NonNull Location start, @NonNull Location end) {
+        if (start.getWorld() != end.getWorld())
+            throw new IllegalArgumentException("'start'와 'end'가 서로 다른 월드에 있음");
     }
 }

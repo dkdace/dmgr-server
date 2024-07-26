@@ -42,8 +42,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color, int length, char symbol) {
-        if (length < 1)
-            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+        validateArgs(length);
 
         if (current < 0) current = 0;
 
@@ -129,8 +128,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getActionbarProgressBar(@NonNull String prefix, int current, int max, int length, char symbol) {
-        if (length < 1)
-            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+        validateArgs(length);
 
         ChatColor color;
         if (current <= max / 4)
@@ -176,8 +174,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getActionbarDurationBar(@NonNull String prefix, double current, double max, int length, char symbol) {
-        if (length < 1)
-            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+        validateArgs(length);
 
         ChatColor color;
         if (current <= max / 4)
@@ -219,8 +216,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getActionbarCooldownBar(@NonNull String prefix, double current, double max, int length, char symbol) {
-        if (length < 1)
-            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
+        validateArgs(length);
 
         ChatColor color;
         if (current <= max / 4)
@@ -237,5 +233,15 @@ public final class StringFormUtil {
                 .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
                 .add("[" + color + TextIcon.COOLDOWN + " " + currentDisplay + "§f]")
                 .toString();
+    }
+
+    /**
+     * 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param length 막대 길이 (글자 수)
+     */
+    private static void validateArgs(int length) {
+        if (length < 1)
+            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
     }
 }

@@ -95,7 +95,7 @@ public final class WorldUtil {
     /**
      * 모든 복제 월드를 삭제한다.
      *
-     * <p>참고: 비동기로 실행하지 않음</p>
+     * @apiNote 비동기로 실행하지 않음
      */
     public static void clearDuplicatedWorlds() {
         File worldDir = new File(Bukkit.getWorldContainer(), ConfigManager.getDatasourcesConfig().getFileConfig().getPath());
