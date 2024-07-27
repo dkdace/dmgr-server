@@ -223,9 +223,9 @@ public final class JagerA2 extends ActiveSkill {
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
-            JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
-            if (skill1.getSummonEntity() != null && skill1.getSummonEntity().getEntity().getTarget() == null)
-                skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
+            JagerP1 skillp1 = (JagerP1) combatUser.getSkill(JagerP1Info.getInstance());
+            skillp1.setTarget(victim);
+            combatUser.useAction(ActionKey.PERIODIC_1);
         }
 
         @Override

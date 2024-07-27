@@ -139,6 +139,8 @@ public enum NamedSound {
     ),
     /** 전투 - '예거' 액티브 1번 - 소환 준비 */
     COMBAT_JAGER_A1_SUMMON_READY(new DefinedSound(Sound.ENTITY_WOLF_GROWL, 1, 1)),
+    /** 전투 - '예거' 액티브 1번 - 적 감지 */
+    COMBAT_JAGER_A1_ENEMY_DETECT(new DefinedSound(Sound.ENTITY_WOLF_GROWL, 2, 0.85)),
     /** 전투 - '예거' 액티브 1번 - 피격 */
     COMBAT_JAGER_A1_DAMAGE(new DefinedSound(Sound.ENTITY_WOLF_HURT, 0.4, 1, 0.1)),
     /** 전투 - '예거' 액티브 1번 - 사망 */

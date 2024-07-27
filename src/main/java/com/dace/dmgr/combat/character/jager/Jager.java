@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -133,14 +132,6 @@ public final class Jager extends Marksman {
             text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f투척");
 
         return text.toString();
-    }
-
-    @Override
-    public void onTick(@NonNull CombatUser combatUser, long i) {
-        super.onTick(combatUser, i);
-
-        if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override

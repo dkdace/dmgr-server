@@ -13,15 +13,15 @@ public final class JagerA1Info extends ActiveSkillInfo {
     /** 소환 최대 거리 (단위: 블록) */
     public static final int SUMMON_MAX_DISTANCE = 15;
     /** 소환 시간 (tick) */
-    public static final long SUMMON_DURATION = 1 * 20;
+    public static final long SUMMON_DURATION = 2 * 20;
     /** 체력 */
-    public static final int HEALTH = 600;
+    public static final int HEALTH = 500;
     /** 피해량 */
     public static final int DAMAGE = 150;
     /** 이동속도 */
     public static final double SPEED = 0.45;
-    /** 치명상 감지 범위 (단위: 블록) */
-    public static final double LOW_HEALTH_DETECT_RADIUS = 20;
+    /** 적 감지 범위 (단위: 블록) */
+    public static final double ENEMY_DETECT_RADIUS = 20;
     /** 체력 최대 회복 시간 (tick) */
     public static final int RECOVER_DURATION = 6 * 20;
 
