@@ -13,7 +13,7 @@ public final class VellionUltInfo extends UltimateSkillInfo {
     /** 효과 범위 (단위: 블록) */
     public static final double RADIUS = 8;
     /** 이동 속도 감소량 */
-    public static final int SLOW = 30;
+    public static final int SLOW = 50;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) (2.5 * 20);
     /** 피해량 비율 */
