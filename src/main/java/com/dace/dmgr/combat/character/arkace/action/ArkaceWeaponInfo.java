@@ -61,7 +61,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
      */
     public interface SPREAD {
         /** 달리기 탄퍼짐 배수 */
-        double SPRINT_MULTIPLIER = 1.5;
+        double SPRINT_MULTIPLIER = 2;
         /** 탄퍼짐 증가량 */
         double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */

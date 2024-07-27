@@ -16,9 +16,9 @@ public final class JagerWeaponInfo extends WeaponInfo {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 80;
     /** 탄퍼짐 */
-    public static final double SPREAD = 3;
+    public static final double SPREAD = 2.5;
     /** 달리기 탄퍼짐 배수 */
-    public static final double SPREAD_SPRINT_MULTIPLIER = 1.5;
+    public static final double SPREAD_SPRINT_MULTIPLIER = 2.5;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 장탄수 */
@@ -66,9 +66,9 @@ public final class JagerWeaponInfo extends WeaponInfo {
             /** 수평 반동 */
             double SIDE = 0;
             /** 수직 반동 분산도 */
-            double UP_SPREAD = 0.3;
+            double UP_SPREAD = 0.25;
             /** 수평 반동 분산도 */
-            double SIDE_SPREAD = 0.4;
+            double SIDE_SPREAD = 0.3;
         }
     }
 

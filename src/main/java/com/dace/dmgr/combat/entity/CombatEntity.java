@@ -144,6 +144,13 @@ public interface CombatEntity extends Disposable {
     boolean isEnemy(@NonNull CombatEntity combatEntity);
 
     /**
+     * 엔티티가 움직이고 있는 지 확인한다.
+     *
+     * @return 움직이고 있으면 {@code true} 반환
+     */
+    boolean isMoving();
+
+    /**
      * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
      * @param velocity 속도
