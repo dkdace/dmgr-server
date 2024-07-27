@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 public final class SiliaA2Info extends ActiveSkillInfo {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 14 * 20;
+    public static final long COOLDOWN = 11 * 20;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = 1 * 20;
     /** 시전 시간 (tick) */
