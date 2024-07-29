@@ -19,7 +19,7 @@ import java.util.HashMap;
 @UtilityClass
 public final class HologramUtil {
     /** 생성된 홀로그램 목록 (홀로그램 ID : 홀로그램 객체) */
-    private static final HashMap<@NonNull String, Hologram> hologramMap = new HashMap<>();
+    private static final HashMap<String, Hologram> hologramMap = new HashMap<>();
 
     /**
      * 지정한 위치에 홀로그램을 생성한다.

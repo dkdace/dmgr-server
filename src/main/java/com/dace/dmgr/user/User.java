@@ -638,9 +638,9 @@ public final class User implements Disposable {
      *
      * @param title    제목
      * @param subtitle 부제목
-     * @param fadeIn   나타나는 시간 (tick)
-     * @param stay     유지 시간 (tick)
-     * @param fadeOut  사라지는 시간 (tick)
+     * @param fadeIn   나타나는 시간 (tick). 0 이상의 값
+     * @param stay     유지 시간 (tick). 0 이상의 값
+     * @param fadeOut  사라지는 시간 (tick). 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut) {
@@ -694,11 +694,11 @@ public final class User implements Disposable {
      *
      * @param line    줄 번호. 0~14 사이의 값
      * @param content 내용
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IndexOutOfBoundsException {@code line}이 유효 범위를 초과하면 발생
      */
     public void editSidebar(int line, @NonNull String content) {
         if (line < 0 || line > 14)
-            throw new IllegalArgumentException("'line'가 0에서 14 사이여야 함");
+            throw new IndexOutOfBoundsException("'line'이 0에서 14 사이여야 함");
         if (sidebar == null)
             return;
 
@@ -710,11 +710,11 @@ public final class User implements Disposable {
      * 플레이어의 사이드바 내용을 업데이트한다.
      *
      * @param contents 내용 목록
-     * @throws IllegalArgumentException {@code contents}의 길이가 15를 초과하면 발생
+     * @throws IndexOutOfBoundsException {@code contents}의 길이가 15를 초과하면 발생
      */
     public void editSidebar(@NonNull String @NonNull ... contents) {
         if (contents.length > 15)
-            throw new IllegalArgumentException("'contents'의 길이가 16 미만이어야 함");
+            throw new IndexOutOfBoundsException("'contents'의 길이가 16 미만이어야 함");
         if (sidebar != null)
             sidebar.setAll(contents);
     }
@@ -754,13 +754,13 @@ public final class User implements Disposable {
      * @param row     행 번호. 0~19 사이의 값
      * @param content 내용
      * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
      */
     public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
         if (column < 0 || column > 3)
-            throw new IllegalArgumentException("'column'이 0에서 3 사이여야 함");
+            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
-            throw new IllegalArgumentException("'row'가 0에서 19 사이여야 함");
+            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
         if (tabList != null)
             tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
     }
@@ -770,13 +770,13 @@ public final class User implements Disposable {
      *
      * @param column 열 번호. 0~3 사이의 값
      * @param row    행 번호. 0~19 사이의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
      */
     public void removeTabListItem(int column, int row) {
         if (column < 0 || column > 3)
-            throw new IllegalArgumentException("'column'이 0에서 3 사이여야 함");
+            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
-            throw new IllegalArgumentException("'row'가 0에서 19 사이여야 함");
+            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
         if (tabList != null)
             tabList.remove(column, row);
     }
