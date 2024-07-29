@@ -1,12 +1,12 @@
 package com.dace.dmgr.item;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.util.task.AsyncTask;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,7 +40,6 @@ public final class ItemBuilder {
     private final ItemStack itemStack;
     /** 생성할 아이템의 정보 객체 */
     @NonNull
-    @Getter
     private final ItemMeta itemMeta;
 
     /**
@@ -67,50 +66,53 @@ public final class ItemBuilder {
     }
 
     /**
-     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 플레이어의 머리로 생성한다.
+     * 플레이어 머리 아이템의 지정 플레이어를 설정한다.
      *
      * @param player 대상 플레이어
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
+     * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
+     * @apiNote 비동기로 실행하지 않음. {@link AsyncTask}와 함께 사용하는 것을 권장
      */
-    @NonNull
-    public static ItemBuilder fromPlayerSkull(@NonNull Player player) {
-        ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
-        ((SkullMeta) itemBuilder.getItemMeta()).setOwningPlayer(player);
-        return itemBuilder;
+    public ItemBuilder setSkullOwner(@NonNull OfflinePlayer player) {
+        if (!(itemMeta instanceof SkullMeta))
+            throw new IllegalStateException("아이템이 플레이어 머리가 아님");
+
+        ((SkullMeta) itemMeta).setOwningPlayer(player);
+        return this;
     }
 
     /**
-     * 아이템을 생성하기 위한 빌더 인스턴스를 지정한 스킨 URL의 머리로 생성한다.
+     * 플레이어 머리 아이템의 지정 플레이어를 지정한 스킨 URL로 설정한다.
      *
      * @param skinUrl 스킨 URL
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
+     * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
      */
-    @NonNull
-    public static ItemBuilder fromPlayerSkull(@NonNull String skinUrl) {
-        ItemBuilder itemBuilder = new ItemBuilder(Material.SKULL_ITEM).setDamage((short) 3);
-        SkullMeta skullMeta = ((SkullMeta) itemBuilder.getItemMeta());
+    public ItemBuilder setSkullOwner(@NonNull String skinUrl) {
+        if (!(itemMeta instanceof SkullMeta))
+            throw new IllegalStateException("아이템이 플레이어 머리가 아님");
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
         gameProfile.getProperties().put("textures", new Property("textures", skinUrl));
 
         try {
             if (profileField == null) {
-                profileField = skullMeta.getClass().getDeclaredField("profile");
+                profileField = ((SkullMeta) itemMeta).getClass().getDeclaredField("profile");
                 profileField.setAccessible(true);
             }
-            profileField.set(skullMeta, gameProfile);
+            profileField.set(itemMeta, gameProfile);
         } catch (Exception ex) {
             ConsoleLogger.severe("머리 아이템 생성 실패", ex);
         }
 
-        return itemBuilder;
+        return this;
     }
 
     /**
      * 아이템의 수량을 설정한다.
      *
      * @param amount 수량
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder setAmount(int amount) {
@@ -122,7 +124,7 @@ public final class ItemBuilder {
      * 아이템의 내구도를 설정한다.
      *
      * @param damage 내구도
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder setDamage(short damage) {
@@ -134,7 +136,7 @@ public final class ItemBuilder {
      * 아이템의 이름을 설정한다.
      *
      * @param name 이름
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder setName(@NonNull String name) {
@@ -158,7 +160,7 @@ public final class ItemBuilder {
      * }</pre>
      *
      * @param arguments 포맷에 사용할 인자 목록
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      * @throws IllegalStateException 아이템 이름이 설정되지 않았을 때 발생
      */
     @NonNull
@@ -174,7 +176,7 @@ public final class ItemBuilder {
      * 아이템의 설명을 설정한다.
      *
      * @param lore 설명 ('\n'으로 줄바꿈)
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder setLore(@NonNull String lore) {
@@ -186,7 +188,7 @@ public final class ItemBuilder {
      * 아이템의 설명을 설정한다.
      *
      * @param lores 설명 목록
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder setLore(@NonNull String @NonNull ... lores) {
@@ -198,7 +200,7 @@ public final class ItemBuilder {
      * 아이템의 설명을 추가한다.
      *
      * @param lore 추가할 설명 ('\n'으로 줄바꿈)
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder addLore(@NonNull String lore) {
@@ -217,7 +219,7 @@ public final class ItemBuilder {
      * 아이템의 설명을 추가한다.
      *
      * @param lores 추가할 설명 목록
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder addLore(@NonNull String @NonNull ... lores) {
@@ -250,7 +252,7 @@ public final class ItemBuilder {
      * }</pre>
      *
      * @param arguments 포맷에 사용할 인자 목록
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      * @throws IllegalStateException 아이템 설명이 설정되지 않았을 때 발생
      */
     @NonNull
@@ -266,7 +268,7 @@ public final class ItemBuilder {
      * 아이템에 플래그 속성 정보를 추가한다.
      *
      * @param itemFlags 추가할 아이템 플래그
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder addItemFlags(@NonNull ItemFlag @NonNull ... itemFlags) {
@@ -278,7 +280,7 @@ public final class ItemBuilder {
      * 아이템의 플래그 속성 정보를 제거한다.
      *
      * @param itemFlags 제거할 아이템 플래그
-     * @return ItemBuilder
+     * @return {@link ItemBuilder}
      */
     @NonNull
     public ItemBuilder removeItemFlags(@NonNull ItemFlag @NonNull ... itemFlags) {
@@ -287,7 +289,7 @@ public final class ItemBuilder {
     }
 
     /**
-     * 아이템 객체를 반환한다.
+     * 아이템 객체를 생성하여 반환한다.
      *
      * @return 해당 아이템
      */

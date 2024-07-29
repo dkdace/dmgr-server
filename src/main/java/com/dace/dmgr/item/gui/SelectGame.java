@@ -14,6 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -21,8 +23,7 @@ import java.util.Arrays;
  * 게임 입장 GUI 클래스.
  */
 public final class SelectGame extends Gui {
-    @Getter
-    private static final SelectGame instance = new SelectGame();
+    /** 이전 버튼 GUI 아이템 객체 */
     private static final GuiItem buttonLeft = new ButtonItem.LEFT("SelectGameLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
@@ -30,77 +31,43 @@ public final class SelectGame extends Gui {
             return true;
         }
     };
+    @Getter
+    private static final SelectGame instance = new SelectGame();
 
     private SelectGame() {
         super(2, "§8게임 시작");
     }
 
     /**
-     * GUI에 일반 게임 방 목록을 표시한다.
+     * GUI에 게임 방 정보를 표시한다.
      *
      * @param guiController GUI 컨트롤러 객체
+     * @param game          게임
+     * @param isRanked      랭크 여부
+     * @param i             방 번호
      */
-    private void displayNormalRooms(@NonNull GuiController guiController) {
-        for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
-            final int index = i;
+    private void displayGameInfo(@NotNull GuiController guiController, @Nullable Game game, boolean isRanked, int i) {
+        int minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
+        int maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
+        int index = isRanked ? i + 11 : i + 2;
+        GuiItem guiItem = isRanked ? SelectGameItem.RANK.guiItem : SelectGameItem.NORMAL.guiItem;
 
-            Game game = Game.fromNumber(false, i);
+        if (game == null)
+            guiController.set(index, guiItem, itemBuilder -> itemBuilder.formatName(i)
+                    .formatLore(0, maxPlayerCount, "§8--", "§8--", "§8--"));
+        else {
+            long playTime = System.currentTimeMillis() - game.getStartTime();
 
-            if (game == null)
-                guiController.set(2 + i, SelectGameItem.NORMAL.guiItem, itemBuilder -> itemBuilder.formatName(index)
-                        .formatLore(0,
-                                GeneralConfig.getGameConfig().getNormalMaxPlayerCount(),
-                                "§8--",
-                                "§8--",
-                                "§8--"));
-            else {
-                long playTime = System.currentTimeMillis() - game.getStartTime();
-                String displayTime = DurationFormatUtils.formatDuration(playTime, "mm:ss", true);
-                String gameUserCountColor = game.getGameUsers().size() >= GeneralConfig.getGameConfig().getNormalMinPlayerCount() ? "§f" : "§c";
+            String displayTime = DurationFormatUtils.formatDuration(playTime, "mm:ss", true);
+            String gameUserCountColor = game.getGameUsers().size() >= minPlayerCount ? "§f" : "§c";
 
-                guiController.set(2 + i, SelectGameItem.NORMAL.guiItem, itemBuilder -> itemBuilder
-                        .formatName(index)
-                        .formatLore(gameUserCountColor + game.getGameUsers().size(),
-                                GeneralConfig.getGameConfig().getNormalMaxPlayerCount(),
-                                (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
-                                (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),
-                                (game.getPhase() == Game.Phase.WAITING ? "§8--" : displayTime)));
-            }
-        }
-    }
-
-    /**
-     * GUI에 랭크 게임 방 목록을 표시한다.
-     *
-     * @param guiController GUI 컨트롤러 객체
-     */
-    private void displayRankRooms(@NonNull GuiController guiController) {
-        for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
-            final int index = i;
-
-            Game game = Game.fromNumber(true, i);
-
-            if (game == null)
-                guiController.set(11 + i, SelectGameItem.RANK.guiItem, itemBuilder -> itemBuilder.formatName(index)
-                        .formatLore(0,
-                                GeneralConfig.getGameConfig().getRankMaxPlayerCount(),
-                                "§8--",
-                                "§8--",
-                                "§8--"));
-            else {
-                long playTime = System.currentTimeMillis() - game.getStartTime();
-                String displayTime = DurationFormatUtils.formatDuration(playTime, "mm:ss", true);
-                String gameUserCountColor = game.getGameUsers().size() >= GeneralConfig.getGameConfig().getRankMinPlayerCount() ? "§f" : "§c";
-
-                guiController.set(11 + i, SelectGameItem.RANK.guiItem, itemBuilder -> itemBuilder
-                        .formatName(index)
-                        .formatLore(gameUserCountColor + game.getGameUsers().size(),
-                                GeneralConfig.getGameConfig().getRankMaxPlayerCount(),
-                                (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
-                                (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),
-                                (game.getPhase() == Game.Phase.WAITING ? "§8--" : displayTime)
-                        ));
-            }
+            guiController.set(index, guiItem, itemBuilder -> itemBuilder
+                    .formatName(i)
+                    .formatLore(gameUserCountColor + game.getGameUsers().size(),
+                            maxPlayerCount,
+                            (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
+                            (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),
+                            (game.getPhase() == Game.Phase.WAITING ? "§8--" : displayTime)));
         }
     }
 
@@ -113,9 +80,13 @@ public final class SelectGame extends Gui {
                 itemBuilder.formatLore(GeneralConfig.getGameConfig().getRankPlacementPlayCount()));
         guiController.set(17, buttonLeft);
 
-        displayNormalRooms(guiController);
-        displayRankRooms(guiController);
+        for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
+            Game normalGame = Game.fromNumber(false, i);
+            Game rankGame = Game.fromNumber(true, i);
 
+            displayGameInfo(guiController, normalGame, false, i);
+            displayGameInfo(guiController, rankGame, true, i);
+        }
     }
 
     private enum SelectGameInfoItem {
@@ -167,8 +138,8 @@ public final class SelectGame extends Gui {
                     if (clickType != ClickType.LEFT)
                         return false;
 
-                    String[] splittedClickItemName = clickItem.getItemMeta().getDisplayName().split(" ");
-                    int number = Integer.parseInt(splittedClickItemName[2]);
+                    String displayName = clickItem.getItemMeta().getDisplayName();
+                    int number = Integer.parseInt(String.valueOf(displayName.charAt(displayName.length() - 1)));
                     boolean isRanked = SelectGameItem.this == SelectGameItem.RANK;
 
                     User user = User.fromPlayer(player);

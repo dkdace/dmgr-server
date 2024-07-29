@@ -1,5 +1,6 @@
 package com.dace.dmgr.item;
 
+import com.dace.dmgr.item.gui.GuiItem;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.inventory.ItemFlag;
@@ -11,6 +12,8 @@ import java.text.MessageFormat;
 
 /**
  * 고정적으로 사용되는 정적 아이템을 관리하는 클래스.
+ *
+ * @see GuiItem
  */
 public class StaticItem {
     /** 아이템 식별자 */

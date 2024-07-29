@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.SkullMeta;
  * 차단 목록 GUI 클래스.
  */
 public final class BlockList extends Gui {
+    /** 차단된 플레이어 GUI 아이템 객체 */
     private static final GuiItem playerInto = new GuiItem("BlockListPlayer", new ItemBuilder(Material.SKULL_ITEM)
             .setDamage((short) 3)
             .setLore("§f클릭 시 차단을 해제합니다.")
@@ -40,10 +41,11 @@ public final class BlockList extends Gui {
 
         UserData[] blockedPlayers = userData.getBlockedPlayers();
         new AsyncTask<Void>((onFinish, onError) -> {
-            for (int i = 0; i < blockedPlayers.length; i++) {
-                int index = i;
-                guiController.set(i, playerInto, itemBuilder -> ((SkullMeta) itemBuilder.setName(blockedPlayers[index].getDisplayName()).getItemMeta())
-                        .setOwningPlayer(Bukkit.getOfflinePlayer(blockedPlayers[index].getPlayerUUID())));
+            for (int i = 0; i < Math.min(blockedPlayers.length, 27); i++) {
+                UserData blockedPlayer = blockedPlayers[i];
+
+                guiController.set(i, playerInto, itemBuilder -> itemBuilder.setName(blockedPlayer.getDisplayName())
+                        .setSkullOwner(Bukkit.getOfflinePlayer(blockedPlayer.getPlayerUUID())));
             }
         });
     }

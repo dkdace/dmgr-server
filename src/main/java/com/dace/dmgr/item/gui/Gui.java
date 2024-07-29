@@ -1,6 +1,5 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.event.EventUtil;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import lombok.AccessLevel;
@@ -8,9 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.function.Consumer;
@@ -19,8 +15,13 @@ import java.util.function.Consumer;
  * GUI(상자 인벤토리) 기능을 제공하는 클래스.
  *
  * <p>해당 클래스를 상속받아 GUI를 구현할 수 있다.</p>
+ *
+ * @see StaticItem
+ * @see GuiItem
+ * @see DisplayItem
+ * @see ButtonItem
  */
-public abstract class Gui implements Listener {
+public abstract class Gui {
     /** 행 크기 */
     private final int rowSize;
     /** GUI 이름 */
@@ -32,15 +33,14 @@ public abstract class Gui implements Listener {
      *
      * @param rowSize 행 크기. 1~6 사이의 값
      * @param name    GUI 이름
-     * @throws IllegalArgumentException {@code rowSize}가 1~6 사이가 아니면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected Gui(int rowSize, @NonNull String name) {
         if (rowSize < 1 || rowSize > 6)
             throw new IllegalArgumentException("'rowSize'가 1에서 6 사이여야 함");
+
         this.rowSize = rowSize;
         this.name = name;
-
-        EventUtil.registerListener(this);
     }
 
     /**
@@ -62,17 +62,12 @@ public abstract class Gui implements Listener {
      */
     protected abstract void onOpen(@NonNull Player player, @NonNull GuiController guiController);
 
-    @EventHandler
-    public final void event(InventoryClickEvent event) {
-        if (event.getInventory().getTitle().equals(name))
-            event.setCancelled(true);
-    }
-
     /**
      * GUI 내부의 아이템을 제어하는 클래스.
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class GuiController {
+        /** 현재 인벤토리 */
         @NonNull
         private final Inventory inventory;
 
@@ -86,6 +81,7 @@ public abstract class Gui implements Listener {
         public void set(int index, @NonNull StaticItem staticItem) {
             if (index < 0 || index > inventory.getSize() - 1)
                 throw new IndexOutOfBoundsException("'index'가 인벤토리의 유효 범위를 초과함");
+
             inventory.setItem(index, staticItem.getItemStack());
         }
 
@@ -98,9 +94,10 @@ public abstract class Gui implements Listener {
          *                      인자로 받아 아이템 빌더의 아이템으로 변환한다.
          * @throws IndexOutOfBoundsException {@code index}가 인벤토리의 유효 범위를 초과하면 발생
          */
-        public void set(int index, @NonNull StaticItem staticItem, @NonNull Consumer<ItemBuilder> itemConverter) {
+        public void set(int index, @NonNull StaticItem staticItem, @NonNull Consumer<@NonNull ItemBuilder> itemConverter) {
             if (index < 0 || index > inventory.getSize() - 1)
                 throw new IndexOutOfBoundsException("'index'가 인벤토리의 유효 범위를 초과함");
+
             ItemBuilder itemBuilder = staticItem.toItemBuilder();
             itemConverter.accept(itemBuilder);
             inventory.setItem(index, itemBuilder.build());
@@ -122,11 +119,12 @@ public abstract class Gui implements Listener {
          *
          * @param row        행 번호. 1~6 사이의 값
          * @param staticItem 정적 아이템
-         * @throws IllegalArgumentException {@code row}가 1~6 사이가 아니면 발생
+         * @throws IndexOutOfBoundsException {@code row}가 1~6 사이가 아니면 발생
          */
         public void fillRow(int row, @NonNull StaticItem staticItem) {
             if (row < 1 || row > 6)
-                throw new IllegalArgumentException("'row'가 1에서 6 사이여야 함");
+                throw new IndexOutOfBoundsException("'row'가 1에서 6 사이여야 함");
+
             for (int i = 0; i < 9; i++)
                 set((row - 1) * 9 + i, staticItem);
         }
@@ -136,11 +134,12 @@ public abstract class Gui implements Listener {
          *
          * @param column     열 번호. 1~9 사이의 값
          * @param staticItem 정적 아이템
-         * @throws IllegalArgumentException {@code column}가 1~9 사이가 아니면 발생
+         * @throws IndexOutOfBoundsException {@code column}이 1~9 사이가 아니면 발생
          */
         public void fillColumn(int column, @NonNull StaticItem staticItem) {
             if (column < 1 || column > 9)
-                throw new IllegalArgumentException("'column'이 1에서 9 사이여야 함");
+                throw new IndexOutOfBoundsException("'column'이 1에서 9 사이여야 함");
+
             for (int i = 0; i < 6; i++)
                 set((column - 1) + i * 9, staticItem);
         }

@@ -6,11 +6,12 @@ import com.dace.dmgr.util.SkinUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
 /**
  * 메뉴 - 설정 GUI 클래스.
@@ -53,7 +54,7 @@ public final class PlayerOption extends Gui {
                     else
                         player.performCommand("kakc chmod 0");
 
-                    return true;
+                    PlayerOption.getInstance().open(player);
                 }),
         NIGHT_VISION("N2VmNGU1NzM1NDkwZmI5MDMyZDUxOTMwMWMzMGU1NTkxNjY2ZTg4YjZmY2I2MmM1M2Q5ZmM3Nzk2YTZmMDZhNyJ9fX0=",
                 "야간 투시", "야간 투시를 활성화합니다.",
@@ -61,16 +62,14 @@ public final class PlayerOption extends Gui {
                     UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
                     userConfig.setNightVision(!userConfig.isNightVision());
 
-                    return true;
+                    PlayerOption.getInstance().open(player);
                 }),
         CROSSHAIR("NzNjM2E5YmRjOGM0MGM0MmQ4NDFkYWViNzFlYTllN2QxYzU0YWIzMWEyM2EyZDkyNjU5MWQ1NTUxNDExN2U1ZCJ9fX0=",
-                "조준선 설정", "조준선을 변경합니다.", player -> true),
+                "조준선 설정", "조준선을 변경합니다.", player -> {
+        }),
         CHAT_SOUND("OWIxZTIwNDEwYmI2YzdlNjk2OGFmY2QzZWM4NTU1MjBjMzdhNDBkNTRhNTRlOGRhZmMyZTZiNmYyZjlhMTkxNSJ9fX0=\\",
                 "채팅 효과음 설정", "채팅 효과음을 변경하거나 끕니다.",
-                player -> {
-                    ChatSoundOption.getInstance().open(player);
-                    return false;
-                }),
+                player -> ChatSoundOption.getInstance().open(player)),
         LEFT(new ButtonItem.LEFT("PlayerOptionLeft") {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
@@ -83,8 +82,10 @@ public final class PlayerOption extends Gui {
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
 
-        PlayerOptionItem(String skinUrl, String name, String lore, Predicate<Player> action) {
-            this.guiItem = new GuiItem("PlayerOption" + this, ItemBuilder.fromPlayerSkull(SkinUtil.TOKEN_PREFIX + skinUrl)
+        PlayerOptionItem(String skinUrl, String name, String lore, Consumer<Player> action) {
+            this.guiItem = new GuiItem("PlayerOption" + this, new ItemBuilder(Material.SKULL_ITEM)
+                    .setDamage((short) 3)
+                    .setSkullOwner(SkinUtil.TOKEN_PREFIX + skinUrl)
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build()) {
@@ -93,9 +94,7 @@ public final class PlayerOption extends Gui {
                     if (clickType != ClickType.LEFT)
                         return false;
 
-                    if (action.test(player))
-                        PlayerOption.getInstance().open(player);
-
+                    action.accept(player);
                     return true;
                 }
             };

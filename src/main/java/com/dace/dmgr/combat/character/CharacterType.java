@@ -14,6 +14,7 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SkinUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +41,9 @@ public enum CharacterType {
 
     CharacterType(Character character) {
         this.character = character;
-        this.guiItem = new GuiItem(this.toString(), ItemBuilder.fromPlayerSkull(SkinUtil.getSkinUrl(character.getSkinName()))
+        this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
+                .setDamage((short) 3)
+                .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
                 .setName("§c" + character.getName())
                 .setLore("§f전투원 설명", toString())
                 .build()) {

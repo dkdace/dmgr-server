@@ -14,16 +14,16 @@ import org.bukkit.inventory.ItemStack;
  * 메뉴 - 채팅 효과음 설정 GUI 클래스.
  */
 public final class ChatSoundOption extends Gui {
-    @Getter
-    private static final ChatSoundOption instance = new ChatSoundOption();
+    /** 이전 버튼 GUI 아이템 객체 */
     private static final GuiItem buttonLeft = new ButtonItem.LEFT("ChatSoundOptionLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            PlayerOption playerOption = PlayerOption.getInstance();
-            playerOption.open(player);
+            PlayerOption.getInstance().open(player);
             return true;
         }
     };
+    @Getter
+    private static final ChatSoundOption instance = new ChatSoundOption();
 
     private ChatSoundOption() {
         super(2, "§8채팅 효과음 설정");
@@ -37,9 +37,10 @@ public final class ChatSoundOption extends Gui {
 
         guiController.fillRow(2, DisplayItem.EMPTY.getStaticItem());
         for (int i = 0; i < chatSounds.length; i++) {
-            int index = i;
-            guiController.set(i, chatSounds[i].guiItem, itemBuilder -> {
-                if (userConfig.getChatSound() == chatSounds[index]) itemBuilder.addLore("§a§l선택됨");
+            ChatSound chatSound = chatSounds[i];
+
+            guiController.set(i, chatSound.guiItem, itemBuilder -> {
+                if (userConfig.getChatSound() == chatSound) itemBuilder.addLore("§a§l선택됨");
             });
         }
 
@@ -80,15 +81,17 @@ public final class ChatSoundOption extends Gui {
         BANJO("벤조", "new.block.note_block.banjo", Material.HAY_BLOCK);
 
         /** 이름 */
+        @NonNull
         @Getter
         private final String name;
         /** 효과음 */
+        @NonNull
         @Getter
         private final String sound;
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
 
-        ChatSound(String name, String sound, Material material) {
+        ChatSound(@NonNull String name, @NonNull String sound, Material material) {
             ItemBuilder itemBuilder = new ItemBuilder(material).setName("§e§l" + name);
             this.name = name;
             this.sound = sound;
@@ -100,9 +103,9 @@ public final class ChatSoundOption extends Gui {
                         return false;
 
                     UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
+                    userConfig.setChatSound(ChatSound.this);
 
                     SoundUtil.play(sound, player, 1, Math.sqrt(2));
-                    userConfig.setChatSound(ChatSound.this);
 
                     ChatSoundOption.getInstance().open(player);
 
