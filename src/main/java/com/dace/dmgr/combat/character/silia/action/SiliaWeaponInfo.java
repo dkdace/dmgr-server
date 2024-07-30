@@ -13,7 +13,7 @@ public final class SiliaWeaponInfo extends WeaponInfo {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 35;
     /** 투사체 크기 (단위: 블록) */
-    public static final double SIZE = 0.5;
+    public static final double SIZE = 0.4;
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.9 * 20);
     @Getter

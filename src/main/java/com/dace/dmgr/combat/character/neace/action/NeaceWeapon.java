@@ -101,7 +101,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     void healTarget(Healable target) {
         boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
 
-        target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
+        target.getDamageModule().heal(combatUser, (NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / (isAmplifying ? 40 : 20)), true);
         if (isAmplifying) {
             target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
             if (target instanceof CombatUser)

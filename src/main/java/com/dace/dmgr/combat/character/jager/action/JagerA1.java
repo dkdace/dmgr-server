@@ -193,6 +193,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             entity.setAI(false);
             entity.setCollarColor(DyeColor.CYAN);
             entity.setTamed(true);
+            entity.setSitting(true);
             entity.setOwner(owner.getEntity());
             entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
             damageModule.setHealth(getStateValue());
@@ -226,17 +227,24 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
             if (i % 10 == 0) {
                 if (entity.getTarget() == null) {
-                    Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living &&
-                                    combatEntity.isEnemy(this) && ((Damageable) combatEntity).getDamageModule().isLowHealth());
-                    if (target != null)
-                        entity.setTarget(target.getEntity());
-                } else {
-                    CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
-                    if (targetCombatEntity == null)
-                        return;
+                    entity.setAngry(false);
+                    entity.setSitting(true);
+                    entity.setTamed(true);
 
-                    if ((targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()) || targetCombatEntity.isDisposed())
+                    Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
+                            combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living && combatEntity.isEnemy(this));
+                    if (target != null) {
+                        entity.setTarget(target.getEntity());
+                        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_ENEMY_DETECT, entity.getLocation());
+                    }
+                } else {
+                    entity.setAngry(true);
+                    entity.setSitting(false);
+                    entity.setTamed(false);
+
+                    CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
+                    if (targetCombatEntity == null || targetCombatEntity.isDisposed() ||
+                            (targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()))
                         entity.setTarget(null);
                 }
             }
@@ -253,6 +261,10 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
             CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
+
+            JagerP1 skillp1 = (JagerP1) combatUser.getSkill(JagerP1Info.getInstance());
+            skillp1.setTarget(victim);
+            combatUser.useAction(ActionKey.PERIODIC_1);
         }
 
         @Override

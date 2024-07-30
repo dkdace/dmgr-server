@@ -507,8 +507,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
                 statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
             return false;
-        if (CooldownUtil.getCooldown(this, Cooldown.WEAPON_NO_SPRINT.id) > 0)
-            return false;
         if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
             return false;
 
@@ -1385,8 +1383,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
         /** 점프대 */
         JUMP_PAD("JumpPad", 10),
-        /** 무기 사용 시 달리기 금지 */
-        WEAPON_NO_SPRINT("WeaponNoSprint", 7),
         /** 적 타격 시 생명력 홀로그램 */
         HIT_HEALTH_HOLOGRAM("HitHealthHologram", 20),
         /** 적 처치 기여 (데미지 누적) 제한시간 */

@@ -11,7 +11,7 @@ public final class VellionWeaponInfo extends WeaponInfo {
     /** 피해량 */
     public static final int DAMAGE = 120;
     /** 사거리 (단위: 블록) */
-    public static final int DISTANCE = 20;
+    public static final int DISTANCE = 30;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 35;
     /** 투사체 크기 (단위: 블록) */

@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -56,7 +59,6 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 }
 
                 setCooldown();
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
 
                 new JagerWeaponRHitscan().shoot();
                 reloadModule.consume(1);

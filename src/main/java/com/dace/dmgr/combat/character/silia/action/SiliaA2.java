@@ -130,8 +130,6 @@ public final class SiliaA2 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            setCooldown(getDefaultCooldown() / 2);
-
             if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
                     SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                 target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);

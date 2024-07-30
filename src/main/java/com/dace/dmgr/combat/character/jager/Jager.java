@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.jager;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -12,7 +11,6 @@ import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -136,21 +134,8 @@ public final class Jager extends Marksman {
     }
 
     @Override
-    public void onTick(@NonNull CombatUser combatUser, long i) {
-        super.onTick(combatUser, i);
-
-        if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
-        JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
-
-        if (skill1.getSummonEntity() != null && victim instanceof Living)
-            skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
-
         return skillUlt.getSummonEntity() == null;
     }
 
@@ -180,7 +165,7 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getWeapon()).getReloadModule().isReloading() && !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
     }
 
     @Override

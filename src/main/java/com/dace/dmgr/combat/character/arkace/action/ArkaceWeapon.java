@@ -56,7 +56,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     return;
                 }
 
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
+                CooldownUtil.setCooldown(combatUser, ArkaceP1.COOLDOWN_ID, ArkaceWeaponInfo.SPRINT_READY_DURATION + 2);
 
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
                     setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
@@ -65,7 +65,11 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 Location loc = combatUser.getEntity().getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
-                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), fullAutoModule.increaseSpread());
+                    double spread = combatUser.isMoving() ? fullAutoModule.increaseSpread() : 0;
+                    if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
+                        spread *= ArkaceWeaponInfo.SPREAD.SPRINT_MULTIPLIER;
+
+                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
                     new ArkaceWeaponHitscan(false).shoot(dir);
                     reloadModule.consume(1);
 

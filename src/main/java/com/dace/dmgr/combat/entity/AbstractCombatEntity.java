@@ -44,6 +44,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     protected final Hitbox @NonNull [] hitboxes;
     /** 활성화 여부 */
     protected boolean isActivated = false;
+    /** 움직임 상태 */
+    protected boolean isMoving = false;
     /** 히트박스의 중앙 위치 */
     @NonNull
     private Location hitboxLocation;
@@ -109,6 +111,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         Location oldLoc = entity.getLocation();
 
         TaskUtil.addTask(this, new DelayTask(() -> {
+            isMoving = oldLoc.distance(entity.getLocation()) > 0;
             for (Hitbox hitbox : getHitboxes()) {
                 hitboxLocation = oldLoc;
                 hitbox.setCenter(hitboxLocation);
