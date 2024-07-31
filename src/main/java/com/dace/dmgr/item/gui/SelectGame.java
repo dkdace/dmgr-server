@@ -59,11 +59,11 @@ public final class SelectGame extends Gui {
             long playTime = System.currentTimeMillis() - game.getStartTime();
 
             String displayTime = DurationFormatUtils.formatDuration(playTime, "mm:ss", true);
-            String gameUserCountColor = game.getGameUsers().size() >= minPlayerCount ? "§f" : "§c";
+            String gameUserCountColor = game.getGameUsers().length >= minPlayerCount ? "§f" : "§c";
 
             guiController.set(index, guiItem, itemBuilder -> itemBuilder
                     .formatName(i)
-                    .formatLore(gameUserCountColor + game.getGameUsers().size(),
+                    .formatLore(gameUserCountColor + game.getGameUsers().length,
                             maxPlayerCount,
                             (game.getPhase() == Game.Phase.WAITING ? "§a" : "§c") + game.getPhase().getName(),
                             (game.getPhase() == Game.Phase.WAITING ? "§8--" : game.getGamePlayMode().getName()),

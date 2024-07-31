@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.Arrays;
+
 /**
  * 역할군이 '지원'인 전투원의 정보를 관리하는 클래스.
  */
@@ -36,8 +38,8 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null) {
-            boolean activate = combatUser.getGame().getTeamUserMap().get(combatUser.getGameUser().getTeam()).stream()
+        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
+            boolean activate = Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
                     .anyMatch(combatUser2 -> combatUser2 != null && combatUser2.getDamageModule().isLowHealth() &&
                             combatUser2.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);

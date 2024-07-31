@@ -3,6 +3,7 @@ package com.dace.dmgr.game.map;
 import com.dace.dmgr.GlobalLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -18,11 +19,15 @@ public enum TeamDeathmatchMap implements GameMap {
     );
 
     /** 맵 이름 */
+    @NonNull
     private final String name;
     /** 맵 월드 */
+    @NonNull
     private final World world;
     /** 레드 팀 스폰 위치 목록 */
-    private final GlobalLocation[] redTeamSpawns;
+    @NonNull
+    private final GlobalLocation @NonNull [] redTeamSpawns;
     /** 블루 팀 스폰 위치 목록 */
-    private final GlobalLocation[] blueTeamSpawns;
+    @NonNull
+    private final GlobalLocation @NonNull [] blueTeamSpawns;
 }

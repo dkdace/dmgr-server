@@ -19,7 +19,7 @@ final class GameReward {
      */
     static int getFinalXp(int xp, double score, @Nullable Boolean isWinner) {
         int finalScore = (int) (xp + 50 + score * 0.2);
-        if (isWinner != null && isWinner)
+        if (Boolean.TRUE.equals(isWinner))
             finalScore += 200;
 
         return finalScore;
@@ -35,7 +35,7 @@ final class GameReward {
      */
     static int getFinalMoney(int money, double score, @Nullable Boolean isWinner) {
         int finalScore = (int) (money + 50 + score * 0.2);
-        if (isWinner != null && isWinner)
+        if (Boolean.TRUE.equals(isWinner))
             finalScore += 200;
 
         return finalScore;
@@ -99,7 +99,7 @@ final class GameReward {
      * @param kda 킬/데스
      * @return 킬/데스 보정치
      */
-    static double getKDARatioCorrection(double kda) {
+    private static double getKDARatioCorrection(double kda) {
         return (kda / GeneralConfig.getGameConfig().getExpectedAverageKDARatio()) * 20;
     }
 
@@ -110,7 +110,7 @@ final class GameReward {
      * @param playTime 플레이 시간 (초)
      * @return 게임 점수 보정치
      */
-    static double getScoreCorrection(double score, long playTime) {
+    private static double getScoreCorrection(double score, long playTime) {
         return ((score / GeneralConfig.getGameConfig().getExpectedAverageScorePerMin()) / playTime / 60) * 20;
     }
 
@@ -120,7 +120,7 @@ final class GameReward {
      * @param isWinner 승리 여부. {@code null}로 지정 시 무승부를 나타냄
      * @return 승패 보정치
      */
-    static double getWinCorrection(@Nullable Boolean isWinner) {
+    private static double getWinCorrection(@Nullable Boolean isWinner) {
         if (isWinner == null)
             return 0;
         return isWinner ? 10 : -8;
@@ -134,7 +134,7 @@ final class GameReward {
      * @param averageRR 게임 참여자들의 랭크 점수 평균
      * @return MMR, 랭크 점수 보정치
      */
-    static double getPointCorrection(int mmr, int rr, int averageRR) {
+    private static double getPointCorrection(int mmr, int rr, int averageRR) {
         double averageDiffValue = (GeneralConfig.getGameConfig().getExpectedAverageRankRate() + averageRR) / 2.0 - rr;
         int weightValue = mmr - rr;
         return averageDiffValue * 0.04 + weightValue * 0.1;

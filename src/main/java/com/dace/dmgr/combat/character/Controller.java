@@ -14,6 +14,8 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 /**
  * 역할군이 '제어'인 전투원의 정보를 관리하는 클래스.
  */
@@ -38,8 +40,8 @@ public abstract class Controller extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null) {
-            combatUser.getGame().getTeamUserMap().get(combatUser.getGameUser().getTeam()).stream()
+        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
+            Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
                     .filter(combatUser2 -> combatUser2 != null && combatUser2 != combatUser && combatUser2.getDamageModule().isLowHealth())
                     .forEach(combatUser2 -> {

@@ -374,8 +374,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             HologramUtil.editHologram(Cooldown.HEAL_PACK.id + healPackLocation,
                     MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
             if (isGame)
-                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
+                for (GameUser gameUser2 : game.getGameUsers()) {
+                    HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
+                            LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer());
+                }
             else
                 for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
                     if (combatEntity instanceof CombatUser)
@@ -767,14 +769,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         ChatColor color = gameUser == null ? ChatColor.WHITE : gameUser.getTeam().getColor();
         String victimName = MessageFormat.format("§f{0}{1}§l {2}", character.getIcon(), color, name);
 
-        game.getGameUsers().forEach(gameUser2 -> {
+        for (GameUser gameUser2 : game.getGameUsers()) {
             gameUser2.getUser().addBossBar("CombatKill" + this,
                     MessageFormat.format("{0} §4§l-> {1}", String.join(", ", attackerNames), victimName),
                     BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
 
             TaskUtil.addTask(gameUser2, new DelayTask(() ->
                     gameUser2.getUser().removeBossBar("CombatKill" + this), KILL_LOG_DISPLAY_DURATION));
-        });
+        }
     }
 
     /**
@@ -820,8 +822,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return false;
 
             if (isGame)
-                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
+                for (GameUser gameUser2 : game.getGameUsers()) {
+                    HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
+                            LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer());
+                }
             else
                 for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
                     if (combatEntity instanceof CombatUser)
