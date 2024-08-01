@@ -188,13 +188,9 @@ public class DMGR extends JavaPlugin {
         getCommand("퇴장").setExecutor(QuitCommand.getInstance());
         getCommand("명령어").setExecutor(HelpCommand.getInstance());
         getCommand("전적").setExecutor(StatCommand.getInstance());
-        getCommand("전적").setTabCompleter(StatCommand.Tab.getInstance());
         getCommand("귓속말").setExecutor(DMCommand.getInstance());
-        getCommand("귓속말").setTabCompleter(DMCommand.Tab.getInstance());
         getCommand("차단").setExecutor(BlockCommand.getInstance());
-        getCommand("차단").setTabCompleter(BlockCommand.Tab.getInstance());
         getCommand("랭킹").setExecutor(RankingCommand.getInstance());
-        getCommand("랭킹").setTabCompleter(RankingCommand.Tab.getInstance());
         getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
     }
 

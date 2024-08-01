@@ -5,10 +5,11 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * 명령어 목록 확인 명령어 클래스.
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
  * <p>Usage: /명령어</p>
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class HelpCommand implements CommandExecutor {
+public final class HelpCommand extends BaseCommandExecutor {
     /** 명령어 목록 표시 메시지 */
     private static final String MESSAGE_HELP = StringFormUtil.BAR +
             "\n§a§l/(메뉴|menu) - §a메뉴 창을 엽니다. §nF키§a를 눌러 사용할 수도 있습니다." +
@@ -31,12 +32,13 @@ public class HelpCommand implements CommandExecutor {
     private static final HelpCommand instance = new HelpCommand();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
-        User user = User.fromPlayer(player);
+    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
+        User.fromPlayer(player).sendMessageInfo(MESSAGE_HELP);
+    }
 
-        user.sendMessageInfo(MESSAGE_HELP);
-
-        return true;
+    @Override
+    @Nullable
+    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
+        return null;
     }
 }
