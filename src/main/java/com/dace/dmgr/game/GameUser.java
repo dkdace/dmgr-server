@@ -145,7 +145,7 @@ public final class GameUser implements Disposable {
             return;
 
         if (getSpawnRegionTeam() == null) {
-            if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
+            if (game.getPhase() == Game.Phase.READY || !combatUser.isActivated())
                 user.teleport(getRespawnLocation());
         } else if (game.getPhase() == Game.Phase.PLAYING) {
             if (getSpawnRegionTeam() == team)
@@ -333,38 +333,18 @@ public final class GameUser implements Disposable {
      * 게임에 참여한 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
      *
      * @param message 메시지
+     * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
-    public void sendAllMessage(@NonNull String message) {
+    public void sendMessage(@NonNull String message, boolean isTeam) {
         if (team == null)
             return;
 
-        String fullMessage = MessageFormat.format(CHAT_FORMAT, "전체", team.getColor(),
+        String fullMessage = MessageFormat.format(CHAT_FORMAT, isTeam ? "팀" : "전체", team.getColor(),
                 (combatUser == null || !combatUser.isActivated() ? "미선택" :
                         "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
                                 team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
                 player.getName(), message);
-        for (GameUser target : game.getGameUsers()) {
-            UserData targetUserData = UserData.fromPlayer(target.getPlayer());
-            target.getUser().getPlayer().sendMessage(fullMessage);
-            SoundUtil.play(targetUserData.getConfig().getChatSound().getSound(), target.getPlayer(), 1000, 1);
-        }
-    }
-
-    /**
-     * 소속된 팀의 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
-     *
-     * @param message 메시지
-     */
-    public void sendTeamMessage(@NonNull String message) {
-        if (team == null)
-            return;
-
-        String fullMessage = MessageFormat.format(CHAT_FORMAT, "팀", team.getColor(),
-                (combatUser == null || !combatUser.isActivated() ? "미선택" :
-                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
-                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
-                player.getName(), message);
-        for (GameUser target : team.getTeamUsers()) {
+        for (GameUser target : (isTeam ? team.getTeamUsers() : game.getGameUsers())) {
             UserData targetUserData = UserData.fromPlayer(target.getPlayer());
             target.getUser().getPlayer().sendMessage(fullMessage);
             SoundUtil.play(targetUserData.getConfig().getChatSound().getSound(), target.getPlayer(), 1000, 1);
@@ -442,7 +422,7 @@ public final class GameUser implements Disposable {
                         CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
                     }
 
-                    gameUser.sendTeamMessage(action.apply(gameUser, combatUser));
+                    gameUser.sendMessage(action.apply(gameUser, combatUser), true);
                     player.closeInventory();
 
                     return true;
