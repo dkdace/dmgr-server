@@ -25,7 +25,6 @@ public abstract class Gui {
     /** 행 크기 */
     private final int rowSize;
     /** GUI 이름 */
-    @NonNull
     private final String name;
 
     /**

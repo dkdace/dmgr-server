@@ -8,8 +8,10 @@ import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import lombok.*;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.EnumMap;
@@ -68,6 +70,7 @@ public final class UserData extends YamlFile {
     @Getter
     private int quitCount = 0;
     /** 차단한 플레이어의 UUID 목록 */
+    @Nullable
     private List<String> blockedPlayers;
 
     /**
@@ -292,6 +295,7 @@ public final class UserData extends YamlFile {
      */
     @NonNull
     public UserData @NonNull [] getBlockedPlayers() {
+        Validate.validState(blockedPlayers != null);
         return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
     }
 
@@ -302,6 +306,7 @@ public final class UserData extends YamlFile {
      * @return 차단 여부
      */
     public boolean isBlockedPlayer(@NonNull UserData userData) {
+        Validate.validState(blockedPlayers != null);
         return this.blockedPlayers.contains(userData.getPlayerUUID().toString());
     }
 
@@ -311,6 +316,8 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
+        Validate.validState(blockedPlayers != null);
+
         this.blockedPlayers.add(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -321,6 +328,8 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void removeBlockedPlayer(@NonNull UserData userData) {
+        Validate.validState(blockedPlayers != null);
+
         this.blockedPlayers.remove(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -329,6 +338,8 @@ public final class UserData extends YamlFile {
      * 차단 목록을 초기화한다.
      */
     public void clearBlockedPlayers() {
+        Validate.validState(blockedPlayers != null);
+
         this.blockedPlayers.clear();
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -397,7 +408,6 @@ public final class UserData extends YamlFile {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class Config {
         /** 채팅 효과음 */
-        @NonNull
         private String chatSound = ChatSoundOption.ChatSound.PLING.toString();
         /** 한글 채팅 여부 */
         @Getter

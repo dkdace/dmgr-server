@@ -37,12 +37,10 @@ import java.util.List;
  */
 public abstract class YamlFile implements Initializable<Void> {
     /** Yaml 설정 객체 */
-    @NonNull
     private final YamlConfiguration config;
     /** 읽기 전용 여부 */
     private final boolean isReadOnly;
     /** 파일 저장을 위한 객체 */
-    @NonNull
     private final File file;
     /** 초기화 여부 */
     @Getter
@@ -55,8 +53,8 @@ public abstract class YamlFile implements Initializable<Void> {
      * @param isReadOnly 읽기 전용 여부
      */
     protected YamlFile(@NonNull String path, boolean isReadOnly) {
-        file = new File(DMGR.getPlugin().getDataFolder(), path + ".yml");
-        config = YamlConfiguration.loadConfiguration(file);
+        this.file = new File(DMGR.getPlugin().getDataFolder(), path + ".yml");
+        this.config = YamlConfiguration.loadConfiguration(file);
         this.isReadOnly = isReadOnly;
     }
 
@@ -284,7 +282,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     @NonNull
-    protected final List<Long> getLongList(@NonNull String key) {
+    protected final List<@NonNull Long> getLongList(@NonNull String key) {
         validate();
 
         if (key.contains("."))
@@ -362,7 +360,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     @NonNull
-    protected final List<Double> getDoubleList(@NonNull String key) {
+    protected final List<@NonNull Double> getDoubleList(@NonNull String key) {
         validate();
 
         if (key.contains("."))
@@ -442,7 +440,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     @NonNull
-    protected final List<String> getStringList(@NonNull String key) {
+    protected final List<@NonNull String> getStringList(@NonNull String key) {
         validate();
 
         if (key.contains("."))
@@ -522,7 +520,7 @@ public abstract class YamlFile implements Initializable<Void> {
      * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
      */
     @NonNull
-    protected final List<Boolean> getBooleanList(@NonNull String key) {
+    protected final List<@NonNull Boolean> getBooleanList(@NonNull String key) {
         validate();
 
         if (key.contains("."))

@@ -21,7 +21,6 @@ public class StaticItem {
     @Getter
     private final String identifier;
     /** 기본 아이템 객체 */
-    @NonNull
     private final ItemStack itemStack;
 
     /**

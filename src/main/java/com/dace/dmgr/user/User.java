@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -164,7 +165,10 @@ public final class User implements Disposable {
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
 
-        TaskUtil.addTask(this, new IntervalTask(i -> User.this.onSecond(), 20));
+        TaskUtil.addTask(this, new IntervalTask(i -> {
+            onSecond();
+            return true;
+        }, 20));
     }
 
     /**
@@ -258,7 +262,7 @@ public final class User implements Disposable {
     /**
      * 매 초마다 실행할 작업.
      */
-    private boolean onSecond() {
+    private void onSecond() {
         if (userData.getConfig().isNightVision())
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
         else
@@ -270,8 +274,6 @@ public final class User implements Disposable {
         GameUser gameUser = GameUser.fromUser(this);
         if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
             updateTablist();
-
-        return true;
     }
 
     /**
@@ -462,8 +464,7 @@ public final class User implements Disposable {
             SkinUtil.resetSkin(player);
 
         if (userData.isInitialized()) {
-            if (sidebar != null)
-                sidebar.clear();
+            clearSidebar();
             clearTabListItems();
         }
 
@@ -683,10 +684,11 @@ public final class User implements Disposable {
      * 플레이어의 사이드바 이름을 지정한다.
      *
      * @param name 사이드바 이름
+     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setSidebarName(@NonNull String name) {
-        if (sidebar != null)
-            sidebar.setName(name);
+        Validate.validState(sidebar != null);
+        sidebar.setName(name);
     }
 
     /**
@@ -695,12 +697,12 @@ public final class User implements Disposable {
      * @param line    줄 번호. 0~14 사이의 값
      * @param content 내용
      * @throws IndexOutOfBoundsException {@code line}이 유효 범위를 초과하면 발생
+     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void editSidebar(int line, @NonNull String content) {
         if (line < 0 || line > 14)
             throw new IndexOutOfBoundsException("'line'이 0에서 14 사이여야 함");
-        if (sidebar == null)
-            return;
+        Validate.validState(sidebar != null);
 
         ChatColor[] chatColors = ChatColor.values();
         sidebar.set(content.isEmpty() ? String.valueOf(chatColors[line]) : content, 14 - line);
@@ -711,40 +713,46 @@ public final class User implements Disposable {
      *
      * @param contents 내용 목록
      * @throws IndexOutOfBoundsException {@code contents}의 길이가 15를 초과하면 발생
+     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void editSidebar(@NonNull String @NonNull ... contents) {
         if (contents.length > 15)
             throw new IndexOutOfBoundsException("'contents'의 길이가 16 미만이어야 함");
-        if (sidebar != null)
-            sidebar.setAll(contents);
+        Validate.validState(sidebar != null);
+
+        sidebar.setAll(contents);
     }
 
     /**
      * 플레이어의 사이드바 내용을 초기화한다.
+     *
+     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void clearSidebar() {
-        if (sidebar != null)
-            sidebar.clear();
+        Validate.validState(sidebar != null);
+        sidebar.clear();
     }
 
     /**
      * 플레이어의 탭리스트 헤더(상단부)의 내용을 지정한다.
      *
      * @param content 내용
+     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListHeader(@NonNull String content) {
-        if (tabList != null)
-            tabList.setHeader(content);
+        Validate.validState(tabList != null);
+        tabList.setHeader(content);
     }
 
     /**
      * 플레이어의 탭리스트 푸터(하단부)의 내용을 지정한다.
      *
      * @param content 내용
+     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListFooter(@NonNull String content) {
-        if (tabList != null)
-            tabList.setFooter(content);
+        Validate.validState(tabList != null);
+        tabList.setFooter(content);
     }
 
     /**
@@ -755,14 +763,16 @@ public final class User implements Disposable {
      * @param content 내용
      * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
      * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
+     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
         if (column < 0 || column > 3)
             throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
             throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
-        if (tabList != null)
-            tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
+        Validate.validState(tabList != null);
+
+        tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
     }
 
     /**
@@ -771,23 +781,28 @@ public final class User implements Disposable {
      * @param column 열 번호. 0~3 사이의 값
      * @param row    행 번호. 0~19 사이의 값
      * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
+     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void removeTabListItem(int column, int row) {
         if (column < 0 || column > 3)
             throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
             throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
-        if (tabList != null)
-            tabList.remove(column, row);
+        Validate.validState(tabList != null);
+
+        tabList.remove(column, row);
     }
 
     /**
      * 플레이어의 탭리스트에서 모든 항목을 제거한다.
+     *
+     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void clearTabListItems() {
-        if (tabList != null)
-            for (int i = 0; i < 80; i++)
-                tabList.remove(i);
+        Validate.validState(tabList != null);
+
+        for (int i = 0; i < 80; i++)
+            tabList.remove(i);
     }
 
     /**

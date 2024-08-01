@@ -36,10 +36,8 @@ public final class ItemBuilder {
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
     private static Field profileField;
     /** 생성할 아이템 객체 */
-    @NonNull
     private final ItemStack itemStack;
     /** 생성할 아이템의 정보 객체 */
-    @NonNull
     private final ItemMeta itemMeta;
 
     /**

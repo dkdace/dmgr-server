@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -58,6 +59,7 @@ public final class GameUser implements Disposable {
     @Getter
     private final Game game;
     /** 전투 플레이어 객체 */
+    @Nullable
     private CombatUser combatUser = null;
     /** 팀 */
     @Nullable
@@ -168,6 +170,8 @@ public final class GameUser implements Disposable {
      * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickTeamSpawn() {
+        Validate.validState(combatUser != null);
+
         if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
@@ -179,6 +183,8 @@ public final class GameUser implements Disposable {
      * 플레이어가 상대 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickOppositeSpawn() {
+        Validate.validState(combatUser != null);
+
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
@@ -279,9 +285,9 @@ public final class GameUser implements Disposable {
      */
     public void addTeamScore(int increment) {
         validate();
+        Validate.validState(team != null);
 
-        if (team != null)
-            team.setScore(team.getScore() + increment);
+        team.setScore(team.getScore() + increment);
     }
 
     /**
@@ -336,8 +342,7 @@ public final class GameUser implements Disposable {
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
     public void sendMessage(@NonNull String message, boolean isTeam) {
-        if (team == null)
-            return;
+        Validate.validState(team != null);
 
         String fullMessage = MessageFormat.format(CHAT_FORMAT, isTeam ? "팀" : "전체", team.getColor(),
                 (combatUser == null || !combatUser.isActivated() ? "미선택" :
@@ -395,6 +400,7 @@ public final class GameUser implements Disposable {
         /** 쿨타임 ID */
         private static final String COOLDOWN_ID = "Communication";
         /** GUI 아이템 객체 */
+        @NonNull
         private final GuiItem guiItem;
 
         CommunicationItem(String name, BiFunction<GameUser, CombatUser, String> action) {
