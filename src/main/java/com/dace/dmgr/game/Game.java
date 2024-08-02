@@ -312,7 +312,7 @@ public final class Game implements Disposable {
                 gameUser.onGameStart();
             });
         }).onError(ex -> {
-            gameUsers.forEach(gameUser2 -> gameUser2.getUser()
+            gameUsers.forEach(gameUser -> gameUser.getUser()
                     .sendMessageWarn("오류로 인해 월드를 불러올 수 없습니다. 관리자에게 문의하십시오."));
             phase = Phase.END;
         });

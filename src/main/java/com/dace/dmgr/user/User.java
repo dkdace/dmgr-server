@@ -376,10 +376,10 @@ public final class User implements Disposable {
                 Skins.getPlayer("Olaf_C"));
 
         Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
-                .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) == null && !player2.isOp())
+                .filter(target -> GameUser.fromUser(User.fromPlayer(target)) == null && !target.isOp())
                 .toArray(Player[]::new);
         Player[] gamePlayers = Bukkit.getOnlinePlayers().stream()
-                .filter(player2 -> GameUser.fromUser(User.fromPlayer(player2)) != null && !player2.isOp())
+                .filter(target -> GameUser.fromUser(User.fromPlayer(target)) != null && !target.isOp())
                 .toArray(Player[]::new);
         Player[] adminPlayers = Bukkit.getOnlinePlayers().stream()
                 .filter(ServerOperator::isOp)
@@ -456,7 +456,7 @@ public final class User implements Disposable {
                 player.removePotionEffect(potionEffect.getType())));
         HologramUtil.setHologramVisibility(player.getName(), true, Bukkit.getOnlinePlayers().toArray(new Player[0]));
         HologramUtil.setHologramVisibility(player.getName(), false, player);
-        Bukkit.getOnlinePlayers().forEach(player2 -> GlowUtil.removeGlowing(player, player2));
+        Bukkit.getOnlinePlayers().forEach(target -> GlowUtil.removeGlowing(this.player, target));
 
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
@@ -571,8 +571,12 @@ public final class User implements Disposable {
      *
      * @param message       메시지
      * @param overrideTicks 덮어쓰기 지속시간 (tick). 0 이상으로 지정하면 지속시간 동안 기존 액션바 출력을 무시함
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void sendActionBar(@NonNull String message, long overrideTicks) {
+        if (overrideTicks < 0)
+            throw new IllegalArgumentException("'overrideTicks'가 0 이상이어야 함");
+
         if (overrideTicks > 0)
             CooldownUtil.setCooldown(this, ACTION_BAR_COOLDOWN_ID, overrideTicks);
         else if (CooldownUtil.getCooldown(this, ACTION_BAR_COOLDOWN_ID) > 0)
@@ -623,8 +627,8 @@ public final class User implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut, long overrideTicks) {
-        if (fadeIn < 0 || stay < 0 || fadeOut < 0)
-            throw new IllegalArgumentException("'fadeIn', 'stay' 및 'fadeOut'이 0 이상이어야 함");
+        if (overrideTicks < 0 || fadeIn < 0 || stay < 0 || fadeOut < 0)
+            throw new IllegalArgumentException("'fadeIn', 'stay', 'fadeOut' 및 'overrideTicks'가 0 이상이어야 함");
 
         if (overrideTicks > 0)
             CooldownUtil.setCooldown(this, TITLE_COOLDOWN_ID, overrideTicks);
