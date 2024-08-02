@@ -105,7 +105,7 @@ public final class CombatUtil {
      * @param game      대상 게임. {@code null}로 지정 시
      *                  {@link CombatUtil#getNearCombatEntity(Location, double, Predicate)} 호출
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
@@ -134,7 +134,7 @@ public final class CombatUtil {
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 모든 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
@@ -160,7 +160,7 @@ public final class CombatUtil {
      * @param game      대상 게임. {@code null}로 지정 시
      *                  {@link CombatUtil#getNearCombatEntities(Location, double, Predicate)} 호출
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 모든 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생

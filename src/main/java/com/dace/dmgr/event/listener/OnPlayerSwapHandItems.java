@@ -1,5 +1,6 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
@@ -23,7 +24,7 @@ public final class OnPlayerSwapHandItems implements Listener {
         CombatUser combatUser = CombatUser.fromUser(user);
 
         if ((gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) ||
-                (combatUser != null && LocationUtil.isInRegion(player, "BattlePVP"))) {
+                (combatUser != null && LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION))) {
             SelectChar.getInstance().open(player);
             return;
         }

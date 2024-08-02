@@ -36,7 +36,7 @@ import java.util.UUID;
  */
 public class DMGR extends JavaPlugin {
     /** 일시적인 엔티티의 사용자 지정 이름 */
-    public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporal";
+    public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
     /** 난수 생성 객체 */
     @NonNull
     @Getter
