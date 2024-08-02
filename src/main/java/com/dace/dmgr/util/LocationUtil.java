@@ -1,11 +1,11 @@
 package com.dace.dmgr.util;
 
+import com.dace.dmgr.DMGR;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,7 +22,7 @@ import java.util.List;
 @UtilityClass
 public final class LocationUtil {
     /** 로비 스폰 위치 */
-    private static final Location lobbyLocation = new Location(Bukkit.getWorld("DMGR"), 72.5, 64, 39.5, 90, 0);
+    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 72.5, 64, 39.5, 90, 0);
     /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
     private static final double CAN_PASS_INTERVAL = 0.25;
 
