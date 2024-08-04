@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public final class AbilityStatus {
     /** 값 수정자 목록 (수정자 ID : 증가량) */
-    private final HashMap<@NonNull String, Double> modifiers = new HashMap<>();
+    private final HashMap<String, Double> modifiers = new HashMap<>();
     /** 기본값 */
     @Getter
     @Setter
@@ -37,9 +37,9 @@ public final class AbilityStatus {
      */
     public double getValue() {
         double valueSum = 0;
-        for (double value : modifiers.values()) {
+        for (double value : modifiers.values())
             valueSum += value;
-        }
+
         return baseValue * (100 + valueSum) / 100;
     }
 

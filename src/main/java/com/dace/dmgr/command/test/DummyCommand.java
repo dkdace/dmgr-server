@@ -1,7 +1,7 @@
 package com.dace.dmgr.command.test;
 
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.entity.temporal.Dummy;
+import com.dace.dmgr.combat.entity.temporary.Dummy;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

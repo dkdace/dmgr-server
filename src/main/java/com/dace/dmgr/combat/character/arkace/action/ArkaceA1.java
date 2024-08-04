@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;

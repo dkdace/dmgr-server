@@ -60,12 +60,12 @@ public final class GameUser implements Disposable {
     private final Game game;
     /** 전투 플레이어 객체 */
     @Nullable
-    private CombatUser combatUser = null;
+    private CombatUser combatUser;
     /** 팀 */
     @Nullable
     @Getter
     @Setter(AccessLevel.PACKAGE)
-    private Game.Team team = null;
+    private Game.Team team;
     /** 점수 */
     @Getter
     @Setter
@@ -345,7 +345,7 @@ public final class GameUser implements Disposable {
         Validate.validState(team != null);
 
         String fullMessage = MessageFormat.format(CHAT_FORMAT, isTeam ? "팀" : "전체", team.getColor(),
-                (combatUser == null || !combatUser.isActivated() ? "미선택" :
+                (combatUser == null || combatUser.getCharacterType() == null ? "미선택" :
                         "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
                                 team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
                 player.getName(), message);

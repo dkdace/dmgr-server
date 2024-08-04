@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -55,8 +55,14 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
 
     @Override
     @MustBeInvokedByOverriders
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                         boolean isCrit, boolean isUlt) {
         if (owner.getGameUser() != null)
             owner.getGameUser().setDefend(owner.getGameUser().getDefend() + damage);
+    }
+
+    @Override
+    public final boolean isLiving() {
+        return false;
     }
 }

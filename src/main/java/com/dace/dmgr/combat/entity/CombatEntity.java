@@ -1,14 +1,11 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.Disposable;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
-import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -111,18 +108,6 @@ public interface CombatEntity extends Disposable {
     double getMaxHitboxSize();
 
     /**
-     * @return 넉백 모듈
-     */
-    @NonNull
-    KnockbackModule getKnockbackModule();
-
-    /**
-     * @return 상태 효과 모듈
-     */
-    @NonNull
-    StatusEffectModule getStatusEffectModule();
-
-    /**
      * 엔티티가 활성화 되었는지 확인한다.
      *
      * @return 엔티티 활성화 여부
@@ -142,28 +127,6 @@ public interface CombatEntity extends Disposable {
      * @see CombatEntity#getTeamIdentifier()
      */
     boolean isEnemy(@NonNull CombatEntity combatEntity);
-
-    /**
-     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
-     *
-     * @param velocity 속도
-     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
-     */
-    void push(@NonNull Vector velocity, boolean isReset);
-
-    /**
-     * 엔티티를 지정한 속도로 밀어낸다. (이동기).
-     *
-     * @param velocity 속도
-     */
-    void push(@NonNull Vector velocity);
-
-    /**
-     * 엔티티를 지정한 위치로 순간이동 시킨다.
-     *
-     * @param location 이동할 위치
-     */
-    void teleport(@NonNull Location location);
 
     /**
      * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.

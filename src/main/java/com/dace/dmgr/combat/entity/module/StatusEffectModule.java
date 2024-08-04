@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.CooldownUtil;
@@ -22,7 +23,7 @@ public final class StatusEffectModule {
     /** 엔티티 객체 */
     @NonNull
     @Getter
-    private final CombatEntity combatEntity;
+    private final Damageable combatEntity;
     /** 상태 효과 저항 값 */
     @NonNull
     @Getter
@@ -34,9 +35,13 @@ public final class StatusEffectModule {
      * 상태 효과 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity 대상 엔티티
-     * @param resistance   상태 효과 저항 기본값
+     * @param resistance   상태 효과 저항 기본값. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public StatusEffectModule(@NonNull CombatEntity combatEntity, double resistance) {
+    public StatusEffectModule(@NonNull Damageable combatEntity, double resistance) {
+        if (resistance < 0)
+            throw new IllegalArgumentException("'resistance'가 0 이상이어야 함");
+
         this.combatEntity = combatEntity;
         this.resistanceStatus = new AbilityStatus(resistance);
     }
@@ -46,7 +51,7 @@ public final class StatusEffectModule {
      *
      * @param combatEntity 대상 엔티티
      */
-    public StatusEffectModule(@NonNull CombatEntity combatEntity) {
+    public StatusEffectModule(@NonNull Damageable combatEntity) {
         this(combatEntity, DEFAULT_VALUE);
     }
 
@@ -58,9 +63,15 @@ public final class StatusEffectModule {
      *
      * @param provider     제공자
      * @param statusEffect 적용할 상태 효과
-     * @param duration     지속시간 (tick)
+     * @param duration     지속시간 (tick). -1로 지정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void applyStatusEffect(@NonNull CombatEntity provider, @NonNull StatusEffect statusEffect, long duration) {
+        if (duration < -1)
+            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
+        if (duration == -1)
+            duration = Long.MAX_VALUE;
+
         long finalDuration = statusEffect.isPositive() ? duration : (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
         if (finalDuration == 0)
             return;

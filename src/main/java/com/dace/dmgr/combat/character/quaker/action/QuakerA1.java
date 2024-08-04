@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;

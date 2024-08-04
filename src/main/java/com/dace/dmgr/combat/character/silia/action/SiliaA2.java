@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
@@ -143,10 +142,10 @@ public final class SiliaA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.END_ROD, loc2.add(0, 1, 0), 3, 0, 0, 0, 0.05);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, getLocation());
 
-                if (target instanceof Living && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()) &&
+                if (target.isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()) &&
                         (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
-                    combatUser.teleport(loc);
-                    combatUser.push(new Vector(0, SiliaA2Info.PUSH, 0), true);
+                    combatUser.getMoveModule().teleport(loc);
+                    combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
                     if (target instanceof CombatUser)
                         combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
                 }

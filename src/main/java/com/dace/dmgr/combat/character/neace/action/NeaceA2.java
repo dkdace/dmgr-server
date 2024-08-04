@@ -113,7 +113,7 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
             if (combatEntity instanceof Damageable)
@@ -123,12 +123,12 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Damageable)

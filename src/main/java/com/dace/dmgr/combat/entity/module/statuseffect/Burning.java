@@ -31,23 +31,22 @@ public abstract class Burning implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         combatEntity.getEntity().setFireTicks(4);
 
-        if (i % 10 == 0 && combatEntity instanceof Damageable && provider instanceof Attacker &&
-                ((Damageable) combatEntity).getDamageModule().damage((Attacker) provider, dps * 10 / 20,
-                        DamageType.NORMAL, null, false, true))
+        if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider, dps * 10 / 20,
+                DamageType.NORMAL, null, false, true))
             SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 }

@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;

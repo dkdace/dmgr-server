@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -66,7 +66,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-            combatUser.push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
+            combatUser.getMoveModule().push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
 
             new SiliaA1Attack(targets).shoot();
 
@@ -83,7 +83,7 @@ public final class SiliaA1 extends ActiveSkill {
             return true;
         }, isCancelled -> {
             onCancelled();
-            combatUser.push(new Vector(), true);
+            combatUser.getMoveModule().push(new Vector(), true);
         }, 1, SiliaA1Info.DURATION));
     }
 

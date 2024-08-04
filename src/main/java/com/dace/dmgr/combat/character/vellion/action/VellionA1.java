@@ -4,13 +4,11 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
-import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
@@ -154,18 +152,18 @@ public final class VellionA1 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof Healable && provider instanceof Healer)
                 ((Healable) combatEntity).getDamageModule().heal((Healer) provider, VellionA1Info.HEAL_PER_SECOND / 20, true);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
     }
@@ -185,14 +183,6 @@ public final class VellionA1 extends ActiveSkill {
      * 벨리온 - 마력 응집체 클래스.
      */
     public final class VellionA1Entity extends SummonEntity<ArmorStand> {
-        /** 넉백 모듈 */
-        @NonNull
-        @Getter
-        private final KnockbackModule knockbackModule;
-        /** 상태 효과 모듈 */
-        @NonNull
-        @Getter
-        private final StatusEffectModule statusEffectModule;
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */
         private long returnTime = VellionA1Info.RETURN_DURATION;
@@ -205,8 +195,6 @@ public final class VellionA1 extends ActiveSkill {
                     true,
                     new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
             );
-            knockbackModule = new KnockbackModule(this, 2);
-            statusEffectModule = new StatusEffectModule(this, 2);
 
             onInit();
         }
@@ -241,7 +229,7 @@ public final class VellionA1 extends ActiveSkill {
             playTickEffect();
 
             Predicate<CombatEntity> condition = combatEntity -> combatEntity != combatUser && combatEntity instanceof Damageable &&
-                    combatEntity instanceof Living;
+                    ((Damageable) combatEntity).isLiving();
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA1Info.RADIUS, condition);
             new VellionA1Area(condition, areaTargets).emit(loc);
         }

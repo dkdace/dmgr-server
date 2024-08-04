@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 @Getter
-public abstract class SummonEntity<T extends Entity> extends TemporalEntity<T> {
+public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> {
     /** 엔티티를 소환한 플레이어 */
     @NonNull
     protected final CombatUser owner;

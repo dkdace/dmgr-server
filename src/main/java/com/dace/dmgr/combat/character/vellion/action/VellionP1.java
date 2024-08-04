@@ -56,7 +56,7 @@ public final class VellionP1 extends AbstractSkill {
                             LocationUtil.getDirection(location, loc).multiply(VellionP1Info.PUSH_SIDE);
                     vec.setY(VellionP1Info.PUSH_UP);
 
-                    combatUser.push(vec, true);
+                    combatUser.getMoveModule().push(vec, true);
 
                     return false;
                 }

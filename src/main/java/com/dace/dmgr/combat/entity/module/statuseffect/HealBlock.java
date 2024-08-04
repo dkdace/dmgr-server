@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,21 +32,21 @@ public class HealBlock implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", 0, 5, 10);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity instanceof Living && combatEntity.getEntity() instanceof LivingEntity)
+    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        if (combatEntity.isLiving() && combatEntity.getEntity() instanceof LivingEntity)
             ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WITHER,
                     4, 0, false, false), true);
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
 }

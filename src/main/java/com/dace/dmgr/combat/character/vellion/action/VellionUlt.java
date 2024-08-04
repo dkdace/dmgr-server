@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -134,7 +133,8 @@ public final class VellionUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(combatUser);
+        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() &&
+                combatEntity.isEnemy(combatUser);
         TaskUtil.addTask(VellionUlt.this, new IntervalTask(i -> {
             if (i % 4 == 0) {
                 Location loc = combatUser.getEntity().getEyeLocation();

@@ -3,9 +3,12 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
@@ -152,11 +155,11 @@ public final class JagerA3 extends ActiveSkill {
         private static final Freeze instance = new Freeze();
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
-            if (combatEntity instanceof Living)
+            if (combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving())
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                         combatEntity.getCenterLocation(), 5, combatEntity.getEntity().getWidth() / 2,
                         combatEntity.getEntity().getHeight() / 2, combatEntity.getEntity().getWidth() / 2,

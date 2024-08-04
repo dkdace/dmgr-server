@@ -57,7 +57,7 @@ public final class SiliaP1 extends AbstractSkill {
                         LocationUtil.getDirection(location, loc).multiply(SiliaP1Info.PUSH_SIDE);
                 vec.setY(SiliaP1Info.PUSH_UP);
 
-                combatUser.push(vec, true);
+                combatUser.getMoveModule().push(vec, true);
 
                 return false;
             }

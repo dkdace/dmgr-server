@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
@@ -33,14 +33,14 @@ public abstract class Slow implements StatusEffect {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifierId, -decrement);
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity instanceof Living)
+    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        if (combatEntity.isLiving())
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12,
                     combatEntity.getEntity().getLocation().add(0, 0.5, 0), 3,
                     combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4, 0);
@@ -48,7 +48,7 @@ public abstract class Slow implements StatusEffect {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifierId);
     }

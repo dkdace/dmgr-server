@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;

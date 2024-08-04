@@ -7,7 +7,10 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.vellion.action.*;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -139,7 +142,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
-        if (!(victim instanceof Living))
+        if (!(victim.isLiving()))
             return true;
 
         VellionP2 skillp2 = (VellionP2) attacker.getSkill(VellionP2Info.getInstance());

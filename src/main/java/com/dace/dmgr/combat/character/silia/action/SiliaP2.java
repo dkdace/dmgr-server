@@ -80,7 +80,7 @@ public final class SiliaP2 extends AbstractSkill {
             if (wallRideCount <= 0)
                 return false;
 
-            combatUser.push(new Vector(0, SiliaP2Info.PUSH, 0), true);
+            combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
@@ -94,7 +94,7 @@ public final class SiliaP2 extends AbstractSkill {
 
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
-            combatUser.push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);
+            combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);
         }, 3, 10));
     }
 

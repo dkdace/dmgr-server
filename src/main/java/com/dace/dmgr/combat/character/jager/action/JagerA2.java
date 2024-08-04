@@ -3,10 +3,13 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.HasReadyTime;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.NamedSound;
@@ -172,7 +175,7 @@ public final class JagerA2 extends ActiveSkill {
                 return;
 
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
-                    combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living && combatEntity.isEnemy(this));
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() && combatEntity.isEnemy(this));
             if (target != null)
                 onCatchEnemy(target);
 

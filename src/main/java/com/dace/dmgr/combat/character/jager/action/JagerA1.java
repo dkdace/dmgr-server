@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.*;
@@ -151,7 +151,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
      * 예거 - 설랑 클래스.
      */
     @Getter
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Jumpable {
+    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;
@@ -227,7 +227,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             if (i % 10 == 0) {
                 if (entity.getTarget() == null) {
                     Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living &&
+                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() &&
                                     combatEntity.isEnemy(this) && ((Damageable) combatEntity).getDamageModule().isLowHealth());
                     if (target != null)
                         entity.setTarget(target.getEntity());
@@ -273,6 +273,11 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             CombatUtil.playBleedingEffect(location, entity, damage);
+        }
+
+        @Override
+        public boolean isLiving() {
+            return true;
         }
 
         @Override

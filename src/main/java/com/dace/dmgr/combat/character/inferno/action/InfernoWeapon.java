@@ -12,7 +12,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -170,13 +170,13 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Healable)
                 ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER_ID, -InfernoT1Info.HEAL_DECREMENT);
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Healable)
                 ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER_ID);
         }

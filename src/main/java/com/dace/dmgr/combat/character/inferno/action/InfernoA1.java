@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.*;
@@ -62,7 +62,7 @@ public final class InfernoA1 extends ActiveSkill {
         Vector vec = location.getDirection().multiply(InfernoA1Info.PUSH_SIDE);
         vec.setY(vec.getY() + InfernoA1Info.PUSH_UP);
 
-        combatUser.push(vec, true);
+        combatUser.getMoveModule().push(vec, true);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i < 15) {

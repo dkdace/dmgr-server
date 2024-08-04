@@ -6,10 +6,9 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -131,7 +130,7 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", 0, 5, 10);
             if (combatEntity instanceof Damageable)
@@ -139,7 +138,7 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     4, 0.2, 0.2, 0.2, 160, 150, 152);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
@@ -147,7 +146,7 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Damageable)
                 ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof CombatUser)
@@ -160,9 +159,10 @@ public final class VellionA2 extends ActiveSkill {
 
         private VellionTarget() {
             super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(VellionA2Info.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(VellionA2.this.combatUser) &&
+                    .condition(combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() &&
+                            combatEntity.isEnemy(VellionA2.this.combatUser) &&
                             LocationUtil.canPass(VellionA2.this.combatUser.getEntity().getEyeLocation(), combatEntity.getCenterLocation()) &&
-                            !combatEntity.getStatusEffectModule().hasStatusEffect(vellionA2Mark)).build());
+                            !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark)).build());
         }
 
         @Override

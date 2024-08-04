@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Living;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
@@ -21,7 +21,7 @@ public final class JagerT1 {
      * @param victim 피격자
      * @param amount 증가량
      */
-    static void addFreezeValue(@NonNull CombatEntity victim, int amount) {
+    static void addFreezeValue(@NonNull Damageable victim, int amount) {
         victim.getPropertyManager().addValue(Property.FREEZE, amount);
         victim.getStatusEffectModule().applyStatusEffect(victim, FreezeValue.instance, JagerT1Info.DURATION);
     }
@@ -47,13 +47,13 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
-            if (combatEntity instanceof Living)
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+            if (combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving())
                 ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3,
                         combatEntity.getEntity().getLocation().add(0, 0.5, 0), 1,
                         combatEntity.getEntity().getWidth() / 2, 0, combatEntity.getEntity().getWidth() / 2, 0);
@@ -64,7 +64,7 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);

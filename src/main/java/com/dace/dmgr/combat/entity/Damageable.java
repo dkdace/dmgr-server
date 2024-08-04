@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -15,6 +17,18 @@ public interface Damageable extends CombatEntity {
      */
     @NonNull
     DamageModule getDamageModule();
+
+    /**
+     * @return 넉백 모듈
+     */
+    @NonNull
+    KnockbackModule getKnockbackModule();
+
+    /**
+     * @return 상태 효과 모듈
+     */
+    @NonNull
+    StatusEffectModule getStatusEffectModule();
 
     /**
      * 엔티티가 피해를 받을 수 있는 지 확인한다.
@@ -34,6 +48,18 @@ public interface Damageable extends CombatEntity {
      */
     default boolean canDie() {
         return true;
+    }
+
+    /**
+     * 엔티티가 살아있는(Living) 대상인 지 확인한다.
+     *
+     * <p>살아있는 엔티티는 플레이어 등의 엔티티를 말한다.</p>
+     *
+     * @return 살아있는 대상이면 {@code true} 반환
+     * @implSpec {@code false}
+     */
+    default boolean isLiving() {
+        return false;
     }
 
     /**

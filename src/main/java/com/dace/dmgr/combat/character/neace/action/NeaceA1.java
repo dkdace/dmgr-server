@@ -70,12 +70,12 @@ public final class NeaceA1 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             healAmount = 0;
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     4, 0.2, 0.2, 0.2, 215, 255, 130);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
@@ -87,7 +87,7 @@ public final class NeaceA1 extends ActiveSkill {
                 return;
 
             if (healAmount >= NeaceA1Info.MAX_HEAL) {
-                combatEntity.getStatusEffectModule().removeStatusEffect(this);
+                ((Healable) combatEntity).getStatusEffectModule().removeStatusEffect(this);
                 return;
             }
 
@@ -96,7 +96,7 @@ public final class NeaceA1 extends ActiveSkill {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
     }
@@ -107,7 +107,7 @@ public final class NeaceA1 extends ActiveSkill {
         private NeaceTarget() {
             super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
                     .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
-                            !combatEntity.getStatusEffectModule().hasStatusEffect(neaceA1Mark)).build());
+                            combatEntity instanceof Healable && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(neaceA1Mark)).build());
         }
 
         @Override

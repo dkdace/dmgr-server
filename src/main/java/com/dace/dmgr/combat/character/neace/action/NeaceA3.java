@@ -95,11 +95,11 @@ public final class NeaceA3 extends ActiveSkill {
                 if (targetLoc.distance(loc) < 1.5)
                     return false;
                 if (isDurationFinished()) {
-                    combatUser.push(vec.multiply(0.5), true);
+                    combatUser.getMoveModule().push(vec.multiply(0.5), true);
                     return false;
                 }
 
-                combatUser.push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
+                combatUser.getMoveModule().push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
                 ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {

@@ -47,7 +47,7 @@ public final class InfernoUlt extends UltimateSkill {
         ((InfernoWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(InfernoWeaponInfo.CAPACITY);
         combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(0);
         combatUser.getDamageModule().setShield(SHIELD_ID, InfernoUltInfo.HEALTH);
-        combatUser.setTemporalHitboxes(new FixedPitchHitbox[]{
+        combatUser.setTemporaryHitboxes(new FixedPitchHitbox[]{
                 new FixedPitchHitbox(combatUser.getEntity().getLocation(), 2, 2, 2, 0, 1, 0)
         });
 
@@ -78,7 +78,7 @@ public final class InfernoUlt extends UltimateSkill {
             }
 
             combatUser.getDamageModule().setShield(SHIELD_ID, 0);
-            combatUser.setTemporalHitboxes(null);
+            combatUser.setTemporaryHitboxes(null);
         }, 1, InfernoUltInfo.DURATION));
     }
 
