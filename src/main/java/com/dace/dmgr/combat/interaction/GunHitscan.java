@@ -13,21 +13,27 @@ import org.bukkit.block.Block;
  * 실탄을 발사하는 화기의 총알을 관리하는 클래스.
  */
 public abstract class GunHitscan extends Hitscan {
+    /**
+     * @see Hitscan#Hitscan(CombatEntity, HitscanOption)
+     */
     protected GunHitscan(@NonNull CombatEntity shooter, @NonNull HitscanOption option) {
         super(shooter, option);
     }
 
+    /**
+     * @see Hitscan#Hitscan(CombatEntity)
+     */
     protected GunHitscan(@NonNull CombatEntity shooter) {
         super(shooter);
     }
 
     @Override
     protected boolean onHitBlock(@NonNull Block hitBlock) {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, location);
-        CombatUtil.playBlockHitSound(location, hitBlock, 1);
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), location,
+        SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, getLocation());
+        CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
                 3, 0, 0, 0, 0.1);
-        ParticleUtil.play(Particle.TOWN_AURA, location, 10, 0, 0, 0, 0);
+        ParticleUtil.play(Particle.TOWN_AURA, getLocation(), 10, 0, 0, 0, 0);
 
         return false;
     }

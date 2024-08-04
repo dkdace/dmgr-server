@@ -152,7 +152,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 1, 0.05, 0.05, 0.05,
                     255, 255, 235);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 3, 0.1, 0.1, 0.1,
@@ -161,7 +161,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected void onHit() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, location, 15, 0.2, 0.2, 0.2,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, getLocation(), 15, 0.2, 0.2, 0.2,
                     255, 255, 200);
         }
 
@@ -172,7 +172,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+            target.getDamageModule().damage(this, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true);
             return false;
         }
     }

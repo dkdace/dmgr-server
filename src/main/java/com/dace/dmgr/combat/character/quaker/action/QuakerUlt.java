@@ -164,10 +164,10 @@ public final class QuakerUlt extends UltimateSkill {
 
         @Override
         protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
                     200, 200, 200);
         }
@@ -184,7 +184,7 @@ public final class QuakerUlt extends UltimateSkill {
 
         @Override
         protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }
@@ -201,9 +201,9 @@ public final class QuakerUlt extends UltimateSkill {
 
         @Override
         protected void trail() {
-            Vector vec = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 15);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec.getX(), vec.getY(), vec.getZ(), 1);
-            ParticleUtil.play(Particle.CRIT, location, 4, 0.2, 0.2, 0.2, 0.1);
+            Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 15);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec.getX(), vec.getY(), vec.getZ(), 1);
+            ParticleUtil.play(Particle.CRIT, getLocation(), 4, 0.2, 0.2, 0.2, 0.1);
         }
 
         @Override
@@ -214,7 +214,7 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
+                if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, false)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
                     target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
@@ -225,7 +225,7 @@ public final class QuakerUlt extends UltimateSkill {
                     }
                 }
 
-                ParticleUtil.play(Particle.CRIT, location, 60, 0, 0, 0, 0.4);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 60, 0, 0, 0, 0.4);
             }
 
             return !(target instanceof Barrier);

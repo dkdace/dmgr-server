@@ -158,13 +158,13 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
         @Override
         protected boolean onInterval() {
-            distance += velocity.length();
-            return true;
+            distance += getVelocity().length();
+            return super.onInterval();
         }
 
         @Override
         protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
                         0, 0, 0, 0, 230, 255);
@@ -175,10 +175,10 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (isUlt)
-                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, false);
+                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, false);
             else {
                 int damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, distance, ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE, true);
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
             }
 
             return false;

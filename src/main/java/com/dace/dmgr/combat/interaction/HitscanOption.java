@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import lombok.Builder;
+import lombok.NonNull;
 
 import java.util.function.Predicate;
 
@@ -33,5 +34,6 @@ public final class HitscanOption {
     final double size = SIZE_DEFAULT;
     /** 대상 엔티티를 찾는 조건 */
     @Builder.Default
-    final Predicate<CombatEntity> condition = CONDITION_DEFAULT;
+    @NonNull
+    final Predicate<@NonNull CombatEntity> condition = CONDITION_DEFAULT;
 }

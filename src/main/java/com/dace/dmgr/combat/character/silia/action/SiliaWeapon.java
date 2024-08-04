@@ -146,38 +146,38 @@ public final class SiliaWeapon extends AbstractWeapon {
         @Override
         protected void trail() {
             for (int i = 0; i < 8; i++) {
-                Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(location);
-                Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
-                axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
+                Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
+                Vector axis = VectorUtil.getPitchAxis(getLocation());
+                Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
+                axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
 
                 vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location.clone().add(vec), 2, 0.05, 0.05, 0.05,
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation().clone().add(vec), 2, 0.05, 0.05, 0.05,
                         255, 255, 255);
             }
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 10, 0.1, 0.1, 0.1, 0.15);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 10, 0.1, 0.1, 0.1, 0.15);
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
-            CombatUtil.playBlockHitSound(location, hitBlock, 1);
-            CombatUtil.playBlockHitEffect(location, hitBlock, 1.5);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
+            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 1.5);
 
             return false;
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
-                    SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+            target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(),
+                    SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
-            ParticleUtil.play(Particle.CRIT, location, 15, 0, 0, 0, 0.4);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
+            ParticleUtil.play(Particle.CRIT, getLocation(), 15, 0, 0, 0, 0.4);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, getLocation());
 
             return false;
         }
@@ -195,23 +195,23 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 8, 0.15, 0.15, 0.15,
                     255, 255, 255);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 3, 0.05, 0.05, 0.05, 0.05);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 3, 0.05, 0.05, 0.05, 0.05);
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatUtil.playBlockHitEffect(location, hitBlock, 1.5);
-            CombatUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 1.5);
+            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -219,15 +219,15 @@ public final class SiliaWeapon extends AbstractWeapon {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.isBackAttack(velocity, target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, getLocation(),
+                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                     target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()).multiply(SiliaT2Info.KNOCKBACK));
                     if (target instanceof CombatUser)
                         combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }
 
-                ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, location);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 40, 0, 0, 0, 0.4);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, getLocation());
             }
 
             return !(target instanceof Barrier);
@@ -235,7 +235,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, loc, 15, 0.08, 0.08, 0.08, 0.08);
         }
     }

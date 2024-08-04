@@ -200,7 +200,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         @Override
         protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 137, 185, 240);
         }
 
@@ -211,7 +211,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+            if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
                 JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
 
             return false;

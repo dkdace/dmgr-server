@@ -85,14 +85,14 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            ParticleUtil.play(Particle.CRIT_MAGIC, location, 1, 0, 0, 0, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 1,
+            ParticleUtil.play(Particle.CRIT_MAGIC, getLocation(), 1, 0, 0, 0, 0);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 1,
                     0, 0, 0, 32, 250, 225);
         }
 
         @Override
         protected void onHit() {
-            Location loc = location.clone().add(0, 0.1, 0);
+            Location loc = getLocation().clone().add(0, 0.1, 0);
             Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
             CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, ArkaceA1Info.RADIUS, condition);
             new ArkaceA1Area(condition, targets).emit(loc);
@@ -110,7 +110,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true) &&
+            if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true) &&
                     target instanceof CombatUser)
                 combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
 

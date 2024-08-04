@@ -190,18 +190,18 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected void trail() {
-            double distance = location.distance(combatUser.getEntity().getEyeLocation());
+            double distance = getLocation().distance(combatUser.getEntity().getEyeLocation());
             if (distance > 5)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.3 - distance * 0.1);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, velocity.getX(), velocity.getY(), velocity.getZ(), 1.45);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
+            ParticleUtil.play(Particle.FLAME, loc, 0, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 1.3 - distance * 0.1);
+            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 1.45);
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.play(Particle.DRIP_LAVA, location, 2, 0.07, 0.07, 0.07, 0);
+            ParticleUtil.play(Particle.DRIP_LAVA, getLocation(), 2, 0.07, 0.07, 0.07, 0);
             return false;
         }
 
@@ -214,7 +214,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 combatUser.useAction(ActionKey.PERIODIC_1);
             }
 
-            ParticleUtil.play(Particle.SMOKE_NORMAL, location, 3, 0.2, 0.2, 0.2, 0.05);
+            ParticleUtil.play(Particle.SMOKE_NORMAL, getLocation(), 3, 0.2, 0.2, 0.2, 0.05);
 
             return true;
         }
@@ -228,7 +228,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.play(Particle.FLAME, loc, 10, 0.12, 0.12, 0.12, 0);
             ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 13, 0.15, 0.15, 0.15, 0.04);
         }
@@ -240,7 +240,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location,
+            if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(),
                     false, true))
                 combatUser.useAction(ActionKey.PERIODIC_1);
 
@@ -249,7 +249,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected void onDestroy() {
-            Location loc = location.clone().add(0, 0.1, 0);
+            Location loc = getLocation().clone().add(0, 0.1, 0);
             Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
             CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, InfernoWeaponInfo.FIREBALL.RADIUS, condition);
             new InfernoWeaponLArea(condition, targets).emit(loc);

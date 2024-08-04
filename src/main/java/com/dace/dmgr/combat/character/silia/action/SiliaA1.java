@@ -111,7 +111,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.2, 1);
             Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
             Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -123,14 +123,14 @@ public final class SiliaA1 extends ActiveSkill {
                             255, 255, 255);
 
                     if ((i == 0 || i == 11) && j == 1) {
-                        Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 10);
+                        Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 10);
                         ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
                     }
                 }
             }
 
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, SiliaA1Info.RADIUS, condition);
-            new SiliaA1Area(condition, areaTargets).emit(location);
+            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), getLocation(), SiliaA1Info.RADIUS, condition);
+            new SiliaA1Area(condition, areaTargets).emit(getLocation());
         }
 
         @Override

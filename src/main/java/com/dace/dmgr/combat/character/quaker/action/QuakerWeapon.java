@@ -109,23 +109,23 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
                     200, 200, 200);
         }
 
         @Override
         protected void onHit() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatUtil.playBlockHitEffect(location, hitBlock, 2);
-            CombatUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 2);
+            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -133,12 +133,12 @@ public final class QuakerWeapon extends AbstractWeapon {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+                if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
                     target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ?
                             -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
-                ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, location);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0, 0, 0, 0.4);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, getLocation());
             }
 
             return !(target instanceof Barrier);
@@ -146,7 +146,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }

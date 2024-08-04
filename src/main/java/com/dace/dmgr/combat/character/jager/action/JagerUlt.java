@@ -102,7 +102,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void trail() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 15,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
 
@@ -118,7 +118,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onDestroy() {
-            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, location);
+            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, getLocation());
             summonEntity = new JagerUltEntity(magmaCube, combatUser);
             summonEntity.activate();
         }

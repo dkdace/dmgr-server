@@ -262,7 +262,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 17,
                     0.7, 0, 0.7, 120, 120, 135);
         }
 
@@ -278,7 +278,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, location);
+            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, getLocation());
             summonEntity = new JagerA2Entity(magmaCube, combatUser);
             summonEntity.activate();
         }

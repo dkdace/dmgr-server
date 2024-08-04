@@ -80,20 +80,20 @@ public final class MeleeAttackAction extends AbstractAction {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, location);
-            CombatUtil.playBlockHitSound(location, hitBlock, 1);
-            CombatUtil.playBlockHitEffect(location, hitBlock, 1);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
+            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
 
             return false;
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, location, false, true);
-            target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(KNOCKBACK));
+            target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true);
+            target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_ENTITY, location);
-            ParticleUtil.play(Particle.CRIT, location, 10, 0, 0, 0, 0.4);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_ENTITY, getLocation());
+            ParticleUtil.play(Particle.CRIT, getLocation(), 10, 0, 0, 0, 0.4);
 
             return false;
         }

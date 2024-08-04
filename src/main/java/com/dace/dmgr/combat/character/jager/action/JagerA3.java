@@ -173,25 +173,25 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            playTickEffect(location);
+            playTickEffect(getLocation());
         }
 
         @Override
         protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, location, 1 + velocity.length() * 2);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, getLocation(), 1 + getVelocity().length() * 2);
             return false;
         }
 
         @Override
         protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            if (velocity.length() > 0.05)
-                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+            if (getVelocity().length() > 0.05)
+                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
             return false;
         }
 
         @Override
         protected void onDestroy() {
-            explode(location, this);
+            explode(getLocation(), this);
         }
     }
 

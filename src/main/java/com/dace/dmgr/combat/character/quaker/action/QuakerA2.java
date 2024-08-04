@@ -154,10 +154,10 @@ public final class QuakerA2 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
                     200, 200, 200);
         }
@@ -174,7 +174,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }
@@ -191,9 +191,9 @@ public final class QuakerA2 extends ActiveSkill {
 
         @Override
         protected void trail() {
-            Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
-            CombatUtil.playBlockHitEffect(location, floor, 3);
-            ParticleUtil.play(Particle.CRIT, location, 20, 0.2, 0.05, 0.2, 0.25);
+            Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
+            CombatUtil.playBlockHitEffect(getLocation(), floor, 3);
+            ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0.2, 0.05, 0.2, 0.25);
         }
 
         @Override
@@ -204,7 +204,7 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, getLocation(), false, true)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
                     target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
                     if (target instanceof CombatUser) {
@@ -213,7 +213,7 @@ public final class QuakerA2 extends ActiveSkill {
                     }
                 }
 
-                ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 50, 0, 0, 0, 0.4);
             }
 
             return !(target instanceof Barrier);

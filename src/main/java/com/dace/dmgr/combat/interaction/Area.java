@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 public abstract class Area {
     /** 기본 판정 크기. (단위: 블록) */
     private static final double SIZE = 0.2;
+
     /** 발사자 엔티티 */
     @NonNull
     @Getter
@@ -34,18 +35,21 @@ public abstract class Area {
      * 광역 판정 인스턴스를 생성한다.
      *
      * @param shooter   발사자
-     * @param radius    범위 (반지름). (단위: 블록)
+     * @param radius    범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 대상 엔티티를 찾는 조건
      * @param targets   예상 피격자 목록
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<CombatEntity> condition, @NonNull CombatEntity[] targets) {
+    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<@NonNull CombatEntity> condition, @NonNull CombatEntity @NonNull [] targets) {
+        if (radius < 0)
+            throw new IllegalArgumentException("'radius'가 0 이상이어야 함");
+
         this.shooter = shooter;
         this.radius = radius;
         this.targets = targets;
         this.condition = condition;
-        for (CombatEntity target : targets) {
+        for (CombatEntity target : targets)
             this.penetrationMap.put(target, null);
-        }
     }
 
     /**
@@ -58,14 +62,14 @@ public abstract class Area {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override
                 protected boolean onHitBlock(@NonNull Block hitBlock) {
-                    return Area.this.onHitBlock(center, location, hitBlock);
+                    return Area.this.onHitBlock(center, getLocation(), hitBlock);
                 }
 
                 @Override
                 protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
                     Boolean canPenetrate = penetrationMap.get(target);
                     if (canPenetrate == null) {
-                        canPenetrate = Area.this.onHitEntity(center, location, target);
+                        canPenetrate = Area.this.onHitEntity(center, getLocation(), target);
                         penetrationMap.putIfAbsent(target, canPenetrate);
                     }
 
