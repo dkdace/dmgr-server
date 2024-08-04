@@ -655,7 +655,7 @@ public final class Game implements Disposable {
         int blueAmount = teams.get(ChatColor.BLUE).teamUsers.size();
 
         gameUsers.add(gameUser);
-        gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + target.getPlayer().getName()));
+        gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
 
         if (phase != Phase.WAITING) {
             Team team = redAmount < blueAmount ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);

@@ -252,7 +252,7 @@ public final class GameUser implements Disposable {
                 game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
 
         int column = 0;
-        for (Game.Team targetTeam : game.getTeams().values()) {
+        for (Game.Team targetTeam : new Game.Team[]{game.getTeams().get(ChatColor.RED), game.getTeams().get(ChatColor.BLUE)}) {
             column++;
             user.setTabListItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
                     targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().length), Skins.getDot(targetTeam.getColor()));
@@ -363,6 +363,8 @@ public final class GameUser implements Disposable {
     public enum CommunicationItem {
         /** 치료 요청 */
         REQ_HEAL("§a치료 요청", (target, targetCombatUser) -> {
+            Validate.validState(targetCombatUser.getCharacterType() != null);
+
             String state;
             String ment;
             if (targetCombatUser.getDamageModule().isLowHealth()) {
@@ -380,6 +382,8 @@ public final class GameUser implements Disposable {
         }),
         /** 궁극기 상태 */
         SHOW_ULT("§a궁극기 상태", (gameUser, targetCombatUser) -> {
+            Validate.validState(targetCombatUser.getCharacterType() != null);
+
             String ment;
             if (targetCombatUser.getUltGaugePercent() < 0.9)
                 ment = targetCombatUser.getCharacterType().getCharacter().getUltStateMent()[0];
@@ -392,6 +396,8 @@ public final class GameUser implements Disposable {
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", (gameUser, targetCombatUser) -> {
+            Validate.validState(targetCombatUser.getCharacterType() != null);
+
             String[] ments = targetCombatUser.getCharacterType().getCharacter().getReqRallyMent();
             String ment = ments[DMGR.getRandom().nextInt(ments.length)];
             return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);

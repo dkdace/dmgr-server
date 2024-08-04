@@ -86,7 +86,7 @@ public final class GeneralConfig extends YamlFile {
             resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
             chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
             commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
-            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriod", rankingUpdatePeriodMinutes);
+            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriodMinutes", rankingUpdatePeriodMinutes);
             netheriteTierMinRank = (int) getLong(SECTION + ".netheriteTierMinRank", netheriteTierMinRank);
             messagePrefix = getString(SECTION + ".messagePrefix", messagePrefix);
             adminContact = getString(SECTION + ".adminContact", adminContact);

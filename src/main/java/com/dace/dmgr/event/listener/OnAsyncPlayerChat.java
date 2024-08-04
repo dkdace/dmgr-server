@@ -44,7 +44,7 @@ public final class OnAsyncPlayerChat implements Listener {
         if (user.getMessageTarget() == null) {
             GameUser gameUser = GameUser.fromUser(user);
 
-            if (gameUser == null || gameUser.getGame().getPhase() != Game.Phase.WAITING) {
+            if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING) {
                 Bukkit.getOnlinePlayers().forEach((Player target) ->
                         sendMessage(user, User.fromPlayer(target), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
             } else
