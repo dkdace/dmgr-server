@@ -17,8 +17,12 @@ import org.bukkit.entity.Player;
  * 자유 전투 시스템 클래스.
  */
 public final class FreeCombat {
+    /** 자유 전투 지역 이름 */
+    public static final String FREE_COMBAT_REGION = "BattlePVP";
     /** 대기실 위치 */
-    private static final Location waitLocation = new Location(Bukkit.getWorld("DMGR"), -1089.5, 67, -114.5, 45, 0);
+    private static final Location waitLocation = new Location(DMGR.getDefaultWorld(), -1089.5, 67, -114.5, 45, 0);
+    /** 자유 전투 이동 지역 이름 */
+    private static final String FREE_COMBAT_WARP_REGION = "BattlePVPWarp";
     /** 스폰 위치 목록 */
     private static final GlobalLocation[] spawnLocations = new GlobalLocation[]{
             new GlobalLocation(-817.5, 65, -132.5, -180, 0),
@@ -77,9 +81,9 @@ public final class FreeCombat {
         CombatUser combatUser = new CombatUser(user);
 
         TaskUtil.addTask(user, new IntervalTask(i -> {
-            if (combatUser.getCharacterType() != null && LocationUtil.isInRegion(user.getPlayer(), "BattlePVPWarp")) {
+            if (combatUser.getCharacterType() != null && LocationUtil.isInRegion(user.getPlayer(), FREE_COMBAT_WARP_REGION)) {
                 int index = DMGR.getRandom().nextInt(spawnLocations.length);
-                user.teleport(spawnLocations[index].toLocation(Bukkit.getWorld("DMGR")));
+                user.teleport(spawnLocations[index].toLocation(DMGR.getDefaultWorld()));
             }
 
             return !combatUser.isDisposed();

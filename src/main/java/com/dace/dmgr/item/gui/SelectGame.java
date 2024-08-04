@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -46,7 +45,7 @@ public final class SelectGame extends Gui {
      * @param isRanked      랭크 여부
      * @param i             방 번호
      */
-    private void displayGameInfo(@NotNull GuiController guiController, @Nullable Game game, boolean isRanked, int i) {
+    private void displayGameInfo(@NonNull GuiController guiController, @Nullable Game game, boolean isRanked, int i) {
         int minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         int maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
         int index = isRanked ? i + 11 : i + 2;

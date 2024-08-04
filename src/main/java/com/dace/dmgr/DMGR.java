@@ -18,6 +18,7 @@ import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,6 +41,10 @@ public class DMGR extends JavaPlugin {
     @NonNull
     @Getter
     private static final Random random = new Random();
+    /** 기본 월드 객체 */
+    @NonNull
+    @Getter
+    private static final World defaultWorld = Bukkit.getWorld("DMGR");
 
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;

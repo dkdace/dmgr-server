@@ -109,6 +109,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final User user;
+    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Nullable
+    @Getter
+    private final GameUser gameUser;
+
     /** 치명타 히트박스 객체 */
     @NonNull
     @Getter
@@ -123,12 +128,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final HashMap<String, Double> scoreMap = new LinkedHashMap<>();
     /** 적 처치를 지원하는 플레이어 목록 (기여자 : (점수 ID : 지원 점수)) */
     private final HashMap<CombatUser, HashMap<String, Double>> killSupporterMap = new HashMap<>();
-    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
-    @Nullable
-    @Getter
-    private final GameUser gameUser;
     /** 임시 히트박스 객체 목록 */
-    @NonNull
+    @Nullable
     @Setter
     private Hitbox @Nullable [] temporaryHitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
@@ -155,7 +156,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private UserData.CharacterRecord characterRecord;
     /** 무기 객체 */
     @Nullable
-    @Getter
     private Weapon weapon;
     /** 연사 무기 사용을 처리하는 태스크 */
     @Nullable
@@ -994,6 +994,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     public Location getArmLocation(boolean isRight) {
         return LocationUtil.getLocationFromOffset(entity.getEyeLocation().subtract(0, 0.4, 0), isRight ? 0.2 : -0.2, 0, 0);
+    }
+
+    @NonNull
+    public Weapon getWeapon() {
+        if (weapon == null)
+            throw new NullPointerException("일치하는 무기가 존재하지 않음");
+
+        return weapon;
     }
 
     /**
