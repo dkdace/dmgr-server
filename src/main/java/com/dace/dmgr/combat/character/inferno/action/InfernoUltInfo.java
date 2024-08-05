@@ -14,6 +14,9 @@ public final class InfernoUltInfo extends UltimateSkillInfo {
     public static final int A1_COOLDOWN_DECREMENT = 3 * 20;
     /** 지속시간 (tick) */
     public static final long DURATION = 10 * 20;
+
+    /** 궁극기 처치 점수 */
+    public static final int KILL_SCORE = 20;
     @Getter
     private static final InfernoUltInfo instance = new InfernoUltInfo();
 

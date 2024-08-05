@@ -9,11 +9,9 @@ import com.dace.dmgr.combat.character.Vanguard;
 import com.dace.dmgr.combat.character.inferno.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.*;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -144,6 +142,19 @@ public final class Inferno extends Vanguard {
                 ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
                         0, 0, 0, 0.1);
         }
+    }
+
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        if (!(victim instanceof CombatUser))
+            return;
+
+        InfernoUlt skillUlt = (InfernoUlt) attacker.getSkill(InfernoUltInfo.getInstance());
+
+        if (score < 100 && CooldownUtil.getCooldown(attacker, InfernoA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE);
+        if (!skillUlt.isDurationFinished())
+            attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override

@@ -10,10 +10,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
-import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -25,6 +22,9 @@ import org.bukkit.util.Vector;
 import java.util.function.Predicate;
 
 public final class InfernoA2 extends ActiveSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
+
     InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
     }
@@ -139,6 +139,10 @@ public final class InfernoA2 extends ActiveSkill {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoA2Burning.instance, 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+                if (target instanceof CombatUser) {
+                    combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
+                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
+                }
             }
 
             return true;
