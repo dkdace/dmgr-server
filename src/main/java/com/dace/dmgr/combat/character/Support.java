@@ -41,8 +41,8 @@ public abstract class Support extends Character {
         if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
             boolean activate = Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .anyMatch(combatUser2 -> combatUser2 != null && combatUser2.getDamageModule().isLowHealth() &&
-                            combatUser2.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
+                    .anyMatch(target -> target != null && target.getDamageModule().isLowHealth() &&
+                            target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
                 combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait1Info.SPEED);

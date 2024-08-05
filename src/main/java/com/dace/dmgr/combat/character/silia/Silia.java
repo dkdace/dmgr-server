@@ -159,23 +159,8 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
-    public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         return combatUser.getSkill(SiliaP1Info.getInstance()).canUse();
-    }
-
-    @Override
-    public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
     }
 
     @Override

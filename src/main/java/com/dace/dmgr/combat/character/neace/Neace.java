@@ -166,11 +166,6 @@ public final class Neace extends Support {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
 
@@ -178,15 +173,8 @@ public final class Neace extends Support {
     }
 
     @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
-
-        return skill4.isDurationFinished() || skill4.isEnabled();
+        return canSprint(combatUser);
     }
 
     @Override

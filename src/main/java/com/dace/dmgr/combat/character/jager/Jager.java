@@ -183,16 +183,6 @@ public final class Jager extends Marksman {
     }
 
     @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
-    public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();

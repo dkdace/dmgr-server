@@ -29,13 +29,12 @@ public abstract class Scuffler extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser))
-            return;
+        if (victim instanceof CombatUser) {
+            if (isFinalHit)
+                attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-        if (isFinalHit)
-            attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-
-        attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+            attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        }
     }
 
     public static final class RoleTrait1Info extends TraitInfo {

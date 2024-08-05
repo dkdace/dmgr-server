@@ -14,7 +14,7 @@ public final class NeaceP1Info extends PassiveSkillInfo {
     private static final NeaceP1Info instance = new NeaceP1Info();
 
     private NeaceP1Info() {
-        super(1, "사냥의 미학");
+        super(1, "생명의 힘");
     }
 
     @Override

@@ -162,11 +162,6 @@ public final class Quaker extends Guardian {
     }
 
     @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() &&
                 combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
@@ -181,10 +176,7 @@ public final class Quaker extends Guardian {
     @Override
     @Nullable
     public PassiveSkillInfo getPassiveSkillInfo(int number) {
-        switch (number) {
-            default:
-                return null;
-        }
+        return null;
     }
 
     @Override

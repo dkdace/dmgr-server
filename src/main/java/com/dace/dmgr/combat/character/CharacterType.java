@@ -26,17 +26,24 @@ import org.bukkit.inventory.ItemStack;
  */
 @Getter
 public enum CharacterType {
+    SILIA(Silia.getInstance()),
+
     ARKACE(Arkace.getInstance()),
     JAGER(Jager.getInstance()),
+
+    INFERNO(Inferno.getInstance()),
+
     QUAKER(Quaker.getInstance()),
-    SILIA(Silia.getInstance()),
+
     NEACE(Neace.getInstance()),
-    VELLION(Vellion.getInstance()),
-    INFERNO(Inferno.getInstance());
+
+    VELLION(Vellion.getInstance());
 
     /** 전투원 정보 */
+    @NonNull
     private final Character character;
     /** GUI 아이템 객체 */
+    @NonNull
     private final GuiItem guiItem;
 
     CharacterType(Character character) {
@@ -49,7 +56,7 @@ public enum CharacterType {
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (clickType != ClickType.LEFT || !clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
+                if (clickType != ClickType.LEFT)
                     return false;
 
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));

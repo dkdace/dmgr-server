@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
@@ -43,13 +44,13 @@ public abstract class Controller extends Character {
         if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
             Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .filter(combatUser2 -> combatUser2 != null && combatUser2 != combatUser && combatUser2.getDamageModule().isLowHealth())
-                    .forEach(combatUser2 -> {
-                        CombatUser target = (CombatUser) CombatUtil.getNearCombatEntity(combatUser.getGame(), combatUser2.getEntity().getLocation(),
+                    .filter(target -> target != null && target != combatUser && target.getDamageModule().isLowHealth())
+                    .forEach(target -> {
+                        CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getEntity().getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
 
-                        if (target != null)
-                            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
+                        if (targetCombatEntity != null)
+                            GlowUtil.setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
                     });
         }
 

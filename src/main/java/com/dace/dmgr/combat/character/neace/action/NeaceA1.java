@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 public final class NeaceA1 extends ActiveSkill {
     private final NeaceA1Mark neaceA1Mark = new NeaceA1Mark();
@@ -128,7 +127,7 @@ public final class NeaceA1 extends ActiveSkill {
             return false;
         }
 
-        private void playUseEffect(@NotNull Damageable target) {
+        private void playUseEffect(@NonNull Damageable target) {
             Location location = combatUser.getArmLocation(true);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,

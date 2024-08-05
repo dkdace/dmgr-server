@@ -228,7 +228,9 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @return 근접 공격을 사용할 수 있으면 {@code true} 반환
      */
-    public abstract boolean canUseMeleeAttack(@NonNull CombatUser combatUser);
+    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
+        return true;
+    }
 
     /**
      * 전투원이 달리기를 할 수 있는 지 확인한다.
@@ -236,7 +238,9 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @return 달리기 가능 여부
      */
-    public abstract boolean canSprint(@NonNull CombatUser combatUser);
+    public boolean canSprint(@NonNull CombatUser combatUser) {
+        return true;
+    }
 
     /**
      * 전투원이 비행할 수 있는 지 확인한다.
@@ -244,7 +248,9 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @return 비행 가능 여부
      */
-    public abstract boolean canFly(@NonNull CombatUser combatUser);
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return false;
+    }
 
     /**
      * 전투원이 점프를 할 수 있는 지 확인한다.
@@ -252,7 +258,9 @@ public abstract class Character {
      * @param combatUser 대상 플레이어
      * @return 점프 가능 여부
      */
-    public abstract boolean canJump(@NonNull CombatUser combatUser);
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
 
     /**
      * @return 무기 정보
@@ -264,7 +272,7 @@ public abstract class Character {
      * 지정한 번호의 패시브 스킬 정보을 반환한다.
      *
      * @param number 스킬 번호
-     * @return 패시브 스킬 정보
+     * @return 패시브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환
      */
     @Nullable
     public abstract PassiveSkillInfo getPassiveSkillInfo(int number);
@@ -273,7 +281,7 @@ public abstract class Character {
      * 지정한 번호의 액티브 스킬 정보을 반환한다.
      *
      * @param number 스킬 번호
-     * @return 액티브 스킬 정보
+     * @return 액티브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환
      */
     @Nullable
     public abstract ActiveSkillInfo getActiveSkillInfo(int number);

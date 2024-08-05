@@ -147,18 +147,8 @@ public final class Inferno extends Vanguard {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         return !((InfernoWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
-    }
-
-    @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
     }
 
     @Override

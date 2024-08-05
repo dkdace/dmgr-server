@@ -154,23 +154,8 @@ public final class Arkace extends Marksman {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         return !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
-    }
-
-    @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
-    public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
     }
 
     @Override
