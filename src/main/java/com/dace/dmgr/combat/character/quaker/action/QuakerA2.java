@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -192,7 +193,7 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected void trail() {
             Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
-            CombatUtil.playBlockHitEffect(getLocation(), floor, 3);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), floor, 3);
             ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0.2, 0.05, 0.2, 0.25);
         }
 

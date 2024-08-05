@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
@@ -30,7 +30,7 @@ public abstract class GunHitscan extends Hitscan {
     @Override
     protected boolean onHitBlock(@NonNull Block hitBlock) {
         SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, getLocation());
-        CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+        CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
                 3, 0, 0, 0, 0.1);
         ParticleUtil.play(Particle.TOWN_AURA, getLocation(), 10, 0, 0, 0, 0);

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -159,7 +160,7 @@ public final class QuakerA3 extends ActiveSkill {
         protected boolean onHitBlock(@NonNull Block hitBlock) {
             onImpact(getLocation());
 
-            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 5);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 5);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 50, 0.2, 0.2, 0.2, 0.4);
 
             return false;

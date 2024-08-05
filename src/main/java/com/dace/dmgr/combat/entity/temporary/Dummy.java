@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.entity.temporary;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healable;
@@ -111,7 +111,7 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     @Override
     public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
-        CombatUtil.playBleedingEffect(location, entity, damage);
+        CombatEffectUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override

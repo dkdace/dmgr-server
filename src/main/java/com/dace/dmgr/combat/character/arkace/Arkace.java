@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -137,7 +137,7 @@ public final class Arkace extends Marksman {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override

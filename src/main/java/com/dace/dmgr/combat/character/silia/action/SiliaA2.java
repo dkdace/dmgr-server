@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -123,7 +123,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 3);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 3);
             return false;
         }
 

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
@@ -272,7 +273,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             addStateValue(-damage);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
-            CombatUtil.playBleedingEffect(location, entity, damage);
+            CombatEffectUtil.playBleedingEffect(location, entity, damage);
         }
 
         @Override

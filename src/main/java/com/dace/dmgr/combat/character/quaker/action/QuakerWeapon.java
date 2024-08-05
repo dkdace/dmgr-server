@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -124,8 +125,8 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 2);
-            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 2);
+            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
 
             return false;
         }

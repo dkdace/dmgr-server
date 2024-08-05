@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
@@ -161,7 +162,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
-                CombatUtil.playBreakEffect(location, entity, damage);
+                CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
 
         @Override

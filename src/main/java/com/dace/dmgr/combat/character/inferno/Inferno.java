@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.inferno;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -137,7 +137,7 @@ public final class Inferno extends Vanguard {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
-            CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+            CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
         else {
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DAMAGE, victim.getEntity().getLocation(), 1 + damage * 0.001);
             if (location != null)

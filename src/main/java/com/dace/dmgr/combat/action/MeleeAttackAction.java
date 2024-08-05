@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.action;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -81,8 +81,8 @@ public final class MeleeAttackAction extends AbstractAction {
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
-            CombatUtil.playBlockHitSound(getLocation(), hitBlock, 1);
-            CombatUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
 
             return false;
         }

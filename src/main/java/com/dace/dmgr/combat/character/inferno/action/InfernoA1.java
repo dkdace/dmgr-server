@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -108,7 +109,7 @@ public final class InfernoA1 extends ActiveSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A1_LAND, loc);
         Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
-        CombatUtil.playBlockHitEffect(loc, floor, 5);
+        CombatEffectUtil.playBlockHitEffect(loc, floor, 5);
         ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 200, 0.8, 0.1, 0.8, 0.05);
 
         loc.setYaw(0);
