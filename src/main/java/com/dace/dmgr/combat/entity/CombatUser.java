@@ -402,17 +402,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             HologramUtil.editHologram(Cooldown.HEAL_PACK.id + healPackLocation,
                     MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            if (isGame)
-                for (GameUser targetGameUser : game.getGameUsers()) {
-                    HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                            LocationUtil.canPass(targetGameUser.getPlayer().getEyeLocation(), hologramLoc), targetGameUser.getPlayer());
-                }
-            else
-                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
-                    if (combatEntity instanceof CombatUser)
-                        HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
-                }
+            for (Player player : entity.getWorld().getPlayers()) {
+                HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
+                        LocationUtil.canPass(player.getPlayer().getEyeLocation(), hologramLoc), player.getPlayer());
+            }
 
             return true;
         }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5);
@@ -871,17 +864,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (isGame && game.isDisposed())
                 return false;
 
-            if (isGame)
-                for (GameUser targetGameUser : game.getGameUsers()) {
-                    HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                            LocationUtil.canPass(targetGameUser.getPlayer().getEyeLocation(), hologramLoc), targetGameUser.getPlayer());
-                }
-            else
-                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
-                    if (combatEntity instanceof CombatUser)
-                        HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
-                }
+            for (Player player : entity.getWorld().getPlayers()) {
+                HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
+                        LocationUtil.canPass(player.getEyeLocation(), hologramLoc), player.getPlayer());
+            }
 
             return true;
         }, isCancelled -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);

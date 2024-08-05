@@ -25,6 +25,8 @@ public final class LocationUtil {
     private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 72.5, 64, 39.5, 90, 0);
     /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
     private static final double CAN_PASS_INTERVAL = 0.25;
+    /** {@link LocationUtil#canPass(Location, Location)}의 최대 거리 */
+    private static final int CAN_PASS_MAX_DISTANCE = 70;
 
     /**
      * 로비 스폰 위치를 반환한다.
@@ -135,6 +137,9 @@ public final class LocationUtil {
     /**
      * 두 위치 사이를 통과할 수 있는지 확인한다.
      *
+     * <p>최적화를 위해 {@link LocationUtil#CAN_PASS_MAX_DISTANCE}를 초과하는
+     * 거리는 무조건 {@code false}를 반환한다.</p>
+     *
      * <p>각종 스킬의 판정에 사용한다.</p>
      *
      * @param start 시작 위치
@@ -148,6 +153,8 @@ public final class LocationUtil {
         Vector direction = getDirection(start, end).multiply(CAN_PASS_INTERVAL);
         Location loc = start.clone();
         double distance = start.distance(end);
+        if (distance > CAN_PASS_MAX_DISTANCE)
+            return false;
 
         while (loc.distance(start) < distance) {
             if (!isNonSolid(loc.add(direction)))
