@@ -20,7 +20,7 @@ public final class VellionA3Info extends ActiveSkillInfo {
     public static final long DURATION = 6 * 20;
 
     /** 초당 효과 점수 */
-    public static final int EFFECT_SCORE_PER_SECOND = 3;
+    public static final int EFFECT_SCORE_PER_SECOND = 2;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 15;
     @Getter
