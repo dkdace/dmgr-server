@@ -813,9 +813,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(victim.getCharacterType());
 
         String[] ments = character.getKillMent(victim.getCharacterType());
-        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String ment = "§f§l" + ments[DMGR.getRandom().nextInt(ments.length)];
 
-        sendMessage(victim, "§f§l" + ment);
+        entity.sendMessage(ment);
+        victim.getEntity().sendMessage(ment);
 
         TaskUtil.addTask(this, new DelayTask(() ->
                 victim.getUser().sendTypewriterTitle(String.valueOf(character.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
@@ -831,9 +832,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(attacker.getCharacterType());
 
         String[] ments = character.getDeathMent(attacker.getCharacterType());
-        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String ment = "§f§l" + ments[DMGR.getRandom().nextInt(ments.length)];
 
-        sendMessage(attacker, "§f§l" + ment);
+        entity.sendMessage(ment);
+        attacker.getEntity().sendMessage(ment);
 
         Location hologramLoc = entity.getLocation();
         for (int i = 0; i < 100; i++)
@@ -1434,23 +1436,21 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 지정한 플레이어에게 메시지(전투원 대사)를 전송한다.
+     * 전투 시스템의 메시지 포맷이 적용된 메시지를 반환한다.
      *
-     * @param combatUser 대상 플레이어
-     * @param message    메시지
+     * <p>인게임 채팅 및 전투원 대사에 사용한다.</p>
+     *
+     * @param message 메시지
+     * @return 포맷이 적용된 메시지
      */
-    public void sendMessage(@NonNull CombatUser combatUser, @NonNull String message) {
-        Validate.notNull(character);
-
+    @NonNull
+    public String getFormattedMessage(@NonNull String message) {
         ChatColor color = gameUser == null || gameUser.getTeam() == null ? ChatColor.YELLOW : gameUser.getTeam().getColor();
-        String fullMessage = MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
-                (!combatUser.isActivated() ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),
+
+        return MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
+                (!isActivated() || character == null ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),
                 entity.getName(), message);
-
-        entity.sendMessage(fullMessage);
-        combatUser.getEntity().sendMessage(fullMessage);
     }
-
 
     /**
      * 쿨타임 ID 및 기본 지속시간 목록.

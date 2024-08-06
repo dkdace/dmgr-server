@@ -39,8 +39,6 @@ import java.util.function.BiFunction;
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class GameUser implements Disposable {
-    /** 채팅의 메시지 포맷 */
-    private static final String CHAT_FORMAT = "§7§l[{0}] §f<{1}§l[{2}]§f{3}> §f{4}";
     /** 스폰 지역 확인 Y 좌표 */
     private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
     /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
@@ -341,13 +339,11 @@ public final class GameUser implements Disposable {
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
     public void sendMessage(@NonNull String message, boolean isTeam) {
+        Validate.notNull(combatUser);
         Validate.notNull(team);
 
-        String fullMessage = MessageFormat.format(CHAT_FORMAT, isTeam ? "팀" : "전체", team.getColor(),
-                (combatUser == null || combatUser.getCharacterType() == null ? "미선택" :
-                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
-                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
-                player.getName(), message);
+        String fullMessage = MessageFormat.format("§7§l[{0}] {1}", isTeam ? "팀" : "전체", combatUser.getFormattedMessage(message));
+
         for (GameUser target : (isTeam ? team.getTeamUsers() : game.getGameUsers())) {
             UserData targetUserData = UserData.fromPlayer(target.getPlayer());
             target.getUser().getPlayer().sendMessage(fullMessage);
