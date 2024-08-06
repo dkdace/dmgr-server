@@ -84,8 +84,7 @@ public abstract class Bullet {
      */
     @NonNull
     public final Location getLocation() {
-        Validate.validState(location != null);
-        return location;
+        return Validate.notNull(location);
     }
 
     /**
@@ -97,8 +96,7 @@ public abstract class Bullet {
      */
     @NonNull
     public final Vector getVelocity() {
-        Validate.validState(velocity != null);
-        return velocity;
+        return Validate.notNull(velocity);
     }
 
     /**

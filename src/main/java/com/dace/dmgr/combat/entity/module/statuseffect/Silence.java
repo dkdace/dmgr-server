@@ -33,7 +33,7 @@ public class Silence implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof CombatUser) {
-            Validate.validState(((CombatUser) combatEntity).getCharacterType() != null);
+            Validate.notNull(((CombatUser) combatEntity).getCharacterType());
 
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 5, 10);
 

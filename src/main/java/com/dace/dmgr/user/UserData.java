@@ -295,7 +295,7 @@ public final class UserData extends YamlFile {
      */
     @NonNull
     public UserData @NonNull [] getBlockedPlayers() {
-        Validate.validState(blockedPlayers != null);
+        Validate.notNull(blockedPlayers);
         return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
     }
 
@@ -306,7 +306,7 @@ public final class UserData extends YamlFile {
      * @return 차단 여부
      */
     public boolean isBlockedPlayer(@NonNull UserData userData) {
-        Validate.validState(blockedPlayers != null);
+        Validate.notNull(blockedPlayers);
         return this.blockedPlayers.contains(userData.getPlayerUUID().toString());
     }
 
@@ -316,7 +316,7 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
-        Validate.validState(blockedPlayers != null);
+        Validate.notNull(blockedPlayers);
 
         this.blockedPlayers.add(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
@@ -328,7 +328,7 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void removeBlockedPlayer(@NonNull UserData userData) {
-        Validate.validState(blockedPlayers != null);
+        Validate.notNull(blockedPlayers);
 
         this.blockedPlayers.remove(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
@@ -338,7 +338,7 @@ public final class UserData extends YamlFile {
      * 차단 목록을 초기화한다.
      */
     public void clearBlockedPlayers() {
-        Validate.validState(blockedPlayers != null);
+        Validate.notNull(blockedPlayers);
 
         this.blockedPlayers.clear();
         set("blockedPlayers", this.blockedPlayers);

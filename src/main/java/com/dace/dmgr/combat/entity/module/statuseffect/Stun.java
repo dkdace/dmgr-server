@@ -33,7 +33,7 @@ public class Stun implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof CombatUser) {
-            Validate.validState(((CombatUser) combatEntity).getCharacterType() != null);
+            Validate.notNull(((CombatUser) combatEntity).getCharacterType());
 
             if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
                     ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())

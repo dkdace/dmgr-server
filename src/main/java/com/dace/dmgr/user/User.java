@@ -688,11 +688,9 @@ public final class User implements Disposable {
      * 플레이어의 사이드바 이름을 지정한다.
      *
      * @param name 사이드바 이름
-     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setSidebarName(@NonNull String name) {
-        Validate.validState(sidebar != null);
-        sidebar.setName(name);
+        Validate.notNull(sidebar).setName(name);
     }
 
     /**
@@ -701,12 +699,11 @@ public final class User implements Disposable {
      * @param line    줄 번호. 0~14 사이의 값
      * @param content 내용
      * @throws IndexOutOfBoundsException {@code line}이 유효 범위를 초과하면 발생
-     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void editSidebar(int line, @NonNull String content) {
+        Validate.notNull(sidebar);
         if (line < 0 || line > 14)
             throw new IndexOutOfBoundsException("'line'이 0에서 14 사이여야 함");
-        Validate.validState(sidebar != null);
 
         ChatColor[] chatColors = ChatColor.values();
         sidebar.set(content.isEmpty() ? String.valueOf(chatColors[line]) : content, 14 - line);
@@ -717,46 +714,38 @@ public final class User implements Disposable {
      *
      * @param contents 내용 목록
      * @throws IndexOutOfBoundsException {@code contents}의 길이가 15를 초과하면 발생
-     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void editSidebar(@NonNull String @NonNull ... contents) {
+        Validate.notNull(sidebar);
         if (contents.length > 15)
             throw new IndexOutOfBoundsException("'contents'의 길이가 16 미만이어야 함");
-        Validate.validState(sidebar != null);
 
         sidebar.setAll(contents);
     }
 
     /**
      * 플레이어의 사이드바 내용을 초기화한다.
-     *
-     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void clearSidebar() {
-        Validate.validState(sidebar != null);
-        sidebar.clear();
+        Validate.notNull(sidebar).clear();
     }
 
     /**
      * 플레이어의 탭리스트 헤더(상단부)의 내용을 지정한다.
      *
      * @param content 내용
-     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListHeader(@NonNull String content) {
-        Validate.validState(tabList != null);
-        tabList.setHeader(content);
+        Validate.notNull(tabList).setHeader(content);
     }
 
     /**
      * 플레이어의 탭리스트 푸터(하단부)의 내용을 지정한다.
      *
      * @param content 내용
-     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListFooter(@NonNull String content) {
-        Validate.validState(tabList != null);
-        tabList.setFooter(content);
+        Validate.notNull(tabList).setFooter(content);
     }
 
     /**
@@ -767,14 +756,13 @@ public final class User implements Disposable {
      * @param content 내용
      * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
      * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
-     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
+        Validate.notNull(tabList);
         if (column < 0 || column > 3)
             throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
             throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
-        Validate.validState(tabList != null);
 
         tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
     }
@@ -785,25 +773,22 @@ public final class User implements Disposable {
      * @param column 열 번호. 0~3 사이의 값
      * @param row    행 번호. 0~19 사이의 값
      * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
-     * @throws IllegalStateException     {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void removeTabListItem(int column, int row) {
+        Validate.notNull(tabList);
         if (column < 0 || column > 3)
             throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
             throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
-        Validate.validState(tabList != null);
 
         tabList.remove(column, row);
     }
 
     /**
      * 플레이어의 탭리스트에서 모든 항목을 제거한다.
-     *
-     * @throws IllegalStateException {@link User#onInit()}이 아직 호출되지 않았으면 발생
      */
     public void clearTabListItems() {
-        Validate.validState(tabList != null);
+        Validate.notNull(tabList);
 
         for (int i = 0; i < 80; i++)
             tabList.remove(i);

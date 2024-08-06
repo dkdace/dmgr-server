@@ -170,7 +170,7 @@ public final class GameUser implements Disposable {
      * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickTeamSpawn() {
-        Validate.validState(combatUser != null);
+        Validate.notNull(combatUser);
 
         if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
@@ -183,7 +183,7 @@ public final class GameUser implements Disposable {
      * 플레이어가 상대 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickOppositeSpawn() {
-        Validate.validState(combatUser != null);
+        Validate.notNull(combatUser);
 
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
@@ -285,9 +285,8 @@ public final class GameUser implements Disposable {
      */
     public void addTeamScore(int increment) {
         validate();
-        Validate.validState(team != null);
 
-        team.setScore(team.getScore() + increment);
+        Validate.notNull(team).setScore(team.getScore() + increment);
     }
 
     /**
@@ -342,7 +341,7 @@ public final class GameUser implements Disposable {
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
     public void sendMessage(@NonNull String message, boolean isTeam) {
-        Validate.validState(team != null);
+        Validate.notNull(team);
 
         String fullMessage = MessageFormat.format(CHAT_FORMAT, isTeam ? "팀" : "전체", team.getColor(),
                 (combatUser == null || combatUser.getCharacterType() == null ? "미선택" :
@@ -363,7 +362,7 @@ public final class GameUser implements Disposable {
     public enum CommunicationItem {
         /** 치료 요청 */
         REQ_HEAL("§a치료 요청", (target, targetCombatUser) -> {
-            Validate.validState(targetCombatUser.getCharacterType() != null);
+            Validate.notNull(targetCombatUser.getCharacterType());
 
             String state;
             String ment;
@@ -382,7 +381,7 @@ public final class GameUser implements Disposable {
         }),
         /** 궁극기 상태 */
         SHOW_ULT("§a궁극기 상태", (gameUser, targetCombatUser) -> {
-            Validate.validState(targetCombatUser.getCharacterType() != null);
+            Validate.notNull(targetCombatUser.getCharacterType());
 
             String ment;
             if (targetCombatUser.getUltGaugePercent() < 0.9)
@@ -396,7 +395,7 @@ public final class GameUser implements Disposable {
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", (gameUser, targetCombatUser) -> {
-            Validate.validState(targetCombatUser.getCharacterType() != null);
+            Validate.notNull(targetCombatUser.getCharacterType());
 
             String[] ments = targetCombatUser.getCharacterType().getCharacter().getReqRallyMent();
             String ment = ments[DMGR.getRandom().nextInt(ments.length)];
