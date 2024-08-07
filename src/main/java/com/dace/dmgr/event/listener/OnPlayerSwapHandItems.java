@@ -23,7 +23,7 @@ public final class OnPlayerSwapHandItems implements Listener {
         GameUser gameUser = GameUser.fromUser(user);
         CombatUser combatUser = CombatUser.fromUser(user);
 
-        if ((gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) ||
+        if ((gameUser != null && gameUser.getTeam() != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) ||
                 (combatUser != null && LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION))) {
             SelectChar.getInstance().open(player);
             return;

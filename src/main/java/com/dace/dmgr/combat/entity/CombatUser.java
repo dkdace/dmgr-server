@@ -829,10 +829,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(victim.getCharacterType());
 
         String[] ments = character.getKillMent(victim.getCharacterType());
-        String ment = "§f§l" + ments[DMGR.getRandom().nextInt(ments.length)];
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String message = getFormattedMessage("§l" + ment);
 
-        entity.sendMessage(ment);
-        victim.getEntity().sendMessage(ment);
+        entity.sendMessage(message);
+        victim.getEntity().sendMessage(message);
 
         TaskUtil.addTask(this, new DelayTask(() ->
                 victim.getUser().sendTypewriterTitle(String.valueOf(character.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
@@ -848,10 +849,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(attacker.getCharacterType());
 
         String[] ments = character.getDeathMent(attacker.getCharacterType());
-        String ment = "§f§l" + ments[DMGR.getRandom().nextInt(ments.length)];
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String message = getFormattedMessage("§l" + ment);
 
-        entity.sendMessage(ment);
-        attacker.getEntity().sendMessage(ment);
+        entity.sendMessage(message);
+        attacker.getEntity().sendMessage(message);
 
         Location hologramLoc = entity.getLocation();
         for (int i = 0; i < 100; i++)
