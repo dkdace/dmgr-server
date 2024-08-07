@@ -67,10 +67,10 @@ import java.util.stream.Collectors;
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Jumpable, CombatEntity {
     /** 암살 점수 */
     public static final int FASTKILL_SCORE = 20;
-    /** 궁극기 차단 점수 */
-    public static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.12;
+    /** 궁극기 차단 점수 */
+    private static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
     /** 추락사 점수 */
@@ -936,7 +936,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             characterRecord.setDeath(characterRecord.getDeath() + 1);
         }
 
-        cancelAction();
+        cancelAction(null);
         respawn();
     }
 
@@ -1393,22 +1393,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /**
      * 사용 중인 모든 동작을 강제로 취소시킨다.
+     *
+     * @param attacker 공격자
      */
-    public void cancelAction() {
+    public void cancelAction(@Nullable CombatUser attacker) {
         Validate.notNull(weapon);
 
         if (weapon.isCancellable())
             weapon.onCancelled();
-        cancelSkill();
+        cancelSkill(attacker);
     }
 
     /**
      * 사용 중인 모든 스킬을 강제로 취소시킨다.
+     *
+     * @param attacker 공격자
      */
-    public void cancelSkill() {
+    public void cancelSkill(@Nullable CombatUser attacker) {
         skillMap.forEach((skillInfo, skill) -> {
-            if (skill.isCancellable())
+            if (skill.isCancellable()) {
                 skill.onCancelled();
+                if (skill instanceof UltimateSkill && attacker != null && !isDead())
+                    attacker.addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
+            }
         });
     }
 

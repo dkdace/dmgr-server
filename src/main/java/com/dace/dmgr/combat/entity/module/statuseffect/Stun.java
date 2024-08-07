@@ -35,10 +35,8 @@ public class Stun implements StatusEffect {
         if (combatEntity instanceof CombatUser) {
             Validate.notNull(((CombatUser) combatEntity).getCharacterType());
 
-            if (provider instanceof CombatUser && !((CombatUser) combatEntity).isDead() &&
-                    ((CombatUser) combatEntity).getSkill(((CombatUser) combatEntity).getCharacterType().getCharacter().getUltimateSkillInfo()).isCancellable())
-                ((CombatUser) provider).addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-            ((CombatUser) combatEntity).cancelAction();
+            if (provider instanceof CombatUser)
+                ((CombatUser) combatEntity).cancelAction((CombatUser) provider);
         }
     }
 
