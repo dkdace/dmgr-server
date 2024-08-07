@@ -9,11 +9,17 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
 
 /**
  * 엔티티의 상태 효과 모듈 클래스.
+ *
+ * <p>전투 시스템 엔티티가 {@link Damageable}을 상속받는 클래스여야 하며,
+ * 엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
+ *
+ * @see Damageable
  */
 public final class StatusEffectModule {
     /** 쿨타임 ID */
@@ -36,11 +42,14 @@ public final class StatusEffectModule {
      *
      * @param combatEntity 대상 엔티티
      * @param resistance   상태 효과 저항 기본값. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
+     *                                  상속받지 않으면 발생
      */
     public StatusEffectModule(@NonNull Damageable combatEntity, double resistance) {
         if (resistance < 0)
             throw new IllegalArgumentException("'resistance'가 0 이상이어야 함");
+        if (!(combatEntity.getEntity() instanceof LivingEntity))
+            throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
 
         this.combatEntity = combatEntity;
         this.resistanceStatus = new AbilityStatus(resistance);
@@ -50,6 +59,7 @@ public final class StatusEffectModule {
      * 상태 효과 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity 대상 엔티티
+     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public StatusEffectModule(@NonNull Damageable combatEntity) {
         this(combatEntity, DEFAULT_VALUE);

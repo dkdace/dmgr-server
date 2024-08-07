@@ -53,10 +53,10 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            CombatUser combatUser2 = CombatUser.fromUser(User.fromPlayer(player2));
-            if (combatUser2 != null && getOwner().isEnemy(combatUser2))
-                packet.sendPacket(player2);
+        Bukkit.getOnlinePlayers().forEach((Player target) -> {
+            CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
+            if (targetCombatUser != null && getOwner().isEnemy(targetCombatUser))
+                packet.sendPacket(target);
         });
     }
 }

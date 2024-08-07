@@ -132,7 +132,7 @@ public final class JagerA2 extends ActiveSkill {
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this, 2);
             attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, JagerA2Info.HEALTH);
+            damageModule = new DamageModule(this, false, true, false, JagerA2Info.DEATH_SCORE, JagerA2Info.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
             onInit();
@@ -176,7 +176,8 @@ public final class JagerA2 extends ActiveSkill {
                 return;
 
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() && combatEntity.isEnemy(this));
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
+                            combatEntity.isEnemy(this));
             if (target != null)
                 onCatchEnemy(target);
 
@@ -247,9 +248,6 @@ public final class JagerA2 extends ActiveSkill {
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerA2Info.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);

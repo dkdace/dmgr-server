@@ -105,7 +105,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         if (isAmplifying) {
             target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2.NeaceA2Buff.instance, 4);
             if (target instanceof CombatUser)
-                ((CombatUser) target).addDamageSupport(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+                ((CombatUser) target).addKillAssist(combatUser, NeaceA2.ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
         }
 
         Location location = combatUser.getArmLocation(true);

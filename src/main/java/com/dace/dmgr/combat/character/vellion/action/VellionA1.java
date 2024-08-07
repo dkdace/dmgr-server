@@ -229,7 +229,7 @@ public final class VellionA1 extends ActiveSkill {
             playTickEffect();
 
             Predicate<CombatEntity> condition = combatEntity -> combatEntity != combatUser && combatEntity instanceof Damageable &&
-                    ((Damageable) combatEntity).isLiving();
+                    ((Damageable) combatEntity).getDamageModule().isLiving();
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA1Info.RADIUS, condition);
             new VellionA1Area(condition, areaTargets).emit(loc);
         }

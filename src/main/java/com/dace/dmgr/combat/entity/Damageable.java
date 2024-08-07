@@ -51,18 +51,6 @@ public interface Damageable extends CombatEntity {
     }
 
     /**
-     * 엔티티가 살아있는(Living) 대상인 지 확인한다.
-     *
-     * <p>살아있는 엔티티는 플레이어 등의 엔티티를 말한다.</p>
-     *
-     * @return 살아있는 대상이면 {@code true} 반환
-     * @implSpec {@code false}
-     */
-    default boolean isLiving() {
-        return false;
-    }
-
-    /**
      * 엔티티가 피해를 입었을 때 실행될 작업.
      *
      * @param attacker      공격자

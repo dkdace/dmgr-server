@@ -116,6 +116,7 @@ public final class QuakerA1 extends ChargeableSkill {
                     entity,
                     owner.getName() + "의 방패",
                     owner,
+                    QuakerA1Info.DEATH_SCORE,
                     QuakerA1Info.HEALTH,
                     new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
             );
@@ -172,9 +173,6 @@ public final class QuakerA1 extends ChargeableSkill {
             setStateValue(0);
             onCancelled();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", QuakerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
             for (int i = 0; i < 3; i++) {

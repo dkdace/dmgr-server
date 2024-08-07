@@ -142,7 +142,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
-        if (!(victim.isLiving()))
+        if (!(victim.getDamageModule().isLiving()))
             return true;
 
         VellionP2 skillp2 = (VellionP2) attacker.getSkill(VellionP2Info.getInstance());

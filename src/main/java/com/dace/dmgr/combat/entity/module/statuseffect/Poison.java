@@ -41,7 +41,7 @@ public abstract class Poison implements StatusEffect {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity.isLiving()) {
+        if (combatEntity.getDamageModule().isLiving()) {
             if (combatEntity.getEntity() instanceof LivingEntity)
                 ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.POISON,
                         4, 0, false, false), true);

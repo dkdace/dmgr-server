@@ -32,14 +32,17 @@ public final class HealModule extends DamageModule {
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
      * @param isShowHealthBar   생명력 홀로그램 표시 여부
+     * @param isLiving          살아있는(Living) 엔티티 여부
+     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
      * @param maxHealth         최대 체력. 0 이상의 값
      * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
      * @param healMultiplier    회복량 배수 기본값. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
      *                                  상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier, double healMultiplier) {
-        super(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier);
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
+                      int score, int maxHealth, double defenseMultiplier, double healMultiplier) {
+        super(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, defenseMultiplier);
         if (healMultiplier < 0)
             throw new IllegalArgumentException("'healMultiplier'가 0 이상이어야 함");
 
@@ -52,13 +55,16 @@ public final class HealModule extends DamageModule {
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
      * @param isShowHealthBar   생명력 홀로그램 표시 여부
+     * @param isLiving          살아있는(Living) 엔티티 여부
+     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
      * @param maxHealth         최대 체력. 0 이상의 값
      * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
      *                                  상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier) {
-        this(combatEntity, isUltProvider, isShowHealthBar, maxHealth, defenseMultiplier, DEFAULT_VALUE);
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
+                      int score, int maxHealth, double defenseMultiplier) {
+        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, defenseMultiplier, DEFAULT_VALUE);
     }
 
     /**
@@ -67,12 +73,15 @@ public final class HealModule extends DamageModule {
      * @param combatEntity    대상 엔티티
      * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
      * @param isShowHealthBar 생명력 홀로그램 표시 여부
+     * @param isLiving        살아있는(Living) 엔티티 여부
+     * @param score           죽었을 때 공격자에게 주는 점수. 0 이상의 값
      * @param maxHealth       최대 체력. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
      *                                  상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth) {
-        this(combatEntity, isUltProvider, isShowHealthBar, maxHealth, DamageModule.DEFAULT_VALUE);
+    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
+                      int score, int maxHealth) {
+        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, DamageModule.DEFAULT_VALUE);
     }
 
     /**

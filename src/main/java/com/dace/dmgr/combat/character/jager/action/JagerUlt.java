@@ -157,7 +157,7 @@ public final class JagerUlt extends UltimateSkill {
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this, 2);
             attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, JagerUltInfo.HEALTH);
+            damageModule = new DamageModule(this, false, true, false, JagerUltInfo.DEATH_SCORE, JagerUltInfo.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
             onInit();
@@ -285,9 +285,6 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerUltInfo.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
                     0.1, 0.1, 0.1, 0.15);

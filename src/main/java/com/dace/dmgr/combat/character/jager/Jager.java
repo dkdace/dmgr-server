@@ -147,7 +147,7 @@ public final class Jager extends Marksman {
         JagerA1 skill1 = (JagerA1) attacker.getSkill(JagerA1Info.getInstance());
         JagerUlt skillUlt = (JagerUlt) attacker.getSkill(JagerUltInfo.getInstance());
 
-        if (skill1.getSummonEntity() != null && victim.isLiving())
+        if (skill1.getSummonEntity() != null && victim.getDamageModule().isLiving())
             skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
 
         return skillUlt.getSummonEntity() == null;

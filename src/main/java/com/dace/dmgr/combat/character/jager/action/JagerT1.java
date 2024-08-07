@@ -53,7 +53,7 @@ public final class JagerT1 {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            if (combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving())
+            if (combatEntity.getDamageModule().isLiving())
                 ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3,
                         combatEntity.getEntity().getLocation().add(0, 0.5, 0), 1,
                         combatEntity.getEntity().getWidth() / 2, 0, combatEntity.getEntity().getWidth() / 2, 0);

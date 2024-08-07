@@ -40,7 +40,7 @@ public abstract class Slow implements StatusEffect {
 
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity.isLiving())
+        if (combatEntity.getDamageModule().isLiving())
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12,
                     combatEntity.getEntity().getLocation().add(0, 0.5, 0), 3,
                     combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4, 0);

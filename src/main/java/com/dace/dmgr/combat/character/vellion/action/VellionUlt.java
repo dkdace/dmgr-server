@@ -133,8 +133,8 @@ public final class VellionUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() &&
-                combatEntity.isEnemy(combatUser);
+        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Damageable &&
+                ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(combatUser);
         TaskUtil.addTask(VellionUlt.this, new IntervalTask(i -> {
             if (i % 4 == 0) {
                 Location loc = combatUser.getEntity().getEyeLocation();

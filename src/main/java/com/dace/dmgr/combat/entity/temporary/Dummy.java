@@ -63,7 +63,7 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
         );
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
-        damageModule = new HealModule(this, true, true, maxHealth);
+        damageModule = new HealModule(this, true, true, true, 0, maxHealth);
         critHitbox = hitboxes[3];
         this.teamIdentifier = teamIdentifier;
 
@@ -112,11 +112,6 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
         CombatEffectUtil.playBleedingEffect(location, entity, damage);
-    }
-
-    @Override
-    public boolean isLiving() {
-        return true;
     }
 
     @Override

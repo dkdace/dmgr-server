@@ -159,7 +159,7 @@ public final class JagerA3 extends ActiveSkill {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
-            if (combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving())
+            if (combatEntity.getDamageModule().isLiving())
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                         combatEntity.getCenterLocation(), 5, combatEntity.getEntity().getWidth() / 2,
                         combatEntity.getEntity().getHeight() / 2, combatEntity.getEntity().getWidth() / 2,

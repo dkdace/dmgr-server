@@ -183,7 +183,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             knockbackModule = new KnockbackModule(this);
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, JagerA1Info.HEALTH);
+            damageModule = new DamageModule(this, false, true, true, JagerA1Info.DEATH_SCORE, JagerA1Info.HEALTH);
             moveModule = new JumpModule(this, JagerA1Info.SPEED);
             readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
 
@@ -228,7 +228,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             if (i % 10 == 0) {
                 if (entity.getTarget() == null) {
                     Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.LOW_HEALTH_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).isLiving() &&
+                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
                                     combatEntity.isEnemy(this) && ((Damageable) combatEntity).getDamageModule().isLowHealth());
                     if (target != null)
                         entity.setTarget(target.getEntity());
@@ -277,19 +277,11 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         }
 
         @Override
-        public boolean isLiving() {
-            return true;
-        }
-
-        @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
 
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f처치", JagerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
         }

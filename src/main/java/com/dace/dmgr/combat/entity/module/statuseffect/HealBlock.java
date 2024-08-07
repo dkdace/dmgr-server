@@ -40,7 +40,7 @@ public class HealBlock implements StatusEffect {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity.isLiving() && combatEntity.getEntity() instanceof LivingEntity)
+        if (combatEntity.getDamageModule().isLiving() && combatEntity.getEntity() instanceof LivingEntity)
             ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WITHER,
                     4, 0, false, false), true);
     }
