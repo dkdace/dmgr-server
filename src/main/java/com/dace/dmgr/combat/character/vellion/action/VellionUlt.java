@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -138,8 +137,7 @@ public final class VellionUlt extends UltimateSkill {
         TaskUtil.addTask(VellionUlt.this, new IntervalTask(i -> {
             if (i % 4 == 0) {
                 Location loc = combatUser.getEntity().getEyeLocation();
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-                new VellionUltArea(condition, targets).emit(loc);
+                new VellionUltArea(condition).emit(loc);
             }
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 4,
@@ -153,8 +151,7 @@ public final class VellionUlt extends UltimateSkill {
         }, isCancelled -> {
             Location loc = combatUser.getEntity().getEyeLocation();
             Location loc2 = loc.clone().add(0, 1, 0);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-            new VellionUltExplodeArea(condition, targets).emit(loc);
+            new VellionUltExplodeArea(condition).emit(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc2);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
@@ -223,8 +220,8 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     private final class VellionUltArea extends Area {
-        private VellionUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltArea(Predicate<CombatEntity> condition) {
+            super(combatUser, VellionUltInfo.RADIUS, condition);
         }
 
         @Override
@@ -247,8 +244,8 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     private final class VellionUltExplodeArea extends Area {
-        private VellionUltExplodeArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltExplodeArea(Predicate<CombatEntity> condition) {
+            super(combatUser, VellionUltInfo.RADIUS, condition);
         }
 
         @Override

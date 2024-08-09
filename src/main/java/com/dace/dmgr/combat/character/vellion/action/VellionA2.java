@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -11,8 +10,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -154,29 +152,18 @@ public final class VellionA2 extends ActiveSkill {
         }
     }
 
-    private final class VellionTarget extends Hitscan {
-        private Damageable target = null;
-
+    private final class VellionTarget extends Target {
         private VellionTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(VellionA2Info.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
-                            combatEntity.isEnemy(VellionA2.this.combatUser) &&
-                            LocationUtil.canPass(VellionA2.this.combatUser.getEntity().getEyeLocation(), combatEntity.getCenterLocation()) &&
-                            !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark)).build());
+            super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> ((Damageable) combatEntity).getDamageModule().isLiving() &&
+                    combatEntity.isEnemy(VellionA2.this.combatUser) &&
+                    !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
             combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
-
-            this.target = target;
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE, combatUser.getEntity().getLocation());
 
@@ -224,8 +211,6 @@ public final class VellionA2 extends ActiveSkill {
                     onCancelled();
                 }, 1));
             }, 1, VellionA2Info.READY_DURATION));
-
-            return false;
         }
 
         private void onTick(Damageable target, long i) {
@@ -242,8 +227,7 @@ public final class VellionA2 extends ActiveSkill {
                 Location loc2 = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
                 Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) && combatEntity != target &&
                         combatEntity instanceof Damageable;
-                CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc2, VellionA2Info.RADIUS, condition);
-                new VellionA2Area(condition, areaTargets).emit(loc2);
+                new VellionA2Area(condition).emit(loc2);
             }
         }
 
@@ -259,17 +243,11 @@ public final class VellionA2 extends ActiveSkill {
                     CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0;
         }
 
-        @Override
-        protected void onDestroy() {
-            if (target == null)
-                combatUser.getUser().sendAlert("대상을 찾을 수 없습니다.");
-        }
-
         private final class VellionA2Area extends Area {
             private boolean isActivated = false;
 
-            private VellionA2Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, VellionA2Info.RADIUS, condition, targets);
+            private VellionA2Area(Predicate<CombatEntity> condition) {
+                super(combatUser, VellionA2Info.RADIUS, condition);
             }
 
             @Override

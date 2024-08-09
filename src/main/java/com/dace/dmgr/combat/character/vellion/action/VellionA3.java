@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
@@ -156,8 +155,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         TaskUtil.addTask(VellionA3.this, new IntervalTask(i -> {
             if (i % 4 == 0) {
                 Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA3Info.RADIUS, condition);
-                new VellionA3Area(condition, targets).emit(loc);
+                new VellionA3Area(condition).emit(loc);
             }
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 3, 0.4, 0, 0.4,
@@ -210,8 +208,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     }
 
     private final class VellionA3Area extends Area {
-        private VellionA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionA3Info.RADIUS, condition, targets);
+        private VellionA3Area(Predicate<CombatEntity> condition) {
+            super(combatUser, VellionA3Info.RADIUS, condition);
         }
 
         @Override

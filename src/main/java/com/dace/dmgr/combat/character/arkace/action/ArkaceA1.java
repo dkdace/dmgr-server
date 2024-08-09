@@ -84,7 +84,7 @@ public final class ArkaceA1 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             ParticleUtil.play(Particle.CRIT_MAGIC, getLocation(), 1, 0, 0, 0, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 1,
                     0, 0, 0, 32, 250, 225);
@@ -94,8 +94,7 @@ public final class ArkaceA1 extends ActiveSkill {
         protected void onHit() {
             Location loc = getLocation().clone().add(0, 0.1, 0);
             Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, ArkaceA1Info.RADIUS, condition);
-            new ArkaceA1Area(condition, targets).emit(loc);
+            new ArkaceA1Area(condition).emit(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_EXPLODE, loc);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 200,
@@ -118,8 +117,8 @@ public final class ArkaceA1 extends ActiveSkill {
         }
 
         private final class ArkaceA1Area extends Area {
-            private ArkaceA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, ArkaceA1Info.RADIUS, condition, targets);
+            private ArkaceA1Area(Predicate<CombatEntity> condition) {
+                super(combatUser, ArkaceA1Info.RADIUS, condition);
             }
 
             @Override

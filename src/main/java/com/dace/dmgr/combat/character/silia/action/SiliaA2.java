@@ -94,7 +94,7 @@ public final class SiliaA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             i++;
 
             Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(0.8);

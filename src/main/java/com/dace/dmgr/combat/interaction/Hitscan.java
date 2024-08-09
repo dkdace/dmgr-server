@@ -39,10 +39,9 @@ public abstract class Hitscan extends Bullet {
             if (!onInterval())
                 break;
 
-            if (getVelocity().length() > 0.01)
-                getLocation().add(getVelocity());
+            getLocation().add(getVelocity());
             if (i % trailInterval == 0)
-                trail();
+                onTrailInterval();
         }
 
         onDestroy();

@@ -154,7 +154,7 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -191,7 +191,7 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
             CombatEffectUtil.playBlockHitEffect(getLocation(), floor, 3);
             ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0.2, 0.05, 0.2, 0.25);

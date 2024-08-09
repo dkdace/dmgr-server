@@ -145,7 +145,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             for (int i = 0; i < 8; i++) {
                 Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
                 Vector axis = VectorUtil.getPitchAxis(getLocation());
@@ -195,7 +195,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 

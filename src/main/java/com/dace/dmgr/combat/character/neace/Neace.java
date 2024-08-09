@@ -9,17 +9,14 @@ import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -51,8 +48,7 @@ public final class Neace extends Support {
      * @param target     사용 대상
      */
     public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-        return target instanceof Healable && !target.isEnemy(combatUser) &&
-                target != combatUser && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation());
+        return target instanceof Healable && !target.isEnemy(combatUser);
     }
 
     @Override
@@ -217,21 +213,14 @@ public final class Neace extends Support {
         return NeaceUltInfo.getInstance();
     }
 
-    private static final class NeaceTarget extends Hitscan {
+    private static final class NeaceTarget extends Target {
         private NeaceTarget(CombatUser combatUser) {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> getTargetedActionCondition(combatUser, combatEntity)).build());
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, false, combatEntity -> getTargetedActionCondition(combatUser, combatEntity));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
-            return false;
         }
     }
 }

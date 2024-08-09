@@ -163,7 +163,7 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
@@ -200,7 +200,7 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 15);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec.getX(), vec.getY(), vec.getZ(), 1);
             ParticleUtil.play(Particle.CRIT, getLocation(), 4, 0.2, 0.2, 0.2, 0.1);

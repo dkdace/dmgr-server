@@ -9,7 +9,10 @@ import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.combat.interaction.ProjectileOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -119,19 +122,14 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         }
     }
 
-    private final class NeaceTarget extends Hitscan {
+    private final class NeaceTarget extends Target {
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceWeaponInfo.HEAL.MAX_DISTANCE)
-                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceWeapon.this.combatUser, combatEntity)).build());
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, false,
+                    combatEntity -> Neace.getTargetedActionCondition(NeaceWeapon.this.combatUser, combatEntity));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             NeaceWeapon.this.target = (Healable) target;
 
             TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed() &&
@@ -139,8 +137,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                     CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0 &&
                     combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
                     isCancelled -> NeaceWeapon.this.target = null, 1));
-
-            return false;
         }
     }
 
@@ -151,7 +147,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 1, 0.05, 0.05, 0.05,
                     255, 255, 235);

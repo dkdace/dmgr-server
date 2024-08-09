@@ -163,7 +163,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,

@@ -135,8 +135,7 @@ public final class JagerA3 extends ActiveSkill {
     private void explode(Location location, JagerA3Projectile projectile) {
         Location loc = location.clone().add(0, 0.1, 0);
         Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) || combatEntity == combatUser;
-        CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, JagerA3Info.RADIUS, condition);
-        new JagerA3Area(condition, targets, projectile).emit(loc);
+        new JagerA3Area(condition, projectile).emit(loc);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_EXPLODE, loc);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, loc,
@@ -175,7 +174,7 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             playTickEffect(getLocation());
         }
 
@@ -201,8 +200,8 @@ public final class JagerA3 extends ActiveSkill {
     private final class JagerA3Area extends Area {
         private final JagerA3Projectile projectile;
 
-        private JagerA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets, JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, condition, targets);
+        private JagerA3Area(Predicate<CombatEntity> condition, JagerA3Projectile projectile) {
+            super(combatUser, JagerA3Info.RADIUS, condition);
             this.projectile = projectile;
         }
 

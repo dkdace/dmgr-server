@@ -102,7 +102,7 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 15,
                     0.6, 0.02, 0.6, 96, 220, 255);
         }
@@ -210,8 +210,7 @@ public final class JagerUlt extends UltimateSkill {
             if (i % 4 == 0) {
                 Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(this) &&
                         combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < entity.getLocation().getY();
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(game, entity.getLocation(), range, condition);
-                new JagerUltArea(condition, targets, range).emit(entity.getLocation());
+                new JagerUltArea(condition, range).emit(entity.getLocation());
             }
             if (i >= JagerUltInfo.DURATION)
                 dispose();
@@ -294,8 +293,8 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         private final class JagerUltArea extends Area {
-            private JagerUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets, double radius) {
-                super(JagerUltEntity.this, radius, condition, targets);
+            private JagerUltArea(Predicate<CombatEntity> condition, double radius) {
+                super(JagerUltEntity.this, radius, condition);
             }
 
             @Override

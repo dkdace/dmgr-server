@@ -189,7 +189,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             double distance = getLocation().distance(combatUser.getEntity().getEyeLocation());
             if (distance > 5)
                 return;
@@ -227,7 +227,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.play(Particle.FLAME, loc, 10, 0.12, 0.12, 0.12, 0);
             ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 13, 0.15, 0.15, 0.15, 0.04);
@@ -251,8 +251,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         protected void onDestroy() {
             Location loc = getLocation().clone().add(0, 0.1, 0);
             Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, InfernoWeaponInfo.FIREBALL.RADIUS, condition);
-            new InfernoWeaponLArea(condition, targets).emit(loc);
+            new InfernoWeaponLArea(condition).emit(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_FIREBALL_EXPLODE, loc);
             ParticleUtil.play(Particle.SMOKE_LARGE, loc, 40, 0.2, 0.2, 0.2, 0.1);
@@ -262,8 +261,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         private final class InfernoWeaponLArea extends Area {
-            private InfernoWeaponLArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, condition, targets);
+            private InfernoWeaponLArea(Predicate<CombatEntity> condition) {
+                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, condition);
             }
 
             @Override

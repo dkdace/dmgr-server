@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.neace.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -137,8 +136,7 @@ public final class NeaceUlt extends UltimateSkill {
             Location loc = combatUser.getEntity().getEyeLocation();
             Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(combatUser) &&
                     combatEntity != combatUser;
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, NeaceWeaponInfo.HEAL.MAX_DISTANCE, condition);
-            new NeaceUltArea(condition, targets).emit(loc);
+            new NeaceUltArea(condition).emit(loc);
 
             playTickEffect(i);
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
@@ -173,8 +171,8 @@ public final class NeaceUlt extends UltimateSkill {
     }
 
     private final class NeaceUltArea extends Area {
-        private NeaceUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, condition, targets);
+        private NeaceUltArea(Predicate<CombatEntity> condition) {
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, condition);
         }
 
         @Override

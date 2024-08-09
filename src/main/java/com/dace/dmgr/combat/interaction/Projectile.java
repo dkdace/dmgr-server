@@ -93,7 +93,7 @@ public abstract class Projectile extends Bullet {
                     if (getVelocity().length() > 0.01)
                         getLocation().add(getVelocity());
                     if (count++ % trailInterval == 0)
-                        trail();
+                        onTrailInterval();
                 }
 
                 return (duration == -1 || i < duration) && getLocation().distance(origin) < maxDistance;

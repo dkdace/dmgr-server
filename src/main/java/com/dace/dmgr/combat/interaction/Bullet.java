@@ -25,13 +25,13 @@ import java.util.function.Predicate;
  */
 public abstract class Bullet {
     /** 궤적 상 히트박스 판정점 간 거리 기본값. (단위: 블록) */
-    protected static final double HITBOX_INTERVAL = 0.125;
+    protected static final double HITBOX_INTERVAL = 1 / 8.0;
 
     /** 발사자 엔티티 */
     @NonNull
     @Getter
     protected final CombatEntity shooter;
-    /** 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수) */
+    /** 트레일 이벤트 ({@link Bullet#onTrailInterval()})를 호출하는 주기. (단위: 판정점 개수) */
     protected final int trailInterval;
     /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
     protected final double startDistance;
@@ -54,7 +54,7 @@ public abstract class Bullet {
      * 총알 인스턴스를 생성한다.
      *
      * @param shooter       발사자 엔티티
-     * @param trailInterval 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수). 0 이상의 값
+     * @param trailInterval 트레일 이벤트 ({@link Bullet#onTrailInterval()})를 호출하는 주기. (단위: 판정점 개수). 0 이상의 값
      * @param startDistance 발사 위치로부터 총알이 생성되는 거리. (단위: 블록). 0 이상의 값
      * @param maxDistance   총알의 최대 사거리. (단위: 블록). 0 이상의 값
      * @param size          총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록). 0 이상의 값
@@ -188,11 +188,9 @@ public abstract class Bullet {
         Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size, condition.and(Damageable.class::isInstance));
 
         if (target != null && targets.add(target)) {
-            boolean isCrit = false;
-
             onHit();
-            if (target instanceof HasCritHitbox)
-                isCrit = ((HasCritHitbox) target).getCritHitbox().isInHitbox(location, size);
+
+            boolean isCrit = target instanceof HasCritHitbox && ((HasCritHitbox) target).getCritHitbox().isInHitbox(location, size);
             return onHitEntity(target, isCrit);
         }
 
@@ -204,7 +202,7 @@ public abstract class Bullet {
      *
      * <p>주로 파티클을 남길 때 사용한다.</p>
      */
-    protected void trail() {
+    protected void onTrailInterval() {
         // 미사용
     }
 

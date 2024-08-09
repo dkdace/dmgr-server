@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.interaction;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.LocationUtil;
@@ -26,8 +27,6 @@ public abstract class Area {
     protected final double radius;
     /** 대상 엔티티를 찾는 조건 */
     protected final Predicate<CombatEntity> condition;
-    /** 예상 피격자 목록 */
-    private final CombatEntity[] targets;
     /** 피격자별 관통 가능 여부 목록. (피격자 : 관통 가능 여부) */
     private final HashMap<CombatEntity, Boolean> penetrationMap = new HashMap<>();
 
@@ -37,19 +36,15 @@ public abstract class Area {
      * @param shooter   발사자
      * @param radius    범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 대상 엔티티를 찾는 조건
-     * @param targets   예상 피격자 목록
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<@NonNull CombatEntity> condition, @NonNull CombatEntity @NonNull [] targets) {
+    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull Predicate<@NonNull CombatEntity> condition) {
         if (radius < 0)
             throw new IllegalArgumentException("'radius'가 0 이상이어야 함");
 
         this.shooter = shooter;
         this.radius = radius;
-        this.targets = targets;
         this.condition = condition;
-        for (CombatEntity target : targets)
-            this.penetrationMap.put(target, null);
     }
 
     /**
@@ -58,6 +53,10 @@ public abstract class Area {
      * @param center 판정 중심지
      */
     public final void emit(@NonNull Location center) {
+        CombatEntity[] targets = CombatUtil.getNearCombatEntities(shooter.getGame(), center, radius, condition);
+        for (CombatEntity target : targets)
+            this.penetrationMap.put(target, null);
+
         for (CombatEntity target : targets) {
             new Hitscan(shooter, HitscanOption.builder().size(SIZE).startDistance(0).maxDistance(radius).condition(condition).build()) {
                 @Override

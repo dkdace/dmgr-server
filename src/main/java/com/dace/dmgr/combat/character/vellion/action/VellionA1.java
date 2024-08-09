@@ -230,8 +230,7 @@ public final class VellionA1 extends ActiveSkill {
 
             Predicate<CombatEntity> condition = combatEntity -> combatEntity != combatUser && combatEntity instanceof Damageable &&
                     ((Damageable) combatEntity).getDamageModule().isLiving();
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA1Info.RADIUS, condition);
-            new VellionA1Area(condition, areaTargets).emit(loc);
+            new VellionA1Area(condition).emit(loc);
         }
 
         /**
@@ -255,8 +254,8 @@ public final class VellionA1 extends ActiveSkill {
         }
 
         private final class VellionA1Area extends Area {
-            private VellionA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, VellionA1Info.RADIUS, condition, targets);
+            private VellionA1Area(Predicate<CombatEntity> condition) {
+                super(combatUser, VellionA1Info.RADIUS, condition);
             }
 
             @Override

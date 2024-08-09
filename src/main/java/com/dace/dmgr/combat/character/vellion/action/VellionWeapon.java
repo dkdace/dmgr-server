@@ -55,7 +55,7 @@ public final class VellionWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.play(Particle.SPELL_WITCH, loc, 4, 0.1, 0.1, 0.1, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 6, 0.25, 0.25, 0.25,

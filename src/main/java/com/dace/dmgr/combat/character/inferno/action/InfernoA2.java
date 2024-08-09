@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -59,8 +58,7 @@ public final class InfernoA2 extends ActiveSkill {
             if (i % 4 == 0) {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, InfernoA2Info.RADIUS, condition);
-                new InfernoA2Area(condition, targets).emit(loc);
+                new InfernoA2Area(condition).emit(loc);
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_TICK, combatUser.getEntity().getLocation());
@@ -124,8 +122,8 @@ public final class InfernoA2 extends ActiveSkill {
     }
 
     private final class InfernoA2Area extends Area {
-        private InfernoA2Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, InfernoA2Info.RADIUS, condition, targets);
+        private InfernoA2Area(Predicate<CombatEntity> condition) {
+            super(combatUser, InfernoA2Info.RADIUS, condition);
         }
 
         @Override

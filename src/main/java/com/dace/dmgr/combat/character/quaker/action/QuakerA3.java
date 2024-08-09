@@ -102,7 +102,7 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             for (int i = 0; i < 3; i++) {
                 Location loc = LocationUtil.getLocationFromOffset(getLocation(), -0.25 + i * 0.25, 0, 0);
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.12, 0.12, 0.12,
@@ -138,7 +138,7 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
             Vector axis = VectorUtil.getPitchAxis(getLocation());
 
@@ -153,7 +153,7 @@ public final class QuakerA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, getLocation());
 
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), getLocation(), size, condition);
-            new QuakerA3Area(condition, areaTargets).emit(getLocation());
+            new QuakerA3Area(condition, areaTargets.length).emit(getLocation());
         }
 
         @Override
@@ -185,9 +185,9 @@ public final class QuakerA3 extends ActiveSkill {
         private final class QuakerA3Area extends Area {
             private final int targetCount;
 
-            private QuakerA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, QuakerA3Info.SIZE, condition, targets);
-                targetCount = targets.length;
+            private QuakerA3Area(Predicate<CombatEntity> condition, int targetCount) {
+                super(combatUser, QuakerA3Info.SIZE, condition);
+                this.targetCount = targetCount;
             }
 
             @Override
