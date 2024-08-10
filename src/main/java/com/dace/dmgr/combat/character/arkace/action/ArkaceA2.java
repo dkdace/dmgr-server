@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class ArkaceA2 extends ActiveSkill {
-    ArkaceA2(@NonNull CombatUser combatUser) {
+    public ArkaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceA2Info.getInstance(), 2);
     }
 

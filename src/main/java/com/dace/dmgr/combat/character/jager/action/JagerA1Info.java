@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class JagerA1Info extends ActiveSkillInfo {
+public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 3 * 20;
     /** 사망 시 쿨타임 (tick) */
@@ -35,12 +33,6 @@ public final class JagerA1Info extends ActiveSkillInfo {
     private static final JagerA1Info instance = new JagerA1Info();
 
     private JagerA1Info() {
-        super(1, "설랑");
-    }
-
-    @Override
-    @NonNull
-    public JagerA1 createSkill(@NonNull CombatUser combatUser) {
-        return new JagerA1(combatUser);
+        super(JagerA1.class, "설랑");
     }
 }

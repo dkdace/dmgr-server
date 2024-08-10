@@ -14,7 +14,7 @@ public final class ArkaceP1 extends AbstractSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "ArkaceP1";
 
-    ArkaceP1(@NonNull CombatUser combatUser) {
+    public ArkaceP1(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceP1Info.getInstance());
     }
 

@@ -18,8 +18,8 @@ public final class OnInventoryClick implements Listener {
     @EventHandler
     public static void event(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        ItemStack itemStack = event.getCurrentItem();
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+        ItemStack itemStack = event.getCurrentItem();
 
         if (combatUser != null)
             event.setCancelled(true);
@@ -27,14 +27,12 @@ public final class OnInventoryClick implements Listener {
             return;
 
         StaticItem staticItem = StaticItem.fromItemStack(itemStack);
-        if (!(staticItem instanceof GuiItem))
-            return;
+        if (staticItem != null) {
+            event.setCancelled(true);
 
-        event.setCancelled(true);
-        if (event.getClick() == ClickType.DOUBLE_CLICK)
-            return;
-
-        if (((GuiItem) staticItem).onClick(event.getClick(), itemStack, player))
-            SoundUtil.playNamedSound(NamedSound.GENERAL_GUI_CLICK, player);
+            if (staticItem instanceof GuiItem && event.getClick() != ClickType.DOUBLE_CLICK &&
+                    ((GuiItem) staticItem).onClick(event.getClick(), itemStack, player))
+                SoundUtil.playNamedSound(NamedSound.GENERAL_GUI_CLICK, player);
+        }
     }
 }

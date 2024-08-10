@@ -1,9 +1,7 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -19,13 +17,11 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 public final class InfernoA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
     public static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
 
-    InfernoA2(@NonNull CombatUser combatUser) {
+    public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
     }
 
@@ -58,9 +54,7 @@ public final class InfernoA2 extends ActiveSkill {
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i % 4 == 0) {
                 Location loc = combatUser.getEntity().getEyeLocation();
-                Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, InfernoA2Info.RADIUS, condition);
-                new InfernoA2Area(condition, targets).emit(loc);
+                new InfernoA2Area().emit(loc);
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_TICK, combatUser.getEntity().getLocation());
@@ -124,8 +118,8 @@ public final class InfernoA2 extends ActiveSkill {
     }
 
     private final class InfernoA2Area extends Area {
-        private InfernoA2Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, InfernoA2Info.RADIUS, condition, targets);
+        private InfernoA2Area() {
+            super(combatUser, InfernoA2Info.RADIUS, combatUser::isEnemy);
         }
 
         @Override

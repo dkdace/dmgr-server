@@ -16,7 +16,7 @@ public final class VellionP1 extends AbstractSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionP1";
 
-    VellionP1(@NonNull CombatUser combatUser) {
+    public VellionP1(@NonNull CombatUser combatUser) {
         super(combatUser, VellionP1Info.getInstance());
     }
 
@@ -56,7 +56,7 @@ public final class VellionP1 extends AbstractSkill {
                             LocationUtil.getDirection(location, loc).multiply(VellionP1Info.PUSH_SIDE);
                     vec.setY(VellionP1Info.PUSH_UP);
 
-                    combatUser.push(vec, true);
+                    combatUser.getMoveModule().push(vec, true);
 
                     return false;
                 }

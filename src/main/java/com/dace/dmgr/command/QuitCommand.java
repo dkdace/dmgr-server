@@ -6,10 +6,11 @@ import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * 게임 퇴장 명령어 클래스.
@@ -19,14 +20,12 @@ import org.bukkit.entity.Player;
  * @see GameUser#dispose()
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuitCommand implements CommandExecutor {
+public final class QuitCommand extends BaseCommandExecutor {
     @Getter
     private static final QuitCommand instance = new QuitCommand();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
-
+    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
 
@@ -37,7 +36,11 @@ public class QuitCommand implements CommandExecutor {
 
             gameUser.dispose();
         }
+    }
 
-        return true;
+    @Override
+    @Nullable
+    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
+        return null;
     }
 }

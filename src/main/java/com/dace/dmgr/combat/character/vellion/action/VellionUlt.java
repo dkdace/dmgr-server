@@ -1,12 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -24,18 +21,17 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 @Getter
 public final class VellionUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
     public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionUlt";
+
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    VellionUlt(@NonNull CombatUser combatUser) {
+    public VellionUlt(@NonNull CombatUser combatUser) {
         super(combatUser, VellionUltInfo.getInstance());
     }
 
@@ -51,7 +47,7 @@ public final class VellionUlt extends UltimateSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+        return super.canUse() && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -134,13 +130,9 @@ public final class VellionUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(combatUser);
-        TaskUtil.addTask(VellionUlt.this, new IntervalTask(i -> {
-            if (i % 4 == 0) {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-                new VellionUltArea(condition, targets).emit(loc);
-            }
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (i % 4 == 0)
+                new VellionUltArea().emit(combatUser.getEntity().getEyeLocation());
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 4,
                     0.3, 0, 0.3, 90, 0, 55);
@@ -153,8 +145,7 @@ public final class VellionUlt extends UltimateSkill {
         }, isCancelled -> {
             Location loc = combatUser.getEntity().getEyeLocation();
             Location loc2 = loc.clone().add(0, 1, 0);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-            new VellionUltExplodeArea(condition, targets).emit(loc);
+            new VellionUltExplodeArea().emit(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc2);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
@@ -223,8 +214,9 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     private final class VellionUltArea extends Area {
-        private VellionUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltArea() {
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override
@@ -247,8 +239,9 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     private final class VellionUltExplodeArea extends Area {
-        private VellionUltExplodeArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltExplodeArea() {
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override

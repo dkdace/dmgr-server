@@ -17,7 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class VellionWeapon extends AbstractWeapon {
-    VellionWeapon(@NonNull CombatUser combatUser) {
+    public VellionWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, VellionWeaponInfo.getInstance());
     }
 
@@ -34,7 +34,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
@@ -55,8 +55,8 @@ public final class VellionWeapon extends AbstractWeapon {
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.play(Particle.SPELL_WITCH, loc, 4, 0.1, 0.1, 0.1, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 6, 0.25, 0.25, 0.25,
                     80, 30, 110);
@@ -64,7 +64,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.SMOKE_NORMAL, location, 30, 0.1, 0.1, 0.1, 0.1);
+            ParticleUtil.play(Particle.SMOKE_NORMAL, getLocation(), 30, 0.1, 0.1, 0.1, 0.1);
         }
 
         @Override
@@ -74,7 +74,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+            target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true);
             return false;
         }
     }

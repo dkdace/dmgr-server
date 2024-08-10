@@ -29,13 +29,12 @@ public abstract class Scuffler extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser))
-            return;
+        if (victim instanceof CombatUser) {
+            if (isFinalHit)
+                attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-        if (isFinalHit)
-            attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-
-        attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+            attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        }
     }
 
     public static final class RoleTrait1Info extends TraitInfo {
@@ -45,7 +44,7 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 근접 - 1");
+            super("역할: 근접 - 1");
         }
     }
 
@@ -58,7 +57,7 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 근접 - 2");
+            super("역할: 근접 - 2");
         }
     }
 

@@ -15,26 +15,34 @@ import java.util.Arrays;
  * 게임 모드의 종류.
  */
 @AllArgsConstructor
-@Getter
 public enum GamePlayMode {
     TEAM_DEATHMATCH("팀 데스매치", 4, 10, TeamDeathmatchMap.values(), false, 20, 600,
             TeamDeathmatchScheduler.getInstance());
 
     /** 이름 */
+    @NonNull
+    @Getter
     private final String name;
     /** 최소 플레이어 수 */
+    @Getter
     private final int minPlayer;
     /** 최대 플레이어 수 */
+    @Getter
     private final int maxPlayer;
     /** 게임 맵 목록 */
     private final GameMap[] gameMaps;
     /** 랭크 여부 */
+    @Getter
     private final boolean isRanked;
     /** 게임 준비 시간 (초) */
+    @Getter
     private final int readyDuration;
     /** 게임 진행 시간 (초) */
+    @Getter
     private final int playDuration;
     /** 게임 모드 스케쥴러 */
+    @NonNull
+    @Getter
     private final GamePlayModeScheduler gamePlayModeScheduler;
 
     /**

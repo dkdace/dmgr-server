@@ -1,8 +1,11 @@
 package com.dace.dmgr.combat.action;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * 무기 및 스킬 설명의 텍스트 아이콘 목록.
  */
+@UtilityClass
 public final class TextIcon {
     /** 피해량 */
     public static final char DAMAGE = '\u4DC0';

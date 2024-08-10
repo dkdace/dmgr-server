@@ -20,47 +20,6 @@ public final class SelectChar extends Gui {
         super(6, "§c§l전투원 선택");
     }
 
-    /**
-     * GUI에 전투원 목록을 표시한다.
-     *
-     * @param guiController GUI 컨트롤러 객체
-     */
-    private void displayCharacters(@NonNull GuiController guiController) {
-        int role1i = 2;
-        int role2i = 11;
-        int role3i = 20;
-        int role4i = 29;
-        int role5i = 38;
-        int role6i = 47;
-
-        for (CharacterType characterType : CharacterType.values()) {
-            int j = 0;
-
-            switch (characterType.getCharacter().getRole()) {
-                case SCUFFLER:
-                    j = role1i++;
-                    break;
-                case MARKSMAN:
-                    j = role2i++;
-                    break;
-                case VANGUARD:
-                    j = role3i++;
-                    break;
-                case GUARDIAN:
-                    j = role4i++;
-                    break;
-                case SUPPORT:
-                    j = role5i++;
-                    break;
-                case CONTROLLER:
-                    j = role6i++;
-                    break;
-            }
-
-            guiController.set(j, CharacterType.valueOf(characterType.toString()).getGuiItem());
-        }
-    }
-
     @Override
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         guiController.fillColumn(2, DisplayItem.EMPTY.getStaticItem());
@@ -71,7 +30,13 @@ public final class SelectChar extends Gui {
         guiController.set(36, SelectCharInfoItem.SUPPORT.staticItem);
         guiController.set(45, SelectCharInfoItem.CONTROLLER.staticItem);
 
-        displayCharacters(guiController);
+        int[] indexes = {2, 11, 20, 29, 38, 47};
+
+        for (CharacterType characterType : CharacterType.values()) {
+            int i = indexes[characterType.getCharacter().getRole().ordinal()]++;
+
+            guiController.set(i, CharacterType.valueOf(characterType.toString()).getGuiItem());
+        }
     }
 
     private enum SelectCharInfoItem {

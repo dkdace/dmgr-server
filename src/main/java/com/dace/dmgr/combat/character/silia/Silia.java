@@ -1,8 +1,10 @@
 package com.dace.dmgr.combat.character.silia;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Scuffler;
 import com.dace.dmgr.combat.character.silia.action.*;
@@ -100,8 +102,8 @@ public final class Silia extends Scuffler {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        SiliaA3 skill3 = (SiliaA3) combatUser.getSkill(SiliaA3Info.getInstance());
-        SiliaUlt skill4 = (SiliaUlt) combatUser.getSkill(SiliaUltInfo.getInstance());
+        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
+        SiliaUlt skill4 = combatUser.getSkill(SiliaUltInfo.getInstance());
 
         double skill3Duration = skill3.getStateValue() / 20.0;
         double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
@@ -110,14 +112,14 @@ public final class Silia extends Scuffler {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill3Display = StringFormUtil.getActionbarDurationBar(skill3.getSkillInfo().toString(), skill3Duration, skill3MaxDuration,
+        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(), skill3Duration, skill3MaxDuration,
                 10, '■');
 
         if (!skill3.isDurationFinished())
             skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
         text.add(skill3Display);
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -135,7 +137,7 @@ public final class Silia extends Scuffler {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -145,8 +147,8 @@ public final class Silia extends Scuffler {
         if (!(victim instanceof CombatUser))
             return;
 
-        SiliaA1 skill1 = (SiliaA1) attacker.getSkill(SiliaA1Info.getInstance());
-        SiliaUlt skillUlt = (SiliaUlt) attacker.getSkill(SiliaUltInfo.getInstance());
+        SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
+        SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
 
         if (CooldownUtil.getCooldown(attacker, CombatUser.Cooldown.FASTKILL_TIME_LIMIT.getId() + victim) > 0)
             attacker.addScore("암살", CombatUser.FASTKILL_SCORE);
@@ -159,23 +161,8 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
-    public boolean canSprint(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         return combatUser.getSkill(SiliaP1Info.getInstance()).canUse();
-    }
-
-    @Override
-    public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
     }
 
     @Override
@@ -186,7 +173,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return SiliaP1Info.getInstance();
@@ -199,7 +186,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return SiliaA1Info.getInstance();

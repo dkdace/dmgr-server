@@ -21,7 +21,7 @@ public final class SiliaUlt extends UltimateSkill {
     /** 일격 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    SiliaUlt(@NonNull CombatUser combatUser) {
+    public SiliaUlt(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaUltInfo.getInstance());
     }
 
@@ -126,7 +126,7 @@ public final class SiliaUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !isDurationFinished(), isCancelled2 -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished(), isCancelled2 -> {
             isEnabled = false;
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);

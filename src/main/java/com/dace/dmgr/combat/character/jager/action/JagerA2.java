@@ -1,12 +1,16 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.HasReadyTime;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.NamedSound;
@@ -26,12 +30,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class JagerA2 extends ActiveSkill {
     /** 소환한 엔티티 */
     private JagerA2Entity summonEntity = null;
 
-    JagerA2(@NonNull CombatUser combatUser) {
+    public JagerA2(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA2Info.getInstance(), 1);
     }
 
@@ -53,7 +56,7 @@ public final class JagerA2 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -97,7 +100,7 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     /**
-     * 예거 - 곰덫 클래스.
+     * 곰덫 클래스.
      */
     @Getter
     public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
@@ -128,7 +131,7 @@ public final class JagerA2 extends ActiveSkill {
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this, 2);
             attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, JagerA2Info.HEALTH);
+            damageModule = new DamageModule(this, false, true, false, JagerA2Info.DEATH_SCORE, JagerA2Info.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
             onInit();
@@ -172,7 +175,8 @@ public final class JagerA2 extends ActiveSkill {
                 return;
 
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
-                    combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living && combatEntity.isEnemy(this));
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
+                            combatEntity.isEnemy(this));
             if (target != null)
                 onCatchEnemy(target);
 
@@ -223,7 +227,7 @@ public final class JagerA2 extends ActiveSkill {
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
-            JagerP1 skillp1 = (JagerP1) combatUser.getSkill(JagerP1Info.getInstance());
+            JagerP1 skillp1 = combatUser.getSkill(JagerP1Info.getInstance());
             skillp1.setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
         }
@@ -237,15 +241,12 @@ public final class JagerA2 extends ActiveSkill {
         public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
-            CombatUtil.playBreakEffect(location, entity, damage);
+            CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", JagerA2Info.DEATH_SCORE);
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);
@@ -261,8 +262,8 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 17,
+        protected void onTrailInterval() {
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 17,
                     0.7, 0, 0.7, 120, 120, 135);
         }
 
@@ -278,7 +279,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, location);
+            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, getLocation());
             summonEntity = new JagerA2Entity(magmaCube, combatUser);
             summonEntity.activate();
         }

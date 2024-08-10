@@ -15,9 +15,7 @@ import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
@@ -31,25 +29,24 @@ import java.util.stream.Collectors;
  * 게임의 정보와 진행을 관리하는 클래스.
  */
 public final class Game implements Disposable {
+    /** 게임 시작 대기 보스바 ID */
+    private static final String GAME_WAIT_BOSSBAR_ID = "GameWait";
+
     /** 방 번호 */
     @Getter
     private final int number;
     /** 소속된 엔티티 목록 */
-    private final HashSet<CombatEntity> combatEntitySet = new HashSet<>();
+    private final HashSet<CombatEntity> combatEntities = new HashSet<>();
     /** 소속된 플레이어 목록 */
-    @NonNull
-    @Getter
     private final ArrayList<GameUser> gameUsers = new ArrayList<>();
     /** 게임을 시작하기 위한 최소 인원 수 */
     private final int minPlayerCount;
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
-    /** 팀별 플레이어 목록 (팀 : 플레이어 목록) */
+    /** 팀 목록 (색상 : 팀) */
+    @NonNull
     @Getter
-    private final EnumMap<@NonNull Team, @NonNull ArrayList<@NonNull GameUser>> teamUserMap = new EnumMap<>(Team.class);
-    /** 팀별 점수 (팀 : 점수) */
-    @Getter
-    private final EnumMap<@NonNull Team, @NonNull Integer> teamScore = new EnumMap<>(Team.class);
+    private final EnumMap<ChatColor, Team> teams = new EnumMap<>(ChatColor.class);
     /** 게임 모드 */
     @NonNull
     @Getter
@@ -90,10 +87,8 @@ public final class Game implements Disposable {
         this.map = gamePlayMode.getRandomMap();
         minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
-        for (Team team : Team.values()) {
-            this.teamUserMap.put(team, new ArrayList<>());
-            this.teamScore.put(team, 0);
-        }
+        teams.put(ChatColor.RED, new Team(ChatColor.RED, "레드"));
+        teams.put(ChatColor.BLUE, new Team(ChatColor.BLUE, "블루"));
         GameRegistry.getInstance().add(new GameRegistry.KeyPair(isRanked, number), this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
@@ -153,7 +148,7 @@ public final class Game implements Disposable {
      */
     @NonNull
     public CombatEntity @NonNull [] getAllCombatEntities() {
-        return combatEntitySet.toArray(new CombatEntity[0]);
+        return combatEntities.toArray(new CombatEntity[0]);
     }
 
     /**
@@ -163,7 +158,7 @@ public final class Game implements Disposable {
      */
     public void addCombatEntity(@NonNull CombatEntity combatEntity) {
         validate();
-        combatEntitySet.add(combatEntity);
+        combatEntities.add(combatEntity);
     }
 
     /**
@@ -173,7 +168,12 @@ public final class Game implements Disposable {
      */
     public void removeCombatEntity(@NonNull CombatEntity combatEntity) {
         validate();
-        combatEntitySet.remove(combatEntity);
+        combatEntities.remove(combatEntity);
+    }
+
+    @NonNull
+    public GameUser @NonNull [] getGameUsers() {
+        return gameUsers.toArray(new GameUser[0]);
     }
 
     /**
@@ -206,18 +206,19 @@ public final class Game implements Disposable {
     private void onSecondWaiting() {
         gameUsers.forEach(this::sendBossBarWaiting);
 
-        if (canStart()) {
-            if (remainingTime > 0 && (remainingTime <= 5 || remainingTime == 10))
-                gameUsers.forEach(gameUser -> gameUser.getUser()
-                        .sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingTime));
-
-            if (remainingTime == 0) {
-                phase = Phase.READY;
-
-                onReady();
-            }
-        } else
+        if (!canStart()) {
             remainingTime = GeneralConfig.getGameConfig().getWaitingTimeSeconds();
+            return;
+        }
+
+        if (remainingTime > 0 && (remainingTime <= 5 || remainingTime == 10))
+            gameUsers.forEach(gameUser -> gameUser.getUser()
+                    .sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingTime));
+
+        if (remainingTime == 0) {
+            phase = Phase.READY;
+            onReady();
+        }
     }
 
     /**
@@ -226,12 +227,12 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     private void sendBossBarWaiting(@NonNull GameUser gameUser) {
-        gameUser.getUser().addBossBar("GameWait1", "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.", BarColor.WHITE,
-                WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        gameUser.getUser().addBossBar("GameWait2",
+        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '1', "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.",
+                BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '2',
                 MessageFormat.format("§c게임을 시작하려면 최소 {0}명이 필요합니다.", minPlayerCount),
                 BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        gameUser.getUser().addBossBar("GameWait3",
+        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '3',
                 MessageFormat.format("§a§l{0} §f[{1}§f/{2} 명]",
                         (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"), (canStart() ? "§f" : "§c") + gameUsers.size(),
                         maxPlayerCount),
@@ -311,7 +312,7 @@ public final class Game implements Disposable {
                 gameUser.onGameStart();
             });
         }).onError(ex -> {
-            gameUsers.forEach(gameUser2 -> gameUser2.getUser()
+            gameUsers.forEach(gameUser -> gameUser.getUser()
                     .sendMessageWarn("오류로 인해 월드를 불러올 수 없습니다. 관리자에게 문의하십시오."));
             phase = Phase.END;
         });
@@ -327,7 +328,7 @@ public final class Game implements Disposable {
      * <li>그 최상위 플레이어를 1팀으로 이동시킨다.</li>
      * <li>그리고 중위권 플레이어를 2팀에 전부 이동시킨다.</li>
      * <li>나머지 하위권 플레이어를 1팀으로 전부 이동시킨다.</li>
-     * <li>1팀, 2팀을 무작위로 {@link Team#RED} 또는 {@link Team#BLUE}로 지정한다.</li>
+     * <li>1팀, 2팀을 무작위로 레드팀 또는 블루팀으로 지정한다.</li>
      * </ol>
      */
     private void divideTeam() {
@@ -345,20 +346,20 @@ public final class Game implements Disposable {
             team2.add(sortedGameUsers.pop());
         team1.addAll(sortedGameUsers);
 
-        Team team1Team = Team.RED;
-        Team team2Team = Team.BLUE;
+        Team team1Team = teams.get(ChatColor.RED);
+        Team team2Team = teams.get(ChatColor.BLUE);
         if (DMGR.getRandom().nextBoolean()) {
-            team1Team = Team.BLUE;
-            team2Team = Team.RED;
+            team1Team = teams.get(ChatColor.BLUE);
+            team2Team = teams.get(ChatColor.RED);
         }
 
         for (GameUser gameUser : team1) {
             gameUser.setTeam(team1Team);
-            teamUserMap.get(team1Team).add(gameUser);
+            team1Team.teamUsers.add(gameUser);
         }
         for (GameUser gameUser : team2) {
             gameUser.setTeam(team2Team);
-            teamUserMap.get(team2Team).add(gameUser);
+            team2Team.teamUsers.add(gameUser);
         }
     }
 
@@ -366,35 +367,35 @@ public final class Game implements Disposable {
      * 게임 종료 시 실행할 작업.
      */
     private void onFinish() {
-        Team winnerTeam = teamScore.get(Team.RED) > teamScore.get(Team.BLUE) ? Team.RED : Team.BLUE;
-        if (teamScore.get(Team.RED).equals(teamScore.get(Team.BLUE)))
-            winnerTeam = Team.NONE;
+        Team winnerTeam = teams.get(ChatColor.RED).score > teams.get(ChatColor.BLUE).score ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);
+        if (teams.get(ChatColor.RED).score == teams.get(ChatColor.BLUE).score)
+            winnerTeam = null;
 
-        EnumMap<Team, List<GameUser>> scoreRank = new EnumMap<>(Team.class);
-        EnumMap<Team, List<GameUser>> damageRank = new EnumMap<>(Team.class);
-        EnumMap<Team, List<GameUser>> killRank = new EnumMap<>(Team.class);
-        EnumMap<Team, List<GameUser>> defendRank = new EnumMap<>(Team.class);
-        EnumMap<Team, List<GameUser>> healRank = new EnumMap<>(Team.class);
-        for (Team team : Team.values()) {
-            if (team == Team.NONE)
-                continue;
-
-            scoreRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+        EnumMap<ChatColor, List<GameUser>> scoreRank = new EnumMap<>(ChatColor.class);
+        EnumMap<ChatColor, List<GameUser>> damageRank = new EnumMap<>(ChatColor.class);
+        EnumMap<ChatColor, List<GameUser>> killRank = new EnumMap<>(ChatColor.class);
+        EnumMap<ChatColor, List<GameUser>> defendRank = new EnumMap<>(ChatColor.class);
+        EnumMap<ChatColor, List<GameUser>> healRank = new EnumMap<>(ChatColor.class);
+        for (Team team : teams.values()) {
+            scoreRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
                     .collect(Collectors.toList()));
-            damageRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
+            damageRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
                     .collect(Collectors.toList()));
-            killRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
+            killRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
                     .collect(Collectors.toList()));
-            defendRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
+            defendRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
                     .collect(Collectors.toList()));
-            healRank.put(team, teamUserMap.get(team).stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
+            healRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
                     .collect(Collectors.toList()));
         }
 
         for (GameUser gameUser : gameUsers) {
+            if (gameUser.getTeam() == null)
+                continue;
+
             gameUser.getUser().clearChat();
 
-            Boolean isWinner = winnerTeam == Team.NONE ? null : gameUser.getTeam() == winnerTeam;
+            Boolean isWinner = winnerTeam == null ? null : gameUser.getTeam() == winnerTeam;
 
             int moneyEarned = updateMoney(gameUser, isWinner);
             int xpEarned = updateXp(gameUser, isWinner);
@@ -406,19 +407,17 @@ public final class Game implements Disposable {
                 updateMMR(gameUser);
 
             UserData userData = gameUser.getUser().getUserData();
-            if (isWinner != null) {
-                if (isWinner)
-                    userData.setWinCount(userData.getWinCount() + 1);
-                else
-                    userData.setLoseCount(userData.getLoseCount() + 1);
-            }
+            if (Boolean.TRUE.equals(isWinner))
+                userData.setWinCount(userData.getWinCount() + 1);
+            else if (Boolean.FALSE.equals(isWinner))
+                userData.setLoseCount(userData.getLoseCount() + 1);
 
             sendResultReport(gameUser, isWinner,
-                    scoreRank.get(gameUser.getTeam()).indexOf(gameUser),
-                    damageRank.get(gameUser.getTeam()).indexOf(gameUser),
-                    killRank.get(gameUser.getTeam()).indexOf(gameUser),
-                    defendRank.get(gameUser.getTeam()).indexOf(gameUser),
-                    healRank.get(gameUser.getTeam()).indexOf(gameUser), moneyEarned, xpEarned, rankEarned);
+                    scoreRank.get(gameUser.getTeam().color).indexOf(gameUser),
+                    damageRank.get(gameUser.getTeam().color).indexOf(gameUser),
+                    killRank.get(gameUser.getTeam().color).indexOf(gameUser),
+                    defendRank.get(gameUser.getTeam().color).indexOf(gameUser),
+                    healRank.get(gameUser.getTeam().color).indexOf(gameUser), moneyEarned, xpEarned, rankEarned);
         }
     }
 
@@ -470,7 +469,8 @@ public final class Game implements Disposable {
                         "\n" +
                         "\n§e▶ CP 획득 §7:: §6+{18}" +
                         "\n§e▶ 경험치 획득 §7:: §6+{19}" +
-                        "\n" + StringFormUtil.BAR,
+                        "\n" +
+                        StringFormUtil.BAR,
                 winColor, winText,
                 rankColors[scoreRank], (int) gameUser.getScore(), scoreRank + 1,
                 rankColors[damageRank], gameUser.getDamage(), damageRank + 1,
@@ -629,8 +629,8 @@ public final class Game implements Disposable {
         if (gameUsers.size() >= maxPlayerCount)
             return false;
 
-        int redAmount = teamUserMap.get(Team.RED).size();
-        int blueAmount = teamUserMap.get(Team.BLUE).size();
+        int redAmount = teams.get(ChatColor.RED).teamUsers.size();
+        int blueAmount = teams.get(ChatColor.BLUE).teamUsers.size();
 
         if (phase != Phase.WAITING)
             return !gamePlayMode.isRanked() && redAmount != blueAmount;
@@ -651,20 +651,17 @@ public final class Game implements Disposable {
         if (!canJoin())
             return;
 
-        int redAmount = teamUserMap.get(Team.RED).size();
-        int blueAmount = teamUserMap.get(Team.BLUE).size();
+        int redAmount = teams.get(ChatColor.RED).teamUsers.size();
+        int blueAmount = teams.get(ChatColor.BLUE).teamUsers.size();
 
         gameUsers.add(gameUser);
-        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
+        gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
 
         if (phase != Phase.WAITING) {
-            if (redAmount < blueAmount)
-                gameUser.setTeam(Team.RED);
-            else
-                gameUser.setTeam(Team.BLUE);
+            Team team = redAmount < blueAmount ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);
 
-            teamUserMap.get(gameUser.getTeam()).add(gameUser);
-            gameUser.onGameStart();
+            gameUser.setTeam(team);
+            team.teamUsers.add(gameUser);
         }
     }
 
@@ -678,9 +675,10 @@ public final class Game implements Disposable {
 
         gameUser.getUser().clearBossBar();
 
-        gameUsers.forEach(gameUser2 -> gameUser2.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
+        gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
-        teamUserMap.get(gameUser.getTeam()).remove(gameUser);
+        if (gameUser.getTeam() != null)
+            teams.get(gameUser.getTeam().color).teamUsers.remove(gameUser);
 
         if (phase != Phase.END && gameUsers.isEmpty())
             phase = Phase.END;
@@ -725,6 +723,33 @@ public final class Game implements Disposable {
         /** 종료 */
         END("종료됨");
 
+        @NonNull
         private final String name;
+    }
+
+    /**
+     * 게임에서 사용하는 팀 정보를 관리하는 클래스.
+     */
+    @RequiredArgsConstructor
+    public static final class Team {
+        /** 팀 색 */
+        @NonNull
+        @Getter
+        private final ChatColor color;
+        /** 팀 이름 */
+        @NonNull
+        @Getter
+        private final String name;
+        /** 소속된 플레이어 목록 */
+        private final ArrayList<GameUser> teamUsers = new ArrayList<>();
+        /** 팀 점수 */
+        @Getter
+        @Setter
+        private int score;
+
+        @NonNull
+        public GameUser @NonNull [] getTeamUsers() {
+            return teamUsers.toArray(new GameUser[0]);
+        }
     }
 }

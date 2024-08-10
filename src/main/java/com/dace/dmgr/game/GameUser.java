@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -30,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.BiFunction;
 
@@ -55,12 +57,13 @@ public final class GameUser implements Disposable {
     @Getter
     private final Game game;
     /** 전투 플레이어 객체 */
-    private CombatUser combatUser = null;
+    @Nullable
+    private CombatUser combatUser;
     /** 팀 */
-    @NonNull
+    @Nullable
     @Getter
     @Setter(AccessLevel.PACKAGE)
-    private Team team = Team.NONE;
+    private Game.Team team;
     /** 점수 */
     @Getter
     @Setter
@@ -98,7 +101,7 @@ public final class GameUser implements Disposable {
     private boolean isTeamChat = true;
 
     /**
-     * 게임 시스템의 플레이어 인스턴스를 생성하고, 게임의 소속 유저 목록({@link Game#getGameUsers()})에 추가한다.
+     * 게임 시스템의 플레이어 인스턴스를 생성하고, 게임의 소속 유저 목록에 추가한다.
      *
      * @param user 대상 플레이어
      * @throws IllegalStateException 해당 {@code user}의 GameUser가 이미 존재하면 발생
@@ -133,7 +136,7 @@ public final class GameUser implements Disposable {
     }
 
     /**
-     * 매 tick마다 실행할 작업.
+     * 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */
@@ -141,20 +144,20 @@ public final class GameUser implements Disposable {
         if (combatUser == null || game.getPhase() == Game.Phase.WAITING)
             return;
 
-        if (getSpawnRegionTeam() != null) {
-            if (game.getPhase() == Game.Phase.PLAYING) {
-                if (getSpawnRegionTeam() == team)
-                    onTickTeamSpawn();
-                else
-                    onTickOppositeSpawn();
-            }
-        } else if (game.getPhase() == Game.Phase.READY || combatUser.getCharacterType() == null)
-            user.teleport(getRespawnLocation());
+        if (getSpawnRegionTeam() == null) {
+            if (game.getPhase() == Game.Phase.READY || !combatUser.isActivated())
+                user.teleport(getRespawnLocation());
+        } else if (game.getPhase() == Game.Phase.PLAYING) {
+            if (getSpawnRegionTeam() == team)
+                onTickTeamSpawn();
+            else
+                onTickOppositeSpawn();
+        }
 
         if (i % 5 == 0) {
-            for (GameUser gameUser2 : game.getGameUsers()) {
-                if (gameUser2.team == team)
-                    GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
+            for (GameUser target : game.getGameUsers()) {
+                if (target.team == team)
+                    GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
             }
         }
         if (i % 20 == 0)
@@ -165,6 +168,8 @@ public final class GameUser implements Disposable {
      * 플레이어가 아군 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickTeamSpawn() {
+        Validate.notNull(combatUser);
+
         if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
@@ -176,6 +181,8 @@ public final class GameUser implements Disposable {
      * 플레이어가 상대 팀 스폰에 있을 때 매 틱마다 실행할 작업.
      */
     private void onTickOppositeSpawn() {
+        Validate.notNull(combatUser);
+
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
@@ -184,7 +191,7 @@ public final class GameUser implements Disposable {
     }
 
     /**
-     * 게임 유저를 제거하고, 소속된 게임({@link Game#getGameUsers()})에서 제거한다.
+     * 게임 유저를 제거하고, 소속된 게임에서 제거한다.
      */
     @Override
     public void dispose() {
@@ -221,13 +228,13 @@ public final class GameUser implements Disposable {
         if (combatUser == null)
             combatUser = new CombatUser(this);
 
-        for (GameUser gameUser2 : game.getGameUsers()) {
-            if (gameUser2.team != team)
+        for (GameUser target : game.getGameUsers()) {
+            if (target.team != team)
                 continue;
 
-            GlowUtil.setGlowing(player, ChatColor.BLUE, gameUser2.player);
-            if (gameUser2 != this)
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, gameUser2.player);
+            GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
+            if (target != this)
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, target.player);
         }
     }
 
@@ -237,32 +244,31 @@ public final class GameUser implements Disposable {
     private void updateGameTablist() {
         user.setTabListHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
                 "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
-                game.getTeamScore().get(Team.RED), game.getTeamScore().get(Team.BLUE)));
+                game.getTeams().get(ChatColor.RED).getScore(), game.getTeams().get(ChatColor.BLUE).getScore()));
 
         boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
                 game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
 
         int column = 0;
-        for (Team team2 : Team.values()) {
-            if (team2 == Team.NONE)
-                continue;
-
+        for (Game.Team targetTeam : new Game.Team[]{game.getTeams().get(ChatColor.RED), game.getTeams().get(ChatColor.BLUE)}) {
             column++;
             user.setTabListItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
-                    team2.getColor(), team2.getName(), game.getTeamUserMap().get(team2).size()), Skins.getDot(team2.getColor()));
+                    targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().length), Skins.getDot(targetTeam.getColor()));
 
-            GameUser[] teamUsers = game.getTeamUserMap().get(team2).stream()
+            GameUser[] teamUsers = Arrays.stream(targetTeam.getTeamUsers())
                     .sorted(Comparator.comparing(GameUser::getScore).reversed())
                     .toArray(GameUser[]::new);
 
             for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
+                int row = (i + 1) * 3;
+
                 if (i > teamUsers.length - 1) {
-                    user.removeTabListItem(column, (i + 1) * 3 - 2);
-                    user.removeTabListItem(column, (i + 1) * 3 - 1);
+                    user.removeTabListItem(column, row - 2);
+                    user.removeTabListItem(column, row - 1);
                 } else {
-                    user.setTabListItem(column, (i + 1) * 3 - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
-                            this.team == team2 || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
-                    user.setTabListItem(column, (i + 1) * 3 - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
+                    user.setTabListItem(column, row - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
+                            this.team == targetTeam || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
+                    user.setTabListItem(column, row - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
                             (int) teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
                             "✔", teamUsers[i].getAssist()), null);
                 }
@@ -278,8 +284,7 @@ public final class GameUser implements Disposable {
     public void addTeamScore(int increment) {
         validate();
 
-        if (team != Team.NONE)
-            game.getTeamScore().put(team, game.getTeamScore().get(team) + increment);
+        Validate.notNull(team).setScore(team.getScore() + increment);
     }
 
     /**
@@ -289,12 +294,12 @@ public final class GameUser implements Disposable {
      */
     @NonNull
     public Location getRespawnLocation() {
-        if (game.getWorld() == null)
+        if (game.getWorld() == null || team == null)
             return LocationUtil.getLobbyLocation();
-        if (team == Team.RED)
+        if (team.getColor() == ChatColor.RED)
             return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
                     .toLocation(game.getWorld());
-        else if (team == Team.BLUE)
+        else if (team.getColor() == ChatColor.BLUE)
             return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
                     .toLocation(game.getWorld());
 
@@ -318,11 +323,11 @@ public final class GameUser implements Disposable {
      * @return 해당 스폰 지역의 팀. 플레이어가 팀 스폰 외부에 있으면 {@code null} 반환
      */
     @Nullable
-    public Team getSpawnRegionTeam() {
+    public Game.Team getSpawnRegionTeam() {
         if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.REDSTONE_ORE))
-            return Team.RED;
+            return game.getTeams().get(ChatColor.RED);
         else if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.LAPIS_ORE))
-            return Team.BLUE;
+            return game.getTeams().get(ChatColor.BLUE);
 
         return null;
     }
@@ -331,42 +336,20 @@ public final class GameUser implements Disposable {
      * 게임에 참여한 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
      *
      * @param message 메시지
+     * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
-    public void sendAllMessage(@NonNull String message) {
-        if (team == Team.NONE)
+    public void sendMessage(@NonNull String message, boolean isTeam) {
+        if (team == null)
             return;
+        Validate.notNull(combatUser);
 
-        String fullMessage = MessageFormat.format("§7§l[전체] §f<{0}§l[{1}]§f{2}> §f{3}", team.getColor(),
-                (combatUser == null || !combatUser.isActivated() ? "미선택" :
-                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
-                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
-                player.getName(), message);
-        game.getGameUsers().forEach(gameUser2 -> {
-            UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
-            gameUser2.getUser().getPlayer().sendMessage(fullMessage);
-            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
-        });
-    }
+        String fullMessage = MessageFormat.format("§7§l[{0}] {1}", isTeam ? "팀" : "전체", combatUser.getFormattedMessage(message));
 
-    /**
-     * 소속된 팀의 모든 플레이어에게 메시지(전투원 대사)를 전송한다.
-     *
-     * @param message 메시지
-     */
-    public void sendTeamMessage(@NonNull String message) {
-        if (team == Team.NONE)
-            return;
-
-        String fullMessage = MessageFormat.format("§7§l[팀] §f<{0}§l[{1}]§f{2}> §f{3}", team.getColor(),
-                (combatUser == null || !combatUser.isActivated() ? "미선택" :
-                        "§f" + combatUser.getCharacterType().getCharacter().getIcon() + " " +
-                                team.getColor() + "§l" + combatUser.getCharacterType().getCharacter().getName()),
-                player.getName(), message);
-        game.getTeamUserMap().get(team).forEach(gameUser2 -> {
-            UserData userData2 = UserData.fromPlayer(gameUser2.getPlayer());
-            gameUser2.getUser().getPlayer().sendMessage(fullMessage);
-            SoundUtil.play(userData2.getConfig().getChatSound().getSound(), gameUser2.getPlayer(), 1000, 1);
-        });
+        for (GameUser target : (isTeam ? team.getTeamUsers() : game.getGameUsers())) {
+            UserData targetUserData = UserData.fromPlayer(target.getPlayer());
+            target.getUser().getPlayer().sendMessage(fullMessage);
+            SoundUtil.play(targetUserData.getConfig().getChatSound().getSound(), target.getPlayer(), 1000, 1);
+        }
     }
 
     /**
@@ -375,37 +358,43 @@ public final class GameUser implements Disposable {
     @Getter
     public enum CommunicationItem {
         /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", (gameUser, combatUser) -> {
+        REQ_HEAL("§a치료 요청", (target, targetCombatUser) -> {
+            Validate.notNull(targetCombatUser.getCharacterType());
+
             String state;
             String ment;
-            if (combatUser.getDamageModule().isLowHealth()) {
+            if (targetCombatUser.getDamageModule().isLowHealth()) {
                 state = "치명상";
-                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[0];
-            } else if (combatUser.getDamageModule().getHealth() <= combatUser.getDamageModule().getMaxHealth() / 2) {
+                ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[0];
+            } else if (targetCombatUser.getDamageModule().getHealth() <= targetCombatUser.getDamageModule().getMaxHealth() / 2) {
                 state = "체력 낮음";
-                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[1];
+                ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[1];
             } else {
                 state = "치료 요청";
-                ment = combatUser.getCharacterType().getCharacter().getReqHealMent()[2];
+                ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[2];
             }
 
             return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
         }),
         /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", (gameUser, combatUser) -> {
-            String ment;
-            if (combatUser.getUltGaugePercent() < 0.9)
-                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[0];
-            else if (combatUser.getUltGaugePercent() < 1)
-                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[1];
-            else
-                ment = combatUser.getCharacterType().getCharacter().getUltStateMent()[2];
+        SHOW_ULT("§a궁극기 상태", (gameUser, targetCombatUser) -> {
+            Validate.notNull(targetCombatUser.getCharacterType());
 
-            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(combatUser.getUltGaugePercent() * 100), ment);
+            String ment;
+            if (targetCombatUser.getUltGaugePercent() < 0.9)
+                ment = targetCombatUser.getCharacterType().getCharacter().getUltStateMent()[0];
+            else if (targetCombatUser.getUltGaugePercent() < 1)
+                ment = targetCombatUser.getCharacterType().getCharacter().getUltStateMent()[1];
+            else
+                ment = targetCombatUser.getCharacterType().getCharacter().getUltStateMent()[2];
+
+            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
         }),
         /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", (gameUser, combatUser) -> {
-            String[] ments = combatUser.getCharacterType().getCharacter().getReqRallyMent();
+        REQ_RALLY("§a집결 요청", (gameUser, targetCombatUser) -> {
+            Validate.notNull(targetCombatUser.getCharacterType());
+
+            String[] ments = targetCombatUser.getCharacterType().getCharacter().getReqRallyMent();
             String ment = ments[DMGR.getRandom().nextInt(ments.length)];
             return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
         });
@@ -413,6 +402,7 @@ public final class GameUser implements Disposable {
         /** 쿨타임 ID */
         private static final String COOLDOWN_ID = "Communication";
         /** GUI 아이템 객체 */
+        @NonNull
         private final GuiItem guiItem;
 
         CommunicationItem(String name, BiFunction<GameUser, CombatUser, String> action) {
@@ -431,7 +421,7 @@ public final class GameUser implements Disposable {
                     if (combatUser == null)
                         return false;
                     GameUser gameUser = GameUser.fromUser(user);
-                    if (gameUser == null || gameUser.getTeam() == Team.NONE)
+                    if (gameUser == null || gameUser.getTeam() == null)
                         return false;
 
                     if (!player.isOp()) {
@@ -440,7 +430,7 @@ public final class GameUser implements Disposable {
                         CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
                     }
 
-                    gameUser.sendTeamMessage(action.apply(gameUser, combatUser));
+                    gameUser.sendMessage(action.apply(gameUser, combatUser), true);
                     player.closeInventory();
 
                     return true;

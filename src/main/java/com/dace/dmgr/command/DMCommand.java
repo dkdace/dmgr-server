@@ -4,14 +4,11 @@ import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,20 +18,19 @@ import java.util.stream.Collectors;
  * <p>Usage: /귓속말 [플레이어]</p>
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DMCommand implements CommandExecutor {
+public final class DMCommand extends BaseCommandExecutor {
     @Getter
     private static final DMCommand instance = new DMCommand();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
+    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
         User user = User.fromPlayer(player);
 
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
-                return true;
+                return;
             }
 
             user.setMessageTarget(User.fromPlayer(target));
@@ -45,7 +41,7 @@ public class DMCommand implements CommandExecutor {
         } else {
             if (user.getMessageTarget() == null) {
                 user.sendMessageWarn("올바른 사용법: §n'/(귓[속말]|dm) <플레이어>'");
-                return true;
+                return;
             }
 
             user.setMessageTarget(null);
@@ -53,23 +49,16 @@ public class DMCommand implements CommandExecutor {
             user.sendMessageInfo("개인 대화가 종료되었습니다.");
             user.sendMessageInfo("");
         }
-
-        return true;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Tab implements TabCompleter {
-        @Getter
-        private static final Tab instance = new Tab();
 
-        @Override
-        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-            List<String> completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-            if (args.length == 1)
-                return completions.stream().filter(completion -> completion.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+    @Override
+    @Nullable
+    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
+        if (args.length != 1)
+            return null;
 
-            return Collections.emptyList();
-        }
+        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
     }
 }
 

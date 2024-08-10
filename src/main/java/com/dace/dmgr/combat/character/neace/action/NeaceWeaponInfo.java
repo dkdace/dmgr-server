@@ -1,11 +1,10 @@
 package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
-public final class NeaceWeaponInfo extends WeaponInfo {
+public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.4 * 20);
     /** 피해량 */
@@ -20,32 +19,28 @@ public final class NeaceWeaponInfo extends WeaponInfo {
     private static final NeaceWeaponInfo instance = new NeaceWeaponInfo();
 
     private NeaceWeaponInfo() {
-        super(RESOURCE.DEFAULT, "이중성");
-    }
-
-    @Override
-    @NonNull
-    public NeaceWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new NeaceWeapon(combatUser);
+        super(NeaceWeapon.class, RESOURCE.DEFAULT, "이중성");
     }
 
     /**
      * 치유 광선의 정보.
      */
-    public interface HEAL {
+    @UtilityClass
+    public static class HEAL {
         /** 초당 치유량 */
-        int HEAL_PER_SECOND = 250;
+        public static final int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
-        int MAX_DISTANCE = 15;
+        public static final int MAX_DISTANCE = 15;
         /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
-        long BLOCK_RESET_DELAY = 2 * 20;
+        public static final long BLOCK_RESET_DELAY = 2 * 20;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 5;
+        public static final short DEFAULT = 5;
     }
 }

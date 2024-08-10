@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
@@ -22,19 +20,18 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 @Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
     public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA3AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA3";
+
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
 
-    VellionA3(@NonNull CombatUser combatUser) {
+    public VellionA3(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA3Info.getInstance(), 2);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
     }
@@ -79,6 +76,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -148,17 +147,14 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
      *
      * @param location 대상 위치
      */
-    private void onReady(Location location) {
+    private void onReady(@NonNull Location location) {
         Location loc = location.clone().add(0, 0.1, 0);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A3_USE_READY, loc);
 
         TaskUtil.addTask(VellionA3.this, new IntervalTask(i -> {
-            if (i % 4 == 0) {
-                Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionA3Info.RADIUS, condition);
-                new VellionA3Area(condition, targets).emit(loc);
-            }
+            if (i % 4 == 0)
+                new VellionA3Area().emit(loc);
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 3, 0.4, 0, 0.4,
                     156, 60, 130);
@@ -174,7 +170,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
      * @param i        인덱스
      * @param location 사용 위치
      */
-    private void playTickEffect(long i, Location location) {
+    private void playTickEffect(long i, @NonNull Location location) {
         location.setYaw(0);
         location.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(location);
@@ -210,8 +206,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     }
 
     private final class VellionA3Area extends Area {
-        private VellionA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionA3Info.RADIUS, condition, targets);
+        private VellionA3Area() {
+            super(combatUser, VellionA3Info.RADIUS, combatUser::isEnemy);
         }
 
         @Override

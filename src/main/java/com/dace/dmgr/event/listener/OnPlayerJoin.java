@@ -48,6 +48,8 @@ public final class OnPlayerJoin implements Listener {
                 case 3:
                     Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, 1 / 12.0)));
                     break;
+                default:
+                    break;
             }
 
             return true;

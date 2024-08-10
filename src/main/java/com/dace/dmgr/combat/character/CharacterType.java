@@ -14,6 +14,7 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SkinUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -25,28 +26,37 @@ import org.bukkit.inventory.ItemStack;
  */
 @Getter
 public enum CharacterType {
+    SILIA(Silia.getInstance()),
+
     ARKACE(Arkace.getInstance()),
     JAGER(Jager.getInstance()),
+
+    INFERNO(Inferno.getInstance()),
+
     QUAKER(Quaker.getInstance()),
-    SILIA(Silia.getInstance()),
+
     NEACE(Neace.getInstance()),
-    VELLION(Vellion.getInstance()),
-    INFERNO(Inferno.getInstance());
+
+    VELLION(Vellion.getInstance());
 
     /** 전투원 정보 */
+    @NonNull
     private final Character character;
     /** GUI 아이템 객체 */
+    @NonNull
     private final GuiItem guiItem;
 
     CharacterType(Character character) {
         this.character = character;
-        this.guiItem = new GuiItem(this.toString(), ItemBuilder.fromPlayerSkull(SkinUtil.getSkinUrl(character.getSkinName()))
+        this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
+                .setDamage((short) 3)
+                .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
                 .setName("§c" + character.getName())
                 .setLore("§f전투원 설명", toString())
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (clickType != ClickType.LEFT || !clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
+                if (clickType != ClickType.LEFT)
                     return false;
 
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));

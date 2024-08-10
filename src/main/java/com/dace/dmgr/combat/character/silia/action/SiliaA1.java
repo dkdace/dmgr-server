@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -22,10 +22,9 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.function.Predicate;
 
 public final class SiliaA1 extends ActiveSkill {
-    SiliaA1(@NonNull CombatUser combatUser) {
+    public SiliaA1(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA1Info.getInstance(), 0);
     }
 
@@ -66,7 +65,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-            combatUser.push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
+            combatUser.getMoveModule().push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
 
             new SiliaA1Attack(targets).shoot();
 
@@ -83,7 +82,7 @@ public final class SiliaA1 extends ActiveSkill {
             return true;
         }, isCancelled -> {
             onCancelled();
-            combatUser.push(new Vector(), true);
+            combatUser.getMoveModule().push(new Vector(), true);
         }, 1, SiliaA1Info.DURATION));
     }
 
@@ -110,8 +109,8 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.2, 1);
             Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
             Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -123,14 +122,13 @@ public final class SiliaA1 extends ActiveSkill {
                             255, 255, 255);
 
                     if ((i == 0 || i == 11) && j == 1) {
-                        Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 10);
+                        Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 10);
                         ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
                     }
                 }
             }
 
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, SiliaA1Info.RADIUS, condition);
-            new SiliaA1Area(condition, areaTargets).emit(location);
+            new SiliaA1Area().emit(getLocation());
         }
 
         @Override
@@ -144,8 +142,8 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         private final class SiliaA1Area extends Area {
-            private SiliaA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, SiliaA1Info.RADIUS, condition, targets);
+            private SiliaA1Area() {
+                super(combatUser, SiliaA1Info.RADIUS, SiliaA1Attack.this.condition);
             }
 
             @Override

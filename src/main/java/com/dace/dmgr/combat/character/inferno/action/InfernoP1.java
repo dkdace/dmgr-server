@@ -14,7 +14,7 @@ public final class InfernoP1 extends AbstractSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "InfernoP1";
 
-    InfernoP1(@NonNull CombatUser combatUser) {
+    public InfernoP1(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoP1Info.getInstance());
     }
 
@@ -64,20 +64,18 @@ public final class InfernoP1 extends AbstractSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, InfernoP1Info.DEFENSE_INCREMENT);
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, InfernoP1Info.DEFENSE_INCREMENT);
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 @Getter
-public abstract class SummonEntity<T extends Entity> extends TemporalEntity<T> {
+public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> {
     /** 엔티티를 소환한 플레이어 */
     @NonNull
     protected final CombatUser owner;
@@ -53,10 +53,10 @@ public abstract class SummonEntity<T extends Entity> extends TemporalEntity<T> {
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            CombatUser combatUser2 = CombatUser.fromUser(User.fromPlayer(player2));
-            if (combatUser2 != null && getOwner().isEnemy(combatUser2))
-                packet.sendPacket(player2);
+        Bukkit.getOnlinePlayers().forEach((Player target) -> {
+            CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
+            if (targetCombatUser != null && getOwner().isEnemy(targetCombatUser))
+                packet.sendPacket(target);
         });
     }
 }

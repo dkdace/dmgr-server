@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 
 public final class ArkaceUlt extends UltimateSkill {
-    ArkaceUlt(@NonNull CombatUser combatUser) {
+    public ArkaceUlt(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceUltInfo.getInstance());
     }
 

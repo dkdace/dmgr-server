@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Damageable;
 import lombok.NonNull;
 
 /**
@@ -28,7 +29,7 @@ public interface StatusEffect {
      * @param combatEntity 대상 엔티티
      * @param provider     제공자
      */
-    void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider);
+    void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
 
     /**
      * 상태 효과 적용 중 매 틱마다 실행할 작업.
@@ -37,7 +38,7 @@ public interface StatusEffect {
      * @param provider     제공자
      * @param i            인덱스
      */
-    void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i);
+    void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i);
 
     /**
      * 상태 효과가 끝났을 때 실행할 작업.
@@ -45,5 +46,5 @@ public interface StatusEffect {
      * @param combatEntity 대상 엔티티
      * @param provider     제공자
      */
-    void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider);
+    void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
 }

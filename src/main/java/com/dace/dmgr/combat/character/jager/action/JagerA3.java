@@ -3,9 +3,12 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
@@ -19,8 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-
-import java.util.function.Predicate;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class JagerA3 extends ActiveSkill {
@@ -29,7 +31,7 @@ public final class JagerA3 extends ActiveSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    JagerA3(@NonNull CombatUser combatUser) {
+    public JagerA3(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA3Info.getInstance(), 2);
     }
 
@@ -51,7 +53,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking();
+        return super.canUse() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -71,7 +73,7 @@ public final class JagerA3 extends ActiveSkill {
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
 
-                TaskUtil.addTask(JagerA3.this, new IntervalTask(i -> {
+                TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                     if (isDurationFinished())
                         return false;
 
@@ -119,7 +121,7 @@ public final class JagerA3 extends ActiveSkill {
      *
      * @param location 사용 위치
      */
-    private void playTickEffect(Location location) {
+    private void playTickEffect(@NonNull Location location) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1, 0.1, 0.1, 120, 220, 240);
     }
 
@@ -129,11 +131,9 @@ public final class JagerA3 extends ActiveSkill {
      * @param location   폭파 위치
      * @param projectile 투사체
      */
-    private void explode(Location location, JagerA3Projectile projectile) {
+    private void explode(@NonNull Location location, @Nullable JagerA3Projectile projectile) {
         Location loc = location.clone().add(0, 0.1, 0);
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) || combatEntity == combatUser;
-        CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, JagerA3Info.RADIUS, condition);
-        new JagerA3Area(condition, targets, projectile).emit(loc);
+        new JagerA3Area(projectile).emit(loc);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_EXPLODE, loc);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, loc,
@@ -152,11 +152,11 @@ public final class JagerA3 extends ActiveSkill {
         private static final Freeze instance = new Freeze();
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
-            if (combatEntity instanceof Living)
+            if (combatEntity.getDamageModule().isLiving())
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
                         combatEntity.getCenterLocation(), 5, combatEntity.getEntity().getWidth() / 2,
                         combatEntity.getEntity().getHeight() / 2, combatEntity.getEntity().getWidth() / 2,
@@ -172,34 +172,34 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
-            playTickEffect(location);
+        protected void onTrailInterval() {
+            playTickEffect(getLocation());
         }
 
         @Override
         protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, location, 1 + velocity.length() * 2);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, getLocation(), 1 + getVelocity().length() * 2);
             return false;
         }
 
         @Override
         protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            if (velocity.length() > 0.05)
-                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+            if (getVelocity().length() > 0.05)
+                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
             return false;
         }
 
         @Override
         protected void onDestroy() {
-            explode(location, this);
+            explode(getLocation(), this);
         }
     }
 
     private final class JagerA3Area extends Area {
         private final JagerA3Projectile projectile;
 
-        private JagerA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets, JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, condition, targets);
+        private JagerA3Area(JagerA3Projectile projectile) {
+            super(combatUser, JagerA3Info.RADIUS, combatEntity -> combatEntity.isEnemy(JagerA3.this.combatUser) || combatEntity == JagerA3.this.combatUser);
             this.projectile = projectile;
         }
 

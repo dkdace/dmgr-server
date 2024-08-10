@@ -50,7 +50,7 @@ public class ConfirmModule {
                     return false;
 
                 skill.onCheckTick(i);
-                ConfirmModule.this.onCheckTick(i);
+                onCheckTick(i);
 
                 return true;
             }, isCancelled -> {

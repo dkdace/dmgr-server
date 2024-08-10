@@ -23,7 +23,7 @@ public final class NeaceA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
-    NeaceA2(@NonNull CombatUser combatUser) {
+    public NeaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA2Info.getInstance(), 1);
     }
 
@@ -51,7 +51,7 @@ public final class NeaceA2 extends ActiveSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A2_USE, combatUser.getEntity().getLocation());
 
-            TaskUtil.addTask(this, new IntervalTask(i -> {
+            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished())
                     return false;
 
@@ -113,26 +113,24 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, NeaceA2Info.SPEED);
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }

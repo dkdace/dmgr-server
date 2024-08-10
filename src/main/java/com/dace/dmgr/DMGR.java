@@ -18,6 +18,7 @@ import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,11 +36,16 @@ import java.util.UUID;
  */
 public class DMGR extends JavaPlugin {
     /** 일시적인 엔티티의 사용자 지정 이름 */
-    public static final String TEMPORAL_ENTITY_CUSTOM_NAME = "temporal";
+    public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
     /** 난수 생성 객체 */
     @NonNull
     @Getter
     private static final Random random = new Random();
+    /** 기본 월드 객체 */
+    @NonNull
+    @Getter
+    private static final World defaultWorld = Bukkit.getWorld("DMGR");
+
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;
     /** 홀로그램 관리 객체 */
@@ -52,6 +58,7 @@ public class DMGR extends JavaPlugin {
      *
      * @return DMGR
      */
+    @NonNull
     public static DMGR getPlugin() {
         return JavaPlugin.getPlugin(DMGR.class);
     }
@@ -173,7 +180,7 @@ public class DMGR extends JavaPlugin {
      */
     private void clearUnusedEntities() {
         Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
-                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORAL_ENTITY_CUSTOM_NAME))
+                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
     }
 
@@ -186,13 +193,9 @@ public class DMGR extends JavaPlugin {
         getCommand("퇴장").setExecutor(QuitCommand.getInstance());
         getCommand("명령어").setExecutor(HelpCommand.getInstance());
         getCommand("전적").setExecutor(StatCommand.getInstance());
-        getCommand("전적").setTabCompleter(StatCommand.Tab.getInstance());
         getCommand("귓속말").setExecutor(DMCommand.getInstance());
-        getCommand("귓속말").setTabCompleter(DMCommand.Tab.getInstance());
         getCommand("차단").setExecutor(BlockCommand.getInstance());
-        getCommand("차단").setTabCompleter(BlockCommand.Tab.getInstance());
         getCommand("랭킹").setExecutor(RankingCommand.getInstance());
-        getCommand("랭킹").setTabCompleter(RankingCommand.Tab.getInstance());
         getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
     }
 

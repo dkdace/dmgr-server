@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
@@ -13,7 +14,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,14 +24,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class QuakerA1 extends ChargeableSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA1";
     /** 소환한 엔티티 */
     private QuakerA1Entity summonEntity = null;
 
-    QuakerA1(@NonNull CombatUser combatUser) {
+    public QuakerA1(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA1Info.getInstance(), 0);
     }
 
@@ -107,7 +106,7 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     /**
-     * 퀘이커 - 불굴의 방패 클래스.
+     * 불굴의 방패 클래스.
      */
     public final class QuakerA1Entity extends Barrier<ArmorStand> {
         private QuakerA1Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
@@ -115,6 +114,7 @@ public final class QuakerA1 extends ChargeableSkill {
                     entity,
                     owner.getName() + "의 방패",
                     owner,
+                    QuakerA1Info.DEATH_SCORE,
                     QuakerA1Info.HEALTH,
                     new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
             );
@@ -161,7 +161,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
-                CombatUtil.playBreakEffect(location, entity, damage);
+                CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
 
         @Override
@@ -171,9 +171,6 @@ public final class QuakerA1 extends ChargeableSkill {
             setStateValue(0);
             onCancelled();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f파괴", QuakerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
             for (int i = 0; i < 3; i++) {

@@ -6,22 +6,19 @@ import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 public final class NeaceA1 extends ActiveSkill {
     private final NeaceA1Mark neaceA1Mark = new NeaceA1Mark();
 
-    NeaceA1(@NonNull CombatUser combatUser) {
+    public NeaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA1Info.getInstance(), 0);
     }
 
@@ -70,12 +67,12 @@ public final class NeaceA1 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             healAmount = 0;
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     4, 0.2, 0.2, 0.2, 215, 255, 130);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
@@ -96,39 +93,28 @@ public final class NeaceA1 extends ActiveSkill {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
     }
 
-    private final class NeaceTarget extends Hitscan {
-        private Healable target = null;
-
+    private final class NeaceTarget extends Target {
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
-                            !combatEntity.getStatusEffectModule().hasStatusEffect(neaceA1Mark)).build());
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
+                    !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(neaceA1Mark));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             setCooldown();
 
-            this.target = (Healable) target;
             target.getStatusEffectModule().applyStatusEffect(combatUser, neaceA1Mark, NeaceA1Info.DURATION);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A1_USE, combatUser.getEntity().getLocation());
             playUseEffect(target);
-
-            return false;
         }
 
-        private void playUseEffect(@NotNull Damageable target) {
+        private void playUseEffect(@NonNull Damageable target) {
             Location location = combatUser.getArmLocation(true);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,
@@ -156,12 +142,6 @@ public final class NeaceA1 extends ActiveSkill {
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
             }
-        }
-
-        @Override
-        protected void onDestroy() {
-            if (target == null)
-                combatUser.getUser().sendAlert("대상을 찾을 수 없습니다.");
         }
     }
 }

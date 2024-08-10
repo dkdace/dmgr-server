@@ -49,8 +49,8 @@ public final class GeneralConfig extends YamlFile {
     }
 
     @Override
-    protected void onInitError(Exception ex) {
-        ConsoleLogger.severe("전역 설정 불러오기 실패");
+    protected void onInitError(@NonNull Exception ex) {
+        ConsoleLogger.severe("전역 설정 불러오기 실패", ex);
     }
 
     /**
@@ -62,6 +62,7 @@ public final class GeneralConfig extends YamlFile {
         /** 섹션 이름 */
         private static final String SECTION = "default";
         /** 리소스팩 URL */
+        @NonNull
         private String resourcePackUrl = "";
         /** 채팅 쿨타임 (tick) */
         private long chatCooldown = 0;
@@ -72,8 +73,10 @@ public final class GeneralConfig extends YamlFile {
         /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
         private int netheriteTierMinRank = 5;
         /** 메시지의 접두사 */
+        @NonNull
         private String messagePrefix = "§3§l[ §bＤＭＧＲ §3§l] §f";
         /** 관리자 연락처 */
+        @NonNull
         private String adminContact = "디스코드 dkdace (DarkDace＃4671)";
 
         /**
@@ -83,7 +86,7 @@ public final class GeneralConfig extends YamlFile {
             resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
             chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
             commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
-            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriod", rankingUpdatePeriodMinutes);
+            rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriodMinutes", rankingUpdatePeriodMinutes);
             netheriteTierMinRank = (int) getLong(SECTION + ".netheriteTierMinRank", netheriteTierMinRank);
             messagePrefix = getString(SECTION + ".messagePrefix", messagePrefix);
             adminContact = getString(SECTION + ".adminContact", adminContact);
@@ -103,16 +106,19 @@ public final class GeneralConfig extends YamlFile {
         /** 리스폰 시간 (tick) */
         private long respawnTime = 200;
         /** 힐 팩에 사용되는 블록의 타입 */
+        @NonNull
         private Material healPackBlock = Material.NETHERRACK;
         /** 힐 팩 쿨타임 (tick) */
         private long healPackCooldown = 15 * 20;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
         /** 점프대에 사용되는 블록의 타입 */
+        @NonNull
         private Material jumpPadBlock = Material.SPONGE;
         /** 점프대 사용 시 속력 */
         private double jumpPadVelocity = 1.4;
         /** 낙사 구역에 사용되는 블록의 타입 */
+        @NonNull
         private Material fallZoneBlock = Material.BEDROCK;
 
         /**

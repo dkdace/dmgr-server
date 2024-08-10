@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,20 +31,20 @@ public class Snare implements StatusEffect {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("Snare", -100);
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l속박당함!", "", 0, 2, 10);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
     }

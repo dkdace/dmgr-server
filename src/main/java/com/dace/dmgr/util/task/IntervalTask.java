@@ -36,16 +36,14 @@ public final class IntervalTask extends Task {
      * <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
      * 타이머를 종료하려면 {@code false} 반환</p>
      */
-    @NonNull
-    private final Function<@NonNull Long, @NonNull Boolean> onCycle;
+    private final Function<Long, Boolean> onCycle;
     /**
      * 태스크가 끝났을 때 실행할 작업.
      *
      * <p>{@link IntervalTask#onCycle}에서 {@code false}를 반환하여 끝낸 경우
      * {@code true}를 인자로 받음</p>
      */
-    @NonNull
-    private final Consumer<@NonNull Boolean> onFinish;
+    private final Consumer<Boolean> onFinish;
     /** 실행 주기 (tick) */
     private final long period;
     /** 반복 횟수 */

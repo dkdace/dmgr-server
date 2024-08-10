@@ -36,7 +36,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @NonNull
     private final AimModule aimModule;
 
-    JagerWeaponL(@NonNull CombatUser combatUser) {
+    public JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
@@ -56,7 +56,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -97,6 +97,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -151,6 +153,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
             case 37:
                 SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.7);
                 break;
+            default:
+                break;
         }
     }
 
@@ -202,8 +206,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 137, 185, 240);
         }
 
@@ -214,7 +218,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+            if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
                 JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
 
             return false;

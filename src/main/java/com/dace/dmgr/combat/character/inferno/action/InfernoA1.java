@@ -1,12 +1,11 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.*;
@@ -19,10 +18,8 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 public final class InfernoA1 extends ActiveSkill {
-    InfernoA1(@NonNull CombatUser combatUser) {
+    public InfernoA1(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA1Info.getInstance(), 0);
     }
 
@@ -62,7 +59,7 @@ public final class InfernoA1 extends ActiveSkill {
         Vector vec = location.getDirection().multiply(InfernoA1Info.PUSH_SIDE);
         vec.setY(vec.getY() + InfernoA1Info.PUSH_UP);
 
-        combatUser.push(vec, true);
+        combatUser.getMoveModule().push(vec, true);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i < 15) {
@@ -102,13 +99,11 @@ public final class InfernoA1 extends ActiveSkill {
      */
     private void onLand() {
         Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-        CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, InfernoA1Info.RADIUS, condition);
-        new InfernoA1Area(condition, targets).emit(loc);
+        new InfernoA1Area().emit(loc);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A1_LAND, loc);
         Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
-        CombatUtil.playBlockHitEffect(loc, floor, 5);
+        CombatEffectUtil.playBlockHitEffect(loc, floor, 5);
         ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 200, 0.8, 0.1, 0.8, 0.05);
 
         loc.setYaw(0);
@@ -129,8 +124,8 @@ public final class InfernoA1 extends ActiveSkill {
     }
 
     private final class InfernoA1Area extends Area {
-        private InfernoA1Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, InfernoA1Info.RADIUS, condition, targets);
+        private InfernoA1Area() {
+            super(combatUser, InfernoA1Info.RADIUS, combatUser::isEnemy);
         }
 
         @Override

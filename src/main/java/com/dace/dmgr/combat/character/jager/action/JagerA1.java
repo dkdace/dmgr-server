@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
@@ -8,7 +9,7 @@ import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.*;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 처치 점수 제한시간 쿨타임 ID */
     public static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
+
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
@@ -32,8 +34,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     @Nullable
     private JagerA1Entity summonEntity = null;
 
-
-    JagerA1(@NonNull CombatUser combatUser) {
+    public JagerA1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA1Info.getInstance(), 0);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }
@@ -95,6 +96,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -148,10 +151,10 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     /**
-     * 예거 - 설랑 클래스.
+     * 설랑 클래스.
      */
     @Getter
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Living, Jumpable {
+    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;
@@ -182,7 +185,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             knockbackModule = new KnockbackModule(this);
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, JagerA1Info.HEALTH);
+            damageModule = new DamageModule(this, false, true, true, JagerA1Info.DEATH_SCORE, JagerA1Info.HEALTH);
             moveModule = new JumpModule(this, JagerA1Info.SPEED);
             readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
 
@@ -232,7 +235,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity.setTamed(true);
 
                     Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && combatEntity instanceof Living && combatEntity.isEnemy(this));
+                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
+                                    combatEntity.isEnemy(this));
                     if (target != null) {
                         entity.setTarget(target.getEntity());
                         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_ENEMY_DETECT, entity.getLocation());
@@ -262,7 +266,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
             CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
 
-            JagerP1 skillp1 = (JagerP1) combatUser.getSkill(JagerP1Info.getInstance());
+            JagerP1 skillp1 = combatUser.getSkill(JagerP1Info.getInstance());
             skillp1.setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
         }
@@ -284,7 +288,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             addStateValue(-damage);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
-            CombatUtil.playBleedingEffect(location, entity, damage);
+            CombatEffectUtil.playBleedingEffect(location, entity, damage);
         }
 
         @Override
@@ -293,9 +297,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);
-
-            if (attacker instanceof CombatUser)
-                ((CombatUser) attacker).addScore("§e" + name + " §f처치", JagerA1Info.DEATH_SCORE);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
         }

@@ -27,16 +27,19 @@ public abstract class BouncingProjectile extends Projectile {
      * <p>튕기는 투사체의 선택적 옵션은 {@link BouncingProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter        발사자
-     * @param velocity       투사체의 속력. (단위: 블록/s)
+     * @param velocity       투사체의 속력. (단위: 블록/s). 0 이상의 값
      * @param bouncing       투사체가 튕기는 횟수. -1로 설정 시 계속 튕김
      * @param option         투사체의 선택적 옵션
      * @param bouncingOption 튕기는 투사체의 선택적 옵션
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see ProjectileOption
      * @see BouncingProjectileOption
      */
     protected BouncingProjectile(@NonNull CombatEntity shooter, int velocity, int bouncing, @NonNull ProjectileOption option,
                                  @NonNull BouncingProjectileOption bouncingOption) {
         super(shooter, velocity, option);
+        validateArgs(bouncing);
+
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
         this.destroyOnHitFloor = bouncingOption.destroyOnHitFloor;
@@ -48,13 +51,16 @@ public abstract class BouncingProjectile extends Projectile {
      * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
      *
      * @param shooter  발사자
-     * @param speed    투사체의 속력. (단위: 블록/s)
+     * @param speed    투사체의 속력. (단위: 블록/s). 0 이상의 값
      * @param bouncing 투사체가 튕기는 횟수. -1로 설정 시 계속 튕김
      * @param option   투사체의 선택적 옵션
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see ProjectileOption
      */
     protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, int bouncing, @NonNull ProjectileOption option) {
         super(shooter, speed, option);
+        validateArgs(bouncing);
+
         BouncingProjectileOption bouncingOption = BouncingProjectileOption.builder().build();
         this.bouncing = bouncing;
         this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
@@ -65,15 +71,27 @@ public abstract class BouncingProjectile extends Projectile {
      * 튕기는 투사체 인스턴스를 생성한다.
      *
      * @param shooter  발사자
-     * @param speed    투사체의 속력. (단위: 블록/s)
+     * @param speed    투사체의 속력. (단위: 블록/s). 0 이상의 값
      * @param bouncing 투사체가 튕기는 횟수. -1로 설정 시 계속 튕김
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, int bouncing) {
         super(shooter, speed);
-        BouncingProjectileOption bouncingOption = BouncingProjectileOption.builder().build();
+        validateArgs(bouncing);
+
         this.bouncing = bouncing;
-        this.bounceVelocityMultiplier = bouncingOption.bounceVelocityMultiplier;
-        this.destroyOnHitFloor = bouncingOption.destroyOnHitFloor;
+        this.bounceVelocityMultiplier = BouncingProjectileOption.BOUNCE_VELOCITY_MULTIPLIER_DEFAULT;
+        this.destroyOnHitFloor = BouncingProjectileOption.DESTROY_ON_HIT_FLOOR_DEFAULT;
+    }
+
+    /**
+     * 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param bouncing 투사체가 튕기는 횟수. -1로 설정 시 계속 튕김
+     */
+    private static void validateArgs(int bouncing) {
+        if (bouncing < -1)
+            throw new IllegalArgumentException("'bouncing'이 -1 이상이어야 함");
     }
 
     @Override
@@ -101,7 +119,7 @@ public abstract class BouncingProjectile extends Projectile {
             return true;
 
         if (bouncing == -1 || bouncing-- > 0) {
-            velocity.multiply(-bounceVelocityMultiplier * 0.5);
+            getVelocity().multiply(-bounceVelocityMultiplier * 0.5);
             return true;
         }
 
@@ -121,19 +139,19 @@ public abstract class BouncingProjectile extends Projectile {
      * 투사체의 도탄 로직을 처리한다.
      */
     private boolean handleBounce() {
-        Location beforeHitBlockLocation = location.getBlock().getLocation();
-        Location hitBlockLocation = location.clone().add(velocity.clone().normalize().multiply(0.5)).getBlock().getLocation();
+        Location beforeHitBlockLocation = getLocation().getBlock().getLocation();
+        Location hitBlockLocation = getLocation().clone().add(getVelocity().clone().normalize().multiply(0.5)).getBlock().getLocation();
         Vector hitDir = hitBlockLocation.subtract(beforeHitBlockLocation).toVector();
         if (destroyOnHitFloor && !LocationUtil.isNonSolid(beforeHitBlockLocation.subtract(0, 0.1, 0)))
             return false;
 
-        velocity.multiply(bounceVelocityMultiplier);
+        getVelocity().multiply(bounceVelocityMultiplier);
         if (Math.abs(hitDir.getX()) > 0.5)
-            velocity.setX(-velocity.getX());
+            getVelocity().setX(-getVelocity().getX());
         else if (Math.abs(hitDir.getY()) > 0.5)
-            velocity.setY(-velocity.getY());
+            getVelocity().setY(-getVelocity().getY());
         else if (Math.abs(hitDir.getZ()) > 0.5)
-            velocity.setZ(-velocity.getZ());
+            getVelocity().setZ(-getVelocity().getZ());
 
         return true;
     }

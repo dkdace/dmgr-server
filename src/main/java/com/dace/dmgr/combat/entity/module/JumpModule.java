@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Jumpable;
 import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
@@ -26,8 +27,9 @@ public final class JumpModule extends MoveModule {
      * 점프 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity 대상 엔티티
-     * @param speed        이동속도 기본값
-     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     * @param speed        이동속도 기본값. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
+     *                                  상속받지 않으면 발생
      */
     public JumpModule(@NonNull Jumpable combatEntity, double speed) {
         super(combatEntity, speed);
@@ -62,9 +64,9 @@ public final class JumpModule extends MoveModule {
      * @return 점프 가능 여부
      */
     private boolean canJump() {
-        if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) ||
-                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
-                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
+        if (combatEntity instanceof Damageable && (((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) ||
+                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
+                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING)))
             return false;
         return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
     }

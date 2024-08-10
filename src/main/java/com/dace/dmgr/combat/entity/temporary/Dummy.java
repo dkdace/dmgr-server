@@ -1,10 +1,10 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
@@ -32,7 +32,7 @@ import java.util.List;
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 @Getter
-public final class Dummy extends TemporalEntity<Zombie> implements Healable, Living, HasCritHitbox {
+public final class Dummy extends TemporaryEntity<Zombie> implements Healable, HasCritHitbox, CombatEntity {
     /** 넉백 모듈 */
     @NonNull
     private final KnockbackModule knockbackModule;
@@ -63,7 +63,7 @@ public final class Dummy extends TemporalEntity<Zombie> implements Healable, Liv
         );
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
-        damageModule = new HealModule(this, true, true, maxHealth);
+        damageModule = new HealModule(this, true, true, true, 0, maxHealth);
         critHitbox = hitboxes[3];
         this.teamIdentifier = teamIdentifier;
 
@@ -109,8 +109,9 @@ public final class Dummy extends TemporalEntity<Zombie> implements Healable, Liv
     }
 
     @Override
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
-        CombatUtil.playBleedingEffect(location, entity, damage);
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                         boolean isCrit, boolean isUlt) {
+        CombatEffectUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override

@@ -2,13 +2,11 @@ package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
@@ -22,18 +20,14 @@ import java.text.MessageFormat;
  * @param <T> {@link Weapon}을 상속받는 보조무기
  * @see Swappable
  */
-@RequiredArgsConstructor
 public final class SwapModule<T extends Weapon> {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "Swap";
     /** 무기 객체 */
-    @NonNull
     private final Swappable<T> weapon;
     /** 보조무기 객체 */
     @NonNull
     @Getter
     private final T subweapon;
-    /** 무기 교체시간 */
+    /** 무기 교체시간 (tick) */
     private final long swapDuration;
 
     /** 무기 전환 중 여부 */
@@ -46,6 +40,23 @@ public final class SwapModule<T extends Weapon> {
     private Swappable.SwapState swapState = Swappable.SwapState.PRIMARY;
 
     /**
+     * 2중 무기 모듈 인스턴스를 생성한다.
+     *
+     * @param weapon       대상 무기
+     * @param subweapon    보조무기 객체
+     * @param swapDuration 무기 교체시간 (tick). 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    public SwapModule(@NonNull Swappable<@NonNull T> weapon, @NonNull T subweapon, long swapDuration) {
+        if (swapDuration < 0)
+            throw new IllegalArgumentException("'swapDuration'이 0 이상이어야 함");
+
+        this.weapon = weapon;
+        this.subweapon = subweapon;
+        this.swapDuration = swapDuration;
+    }
+
+    /**
      * 이중 무기의 상태를 변경한다.
      *
      * @param targetState 변경할 상태
@@ -55,7 +66,6 @@ public final class SwapModule<T extends Weapon> {
             return;
 
         isSwapping = true;
-        CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, swapDuration);
         weapon.onSwapStart(targetState);
 
         TaskUtil.addTask(weapon, new IntervalTask(i -> {
@@ -68,7 +78,6 @@ public final class SwapModule<T extends Weapon> {
 
             return true;
         }, isCancelled -> {
-            CooldownUtil.setCooldown(weapon.getCombatUser(), COOLDOWN_ID, 0);
             if (isCancelled)
                 return;
 

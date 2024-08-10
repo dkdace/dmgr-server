@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.entity.AbstractCombatEntity;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  * @see SummonEntity
  */
-public abstract class TemporalEntity<T extends Entity> extends AbstractCombatEntity<T> {
+public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEntity<T> {
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
@@ -26,7 +26,7 @@ public abstract class TemporalEntity<T extends Entity> extends AbstractCombatEnt
      * @param hitboxes 히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected TemporalEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
+    protected TemporaryEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
         super(entity, name, game, hitboxes);
     }
 

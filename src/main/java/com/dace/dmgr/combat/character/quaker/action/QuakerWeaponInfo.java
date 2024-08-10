@@ -1,11 +1,10 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
-public final class QuakerWeaponInfo extends WeaponInfo {
+public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (1.1 * 20);
     /** 전역 쿨타임 (tick) */
@@ -22,20 +21,15 @@ public final class QuakerWeaponInfo extends WeaponInfo {
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 
     private QuakerWeaponInfo() {
-        super(RESOURCE.DEFAULT, "타바르진");
-    }
-
-    @Override
-    @NonNull
-    public QuakerWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new QuakerWeapon(combatUser);
+        super(QuakerWeapon.class, RESOURCE.DEFAULT, "타바르진");
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 3;
+        public static final short DEFAULT = 3;
     }
 }

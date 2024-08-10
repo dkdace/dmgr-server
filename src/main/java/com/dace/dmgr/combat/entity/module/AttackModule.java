@@ -26,9 +26,13 @@ public final class AttackModule {
      * 공격 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity     대상 엔티티
-     * @param damageMultiplier 공격력 배수 기본값
+     * @param damageMultiplier 공격력 배수 기본값. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public AttackModule(@NonNull Attacker combatEntity, double damageMultiplier) {
+        if (damageMultiplier < 0)
+            throw new IllegalArgumentException("'damageMultiplier'가 0 이상이어야 함");
+
         this.combatEntity = combatEntity;
         this.damageMultiplierStatus = new AbilityStatus(damageMultiplier);
     }

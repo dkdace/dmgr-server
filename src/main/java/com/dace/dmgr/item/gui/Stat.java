@@ -12,7 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -22,6 +21,7 @@ import java.util.Comparator;
  * 전적 GUI 클래스.
  */
 public final class Stat extends Gui {
+    /** 플레이어 전적 GUI 아이템 객체 */
     private static final StaticItem playerInto = new StaticItem("StatPlayer", new ItemBuilder(Material.SKULL_ITEM)
             .setDamage((short) 3)
             .setLore("",
@@ -29,6 +29,7 @@ public final class Stat extends Gui {
                     "§e탈주 : §c{3}회 §f({4}%)",
                     "§e플레이 시간 : §f{5}")
             .build());
+    /** 이전 버튼 GUI 아이템 객체 */
     private static final GuiItem buttonLeft = new ButtonItem.LEFT("StatLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
@@ -40,7 +41,12 @@ public final class Stat extends Gui {
     /** 대상 플레이어 데이터 정보 */
     private final UserData userData;
 
-    public Stat(UserData userData) {
+    /**
+     * 지정한 플레이어의 전적 GUI 인스턴스를 생성한다.
+     *
+     * @param userData 대상 플레이어 데이터 정보
+     */
+    public Stat(@NonNull UserData userData) {
         super(6, "§8전적");
         this.userData = userData;
     }
@@ -51,7 +57,7 @@ public final class Stat extends Gui {
 
         new AsyncTask<Void>((onFinish, onError) ->
                 guiController.set(4, playerInto, itemBuilder -> {
-                    ((SkullMeta) itemBuilder.setName(userData.getDisplayName()).getItemMeta()).setOwningPlayer(Bukkit.getOfflinePlayer(userData.getPlayerUUID()));
+                    itemBuilder.setName(userData.getDisplayName()).setSkullOwner(Bukkit.getOfflinePlayer(userData.getPlayerUUID()));
                     itemBuilder.formatLore(userData.getWinCount(), userData.getLoseCount(),
                             (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
                             userData.getQuitCount(),

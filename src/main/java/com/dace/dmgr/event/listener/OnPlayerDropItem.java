@@ -17,10 +17,11 @@ public final class OnPlayerDropItem implements Listener {
         if (!player.isOp())
             event.setCancelled(true);
 
-        if (combatUser != null) {
-            event.setCancelled(true);
-            if (combatUser.getCharacterType() != null)
-                combatUser.useAction(ActionKey.DROP);
-        }
+        if (combatUser == null)
+            return;
+
+        event.setCancelled(true);
+        if (combatUser.getCharacterType() != null)
+            combatUser.useAction(ActionKey.DROP);
     }
 }

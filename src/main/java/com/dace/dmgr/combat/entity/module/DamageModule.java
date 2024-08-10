@@ -58,6 +58,12 @@ public class DamageModule {
     /** 생명력 홀로그램 표시 여부 */
     @Getter
     protected final boolean isShowHealthBar;
+    /** 살아있는(Living) 엔티티 여부 */
+    @Getter
+    protected final boolean isLiving;
+    /** 죽었을 때 공격자에게 주는 점수 */
+    @Getter
+    protected final int score;
     /** 방어력 배수 값 */
     @NonNull
     @Getter
@@ -74,11 +80,17 @@ public class DamageModule {
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
      * @param isShowHealthBar   생명력 홀로그램 표시 여부
-     * @param maxHealth         최대 체력
-     * @param defenseMultiplier 방어력 배수 기본값
-     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     * @param isLiving          살아있는(Living) 엔티티 여부
+     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
+     * @param maxHealth         최대 체력. 0 이상의 값
+     * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
+     *                                  상속받지 않으면 발생
      */
-    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth, double defenseMultiplier) {
+    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
+                        int score, int maxHealth, double defenseMultiplier) {
+        if (score < 0 || maxHealth < 0 || defenseMultiplier < 0)
+            throw new IllegalArgumentException("'score', 'maxHealth' 및 'defenseMultiplier'가 0 이상이어야 함");
         if (!(combatEntity.getEntity() instanceof LivingEntity))
             throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
 
@@ -86,6 +98,8 @@ public class DamageModule {
         this.defenseMultiplierStatus = new AbilityStatus(defenseMultiplier);
         this.isUltProvider = isUltProvider;
         this.isShowHealthBar = isShowHealthBar;
+        this.isLiving = isLiving;
+        this.score = score;
         this.maxHealth = maxHealth;
 
         setMaxHealth(getMaxHealth());
@@ -101,11 +115,14 @@ public class DamageModule {
      * @param combatEntity    대상 엔티티
      * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
      * @param isShowHealthBar 생명력 홀로그램 표시 여부
-     * @param maxHealth       최대 체력
-     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
+     * @param score           죽었을 때 공격자에게 주는 점수. 0 이상의 값
+     * @param maxHealth       최대 체력. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
+     *                                  상속받지 않으면 발생
      */
-    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, int maxHealth) {
-        this(combatEntity, isUltProvider, isShowHealthBar, maxHealth, DEFAULT_VALUE);
+    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
+                        int score, int maxHealth) {
+        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, DEFAULT_VALUE);
     }
 
     /**
@@ -123,14 +140,14 @@ public class DamageModule {
             int current = getHealth();
             int max = getMaxHealth();
             ChatColor color;
-            if (current <= max / 4)
+            if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
+                color = ChatColor.DARK_PURPLE;
+            else if (current <= max / 4)
                 color = ChatColor.RED;
             else if (current <= max / 2)
                 color = ChatColor.YELLOW;
             else
                 color = ChatColor.GREEN;
-            if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
-                color = ChatColor.DARK_PURPLE;
 
             HologramUtil.editHologram(HEALTH_HOLOGRAM_ID + combatEntity, StringFormUtil.getProgressBar(current, max, color));
 
@@ -159,9 +176,13 @@ public class DamageModule {
     /**
      * 엔티티의 최대 체력을 설정한다.
      *
-     * @param health 실제 체력×50 (체력 1줄 기준 1000)
+     * @param health 실제 체력×50 (체력 1줄 기준 1000). 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final void setMaxHealth(int health) {
+        if (health < 0)
+            throw new IllegalArgumentException("'health'가 0 이상이어야 함");
+
         maxHealth = health;
         ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
@@ -251,7 +272,6 @@ public class DamageModule {
         if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
                 combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.INVULNERABLE))
             return false;
-
         if (damage == 0)
             return true;
 
@@ -298,14 +318,18 @@ public class DamageModule {
      * 엔티티에게 피해를 입힌다.
      *
      * @param attacker       공격자
-     * @param damage         피해량
+     * @param damage         피해량. 0 이상의 값
      * @param damageType     피해 타입
      * @param location       맞은 위치
-     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용
+     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 0 이상의 값
      * @param isUlt          궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+        if (damage < 0 || critMultiplier < 0)
+            throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
+
         double damageMultiplier = attacker == null ? 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
         double defenseMultiplier = defenseMultiplierStatus.getValue();
 
@@ -316,12 +340,13 @@ public class DamageModule {
      * 엔티티에게 피해를 입힌다.
      *
      * @param attacker   공격자
-     * @param damage     피해량
+     * @param damage     피해량. 0 이상의 값
      * @param damageType 피해 타입
      * @param location   맞은 위치
      * @param isCrit     치명타 여부
      * @param isUlt      궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         return damage(attacker, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
@@ -331,14 +356,18 @@ public class DamageModule {
      * 엔티티에게 피해를 입힌다.
      *
      * @param projectile     공격자가 발사한 투사체
-     * @param damage         피해량
+     * @param damage         피해량. 0 이상의 값
      * @param damageType     피해 타입
      * @param location       맞은 위치
-     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용
+     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 0 이상의 값
      * @param isUlt          궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final boolean damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+        if (damage < 0 || critMultiplier < 0)
+            throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
+
         CombatEntity attacker = projectile.getShooter();
         if (attacker instanceof Attacker) {
             double damageMultiplier = projectile.getDamageIncrement();
@@ -354,12 +383,13 @@ public class DamageModule {
      * 엔티티에게 피해를 입힌다.
      *
      * @param projectile 공격자가 발사한 투사체
-     * @param damage     피해량
+     * @param damage     피해량. 0 이상의 값
      * @param damageType 피해 타입
      * @param location   맞은 위치
      * @param isCrit     치명타 여부
      * @param isUlt      궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final boolean damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         return damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);

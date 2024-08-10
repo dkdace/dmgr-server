@@ -79,6 +79,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -125,20 +127,20 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
         @Override
         protected boolean onInterval() {
-            distance += velocity.length();
-            return true;
+            distance += getVelocity().length();
+            return super.onInterval();
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.2, 0);
             ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE, true);
-            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
 
             return false;
         }

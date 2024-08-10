@@ -3,6 +3,7 @@ package com.dace.dmgr.util;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Sound;
 
 /**
@@ -20,7 +21,7 @@ public enum NamedSound {
     TYPEWRITER_TITLE(new DefinedSound("new.block.note_block.bass", 1, 1.5)),
 
     /** 게임 - 타이머 효과음 */
-    GAME_TIMER(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 1)),
+    GAME_TIMER(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1000, 1)),
     /** 게임 - 전투 시작 */
     GAME_ON_PLAY(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 1000, 1)),
     /** 게임 - 승리 */
@@ -35,7 +36,7 @@ public enum NamedSound {
     /** 전투 - 궁극기 준비 */
     COMBAT_ULTIMATE_SKILL_READY(new DefinedSound(Sound.ENTITY_PLAYER_LEVELUP, 0.5, 2)),
     /** 전투 - 궁극기 사용 */
-    COMBAT_ULTIMATE_SKILL_USE(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 10, 2)),
+    COMBAT_ULTIMATE_SKILL_USE(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 1000, 2)),
     /** 전투 - 힐 팩 사용 */
     COMBAT_USE_HEAL_PACK(new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.2)),
     /** 전투 - 점프대 사용 */
@@ -522,9 +523,10 @@ public enum NamedSound {
     );
 
     /** 지정된 효과음 목록 */
-    private final DefinedSound[] definedSounds;
+    @NonNull
+    private final DefinedSound @NonNull [] definedSounds;
 
-    NamedSound(DefinedSound... definedSounds) {
+    NamedSound(DefinedSound @NonNull ... definedSounds) {
         this.definedSounds = definedSounds;
     }
 
@@ -535,6 +537,7 @@ public enum NamedSound {
     @Getter
     static class DefinedSound {
         /** 소리 이름 */
+        @NonNull
         private final String sound;
         /** 음량 */
         private final double volume;
@@ -543,15 +546,15 @@ public enum NamedSound {
         /** 음정의 분산도 */
         private final double pitchSpreadRange;
 
-        private DefinedSound(String sound, double volume, double pitch) {
+        private DefinedSound(@NonNull String sound, double volume, double pitch) {
             this(sound, volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch) {
             this(sound.toString(), volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch, double pitchSpreadRange) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch, double pitchSpreadRange) {
             this(sound.toString(), volume, pitch, pitchSpreadRange);
         }
     }

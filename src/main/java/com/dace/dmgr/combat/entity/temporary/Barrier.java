@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.temporal;
+package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -41,21 +41,23 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
      * @param entity    대상 엔티티
      * @param name      이름
      * @param owner     엔티티를 소환한 플레이어
+     * @param score     죽었을 때 공격자에게 주는 점수
      * @param maxHealth 최대 체력
      * @param hitboxes  히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected Barrier(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, int maxHealth, @NonNull Hitbox @NonNull ... hitboxes) {
+    protected Barrier(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, int score, int maxHealth, @NonNull Hitbox @NonNull ... hitboxes) {
         super(entity, name, owner, false, hitboxes);
 
         knockbackModule = new KnockbackModule(this, 2);
         statusEffectModule = new StatusEffectModule(this, 2);
-        damageModule = new DamageModule(this, false, false, maxHealth);
+        damageModule = new DamageModule(this, false, false, false, score, maxHealth);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                         boolean isCrit, boolean isUlt) {
         if (owner.getGameUser() != null)
             owner.getGameUser().setDefend(owner.getGameUser().getDefend() + damage);
     }

@@ -2,11 +2,10 @@ package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
-public final class JagerWeaponInfo extends WeaponInfo {
+public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.25 * 20);
     /** 피해량 */
@@ -33,64 +32,62 @@ public final class JagerWeaponInfo extends WeaponInfo {
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
     private JagerWeaponInfo() {
-        super(RESOURCE.DEFAULT, "MK.73 ELNR");
-    }
-
-    @Override
-    @NonNull
-    public JagerWeaponL createWeapon(@NonNull CombatUser combatUser) {
-        return new JagerWeaponL(combatUser);
+        super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR");
     }
 
     /**
      * 정조준 상태의 정보.
      */
-    public interface SCOPE {
+    @UtilityClass
+    public static class SCOPE {
         /** 쿨타임 (tick) */
-        long COOLDOWN = (long) (0.25 * 20);
+        public static final long COOLDOWN = (long) (0.25 * 20);
         /** 피해량 */
-        int DAMAGE = 240;
+        public static final int DAMAGE = 240;
         /** 피해량 감소 시작 거리 (단위: 블록) */
-        int DAMAGE_WEAKENING_DISTANCE = 30;
+        public static final int DAMAGE_WEAKENING_DISTANCE = 30;
         /** 장탄수 */
-        int CAPACITY = 7;
+        public static final int CAPACITY = 7;
         /** 확대 레벨 */
-        Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L4;
+        public static final Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L4;
 
         /**
          * 반동 정보.
          */
-        interface RECOIL {
+        @UtilityClass
+        public static class RECOIL {
             /** 수직 반동 */
-            double UP = 2.8;
+            public static final double UP = 2.8;
             /** 수평 반동 */
-            double SIDE = 0;
+            public static final double SIDE = 0;
             /** 수직 반동 분산도 */
-            double UP_SPREAD = 0.25;
+            public static final double UP_SPREAD = 0.25;
             /** 수평 반동 분산도 */
-            double SIDE_SPREAD = 0.3;
+            public static final double SIDE_SPREAD = 0.3;
         }
     }
 
     /**
      * 반동 정보.
      */
-    public interface RECOIL {
+    @UtilityClass
+    public static class RECOIL {
         /** 수직 반동 */
-        double UP = 0.8;
+        public static final double UP = 0.8;
         /** 수평 반동 */
-        double SIDE = 0;
+        public static final double SIDE = 0;
         /** 수직 반동 분산도 */
-        double UP_SPREAD = 0.1;
+        public static final double UP_SPREAD = 0.1;
         /** 수평 반동 분산도 */
-        double SIDE_SPREAD = 0.05;
+        public static final double SIDE_SPREAD = 0.05;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 2;
+        public static final short DEFAULT = 2;
     }
 }

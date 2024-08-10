@@ -7,15 +7,12 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +22,7 @@ import java.util.stream.Collectors;
  * <p>Usage: /차단 (<플레이어>|목록|초기화)</p>
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BlockCommand implements CommandExecutor {
+public final class BlockCommand extends BaseCommandExecutor {
     /** 도움말 메시지 */
     private static final String MESSAGE_HELP = StringFormUtil.BAR +
             "\n§a§l/(차단|block) <플레이어> - §a플레이어의 채팅을 차단하거나 차단 해제합니다." +
@@ -36,8 +33,7 @@ public class BlockCommand implements CommandExecutor {
     private static final BlockCommand instance = new BlockCommand();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
+    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
         User user = User.fromPlayer(player);
         UserData userData = user.getUserData();
 
@@ -49,13 +45,14 @@ public class BlockCommand implements CommandExecutor {
                     if (userData.getBlockedPlayers().length == 0) {
                         user.sendMessageWarn("차단한 플레이어가 없습니다.");
                         player.closeInventory();
-                        return true;
+
+                        return;
                     }
 
                     BlockList blockList = BlockList.getInstance();
                     blockList.open(player);
 
-                    break;
+                    return;
                 }
                 case "초기화":
                 case "chrlghk":
@@ -63,17 +60,17 @@ public class BlockCommand implements CommandExecutor {
                     user.sendMessageInfo("차단 목록을 초기화했습니다.");
                     userData.clearBlockedPlayers();
 
-                    break;
+                    return;
                 }
                 default: {
                     UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
-                            .filter(userData2 -> userData2.getPlayerName().equalsIgnoreCase(args[0]))
+                            .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
                             .findFirst()
                             .orElse(null);
 
                     if (targetUserData == null) {
                         user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
-                        return true;
+                        return;
                     }
 
                     if (userData.isBlockedPlayer(targetUserData)) {
@@ -83,38 +80,32 @@ public class BlockCommand implements CommandExecutor {
                         user.sendMessageInfo("§e§n{0}§r님의 채팅을 차단했습니다.", targetUserData.getPlayerName());
                         userData.addBlockedPlayer(targetUserData);
                     }
-
-                    break;
                 }
             }
         } else
             user.sendMessageInfo(MESSAGE_HELP);
-
-        return true;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Tab implements TabCompleter {
-        @Getter
-        private static final Tab instance = new Tab();
+    @Override
+    @Nullable
+    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
+        if (args.length != 1)
+            return null;
 
-        @Override
-        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-            List<String> completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-            switch (alias.toLowerCase()) {
-                case "차단":
-                case "ckeks":
-                    completions.addAll(Arrays.asList("목록", "초기화"));
-                    break;
-                case "block":
-                    completions.addAll(Arrays.asList("list", "clear"));
-                    break;
-            }
-            if (args.length == 1)
-                return completions.stream().filter(completion -> completion.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-
-            return Collections.emptyList();
+        List<String> completions = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+        switch (alias.toLowerCase()) {
+            case "차단":
+            case "ckeks":
+                completions.addAll(Arrays.asList("목록", "초기화"));
+                break;
+            case "block":
+                completions.addAll(Arrays.asList("list", "clear"));
+                break;
+            default:
+                break;
         }
+
+        return completions;
     }
 }
 

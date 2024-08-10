@@ -14,7 +14,7 @@ public final class JagerP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Damageable target = null;
 
-    JagerP1(@NonNull CombatUser combatUser) {
+    public JagerP1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerP1Info.getInstance());
     }
 

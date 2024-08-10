@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -7,7 +8,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -19,13 +20,12 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.function.Predicate;
 
 public final class QuakerA3 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA3";
 
-    QuakerA3(@NonNull CombatUser combatUser) {
+    public QuakerA3(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA3Info.getInstance(), 2);
     }
 
@@ -101,9 +101,9 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
+        protected void onTrailInterval() {
             for (int i = 0; i < 3; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
+                Location loc = LocationUtil.getLocationFromOffset(getLocation(), -0.25 + i * 0.25, 0, 0);
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.12, 0.12, 0.12,
                         200, 200, 200);
             }
@@ -122,7 +122,7 @@ public final class QuakerA3 extends ActiveSkill {
         @Override
         protected void onDestroy() {
             for (int i = 0; i < 3; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
+                Location loc = LocationUtil.getLocationFromOffset(getLocation(), -0.25 + i * 0.25, 0, 0);
                 ParticleUtil.play(Particle.CRIT, loc, 3, 0.07, 0.07, 0.07, 0);
             }
         }
@@ -137,30 +137,30 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
-            Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
-            Vector axis = VectorUtil.getPitchAxis(location);
+        protected void onTrailInterval() {
+            Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
+            Vector axis = VectorUtil.getPitchAxis(getLocation());
 
             for (int i = 0; i < 8; i++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (i - 2)).multiply(0.6);
-                Location loc = location.clone().add(vec);
+                Location loc = getLocation().clone().add(vec);
                 new QuakerA3Effect().shoot(loc, vec);
 
-                Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 30);
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.2);
+                Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.2);
             }
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, getLocation());
 
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), location, size, condition);
-            new QuakerA3Area(condition, areaTargets).emit(location);
+            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), getLocation(), size, condition);
+            new QuakerA3Area(areaTargets.length).emit(getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            onImpact(location);
+            onImpact(getLocation());
 
-            CombatUtil.playBlockHitEffect(location, hitBlock, 5);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 50, 0.2, 0.2, 0.2, 0.4);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 5);
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 50, 0.2, 0.2, 0.2, 0.4);
 
             return false;
         }
@@ -171,10 +171,10 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         private void onImpact(@NonNull Location location) {
-            for (Damageable target2 : targets) {
-                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
-                        target2.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
-                        target2 instanceof CombatUser)
+            for (Damageable target : targets) {
+                if (target.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
+                        target.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
+                        target instanceof CombatUser)
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
@@ -184,9 +184,9 @@ public final class QuakerA3 extends ActiveSkill {
         private final class QuakerA3Area extends Area {
             private final int targetCount;
 
-            private QuakerA3Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, QuakerA3Info.SIZE, condition, targets);
-                targetCount = targets.length;
+            private QuakerA3Area(int targetCount) {
+                super(combatUser, QuakerA3Info.SIZE, QuakerA3Projectile.this.condition);
+                this.targetCount = targetCount;
             }
 
             @Override
@@ -200,7 +200,7 @@ public final class QuakerA3 extends ActiveSkill {
                     onImpact(location);
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
                 }
-                target.getKnockbackModule().knockback(velocity.clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
+                target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);

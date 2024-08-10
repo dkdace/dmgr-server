@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class VellionUltInfo extends UltimateSkillInfo {
+public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 9000;
     /** 시전 시간 (tick) */
@@ -29,12 +27,6 @@ public final class VellionUltInfo extends UltimateSkillInfo {
     private static final VellionUltInfo instance = new VellionUltInfo();
 
     private VellionUltInfo() {
-        super("나락의 결계");
-    }
-
-    @Override
-    @NonNull
-    public VellionUlt createSkill(@NonNull CombatUser combatUser) {
-        return new VellionUlt(combatUser);
+        super(VellionUlt.class, "나락의 결계");
     }
 }

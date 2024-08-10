@@ -7,17 +7,16 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * 정적 아이템 중 GUI에 사용하는 아이템을 관리하는 클래스.
+ * 정적 아이템 중 GUI에서 클릭할 수 있는 아이템을 관리하는 클래스.
  *
  * @see Gui
  */
 public abstract class GuiItem extends StaticItem {
+    /**
+     * @see StaticItem#StaticItem(String, ItemStack)
+     */
     protected GuiItem(@NonNull String identifier, @NonNull ItemStack itemStack) {
         super(identifier, itemStack);
-    }
-
-    protected GuiItem(@NonNull String identifier, @NonNull StaticItem staticItem) {
-        super(identifier, staticItem.getItemStack());
     }
 
     /**

@@ -29,7 +29,7 @@ public interface Reloadable extends Weapon {
     void onAmmoEmpty();
 
     /**
-     * 재장전을 진행할 때 매 tick마다 실행할 작업.
+     * 재장전을 진행할 때 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import lombok.Builder;
+import lombok.NonNull;
 
 import java.util.function.Predicate;
 
@@ -12,14 +13,18 @@ import java.util.function.Predicate;
  */
 @Builder
 public final class HitscanOption {
+    /** {@link Hitscan#trailInterval} 의 기본값 */
     public static final int TRAIL_INTERVAL_DEFAULT = 14;
+    /** {@link Hitscan#startDistance} 의 기본값 */
     public static final double START_DISTANCE_DEFAULT = 0.5;
+    /** {@link Hitscan#maxDistance} 의 기본값 */
     public static final double MAX_DISTANCE_DEFAULT = 70;
+    /** {@link Hitscan#size} 의 기본값 */
     public static final double SIZE_DEFAULT = 0.05;
-    public static final double TARGET_SIZE_DEFAULT = 1;
+    /** {@link Hitscan#condition} 의 기본값 */
     public static final Predicate<CombatEntity> CONDITION_DEFAULT = combatEntity -> true;
 
-    /** 트레일 이벤트 ({@link Bullet#trail()})를 호출하는 주기. (단위: 판정점 개수) */
+    /** 트레일 이벤트 ({@link Bullet#onTrailInterval()})를 호출하는 주기. (단위: 판정점 개수) */
     @Builder.Default
     final int trailInterval = TRAIL_INTERVAL_DEFAULT;
     /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록) */
@@ -33,5 +38,6 @@ public final class HitscanOption {
     final double size = SIZE_DEFAULT;
     /** 대상 엔티티를 찾는 조건 */
     @Builder.Default
-    final Predicate<CombatEntity> condition = CONDITION_DEFAULT;
+    @NonNull
+    final Predicate<@NonNull CombatEntity> condition = CONDITION_DEFAULT;
 }

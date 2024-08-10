@@ -39,9 +39,11 @@ public final class RankUtil {
 
     /**
      * 모든 랭킹을 업데이트한다.
+     *
+     * @return 전체 유저 수
      */
     @NonNull
-    private static AsyncTask<Integer> updateRanking() {
+    private static AsyncTask<@NonNull Integer> updateRanking() {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
                 UserData[] userDatas = UserData.getAllUserDatas();
@@ -66,10 +68,11 @@ public final class RankUtil {
      * 랭크 점수를 기준으로 내림차순 정렬된 유저 데이터 정보 목록을 반환한다.
      *
      * @param indicator 데이터 지표 종류
-     * @param limit     반환할 유저 데이터의 갯수
+     * @param limit     반환할 유저 데이터의 갯수. 1 이상의 값
      * @return {@code limit}위까지의 유저 랭킹
-     * @throws IllegalArgumentException {@code limit}가 1 미만이면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
+    @NonNull
     public static UserData @NonNull [] getRanking(@NonNull RankUtil.Indicator indicator, int limit) {
         if (limit < 1)
             throw new IllegalArgumentException("'limit'가 1 이상이어야 함");

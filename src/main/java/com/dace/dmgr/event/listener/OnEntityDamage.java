@@ -24,6 +24,9 @@ public final class OnEntityDamage implements Listener {
             case DROWNING:
             case FIRE_TICK:
                 event.setCancelled(true);
+                break;
+            default:
+                break;
         }
 
         if (entity instanceof LivingEntity) {

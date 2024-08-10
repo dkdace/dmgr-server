@@ -66,6 +66,7 @@ public interface Action extends Disposable {
      * 쿨타임을 설정한다.
      *
      * @param cooldown 쿨타임 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     void setCooldown(long cooldown);
 
@@ -79,7 +80,8 @@ public interface Action extends Disposable {
     /**
      * 쿨타임을 증가시킨다.
      *
-     * @param cooldown 추가할 쿨타임 (tick)
+     * @param cooldown 추가할 쿨타임 (tick). 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     void addCooldown(long cooldown);
 
@@ -109,6 +111,7 @@ public interface Action extends Disposable {
      *
      * @return 강제 취소 가능 여부
      * @implSpec {@code true}
+     * @see CombatUser#cancelAction(CombatUser)
      */
     default boolean isCancellable() {
         return true;

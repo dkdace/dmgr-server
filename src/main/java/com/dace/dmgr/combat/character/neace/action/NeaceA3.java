@@ -5,9 +5,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
@@ -18,13 +16,12 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public final class NeaceA3 extends ActiveSkill {
-    NeaceA3(@NonNull CombatUser combatUser) {
+    public NeaceA3(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA3Info.getInstance(), 2);
     }
 
@@ -63,24 +60,14 @@ public final class NeaceA3 extends ActiveSkill {
         setDuration(0);
     }
 
-    private final class NeaceTarget extends Hitscan {
-        private Healable target = null;
-
+    private final class NeaceTarget extends Target {
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA3.this.combatUser, combatEntity)).build());
+            super(combatUser, NeaceA3Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA3.this.combatUser, combatEntity));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
-
-            this.target = (Healable) target;
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A3_USE, combatUser.getEntity().getLocation());
 
@@ -95,11 +82,11 @@ public final class NeaceA3 extends ActiveSkill {
                 if (targetLoc.distance(loc) < 1.5)
                     return false;
                 if (isDurationFinished()) {
-                    combatUser.push(vec.multiply(0.5), true);
+                    combatUser.getMoveModule().push(vec.multiply(0.5), true);
                     return false;
                 }
 
-                combatUser.push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
+                combatUser.getMoveModule().push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
                 ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
@@ -122,14 +109,6 @@ public final class NeaceA3 extends ActiveSkill {
                 }, isCancelled2 ->
                         combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
             }, 1, NeaceA3Info.DURATION));
-
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            if (target == null)
-                combatUser.getUser().sendAlert("대상을 찾을 수 없습니다.");
         }
     }
 }

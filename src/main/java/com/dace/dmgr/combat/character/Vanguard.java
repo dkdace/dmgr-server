@@ -10,10 +10,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 역할군이 '돌격'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Vanguard extends Character {
-    /** 넉백 저항 수정자 ID */
-    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait1Knockback";
-    /** 상태 효과 저항 수정자 ID */
-    private static final String STATUS_RESISTANCE_MODIFIER_ID = "RoleTrait1Status";
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "RoleTrait1";
 
     /**
      * 돌격 역할군 전투원 정보 인스턴스를 생성한다.
@@ -32,8 +30,8 @@ public abstract class Vanguard extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        combatUser.getKnockbackModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER_ID, RoleTrait1Info.KNOCKBACK_RESISTANCE);
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_RESISTANCE_MODIFIER_ID, RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
+        combatUser.getKnockbackModule().getResistanceStatus().addModifier(MODIFIER_ID, RoleTrait1Info.KNOCKBACK_RESISTANCE);
+        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(MODIFIER_ID, RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
     }
 
     @Override
@@ -51,7 +49,7 @@ public abstract class Vanguard extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 돌격 - 1");
+            super("역할: 돌격 - 1");
         }
     }
 
@@ -60,7 +58,7 @@ public abstract class Vanguard extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 돌격 - 2");
+            super("역할: 돌격 - 2");
         }
     }
 }

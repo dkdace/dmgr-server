@@ -11,7 +11,7 @@ public final class VellionP2 extends AbstractSkill {
     /** 최근 피해량 */
     private int damageAmount;
 
-    VellionP2(@NonNull CombatUser combatUser) {
+    public VellionP2(@NonNull CombatUser combatUser) {
         super(combatUser, VellionP2Info.getInstance());
     }
 
