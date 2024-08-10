@@ -50,7 +50,7 @@ public final class Neace extends Support {
      * @param target     사용 대상
      */
     public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-        return target instanceof Healable && !target.isEnemy(combatUser);
+        return target instanceof Healable && target != combatUser && !target.isEnemy(combatUser);
     }
 
     @Override
@@ -184,12 +184,10 @@ public final class Neace extends Support {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return NeaceP1Info.getInstance();
-            default:
-                return null;
-        }
+        if (number == 1)
+            return NeaceP1Info.getInstance();
+
+        return null;
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.function.Predicate;
 
 public final class QuakerA3 extends ActiveSkill {
     /** 수정자 ID */
@@ -153,7 +152,7 @@ public final class QuakerA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, getLocation());
 
             CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), getLocation(), size, condition);
-            new QuakerA3Area(condition, areaTargets.length).emit(getLocation());
+            new QuakerA3Area(areaTargets.length).emit(getLocation());
         }
 
         @Override
@@ -172,10 +171,10 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         private void onImpact(@NonNull Location location) {
-            for (Damageable target2 : targets) {
-                if (target2.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
-                        target2.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
-                        target2 instanceof CombatUser)
+            for (Damageable target : targets) {
+                if (target.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
+                        target.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
+                        target instanceof CombatUser)
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
@@ -185,8 +184,8 @@ public final class QuakerA3 extends ActiveSkill {
         private final class QuakerA3Area extends Area {
             private final int targetCount;
 
-            private QuakerA3Area(Predicate<CombatEntity> condition, int targetCount) {
-                super(combatUser, QuakerA3Info.SIZE, condition);
+            private QuakerA3Area(int targetCount) {
+                super(combatUser, QuakerA3Info.SIZE, QuakerA3Projectile.this.condition);
                 this.targetCount = targetCount;
             }
 

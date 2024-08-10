@@ -16,11 +16,10 @@ import org.bukkit.util.Vector;
 
 public final class SiliaP2 extends AbstractSkill {
     /** 벽타기 남은 횟수 */
-    private int wallRideCount;
+    private int wallRideCount = SiliaP2Info.USE_COUNT;
 
     public SiliaP2(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaP2Info.getInstance());
-        wallRideCount = SiliaP2Info.USE_COUNT;
     }
 
     @Override

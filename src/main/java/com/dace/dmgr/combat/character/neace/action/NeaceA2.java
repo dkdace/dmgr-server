@@ -51,7 +51,7 @@ public final class NeaceA2 extends ActiveSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A2_USE, combatUser.getEntity().getLocation());
 
-            TaskUtil.addTask(this, new IntervalTask(i -> {
+            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished())
                     return false;
 
@@ -114,10 +114,9 @@ public final class NeaceA2 extends ActiveSkill {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, NeaceA2Info.SPEED);
         }
@@ -129,10 +128,9 @@ public final class NeaceA2 extends ActiveSkill {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }

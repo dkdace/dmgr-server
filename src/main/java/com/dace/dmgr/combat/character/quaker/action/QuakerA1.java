@@ -14,7 +14,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,7 +24,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class QuakerA1 extends ChargeableSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA1";
@@ -108,7 +106,7 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     /**
-     * 퀘이커 - 불굴의 방패 클래스.
+     * 불굴의 방패 클래스.
      */
     public final class QuakerA1Entity extends Barrier<ArmorStand> {
         private QuakerA1Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {

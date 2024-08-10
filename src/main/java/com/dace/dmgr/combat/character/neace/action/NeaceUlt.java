@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
@@ -21,8 +21,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-
-import java.util.function.Predicate;
 
 @Getter
 public final class NeaceUlt extends UltimateSkill {
@@ -132,11 +130,9 @@ public final class NeaceUlt extends UltimateSkill {
         ParticleUtil.playFirework(combatUser.getEntity().getLocation(), 215, 255, 130,
                 255, 255, 255, FireworkEffect.Type.STAR, true, false);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation();
-            Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Healable && !combatEntity.isEnemy(combatUser) &&
-                    combatEntity != combatUser;
-            new NeaceUltArea(condition).emit(loc);
+            new NeaceUltArea().emit(loc);
 
             playTickEffect(i);
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
@@ -171,8 +167,8 @@ public final class NeaceUlt extends UltimateSkill {
     }
 
     private final class NeaceUltArea extends Area {
-        private NeaceUltArea(Predicate<CombatEntity> condition) {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, condition);
+        private NeaceUltArea() {
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, combatEntity -> Neace.getTargetedActionCondition(NeaceUlt.this.combatUser, combatEntity));
         }
 
         @Override

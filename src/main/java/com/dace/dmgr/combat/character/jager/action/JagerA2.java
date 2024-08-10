@@ -30,7 +30,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class JagerA2 extends ActiveSkill {
     /** 소환한 엔티티 */
     private JagerA2Entity summonEntity = null;
@@ -57,7 +56,7 @@ public final class JagerA2 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -101,7 +100,7 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     /**
-     * 예거 - 곰덫 클래스.
+     * 곰덫 클래스.
      */
     @Getter
     public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
@@ -228,7 +227,7 @@ public final class JagerA2 extends ActiveSkill {
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
-            JagerA1 skill1 = (JagerA1) owner.getSkill(JagerA1Info.getInstance());
+            JagerA1 skill1 = owner.getSkill(JagerA1Info.getInstance());
             if (skill1.getSummonEntity() != null && skill1.getSummonEntity().getEntity().getTarget() == null)
                 skill1.getSummonEntity().getEntity().setTarget(victim.getEntity());
         }

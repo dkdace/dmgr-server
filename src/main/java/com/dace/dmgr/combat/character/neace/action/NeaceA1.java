@@ -84,7 +84,7 @@ public final class NeaceA1 extends ActiveSkill {
                 return;
 
             if (healAmount >= NeaceA1Info.MAX_HEAL) {
-                ((Healable) combatEntity).getStatusEffectModule().removeStatusEffect(this);
+                combatEntity.getStatusEffectModule().removeStatusEffect(this);
                 return;
             }
 

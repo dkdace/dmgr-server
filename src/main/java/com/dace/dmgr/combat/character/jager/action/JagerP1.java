@@ -44,7 +44,7 @@ public final class JagerP1 extends AbstractSkill {
      * @return 활성화 조건
      */
     private boolean canActivate() {
-        JagerA1 skill1 = (JagerA1) combatUser.getSkill(JagerA1Info.getInstance());
+        JagerA1 skill1 = combatUser.getSkill(JagerA1Info.getInstance());
 
         if (!skill1.isDurationFinished() && skill1.getSummonEntity() != null) {
             JagerA1.JagerA1Entity jagerA1Entity = skill1.getSummonEntity();

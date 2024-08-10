@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
@@ -26,8 +27,9 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 3;
+        public static final short DEFAULT = 3;
     }
 }

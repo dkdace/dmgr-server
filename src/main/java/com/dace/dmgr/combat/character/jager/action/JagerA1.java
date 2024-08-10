@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 처치 점수 제한시간 쿨타임 ID */
     public static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
+
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
@@ -95,6 +96,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -148,7 +151,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     /**
-     * 예거 - 설랑 클래스.
+     * 설랑 클래스.
      */
     @Getter
     public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {

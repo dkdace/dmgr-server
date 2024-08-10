@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.inferno.action;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -18,8 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-
-import java.util.function.Predicate;
 
 public final class InfernoA1 extends ActiveSkill {
     public InfernoA1(@NonNull CombatUser combatUser) {
@@ -102,8 +99,7 @@ public final class InfernoA1 extends ActiveSkill {
      */
     private void onLand() {
         Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser);
-        new InfernoA1Area(condition).emit(loc);
+        new InfernoA1Area().emit(loc);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A1_LAND, loc);
         Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
@@ -128,8 +124,8 @@ public final class InfernoA1 extends ActiveSkill {
     }
 
     private final class InfernoA1Area extends Area {
-        private InfernoA1Area(Predicate<CombatEntity> condition) {
-            super(combatUser, InfernoA1Info.RADIUS, condition);
+        private InfernoA1Area() {
+            super(combatUser, InfernoA1Info.RADIUS, combatUser::isEnemy);
         }
 
         @Override

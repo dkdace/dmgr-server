@@ -56,7 +56,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking() &&
+        return super.canUse() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -94,6 +94,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -147,6 +149,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 break;
             case 37:
                 SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.7);
+                break;
+            default:
                 break;
         }
     }

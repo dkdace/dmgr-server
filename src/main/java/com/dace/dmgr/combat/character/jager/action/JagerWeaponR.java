@@ -77,6 +77,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
                 break;
             }
+            default:
+                break;
         }
     }
 

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 연사속도 */
@@ -37,36 +38,39 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /**
      * 반동 정보.
      */
-    public interface RECOIL {
+    @UtilityClass
+    public static class RECOIL {
         /** 수직 반동 */
-        double UP = 0.6;
+        public static final double UP = 0.6;
         /** 수평 반동 */
-        double SIDE = 0.04;
+        public static final double SIDE = 0.04;
         /** 수직 반동 분산도 */
-        double UP_SPREAD = 0.1;
+        public static final double UP_SPREAD = 0.1;
         /** 수평 반동 분산도 */
-        double SIDE_SPREAD = 0.06;
+        public static final double SIDE_SPREAD = 0.06;
     }
 
     /**
      * 탄퍼짐 정보.
      */
-    public interface SPREAD {
+    @UtilityClass
+    public static class SPREAD {
         /** 탄퍼짐 증가량 */
-        double INCREMENT = 0.3;
+        public static final double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */
-        int START = 5;
+        public static final int START = 5;
         /** 탄퍼짐 최대 시점 */
-        int MAX = 20;
+        public static final int MAX = 20;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 1;
+        public static final short DEFAULT = 1;
         /** 달리기 */
-        short SPRINT = DEFAULT + 1000;
+        public static final short SPRINT = DEFAULT + 1000;
     }
 }

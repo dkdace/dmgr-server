@@ -193,12 +193,10 @@ public final class Jager extends Marksman {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return JagerP1Info.getInstance();
-            default:
-                return null;
-        }
+        if (number == 1)
+            return JagerP1Info.getInstance();
+
+        return null;
     }
 
     @Override

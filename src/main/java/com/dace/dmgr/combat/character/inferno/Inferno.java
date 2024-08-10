@@ -103,7 +103,7 @@ public final class Inferno extends Vanguard {
         InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
         InfernoUlt skill4 = combatUser.getSkill(InfernoUltInfo.getInstance());
 
-        int capacity = weapon.getReloadModule().getRemainingAmmo();
+        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
         double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
         double skillp1MaxDuration = InfernoP1Info.DURATION / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
@@ -111,7 +111,7 @@ public final class Inferno extends Vanguard {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, InfernoWeaponInfo.CAPACITY,
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, InfernoWeaponInfo.CAPACITY,
                 10, '■');
 
         text.add(weaponDisplay);
@@ -166,12 +166,10 @@ public final class Inferno extends Vanguard {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return InfernoP1Info.getInstance();
-            default:
-                return null;
-        }
+        if (number == 1)
+            return InfernoP1Info.getInstance();
+
+        return null;
     }
 
     @Override

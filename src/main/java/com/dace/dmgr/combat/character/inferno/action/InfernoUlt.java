@@ -51,7 +51,7 @@ public final class InfernoUlt extends UltimateSkill {
                 new FixedPitchHitbox(combatUser.getEntity().getLocation(), 2, 2, 2, 0, 1, 0)
         });
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.getDamageModule().getShield(SHIELD_ID) == 0)
                 return false;
 

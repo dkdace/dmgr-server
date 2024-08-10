@@ -110,7 +110,7 @@ public final class Arkace extends Marksman {
         ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
         ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
 
-        int capacity = weapon.getReloadModule().getRemainingAmmo();
+        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
         double skill2Duration = skill2.getDuration() / 20.0;
         double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
@@ -118,7 +118,7 @@ public final class Arkace extends Marksman {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, ArkaceWeaponInfo.CAPACITY,
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, ArkaceWeaponInfo.CAPACITY,
                 ArkaceWeaponInfo.CAPACITY, '|');
 
         text.add(weaponDisplay);
@@ -169,12 +169,10 @@ public final class Arkace extends Marksman {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return ArkaceP1Info.getInstance();
-            default:
-                return null;
-        }
+        if (number == 1)
+            return ArkaceP1Info.getInstance();
+
+        return null;
     }
 
     @Override

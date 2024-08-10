@@ -22,7 +22,6 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.function.Predicate;
 
 public final class SiliaA1 extends ActiveSkill {
     public SiliaA1(@NonNull CombatUser combatUser) {
@@ -129,7 +128,7 @@ public final class SiliaA1 extends ActiveSkill {
                 }
             }
 
-            new SiliaA1Area(condition).emit(getLocation());
+            new SiliaA1Area().emit(getLocation());
         }
 
         @Override
@@ -143,8 +142,8 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         private final class SiliaA1Area extends Area {
-            private SiliaA1Area(Predicate<CombatEntity> condition) {
-                super(combatUser, SiliaA1Info.RADIUS, condition);
+            private SiliaA1Area() {
+                super(combatUser, SiliaA1Info.RADIUS, SiliaA1Attack.this.condition);
             }
 
             @Override

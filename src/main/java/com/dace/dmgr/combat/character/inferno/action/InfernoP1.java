@@ -65,8 +65,7 @@ public final class InfernoP1 extends AbstractSkill {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, InfernoP1Info.DEFENSE_INCREMENT);
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, InfernoP1Info.DEFENSE_INCREMENT);
         }
 
         @Override
@@ -76,8 +75,7 @@ public final class InfernoP1 extends AbstractSkill {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
         }
     }
 }

@@ -16,7 +16,6 @@ import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -27,9 +26,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.function.Predicate;
 
-@Getter
 public final class VellionA1 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA1";
@@ -58,7 +55,7 @@ public final class VellionA1 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+        return super.canUse() && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -183,6 +180,7 @@ public final class VellionA1 extends ActiveSkill {
      * 벨리온 - 마력 응집체 클래스.
      */
     public final class VellionA1Entity extends SummonEntity<ArmorStand> {
+        /** 피격자 목록 */
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */
         private long returnTime = VellionA1Info.RETURN_DURATION;
@@ -228,9 +226,7 @@ public final class VellionA1 extends ActiveSkill {
 
             playTickEffect();
 
-            Predicate<CombatEntity> condition = combatEntity -> combatEntity != combatUser && combatEntity instanceof Damageable &&
-                    ((Damageable) combatEntity).getDamageModule().isLiving();
-            new VellionA1Area(condition).emit(loc);
+            new VellionA1Area().emit(loc);
         }
 
         /**
@@ -254,8 +250,9 @@ public final class VellionA1 extends ActiveSkill {
         }
 
         private final class VellionA1Area extends Area {
-            private VellionA1Area(Predicate<CombatEntity> condition) {
-                super(combatUser, VellionA1Info.RADIUS, condition);
+            private VellionA1Area() {
+                super(combatUser, VellionA1Info.RADIUS, combatEntity -> combatEntity != VellionA1.this.combatUser && combatEntity instanceof Damageable &&
+                        ((Damageable) combatEntity).getDamageModule().isLiving());
             }
 
             @Override

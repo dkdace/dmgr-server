@@ -85,6 +85,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -131,6 +133,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 break;
             case 27:
                 SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.8);
+                break;
+            default:
                 break;
         }
     }

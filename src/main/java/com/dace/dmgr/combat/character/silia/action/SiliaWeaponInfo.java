@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /** 피해량 */
@@ -24,10 +25,11 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 4;
+        public static final short DEFAULT = 4;
         /** 확장 */
-        short EXTENDED = DEFAULT + 1000;
+        public static final short EXTENDED = DEFAULT + 1000;
     }
 }

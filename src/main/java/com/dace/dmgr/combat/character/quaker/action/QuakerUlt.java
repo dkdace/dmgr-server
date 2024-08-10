@@ -67,19 +67,12 @@ public final class QuakerUlt extends UltimateSkill {
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             int delay = 0;
             for (int i = 0; i < 8; i++) {
-                final int index = i;
+                int index = i;
 
-                switch (i) {
-                    case 1:
-                        delay += 2;
-                        break;
-                    case 2:
-                    case 4:
-                    case 6:
-                    case 7:
-                        delay += 1;
-                        break;
-                }
+                if (i == 1)
+                    delay += 2;
+                else if (i == 2 || i == 4 || i == 6 || i == 7)
+                    delay += 1;
 
                 TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                     Location loc = combatUser.getEntity().getEyeLocation();
@@ -195,7 +188,6 @@ public final class QuakerUlt extends UltimateSkill {
         private QuakerUltProjectile(HashSet<CombatEntity> targets) {
             super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(QuakerUltInfo.SIZE)
                     .maxDistance(QuakerUltInfo.DISTANCE).condition(combatUser::isEnemy).build());
-
             this.targets = targets;
         }
 

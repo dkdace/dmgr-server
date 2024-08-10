@@ -59,19 +59,12 @@ public final class QuakerWeapon extends AbstractWeapon {
 
             int delay = 0;
             for (int i = 0; i < 8; i++) {
-                final int index = i;
+                int index = i;
 
-                switch (i) {
-                    case 1:
-                        delay += 2;
-                        break;
-                    case 2:
-                    case 4:
-                    case 6:
-                    case 7:
-                        delay += 1;
-                        break;
-                }
+                if (i == 1)
+                    delay += 2;
+                else if (i == 2 || i == 4 || i == 6 || i == 7)
+                    delay += 1;
 
                 TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                     Location loc = combatUser.getEntity().getEyeLocation();

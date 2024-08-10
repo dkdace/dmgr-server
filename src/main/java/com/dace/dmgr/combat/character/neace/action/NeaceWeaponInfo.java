@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     /** 쿨타임 (tick) */
@@ -24,20 +25,22 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     /**
      * 치유 광선의 정보.
      */
-    public interface HEAL {
+    @UtilityClass
+    public static class HEAL {
         /** 초당 치유량 */
-        int HEAL_PER_SECOND = 250;
+        public static final int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
-        int MAX_DISTANCE = 15;
+        public static final int MAX_DISTANCE = 15;
         /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
-        long BLOCK_RESET_DELAY = 2 * 20;
+        public static final long BLOCK_RESET_DELAY = 2 * 20;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 5;
+        public static final short DEFAULT = 5;
     }
 }

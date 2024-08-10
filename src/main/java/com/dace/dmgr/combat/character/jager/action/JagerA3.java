@@ -22,8 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-
-import java.util.function.Predicate;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class JagerA3 extends ActiveSkill {
@@ -54,7 +53,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse() {
-        return super.canUse() && !((JagerA1) combatUser.getSkill(JagerA1Info.getInstance())).getConfirmModule().isChecking();
+        return super.canUse() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -74,7 +73,7 @@ public final class JagerA3 extends ActiveSkill {
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
 
-                TaskUtil.addTask(JagerA3.this, new IntervalTask(i -> {
+                TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                     if (isDurationFinished())
                         return false;
 
@@ -122,7 +121,7 @@ public final class JagerA3 extends ActiveSkill {
      *
      * @param location 사용 위치
      */
-    private void playTickEffect(Location location) {
+    private void playTickEffect(@NonNull Location location) {
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1, 0.1, 0.1, 120, 220, 240);
     }
 
@@ -132,10 +131,9 @@ public final class JagerA3 extends ActiveSkill {
      * @param location   폭파 위치
      * @param projectile 투사체
      */
-    private void explode(Location location, JagerA3Projectile projectile) {
+    private void explode(@NonNull Location location, @Nullable JagerA3Projectile projectile) {
         Location loc = location.clone().add(0, 0.1, 0);
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) || combatEntity == combatUser;
-        new JagerA3Area(condition, projectile).emit(loc);
+        new JagerA3Area(projectile).emit(loc);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_EXPLODE, loc);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, loc,
@@ -200,8 +198,8 @@ public final class JagerA3 extends ActiveSkill {
     private final class JagerA3Area extends Area {
         private final JagerA3Projectile projectile;
 
-        private JagerA3Area(Predicate<CombatEntity> condition, JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, condition);
+        private JagerA3Area(JagerA3Projectile projectile) {
+            super(combatUser, JagerA3Info.RADIUS, combatEntity -> combatEntity.isEnemy(JagerA3.this.combatUser) || combatEntity == JagerA3.this.combatUser);
             this.projectile = projectile;
         }
 

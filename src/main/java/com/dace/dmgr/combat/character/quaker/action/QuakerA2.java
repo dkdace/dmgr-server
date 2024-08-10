@@ -66,7 +66,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
-            final int index = i;
+            int index = i;
 
             if (i < 2)
                 delay += 1;
@@ -186,7 +186,6 @@ public final class QuakerA2 extends ActiveSkill {
         private QuakerA2Projectile(HashSet<CombatEntity> targets) {
             super(combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(QuakerA2Info.SIZE)
                     .maxDistance(QuakerA2Info.DISTANCE).condition(combatUser::isEnemy).build());
-
             this.targets = targets;
         }
 

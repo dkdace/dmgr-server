@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 
@@ -28,11 +29,13 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     private static final String TARGET_RESET_DELAY_COOLDOWN_ID = "TargetResetDelay";
     /** 대상 위치 통과 불가 시 초기화 딜레이 쿨타임 ID */
     private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
+
     /** 연사 모듈 */
     @NonNull
     @Getter
     private final FullAutoModule fullAutoModule;
     /** 현재 사용 대상 */
+    @Nullable
     private Healable target = null;
 
     public NeaceWeapon(@NonNull CombatUser combatUser) {
@@ -85,7 +88,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 combatUser.getUser().sendTitle("", MessageFormat.format("{0}{1} §f치유 중 : {2}§e{3}",
                                 (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished() ? "§a" : "§b"),
                                 TextIcon.HEAL,
-                                (target instanceof CombatUser ? ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : ""),
+                                (target instanceof CombatUser && ((CombatUser) target).getCharacterType() != null ?
+                                        ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : ""),
                                 target.getName()),
                         0, 5, 5);
 
@@ -93,6 +97,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -101,7 +107,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
      *
      * @param target 치유 대상
      */
-    void healTarget(Healable target) {
+    void healTarget(@NonNull Healable target) {
         boolean isAmplifying = !combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished();
 
         target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);

@@ -26,12 +26,11 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 @Getter
 public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "InfernoWeapon";
+
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -97,6 +96,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -143,6 +144,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 break;
             case 47:
                 SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, combatUser.getEntity().getLocation(), 0.6, 1.4);
+                break;
+            default:
                 break;
         }
     }
@@ -250,8 +253,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @Override
         protected void onDestroy() {
             Location loc = getLocation().clone().add(0, 0.1, 0);
-            Predicate<CombatEntity> condition = this.condition.or(combatEntity -> combatEntity == combatUser);
-            new InfernoWeaponLArea(condition).emit(loc);
+            new InfernoWeaponLArea().emit(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_FIREBALL_EXPLODE, loc);
             ParticleUtil.play(Particle.SMOKE_LARGE, loc, 40, 0.2, 0.2, 0.2, 0.1);
@@ -261,8 +263,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         private final class InfernoWeaponLArea extends Area {
-            private InfernoWeaponLArea(Predicate<CombatEntity> condition) {
-                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, condition);
+            private InfernoWeaponLArea() {
+                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, InfernoWeaponLProjectile.this.condition.or(combatEntity ->
+                        combatEntity == InfernoWeapon.this.combatUser));
             }
 
             @Override
