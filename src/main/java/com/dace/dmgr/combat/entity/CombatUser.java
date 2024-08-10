@@ -950,7 +950,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, Cooldown.RESPAWN.duration);
+        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : Cooldown.RESPAWN.duration);
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
