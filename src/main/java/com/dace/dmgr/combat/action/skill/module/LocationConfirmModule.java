@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -71,8 +72,15 @@ public final class LocationConfirmModule extends ConfirmModule {
     public boolean isValid() {
         if (!isChecking)
             return false;
-        return !currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) && currentLocation.getBlock().isEmpty() &&
-                !currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
+        if (currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) || !currentLocation.getBlock().isEmpty() ||
+                currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
+            return false;
+
+        Location loc = skill.getCombatUser().getEntity().getEyeLocation();
+        loc.setY(currentLocation.getY());
+
+        return skill.getCombatUser().getEntity().getEyeLocation().getY() > currentLocation.getY() ||
+                LocationUtil.canPass(loc, skill.getCombatUser().getEntity().getEyeLocation());
     }
 
     @Override
@@ -106,6 +114,20 @@ public final class LocationConfirmModule extends ConfirmModule {
         Player player = skill.getCombatUser().getEntity();
 
         currentLocation = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 1, 0.5);
+        Location loc = currentLocation.clone();
+        for (int j = 0; j < 16; j++) {
+            if (!LocationUtil.isNonSolid(loc.subtract(0, 0.5, 0))) {
+                currentLocation = loc;
+                break;
+            }
+        }
+        loc = currentLocation.clone();
+        for (int j = 0; j < 16; j++) {
+            if (LocationUtil.isNonSolid(loc.add(0, 0.5, 0))) {
+                currentLocation = loc;
+                break;
+            }
+        }
         currentLocation.setYaw(i * 10);
         currentLocation.setPitch(0);
 
