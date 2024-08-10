@@ -22,13 +22,13 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 처치 점수 제한시간 쿨타임 ID */
     public static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
 
     /** 위치 확인 모듈 */
     @NonNull
+    @Getter
     private final LocationConfirmModule confirmModule;
     /** 소환한 엔티티 */
     @Nullable

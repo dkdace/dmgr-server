@@ -68,6 +68,8 @@ import java.util.stream.Collectors;
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Jumpable, CombatEntity {
     /** 암살 점수 */
     public static final int FASTKILL_SCORE = 20;
+    /** 암살 보너스 제한시간 쿨타임 ID (tick) */
+    public static final String FASTKILL_TIME_LIMIT_COOLDOWN_ID = "FastkillTimeLimit";
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.12;
     /** 궁극기 차단 점수 */
@@ -1490,8 +1492,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 쿨타임 ID 및 기본 지속시간 목록.
      */
     @AllArgsConstructor
-    @Getter
-    public enum Cooldown {
+    private enum Cooldown {
         /** 힐 팩 */
         HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
         /** 점프대 */
@@ -1505,7 +1506,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         /** 적 처치 지원 제한시간 */
         KILL_SUPPORT_TIME_LIMIT("KillSupportTimeLimit", 0),
         /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 (tick) */
-        FASTKILL_TIME_LIMIT("FastkillTimeLimit", (long) (2.5 * 20)),
+        FASTKILL_TIME_LIMIT(FASTKILL_TIME_LIMIT_COOLDOWN_ID, (long) (2.5 * 20)),
         /** 리스폰 시간 */
         RESPAWN("Respawn", GeneralConfig.getCombatConfig().getRespawnTime()),
         /** 추락사 */
@@ -1520,7 +1521,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         WEAPON_FULLAUTO("WeaponFullauto", 6);
 
         /** 쿨타임 ID */
-        @NonNull
         private final String id;
         /** 기본 지속시간 (tick) */
         private final long duration;
