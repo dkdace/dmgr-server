@@ -135,6 +135,7 @@ public final class VellionA2 extends ActiveSkill {
             setDuration();
             combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
+            CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE, combatUser.getEntity().getLocation());
 
