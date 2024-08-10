@@ -36,7 +36,7 @@ public final class VellionA1 extends ActiveSkill {
     /** 소환한 엔티티 */
     private VellionA1Entity summonEntity = null;
 
-    VellionA1(@NonNull CombatUser combatUser) {
+    public VellionA1(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA1Info.getInstance(), 0);
     }
 

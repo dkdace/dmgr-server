@@ -31,7 +31,7 @@ public final class NeaceUlt extends UltimateSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    NeaceUlt(@NonNull CombatUser combatUser) {
+    public NeaceUlt(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceUltInfo.getInstance());
     }
 

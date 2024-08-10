@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class InfernoA2Info extends ActiveSkillInfo {
+public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     /** 쿨타임 (tick) */
     public static final int COOLDOWN = 12 * 20;
     /** 초당 화염 피해량 */
@@ -18,12 +16,6 @@ public final class InfernoA2Info extends ActiveSkillInfo {
     private static final InfernoA2Info instance = new InfernoA2Info();
 
     private InfernoA2Info() {
-        super(2, "불꽃 방출");
-    }
-
-    @Override
-    @NonNull
-    public InfernoA2 createSkill(@NonNull CombatUser combatUser) {
-        return new InfernoA2(combatUser);
+        super(InfernoA2.class, "불꽃 방출");
     }
 }

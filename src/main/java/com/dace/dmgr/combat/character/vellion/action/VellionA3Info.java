@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class VellionA3Info extends ActiveSkillInfo {
+public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 17 * 20;
     /** 시전 시간 (tick) */
@@ -27,12 +25,6 @@ public final class VellionA3Info extends ActiveSkillInfo {
     private static final VellionA3Info instance = new VellionA3Info();
 
     private VellionA3Info() {
-        super(3, "칠흑의 균열");
-    }
-
-    @Override
-    @NonNull
-    public VellionA3 createSkill(@NonNull CombatUser combatUser) {
-        return new VellionA3(combatUser);
+        super(VellionA3.class, "칠흑의 균열");
     }
 }

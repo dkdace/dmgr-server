@@ -29,7 +29,7 @@ public final class QuakerUlt extends UltimateSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerUlt";
 
-    QuakerUlt(@NonNull CombatUser combatUser) {
+    public QuakerUlt(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerUltInfo.getInstance());
     }
 

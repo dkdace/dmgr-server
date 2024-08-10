@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 
 public final class SiliaA1 extends ActiveSkill {
-    SiliaA1(@NonNull CombatUser combatUser) {
+    public SiliaA1(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA1Info.getInstance(), 0);
     }
 

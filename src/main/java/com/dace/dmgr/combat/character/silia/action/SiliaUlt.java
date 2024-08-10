@@ -21,7 +21,7 @@ public final class SiliaUlt extends UltimateSkill {
     /** 일격 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    SiliaUlt(@NonNull CombatUser combatUser) {
+    public SiliaUlt(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaUltInfo.getInstance());
     }
 

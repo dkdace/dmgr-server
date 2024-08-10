@@ -12,6 +12,7 @@ import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
@@ -52,6 +53,7 @@ public final class MeleeAttackAction extends AbstractAction {
 
     @Override
     public boolean canUse() {
+        Validate.notNull(combatUser.getCharacterType());
         return super.canUse() && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser) && combatUser.isGlobalCooldownFinished();
     }
 
@@ -89,8 +91,8 @@ public final class MeleeAttackAction extends AbstractAction {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true);
-            target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
+            if (target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true))
+                target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_ENTITY, getLocation());
             ParticleUtil.play(Particle.CRIT, getLocation(), 10, 0, 0, 0, 0.4);

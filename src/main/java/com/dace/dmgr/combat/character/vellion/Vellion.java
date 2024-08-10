@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.vellion.action.*;
@@ -107,9 +109,9 @@ public final class Vellion extends Controller {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        VellionP1 skillp1 = (VellionP1) combatUser.getSkill(VellionP1Info.getInstance());
-        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
-        VellionUlt skill4 = (VellionUlt) combatUser.getSkill(VellionUltInfo.getInstance());
+        VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
+        VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
+        VellionUlt skill4 = combatUser.getSkill(VellionUltInfo.getInstance());
 
         double skillp1Cooldown = skillp1.getCooldown() / 20.0;
         double skillp1MaxCooldown = skillp1.getDefaultCooldown() / 20.0;
@@ -121,18 +123,18 @@ public final class Vellion extends Controller {
         StringJoiner text = new StringJoiner("    ");
 
         if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration, skillp1MaxDuration,
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(VellionP1Info.getInstance().toString(), skillp1Duration, skillp1MaxDuration,
                     10, '■') + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
             text.add(skillp1Display);
         } else if (!skillp1.isCooldownFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarCooldownBar(skillp1.getSkillInfo().toString(), skillp1Cooldown, skillp1MaxCooldown,
+            String skillp1Display = StringFormUtil.getActionbarCooldownBar(VellionP1Info.getInstance().toString(), skillp1Cooldown, skillp1MaxCooldown,
                     10, '■');
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished() && skill2.isEnabled())
-            text.add(skill2.getSkillInfo() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
+            text.add(VellionA2Info.getInstance() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(VellionUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -145,7 +147,7 @@ public final class Vellion extends Controller {
         if (!(victim.getDamageModule().isLiving()))
             return true;
 
-        VellionP2 skillp2 = (VellionP2) attacker.getSkill(VellionP2Info.getInstance());
+        VellionP2 skillp2 = attacker.getSkill(VellionP2Info.getInstance());
         skillp2.setDamageAmount(damage);
         attacker.useAction(ActionKey.PERIODIC_1);
 
@@ -184,12 +186,12 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+        return !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
+        VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
 
         return !combatUser.getEntity().isFlying() && combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() &&
                 (skill2.isDurationFinished() || skill2.isEnabled()) && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() &&
@@ -203,7 +205,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        VellionA2 skill2 = (VellionA2) combatUser.getSkill(VellionA2Info.getInstance());
+        VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
 
         return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled()) &&
                 combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
@@ -217,7 +219,7 @@ public final class Vellion extends Controller {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return VellionP1Info.getInstance();
@@ -230,7 +232,7 @@ public final class Vellion extends Controller {
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return VellionA1Info.getInstance();

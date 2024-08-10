@@ -26,7 +26,7 @@ public final class QuakerA3 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA3";
 
-    QuakerA3(@NonNull CombatUser combatUser) {
+    public QuakerA3(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA3Info.getInstance(), 2);
     }
 

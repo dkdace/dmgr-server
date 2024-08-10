@@ -26,10 +26,14 @@ public abstract class ActiveSkill extends AbstractSkill {
      *
      * @param combatUser      대상 플레이어
      * @param activeSkillInfo 액티브 스킬 정보 객체
-     * @param slot            슬롯 번호
+     * @param slot            슬롯 번호. 0~8 사이의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+    protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
         super(combatUser, activeSkillInfo);
+        if (slot < 0 || slot > 8)
+            throw new IllegalArgumentException("'slot'이 0에서 8 사이여야 함");
+
         this.slot = slot;
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
@@ -80,7 +84,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayCooldown(int amount) {
-        itemStack = skillInfo.getItemStack();
+        itemStack = originalItemStack.clone();
         itemStack.setDurability((short) 15);
         itemStack.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
         display(amount);
@@ -92,7 +96,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayReady(int amount) {
-        itemStack = skillInfo.getItemStack();
+        itemStack = originalItemStack.clone();
         display(amount);
     }
 
@@ -102,7 +106,7 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @param amount 아이템 수량
      */
     final void displayUsing(int amount) {
-        itemStack = skillInfo.getItemStack();
+        itemStack = originalItemStack.clone();
         itemStack.setDurability((short) 5);
         display(amount);
     }

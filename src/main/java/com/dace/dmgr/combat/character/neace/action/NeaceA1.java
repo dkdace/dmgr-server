@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 public final class NeaceA1 extends ActiveSkill {
     private final NeaceA1Mark neaceA1Mark = new NeaceA1Mark();
 
-    NeaceA1(@NonNull CombatUser combatUser) {
+    public NeaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA1Info.getInstance(), 0);
     }
 

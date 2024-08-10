@@ -19,7 +19,7 @@ public interface Confirmable extends Skill {
     void onCheckEnable();
 
     /**
-     * 확인 모드 중에 매 tick마다 실행할 작업.
+     * 확인 모드 중에 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */

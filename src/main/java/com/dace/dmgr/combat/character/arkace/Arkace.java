@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
@@ -105,8 +107,8 @@ public final class Arkace extends Marksman {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
-        ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());
-        ArkaceUlt skill4 = (ArkaceUlt) combatUser.getSkill(ArkaceUltInfo.getInstance());
+        ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
+        ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
         double skill2Duration = skill2.getDuration() / 20.0;
@@ -122,12 +124,12 @@ public final class Arkace extends Marksman {
         text.add(weaponDisplay);
         text.add("");
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2Duration,
                     skill2MaxDuration, 10, '■');
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -147,7 +149,7 @@ public final class Arkace extends Marksman {
         if (!(victim instanceof CombatUser))
             return;
 
-        ArkaceUlt skillUlt = (ArkaceUlt) attacker.getSkill(ArkaceUltInfo.getInstance());
+        ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());
 
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
@@ -166,7 +168,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return ArkaceP1Info.getInstance();
@@ -177,7 +179,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return ArkaceA1Info.getInstance();

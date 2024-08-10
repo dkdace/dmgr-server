@@ -13,7 +13,7 @@ public interface Swappable<T extends Weapon> extends Weapon {
      * @return 2중 무기 모듈
      */
     @NonNull
-    SwapModule<T> getSwapModule();
+    SwapModule<@NonNull T> getSwapModule();
 
     /**
      * 무기 전환을 시작할 때 실행할 작업.

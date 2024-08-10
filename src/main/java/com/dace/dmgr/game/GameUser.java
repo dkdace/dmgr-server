@@ -339,8 +339,9 @@ public final class GameUser implements Disposable {
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
     public void sendMessage(@NonNull String message, boolean isTeam) {
+        if (team == null)
+            return;
         Validate.notNull(combatUser);
-        Validate.notNull(team);
 
         String fullMessage = MessageFormat.format("§7§l[{0}] {1}", isTeam ? "팀" : "전체", combatUser.getFormattedMessage(message));
 

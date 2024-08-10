@@ -32,7 +32,7 @@ public final class JagerA3 extends ActiveSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    JagerA3(@NonNull CombatUser combatUser) {
+    public JagerA3(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA3Info.getInstance(), 2);
     }
 

@@ -18,7 +18,7 @@ public final class InfernoUlt extends UltimateSkill {
     /** 보호막 ID */
     private static final String SHIELD_ID = "InfernoUlt";
 
-    InfernoUlt(@NonNull CombatUser combatUser) {
+    public InfernoUlt(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoUltInfo.getInstance());
     }
 

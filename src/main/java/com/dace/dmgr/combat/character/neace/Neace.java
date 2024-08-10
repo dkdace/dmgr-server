@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
@@ -108,9 +110,9 @@ public final class Neace extends Support {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
-        NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+        NeaceA2 skill2 = combatUser.getSkill(NeaceA2Info.getInstance());
+        NeaceA3 skill3 = combatUser.getSkill(NeaceA3Info.getInstance());
+        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
 
         double skill2Duration = skill2.getDuration() / 20.0;
         double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
@@ -120,14 +122,14 @@ public final class Neace extends Support {
         StringJoiner text = new StringJoiner("    ");
 
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+            String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2Duration,
                     skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
             text.add(skill2Display);
         }
         if (!skill3.isDurationFinished())
-            text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
+            text.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -163,7 +165,7 @@ public final class Neace extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
 
         return skill4.isDurationFinished() || skill4.isEnabled();
     }
@@ -181,7 +183,7 @@ public final class Neace extends Support {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return NeaceP1Info.getInstance();
@@ -192,7 +194,7 @@ public final class Neace extends Support {
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return NeaceA1Info.getInstance();

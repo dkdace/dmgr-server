@@ -33,7 +33,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     @NonNull
     private final LocationConfirmModule confirmModule;
 
-    VellionA3(@NonNull CombatUser combatUser) {
+    public VellionA3(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA3Info.getInstance(), 2);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
     }

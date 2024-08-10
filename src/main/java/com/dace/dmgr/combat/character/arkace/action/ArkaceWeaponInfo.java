@@ -3,11 +3,9 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class ArkaceWeaponInfo extends WeaponInfo {
+public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 연사속도 */
     public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_600;
     /** 피해량 */
@@ -24,7 +22,8 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
     private ArkaceWeaponInfo() {
-        super(RESOURCE.DEFAULT, "HLN-12",
+        super(ArkaceWeapon.class, RESOURCE.DEFAULT,
+                "HLN-12",
                 "",
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
                 "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
@@ -32,14 +31,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
                 "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_WEAKENING_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_WEAKENING_DISTANCE * 2 + "m)",
                 "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
                 "§f" + TextIcon.CAPACITY + "§f 30발",
-                "",
-                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
-    }
-
-    @Override
-    @NonNull
-    public ArkaceWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new ArkaceWeapon(combatUser);
+                "", "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
     }
 
     /**

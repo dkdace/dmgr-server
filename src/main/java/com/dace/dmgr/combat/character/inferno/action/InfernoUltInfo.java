@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class InfernoUltInfo extends UltimateSkillInfo {
+public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 8000;
     /** 체력 */
@@ -18,12 +16,6 @@ public final class InfernoUltInfo extends UltimateSkillInfo {
     private static final InfernoUltInfo instance = new InfernoUltInfo();
 
     private InfernoUltInfo() {
-        super("과부하");
-    }
-
-    @Override
-    @NonNull
-    public InfernoUlt createSkill(@NonNull CombatUser combatUser) {
-        return new InfernoUlt(combatUser);
+        super(InfernoUlt.class, "과부하");
     }
 }

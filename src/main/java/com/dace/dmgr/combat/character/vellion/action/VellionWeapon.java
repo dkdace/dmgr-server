@@ -17,7 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class VellionWeapon extends AbstractWeapon {
-    VellionWeapon(@NonNull CombatUser combatUser) {
+    public VellionWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, VellionWeaponInfo.getInstance());
     }
 

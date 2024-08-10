@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Vanguard;
 import com.dace.dmgr.combat.character.inferno.action.*;
@@ -98,9 +100,8 @@ public final class Inferno extends Vanguard {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
-        InfernoP1 skillp1 = (InfernoP1) combatUser.getSkill(InfernoP1Info.getInstance());
         InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
-        InfernoUlt skill4 = (InfernoUlt) combatUser.getSkill(InfernoUltInfo.getInstance());
+        InfernoUlt skill4 = combatUser.getSkill(InfernoUltInfo.getInstance());
 
         int capacity = weapon.getReloadModule().getRemainingAmmo();
         double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
@@ -116,12 +117,12 @@ public final class Inferno extends Vanguard {
         text.add(weaponDisplay);
         text.add("");
         if (combatUser.getStatusEffectModule().hasStatusEffect(skillp1buff)) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(skillp1.getSkillInfo().toString(), skillp1Duration,
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(), skillp1Duration,
                     skillp1MaxDuration, 10, '■');
             text.add(skillp1Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(InfernoUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -164,7 +165,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return InfernoP1Info.getInstance();
@@ -175,7 +176,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return InfernoA1Info.getInstance();

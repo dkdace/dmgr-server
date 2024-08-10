@@ -30,7 +30,7 @@ public final class QuakerA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA2";
 
-    QuakerA2(@NonNull CombatUser combatUser) {
+    public QuakerA2(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA2Info.getInstance(), 1);
     }
 

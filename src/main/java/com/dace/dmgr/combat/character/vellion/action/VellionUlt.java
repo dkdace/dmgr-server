@@ -33,7 +33,7 @@ public final class VellionUlt extends UltimateSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    VellionUlt(@NonNull CombatUser combatUser) {
+    public VellionUlt(@NonNull CombatUser combatUser) {
         super(combatUser, VellionUltInfo.getInstance());
     }
 

@@ -10,6 +10,6 @@ public final class InfernoT1Info extends TraitInfo {
     private static final InfernoT1Info instance = new InfernoT1Info();
 
     private InfernoT1Info() {
-        super(1, "융해");
+        super("융해");
     }
 }

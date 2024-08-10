@@ -23,7 +23,7 @@ public final class NeaceA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
-    NeaceA2(@NonNull CombatUser combatUser) {
+    public NeaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA2Info.getInstance(), 1);
     }
 

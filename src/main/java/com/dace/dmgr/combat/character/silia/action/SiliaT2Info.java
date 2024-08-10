@@ -21,6 +21,6 @@ public final class SiliaT2Info extends TraitInfo {
     private static final SiliaT2Info instance = new SiliaT2Info();
 
     private SiliaT2Info() {
-        super(2, "일격");
+        super("일격");
     }
 }

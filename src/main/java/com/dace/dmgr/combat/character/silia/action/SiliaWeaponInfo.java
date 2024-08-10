@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class SiliaWeaponInfo extends WeaponInfo {
+public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /** 피해량 */
     public static final int DAMAGE = 200;
     /** 사거리 (단위: 블록) */
@@ -20,13 +18,7 @@ public final class SiliaWeaponInfo extends WeaponInfo {
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();
 
     private SiliaWeaponInfo() {
-        super(RESOURCE.DEFAULT, "접이식 마체테");
-    }
-
-    @Override
-    @NonNull
-    public SiliaWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new SiliaWeapon(combatUser);
+        super(SiliaWeapon.class, RESOURCE.DEFAULT, "접이식 마체테");
     }
 
     /**

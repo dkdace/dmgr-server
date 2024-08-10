@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class NeaceA2Info extends ActiveSkillInfo {
+public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 12 * 20;
     /** 공격력 증가량 */
@@ -23,12 +21,6 @@ public final class NeaceA2Info extends ActiveSkillInfo {
     private static final NeaceA2Info instance = new NeaceA2Info();
 
     private NeaceA2Info() {
-        super(2, "축복");
-    }
-
-    @Override
-    @NonNull
-    public NeaceA2 createSkill(@NonNull CombatUser combatUser) {
-        return new NeaceA2(combatUser);
+        super(NeaceA2.class, "축복");
     }
 }

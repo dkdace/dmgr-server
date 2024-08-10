@@ -4,6 +4,10 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
+import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.AccessLevel;
@@ -266,7 +270,7 @@ public abstract class Character {
      * @return 무기 정보
      */
     @NonNull
-    public abstract WeaponInfo getWeaponInfo();
+    public abstract WeaponInfo<? extends Weapon> getWeaponInfo();
 
     /**
      * 지정한 번호의 패시브 스킬 정보을 반환한다.
@@ -275,7 +279,7 @@ public abstract class Character {
      * @return 패시브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환
      */
     @Nullable
-    public abstract PassiveSkillInfo getPassiveSkillInfo(int number);
+    public abstract PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number);
 
     /**
      * 지정한 번호의 액티브 스킬 정보을 반환한다.
@@ -284,11 +288,11 @@ public abstract class Character {
      * @return 액티브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환
      */
     @Nullable
-    public abstract ActiveSkillInfo getActiveSkillInfo(int number);
+    public abstract ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number);
 
     /**
      * @return 궁극기 정보
      */
     @NonNull
-    public abstract UltimateSkillInfo getUltimateSkillInfo();
+    public abstract UltimateSkillInfo<? extends UltimateSkill> getUltimateSkillInfo();
 }

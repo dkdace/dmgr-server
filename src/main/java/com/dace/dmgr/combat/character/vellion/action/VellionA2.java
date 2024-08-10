@@ -38,7 +38,7 @@ public final class VellionA2 extends ActiveSkill {
     @Getter
     private boolean isEnabled = false;
 
-    VellionA2(@NonNull CombatUser combatUser) {
+    public VellionA2(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA2Info.getInstance(), 1);
     }
 

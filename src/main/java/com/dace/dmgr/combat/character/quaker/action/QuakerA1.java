@@ -32,7 +32,7 @@ public final class QuakerA1 extends ChargeableSkill {
     /** 소환한 엔티티 */
     private QuakerA1Entity summonEntity = null;
 
-    QuakerA1(@NonNull CombatUser combatUser) {
+    public QuakerA1(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA1Info.getInstance(), 0);
     }
 

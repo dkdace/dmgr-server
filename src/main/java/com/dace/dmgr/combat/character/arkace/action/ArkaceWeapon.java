@@ -29,7 +29,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @NonNull
     private final GradualSpreadModule fullAutoModule;
 
-    ArkaceWeapon(@NonNull CombatUser combatUser) {
+    public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,

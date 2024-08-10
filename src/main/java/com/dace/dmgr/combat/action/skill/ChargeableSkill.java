@@ -17,7 +17,10 @@ public abstract class ChargeableSkill extends ActiveSkill {
     /** 상태 변수 */
     private int stateValue = 0;
 
-    protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+    /**
+     * @see ActiveSkill#ActiveSkill(CombatUser, ActiveSkillInfo, int)
+     */
+    protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
         super(combatUser, activeSkillInfo, slot);
     }
 
@@ -37,6 +40,7 @@ public abstract class ChargeableSkill extends ActiveSkill {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
         super.onCooldownFinished();
         runStateValueCharge();

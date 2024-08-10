@@ -3,6 +3,8 @@ package com.dace.dmgr.combat.character.quaker;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
@@ -104,14 +106,14 @@ public final class Quaker extends Guardian {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        QuakerA1 skill1 = (QuakerA1) combatUser.getSkill(QuakerA1Info.getInstance());
+        QuakerA1 skill1 = combatUser.getSkill(QuakerA1Info.getInstance());
 
         int skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(QuakerA1Info.getInstance().toString(), skill1Health, skill1MaxHealth,
                 10, '■');
 
         if (!skill1.isDurationFinished())
@@ -175,13 +177,13 @@ public final class Quaker extends Guardian {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
         return null;
     }
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return QuakerA1Info.getInstance();

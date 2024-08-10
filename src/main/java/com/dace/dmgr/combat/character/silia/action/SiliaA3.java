@@ -15,7 +15,7 @@ public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "SiliaA3";
 
-    SiliaA3(@NonNull CombatUser combatUser) {
+    public SiliaA3(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA3Info.getInstance(), 2);
     }
 

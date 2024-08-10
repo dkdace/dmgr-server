@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class InfernoWeaponInfo extends WeaponInfo {
+public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     /** 초당 피해량 */
     public static final int DAMAGE_PER_SECOND = 150;
     /** 초당 화염 피해량 */
@@ -28,13 +26,7 @@ public final class InfernoWeaponInfo extends WeaponInfo {
     private static final InfernoWeaponInfo instance = new InfernoWeaponInfo();
 
     private InfernoWeaponInfo() {
-        super(RESOURCE.DEFAULT, "파이어스톰");
-    }
-
-    @Override
-    @NonNull
-    public InfernoWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new InfernoWeapon(combatUser);
+        super(InfernoWeapon.class, RESOURCE.DEFAULT, "파이어스톰");
     }
 
     /**

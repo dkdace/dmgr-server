@@ -28,7 +28,7 @@ public final class SiliaWeapon extends AbstractWeapon {
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    SiliaWeapon(@NonNull CombatUser combatUser) {
+    public SiliaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaWeaponInfo.getInstance());
     }
 

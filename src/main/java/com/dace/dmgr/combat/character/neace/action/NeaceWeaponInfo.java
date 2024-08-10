@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class NeaceWeaponInfo extends WeaponInfo {
+public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.4 * 20);
     /** 피해량 */
@@ -20,13 +18,7 @@ public final class NeaceWeaponInfo extends WeaponInfo {
     private static final NeaceWeaponInfo instance = new NeaceWeaponInfo();
 
     private NeaceWeaponInfo() {
-        super(RESOURCE.DEFAULT, "이중성");
-    }
-
-    @Override
-    @NonNull
-    public NeaceWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new NeaceWeapon(combatUser);
+        super(NeaceWeapon.class, RESOURCE.DEFAULT, "이중성");
     }
 
     /**

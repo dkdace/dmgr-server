@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -129,7 +130,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
-    private final HashMap<SkillInfo, Skill> skillMap = new HashMap<>();
+    private final HashMap<SkillInfo<? extends Skill>, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<>();
     /** 임시 히트박스 객체 목록 */
@@ -1004,12 +1005,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 지정한 스킬 정보에 해당하는 스킬을 반환한다.
      *
      * @param skillInfo 스킬 정보 객체
+     * @param <T>       {@link Skill}을 상속받는 스킬
      * @return 스킬 객체
      * @throws NullPointerException 해당하는 스킬이 존재하지 않으면 발생
      */
     @NonNull
-    public Skill getSkill(@NonNull SkillInfo skillInfo) {
-        Skill skill = skillMap.get(skillInfo);
+    public <T extends Skill> T getSkill(@NonNull SkillInfo<T> skillInfo) {
+        T skill = (T) skillMap.get(skillInfo);
         if (skill == null)
             throw new NullPointerException("일치하는 스킬이 존재하지 않음");
 
@@ -1190,7 +1192,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void addUltGauge(double value) {
         Validate.notNull(character);
 
-        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
+        UltimateSkill ultimateSkill = getSkill(character.getUltimateSkillInfo());
         addUltGaugePercent(value / ultimateSkill.getCost());
     }
 
@@ -1277,11 +1279,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             actionMap.get(actionKey).add(weapon);
 
         for (int i = 1; i <= 4; i++) {
-            ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
-            PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
+            ActiveSkillInfo<?> activeSkillInfo = character.getActiveSkillInfo(i);
+            PassiveSkillInfo<?> passiveSkillInfo = character.getPassiveSkillInfo(i);
 
             if (activeSkillInfo != null) {
-                Skill skill = activeSkillInfo.createSkill(this);
+                ActiveSkill skill = activeSkillInfo.createSkill(this);
                 skillMap.put(activeSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys())
                     actionMap.get(actionKey).add(skill);

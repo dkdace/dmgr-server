@@ -35,7 +35,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     /** 현재 사용 대상 */
     private Healable target = null;
 
-    NeaceWeapon(@NonNull CombatUser combatUser) {
+    public NeaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceWeaponInfo.getInstance());
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
     }

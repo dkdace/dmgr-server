@@ -58,7 +58,7 @@ public abstract class Guardian extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 수호 - 1");
+            super("역할: 수호 - 1");
         }
     }
 
@@ -71,7 +71,7 @@ public abstract class Guardian extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 수호 - 2");
+            super("역할: 수호 - 2");
         }
     }
 }

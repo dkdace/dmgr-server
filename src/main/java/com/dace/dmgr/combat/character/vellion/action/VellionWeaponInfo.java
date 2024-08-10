@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class VellionWeaponInfo extends WeaponInfo {
+public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.5 * 20);
     /** 피해량 */
@@ -20,13 +18,7 @@ public final class VellionWeaponInfo extends WeaponInfo {
     private static final VellionWeaponInfo instance = new VellionWeaponInfo();
 
     private VellionWeaponInfo() {
-        super(RESOURCE.DEFAULT, "절멸");
-    }
-
-    @Override
-    @NonNull
-    public VellionWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new VellionWeapon(combatUser);
+        super(VellionWeapon.class, RESOURCE.DEFAULT, "절멸");
     }
 
     /**

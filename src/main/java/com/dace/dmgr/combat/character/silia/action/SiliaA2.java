@@ -19,7 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class SiliaA2 extends ActiveSkill {
-    SiliaA2(@NonNull CombatUser combatUser) {
+    public SiliaA2(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA2Info.getInstance(), 1);
     }
 

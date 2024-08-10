@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class VellionA1Info extends ActiveSkillInfo {
+public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 6 * 20;
     /** 전역 쿨타임 (tick) */
@@ -35,12 +33,6 @@ public final class VellionA1Info extends ActiveSkillInfo {
     private static final VellionA1Info instance = new VellionA1Info();
 
     private VellionA1Info() {
-        super(1, "마력 집중");
-    }
-
-    @Override
-    @NonNull
-    public VellionA1 createSkill(@NonNull CombatUser combatUser) {
-        return new VellionA1(combatUser);
+        super(VellionA1.class, "마력 집중");
     }
 }

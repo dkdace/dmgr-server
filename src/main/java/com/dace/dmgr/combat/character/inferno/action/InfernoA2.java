@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 import java.util.function.Predicate;
 
 public final class InfernoA2 extends ActiveSkill {
-    InfernoA2(@NonNull CombatUser combatUser) {
+    public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
     }
 

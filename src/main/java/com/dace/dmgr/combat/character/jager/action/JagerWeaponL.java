@@ -36,7 +36,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @NonNull
     private final AimModule aimModule;
 
-    JagerWeaponL(@NonNull CombatUser combatUser) {
+    public JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);

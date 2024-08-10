@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class SiliaUltInfo extends UltimateSkillInfo {
+public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 8000;
     /** 시전 시간 (tick) */
@@ -25,12 +23,6 @@ public final class SiliaUltInfo extends UltimateSkillInfo {
     private static final SiliaUltInfo instance = new SiliaUltInfo();
 
     private SiliaUltInfo() {
-        super("폭풍의 부름");
-    }
-
-    @Override
-    @NonNull
-    public SiliaUlt createSkill(@NonNull CombatUser combatUser) {
-        return new SiliaUlt(combatUser);
+        super(SiliaUlt.class, "폭풍의 부름");
     }
 }

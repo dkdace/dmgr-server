@@ -2,11 +2,9 @@ package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class JagerWeaponInfo extends WeaponInfo {
+public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.25 * 20);
     /** 피해량 */
@@ -31,13 +29,7 @@ public final class JagerWeaponInfo extends WeaponInfo {
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
     private JagerWeaponInfo() {
-        super(RESOURCE.DEFAULT, "MK.73 ELNR");
-    }
-
-    @Override
-    @NonNull
-    public JagerWeaponL createWeapon(@NonNull CombatUser combatUser) {
-        return new JagerWeaponL(combatUser);
+        super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR");
     }
 
     /**

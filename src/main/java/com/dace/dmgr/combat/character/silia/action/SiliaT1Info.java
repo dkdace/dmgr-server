@@ -13,6 +13,6 @@ public final class SiliaT1Info extends TraitInfo {
     private static final SiliaT1Info instance = new SiliaT1Info();
 
     private SiliaT1Info() {
-        super(1, "백어택");
+        super("백어택");
     }
 }

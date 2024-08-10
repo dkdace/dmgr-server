@@ -13,7 +13,7 @@ public final class JagerP1 extends AbstractSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "JagerP1";
 
-    JagerP1(@NonNull CombatUser combatUser) {
+    public JagerP1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerP1Info.getInstance());
     }
 

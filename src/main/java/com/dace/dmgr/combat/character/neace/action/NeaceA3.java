@@ -21,7 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public final class NeaceA3 extends ActiveSkill {
-    NeaceA3(@NonNull CombatUser combatUser) {
+    public NeaceA3(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA3Info.getInstance(), 2);
     }
 

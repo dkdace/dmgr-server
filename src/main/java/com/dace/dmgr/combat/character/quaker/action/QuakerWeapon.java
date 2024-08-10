@@ -26,7 +26,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     /** 휘두르는 방향의 시계 방향 여부 */
     private boolean isClockwise = true;
 
-    QuakerWeapon(@NonNull CombatUser combatUser) {
+    public QuakerWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerWeaponInfo.getInstance());
     }
 

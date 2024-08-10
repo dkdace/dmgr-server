@@ -26,7 +26,7 @@ import org.bukkit.block.Block;
 import java.util.function.Predicate;
 
 public final class ArkaceA1 extends ActiveSkill {
-    ArkaceA1(@NonNull CombatUser combatUser) {
+    public ArkaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceA1Info.getInstance(), 1);
     }
 

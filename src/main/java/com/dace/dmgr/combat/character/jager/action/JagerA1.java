@@ -33,8 +33,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     @Nullable
     private JagerA1Entity summonEntity = null;
 
-
-    JagerA1(@NonNull CombatUser combatUser) {
+    public JagerA1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA1Info.getInstance(), 0);
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
     }

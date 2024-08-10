@@ -39,7 +39,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     @NonNull
     private final FullAutoModule fullAutoModule;
 
-    InfernoWeapon(@NonNull CombatUser combatUser) {
+    public InfernoWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);

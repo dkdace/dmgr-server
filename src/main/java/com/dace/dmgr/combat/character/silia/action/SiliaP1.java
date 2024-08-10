@@ -13,7 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
-    SiliaP1(@NonNull CombatUser combatUser) {
+    public SiliaP1(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaP1Info.getInstance());
     }
 
