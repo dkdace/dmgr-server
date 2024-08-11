@@ -179,7 +179,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity,
                     owner.getName() + "의 설랑",
                     owner,
-                    false,
+                    true, false,
                     new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
             );
             knockbackModule = new KnockbackModule(this);

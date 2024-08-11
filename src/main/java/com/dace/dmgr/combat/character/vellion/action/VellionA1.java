@@ -190,7 +190,7 @@ public final class VellionA1 extends ActiveSkill {
                     entity,
                     owner.getName() + "의 마력 응집체",
                     owner,
-                    true,
+                    false, true,
                     new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
             );
 

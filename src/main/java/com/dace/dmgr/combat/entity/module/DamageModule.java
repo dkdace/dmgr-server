@@ -11,7 +11,9 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -106,7 +108,7 @@ public class DamageModule {
         setHealth(getMaxHealth());
 
         if (isShowHealthBar)
-            addHealthHologram();
+            TaskUtil.addTask(combatEntity, new DelayTask(this::addHealthHologram, 5));
     }
 
     /**
