@@ -71,8 +71,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override

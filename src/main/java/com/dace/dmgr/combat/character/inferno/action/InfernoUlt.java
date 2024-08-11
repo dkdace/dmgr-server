@@ -33,8 +33,8 @@ public final class InfernoUlt extends UltimateSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished() &&
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished() &&
                 combatUser.getSkill(InfernoA2Info.getInstance()).isDurationFinished();
     }
 

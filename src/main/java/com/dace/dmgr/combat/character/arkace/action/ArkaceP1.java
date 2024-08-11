@@ -35,8 +35,8 @@ public final class ArkaceP1 extends AbstractSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading() &&
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading() &&
                 CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) == 0;
     }
 

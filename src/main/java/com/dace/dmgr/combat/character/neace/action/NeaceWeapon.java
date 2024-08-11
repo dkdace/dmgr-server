@@ -55,8 +55,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

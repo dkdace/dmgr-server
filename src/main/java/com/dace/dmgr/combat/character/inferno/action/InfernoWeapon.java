@@ -56,6 +56,11 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {

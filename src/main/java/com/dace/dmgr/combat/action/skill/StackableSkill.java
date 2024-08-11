@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
@@ -46,8 +47,8 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && stack > 0;
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && stack > 0;
     }
 
     @Override

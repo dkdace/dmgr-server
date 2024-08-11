@@ -14,6 +14,8 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -41,12 +43,12 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     public long getDefaultCooldown() {
-        return JagerWeaponInfo.SCOPE.COOLDOWN;
+        return JagerWeaponInfo.COOLDOWN;
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && mainWeapon.canUse();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
     }
 
     @Override
@@ -105,7 +107,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
             return;
 
         onCancelled();
-        mainWeapon.getReloadModule().reload();
+        TaskUtil.addTask(taskRunner, new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown()));
     }
 
     @Override
