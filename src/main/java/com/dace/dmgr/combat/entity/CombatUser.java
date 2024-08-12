@@ -243,8 +243,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         super.activate();
 
         for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
-            if (combatEntity instanceof Damageable && combatEntity.isEnemy(this))
+            if (combatEntity instanceof Damageable && combatEntity.isEnemy(this)) {
                 HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, false, entity);
+                HologramUtil.setHologramVisibility(SummonEntity.NAMETAG_HOLOGRAM_ID + combatEntity, false, entity);
+            }
 
             if (combatEntity instanceof CombatUser)
                 HologramUtil.setHologramVisibility(combatEntity.getEntity().getName(), false, entity);
@@ -950,7 +952,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, Cooldown.RESPAWN.duration);
+        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : Cooldown.RESPAWN.duration);
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
@@ -1314,7 +1316,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN))
                 return;
 
-            if (action instanceof MeleeAttackAction && action.canUse()) {
+            if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
                 action.onUse(actionKey);
                 return;
             }
@@ -1339,7 +1341,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
         if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
             handleUseFullAutoWeapon(actionKey, weapon);
-        else if (weapon.canUse())
+        else if (weapon.canUse(actionKey))
             weapon.onUse(actionKey);
     }
 
@@ -1368,7 +1370,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id) == 0)
                         return false;
 
-                    if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
+                    if (weapon.canUse(actionKey) && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
                         j++;
                         weapon.onUse(actionKey);
                     }
@@ -1387,7 +1389,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse() || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
+        if (!skill.canUse(actionKey) || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
             return;
 
         skill.onUse(actionKey);

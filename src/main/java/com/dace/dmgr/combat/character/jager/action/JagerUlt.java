@@ -21,7 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -50,8 +50,8 @@ public final class JagerUlt extends UltimateSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -121,7 +121,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onDestroy() {
-            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, getLocation());
+            ArmorStand magmaCube = CombatUtil.spawnEntity(ArmorStand.class, getLocation());
             summonEntity = new JagerUltEntity(magmaCube, combatUser);
             summonEntity.activate();
         }
@@ -131,7 +131,7 @@ public final class JagerUlt extends UltimateSkill {
      * 눈폭풍 발생기 클래스.
      */
     @Getter
-    public final class JagerUltEntity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
+    public final class JagerUltEntity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;
@@ -148,12 +148,12 @@ public final class JagerUlt extends UltimateSkill {
         @NonNull
         private final ReadyTimeModule readyTimeModule;
 
-        private JagerUltEntity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
+        private JagerUltEntity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
             super(
                     entity,
                     owner.getName() + "의 눈폭풍 발생기",
                     owner,
-                    true,
+                    true, true,
                     new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
             );
             knockbackModule = new KnockbackModule(this, 2);
@@ -167,10 +167,14 @@ public final class JagerUlt extends UltimateSkill {
 
         private void onInit() {
             entity.setAI(false);
-            entity.setSize(1);
+            entity.setGravity(false);
             entity.setSilent(true);
             entity.setInvulnerable(true);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
+            entity.setMarker(true);
+            entity.setSmall(true);
+            entity.setVisible(false);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
+                    false), true);
             damageModule.setMaxHealth(JagerUltInfo.HEALTH);
             damageModule.setHealth(JagerUltInfo.HEALTH);
 

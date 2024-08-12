@@ -8,7 +8,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (1.1 * 20);
     /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
+    public static final int GLOBAL_COOLDOWN = (int) (0.3 * 20);
     /** 피해량 */
     public static final int DAMAGE = 320;
     /** 사거리 (단위: 블록) */

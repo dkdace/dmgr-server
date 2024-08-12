@@ -54,8 +54,8 @@ public final class VellionA1 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -190,7 +190,7 @@ public final class VellionA1 extends ActiveSkill {
                     entity,
                     owner.getName() + "의 마력 응집체",
                     owner,
-                    true,
+                    false, true,
                     new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
             );
 

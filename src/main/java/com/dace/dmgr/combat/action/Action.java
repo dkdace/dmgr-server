@@ -95,9 +95,10 @@ public interface Action extends Disposable {
     /**
      * 동작을 사용할 수 있는 지 확인한다.
      *
+     * @param actionKey 사용 키
      * @return 사용 가능 여부
      */
-    boolean canUse();
+    boolean canUse(@NonNull ActionKey actionKey);
 
     /**
      * 동작 사용 시 실행할 작업.

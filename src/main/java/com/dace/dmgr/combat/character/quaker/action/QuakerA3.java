@@ -46,8 +46,8 @@ public final class QuakerA3 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

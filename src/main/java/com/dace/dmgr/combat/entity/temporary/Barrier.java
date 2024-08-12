@@ -47,7 +47,7 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected Barrier(@NonNull T entity, @NonNull String name, @NonNull CombatUser owner, int score, int maxHealth, @NonNull Hitbox @NonNull ... hitboxes) {
-        super(entity, name, owner, false, hitboxes);
+        super(entity, name, owner, false, false, hitboxes);
 
         knockbackModule = new KnockbackModule(this, 2);
         statusEffectModule = new StatusEffectModule(this, 2);

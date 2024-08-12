@@ -44,8 +44,8 @@ public final class SiliaP2 extends AbstractSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && canActivate();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && canActivate();
     }
 
     /**

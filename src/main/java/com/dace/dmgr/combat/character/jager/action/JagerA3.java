@@ -36,9 +36,14 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
+    public int getPriority() {
+        return 2;
+    }
+
+    @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+        return new ActionKey[]{ActionKey.SLOT_3, ActionKey.LEFT_CLICK};
     }
 
     @Override
@@ -52,16 +57,18 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().onCancelled();
-
         if (isDurationFinished()) {
+            if (actionKey != ActionKey.SLOT_3)
+                return;
+
             setDuration();
+            combatUser.getWeapon().onCancelled();
             combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             combatUser.getWeapon().setVisible(false);
 
@@ -93,6 +100,8 @@ public final class JagerA3 extends ActiveSkill {
                 }, 1, JagerA3Info.EXPLODE_DURATION));
             }, JagerA3Info.READY_DURATION));
         } else {
+            combatUser.getWeapon().setCooldown(2);
+
             Location loc = combatUser.getArmLocation(true);
             new JagerA3Projectile().shoot(loc);
 

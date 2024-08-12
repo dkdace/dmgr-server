@@ -52,9 +52,9 @@ public final class MeleeAttackAction extends AbstractAction {
     }
 
     @Override
-    public boolean canUse() {
+    public boolean canUse(@NonNull ActionKey actionKey) {
         Validate.notNull(combatUser.getCharacterType());
-        return super.canUse() && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser) && combatUser.isGlobalCooldownFinished();
+        return super.canUse(actionKey) && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser) && combatUser.isGlobalCooldownFinished();
     }
 
     @Override

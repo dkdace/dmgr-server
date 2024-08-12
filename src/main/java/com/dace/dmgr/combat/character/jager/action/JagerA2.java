@@ -25,7 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -55,8 +55,8 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
@@ -99,11 +99,42 @@ public final class JagerA2 extends ActiveSkill {
             summonEntity.dispose();
     }
 
+    private final class JagerA2Projectile extends BouncingProjectile {
+        private JagerA2Projectile() {
+            super(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
+                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
+                    .destroyOnHitFloor(true).build());
+        }
+
+        @Override
+        protected void onTrailInterval() {
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 17,
+                    0.7, 0, 0.7, 120, 120, 135);
+        }
+
+        @Override
+        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
+            return false;
+        }
+
+        @Override
+        protected void onDestroy() {
+            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, getLocation());
+            summonEntity = new JagerA2Entity(armorStand, combatUser);
+            summonEntity.activate();
+        }
+    }
+
     /**
      * 곰덫 클래스.
      */
     @Getter
-    public final class JagerA2Entity extends SummonEntity<MagmaCube> implements HasReadyTime, Damageable, Attacker {
+    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;
@@ -120,12 +151,12 @@ public final class JagerA2 extends ActiveSkill {
         @NonNull
         private final ReadyTimeModule readyTimeModule;
 
-        private JagerA2Entity(@NonNull MagmaCube entity, @NonNull CombatUser owner) {
+        private JagerA2Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
             super(
                     entity,
                     owner.getName() + "의 곰덫",
                     owner,
-                    true,
+                    true, true,
                     new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
             );
             knockbackModule = new KnockbackModule(this, 2);
@@ -139,10 +170,13 @@ public final class JagerA2 extends ActiveSkill {
 
         private void onInit() {
             entity.setAI(false);
-            entity.setSize(1);
-            entity.setSilent(true);
             entity.setInvulnerable(true);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
+            entity.setSilent(true);
+            entity.setMarker(true);
+            entity.setSmall(true);
+            entity.setVisible(false);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
+                    false), true);
             entity.teleport(entity.getLocation().add(0, 0.05, 0));
             damageModule.setMaxHealth(JagerA2Info.HEALTH);
             damageModule.setHealth(JagerA2Info.HEALTH);
@@ -251,37 +285,6 @@ public final class JagerA2 extends ActiveSkill {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DEATH, entity.getLocation());
-        }
-    }
-
-    private final class JagerA2Projectile extends BouncingProjectile {
-        private JagerA2Projectile() {
-            super(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
-                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
-                    .destroyOnHitFloor(true).build());
-        }
-
-        @Override
-        protected void onTrailInterval() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 17,
-                    0.7, 0, 0.7, 120, 120, 135);
-        }
-
-        @Override
-        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            MagmaCube magmaCube = CombatUtil.spawnEntity(MagmaCube.class, getLocation());
-            summonEntity = new JagerA2Entity(magmaCube, combatUser);
-            summonEntity.activate();
         }
     }
 }

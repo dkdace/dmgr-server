@@ -33,8 +33,8 @@ public final class NeaceP1 extends AbstractSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) == 0;
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) == 0;
     }
 
     @Override

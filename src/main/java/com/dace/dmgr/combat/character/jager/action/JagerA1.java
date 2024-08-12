@@ -71,8 +71,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -135,7 +135,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         setDuration();
         confirmModule.toggleCheck();
-        combatUser.getWeapon().setCooldown(1);
+        combatUser.getWeapon().setCooldown(2);
 
         Wolf wolf = CombatUtil.spawnEntity(Wolf.class, confirmModule.getCurrentLocation());
         summonEntity = new JagerA1Entity(wolf, combatUser);
@@ -179,7 +179,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity,
                     owner.getName() + "의 설랑",
                     owner,
-                    false,
+                    true, false,
                     new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
             );
             knockbackModule = new KnockbackModule(this);

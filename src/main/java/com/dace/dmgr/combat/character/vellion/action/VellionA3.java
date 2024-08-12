@@ -58,8 +58,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished();
     }
 
     @Override

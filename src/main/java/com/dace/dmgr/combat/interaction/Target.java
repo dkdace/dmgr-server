@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.interaction;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
@@ -46,9 +45,6 @@ public abstract class Target extends Hitscan {
 
     @Override
     protected final boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-        if (!LocationUtil.canPass(((CombatUser) shooter).getEntity().getEyeLocation(), target.getCenterLocation()))
-            return true;
-
         currentTarget = target;
         onFindEntity(target);
 

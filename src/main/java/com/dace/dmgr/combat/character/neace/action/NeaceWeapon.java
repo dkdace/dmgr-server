@@ -55,8 +55,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -137,6 +137,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
             NeaceWeapon.this.target = (Healable) target;
+            CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
             TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed() &&
                     CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0 &&

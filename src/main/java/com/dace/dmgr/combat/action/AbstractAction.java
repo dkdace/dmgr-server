@@ -115,7 +115,7 @@ public abstract class AbstractAction implements Action {
     }
 
     @Override
-    public boolean canUse() {
+    public boolean canUse(@NonNull ActionKey actionKey) {
         return isCooldownFinished();
     }
 

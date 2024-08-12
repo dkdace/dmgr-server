@@ -40,8 +40,6 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      */
     @UtilityClass
     public static class SCOPE {
-        /** 쿨타임 (tick) */
-        public static final long COOLDOWN = (long) (0.25 * 20);
         /** 피해량 */
         public static final int DAMAGE = 240;
         /** 피해량 감소 시작 거리 (단위: 블록) */

@@ -44,8 +44,8 @@ public final class SiliaWeapon extends AbstractWeapon {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
