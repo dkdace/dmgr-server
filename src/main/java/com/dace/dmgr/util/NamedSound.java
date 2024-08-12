@@ -86,6 +86,10 @@ public enum NamedSound {
     ),
     /** 전투 - 총알 - 블록 타격 */
     COMBAT_GUN_HIT_BLOCK(new DefinedSound("random.gun.ricochet", 0.8, 0.975, 0.05)),
+    /** 전투 - 총기 탄피 */
+    COMBAT_GUN_SHELL_DROP(new DefinedSound(Sound.ENTITY_MAGMACUBE_JUMP, 0.8, 1, 0.1)),
+    /** 전투 - 산탄총 탄피 */
+    COMBAT_SHOTGUN_SHELL_DROP(new DefinedSound(Sound.ENTITY_ZOMBIE_HORSE_DEATH, 1, 1, 0.1)),
     /** 전투 - 엔티티 소환 */
     COMBAT_ENTITY_SUMMON(new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.8, 1)),
     /** 전투 - 투척 */
