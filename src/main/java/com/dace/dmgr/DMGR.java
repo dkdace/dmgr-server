@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -42,9 +43,8 @@ public class DMGR extends JavaPlugin {
     @Getter
     private static final Random random = new Random();
     /** 기본 월드 객체 */
-    @NonNull
-    @Getter
-    private static final World defaultWorld = Bukkit.getWorld("DMGR");
+    @Nullable
+    private static World defaultWorld;
 
     /** 탭리스트 관리 객체 */
     private static Tabbed tabbed = null;
@@ -52,6 +52,14 @@ public class DMGR extends JavaPlugin {
     private static HolographicDisplaysAPI holographicDisplaysAPI = null;
     /** 스킨 API 객체 */
     private static SkinsRestorerAPI skinsRestorerAPI = null;
+
+    @NonNull
+    public static World getDefaultWorld() {
+        if (defaultWorld == null)
+            throw new IllegalStateException("아직 기본 월드에 접근할 수 없음");
+
+        return defaultWorld;
+    }
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -127,6 +135,7 @@ public class DMGR extends JavaPlugin {
         clearUnusedEntities();
         WorldUtil.clearDuplicatedWorlds();
 
+        defaultWorld = Bukkit.getWorld("DMGR");
         registerCommands();
         registerTestCommands();
 
