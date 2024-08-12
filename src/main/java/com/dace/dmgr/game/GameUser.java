@@ -217,6 +217,9 @@ public final class GameUser implements Disposable {
 
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
+        player.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
+        player.getInventory().setItem(10, CommunicationItem.SHOW_ULT.guiItem.getItemStack());
+        player.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
         user.teleport(getRespawnLocation());
         user.clearChat();
         HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
@@ -355,8 +358,7 @@ public final class GameUser implements Disposable {
     /**
      * 의사소통 GUI 아이템 목록.
      */
-    @Getter
-    public enum CommunicationItem {
+    private enum CommunicationItem {
         /** 치료 요청 */
         REQ_HEAL("§a치료 요청", (target, targetCombatUser) -> {
             Validate.notNull(targetCombatUser.getCharacterType());
@@ -402,7 +404,6 @@ public final class GameUser implements Disposable {
         /** 쿨타임 ID */
         private static final String COOLDOWN_ID = "Communication";
         /** GUI 아이템 객체 */
-        @NonNull
         private final GuiItem guiItem;
 
         CommunicationItem(String name, BiFunction<GameUser, CombatUser, String> action) {
@@ -418,7 +419,7 @@ public final class GameUser implements Disposable {
 
                     User user = User.fromPlayer(player);
                     CombatUser combatUser = CombatUser.fromUser(user);
-                    if (combatUser == null)
+                    if (combatUser == null || !combatUser.isActivated())
                         return false;
                     GameUser gameUser = GameUser.fromUser(user);
                     if (gameUser == null || gameUser.getTeam() == null)

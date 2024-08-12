@@ -1210,9 +1210,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setMaxHealth(realCharacter.getHealth());
         damageModule.setHealth(realCharacter.getHealth());
         moveModule.getSpeedStatus().setBaseValue(DEFAULT_SPEED * realCharacter.getSpeedMultiplier());
-        entity.getInventory().setItem(9, GameUser.CommunicationItem.REQ_HEAL.getGuiItem().getItemStack());
-        entity.getInventory().setItem(10, GameUser.CommunicationItem.SHOW_ULT.getGuiItem().getItemStack());
-        entity.getInventory().setItem(11, GameUser.CommunicationItem.REQ_RALLY.getGuiItem().getItemStack());
 
         double hitboxMultiplier = realCharacter.getHitboxMultiplier();
         for (Hitbox hitbox : hitboxes)
