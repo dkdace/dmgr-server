@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -84,7 +83,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-2, 6, isOpposite);
 
-        HashSet<CombatEntity> targets = new HashSet<>();
+        HashSet<Damageable> targets = new HashSet<>();
 
         int delay = 0;
         for (int i = 0; i < 8; i++) {
@@ -179,9 +178,9 @@ public final class SiliaWeapon extends AbstractWeapon {
     }
 
     private final class SiliaWeaponStrikeAttack extends Hitscan {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private SiliaWeaponStrikeAttack(CombatUser combatUser, HashSet<CombatEntity> targets) {
+        private SiliaWeaponStrikeAttack(CombatUser combatUser, HashSet<Damageable> targets) {
             super(combatUser, HitscanOption.builder().trailInterval(5).size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE)
                     .condition(combatUser::isEnemy).build());
             this.targets = targets;

@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -121,7 +120,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
 
-        HashSet<CombatEntity> targets = new HashSet<>();
+        HashSet<Damageable> targets = new HashSet<>();
         Vector vector = VectorUtil.getPitchAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -181,9 +180,9 @@ public final class QuakerA2 extends ActiveSkill {
     }
 
     private final class QuakerA2Projectile extends GroundProjectile {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private QuakerA2Projectile(HashSet<CombatEntity> targets) {
+        private QuakerA2Projectile(HashSet<Damageable> targets) {
             super(combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(QuakerA2Info.SIZE)
                     .maxDistance(QuakerA2Info.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;

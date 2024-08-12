@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -61,7 +60,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A1_USE, location);
 
-        HashSet<CombatEntity> targets = new HashSet<>();
+        HashSet<Damageable> targets = new HashSet<>();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
@@ -101,9 +100,9 @@ public final class SiliaA1 extends ActiveSkill {
     }
 
     private final class SiliaA1Attack extends Hitscan {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private SiliaA1Attack(HashSet<CombatEntity> targets) {
+        private SiliaA1Attack(HashSet<Damageable> targets) {
             super(combatUser, HitscanOption.builder().trailInterval(12).maxDistance(SiliaA1Info.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;
         }

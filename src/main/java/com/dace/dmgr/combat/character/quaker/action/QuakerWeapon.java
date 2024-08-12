@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -55,7 +54,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
-            HashSet<CombatEntity> targets = new HashSet<>();
+            HashSet<Damageable> targets = new HashSet<>();
 
             int delay = 0;
             for (int i = 0; i < 8; i++) {
@@ -93,9 +92,9 @@ public final class QuakerWeapon extends AbstractWeapon {
     }
 
     private class QuakerWeaponAttack extends Hitscan {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private QuakerWeaponAttack(HashSet<CombatEntity> targets) {
+        private QuakerWeaponAttack(HashSet<Damageable> targets) {
             super(combatUser, HitscanOption.builder().trailInterval(6).size(QuakerWeaponInfo.SIZE).maxDistance(QuakerWeaponInfo.DISTANCE)
                     .condition(combatUser::isEnemy).build());
             this.targets = targets;

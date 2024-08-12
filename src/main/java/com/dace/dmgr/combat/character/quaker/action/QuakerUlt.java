@@ -4,7 +4,6 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -119,7 +118,7 @@ public final class QuakerUlt extends UltimateSkill {
         ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
                 0.2, 0.2, 0.2, 0.6);
 
-        HashSet<CombatEntity> targets = new HashSet<>();
+        HashSet<Damageable> targets = new HashSet<>();
         Vector vector = VectorUtil.getPitchAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -183,9 +182,9 @@ public final class QuakerUlt extends UltimateSkill {
     }
 
     private final class QuakerUltProjectile extends Projectile {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private QuakerUltProjectile(HashSet<CombatEntity> targets) {
+        private QuakerUltProjectile(HashSet<Damageable> targets) {
             super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(QuakerUltInfo.SIZE)
                     .maxDistance(QuakerUltInfo.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;

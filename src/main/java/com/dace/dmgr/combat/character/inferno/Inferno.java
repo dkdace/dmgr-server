@@ -150,7 +150,7 @@ public final class Inferno extends Vanguard {
         if (!(victim instanceof CombatUser))
             return;
 
-        InfernoUlt skillUlt = (InfernoUlt) attacker.getSkill(InfernoUltInfo.getInstance());
+        InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
 
         if (score < 100 && CooldownUtil.getCooldown(attacker, InfernoA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
             attacker.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE);
