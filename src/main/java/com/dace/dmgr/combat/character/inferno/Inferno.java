@@ -99,11 +99,14 @@ public final class Inferno extends Vanguard {
     public String getActionbarString(@NonNull CombatUser combatUser) {
         InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
         InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
+        InfernoA2 skill2 = combatUser.getSkill(InfernoA2Info.getInstance());
         InfernoUlt skill4 = combatUser.getSkill(InfernoUltInfo.getInstance());
 
         int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
         double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
         double skillp1MaxDuration = InfernoP1Info.DURATION / 20.0;
+        double skill2Duration = skill2.getDuration() / 20.0;
+        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
         double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
 
@@ -118,6 +121,11 @@ public final class Inferno extends Vanguard {
             String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(), skillp1Duration,
                     skillp1MaxDuration, 10, '■');
             text.add(skillp1Display);
+        }
+        if (!skill2.isDurationFinished()) {
+            String skill2Display = StringFormUtil.getActionbarDurationBar(InfernoA2Info.getInstance().toString(), skill2Duration,
+                    skill2MaxDuration, 10, '■');
+            text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(InfernoUltInfo.getInstance().toString(), skill4Duration,
