@@ -72,6 +72,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 break;
             }
             case RIGHT_CLICK: {
+                setCooldown(2);
                 onCancelled();
 
                 break;

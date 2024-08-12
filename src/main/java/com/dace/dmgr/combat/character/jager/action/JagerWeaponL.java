@@ -87,7 +87,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 break;
             }
             case RIGHT_CLICK: {
+                setCooldown(2);
                 onCancelled();
+
                 aimModule.toggleAim();
                 swapModule.swap();
 
@@ -210,6 +212,12 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 137, 185, 240);
+        }
+
+        @Override
+        protected void onHit() {
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 10, 0.25, 0.25, 0.25,
+                    137, 185, 240);
         }
 
         @Override
