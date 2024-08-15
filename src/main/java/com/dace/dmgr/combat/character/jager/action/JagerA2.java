@@ -160,7 +160,7 @@ public final class JagerA2 extends ActiveSkill {
                     new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
             );
             knockbackModule = new KnockbackModule(this, 2);
-            statusEffectModule = new StatusEffectModule(this, 2);
+            statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
             damageModule = new DamageModule(this, false, true, false, JagerA2Info.DEATH_SCORE, JagerA2Info.HEALTH);
             readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
@@ -208,7 +208,7 @@ public final class JagerA2 extends ActiveSkill {
             if (!readyTimeModule.isReady())
                 return;
 
-            Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), 0.8,
+            Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation().add(0, 0.5, 0), 0.8,
                     combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
                             combatEntity.isEnemy(this));
             if (target != null)

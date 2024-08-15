@@ -50,7 +50,7 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
         super(entity, name, owner, false, false, hitboxes);
 
         knockbackModule = new KnockbackModule(this, 2);
-        statusEffectModule = new StatusEffectModule(this, 2);
+        statusEffectModule = new StatusEffectModule(this);
         damageModule = new DamageModule(this, false, false, false, score, maxHealth);
     }
 
