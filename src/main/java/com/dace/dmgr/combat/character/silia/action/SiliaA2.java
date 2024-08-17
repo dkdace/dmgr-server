@@ -140,7 +140,7 @@ public final class SiliaA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.END_ROD, loc2.add(0, 1, 0), 3, 0, 0, 0, 0.05);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, getLocation());
 
-                if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()) &&
+                if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc) &&
                         (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                     combatUser.getMoveModule().teleport(loc);
                     combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
