@@ -214,7 +214,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                 if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, getLocation(),
                         SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                     target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()).multiply(SiliaT2Info.KNOCKBACK));
-                    if (target instanceof CombatUser)
+                    if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
                         combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }
 
