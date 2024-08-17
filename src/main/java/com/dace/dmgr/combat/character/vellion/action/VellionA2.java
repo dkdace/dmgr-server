@@ -125,8 +125,8 @@ public final class VellionA2 extends ActiveSkill {
 
     private final class VellionTarget extends Target {
         private VellionTarget() {
-            super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> ((Damageable) combatEntity).getDamageModule().isLiving() &&
-                    combatEntity.isEnemy(VellionA2.this.combatUser) &&
+            super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionA2.this.combatUser) &&
                     !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark));
         }
 
