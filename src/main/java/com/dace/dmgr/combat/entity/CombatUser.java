@@ -290,23 +290,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setLowHealthScreenEffect(damageModule.isLowHealth() || isDead());
         setCanSprint();
         adjustWalkSpeed();
-        changeFov(fovValue);
-    }
-
-    /**
-     * 플레이어의 시야각을 변경한다.
-     *
-     * @param value 값
-     */
-    private void changeFov(double value) {
-        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
-
-        packet.setCanFly(isActivated && canFly());
-        packet.setFlying(entity.isFlying());
-        packet.setWalkingSpeed((float) (moveModule.getSpeedStatus().getValue() * 2 * value));
-        packet.setFlyingSpeed(entity.getFlySpeed());
-
-        packet.sendPacket(entity);
     }
 
     /**
@@ -696,7 +679,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt) {
         Validate.notNull(character);
 
-        isUlt = isUlt && skillMap.get(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
+        isUlt = isUlt && getSkill(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
 
         if (target.getDamageModule().isUltProvider() && isUlt) {
             int ultAmount = amount;
@@ -889,6 +872,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return;
         Validate.notNull(character);
         Validate.notNull(characterRecord);
+        Validate.notNull(weapon);
 
         if (CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id) > 0)
             return;
@@ -970,6 +954,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }, isCancelled -> {
             damageModule.setHealth(damageModule.getMaxHealth());
             damageModule.clearShield();
+            statusEffectModule.clearStatusEffect();
             entity.setGameMode(GameMode.SURVIVAL);
 
             weapon.reset();
@@ -1163,7 +1148,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (value == 1) {
             value = 0.999;
-            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
             if (!skill.isCooldownFinished())
                 skill.setCooldown(0);
         }
@@ -1181,7 +1166,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void addUltGaugePercent(double value) {
         Validate.notNull(character);
 
-        Skill skill = skillMap.get(character.getUltimateSkillInfo());
+        UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
         if (skill.isDurationFinished())
             setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
@@ -1245,7 +1230,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         fovValue = 0;
         damageModule.clearShield();
-        changeFov(0);
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
 
