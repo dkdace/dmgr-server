@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 7000;
+    public static final int COST = 6500;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.8 * 20);
     /** 시전 시간 (tick) */

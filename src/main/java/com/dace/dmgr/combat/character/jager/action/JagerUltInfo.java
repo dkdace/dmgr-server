@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 9000;
+    public static final int COST = 10000;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 투사체 속력 (단위: 블록/s) */

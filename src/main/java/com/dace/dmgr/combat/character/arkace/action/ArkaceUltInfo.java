@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 7000;
+    public static final int COST = 7500;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) 12 * 20;
 
