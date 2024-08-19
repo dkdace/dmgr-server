@@ -52,7 +52,7 @@ public final class NeaceA2 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A2_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (isDurationFinished())
+                if (isDurationFinished() || combatUser.isDead())
                     return false;
 
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 3,

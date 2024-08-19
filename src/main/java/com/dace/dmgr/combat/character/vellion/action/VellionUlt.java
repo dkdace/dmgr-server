@@ -131,6 +131,9 @@ public final class VellionUlt extends UltimateSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (combatUser.isDead())
+                return false;
+
             if (i % 4 == 0)
                 new VellionUltArea().emit(combatUser.getEntity().getEyeLocation());
 
@@ -182,10 +185,12 @@ public final class VellionUlt extends UltimateSkill {
                 if (j > 0 && j % 10 == 0)
                     ParticleUtil.play(Particle.SPELL_WITCH, loc2.clone().add(0, 2.5, 0), 20, 0, 2, 0, 0);
                 else {
-                    ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc2,
-                            1, 0, 0, 0, 0);
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                            (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
+                    if (i > 20)
+                        ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc2,
+                                1, 0, 0, 0, 0);
+                    else
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
+                                (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
                 }
             }
         }

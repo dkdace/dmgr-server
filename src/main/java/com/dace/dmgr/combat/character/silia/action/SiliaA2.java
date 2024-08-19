@@ -133,7 +133,7 @@ public final class SiliaA2 extends ActiveSkill {
                     SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                 target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
-                Location loc = target.getEntity().getLocation();
+                Location loc = target.getEntity().getLocation().add(0, 0.1, 0);
                 loc.setPitch(0);
                 loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
                 for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))

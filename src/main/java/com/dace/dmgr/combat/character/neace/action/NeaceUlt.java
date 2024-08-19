@@ -131,6 +131,9 @@ public final class NeaceUlt extends UltimateSkill {
                 255, 255, 255, FireworkEffect.Type.STAR, true, false);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (combatUser.isDead())
+                return false;
+
             Location loc = combatUser.getEntity().getEyeLocation();
             new NeaceUltArea().emit(loc);
 
