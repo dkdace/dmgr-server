@@ -9,7 +9,7 @@ public final class SiliaT2Info extends TraitInfo {
     /** 피해량 */
     public static final int DAMAGE = 350;
     /** 사거리 (단위: 블록) */
-    public static final double DISTANCE = 3.5;
+    public static final double DISTANCE = 3.7;
     /** 판정 크기 (단위: 블록) */
     public static final double SIZE = 0.5;
     /** 넉백 강도 */
