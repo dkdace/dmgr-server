@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -132,7 +130,7 @@ public final class QuakerA3 extends ActiveSkill {
         private final HashSet<Damageable> targets = new HashSet<>();
 
         private QuakerA3Projectile() {
-            super(combatUser, QuakerA3Info.VELOCITY, ProjectileOption.builder().trailInterval(15).size(QuakerA3Info.SIZE)
+            super(combatUser, QuakerA3Info.VELOCITY, ProjectileOption.builder().trailInterval(16).size(QuakerA3Info.SIZE)
                     .maxDistance(QuakerA3Info.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
@@ -147,46 +145,51 @@ public final class QuakerA3 extends ActiveSkill {
                 new QuakerA3Effect().shoot(loc, vec);
 
                 Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.2);
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.4);
             }
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, getLocation());
+        }
 
-            CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), getLocation(), size, condition);
-            new QuakerA3Area(areaTargets.length).emit(getLocation());
+        @Override
+        protected void onHit() {
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 50, 0.2, 0.2, 0.2, 0.4);
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            onImpact(getLocation());
-
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, getLocation());
             CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 5);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 50, 0.2, 0.2, 0.2, 0.4);
-
             return false;
         }
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            return !(target instanceof Barrier);
-        }
+            if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, getLocation(), false, true) ||
+                    target.getKnockbackModule().getResistanceStatus().getValue() < 2) {
+                Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
+                TaskUtil.addTask(QuakerA3.this, new IntervalTask(i -> {
+                    if (!target.canBeTargeted() || target.isDisposed())
+                        return false;
 
-        private void onImpact(@NonNull Location location) {
-            for (Damageable target : targets) {
-                if (target.getNearestLocationOfHitboxes(location).distance(location) < QuakerA3Info.SIZE &&
-                        target.getDamageModule().damage(this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location, false, true) &&
-                        target instanceof CombatUser)
-                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
+                    target.getKnockbackModule().knockback(vec, true);
+
+                    new QuakerA3Area().emit(target.getCenterLocation());
+
+                    for (int j = 0; j < 5; j++) {
+                        Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);
+                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 0.6);
+                    }
+
+                    return true;
+                }, 1, 8));
             }
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
+            return false;
         }
 
         private final class QuakerA3Area extends Area {
-            private final int targetCount;
-
-            private QuakerA3Area(int targetCount) {
-                super(combatUser, QuakerA3Info.SIZE, QuakerA3Projectile.this.condition);
-                this.targetCount = targetCount;
+            private QuakerA3Area() {
+                super(combatUser, QuakerA3Info.RADIUS, QuakerA3Projectile.this.condition);
             }
 
             @Override
@@ -196,12 +199,18 @@ public final class QuakerA3 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (targets.add(target) && targetCount > 1) {
-                    onImpact(location);
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(QuakerA3Projectile.this, QuakerA3Info.DAMAGE, DamageType.NORMAL, getLocation(),
+                            false, true)) {
+                        target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK * 0.5));
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
+                        if (target instanceof CombatUser)
+                            combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
+                    }
+
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
                 }
-                target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 return !(target instanceof Barrier);
             }
