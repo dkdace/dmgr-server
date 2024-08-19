@@ -101,7 +101,7 @@ public final class JagerA2 extends ActiveSkill {
 
     private final class JagerA2Projectile extends BouncingProjectile {
         private JagerA2Projectile() {
-            super(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
+            super(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).duration(100).hasGravity(true)
                     .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }

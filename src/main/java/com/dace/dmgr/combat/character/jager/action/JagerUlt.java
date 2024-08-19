@@ -98,7 +98,7 @@ public final class JagerUlt extends UltimateSkill {
 
     private final class JagerUltProjectile extends BouncingProjectile {
         private JagerUltProjectile() {
-            super(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).hasGravity(true)
+            super(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).duration(100).hasGravity(true)
                     .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
                     .destroyOnHitFloor(true).build());
         }
