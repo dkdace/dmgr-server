@@ -73,6 +73,13 @@ public abstract class ActiveSkill extends AbstractSkill {
 
     @Override
     @MustBeInvokedByOverriders
+    public void reset() {
+        super.reset();
+        setDuration(0);
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
     public void dispose() {
         super.dispose();
 

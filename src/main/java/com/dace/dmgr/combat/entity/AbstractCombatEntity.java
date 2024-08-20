@@ -118,6 +118,12 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     @NonNull
+    public final Location getHitboxLocation() {
+        return hitboxLocation.clone();
+    }
+
+    @Override
+    @NonNull
     public final Location getCenterLocation() {
         return entity.getLocation().add(0, entity.getHeight() / 2, 0);
     }
