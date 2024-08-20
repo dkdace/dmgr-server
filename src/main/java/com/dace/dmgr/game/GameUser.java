@@ -214,6 +214,7 @@ public final class GameUser implements Disposable {
      */
     public void onGameStart() {
         validate();
+        Validate.notNull(team);
 
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
@@ -231,10 +232,7 @@ public final class GameUser implements Disposable {
         if (combatUser == null)
             combatUser = new CombatUser(this);
 
-        for (GameUser target : game.getGameUsers()) {
-            if (target.team != team)
-                continue;
-
+        for (GameUser target : team.getTeamUsers()) {
             GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
             if (target != this)
                 HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, target.player);

@@ -243,9 +243,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         super.activate();
 
         for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
-            if (combatEntity instanceof Damageable && combatEntity.isEnemy(this)) {
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, false, entity);
-                HologramUtil.setHologramVisibility(SummonEntity.NAMETAG_HOLOGRAM_ID + combatEntity, false, entity);
+            if (combatEntity instanceof Damageable) {
+                if (combatEntity != this)
+                    HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, !combatEntity.isEnemy(this), entity);
+                if (combatEntity instanceof SummonEntity && combatEntity.isEnemy(this))
+                    HologramUtil.setHologramVisibility(SummonEntity.NAMETAG_HOLOGRAM_ID + combatEntity, false, entity);
             }
 
             if (combatEntity instanceof CombatUser)
@@ -269,12 +271,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (!entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                    Integer.MAX_VALUE, 40, false, false), true);
+                    Integer.MAX_VALUE, 39, false, false), true);
 
             WrapperPlayServerEntityEffect packet = new WrapperPlayServerEntityEffect();
             packet.setEntityID(entity.getEntityId());
             packet.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
-            packet.setAmplifier((byte) 40);
+            packet.setAmplifier((byte) 39);
             packet.setDuration(-1);
             packet.setHideParticles(true);
             packet.broadcastPacket();
