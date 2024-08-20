@@ -77,11 +77,12 @@ public final class UserData extends YamlFile {
      * 유저 데이터 정보 인스턴스를 생성한다.
      *
      * @param playerUUID 대상 플레이어 UUID
+     * @param playerName 대상 플레이어 이름
      */
-    private UserData(@NonNull UUID playerUUID) {
+    private UserData(@NonNull UUID playerUUID, @NonNull String playerName) {
         super("User/" + playerUUID);
         this.playerUUID = playerUUID;
-        this.playerName = Bukkit.getOfflinePlayer(playerUUID).getName();
+        this.playerName = playerName;
         for (CharacterType characterType : CharacterType.values())
             characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
@@ -109,7 +110,7 @@ public final class UserData extends YamlFile {
     public static UserData fromUUID(@NonNull UUID playerUUID) {
         UserData userData = UserDataRegistry.getInstance().get(playerUUID);
         if (userData == null)
-            userData = new UserData(playerUUID);
+            userData = new UserData(playerUUID, Bukkit.getOfflinePlayer(playerUUID).getName());
 
         return userData;
     }
