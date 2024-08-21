@@ -1,12 +1,11 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
@@ -25,7 +24,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     /** 휘두르는 방향의 시계 방향 여부 */
     private boolean isClockwise = true;
 
-    QuakerWeapon(@NonNull CombatUser combatUser) {
+    public QuakerWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerWeaponInfo.getInstance());
     }
 
@@ -41,8 +40,8 @@ public final class QuakerWeapon extends AbstractWeapon {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -54,23 +53,16 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
-            HashSet<CombatEntity> targets = new HashSet<>();
+            HashSet<Damageable> targets = new HashSet<>();
 
             int delay = 0;
             for (int i = 0; i < 8; i++) {
-                final int index = i;
+                int index = i;
 
-                switch (i) {
-                    case 1:
-                        delay += 2;
-                        break;
-                    case 2:
-                    case 4:
-                    case 6:
-                    case 7:
-                        delay += 1;
-                        break;
-                }
+                if (i == 1)
+                    delay += 2;
+                else if (i == 2 || i == 4 || i == 6 || i == 7)
+                    delay += 1;
 
                 TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                     Location loc = combatUser.getEntity().getEyeLocation();
@@ -80,11 +72,11 @@ public final class QuakerWeapon extends AbstractWeapon {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
                     new QuakerWeaponAttack(targets).shoot(loc, vec);
 
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 1 : -1) * 0.8, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 0.8 : -0.8), 0.1);
                     if (index % 2 == 0)
                         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.addYawAndPitch(combatUser.getEntity(), isClockwise ? -1 : 1, -0.7);
+                        CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? -1 : 1), -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
                     }
                 }, delay));
@@ -99,33 +91,33 @@ public final class QuakerWeapon extends AbstractWeapon {
     }
 
     private class QuakerWeaponAttack extends Hitscan {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private QuakerWeaponAttack(HashSet<CombatEntity> targets) {
+        private QuakerWeaponAttack(HashSet<Damageable> targets) {
             super(combatUser, HitscanOption.builder().trailInterval(6).size(QuakerWeaponInfo.SIZE).maxDistance(QuakerWeaponInfo.DISTANCE)
                     .condition(combatUser::isEnemy).build());
             this.targets = targets;
         }
 
         @Override
-        protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+        protected void onTrailInterval() {
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
                     200, 200, 200);
         }
 
         @Override
         protected void onHit() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, location);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatUtil.playBlockHitEffect(location, hitBlock, 2);
-            CombatUtil.playBlockHitSound(location, hitBlock, 1);
+            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 2);
+            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -133,20 +125,20 @@ public final class QuakerWeapon extends AbstractWeapon {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+                if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
                     target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ?
                             -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
-                ParticleUtil.play(Particle.CRIT, location, 20, 0, 0, 0, 0.4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, location);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0, 0, 0, 0.4);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, getLocation());
             }
 
-            return !(target instanceof Barrier);
+            return true;
         }
 
         @Override
         protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }

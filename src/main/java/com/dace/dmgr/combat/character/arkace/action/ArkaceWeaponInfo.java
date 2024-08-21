@@ -2,11 +2,13 @@ package com.dace.dmgr.combat.character.arkace.action;
 
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.action.weapon.FullAuto;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
-public final class ArkaceWeaponInfo extends WeaponInfo {
+public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
+    /** 연사속도 */
+    public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_600;
     /** 피해량 */
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 (단위: 블록) */
@@ -21,7 +23,8 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
     private ArkaceWeaponInfo() {
-        super(RESOURCE.DEFAULT, "HLN-12",
+        super(ArkaceWeapon.class, RESOURCE.DEFAULT,
+                "HLN-12",
                 "",
                 "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
                 "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
@@ -29,49 +32,47 @@ public final class ArkaceWeaponInfo extends WeaponInfo {
                 "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_WEAKENING_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_WEAKENING_DISTANCE * 2 + "m)",
                 "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
                 "§f" + TextIcon.CAPACITY + "§f 30발",
-                "",
-                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
-    }
-
-    @Override
-    @NonNull
-    public ArkaceWeapon createWeapon(@NonNull CombatUser combatUser) {
-        return new ArkaceWeapon(combatUser);
+                "", "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
     }
 
     /**
      * 반동 정보.
      */
-    public interface RECOIL {
+    @UtilityClass
+    public static class RECOIL {
         /** 수직 반동 */
-        double UP = 0.6;
+        public static final double UP = 0.6;
         /** 수평 반동 */
-        double SIDE = 0.04;
+        public static final double SIDE = 0.04;
         /** 수직 반동 분산도 */
-        double UP_SPREAD = 0.1;
+        public static final double UP_SPREAD = 0.1;
         /** 수평 반동 분산도 */
-        double SIDE_SPREAD = 0.06;
+        public static final double SIDE_SPREAD = 0.06;
     }
 
     /**
      * 탄퍼짐 정보.
      */
-    public interface SPREAD {
+    @UtilityClass
+    public static class SPREAD {
+        /** 달리기 탄퍼짐 배수 */
+        public static final double SPRINT_MULTIPLIER = 2;
         /** 탄퍼짐 증가량 */
-        double INCREMENT = 0.3;
+        public static final double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */
-        int START = 5;
+        public static final int START = 5;
         /** 탄퍼짐 최대 시점 */
-        int MAX = 20;
+        public static final int MAX = 20;
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
-    public interface RESOURCE {
+    @UtilityClass
+    public static class RESOURCE {
         /** 기본 */
-        short DEFAULT = 1;
+        public static final short DEFAULT = 1;
         /** 달리기 */
-        short SPRINT = DEFAULT + 1000;
+        public static final short SPRINT = DEFAULT + 1000;
     }
 }

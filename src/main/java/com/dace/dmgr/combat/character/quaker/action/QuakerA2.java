@@ -1,23 +1,20 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -32,7 +29,7 @@ public final class QuakerA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA2";
 
-    QuakerA2(@NonNull CombatUser combatUser) {
+    public QuakerA2(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA2Info.getInstance(), 1);
     }
 
@@ -53,8 +50,8 @@ public final class QuakerA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -68,7 +65,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
-            final int index = i;
+            int index = i;
 
             if (i < 2)
                 delay += 1;
@@ -120,16 +117,18 @@ public final class QuakerA2 extends ActiveSkill {
     private void onReady() {
         Location loc = combatUser.getEntity().getLocation();
         loc.setPitch(0);
+
         SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
-        HashSet<CombatEntity> targets = new HashSet<>();
+
+        HashSet<Damageable> targets = new HashSet<>();
+        Vector vector = VectorUtil.getPitchAxis(loc);
+        Vector axis = VectorUtil.getYawAxis(loc);
 
         for (int i = 0; i < 7; i++) {
-            Vector vector = VectorUtil.getPitchAxis(loc);
-            Vector axis = VectorUtil.getYawAxis(loc);
-
             Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 9 * (i - 3));
             new QuakerA2Projectile(targets).shoot(loc, vec);
         }
+
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
@@ -137,20 +136,14 @@ public final class QuakerA2 extends ActiveSkill {
         }, 1, 5));
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    /**
+     * 둔화 상태 효과 클래스.
+     */
     private static final class QuakerA2Slow extends Slow {
         private static final QuakerA2Slow instance = new QuakerA2Slow();
 
-        @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA2Info.SLOW);
-        }
-
-        @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        private QuakerA2Slow() {
+            super(MODIFIER_ID, QuakerA2Info.SLOW);
         }
     }
 
@@ -160,11 +153,11 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         @Override
-        protected void trail() {
-            if (location.distance(combatUser.getEntity().getEyeLocation()) <= 1)
+        protected void onTrailInterval() {
+            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
                 return;
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
                     200, 200, 200);
         }
@@ -181,26 +174,25 @@ public final class QuakerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            Location trailLoc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, trailLoc, 30, 0.15, 0.15, 0.15, 0.05);
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
+            ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
         }
     }
 
     private final class QuakerA2Projectile extends GroundProjectile {
-        private final HashSet<CombatEntity> targets;
+        private final HashSet<Damageable> targets;
 
-        private QuakerA2Projectile(HashSet<CombatEntity> targets) {
+        private QuakerA2Projectile(HashSet<Damageable> targets) {
             super(combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(QuakerA2Info.SIZE)
                     .maxDistance(QuakerA2Info.DISTANCE).condition(combatUser::isEnemy).build());
-
             this.targets = targets;
         }
 
         @Override
-        protected void trail() {
-            Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
-            CombatUtil.playBlockHitEffect(location, floor, 3);
-            ParticleUtil.play(Particle.CRIT, location, 20, 0.2, 0.05, 0.2, 0.25);
+        protected void onTrailInterval() {
+            Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
+            CombatEffectUtil.playBlockHitEffect(getLocation(), floor, 3);
+            ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0.2, 0.05, 0.2, 0.25);
         }
 
         @Override
@@ -211,7 +203,7 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (targets.add(target)) {
-                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, getLocation(), false, true)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
                     target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
                     if (target instanceof CombatUser) {
@@ -220,7 +212,7 @@ public final class QuakerA2 extends ActiveSkill {
                     }
                 }
 
-                ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
+                ParticleUtil.play(Particle.CRIT, getLocation(), 50, 0, 0, 0, 0.4);
             }
 
             return !(target instanceof Barrier);

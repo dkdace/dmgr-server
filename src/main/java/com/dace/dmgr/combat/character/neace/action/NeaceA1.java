@@ -6,21 +6,19 @@ import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 public final class NeaceA1 extends ActiveSkill {
     private final NeaceA1Mark neaceA1Mark = new NeaceA1Mark();
 
-    NeaceA1(@NonNull CombatUser combatUser) {
+    public NeaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA1Info.getInstance(), 0);
     }
 
@@ -50,6 +48,9 @@ public final class NeaceA1 extends ActiveSkill {
         return false;
     }
 
+    /**
+     * 치유 표식 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class NeaceA1Mark implements StatusEffect {
         private int healAmount = 0;
@@ -66,81 +67,73 @@ public final class NeaceA1 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             healAmount = 0;
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     4, 0.2, 0.2, 0.2, 215, 255, 130);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     1, 0, 0, 0, 215, 255, 130);
 
-            if (!(combatEntity instanceof Healable))
+            if (!(combatEntity instanceof Healable) || !(provider instanceof Healer))
                 return;
             if (((Healable) combatEntity).getDamageModule().getHealth() == ((Healable) combatEntity).getDamageModule().getMaxHealth())
                 return;
+
             if (healAmount >= NeaceA1Info.MAX_HEAL) {
                 combatEntity.getStatusEffectModule().removeStatusEffect(this);
                 return;
             }
-
-            if (!(provider instanceof Healer))
-                return;
 
             if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, NeaceA1Info.HEAL_PER_SECOND / 20, true))
                 healAmount += NeaceA1Info.HEAL_PER_SECOND / 20;
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             // 미사용
         }
     }
 
-    private final class NeaceTarget extends Hitscan {
-        private Healable target = null;
-
+    private final class NeaceTarget extends Target {
         private NeaceTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
-                            !combatEntity.getStatusEffectModule().hasStatusEffect(neaceA1Mark)).build());
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
+                    !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(neaceA1Mark));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             setCooldown();
 
-            this.target = (Healable) target;
             target.getStatusEffectModule().applyStatusEffect(combatUser, neaceA1Mark, NeaceA1Info.DURATION);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A1_USE, combatUser.getEntity().getLocation());
+            playUseEffect(target);
+        }
 
-            Location location = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-            for (Location loc : LocationUtil.getLine(location, target.getEntity().getLocation().add(0, 1, 0), 0.4)) {
+        private void playUseEffect(@NonNull Damageable target) {
+            Location location = combatUser.getArmLocation(true);
+            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,
                         215, 255, 130);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0);
             }
 
-            Location location2 = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 1.5);
+            Location location2 = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
             Vector vector = VectorUtil.getYawAxis(location2).multiply(0.8);
             Vector axis = VectorUtil.getRollAxis(location2);
 
             for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 5; j++) {
-                    Vector vec1 = VectorUtil.getRotatedVector(vector, axis, i * 10 + j * 72).multiply(1 + i * 0.2);
-                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, i * -10 + j * 72).multiply(1 + i * 0.2);
-                    Location loc1 = location2.clone().add(vec1);
-                    Location loc2 = location2.clone().add(vec2);
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
+                int angle = i * 10;
+
+                for (int j = 0; j < 10; j++) {
+                    angle += 72;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
+
+                    ParticleUtil.play(Particle.VILLAGER_HAPPY, location2.clone().add(vec), 2, 0, 0, 0, 0);
                 }
             }
             for (int i = 0; i < 7; i++) {
@@ -149,14 +142,6 @@ public final class NeaceA1 extends ActiveSkill {
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
             }
-
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            if (target == null)
-                combatUser.getUser().sendAlert("대상을 찾을 수 없습니다.");
         }
     }
 }

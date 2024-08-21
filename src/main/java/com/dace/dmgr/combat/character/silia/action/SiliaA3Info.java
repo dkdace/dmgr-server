@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class SiliaA3Info extends ActiveSkillInfo {
+public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 1 * 20;
     /** 강제 해제 쿨타임 (tick) */
@@ -22,12 +20,6 @@ public final class SiliaA3Info extends ActiveSkillInfo {
     private static final SiliaA3Info instance = new SiliaA3Info();
 
     private SiliaA3Info() {
-        super(3, "폭풍전야");
-    }
-
-    @Override
-    @NonNull
-    public SiliaA3 createSkill(@NonNull CombatUser combatUser) {
-        return new SiliaA3(combatUser);
+        super(SiliaA3.class, "폭풍전야");
     }
 }

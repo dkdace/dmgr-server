@@ -14,7 +14,7 @@ import java.util.EnumMap;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PropertyManager {
     /** 속성 값 목록 (속성 종류 : 값) */
-    private final EnumMap<@NonNull Property, Integer> propertyValueMap = new EnumMap<>(Property.class);
+    private final EnumMap<Property, Integer> propertyValueMap = new EnumMap<>(Property.class);
 
     /**
      * 속성 값을 반환한다.

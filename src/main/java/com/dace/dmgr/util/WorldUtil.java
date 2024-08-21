@@ -25,6 +25,11 @@ import java.util.Arrays;
  */
 @UtilityClass
 public final class WorldUtil {
+    /** SlimeWorld 플러그인 객체 */
+    private static final SWMPlugin swmPlugin = SWMPlugin.getInstance();
+    /** SlimeWorld 설정 객체 */
+    private static final WorldsConfig worldsConfig = ConfigManager.getWorldConfig();
+
     /**
      * 지정한 월드로 새로운 복제본 월드를 생성한다.
      *
@@ -35,22 +40,21 @@ public final class WorldUtil {
      * @throws IllegalArgumentException {@code targetWorldName}이 언더바('_')로 시작하지 않으면 발생
      */
     @NonNull
-    public static AsyncTask<World> duplicateWorld(@NonNull World world, @NonNull String targetWorldName) {
+    public static AsyncTask<@NonNull World> duplicateWorld(@NonNull World world, @NonNull String targetWorldName) {
         if (!targetWorldName.startsWith("_"))
             throw new IllegalArgumentException("'targetWorldName'이 '_'으로 시작해야 함");
 
         String worldName = world.getName();
-        WorldsConfig config = ConfigManager.getWorldConfig();
-        WorldData worldData = config.getWorlds().get(worldName);
+        WorldData worldData = worldsConfig.getWorlds().get(worldName);
         String dataSource = worldData.getDataSource();
-        SlimeLoader loader = SWMPlugin.getInstance().getLoader(dataSource);
+        SlimeLoader loader = swmPlugin.getLoader(dataSource);
         CommandManager.getInstance().getWorldsInUse().add(targetWorldName);
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                SlimeWorld slimeWorld = SWMPlugin.getInstance().loadWorld(loader, worldName, true,
+                SlimeWorld slimeWorld = swmPlugin.loadWorld(loader, worldName, true,
                         worldData.toPropertyMap()).clone(targetWorldName, loader);
-                SWMPlugin.getInstance().generateWorld(slimeWorld);
+                swmPlugin.generateWorld(slimeWorld);
 
                 onFinish.accept(Bukkit.getWorld(targetWorldName));
             } catch (Exception ex) {
@@ -91,7 +95,7 @@ public final class WorldUtil {
     /**
      * 모든 복제 월드를 삭제한다.
      *
-     * <p>참고: 비동기로 실행하지 않음</p>
+     * @apiNote 비동기로 실행하지 않음. {@link AsyncTask}와 함께 사용하는 것을 권장
      */
     public static void clearDuplicatedWorlds() {
         File worldDir = new File(Bukkit.getWorldContainer(), ConfigManager.getDatasourcesConfig().getFileConfig().getPath());

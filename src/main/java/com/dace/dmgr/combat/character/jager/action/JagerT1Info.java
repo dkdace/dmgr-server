@@ -16,6 +16,6 @@ public final class JagerT1Info extends TraitInfo {
     private static final JagerT1Info instance = new JagerT1Info();
 
     private JagerT1Info() {
-        super(1, "빙결");
+        super("빙결");
     }
 }

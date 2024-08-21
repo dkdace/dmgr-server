@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -13,9 +13,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,18 +21,17 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.function.Predicate;
-
 @Getter
 public final class VellionUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
     public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionUlt";
+
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    VellionUlt(@NonNull CombatUser combatUser) {
+    public VellionUlt(@NonNull CombatUser combatUser) {
         super(combatUser, VellionUltInfo.getInstance());
     }
 
@@ -49,8 +46,8 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && isDurationFinished() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -66,8 +63,7 @@ public final class VellionUlt extends UltimateSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            for (int j = 0; j < 2; j++)
-                playUseTickEffect(i * 2 + j);
+            playUseTickEffect(i);
 
             return true;
         }, isCancelled -> new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled2 -> {
@@ -95,31 +91,74 @@ public final class VellionUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        long angle = i * 6;
-        long angle2 = i * -6;
-        double distance = 2.5;
-        double up = 0;
-        if (i < 16)
-            distance = i * 0.15;
-        else
-            up = (i - 16) * 0.15;
-
         Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 6; j++) {
-            angle += 120;
-            angle2 += 120;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : angle2);
+        for (int j = 0; j < 2; j++) {
+            long index = i * 2 + j;
+            long angle = index * 6;
+            double distance = 2.5;
+            double up = 0;
+            if (i < 8)
+                distance = index * 0.15;
+            else
+                up = (index - 16) * 0.15;
 
-            ParticleUtil.play(Particle.SPELL_WITCH, loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0),
-                    3, 0.05, 0.05, 0.05, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec.clone().multiply(distance)).add(0, up, 0),
-                    1, 0, 0, 0, 70, 0, 45);
+            for (int k = 0; k < 6; k++) {
+                angle += 120;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
+                Location loc2 = loc.clone().add(vec).add(0, up, 0);
+
+                ParticleUtil.play(Particle.SPELL_WITCH, loc2, 3, 0.05, 0.05, 0.05, 0);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 1,
+                        0, 0, 0, 70, 0, 45);
+            }
         }
+    }
+
+    /**
+     * 시전 완료 시 실행할 작업.
+     */
+    private void onReady() {
+        isEnabled = true;
+
+        setDuration();
+        combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
+
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (combatUser.isDead())
+                return false;
+
+            if (i % 4 == 0)
+                new VellionUltArea().emit(combatUser.getEntity().getEyeLocation());
+
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 4,
+                    0.3, 0, 0.3, 90, 0, 55);
+            if (i < 8)
+                ParticleUtil.play(Particle.PORTAL, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 40,
+                        0, 0, 0, 1.5);
+            playTickEffect(i);
+
+            return true;
+        }, isCancelled -> {
+            Location loc = combatUser.getEntity().getEyeLocation();
+            Location loc2 = loc.clone().add(0, 1, 0);
+            new VellionUltExplodeArea().emit(loc);
+
+            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc2);
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
+                    0.3, 0.3, 0.3, 0.4);
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 14, loc2, 200,
+                    0.3, 0.3, 0.3, 0.4);
+
+            isEnabled = false;
+            onCancelled();
+        }, 1, VellionUltInfo.DURATION));
     }
 
     /**
@@ -135,108 +174,54 @@ public final class VellionUlt extends UltimateSkill {
         Vector axis = VectorUtil.getYawAxis(loc);
 
         for (int j = (i >= 5 ? (int) i - 5 : 0); j < i; j++) {
+            int angle = j * (j > 30 ? -3 : 5);
             double distance = j * 0.16;
 
-            for (int k = 0; k < 6; k++) {
-                int angle = j * (j > 30 ? -3 : 5) + k * 60;
+            for (int k = 0; k < 12; k++) {
+                angle += 60;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(distance);
+                Location loc2 = loc.clone().add(vec);
 
-                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle).multiply(distance);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, -angle).multiply(distance);
-
-                if (j > 0 && j % 10 == 0) {
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc.clone().add(vec1).add(0, 2.5, 0), 20, 0, 2, 0, 0);
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc.clone().add(vec2).add(0, 2.5, 0), 20, 0, 2, 0, 0);
-                } else {
-                    ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc.clone().add(vec1),
-                            1, 0, 0, 0, 0);
-                    ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc.clone().add(vec2),
-                            1, 0, 0, 0, 0);
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec1), 1,
-                            0, 0, 0, (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec2), 1,
-                            0, 0, 0, (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
+                if (j > 0 && j % 10 == 0)
+                    ParticleUtil.play(Particle.SPELL_WITCH, loc2.clone().add(0, 2.5, 0), 20, 0, 2, 0, 0);
+                else {
+                    if (i > 20)
+                        ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc2,
+                                1, 0, 0, 0, 0);
+                    else
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
+                                (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
                 }
             }
         }
-
         long angle = i * 4;
-        long angle2 = i * -4;
         for (int j = 0; j < 8; j++) {
             angle += 90;
-            angle2 += 90;
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
+            Location loc2 = loc.clone().add(vec);
 
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : angle2).multiply(8);
-
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec), 3, 0.1, 0.1, 0.1,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 3, 0.1, 0.1, 0.1,
                     90, 0, 55);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.MYCEL, 0, loc.clone().add(vec).add(0, 2, 0),
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.MYCEL, 0, loc2.clone().add(0, 2, 0),
                     4, 0.15, 0.4, 0.15, 0);
         }
     }
 
     /**
-     * 시전 완료 시 실행할 작업.
+     * 둔화 상태 효과 클래스.
      */
-    private void onReady() {
-        isEnabled = true;
-
-        setDuration();
-        combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
-
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
-
-        Predicate<CombatEntity> condition = combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(combatUser);
-        TaskUtil.addTask(VellionUlt.this, new IntervalTask(i -> {
-            if (i % 4 == 0) {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-                new VellionUltArea(condition, targets).emit(loc);
-            }
-
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 4,
-                    0.3, 0, 0.3, 90, 0, 55);
-            if (i < 8)
-                ParticleUtil.play(Particle.PORTAL, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 40,
-                        0, 0, 0, 1.5);
-            playTickEffect(i);
-
-            return true;
-        }, isCancelled -> {
-            Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
-            CombatEntity[] targets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc, VellionUltInfo.RADIUS, condition);
-            new VellionUltExplodeArea(condition, targets).emit(loc);
-
-            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc, 300,
-                    0.3, 0.3, 0.3, 0.4);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 14, loc, 200,
-                    0.3, 0.3, 0.3, 0.4);
-
-            isEnabled = false;
-            onCancelled();
-        }, 1, VellionUltInfo.DURATION));
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class VellionUltSlow extends Slow {
         private static final VellionUltSlow instance = new VellionUltSlow();
 
-        @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionUltInfo.SLOW);
-        }
-
-        @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        private VellionUltSlow() {
+            super(MODIFIER_ID, VellionUltInfo.SLOW);
         }
     }
 
     private final class VellionUltArea extends Area {
-        private VellionUltArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltArea() {
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override
@@ -259,8 +244,9 @@ public final class VellionUlt extends UltimateSkill {
     }
 
     private final class VellionUltExplodeArea extends Area {
-        private VellionUltExplodeArea(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-            super(combatUser, VellionUltInfo.RADIUS, condition, targets);
+        private VellionUltExplodeArea() {
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override
@@ -280,8 +266,8 @@ public final class VellionUlt extends UltimateSkill {
             }
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
-            for (Location trailLoc : LocationUtil.getLine(loc, target.getEntity().getLocation().add(0, 1, 0), 0.4))
-                ParticleUtil.play(Particle.SMOKE_NORMAL, trailLoc, 3, 0.05, 0.50, 0.05, 0);
+            for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 3, 0.05, 0.50, 0.05, 0);
             ParticleUtil.play(Particle.CRIT_MAGIC, location, 50, 0, 0, 0, 0.4);
 
             return true;

@@ -5,7 +5,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.GlobalLocation;
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -25,8 +26,7 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.Dummy;
-import com.dace.dmgr.combat.entity.temporal.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
@@ -44,6 +44,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -59,27 +60,36 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, Living, HasCritHitbox, Jumpable {
+public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Jumpable, CombatEntity {
     /** 암살 점수 */
     public static final int FASTKILL_SCORE = 20;
-    /** 궁극기 차단 점수 */
-    public static final int ULT_BLOCK_KILL_SCORE = 50;
+    /** 암살 보너스 제한시간 쿨타임 ID (tick) */
+    public static final String FASTKILL_TIME_LIMIT_COOLDOWN_ID = "FastkillTimeLimit";
     /** 기본 이동속도 */
     private static final double DEFAULT_SPEED = 0.12;
-    /** 킬 로그 표시 유지시간 (tick) */
-    private static final long KILL_LOG_DISPLAY_DURATION = 80;
+    /** 궁극기 차단 점수 */
+    private static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
     /** 추락사 점수 */
     private static final int FALL_ZONE_KILL_SCORE = 30;
     /** 연속 처치 점수 */
     private static final int KILLSTREAK_SCORE = 25;
+    /** 처치 지원 점수 비율 */
+    private static final double KILL_SUPPORT_SCORE_RATIO = 0.2;
     /** 사망 대사 홀로그램 ID */
     private static final String DEATH_MENT_HOLOGRAM_ID = "DeathMent";
+    /** 킬 로그 보스바 ID */
+    private static final String COMBAT_KILL_BOSSBAR_ID = "CombatKill";
+    /** 킬 로그 내용 포맷 */
+    private static final String COMBAT_KILL_BOSSBAR_FORMAT = "§f{0}{1}§l {2}";
+    /** 힐 팩 홀로그램 내용 포맷 */
+    private static final String HEAL_PACK_HOLOGRAM_FORMAT = "§f§l[ §6{0} {1} §f§l]";
 
     /** 넉백 모듈 */
     @NonNull
@@ -106,24 +116,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final User user;
+    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Nullable
+    @Getter
+    private final GameUser gameUser;
+
     /** 치명타 히트박스 객체 */
     @NonNull
     @Getter
     private final Hitbox critHitbox;
     /** 킬 기여자별 피해량 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 누적 피해량) */
-    private final HashMap<@NonNull CombatUser, Integer> damageMap = new HashMap<>();
-    /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
-    private final EnumMap<@NonNull ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
-    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
-    private final HashMap<@NonNull SkillInfo, Skill> skillMap = new HashMap<>();
-    /** 획득 점수 목록 (항목 : 획득 점수) */
-    private final HashMap<@NonNull String, Double> scoreMap = new LinkedHashMap<>();
+    private final HashMap<CombatUser, Integer> damageMap = new HashMap<>();
     /** 적 처치를 지원하는 플레이어 목록 (기여자 : (점수 ID : 지원 점수)) */
-    private final HashMap<@NonNull CombatUser, HashMap<String, Double>> killSupporterMap = new HashMap<>();
-    /** 게임 유저 객체. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    private final HashMap<CombatUser, HashMap<String, Double>> killAssistMap = new HashMap<>();
+    /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
+    private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
+    /** 스킬 객체 목록 (스킬 정보 : 스킬) */
+    private final HashMap<SkillInfo<? extends Skill>, Skill> skillMap = new HashMap<>();
+    /** 획득 점수 목록 (항목 : 획득 점수) */
+    private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<>();
+    /** 임시 히트박스 객체 목록 */
     @Nullable
-    @Getter
-    private final GameUser gameUser;
+    @Setter
+    private Hitbox @Nullable [] temporaryHitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
     private int selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
@@ -137,17 +152,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 이동 거리. 발소리 재생에 사용됨 */
     private double footstepDistance = 0;
     /** 선택한 전투원 종류 */
+    @Nullable
     @Getter
-    private CharacterType characterType = null;
+    private CharacterType characterType;
     /** 선택한 전투원 */
-    private Character character = null;
+    @Nullable
+    private Character character;
     /** 선택한 전투원 기록 정보 */
-    private UserData.CharacterRecord characterRecord = null;
+    @Nullable
+    private UserData.CharacterRecord characterRecord;
     /** 무기 객체 */
-    @Getter
-    private Weapon weapon = null;
+    @Nullable
+    private Weapon weapon;
     /** 연사 무기 사용을 처리하는 태스크 */
-    private IntervalTask fullAutoTask = null;
+    @Nullable
+    private IntervalTask fullAutoTask;
+
     @Getter
     @Setter
     private long time = System.currentTimeMillis();
@@ -171,7 +191,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
-        damageModule = new HealModule(this, true, true, 1000);
+        damageModule = new HealModule(this, true, true, true, 0, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);
         critHitbox = hitboxes[3];
         user.clearSidebar();
@@ -196,7 +216,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
-        damageModule = new HealModule(this, true, true, 1000);
+        damageModule = new HealModule(this, true, true, true, 0, 1000);
         moveModule = new JumpModule(this, DEFAULT_SPEED);
         critHitbox = hitboxes[3];
         user.clearSidebar();
@@ -223,8 +243,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         super.activate();
 
         for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
-            if (combatEntity instanceof Damageable && combatEntity.isEnemy(this))
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, false, entity);
+            if (combatEntity instanceof Damageable) {
+                if (combatEntity != this)
+                    HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatEntity, !combatEntity.isEnemy(this), entity);
+                if (combatEntity instanceof SummonEntity && combatEntity.isEnemy(this))
+                    HologramUtil.setHologramVisibility(SummonEntity.NAMETAG_HOLOGRAM_ID + combatEntity, false, entity);
+            }
 
             if (combatEntity instanceof CombatUser)
                 HologramUtil.setHologramVisibility(combatEntity.getEntity().getName(), false, entity);
@@ -232,20 +256,27 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
+    @NonNull
+    public Hitbox @NonNull [] getHitboxes() {
+        return temporaryHitboxes == null ? super.getHitboxes() : temporaryHitboxes;
+    }
+
+    @Override
     protected void onTick(long i) {
         if (!isActivated)
             return;
+        Validate.notNull(character);
 
         character.onTick(this, i);
 
         if (!entity.hasPotionEffect(PotionEffectType.FAST_DIGGING)) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                    Integer.MAX_VALUE, 40, false, false), true);
+                    Integer.MAX_VALUE, 39, false, false), true);
 
             WrapperPlayServerEntityEffect packet = new WrapperPlayServerEntityEffect();
             packet.setEntityID(entity.getEntityId());
             packet.setEffectID((byte) PotionEffectType.FAST_DIGGING.getId());
-            packet.setAmplifier((byte) 40);
+            packet.setAmplifier((byte) 39);
             packet.setDuration(-1);
             packet.setHideParticles(true);
             packet.broadcastPacket();
@@ -261,29 +292,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setLowHealthScreenEffect(damageModule.isLowHealth() || isDead());
         setCanSprint();
         adjustWalkSpeed();
-        changeFov(fovValue);
-    }
-
-    /**
-     * 플레이어의 시야각을 변경한다.
-     *
-     * @param value 값
-     */
-    private void changeFov(double value) {
-        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities();
-
-        packet.setCanFly(isActivated && canFly());
-        packet.setFlying(entity.isFlying());
-        packet.setWalkingSpeed((float) (moveModule.getSpeedStatus().getValue() * 2 * value));
-        packet.setFlyingSpeed(entity.getFlySpeed());
-
-        packet.sendPacket(entity);
     }
 
     /**
      * 플레이어의 이동 속도를 조정한다.
      */
     private void adjustWalkSpeed() {
+        Validate.notNull(character);
+
         double speed = Math.max(0, DEFAULT_SPEED * character.getSpeedMultiplier());
 
         if (entity.isSprinting()) {
@@ -302,32 +318,24 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param i 인덱스
      */
     private void onTickLive(long i) {
+        Validate.notNull(character);
+        Validate.notNull(characterRecord);
+
+        user.sendActionBar(character.getActionbarString(this));
+
         checkHealPack();
         checkJumpPad();
         checkFallZone();
-
-        onTickActionbar();
         onFootstep();
 
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            CombatUtil.playBleedingEffect(null, entity, 0);
+            CombatEffectUtil.playBleedingEffect(null, entity, 0);
 
         if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
             characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
-    }
-
-    /**
-     * 액션바 전송 작업을 실행한다.
-     */
-    private void onTickActionbar() {
-        StringJoiner text = new StringJoiner("    ");
-
-        text.add(character.getActionbarString(this));
-
-        user.sendActionBar(text.toString());
     }
 
     /**
@@ -345,13 +353,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (damageModule.getHealth() == damageModule.getMaxHealth())
             return;
 
+        useHealPack(healPackLocation, location);
+    }
+
+    /**
+     * 힐 팩 사용 시 실행할 작업.
+     *
+     * @param healPackLocation 힐 팩 위치
+     * @param location         실제 블록 위치
+     */
+    private void useHealPack(@NonNull GlobalLocation healPackLocation, @NonNull Location location) {
+        Validate.notNull(character);
+
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK.id, Cooldown.HEAL_PACK.duration);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
         character.onUseHealPack(this);
         SoundUtil.playNamedSound(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
-        HologramUtil.addHologram(Cooldown.HEAL_PACK.id + healPackLocation, hologramLoc, MessageFormat.format("§f§l[ §6{0} 0 §f§l]", TextIcon.COOLDOWN));
+        HologramUtil.addHologram(Cooldown.HEAL_PACK.id + healPackLocation, hologramLoc,
+                MessageFormat.format(HEAL_PACK_HOLOGRAM_FORMAT, TextIcon.COOLDOWN, 0));
 
         boolean isGame = game != null;
         new IntervalTask(i -> {
@@ -362,16 +383,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return false;
 
             HologramUtil.editHologram(Cooldown.HEAL_PACK.id + healPackLocation,
-                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            if (isGame)
-                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
-            else
-                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
-                    if (combatEntity instanceof CombatUser)
-                        HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
-                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
-                }
+                    MessageFormat.format(HEAL_PACK_HOLOGRAM_FORMAT, TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
+            for (Player player : entity.getWorld().getPlayers()) {
+                HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
+                        LocationUtil.canPass(player.getPlayer().getEyeLocation(), hologramLoc), player.getPlayer());
+            }
 
             return true;
         }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5);
@@ -389,7 +405,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD.id, Cooldown.JUMP_PAD.duration);
 
-        push(new Vector(0, GeneralConfig.getCombatConfig().getJumpPadVelocity(), 0), true);
+        moveModule.push(new Vector(0, GeneralConfig.getCombatConfig().getJumpPadVelocity(), 0), true);
         SoundUtil.playNamedSound(NamedSound.COMBAT_USE_JUMP_PAD, entity.getLocation());
     }
 
@@ -411,6 +427,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * <p>주로 발소리 재생에 사용한다.</p>
      */
     private void onFootstep() {
+        Validate.notNull(character);
+
         Location oldLoc = entity.getLocation();
         double fallDistance = entity.getFallDistance();
 
@@ -466,7 +484,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Override
     @NonNull
     public String getTeamIdentifier() {
-        return gameUser == null ? name : gameUser.getTeam().getName();
+        return gameUser == null || gameUser.getTeam() == null ? name : gameUser.getTeam().getName();
     }
 
     /**
@@ -490,6 +508,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 달리기 가능 여부
      */
     private boolean canSprint() {
+        Validate.notNull(character);
+
         if (isDead())
             return false;
         if (!character.canSprint(this))
@@ -497,12 +517,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
                 statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
             return false;
-        if (CooldownUtil.getCooldown(this, Cooldown.WEAPON_NO_SPRINT.id) > 0)
-            return false;
-        if (propertyManager.getValue(Property.FREEZE) >= JagerT1Info.NO_SPRINT)
-            return false;
-
-        return true;
+        return propertyManager.getValue(Property.FREEZE) < JagerT1Info.NO_SPRINT;
     }
 
     /**
@@ -511,38 +526,53 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 비행 가능 여부
      */
     private boolean canFly() {
+        Validate.notNull(character);
+
         if (isDead())
             return false;
         if (!character.canFly(this))
             return false;
-        if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
-                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING) || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
-            return false;
-
-        return true;
+        return !statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) && !statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) &&
+                !statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING) && !statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE);
     }
 
     @Override
     public boolean canJump() {
         if (!isActivated)
             return true;
-        if (!character.canJump(this))
-            return false;
+        Validate.notNull(character);
 
-        return true;
+        return character.canJump(this);
     }
 
     @Override
     public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
-        if (this == victim)
-            return;
         if (!isActivated)
+            return;
+        Validate.notNull(character);
+
+        if (this == victim)
             return;
 
         isUlt = isUlt && character.onAttack(this, victim, damage, damageType, isCrit);
 
+        playAttackEffect(isCrit);
         if (victim.getDamageModule().isShowHealthBar())
             showHealthHologram(victim);
+
+        if (victim.getDamageModule().isUltProvider() && isUlt)
+            addUltGauge(damage);
+
+        if (gameUser != null && victim instanceof CombatUser)
+            gameUser.setDamage(gameUser.getDamage() + damage);
+    }
+
+    /**
+     * 공격했을 때 효과를 재생한다.
+     *
+     * @param isCrit 치명타 여부
+     */
+    private void playAttackEffect(boolean isCrit) {
         if (isCrit) {
             user.sendTitle("", "§c§l×", 0, 2, 10);
             TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
@@ -550,12 +580,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             user.sendTitle("", "§f×", 0, 2, 10);
             TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK, entity), 2));
         }
-
-        if (victim.getDamageModule().isUltProvider() && isUlt)
-            addUltGauge(damage);
-
-        if (gameUser != null && victim instanceof CombatUser)
-            gameUser.setDamage(gameUser.getDamage() + damage);
     }
 
     /**
@@ -570,8 +594,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 if (cooldown <= 0 || victim.isDisposed())
                     return false;
 
-                Location loc = victim.getEntity().getLocation().add(0, victim.getEntity().getHeight(), 0);
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim, LocationUtil.canPass(entity.getEyeLocation(), loc), entity);
+                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim,
+                        LocationUtil.canPass(entity.getEyeLocation(), victim.getCenterLocation()), entity);
 
                 return true;
             }, isCancelled -> HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + victim, false, entity), 4));
@@ -580,9 +604,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit, boolean isUlt) {
+    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+                         boolean isCrit, boolean isUlt) {
         if (!isActivated)
             return;
+        Validate.notNull(character);
+
         if (this == attacker) {
             selfHarmDamage += damage;
             return;
@@ -595,8 +622,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
         if (attacker instanceof CombatUser) {
-            if (CooldownUtil.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + entity) == 0) {
-                CooldownUtil.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT.id + entity, Cooldown.FASTKILL_TIME_LIMIT.duration);
+            if (CooldownUtil.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0) {
+                CooldownUtil.setCooldown(attacker, Cooldown.FASTKILL_TIME_LIMIT.id + this, Cooldown.FASTKILL_TIME_LIMIT.duration);
                 damageMap.remove(attacker);
             }
             CooldownUtil.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
@@ -604,53 +631,57 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             int sumDamage = damageMap.getOrDefault(attacker, 0);
             damageMap.put((CombatUser) attacker, sumDamage + damage);
 
-            for (CombatUser attacker2 : ((CombatUser) attacker).killSupporterMap.keySet()) {
-                if (CooldownUtil.getCooldown(attacker2, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
-                    damageMap.remove(attacker2);
-
-                if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + attacker2) == 0) {
-                    ((CombatUser) attacker).killSupporterMap.remove(attacker2);
-                    continue;
-                }
-                HashMap<String, Double> scores = ((CombatUser) attacker).killSupporterMap.get(attacker2);
-                for (String id : scores.keySet()) {
-                    if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + attacker2 + id) == 0)
-                        scores.remove(id);
-                }
-
-                CooldownUtil.setCooldown(attacker2, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
-                int sumDamage2 = damageMap.getOrDefault(attacker2, 0);
-                damageMap.put(attacker2, sumDamage2 + (int) (damage * 0.2));
-            }
+            handleAttackerKillAssists((CombatUser) attacker, damage);
         }
 
         if (gameUser != null)
             gameUser.setDefend(gameUser.getDefend() + reducedDamage);
     }
 
+    /**
+     * 피해를 입었을 때 공격자를 지원하는 플레이어의 적 처치 기여를 처리한다.
+     *
+     * @param attacker 공격자
+     * @param damage   피해량
+     */
+    private void handleAttackerKillAssists(@NonNull CombatUser attacker, int damage) {
+        new HashMap<>(attacker.killAssistMap).forEach((target, scores) -> {
+            if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
+                damageMap.remove(target);
+            if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0) {
+                attacker.killAssistMap.remove(target);
+                return;
+            }
+
+            for (String id : scores.keySet())
+                if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target + id) == 0)
+                    scores.remove(id);
+
+            CooldownUtil.setCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
+            int sumDamage = damageMap.getOrDefault(target, 0);
+            damageMap.put(target, sumDamage + (int) (damage * KILL_SUPPORT_SCORE_RATIO));
+        });
+    }
+
     @Override
     public boolean canTakeDamage() {
         if (!isActivated)
             return false;
-        if (entity.getGameMode() != GameMode.SURVIVAL)
-            return false;
-
-        return true;
+        return entity.getGameMode() == GameMode.SURVIVAL;
     }
 
     @Override
     public boolean canDie() {
         if (!isActivated)
             return false;
-        if (LocationUtil.isInRegion(entity, "BattleTrain"))
-            return false;
-
-        return true;
+        return !LocationUtil.isInRegion(entity, "BattleTrain");
     }
 
     @Override
     public void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt) {
-        isUlt = isUlt && character.onGiveHeal(this, target, amount);
+        Validate.notNull(character);
+
+        isUlt = isUlt && getSkill(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
 
         if (target.getDamageModule().isUltProvider() && isUlt) {
             int ultAmount = amount;
@@ -670,6 +701,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onTakeHeal(@Nullable Healer provider, int amount, boolean isUlt) {
         if (!isActivated)
             return;
+        Validate.notNull(character);
 
         character.onTakeHeal(this, provider, amount);
         selfHarmDamage -= amount;
@@ -694,11 +726,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onKill(@NonNull Damageable victim) {
         if (!isActivated)
             return;
+        Validate.notNull(character);
+        Validate.notNull(characterRecord);
+
         if (this == victim)
             return;
 
         playKillEffect();
         if (victim instanceof CombatUser) {
+            Validate.notNull(((CombatUser) victim).getCharacterType());
+
             int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
             int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
             int score = Math.round(((float) damage / totalDamage) * 100);
@@ -711,9 +748,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 killStreak = 0;
             CooldownUtil.setCooldown(this, Cooldown.KILLSTREAK_TIME_LIMIT.id, Cooldown.KILLSTREAK_TIME_LIMIT.duration);
             if (killStreak++ > 0)
-                addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1));
+                addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
-            if (!((CombatUser) victim).getSkill(((CombatUser) victim).character.getUltimateSkillInfo()).isDurationFinished())
+            if (!((CombatUser) victim).getSkill(((CombatUser) victim).getCharacterType().getCharacter().getUltimateSkillInfo()).isDurationFinished())
                 addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
 
             if (gameUser != null) {
@@ -728,8 +765,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         } else {
             character.onKill(this, victim, -1, true);
 
-            if (victim instanceof Dummy)
-                addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), 0);
+            addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.getDamageModule().isLiving() ? "처치" : "파괴")),
+                    victim.getDamageModule().getScore());
         }
     }
 
@@ -742,29 +779,32 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 처치 시 킬로그를 표시한다.
+     * 처치 시 킬로그 보스바를 표시한다.
      */
-    private void broadcastPlayerKillMessage() {
+    private void broadcastPlayerKillBossBar() {
+        Validate.notNull(character);
         if (game == null)
             return;
 
-        Set<String> attackerNames = new HashSet<>();
-        for (CombatUser attacker2 : damageMap.keySet()) {
-            ChatColor color = attacker2.getGameUser() == null ? ChatColor.WHITE : attacker2.getGameUser().getTeam().getColor();
-            String s = MessageFormat.format("§f{0}{1}§l {2}", attacker2.character.getIcon(), color, attacker2.getName());
-            attackerNames.add(s);
-        }
-        ChatColor color = gameUser == null ? ChatColor.WHITE : gameUser.getTeam().getColor();
-        String victimName = MessageFormat.format("§f{0}{1}§l {2}", character.getIcon(), color, name);
+        String attackerNames = damageMap.keySet().stream().map(target -> {
+            Validate.notNull(target.getCharacterType());
 
-        game.getGameUsers().forEach(gameUser2 -> {
-            gameUser2.getUser().addBossBar("CombatKill" + this,
-                    MessageFormat.format("{0} §4§l-> {1}", String.join(", ", attackerNames), victimName),
+            ChatColor color = target.getGameUser() == null || target.getGameUser().getTeam() == null ?
+                    ChatColor.WHITE : target.getGameUser().getTeam().getColor();
+            return MessageFormat.format(COMBAT_KILL_BOSSBAR_FORMAT, target.getCharacterType().getCharacter().getIcon(), color, target.getName());
+        }).collect(Collectors.joining(", "));
+
+        ChatColor color = gameUser == null || gameUser.getTeam() == null ? ChatColor.WHITE : gameUser.getTeam().getColor();
+        String victimName = MessageFormat.format(COMBAT_KILL_BOSSBAR_FORMAT, character.getIcon(), color, name);
+
+        for (GameUser targetGameUser : game.getGameUsers()) {
+            targetGameUser.getUser().addBossBar(COMBAT_KILL_BOSSBAR_ID + this,
+                    MessageFormat.format("{0} §4§l-> {1}", attackerNames, victimName),
                     BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
 
-            TaskUtil.addTask(gameUser2, new DelayTask(() ->
-                    gameUser2.getUser().removeBossBar("CombatKill" + this), KILL_LOG_DISPLAY_DURATION));
-        });
+            TaskUtil.addTask(targetGameUser, new DelayTask(() ->
+                    targetGameUser.getUser().removeBossBar(COMBAT_KILL_BOSSBAR_ID + this), Cooldown.KILL_LOG_DISPLAY_DURATION.duration));
+        }
     }
 
     /**
@@ -773,10 +813,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      */
     private void sendPlayerKillMent(@NonNull CombatUser victim) {
-        String[] ments = character.getKillMent(victim.characterType);
-        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        Validate.notNull(character);
+        Validate.notNull(victim.getCharacterType());
 
-        sendMessage(victim, "§f§l" + ment);
+        String[] ments = character.getKillMent(victim.getCharacterType());
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String message = getFormattedMessage("§l" + ment);
+
+        entity.sendMessage(message);
+        victim.getEntity().sendMessage(message);
 
         TaskUtil.addTask(this, new DelayTask(() ->
                 victim.getUser().sendTypewriterTitle(String.valueOf(character.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
@@ -788,16 +833,21 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      */
     private void sendPlayerDeathMent(@NonNull CombatUser attacker) {
-        String[] ments = character.getDeathMent(attacker.characterType);
-        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        Validate.notNull(character);
+        Validate.notNull(attacker.getCharacterType());
 
-        sendMessage(attacker, "§f§l" + ment);
+        String[] ments = character.getDeathMent(attacker.getCharacterType());
+        String ment = ments[DMGR.getRandom().nextInt(ments.length)];
+        String message = getFormattedMessage("§l" + ment);
+
+        entity.sendMessage(message);
+        attacker.getEntity().sendMessage(message);
 
         Location hologramLoc = entity.getLocation();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++)
             if (!LocationUtil.isNonSolid(hologramLoc.subtract(0, 0.1, 0)))
                 break;
-        }
+
         hologramLoc.add(0, 1.2, 0);
         HologramUtil.addHologram(DEATH_MENT_HOLOGRAM_ID + this, hologramLoc, MessageFormat.format("§f{0} \"{1}\"", character.getIcon(), ment));
 
@@ -809,15 +859,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (isGame && game.isDisposed())
                 return false;
 
-            if (isGame)
-                game.getGameUsers().forEach(gameUser2 -> HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                        LocationUtil.canPass(gameUser2.getPlayer().getEyeLocation(), hologramLoc), gameUser2.getPlayer()));
-            else
-                for (CombatEntity combatEntity : CombatEntity.getAllExcluded()) {
-                    if (combatEntity instanceof CombatUser)
-                        HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                                LocationUtil.canPass(((CombatUser) combatEntity).getEntity().getEyeLocation(), hologramLoc), combatEntity.getEntity());
-                }
+            for (Player player : entity.getWorld().getPlayers()) {
+                HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
+                        LocationUtil.canPass(player.getEyeLocation(), hologramLoc), player.getPlayer());
+            }
 
             return true;
         }, isCancelled -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);
@@ -827,39 +872,51 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onDeath(@Nullable Attacker attacker) {
         if (!isActivated)
             return;
-        if (CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id) != 0)
+        Validate.notNull(character);
+        Validate.notNull(characterRecord);
+        Validate.notNull(weapon);
+
+        if (CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id) > 0)
             return;
 
         character.onDeath(this, attacker);
 
         damageModule.setHealth(damageModule.getMaxHealth());
+        damageModule.clearShield();
         statusEffectModule.clearStatusEffect();
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
-        damageMap.forEach((CombatUser attacker2, Integer damage) -> {
-            if (CooldownUtil.getCooldown(attacker2, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) > 0) {
+        damageMap.forEach((CombatUser target, Integer damage) -> {
+            Validate.notNull(target.character);
+            Validate.notNull(target.characterRecord);
 
-                attacker2.killSupporterMap.forEach((attacker3, scores) ->
-                        scores.values().forEach(supportScore -> attacker3.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore)));
-                if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
-                    attacker2.addScore("추락사", FALL_ZONE_KILL_SCORE);
+            if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
+                return;
 
-                if (attacker2 != ((attacker instanceof SummonEntity) ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
-                    int score = Math.round(((float) damage / totalDamage) * 100);
+            target.killAssistMap.forEach((targetAttacker, scores) ->
+                    scores.values().forEach(supportScore -> {
+                        targetAttacker.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore);
+                        if (targetAttacker.gameUser != null)
+                            targetAttacker.gameUser.setAssist(targetAttacker.gameUser.getAssist() + 1);
+                    }));
+            if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
+                target.addScore("추락사", FALL_ZONE_KILL_SCORE);
 
-                    attacker2.character.onKill(attacker2, this, score, false);
-                    attacker2.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-                    attacker2.playKillEffect();
+            if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
+                int score = Math.round(((float) damage / totalDamage) * 100);
 
-                    if (attacker2.gameUser != null) {
-                        attacker2.gameUser.setAssist(attacker2.gameUser.getAssist() + 1);
-                        attacker2.characterRecord.setKill(attacker2.characterRecord.getKill() + 1);
-                    }
+                target.character.onKill(target, this, score, false);
+                target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
+                target.playKillEffect();
+
+                if (target.gameUser != null) {
+                    target.gameUser.setAssist(target.gameUser.getAssist() + 1);
+                    target.characterRecord.setKill(target.characterRecord.getKill() + 1);
                 }
             }
         });
 
-        broadcastPlayerKillMessage();
+        broadcastPlayerKillBossBar();
         selfHarmDamage = 0;
         damageMap.clear();
 
@@ -868,7 +925,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             characterRecord.setDeath(characterRecord.getDeath() + 1);
         }
 
-        cancelAction();
+        cancelAction(null);
         respawn();
     }
 
@@ -876,10 +933,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
+        Validate.notNull(weapon);
+
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, Cooldown.RESPAWN.duration);
+        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : Cooldown.RESPAWN.duration);
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
@@ -896,6 +955,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return true;
         }, isCancelled -> {
             damageModule.setHealth(damageModule.getMaxHealth());
+            damageModule.clearShield();
+            statusEffectModule.clearStatusEffect();
             entity.setGameMode(GameMode.SURVIVAL);
 
             weapon.reset();
@@ -913,28 +974,60 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
+     * 플레이어의 왼손 또는 오른손의 위치를 반환한다.
+     *
+     * @param isRight 왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로
+     *                지정 시 오른손
+     * @return 해당 위치
+     */
+    @NonNull
+    public Location getArmLocation(boolean isRight) {
+        return LocationUtil.getLocationFromOffset(entity.getEyeLocation().subtract(0, 0.4, 0), isRight ? 0.2 : -0.2, 0, 0);
+    }
+
+    @NonNull
+    public Weapon getWeapon() {
+        return Validate.notNull(weapon);
+    }
+
+    /**
      * 지정한 스킬 정보에 해당하는 스킬을 반환한다.
      *
      * @param skillInfo 스킬 정보 객체
+     * @param <T>       {@link Skill}을 상속받는 스킬
      * @return 스킬 객체
+     * @throws NullPointerException 해당하는 스킬이 존재하지 않으면 발생
      */
-    public Skill getSkill(@NonNull SkillInfo skillInfo) {
-        return skillMap.get(skillInfo);
+    @NonNull
+    public <T extends Skill> T getSkill(@NonNull SkillInfo<T> skillInfo) {
+        T skill = (T) skillMap.get(skillInfo);
+        if (skill == null)
+            throw new NullPointerException("일치하는 스킬이 존재하지 않음");
+
+        return skill;
     }
 
     /**
      * 적 처치를 지원하는 플레이어를 추가한다.
      *
-     * <p>플레이어가 적을 처치하면 해당 항목의 점수를 지정한 플레이어에게 지급한다.</p>
+     * <p>플레이어가 적을 처치하면 해당 점수를 지정한 플레이어에게 지급한다.</p>
      *
      * @param combatUser 대상 플레이어
      * @param id         점수 ID
-     * @param score      지원 점수
-     * @param duration   지속시간 (tick)
+     * @param score      지원 점수. 0 이상의 값
+     * @param duration   지속시간 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public void addDamageSupport(@NonNull CombatUser combatUser, @NonNull String id, double score, long duration) {
-        killSupporterMap.putIfAbsent(combatUser, new HashMap<>());
-        HashMap<String, Double> scores = killSupporterMap.get(combatUser);
+    public void addKillAssist(@NonNull CombatUser combatUser, @NonNull String id, double score, long duration) {
+        if (score < 0)
+            throw new IllegalArgumentException("'score'가 0 이상이어야 함");
+        if (duration < -1)
+            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
+        if (duration == -1)
+            duration = Long.MAX_VALUE;
+
+        killAssistMap.putIfAbsent(combatUser, new HashMap<>());
+        HashMap<String, Double> scores = killAssistMap.get(combatUser);
         scores.put(id, score);
 
         if (CooldownUtil.getCooldown(this, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + combatUser) < duration)
@@ -965,10 +1058,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 전역 쿨타임을 설정한다.
      *
      * @param cooldown 쿨타임 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setGlobalCooldown(int cooldown) {
+        Validate.notNull(weapon);
+        if (cooldown < -1)
+            throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
         if (cooldown == -1)
             cooldown = Integer.MAX_VALUE;
+
         if (cooldown < CooldownUtil.getCooldown(this, Cooldown.ACTION_GLOBAL_COOLDOWN.id))
             return;
 
@@ -984,16 +1082,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * <p>게임 참여 중이 아니면 점수 획득 표시만 한다.</p>
      *
      * @param context 항목
-     * @param score   점수 증가량
+     * @param score   점수 증가량. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addScore(@NonNull String context, double score) {
+        if (score < 0)
+            throw new IllegalArgumentException("'score'가 0 이상이어야 함");
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 
         if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id) == 0) {
             CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
 
-            TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) != 0,
+            TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) > 0,
                     isCancelled -> {
                         scoreStreakSum = 0;
                         scoreMap.clear();
@@ -1039,17 +1140,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 궁극기 게이지 백분율을 설정한다.
      *
      * @param value 궁극기 게이지. 0~1 사이의 값. (단위: 백분율)
-     * @throws IllegalArgumentException {@code value}가 0~1 사이가 아니면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setUltGaugePercent(double value) {
         if (value < 0 || value > 1)
             throw new IllegalArgumentException("'value'가 0에서 1 사이여야 함");
-        if (!isActivated)
+        if (!isActivated || character == null)
             value = 0;
 
         if (value == 1) {
             value = 0.999;
-            Skill skill = skillMap.get(character.getUltimateSkillInfo());
+            UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
             if (!skill.isCooldownFinished())
                 skill.setCooldown(0);
         }
@@ -1062,9 +1163,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 궁극기 게이지를 증가시킨다.
      *
      * @param value 추가할 궁극기 게이지. 0~1 사이의 값. (단위: 백분율)
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGaugePercent(double value) {
-        Skill skill = skillMap.get(character.getUltimateSkillInfo());
+        Validate.notNull(character);
+
+        UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
         if (skill.isDurationFinished())
             setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
@@ -1075,7 +1179,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param value 추가할 궁극기 게이지
      */
     public void addUltGauge(double value) {
-        UltimateSkill ultimateSkill = (UltimateSkill) getSkill(character.getUltimateSkillInfo());
+        Validate.notNull(character);
+
+        UltimateSkill ultimateSkill = getSkill(character.getUltimateSkillInfo());
         addUltGaugePercent(value / ultimateSkill.getCost());
     }
 
@@ -1091,9 +1197,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setMaxHealth(realCharacter.getHealth());
         damageModule.setHealth(realCharacter.getHealth());
         moveModule.getSpeedStatus().setBaseValue(DEFAULT_SPEED * realCharacter.getSpeedMultiplier());
-        entity.getInventory().setItem(9, GameUser.CommunicationItem.REQ_HEAL.getGuiItem().getItemStack());
-        entity.getInventory().setItem(10, GameUser.CommunicationItem.SHOW_ULT.getGuiItem().getItemStack());
-        entity.getInventory().setItem(11, GameUser.CommunicationItem.REQ_RALLY.getGuiItem().getItemStack());
 
         double hitboxMultiplier = realCharacter.getHitboxMultiplier();
         for (Hitbox hitbox : hitboxes)
@@ -1126,8 +1229,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setAllowFlight(false);
         entity.setFlying(false);
         entity.setGameMode(GameMode.SURVIVAL);
+
         fovValue = 0;
-        changeFov(0);
+        damageModule.clearShield();
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
 
@@ -1142,6 +1246,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 동작 설정을 초기화한다.
      */
     private void initActions() {
+        Validate.notNull(character);
+
         if (weapon != null)
             weapon.dispose();
         skillMap.forEach((skillInfo, skill) -> skill.dispose());
@@ -1158,16 +1264,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             actionMap.get(actionKey).add(weapon);
 
         for (int i = 1; i <= 4; i++) {
-            ActiveSkillInfo activeSkillInfo = character.getActiveSkillInfo(i);
+            ActiveSkillInfo<?> activeSkillInfo = character.getActiveSkillInfo(i);
+            PassiveSkillInfo<?> passiveSkillInfo = character.getPassiveSkillInfo(i);
+
             if (activeSkillInfo != null) {
-                Skill skill = activeSkillInfo.createSkill(this);
+                ActiveSkill skill = activeSkillInfo.createSkill(this);
                 skillMap.put(activeSkillInfo, skill);
                 for (ActionKey actionKey : skill.getDefaultActionKeys())
                     actionMap.get(actionKey).add(skill);
             }
-        }
-        for (int i = 1; i <= 4; i++) {
-            PassiveSkillInfo passiveSkillInfo = character.getPassiveSkillInfo(i);
             if (passiveSkillInfo != null) {
                 Skill skill = passiveSkillInfo.createSkill(this);
                 skillMap.put(passiveSkillInfo, skill);
@@ -1183,20 +1288,23 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param actionKey 동작 사용 키
      */
     public void useAction(@NonNull ActionKey actionKey) {
-        TreeSet<Action> actions = actionMap.get(actionKey);
+        if (!isActivated)
+            return;
+        Validate.notNull(weapon);
 
+        TreeSet<Action> actions = actionMap.get(actionKey);
         actions.forEach(action -> {
             if (isDead() || action == null)
                 return;
             if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN))
                 return;
 
-            if (action instanceof MeleeAttackAction && action.canUse()) {
+            if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
                 action.onUse(actionKey);
                 return;
             }
 
-            Weapon realWeapon = this.weapon;
+            Weapon realWeapon = weapon;
             if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
                 realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
 
@@ -1216,7 +1324,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
         if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
             handleUseFullAutoWeapon(actionKey, weapon);
-        else if (weapon.canUse())
+        else if (weapon.canUse(actionKey))
             weapon.onUse(actionKey);
     }
 
@@ -1245,7 +1353,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id) == 0)
                         return false;
 
-                    if (weapon.canUse() && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
+                    if (weapon.canUse(actionKey) && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
                         j++;
                         weapon.onUse(actionKey);
                     }
@@ -1264,7 +1372,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse() || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
+        if (!skill.canUse(actionKey) || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
             return;
 
         skill.onUse(actionKey);
@@ -1272,20 +1380,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /**
      * 사용 중인 모든 동작을 강제로 취소시킨다.
+     *
+     * @param attacker 공격자
      */
-    public void cancelAction() {
+    public void cancelAction(@Nullable CombatUser attacker) {
+        Validate.notNull(weapon);
+
         if (weapon.isCancellable())
             weapon.onCancelled();
-        cancelSkill();
+        cancelSkill(attacker);
     }
 
     /**
      * 사용 중인 모든 스킬을 강제로 취소시킨다.
+     *
+     * @param attacker 공격자
      */
-    public void cancelSkill() {
+    public void cancelSkill(@Nullable CombatUser attacker) {
         skillMap.forEach((skillInfo, skill) -> {
-            if (skill.isCancellable())
+            if (skill.isCancellable()) {
                 skill.onCancelled();
+                if (skill instanceof UltimateSkill && attacker != null && !isDead())
+                    attacker.addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
+            }
         });
     }
 
@@ -1307,10 +1424,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어에게 근접 공격 애니메이션을 재생한다.
      *
      * @param amplifier 성급함 포션 효과 레벨
-     * @param duration  지속시간 (tick)
-     * @param isRight   왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로 지정 시 오른손
+     * @param duration  지속시간 (tick). 0 이상의 값
+     * @param isRight   왼손/오른손. {@code false}로 지정 시 왼손, {@code true}로
+     *                  지정 시 오른손
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void playMeleeAttackAnimation(int amplifier, int duration, boolean isRight) {
+        if (duration < 0)
+            throw new IllegalArgumentException("'duration'이 0 이상이어야 함");
+
         entity.removePotionEffect(PotionEffectType.FAST_DIGGING);
         entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                 duration, amplifier, false, false), true);
@@ -1335,34 +1457,31 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 지정한 플레이어에게 메시지(전투원 대사)를 전송한다.
+     * 전투 시스템의 메시지 포맷이 적용된 메시지를 반환한다.
      *
-     * @param combatUser 대상 플레이어
-     * @param message    메시지
+     * <p>인게임 채팅 및 전투원 대사에 사용한다.</p>
+     *
+     * @param message 메시지
+     * @return 포맷이 적용된 메시지
      */
-    public void sendMessage(@NonNull CombatUser combatUser, @NonNull String message) {
-        ChatColor color = gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getColor();
-        String fullMessage = MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
-                (!combatUser.isActivated() ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),
+    @NonNull
+    public String getFormattedMessage(@NonNull String message) {
+        ChatColor color = gameUser == null || gameUser.getTeam() == null ? ChatColor.YELLOW : gameUser.getTeam().getColor();
+
+        return MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
+                (!isActivated() || character == null ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),
                 entity.getName(), message);
-
-        entity.sendMessage(fullMessage);
-        combatUser.getEntity().sendMessage(fullMessage);
     }
-
 
     /**
      * 쿨타임 ID 및 기본 지속시간 목록.
      */
     @AllArgsConstructor
-    @Getter
-    public enum Cooldown {
+    private enum Cooldown {
         /** 힐 팩 */
         HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
         /** 점프대 */
         JUMP_PAD("JumpPad", 10),
-        /** 무기 사용 시 달리기 금지 */
-        WEAPON_NO_SPRINT("WeaponNoSprint", 7),
         /** 적 타격 시 생명력 홀로그램 */
         HIT_HEALTH_HOLOGRAM("HitHealthHologram", 20),
         /** 적 처치 기여 (데미지 누적) 제한시간 */
@@ -1372,7 +1491,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         /** 적 처치 지원 제한시간 */
         KILL_SUPPORT_TIME_LIMIT("KillSupportTimeLimit", 0),
         /** 암살 보너스 (첫 공격 후 일정시간 안에 적 처치) 제한시간 (tick) */
-        FASTKILL_TIME_LIMIT("FastkillTimeLimit", (long) (2.5 * 20)),
+        FASTKILL_TIME_LIMIT(FASTKILL_TIME_LIMIT_COOLDOWN_ID, (long) (2.5 * 20)),
         /** 리스폰 시간 */
         RESPAWN("Respawn", GeneralConfig.getCombatConfig().getRespawnTime()),
         /** 추락사 */
@@ -1381,6 +1500,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         ACTION_GLOBAL_COOLDOWN("ActionGlobalCooldown", 0),
         /** 획득 점수 표시 유지시간 (tick) */
         SCORE_DISPLAY_DURATION("ScoreDisplayDuration", 5 * 20),
+        /** 킬 로그 표시 유지시간 (tick) */
+        KILL_LOG_DISPLAY_DURATION("KillLogDisplayDuration", 4 * 20),
         /** 연사가 가능한 총기류의 쿨타임 */
         WEAPON_FULLAUTO("WeaponFullauto", 6);
 

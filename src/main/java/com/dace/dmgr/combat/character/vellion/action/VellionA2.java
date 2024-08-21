@@ -1,19 +1,16 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.temporal.Barrier;
+import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -25,9 +22,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
-
-import java.util.function.Predicate;
 
 public final class VellionA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
@@ -36,12 +32,13 @@ public final class VellionA2 extends ActiveSkill {
     private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA2";
+
     private final VellionA2Mark vellionA2Mark = new VellionA2Mark();
     /** 활성화 완료 여부 */
     @Getter
     private boolean isEnabled = false;
 
-    VellionA2(@NonNull CombatUser combatUser) {
+    public VellionA2(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA2Info.getInstance(), 1);
     }
 
@@ -62,8 +59,8 @@ public final class VellionA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -88,34 +85,8 @@ public final class VellionA2 extends ActiveSkill {
     }
 
     /**
-     * 사용 준비 시 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param i        인덱스
+     * 저주 표식 상태 효과 클래스.
      */
-    private void playUseReadyEffect(Location location, long i) {
-        Vector vector = VectorUtil.getYawAxis(location);
-        Vector axis = VectorUtil.getRollAxis(location);
-
-        for (int j = (i >= 6 ? (int) i - 6 : 0); j < i; j++) {
-            for (int k = 0; k < 4; k++) {
-                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, j * (j > 5 ? 4 : 12) + k * 90).multiply(j * 0.2);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, j * -(j > 5 ? 4 : 12) + k * 90).multiply(j * 0.2);
-                Location loc1 = location.clone().add(vec1);
-                Location loc2 = location.clone().add(vec2);
-                if (i == 15) {
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc1, 1, 0, 0, 0, 0);
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
-                } else {
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc1, 1, 0, 0, 0,
-                            (int) (200 - i * 4), 130, (int) (230 - i * 5));
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                            (int) (200 - i * 4), 130, (int) (230 - i * 5));
-                }
-            }
-        }
-    }
-
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class VellionA2Mark implements StatusEffect {
         @Override
@@ -130,15 +101,14 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, -VellionA2Info.DEFENSE_DECREMENT);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", 0, 5, 10);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, -VellionA2Info.DEFENSE_DECREMENT);
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
                     4, 0.2, 0.2, 0.2, 160, 150, 152);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
@@ -146,37 +116,26 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§f저주가 풀림", "", 0, 5, 10);
         }
     }
 
-    private final class VellionTarget extends Hitscan {
-        private Damageable target = null;
-
+    private final class VellionTarget extends Target {
         private VellionTarget() {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(VellionA2Info.MAX_DISTANCE)
-                    .condition(combatEntity -> combatEntity instanceof Living && combatEntity.isEnemy(VellionA2.this.combatUser) &&
-                            LocationUtil.canPass(VellionA2.this.combatUser.getEntity().getEyeLocation(),
-                                    combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() / 2, 0)) &&
-                            !combatEntity.getStatusEffectModule().hasStatusEffect(vellionA2Mark)).build());
+            super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> combatEntity instanceof Damageable &&
+                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionA2.this.combatUser) &&
+                    !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
             combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
-
-            this.target = target;
+            CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE, combatUser.getEntity().getLocation());
 
@@ -184,16 +143,16 @@ public final class VellionA2 extends ActiveSkill {
                 if (isDurationFinished())
                     return false;
 
-                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
+                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, 3);
 
-                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-                Location targetLoc = target.getEntity().getLocation().add(0, 1, 0);
-                for (Location trailLoc : LocationUtil.getLine(loc, target.getEntity().getLocation().add(0, 1, 0), 0.7))
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, trailLoc, 1, 0, 0, 0,
+                Location loc = combatUser.getArmLocation(true);
+                for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.7))
+                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
                             (int) (200 - i * 4), 130, (int) (230 - i * 5));
-                Location loc2 = LocationUtil.getLocationFromOffset(loc, LocationUtil.getDirection(loc, targetLoc), 0, 0, 1.5);
-                playUseReadyEffect(loc2, i);
+                Location loc2 = LocationUtil.getLocationFromOffset(loc, LocationUtil.getDirection(loc, target.getCenterLocation()),
+                        0, 0, 1.5);
+                playUseTickEffect(loc2, i);
 
                 return canKeep(combatUser, target) && target.canBeTargeted();
             }, isCancelled -> {
@@ -203,34 +162,20 @@ public final class VellionA2 extends ActiveSkill {
                 }
 
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-                Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0.2, -0.4, 0);
-                Location targetLoc = target.getEntity().getLocation().add(0, 1, 0);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE_READY, combatUser.getEntity().getLocation());
-                for (Location trailLoc : LocationUtil.getLine(loc, targetLoc, 0.4))
-                    ParticleUtil.play(Particle.SPELL_WITCH, trailLoc, 1, 0, 0, 0, 0);
+
+                Location loc = combatUser.getArmLocation(true);
+                for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
+                    ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
 
                 TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
                     if (isDurationFinished() || !target.getStatusEffectModule().hasStatusEffect(vellionA2Mark))
                         return false;
 
                     isEnabled = true;
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
-                    GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 4);
-                    if (target instanceof CombatUser)
-                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
-
-                    if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0)))
-                        CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
-
-                    if (i % 10 == 0) {
-                        Location loc2 = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
-                        Predicate<CombatEntity> condition = combatEntity -> combatEntity.isEnemy(combatUser) && combatEntity != target &&
-                                combatEntity instanceof Damageable;
-                        CombatEntity[] areaTargets = CombatUtil.getNearCombatEntities(combatUser.getGame(), loc2, VellionA2Info.RADIUS, condition);
-                        new VellionA2Area(condition, areaTargets).emit(loc2);
-                    }
+                    onTick(target, i);
 
                     return canKeep(combatUser, target);
                 }, isCancelled2 -> {
@@ -238,35 +183,70 @@ public final class VellionA2 extends ActiveSkill {
                     onCancelled();
                 }, 1));
             }, 1, VellionA2Info.READY_DURATION));
-
-            return false;
         }
 
         /**
-         * 동작을 유지할 수 있는지 확인한다.
+         * 사용 시 효과를 재생한다.
+         *
+         * @param location 대상 위치
+         * @param i        인덱스
+         */
+        private void playUseTickEffect(@NonNull Location location, long i) {
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (int j = (i >= 6 ? (int) i - 6 : 0); j < i; j++) {
+                int angle = j * (j > 5 ? 4 : 12);
+
+                for (int k = 0; k < 8; k++) {
+                    angle += 90;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(j * 0.2);
+                    Location loc = location.clone().add(vec);
+
+                    if (i == 15)
+                        ParticleUtil.play(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
+                    else
+                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
+                                (int) (200 - i * 4), 130, (int) (230 - i * 5));
+                }
+            }
+        }
+
+        private void onTick(@NonNull Damageable target, long i) {
+            target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
+            if (target instanceof CombatUser)
+                CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
+
+            if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
+                CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
+
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 4);
+
+            if (i % 10 == 0)
+                new VellionA2Area(target, ((LivingEntity) target.getEntity()).getEyeLocation().add(0, 0.5, 0))
+                        .emit(target.getCenterLocation());
+        }
+
+        /**
+         * 저주 효과를 유지할 수 있는지 확인한다.
          *
          * @param combatUser 플레이어
          * @param target     사용 대상
          */
         private boolean canKeep(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-            Location loc = combatUser.getEntity().getEyeLocation();
-            Location targetLoc = target.getNearestLocationOfHitboxes(loc);
-
-            return target.isEnemy(combatUser) && !target.isDisposed() && targetLoc.distance(loc) <= VellionA2Info.MAX_DISTANCE &&
+            return target.isEnemy(combatUser) && !target.isDisposed() &&
+                    combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= VellionA2Info.MAX_DISTANCE &&
                     CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0;
         }
 
-        @Override
-        protected void onDestroy() {
-            if (target == null)
-                combatUser.getUser().sendAlert("대상을 찾을 수 없습니다.");
-        }
-
         private final class VellionA2Area extends Area {
+            private final Location effectLoc;
             private boolean isActivated = false;
 
-            private VellionA2Area(Predicate<CombatEntity> condition, CombatEntity[] targets) {
-                super(combatUser, VellionA2Info.RADIUS, condition, targets);
+            private VellionA2Area(Damageable target, Location effectLoc) {
+                super(combatUser, VellionA2Info.RADIUS, combatEntity -> combatEntity.isEnemy(VellionA2.this.combatUser) && combatEntity != target &&
+                        combatEntity instanceof Damageable);
+                this.effectLoc = effectLoc;
             }
 
             @Override
@@ -279,12 +259,13 @@ public final class VellionA2 extends ActiveSkill {
                 target.getDamageModule().damage(combatUser, VellionA2Info.DAMAGE_PER_SECOND * 10 / 20, DamageType.NORMAL, null,
                         false, true);
 
-                for (Location trailLoc : LocationUtil.getLine(center, location, 0.4))
-                    ParticleUtil.play(Particle.SMOKE_NORMAL, trailLoc, 1, 0, 0, 0, 0);
+                for (Location loc2 : LocationUtil.getLine(effectLoc, location, 0.4))
+                    ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 1, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.CRIT_MAGIC, location, 15, 0, 0, 0, 0.3);
+
                 if (!isActivated) {
                     isActivated = true;
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_TRIGGER, center);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_TRIGGER, effectLoc);
                 }
 
                 return !(target instanceof Barrier);

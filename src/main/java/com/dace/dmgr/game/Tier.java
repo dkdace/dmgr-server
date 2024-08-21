@@ -2,6 +2,7 @@ package com.dace.dmgr.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * 티어 목록.
@@ -19,11 +20,13 @@ public enum Tier {
     NETHERITE("네더라이트", 1000, Integer.MAX_VALUE, "§5§l[ 네더라이트 ]");
 
     /** 티어의 이름 */
+    @NonNull
     private final String name;
     /** 최소 랭크 점수 */
     private final int minScore;
     /** 최대 랭크 점수 */
     private final int maxScore;
     /** 칭호 */
+    @NonNull
     private final String prefix;
 }

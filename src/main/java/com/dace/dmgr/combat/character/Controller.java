@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
@@ -13,6 +14,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
 
 /**
  * 역할군이 '제어'인 전투원의 정보를 관리하는 클래스.
@@ -38,16 +41,16 @@ public abstract class Controller extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null) {
-            combatUser.getGame().getTeamUserMap().get(combatUser.getGameUser().getTeam()).stream()
+        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
+            Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .filter(combatUser2 -> combatUser2 != null && combatUser2 != combatUser && combatUser2.getDamageModule().isLowHealth())
-                    .forEach(combatUser2 -> {
-                        CombatUser target = (CombatUser) CombatUtil.getNearCombatEntity(combatUser.getGame(), combatUser2.getEntity().getLocation(),
+                    .filter(target -> target != null && target != combatUser && target.getDamageModule().isLowHealth())
+                    .forEach(target -> {
+                        CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getEntity().getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
 
-                        if (target != null)
-                            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
+                        if (targetCombatEntity != null)
+                            GlowUtil.setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
                     });
         }
 
@@ -68,7 +71,7 @@ public abstract class Controller extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 제어 - 1");
+            super("역할: 제어 - 1");
         }
     }
 
@@ -81,7 +84,7 @@ public abstract class Controller extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 지원 - 2");
+            super("역할: 지원 - 2");
         }
     }
 }

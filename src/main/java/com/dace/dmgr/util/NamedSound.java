@@ -3,6 +3,7 @@ package com.dace.dmgr.util;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Sound;
 
 /**
@@ -20,7 +21,7 @@ public enum NamedSound {
     TYPEWRITER_TITLE(new DefinedSound("new.block.note_block.bass", 1, 1.5)),
 
     /** 게임 - 타이머 효과음 */
-    GAME_TIMER(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 1)),
+    GAME_TIMER(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1000, 1)),
     /** 게임 - 전투 시작 */
     GAME_ON_PLAY(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 1000, 1)),
     /** 게임 - 승리 */
@@ -35,7 +36,7 @@ public enum NamedSound {
     /** 전투 - 궁극기 준비 */
     COMBAT_ULTIMATE_SKILL_READY(new DefinedSound(Sound.ENTITY_PLAYER_LEVELUP, 0.5, 2)),
     /** 전투 - 궁극기 사용 */
-    COMBAT_ULTIMATE_SKILL_USE(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 10, 2)),
+    COMBAT_ULTIMATE_SKILL_USE(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 1000, 2)),
     /** 전투 - 힐 팩 사용 */
     COMBAT_USE_HEAL_PACK(new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.2)),
     /** 전투 - 점프대 사용 */
@@ -72,6 +73,8 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2, 1.25),
             new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1.25)
     ),
+    /** 전투 - 피해 (화염) */
+    COMBAT_DAMAGE_BURNING(new DefinedSound(Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7, 1, 0.1)),
     /** 전투 - 근접 공격 - 사용 */
     COMBAT_MELEE_ATTACK_USE(new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.6, 1.1, 0.1)),
     /** 전투 - 근접 공격 - 블록 타격 */
@@ -83,6 +86,10 @@ public enum NamedSound {
     ),
     /** 전투 - 총알 - 블록 타격 */
     COMBAT_GUN_HIT_BLOCK(new DefinedSound("random.gun.ricochet", 0.8, 0.975, 0.05)),
+    /** 전투 - 총기 탄피 */
+    COMBAT_GUN_SHELL_DROP(new DefinedSound(Sound.ENTITY_MAGMACUBE_JUMP, 0.8, 1, 0.1)),
+    /** 전투 - 산탄총 탄피 */
+    COMBAT_SHOTGUN_SHELL_DROP(new DefinedSound(Sound.ENTITY_ZOMBIE_HORSE_DEATH, 1, 1, 0.1)),
     /** 전투 - 엔티티 소환 */
     COMBAT_ENTITY_SUMMON(new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.8, 1)),
     /** 전투 - 투척 */
@@ -137,6 +144,8 @@ public enum NamedSound {
     ),
     /** 전투 - '예거' 액티브 1번 - 소환 준비 */
     COMBAT_JAGER_A1_SUMMON_READY(new DefinedSound(Sound.ENTITY_WOLF_GROWL, 1, 1)),
+    /** 전투 - '예거' 액티브 1번 - 적 감지 */
+    COMBAT_JAGER_A1_ENEMY_DETECT(new DefinedSound(Sound.ENTITY_WOLF_GROWL, 2, 0.85)),
     /** 전투 - '예거' 액티브 1번 - 피격 */
     COMBAT_JAGER_A1_DAMAGE(new DefinedSound(Sound.ENTITY_WOLF_HURT, 0.4, 1, 0.1)),
     /** 전투 - '예거' 액티브 1번 - 사망 */
@@ -451,12 +460,77 @@ public enum NamedSound {
             new DefinedSound("new.block.conduit.deactivate", 3, 0.6),
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.6),
             new DefinedSound("new.block.respawn_anchor.deplete", 3, 0.8)
+    ),
+    /** 전투 - '인페르노' 발소리 */
+    COMBAT_INFERNO_FOOTSTEP(
+            new DefinedSound("new.entity.panda.step", 0.4, 0.9, 0.1),
+            new DefinedSound(Sound.ENTITY_LLAMA_STEP, 0.3, 0.7, 0.1)
+    ),
+    /** 전투 - '인페르노' 무기 - 사용 */
+    COMBAT_INFERNO_WEAPON_USE(
+            new DefinedSound(Sound.ENTITY_HORSE_BREATHE, 1.5, 0.7),
+            new DefinedSound(Sound.ENTITY_HORSE_BREATHE, 1.5, 1.3),
+            new DefinedSound("new.block.soul_sand.fall", 1.5, 0.5)
+    ),
+    /** 전투 - '인페르노' 무기 - 사용 (화염탄) */
+    COMBAT_INFERNO_WEAPON_USE_FIREBALL(
+            new DefinedSound(Sound.ENTITY_SHULKER_SHOOT, 2, 1.5),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 2, 1.1),
+            new DefinedSound("random.gun.grenade", 2, 0.9)
+    ),
+    /** 전투 - '인페르노' 무기 - 폭발 (화염탄) */
+    COMBAT_INFERNO_WEAPON_FIREBALL_EXPLODE(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4),
+            new DefinedSound("random.gun_reverb2", 5, 1)
+    ),
+    /** 전투 - '인페르노' 액티브 1번 - 사용 */
+    COMBAT_INFERNO_A1_USE(
+            new DefinedSound(Sound.ENTITY_WITHER_SHOOT, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 3, 0.8),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.6)
+    ),
+    /** 전투 - '인페르노' 액티브 1번 - 착지 */
+    COMBAT_INFERNO_A1_LAND(
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+            new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.7),
+            new DefinedSound(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.5),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.3)
+    ),
+    /** 전투 - '인페르노' 액티브 2번 - 사용 */
+    COMBAT_INFERNO_A2_USE(
+            new DefinedSound(Sound.BLOCK_PISTON_CONTRACT, 2, 0.5),
+            new DefinedSound(Sound.BLOCK_PISTON_CONTRACT, 2, 0.6)
+    ),
+    /** 전투 - '인페르노' 액티브 2번 - 틱 효과음 */
+    COMBAT_INFERNO_A2_TICK(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.55, 0.1),
+            new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 사용 */
+    COMBAT_INFERNO_ULT_USE(
+            new DefinedSound("new.block.respawn_anchor.ambient", 3, 1.2)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 틱 효과음 */
+    COMBAT_INFERNO_ULT_TICK(
+            new DefinedSound(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 피격 */
+    COMBAT_INFERNO_ULT_DAMAGE(
+            new DefinedSound(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1)
+    ),
+    /** 전투 - '인페르노' 궁극기 - 파괴 */
+    COMBAT_INFERNO_ULT_DEATH(
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+            new DefinedSound("new.block.conduit.deactivate", 3, 0.8)
     );
 
     /** 지정된 효과음 목록 */
-    private final DefinedSound[] definedSounds;
+    @NonNull
+    private final DefinedSound @NonNull [] definedSounds;
 
-    NamedSound(DefinedSound... definedSounds) {
+    NamedSound(DefinedSound @NonNull ... definedSounds) {
         this.definedSounds = definedSounds;
     }
 
@@ -467,6 +541,7 @@ public enum NamedSound {
     @Getter
     static class DefinedSound {
         /** 소리 이름 */
+        @NonNull
         private final String sound;
         /** 음량 */
         private final double volume;
@@ -475,15 +550,15 @@ public enum NamedSound {
         /** 음정의 분산도 */
         private final double pitchSpreadRange;
 
-        private DefinedSound(String sound, double volume, double pitch) {
+        private DefinedSound(@NonNull String sound, double volume, double pitch) {
             this(sound, volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch) {
             this(sound.toString(), volume, pitch, 0);
         }
 
-        private DefinedSound(Sound sound, double volume, double pitch, double pitchSpreadRange) {
+        private DefinedSound(@NonNull Sound sound, double volume, double pitch, double pitchSpreadRange) {
             this(sound.toString(), volume, pitch, pitchSpreadRange);
         }
     }

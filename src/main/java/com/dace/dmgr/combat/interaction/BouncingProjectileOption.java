@@ -9,10 +9,15 @@ import lombok.Builder;
  */
 @Builder
 public final class BouncingProjectileOption {
+    /** {@link BouncingProjectile#bounceVelocityMultiplier} 의 기본값 */
+    public static final int BOUNCE_VELOCITY_MULTIPLIER_DEFAULT = 1;
+    /** {@link BouncingProjectile#destroyOnHitFloor} 의 기본값 */
+    public static final boolean DESTROY_ON_HIT_FLOOR_DEFAULT = false;
+
     /** 투사체가 튕겼을 때의 속력 배수 */
     @Builder.Default
-    final double bounceVelocityMultiplier = 1;
+    final double bounceVelocityMultiplier = BOUNCE_VELOCITY_MULTIPLIER_DEFAULT;
     /** 바닥에 닿았을 때 제거 여부 */
     @Builder.Default
-    final boolean destroyOnHitFloor = false;
+    final boolean destroyOnHitFloor = DESTROY_ON_HIT_FLOOR_DEFAULT;
 }

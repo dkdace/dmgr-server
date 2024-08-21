@@ -1,13 +1,11 @@
 package com.dace.dmgr.combat.character.jager.action;
 
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class JagerUltInfo extends UltimateSkillInfo {
+public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 9000;
+    public static final int COST = 10000;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 투사체 속력 (단위: 블록/s) */
@@ -39,12 +37,6 @@ public final class JagerUltInfo extends UltimateSkillInfo {
     private static final JagerUltInfo instance = new JagerUltInfo();
 
     private JagerUltInfo() {
-        super("백야의 눈폭풍");
-    }
-
-    @Override
-    @NonNull
-    public JagerUlt createSkill(@NonNull CombatUser combatUser) {
-        return new JagerUlt(combatUser);
+        super(JagerUlt.class, "백야의 눈폭풍");
     }
 }

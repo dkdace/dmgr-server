@@ -13,6 +13,8 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -29,10 +31,10 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @NonNull
     private final GradualSpreadModule fullAutoModule;
 
-    ArkaceWeapon(@NonNull CombatUser combatUser) {
+    public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_600, ArkaceWeaponInfo.SPREAD.INCREMENT,
+        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
                 ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
     }
 
@@ -56,7 +58,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     return;
                 }
 
-                CooldownUtil.setCooldown(combatUser, CombatUser.Cooldown.WEAPON_NO_SPRINT.getId(), CombatUser.Cooldown.WEAPON_NO_SPRINT.getDuration());
+                CooldownUtil.setCooldown(combatUser, ArkaceP1.COOLDOWN_ID, ArkaceWeaponInfo.SPRINT_READY_DURATION + 2);
 
                 if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
                     setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
@@ -65,15 +67,21 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 Location loc = combatUser.getEntity().getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
-                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), fullAutoModule.increaseSpread());
+                    double spread = combatUser.isMoving() ? fullAutoModule.increaseSpread() : 0;
+                    if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
+                        spread *= ArkaceWeaponInfo.SPREAD.SPRINT_MULTIPLIER;
+
+                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
                     new ArkaceWeaponHitscan(false).shoot(dir);
                     reloadModule.consume(1);
 
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
+                    TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_SHELL_DROP, loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shoot();
+
                     SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
                 }
 
@@ -84,6 +92,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -131,6 +141,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
             case 27:
                 SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.8);
                 break;
+            default:
+                break;
         }
     }
 
@@ -157,13 +169,13 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
         @Override
         protected boolean onInterval() {
-            distance += velocity.length();
-            return true;
+            distance += getVelocity().length();
+            return super.onInterval();
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             if (isUlt)
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
                         0, 0, 0, 0, 230, 255);
@@ -174,10 +186,10 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (isUlt)
-                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, false);
+                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, false);
             else {
                 int damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, distance, ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE, true);
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
             }
 
             return false;

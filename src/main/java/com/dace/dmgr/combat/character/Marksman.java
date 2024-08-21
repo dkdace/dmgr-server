@@ -40,10 +40,7 @@ public abstract class Marksman extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser))
-            return;
-
-        if (isFinalHit)
+        if (victim instanceof CombatUser && isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
     }
 
@@ -54,7 +51,7 @@ public abstract class Marksman extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 사격 - 1");
+            super("역할: 사격 - 1");
         }
     }
 
@@ -65,7 +62,7 @@ public abstract class Marksman extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 사격 - 2");
+            super("역할: 사격 - 2");
         }
     }
 }

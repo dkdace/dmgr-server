@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Living;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
@@ -17,11 +16,14 @@ public final class SiliaT1 {
      * @return 백어택 여부
      */
     static boolean isBackAttack(@NonNull Vector direction, @NonNull Damageable victim) {
+        if (!(victim.getDamageModule().isLiving()))
+            return false;
+
         Vector dir = direction.clone().normalize().setY(0).normalize();
         Location vloc = victim.getEntity().getLocation();
         vloc.setPitch(0);
         Vector vdir = vloc.getDirection();
 
-        return victim instanceof Living && dir.distance(vdir) < 0.6;
+        return dir.distance(vdir) < 0.6;
     }
 }

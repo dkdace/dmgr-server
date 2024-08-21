@@ -15,7 +15,7 @@ public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "SiliaA3";
 
-    SiliaA3(@NonNull CombatUser combatUser) {
+    public SiliaA3(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA3Info.getInstance(), 2);
     }
 
@@ -46,8 +46,8 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

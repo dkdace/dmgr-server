@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class NeaceA1Info extends ActiveSkillInfo {
+public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 10 * 20;
     /** 초당 치유량 */
@@ -20,12 +18,6 @@ public final class NeaceA1Info extends ActiveSkillInfo {
     private static final NeaceA1Info instance = new NeaceA1Info();
 
     private NeaceA1Info() {
-        super(1, "구원의 표식");
-    }
-
-    @Override
-    @NonNull
-    public NeaceA1 createSkill(@NonNull CombatUser combatUser) {
-        return new NeaceA1(combatUser);
+        super(NeaceA1.class, "구원의 표식");
     }
 }

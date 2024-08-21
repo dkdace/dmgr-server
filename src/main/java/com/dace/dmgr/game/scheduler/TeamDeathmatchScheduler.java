@@ -2,6 +2,7 @@ package com.dace.dmgr.game.scheduler;
 
 import com.comphenix.packetwrapper.WrapperPlayServerBoss;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameUser;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,12 +38,13 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
     /**
      * 모든 플레이어에게 게임 진행 타이머 보스바를 전송한다.
      */
-    private void broadcastBossBar(Game game) {
+    private void broadcastBossBar(@NonNull Game game) {
         String displayTime = (game.getRemainingTime() < 60 ? "§c§l" : "§l") +
                 DurationFormatUtils.formatDuration(game.getRemainingTime() * 1000L, "mm:ss", true);
 
-        game.getGameUsers().forEach(gameUser ->
-                gameUser.getUser().addBossBar("RemainingTime", MessageFormat.format("§b남은 시간 : {0}", displayTime),
-                        BarColor.BLUE, WrapperPlayServerBoss.BarStyle.PROGRESS, (double) game.getRemainingTime() / game.getGamePlayMode().getPlayDuration()));
+        for (GameUser gameUser : game.getGameUsers()) {
+            gameUser.getUser().addBossBar("RemainingTime", MessageFormat.format("§b남은 시간 : {0}", displayTime),
+                    BarColor.BLUE, WrapperPlayServerBoss.BarStyle.PROGRESS, (double) game.getRemainingTime() / game.getGamePlayMode().getPlayDuration());
+        }
     }
 }

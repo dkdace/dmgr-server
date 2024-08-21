@@ -2,11 +2,13 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 속박 상태 효과를 처리하는 클래스.
@@ -28,19 +30,21 @@ public class Snare implements StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    @MustBeInvokedByOverriders
+    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier("Snare", -100);
     }
 
     @Override
-    public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l속박당함!", "", 0, 2, 10);
     }
 
     @Override
-    public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+    @MustBeInvokedByOverriders
+    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
     }

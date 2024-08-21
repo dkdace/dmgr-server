@@ -1,9 +1,12 @@
 package com.dace.dmgr.combat.character.arkace;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.arkace.action.*;
@@ -105,10 +108,10 @@ public final class Arkace extends Marksman {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
-        ArkaceA2 skill2 = (ArkaceA2) combatUser.getSkill(ArkaceA2Info.getInstance());
-        ArkaceUlt skill4 = (ArkaceUlt) combatUser.getSkill(ArkaceUltInfo.getInstance());
+        ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
+        ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
 
-        int capacity = weapon.getReloadModule().getRemainingAmmo();
+        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
         double skill2Duration = skill2.getDuration() / 20.0;
         double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
         double skill4Duration = skill4.getDuration() / 20.0;
@@ -116,18 +119,18 @@ public final class Arkace extends Marksman {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, capacity, ArkaceWeaponInfo.CAPACITY,
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, ArkaceWeaponInfo.CAPACITY,
                 ArkaceWeaponInfo.CAPACITY, '|');
 
         text.add(weaponDisplay);
         text.add("");
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2Duration,
                     skill2MaxDuration, 10, '■');
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -136,8 +139,16 @@ public final class Arkace extends Marksman {
     }
 
     @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
+        if (combatUser.getEntity().isSprinting())
+            combatUser.useAction(ActionKey.PERIODIC_1);
+    }
+
+    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -147,30 +158,10 @@ public final class Arkace extends Marksman {
         if (!(victim instanceof CombatUser))
             return;
 
-        ArkaceUlt skillUlt = (ArkaceUlt) attacker.getSkill(ArkaceUltInfo.getInstance());
+        ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());
 
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
-    }
-
-    @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
-    public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
-    }
-
-    @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
-    public boolean canJump(@NonNull CombatUser combatUser) {
-        return true;
     }
 
     @Override
@@ -181,18 +172,16 @@ public final class Arkace extends Marksman {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return ArkaceP1Info.getInstance();
-            default:
-                return null;
-        }
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
+        if (number == 1)
+            return ArkaceP1Info.getInstance();
+
+        return null;
     }
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return ArkaceA1Info.getInstance();

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
@@ -21,7 +22,10 @@ public abstract class StackableSkill extends ActiveSkill {
     /** 스킬 스택 수 */
     protected int stack = 0;
 
-    protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo activeSkillInfo, int slot) {
+    /**
+     * @see ActiveSkill#ActiveSkill(CombatUser, ActiveSkillInfo, int)
+     */
+    protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
         super(combatUser, activeSkillInfo, slot);
         setStackCooldown(getDefaultStackCooldown());
     }
@@ -43,8 +47,8 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && stack > 0;
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && stack > 0;
     }
 
     @Override
@@ -76,8 +80,11 @@ public abstract class StackableSkill extends ActiveSkill {
      * 스킬의 스택 충전 쿨타임을 설정한다.
      *
      * @param cooldown 스택 충전 쿨타임 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final void setStackCooldown(long cooldown) {
+        if (cooldown < -1)
+            throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
         if (stack >= getMaxStack())
             return;
 

@@ -8,11 +8,11 @@ public final class SiliaT1Info extends TraitInfo {
     public static final int CRIT_MULTIPLIER = 2;
 
     /** 치명타 점수 */
-    public static final int CRIT_SCORE = 5;
+    public static final int CRIT_SCORE = 3;
     @Getter
     private static final SiliaT1Info instance = new SiliaT1Info();
 
     private SiliaT1Info() {
-        super(1, "백어택");
+        super("백어택");
     }
 }

@@ -8,8 +8,10 @@ import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import lombok.*;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.EnumMap;
@@ -21,16 +23,16 @@ import java.util.UUID;
  */
 public final class UserData extends YamlFile {
     /** 플레이어 UUID */
-    @Getter
     @NonNull
+    @Getter
     private final UUID playerUUID;
     /** 플레이어 이름 */
-    @Getter
     @NonNull
+    @Getter
     private final String playerName;
     /** 유저 개인 설정 */
-    @Getter
     @NonNull
+    @Getter
     private final Config config = new Config();
     /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
     private final EnumMap<CharacterType, CharacterRecord> characterRecordMap = new EnumMap<>(CharacterType.class);
@@ -68,17 +70,19 @@ public final class UserData extends YamlFile {
     @Getter
     private int quitCount = 0;
     /** 차단한 플레이어의 UUID 목록 */
+    @Nullable
     private List<String> blockedPlayers;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
      *
      * @param playerUUID 대상 플레이어 UUID
+     * @param playerName 대상 플레이어 이름
      */
-    private UserData(@NonNull UUID playerUUID) {
+    private UserData(@NonNull UUID playerUUID, @NonNull String playerName) {
         super("User/" + playerUUID);
         this.playerUUID = playerUUID;
-        this.playerName = Bukkit.getOfflinePlayer(playerUUID).getName();
+        this.playerName = playerName;
         for (CharacterType characterType : CharacterType.values())
             characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
@@ -106,7 +110,7 @@ public final class UserData extends YamlFile {
     public static UserData fromUUID(@NonNull UUID playerUUID) {
         UserData userData = UserDataRegistry.getInstance().get(playerUUID);
         if (userData == null)
-            userData = new UserData(playerUUID);
+            userData = new UserData(playerUUID, Bukkit.getOfflinePlayer(playerUUID).getName());
 
         return userData;
     }
@@ -147,7 +151,7 @@ public final class UserData extends YamlFile {
     }
 
     @Override
-    protected void onInitError(Exception ex) {
+    protected void onInitError(@NonNull Exception ex) {
         ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName);
     }
 
@@ -162,6 +166,13 @@ public final class UserData extends YamlFile {
         return characterRecordMap.get(characterType);
     }
 
+    /**
+     * 플레이어의 경험치를 설정하고 필요 경험치를 충족했을 경우 레벨을 증가시킨다.
+     *
+     * <p>레벨이 증가했을 경우 {@link User#playLevelUpEffect()}를 호출한다.</p>
+     *
+     * @param xp 경험치
+     */
     public void setXp(int xp) {
         boolean levelup = false;
 
@@ -218,6 +229,14 @@ public final class UserData extends YamlFile {
         set("money", this.money);
     }
 
+    /**
+     * 플레이어의 랭크 점수를 설정한다.
+     *
+     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는
+     * {@link User#playTierDownEffect()}를 호출한다.</p>
+     *
+     * @param rankRate 랭크 점수 (RR)
+     */
     public void setRankRate(int rankRate) {
         Tier tier = getTier();
 
@@ -256,17 +275,17 @@ public final class UserData extends YamlFile {
     }
 
     public void setWinCount(int winCount) {
-        this.winCount = winCount;
+        this.winCount = Math.max(0, winCount);
         set("winCount", this.winCount);
     }
 
     public void setLoseCount(int loseCount) {
-        this.loseCount = loseCount;
+        this.loseCount = Math.max(0, loseCount);
         set("loseCount", this.loseCount);
     }
 
     public void setQuitCount(int quitCount) {
-        this.quitCount = quitCount;
+        this.quitCount = Math.max(0, quitCount);
         set("quitCount", this.quitCount);
     }
 
@@ -276,7 +295,8 @@ public final class UserData extends YamlFile {
      * @return 차단한 플레이어 목록의 유저 데이터 정보
      */
     @NonNull
-    public UserData[] getBlockedPlayers() {
+    public UserData @NonNull [] getBlockedPlayers() {
+        Validate.notNull(blockedPlayers);
         return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
     }
 
@@ -287,6 +307,7 @@ public final class UserData extends YamlFile {
      * @return 차단 여부
      */
     public boolean isBlockedPlayer(@NonNull UserData userData) {
+        Validate.notNull(blockedPlayers);
         return this.blockedPlayers.contains(userData.getPlayerUUID().toString());
     }
 
@@ -296,6 +317,8 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
+        Validate.notNull(blockedPlayers);
+
         this.blockedPlayers.add(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -306,6 +329,8 @@ public final class UserData extends YamlFile {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void removeBlockedPlayer(@NonNull UserData userData) {
+        Validate.notNull(blockedPlayers);
+
         this.blockedPlayers.remove(userData.getPlayerUUID().toString());
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -314,6 +339,8 @@ public final class UserData extends YamlFile {
      * 차단 목록을 초기화한다.
      */
     public void clearBlockedPlayers() {
+        Validate.notNull(blockedPlayers);
+
         this.blockedPlayers.clear();
         set("blockedPlayers", this.blockedPlayers);
     }
@@ -321,7 +348,7 @@ public final class UserData extends YamlFile {
     /**
      * 전체 게임 플레이 시간을 반환한다.
      *
-     * @return 게임 플레이 시간
+     * @return 게임 플레이 시간 (초)
      */
     public int getPlayTime() {
         int totalPlayTime = 0;
@@ -382,7 +409,6 @@ public final class UserData extends YamlFile {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class Config {
         /** 채팅 효과음 */
-        @NonNull
         private String chatSound = ChatSoundOption.ChatSound.PLING.toString();
         /** 한글 채팅 여부 */
         @Getter
@@ -420,6 +446,7 @@ public final class UserData extends YamlFile {
         /** 섹션 이름 */
         private static final String SECTION = "record";
         /** 전투원 종류 */
+        @NonNull
         private final CharacterType characterType;
         /** 킬 */
         @Getter

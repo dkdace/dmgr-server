@@ -28,6 +28,8 @@ public final class OnPlayerInteract implements Listener {
             case RIGHT_CLICK_BLOCK:
                 combatUser.useAction(ActionKey.RIGHT_CLICK);
                 break;
+            default:
+                break;
         }
     }
 }

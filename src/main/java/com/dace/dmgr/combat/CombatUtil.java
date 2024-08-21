@@ -6,18 +6,11 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -47,36 +40,47 @@ public final class CombatUtil {
      * }</pre>
      *
      * @param damage            피해량
-     * @param distance          거리 (단위: 블록)
-     * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록)
+     * @param distance          거리 (단위: 블록). 0 이상의 값
+     * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록). 0 이상의 값
      * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소,
      *                          {@code false}면 최소 피해량이 0이 될 때까지 감소
      * @return 최종 피해량
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static int getDistantDamage(int damage, double distance, double weakeningDistance, boolean isHalf) {
-        if (distance > weakeningDistance) {
-            distance = distance - weakeningDistance;
-            int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
+        if (distance < 0)
+            throw new IllegalArgumentException("'distance'가 0 이상이어야 함");
+        if (weakeningDistance < 0)
+            throw new IllegalArgumentException("'pitch'가 0 이상이어야 함");
 
-            if (isHalf && finalDamage < damage / 2) {
-                finalDamage = damage / 2;
-            } else if (finalDamage < 0)
-                finalDamage = 0;
-
-            return finalDamage;
-        } else
+        if (distance <= weakeningDistance)
             return damage;
+
+        distance = distance - weakeningDistance;
+        int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
+
+        if (isHalf && finalDamage < damage / 2)
+            finalDamage = damage / 2;
+        else if (finalDamage < 0)
+            finalDamage = 0;
+
+        return finalDamage;
     }
 
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see CombatUtil#getNearCombatEntities(Location, double, Predicate)
      */
-    public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    @Nullable
+    public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
+        validateArgs(range);
+
         return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
@@ -95,11 +99,17 @@ public final class CombatUtil {
      * @param game      대상 게임. {@code null}로 지정 시
      *                  {@link CombatUtil#getNearCombatEntity(Location, double, Predicate)} 호출
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 가장 가까운 엔티티
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see CombatUtil#getNearCombatEntities(Game, Location, double, Predicate)
      */
-    public static CombatEntity getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    @Nullable
+    public static CombatEntity getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range,
+                                                   @NonNull Predicate<@NonNull CombatEntity> condition) {
+        validateArgs(range);
+
         if (game == null)
             return getNearCombatEntity(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())
@@ -118,12 +128,16 @@ public final class CombatUtil {
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 모든 엔티티
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see CombatUtil#getNearCombatEntity(Location, double, Predicate)
      */
     @NonNull
-    public static CombatEntity[] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity @NonNull [] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
+        validateArgs(range);
+
         return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
@@ -140,12 +154,17 @@ public final class CombatUtil {
      * @param game      대상 게임. {@code null}로 지정 시
      *                  {@link CombatUtil#getNearCombatEntities(Location, double, Predicate)} 호출
      * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록)
+     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
      * @return 범위 내 모든 엔티티
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see CombatUtil#getNearCombatEntity(Game, Location, double, Predicate)
      */
     @NonNull
-    public static CombatEntity[] getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range, @NonNull Predicate<CombatEntity> condition) {
+    public static CombatEntity @NonNull [] getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
+                                                                 @NonNull Predicate<@NonNull CombatEntity> condition) {
+        validateArgs(range);
+
         if (game == null)
             return getNearCombatEntities(location, range, condition);
         return Arrays.stream(game.getAllCombatEntities())
@@ -156,6 +175,16 @@ public final class CombatUtil {
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .toArray(CombatEntity[]::new);
+    }
+
+    /**
+     * 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param range 범위 (반지름). (단위: 블록)
+     */
+    private static void validateArgs(double range) {
+        if (range < 0)
+            throw new IllegalArgumentException("'range'가 0 이상이어야 함");
     }
 
     /**
@@ -211,21 +240,26 @@ public final class CombatUtil {
      * @param side            수평 반동
      * @param upSpread        수직 반동 분산도
      * @param sideSpread      수평 반동 분산도
-     * @param duration        반동 진행 시간 (tick)
+     * @param duration        반동 진행 시간 (tick). 1~5 사이의 값
      * @param firstMultiplier 초탄 반동 계수. 1로 설정 시 차탄과 동일
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
-        final double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
-        final double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
-        final boolean first = CooldownUtil.getCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID) == 0;
+        if (duration < 1 || duration > 5)
+            throw new IllegalArgumentException("'duration'이 1에서 5 사이여야 함");
+        if (firstMultiplier < 0)
+            throw new IllegalArgumentException("'firstMultiplier'가 0 이상이어야 함");
+
+        double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
+        double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
+        boolean first = CooldownUtil.getCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID) == 0;
         CooldownUtil.setCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID, 4);
 
         int sum = 0;
         for (int i = 1; i <= duration; i++) {
             sum += i;
         }
-
-        final int finalSum = sum;
+        int finalSum = sum;
 
         TaskUtil.addTask(combatUser, new IntervalTask(i -> {
             double finalUp = (up + finalUpSpread) / ((double) finalSum / (duration - i));
@@ -258,174 +292,5 @@ public final class CombatUtil {
         entity.getEquipment().clear();
 
         return entity;
-    }
-
-    /**
-     * 지정한 위치 또는 엔티티에 출혈 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param entity   대상 엔티티
-     * @param damage   피해량
-     */
-    public static void playBleedingEffect(@Nullable Location location, @Nullable Entity entity, int damage) {
-        if (location == null && entity == null)
-            return;
-
-        if (location == null)
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0,
-                    entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.1),
-                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
-        else
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.REDSTONE_BLOCK, 0, location, (int) Math.ceil(damage * 0.06),
-                    0, 0, 0, 0.1);
-    }
-
-    /**
-     * 지정한 위치 또는 엔티티에 파괴 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param entity   대상 엔티티
-     * @param damage   피해량
-     */
-    public static void playBreakEffect(@Nullable Location location, @Nullable Entity entity, int damage) {
-        if (location == null && entity == null)
-            return;
-
-        if (location == null)
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0,
-                    entity.getLocation().add(0, entity.getHeight() / 2, 0), damage == 0 ? 1 : (int) Math.ceil(damage * 0.07),
-                    entity.getWidth() / 4, entity.getHeight() / 4, entity.getWidth() / 4, damage == 0 ? 0.03 : 0.1);
-        else
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, location, (int) Math.ceil(damage * 0.04),
-                    0, 0, 0, 0.1);
-    }
-
-    /**
-     * 지정한 위치에 블록 타격 효과를 재생한다.
-     *
-     * @param location        대상 위치
-     * @param block           블록
-     * @param scaleMultiplier 규모(입자의 양 및 범위) 배수
-     */
-    public static void playBlockHitEffect(@NonNull Location location, @NonNull Block block, double scaleMultiplier) {
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, block.getType(), block.getData(), location,
-                (int) (6 * scaleMultiplier), 0.06 * scaleMultiplier, 0.06 * scaleMultiplier, 0.06 * scaleMultiplier, 0.1);
-        ParticleUtil.play(Particle.TOWN_AURA, location, (int) (25 * scaleMultiplier),
-                0.05 * scaleMultiplier, 0.05 * scaleMultiplier, 0.05 * scaleMultiplier, 0);
-    }
-
-    /**
-     * 지정한 위치에 블록 타격 효과음을 재생한다.
-     *
-     * @param location         대상 위치
-     * @param block            블록
-     * @param volumeMultiplier 음량 배수
-     */
-    public static void playBlockHitSound(@NonNull Location location, @NonNull Block block, double volumeMultiplier) {
-        switch (block.getType()) {
-            case GRASS:
-            case LEAVES:
-            case LEAVES_2:
-            case SPONGE:
-            case HAY_BLOCK:
-                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case DIRT:
-            case GRAVEL:
-            case SAND:
-            case CLAY:
-                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case STONE:
-            case COBBLESTONE:
-            case COBBLESTONE_STAIRS:
-            case BRICK:
-            case BRICK_STAIRS:
-            case SANDSTONE:
-            case SANDSTONE_STAIRS:
-            case RED_SANDSTONE:
-            case RED_SANDSTONE_STAIRS:
-            case HARD_CLAY:
-            case STAINED_CLAY:
-            case OBSIDIAN:
-            case COAL_BLOCK:
-            case QUARTZ_BLOCK:
-            case QUARTZ_STAIRS:
-            case COBBLE_WALL:
-            case SMOOTH_BRICK:
-            case SMOOTH_STAIRS:
-            case NETHER_BRICK:
-            case NETHER_FENCE:
-            case NETHER_BRICK_STAIRS:
-            case STEP:
-            case DOUBLE_STEP:
-            case STONE_SLAB2:
-            case DOUBLE_STONE_SLAB2:
-            case CONCRETE:
-                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1 * volumeMultiplier, 0.9, 0.1);
-                break;
-            case IRON_BLOCK:
-            case GOLD_BLOCK:
-            case IRON_DOOR_BLOCK:
-            case ANVIL:
-            case IRON_TRAPDOOR:
-            case CAULDRON:
-            case HOPPER:
-                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5 * volumeMultiplier, 1.95, 0.1);
-                SoundUtil.play("random.metalhit", location, 0.8 * volumeMultiplier, 1.95, 0.1);
-                break;
-            case WOOD:
-            case LOG:
-            case LOG_2:
-            case WOOD_STAIRS:
-            case SPRUCE_WOOD_STAIRS:
-            case BIRCH_WOOD_STAIRS:
-            case JUNGLE_WOOD_STAIRS:
-            case DARK_OAK_STAIRS:
-            case ACACIA_STAIRS:
-            case WOOD_STEP:
-            case WOOD_DOUBLE_STEP:
-            case NOTE_BLOCK:
-            case JUKEBOX:
-            case FENCE:
-            case SPRUCE_FENCE:
-            case BIRCH_FENCE:
-            case JUNGLE_FENCE:
-            case DARK_OAK_FENCE:
-            case ACACIA_FENCE:
-            case FENCE_GATE:
-            case SPRUCE_FENCE_GATE:
-            case BIRCH_FENCE_GATE:
-            case JUNGLE_FENCE_GATE:
-            case DARK_OAK_FENCE_GATE:
-            case ACACIA_FENCE_GATE:
-            case WOODEN_DOOR:
-            case SPRUCE_DOOR:
-            case BIRCH_DOOR:
-            case JUNGLE_DOOR:
-            case DARK_OAK_DOOR:
-            case ACACIA_DOOR:
-            case CHEST:
-            case BOOKSHELF:
-                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8 * volumeMultiplier, 0.8, 0.1);
-                SoundUtil.play("random.stab", location, 0.8 * volumeMultiplier, 1.95, 0.1);
-                break;
-            case GLASS:
-            case THIN_GLASS:
-            case STAINED_GLASS:
-            case STAINED_GLASS_PANE:
-            case ICE:
-            case PACKED_ICE:
-            case FROSTED_ICE:
-            case REDSTONE_LAMP_OFF:
-            case REDSTONE_LAMP_ON:
-            case SEA_LANTERN:
-                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
-                break;
-            case WOOL:
-            case CARPET:
-                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1 * volumeMultiplier, 0.8, 0.1);
-                break;
-        }
     }
 }

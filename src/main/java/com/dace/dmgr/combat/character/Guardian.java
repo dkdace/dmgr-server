@@ -12,10 +12,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Guardian extends Character {
-    /** 넉백 저항 수정자 ID */
-    private static final String KNOCKBACK_RESISTANCE_MODIFIER_ID = "RoleTrait1Knockback";
-    /** 방어력 수정자 ID */
-    private static final String DEFENSE_MODIFIER_ID = "RoleTrait1Defense";
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "RoleTrait1";
 
     /**
      * 수호 역할군 전투원 정보 인스턴스를 생성한다.
@@ -34,8 +32,8 @@ public abstract class Guardian extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        combatUser.getKnockbackModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER_ID, RoleTrait1Info.KNOCKBACK_RESISTANCE);
-        combatUser.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER_ID, RoleTrait1Info.DEFENSE);
+        combatUser.getKnockbackModule().getResistanceStatus().addModifier(MODIFIER_ID, RoleTrait1Info.KNOCKBACK_RESISTANCE);
+        combatUser.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, RoleTrait1Info.DEFENSE);
     }
 
     @Override
@@ -60,7 +58,7 @@ public abstract class Guardian extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 수호 - 1");
+            super("역할: 수호 - 1");
         }
     }
 
@@ -73,7 +71,7 @@ public abstract class Guardian extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 수호 - 2");
+            super("역할: 수호 - 2");
         }
     }
 }

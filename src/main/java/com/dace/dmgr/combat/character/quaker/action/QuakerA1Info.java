@@ -1,11 +1,9 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class QuakerA1Info extends ActiveSkillInfo {
+public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 1 * 20;
     /** 사망 시 쿨타임 (tick) */
@@ -20,19 +18,13 @@ public final class QuakerA1Info extends ActiveSkillInfo {
     public static final int USE_SLOW = 25;
 
     /** 방어 점수 */
-    public static final int BLOCK_SCORE = 75;
+    public static final int BLOCK_SCORE = 50;
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 20;
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 
     private QuakerA1Info() {
-        super(1, "불굴의 방패");
-    }
-
-    @Override
-    @NonNull
-    public QuakerA1 createSkill(@NonNull CombatUser combatUser) {
-        return new QuakerA1(combatUser);
+        super(QuakerA1.class, "불굴의 방패");
     }
 }

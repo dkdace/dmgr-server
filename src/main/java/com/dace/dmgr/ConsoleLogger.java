@@ -30,7 +30,7 @@ public final class ConsoleLogger {
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
      */
-    public static void info(@NonNull String message, @NonNull Object... arguments) {
+    public static void info(@NonNull String message, @NonNull Object @NonNull ... arguments) {
         logger.info(() -> MessageFormat.format(message, arguments));
     }
 
@@ -58,7 +58,7 @@ public final class ConsoleLogger {
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
      */
-    public static void warning(@NonNull String message, @NonNull Object... arguments) {
+    public static void warning(@NonNull String message, @NonNull Object @NonNull ... arguments) {
         logger.warning(() -> MessageFormat.format(message, arguments));
     }
 
@@ -86,7 +86,7 @@ public final class ConsoleLogger {
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
      */
-    public static void severe(@NonNull String message, @NonNull Object... arguments) {
+    public static void severe(@NonNull String message, @NonNull Object @NonNull ... arguments) {
         logger.severe(() -> MessageFormat.format(message, arguments));
     }
 
@@ -98,15 +98,15 @@ public final class ConsoleLogger {
      * <p>Example:</p>
      *
      * <pre>{@code
-     * // Hello, World!
-     * ConsoleLogger.severe("Hello, {0}!", "World!");
+     * // "Hello, World!" 및 예외 정보 출력
+     * ConsoleLogger.severe("Hello, {0}!", ex, "World!");
      * }</pre>
      *
      * @param message   메시지
      * @param exception 예외 객체
      * @param arguments 포맷에 사용할 인자 목록
      */
-    public static void severe(@NonNull String message, @NonNull Exception exception, @NonNull Object... arguments) {
+    public static void severe(@NonNull String message, @NonNull Exception exception, @NonNull Object @NonNull ... arguments) {
         logger.log(Level.SEVERE, MessageFormat.format(message, arguments), exception);
     }
 

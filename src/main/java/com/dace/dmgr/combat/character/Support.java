@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.Arrays;
+
 /**
  * 역할군이 '지원'인 전투원의 정보를 관리하는 클래스.
  */
@@ -36,11 +38,11 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null) {
-            boolean activate = combatUser.getGame().getTeamUserMap().get(combatUser.getGameUser().getTeam()).stream()
+        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
+            boolean activate = Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .anyMatch(combatUser2 -> combatUser2 != null && combatUser2.getDamageModule().isLowHealth() &&
-                            combatUser2.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
+                    .anyMatch(target -> target != null && target.getDamageModule().isLowHealth() &&
+                            target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
                 combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait1Info.SPEED);
@@ -76,7 +78,7 @@ public abstract class Support extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 지원 - 1");
+            super("역할: 지원 - 1");
         }
     }
 
@@ -89,7 +91,7 @@ public abstract class Support extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 지원 - 2");
+            super("역할: 지원 - 2");
         }
     }
 }

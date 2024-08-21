@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.ChatColor;
 
 /**
@@ -18,9 +19,12 @@ public enum Role {
     CONTROLLER("제어", ChatColor.LIGHT_PURPLE, new String[]{"§f역할군 설명"});
 
     /** 이름 */
+    @NonNull
     private final String name;
     /** 상징 색 */
+    @NonNull
     private final ChatColor color;
     /** 설명 */
-    private final String[] description;
+    @NonNull
+    private final String @NonNull [] description;
 }

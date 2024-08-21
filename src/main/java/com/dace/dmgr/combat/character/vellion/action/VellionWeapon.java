@@ -17,7 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class VellionWeapon extends AbstractWeapon {
-    VellionWeapon(@NonNull CombatUser combatUser) {
+    public VellionWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, VellionWeaponInfo.getInstance());
     }
 
@@ -33,36 +33,30 @@ public final class VellionWeapon extends AbstractWeapon {
     }
 
     @Override
-    public boolean canUse() {
-        return super.canUse() && !((VellionA3) combatUser.getSkill(VellionA3Info.getInstance())).getConfirmModule().isChecking() &&
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking() &&
                 combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                setCooldown();
-                combatUser.playMeleeAttackAnimation(-4, 8, true);
+        setCooldown();
+        combatUser.playMeleeAttackAnimation(-4, 8, true);
 
-                new VellionWeaponProjectile().shoot();
+        new VellionWeaponProjectile().shoot();
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_WEAPON_USE, combatUser.getEntity().getLocation());
-
-                break;
-            }
-        }
+        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_WEAPON_USE, combatUser.getEntity().getLocation());
     }
 
     private final class VellionWeaponProjectile extends Projectile {
         private VellionWeaponProjectile() {
-            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(13).size(VellionWeaponInfo.SIZE)
+            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(12).size(VellionWeaponInfo.SIZE)
                     .maxDistance(VellionWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
         }
 
         @Override
-        protected void trail() {
-            Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+        protected void onTrailInterval() {
+            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
             ParticleUtil.play(Particle.SPELL_WITCH, loc, 4, 0.1, 0.1, 0.1, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 6, 0.25, 0.25, 0.25,
                     80, 30, 110);
@@ -70,7 +64,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.SMOKE_NORMAL, location, 30, 0.1, 0.1, 0.1, 0.1);
+            ParticleUtil.play(Particle.SMOKE_NORMAL, getLocation(), 30, 0.1, 0.1, 0.1, 0.1);
         }
 
         @Override
@@ -80,7 +74,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+            target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true);
             return false;
         }
     }

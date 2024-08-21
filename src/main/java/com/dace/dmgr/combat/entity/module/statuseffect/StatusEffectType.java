@@ -29,6 +29,8 @@ public enum StatusEffectType {
     SILENCE,
     /** 독 */
     POISON,
+    /** 화염 */
+    BURNING,
     /** 회복 차단 */
     HEAL_BLOCK
 }

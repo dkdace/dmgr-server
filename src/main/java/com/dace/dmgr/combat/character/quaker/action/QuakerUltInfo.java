@@ -1,13 +1,11 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
-import lombok.NonNull;
 
-public final class QuakerUltInfo extends UltimateSkillInfo {
+public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 7000;
+    public static final int COST = 6500;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.8 * 20);
     /** 시전 시간 (tick) */
@@ -37,12 +35,6 @@ public final class QuakerUltInfo extends UltimateSkillInfo {
     private static final QuakerUltInfo instance = new QuakerUltInfo();
 
     private QuakerUltInfo() {
-        super("심판의 문지기");
-    }
-
-    @Override
-    @NonNull
-    public QuakerUlt createSkill(@NonNull CombatUser combatUser) {
-        return new QuakerUlt(combatUser);
+        super(QuakerUlt.class, "심판의 문지기");
     }
 }

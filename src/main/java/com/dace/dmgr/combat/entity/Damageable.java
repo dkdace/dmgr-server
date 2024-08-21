@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -15,6 +17,18 @@ public interface Damageable extends CombatEntity {
      */
     @NonNull
     DamageModule getDamageModule();
+
+    /**
+     * @return 넉백 모듈
+     */
+    @NonNull
+    KnockbackModule getKnockbackModule();
+
+    /**
+     * @return 상태 효과 모듈
+     */
+    @NonNull
+    StatusEffectModule getStatusEffectModule();
 
     /**
      * 엔티티가 피해를 받을 수 있는 지 확인한다.

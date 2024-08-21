@@ -21,6 +21,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 public abstract class AbstractAction implements Action {
     /** 동작 쿨타임 ID */
     protected static final String ACTION_COOLDOWN_ID = "ActionCooldown";
+
     /** 플레이어 객체 */
     @NonNull
     protected final CombatUser combatUser;
@@ -56,6 +57,9 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final void setCooldown(long cooldown) {
+        if (cooldown < -1)
+            throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
+
         if (isCooldownFinished()) {
             CooldownUtil.setCooldown(this, ACTION_COOLDOWN_ID, cooldown);
             runCooldown();
@@ -71,6 +75,9 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final void addCooldown(long cooldown) {
+        if (cooldown < 0)
+            throw new IllegalArgumentException("'cooldown'이 0 이상이어야 함");
+
         setCooldown(getCooldown() + cooldown);
     }
 
@@ -108,7 +115,7 @@ public abstract class AbstractAction implements Action {
     }
 
     @Override
-    public boolean canUse() {
+    public boolean canUse(@NonNull ActionKey actionKey) {
         return isCooldownFinished();
     }
 
@@ -121,6 +128,7 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void reset() {
+        validate();
         setCooldown(getDefaultCooldown());
     }
 

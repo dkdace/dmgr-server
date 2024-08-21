@@ -1,8 +1,10 @@
 package com.dace.dmgr.combat.character.quaker;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
@@ -104,14 +106,14 @@ public final class Quaker extends Guardian {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        QuakerA1 skill1 = (QuakerA1) combatUser.getSkill(QuakerA1Info.getInstance());
+        QuakerA1 skill1 = combatUser.getSkill(QuakerA1Info.getInstance());
 
         int skill1Health = skill1.getStateValue();
         int skill1MaxHealth = skill1.getMaxStateValue();
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar(skill1.getSkillInfo().toString(), skill1Health, skill1MaxHealth,
+        String skill1Display = StringFormUtil.getActionbarProgressBar(QuakerA1Info.getInstance().toString(), skill1Health, skill1MaxHealth,
                 10, '■');
 
         if (!skill1.isDurationFinished())
@@ -136,7 +138,7 @@ public final class Quaker extends Guardian {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
     @Override
@@ -162,11 +164,6 @@ public final class Quaker extends Guardian {
     }
 
     @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
-    }
-
-    @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() &&
                 combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
@@ -180,16 +177,13 @@ public final class Quaker extends Guardian {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
-        switch (number) {
-            default:
-                return null;
-        }
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
+        return null;
     }
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return QuakerA1Info.getInstance();

@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.function.Consumer;
 
@@ -19,11 +18,12 @@ import java.util.function.Consumer;
  * 메뉴 GUI 클래스.
  */
 public final class Menu extends Gui {
-    @Getter
-    private static final Menu instance = new Menu();
+    /** 플레이어 GUI 아이템 객체 */
     private static final StaticItem playerInto = new StaticItem("MenuPlayer", new ItemBuilder(Material.SKULL_ITEM)
             .setDamage((short) 3)
             .build());
+    @Getter
+    private static final Menu instance = new Menu();
 
     private Menu() {
         super(6, "§8메뉴");
@@ -36,7 +36,7 @@ public final class Menu extends Gui {
         new AsyncTask<Void>((onFinish, onError) ->
                 guiController.set(4, playerInto, itemBuilder -> {
                     UserData userData = UserData.fromPlayer(player);
-                    ((SkullMeta) itemBuilder.setName(userData.getDisplayName()).getItemMeta()).setOwningPlayer(player);
+                    itemBuilder.setName(userData.getDisplayName()).setSkullOwner(player);
                 })
         );
 

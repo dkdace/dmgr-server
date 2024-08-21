@@ -1,9 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -12,8 +10,6 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,12 +34,15 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     protected final String name;
     /** 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Nullable
     protected final Game game;
     /** 히트박스 객체 목록 */
     @NonNull
     protected final Hitbox @NonNull [] hitboxes;
     /** 활성화 여부 */
     protected boolean isActivated = false;
+    /** 움직임 상태 */
+    protected boolean isMoving = false;
     /** 히트박스의 중앙 위치 */
     @NonNull
     private Location hitboxLocation;
@@ -109,7 +108,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         Location oldLoc = entity.getLocation();
 
         TaskUtil.addTask(this, new DelayTask(() -> {
-            for (Hitbox hitbox : hitboxes) {
+            isMoving = oldLoc.distance(entity.getLocation()) > 0;
+            for (Hitbox hitbox : getHitboxes()) {
                 hitboxLocation = oldLoc;
                 hitbox.setCenter(hitboxLocation);
             }
@@ -118,8 +118,20 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     @NonNull
+    public final Location getHitboxLocation() {
+        return hitboxLocation.clone();
+    }
+
+    @Override
+    @NonNull
+    public final Location getCenterLocation() {
+        return entity.getLocation().add(0, entity.getHeight() / 2, 0);
+    }
+
+    @Override
+    @NonNull
     public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
-        return Arrays.stream(hitboxes).map(hitbox -> hitbox.getNearestLocation(location))
+        return Arrays.stream(getHitboxes()).map(hitbox -> hitbox.getNearestLocation(location))
                 .min(Comparator.comparing(loc -> loc.distance(location)))
                 .orElseThrow(() -> new IllegalStateException("가장 가까운 위치를 찾을 수 없음"));
     }
@@ -144,29 +156,5 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Override
     public final boolean isEnemy(@NonNull CombatEntity combatEntity) {
         return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
-    }
-
-    @Override
-    public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (!getKnockbackModule().isKnockbacked() && !getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) &&
-                !getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
-            entity.setVelocity(isReset ? velocity : entity.getVelocity().add(velocity));
-    }
-
-    @Override
-    public final void push(@NonNull Vector velocity) {
-        push(velocity, false);
-    }
-
-    @Override
-    public final void teleport(@NonNull Location location) {
-        if (getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) || getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
-            return;
-
-        if (entity instanceof Player) {
-            User user = User.fromPlayer((Player) entity);
-            user.teleport(location);
-        } else
-            entity.teleport(location);
     }
 }

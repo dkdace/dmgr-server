@@ -10,6 +10,6 @@ public final class QuakerT1Info extends TraitInfo {
     private static final QuakerT1Info instance = new QuakerT1Info();
 
     private QuakerT1Info() {
-        super(1, "불굴");
+        super("불굴");
     }
 }

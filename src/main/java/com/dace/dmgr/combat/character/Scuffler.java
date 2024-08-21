@@ -1,14 +1,10 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Speed;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -33,13 +29,12 @@ public abstract class Scuffler extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser))
-            return;
+        if (victim instanceof CombatUser) {
+            if (isFinalHit)
+                attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-        if (isFinalHit)
-            attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
-
-        attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+            attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+        }
     }
 
     public static final class RoleTrait1Info extends TraitInfo {
@@ -49,7 +44,7 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super(1, "역할: 근접 - 1");
+            super("역할: 근접 - 1");
         }
     }
 
@@ -62,26 +57,20 @@ public abstract class Scuffler extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super(2, "역할: 근접 - 2");
+            super("역할: 근접 - 2");
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    /**
+     * 속도 증가 상태 효과 클래스.
+     */
     private static final class RoleTrait2Speed extends Speed {
+        private static final RoleTrait2Speed instance = new RoleTrait2Speed();
         /** 수정자 ID */
         private static final String MODIFIER_ID = "RoleTrait2";
-        private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
-        @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait2Info.SPEED);
-        }
-
-        @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        private RoleTrait2Speed() {
+            super(MODIFIER_ID, RoleTrait2Info.SPEED);
         }
     }
 }

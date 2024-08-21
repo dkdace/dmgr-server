@@ -3,6 +3,7 @@ package com.dace.dmgr.item.gui;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Material;
 
 /**
@@ -26,6 +27,7 @@ public enum DisplayItem {
     ENABLED(7);
 
     /** 정적 아이템 객체 */
+    @NonNull
     private final StaticItem staticItem;
 
     DisplayItem(int damage) {

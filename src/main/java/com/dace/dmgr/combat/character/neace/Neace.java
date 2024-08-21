@@ -1,25 +1,24 @@
 package com.dace.dmgr.combat.character.neace;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -51,9 +50,7 @@ public final class Neace extends Support {
      * @param target     사용 대상
      */
     public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-        return target instanceof Healable && !target.isEnemy(combatUser) &&
-                target != combatUser && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(),
-                target.getEntity().getLocation().add(0, target.getEntity().getHeight() / 2, 0));
+        return target instanceof Healable && target != combatUser && !target.isEnemy(combatUser);
     }
 
     @Override
@@ -113,9 +110,9 @@ public final class Neace extends Support {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        NeaceA2 skill2 = (NeaceA2) combatUser.getSkill(NeaceA2Info.getInstance());
-        NeaceA3 skill3 = (NeaceA3) combatUser.getSkill(NeaceA3Info.getInstance());
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+        NeaceA2 skill2 = combatUser.getSkill(NeaceA2Info.getInstance());
+        NeaceA3 skill3 = combatUser.getSkill(NeaceA3Info.getInstance());
+        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
 
         double skill2Duration = skill2.getDuration() / 20.0;
         double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
@@ -125,14 +122,14 @@ public final class Neace extends Support {
         StringJoiner text = new StringJoiner("    ");
 
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(skill2.getSkillInfo().toString(), skill2Duration,
+            String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2Duration,
                     skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
             text.add(skill2Display);
         }
         if (!skill3.isDurationFinished())
-            text.add(skill3.getSkillInfo() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
+            text.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(skill4.getSkillInfo().toString(), skill4Duration,
+            String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4Duration,
                     skill4MaxDuration, 10, '■');
             text.add(skill4Display);
         }
@@ -152,7 +149,7 @@ public final class Neace extends Support {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
         CooldownUtil.setCooldown(victim, NeaceP1.COOLDOWN_ID, NeaceP1Info.ACTIVATE_DURATION);
     }
 
@@ -167,27 +164,15 @@ public final class Neace extends Support {
     }
 
     @Override
-    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return true;
-    }
-
-    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
+        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
 
         return skill4.isDurationFinished() || skill4.isEnabled();
-    }
-
-    @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return false;
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = (NeaceUlt) combatUser.getSkill(NeaceUltInfo.getInstance());
-
-        return skill4.isDurationFinished() || skill4.isEnabled();
+        return canSprint(combatUser);
     }
 
     @Override
@@ -198,18 +183,16 @@ public final class Neace extends Support {
 
     @Override
     @Nullable
-    public PassiveSkillInfo getPassiveSkillInfo(int number) {
-        switch (number) {
-            case 1:
-                return NeaceP1Info.getInstance();
-            default:
-                return null;
-        }
+    public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
+        if (number == 1)
+            return NeaceP1Info.getInstance();
+
+        return null;
     }
 
     @Override
     @Nullable
-    public ActiveSkillInfo getActiveSkillInfo(int number) {
+    public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
             case 1:
                 return NeaceA1Info.getInstance();
@@ -230,21 +213,14 @@ public final class Neace extends Support {
         return NeaceUltInfo.getInstance();
     }
 
-    private static final class NeaceTarget extends Hitscan {
+    private static final class NeaceTarget extends Target {
         private NeaceTarget(CombatUser combatUser) {
-            super(combatUser, HitscanOption.builder().size(HitscanOption.TARGET_SIZE_DEFAULT).maxDistance(NeaceA1Info.MAX_DISTANCE)
-                    .condition(combatEntity -> getTargetedActionCondition(combatUser, combatEntity)).build());
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, false, combatEntity -> getTargetedActionCondition(combatUser, combatEntity));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
+        protected void onFindEntity(@NonNull Damageable target) {
             GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
-            return false;
         }
     }
 }

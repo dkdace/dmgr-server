@@ -7,19 +7,14 @@ import com.dace.dmgr.util.StringFormUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 랭킹 명령어 클래스.
@@ -27,7 +22,7 @@ import java.util.stream.Collectors;
  * <p>Usage: /랭킹</p>
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RankingCommand implements CommandExecutor {
+public final class RankingCommand extends BaseCommandExecutor {
     /** 도움말 메시지 */
     private static final String MESSAGE_HELP = StringFormUtil.BAR +
             "\n§a§l/(랭킹|rank[ing]) <항목> - §a1위부터 10위까지의 항목별 랭킹을 확인합니다." +
@@ -40,8 +35,7 @@ public class RankingCommand implements CommandExecutor {
     private static final RankingCommand instance = new RankingCommand();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
+    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
         User user = User.fromPlayer(player);
 
         if (args.length == 1) {
@@ -78,7 +72,7 @@ public class RankingCommand implements CommandExecutor {
                 }
                 default: {
                     user.sendMessageInfo(MESSAGE_HELP);
-                    return true;
+                    return;
                 }
             }
 
@@ -87,32 +81,23 @@ public class RankingCommand implements CommandExecutor {
             user.sendMessageInfo(StringFormUtil.BAR);
         } else
             user.sendMessageInfo(MESSAGE_HELP);
-
-        return true;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Tab implements TabCompleter {
-        @Getter
-        private static final Tab instance = new Tab();
+    @Override
+    @Nullable
+    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
+        if (args.length != 1)
+            return null;
 
-        @Override
-        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-            List<String> completions = new ArrayList<>();
-            switch (alias.toLowerCase()) {
-                case "랭킹":
-                case "fodzld":
-                    completions.addAll(Arrays.asList("점수", "티어", "레벨"));
-                    break;
-                case "rank":
-                case "ranking":
-                    completions.addAll(Arrays.asList("tier", "level"));
-                    break;
-            }
-            if (args.length == 1)
-                return completions.stream().filter(completion -> completion.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-
-            return Collections.emptyList();
+        switch (alias.toLowerCase()) {
+            case "랭킹":
+            case "fodzld":
+                return Arrays.asList("점수", "티어", "레벨");
+            case "rank":
+            case "ranking":
+                return Arrays.asList("tier", "level");
+            default:
+                return null;
         }
     }
 }

@@ -1,13 +1,9 @@
 package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-
-import java.util.HashSet;
 
 /**
  * 히트스캔. 광선과 같이 탄속이 무한한 총알을 관리하는 클래스.
@@ -20,6 +16,7 @@ public abstract class Hitscan extends Bullet {
      *
      * @param shooter 발사자
      * @param option  선택적 옵션
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see HitscanOption
      */
     protected Hitscan(@NonNull CombatEntity shooter, @NonNull HitscanOption option) {
@@ -36,39 +33,17 @@ public abstract class Hitscan extends Bullet {
                 HitscanOption.SIZE_DEFAULT, HitscanOption.CONDITION_DEFAULT);
     }
 
-    /**
-     * 히트스캔 총알을 발사한다.
-     *
-     * @param origin    발사 위치
-     * @param direction 발사 방향
-     */
     @Override
-    public final void shoot(@NonNull Location origin, @NonNull Vector direction) {
-        velocity = direction.clone().normalize().multiply(HITBOX_INTERVAL);
-        location = origin.clone();
-        location.add(direction.clone().multiply(startDistance));
-        HashSet<Damageable> targets = new HashSet<>();
-
-        for (int i = 0; location.distance(origin) < maxDistance; i++) {
+    protected final void onShoot(@NonNull Location origin, @NonNull Vector direction) {
+        for (int i = 0; getLocation().distance(origin) < maxDistance; i++) {
             if (!onInterval())
                 break;
 
-            if (!LocationUtil.isNonSolid(location) && !handleBlockCollision())
-                break;
-
-            if (!findTargetAndHandleCollision(targets))
-                break;
-
-            location.add(velocity);
+            getLocation().add(getVelocity());
             if (i % trailInterval == 0)
-                trail();
+                onTrailInterval();
         }
 
         onDestroy();
-    }
-
-    @Override
-    protected boolean onInterval() {
-        return true;
     }
 }

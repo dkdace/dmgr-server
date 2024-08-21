@@ -4,9 +4,11 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 
@@ -35,6 +38,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     @Getter
     private Location currentLocation;
     /** 위치 표시용 갑옷 거치대 객체 */
+    @Nullable
     private ArmorStand pointer = null;
 
     /**
@@ -43,10 +47,14 @@ public final class LocationConfirmModule extends ConfirmModule {
      * @param skill       대상 스킬
      * @param acceptKey   수락 키
      * @param cancelKey   취소 키
-     * @param maxDistance 최대 거리. (단위: 블록)
+     * @param maxDistance 최대 거리. (단위: 블록). 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public LocationConfirmModule(@NonNull Confirmable skill, @NonNull ActionKey acceptKey, @NonNull ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
+        if (maxDistance < 0)
+            throw new IllegalArgumentException("'maxDistance'가 0 이상이어야 함");
+
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getEntity().getLocation();
 
@@ -64,8 +72,15 @@ public final class LocationConfirmModule extends ConfirmModule {
     public boolean isValid() {
         if (!isChecking)
             return false;
-        return !currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) && currentLocation.getBlock().isEmpty() &&
-                !currentLocation.clone().add(0, -1, 0).getBlock().isEmpty();
+        if (currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) || !currentLocation.getBlock().isEmpty() ||
+                currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
+            return false;
+
+        Location loc = skill.getCombatUser().getEntity().getEyeLocation();
+        loc.setY(currentLocation.getY());
+
+        return skill.getCombatUser().getEntity().getEyeLocation().getY() > currentLocation.getY() ||
+                LocationUtil.canPass(loc, skill.getCombatUser().getEntity().getEyeLocation());
     }
 
     @Override
@@ -94,9 +109,25 @@ public final class LocationConfirmModule extends ConfirmModule {
 
     @Override
     protected void onCheckTick(long i) {
+        Validate.notNull(pointer);
+
         Player player = skill.getCombatUser().getEntity();
 
         currentLocation = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 1, 0.5);
+        Location loc = currentLocation.clone();
+        for (int j = 0; j < 16; j++) {
+            if (!LocationUtil.isNonSolid(loc.subtract(0, 0.5, 0))) {
+                currentLocation = loc;
+                break;
+            }
+        }
+        loc = currentLocation.clone();
+        for (int j = 0; j < 16; j++) {
+            if (LocationUtil.isNonSolid(loc.add(0, 0.5, 0))) {
+                currentLocation = loc;
+                break;
+            }
+        }
         currentLocation.setYaw(i * 10);
         currentLocation.setPitch(0);
 
@@ -115,6 +146,7 @@ public final class LocationConfirmModule extends ConfirmModule {
 
     @Override
     protected void onCheckDisable() {
+        Validate.notNull(pointer);
         pointer.remove();
     }
 }

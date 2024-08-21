@@ -1,16 +1,14 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.Registry;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.HashMap;
 
 /**
  * 게임 정보({@link Game})를 저장하는 클래스.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GameRegistry extends Registry<GameRegistry.KeyPair, Game> {
     @Getter
     private static final GameRegistry instance = new GameRegistry();

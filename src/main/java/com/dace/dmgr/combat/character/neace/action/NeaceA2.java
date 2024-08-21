@@ -23,7 +23,7 @@ public final class NeaceA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
-    NeaceA2(@NonNull CombatUser combatUser) {
+    public NeaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA2Info.getInstance(), 1);
     }
 
@@ -51,12 +51,11 @@ public final class NeaceA2 extends ActiveSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A2_USE, combatUser.getEntity().getLocation());
 
-            TaskUtil.addTask(this, new IntervalTask(i -> {
-                if (isDurationFinished())
+            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+                if (isDurationFinished() || combatUser.isDead())
                     return false;
 
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                        combatUser.getEntity().getLocation().add(0, combatUser.getEntity().getHeight() / 2, 0), 3,
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 3,
                         1, 1.5, 1, 140, 255, 245);
                 if (i < 12)
                     playTickEffect(i);
@@ -64,7 +63,7 @@ public final class NeaceA2 extends ActiveSkill {
                 return true;
             }, isCancelled -> combatUser.getWeapon().setGlowing(false), 1));
         } else
-            setCooldown();
+            setDuration(0);
     }
 
     @Override
@@ -78,17 +77,16 @@ public final class NeaceA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        double angle = i * 14;
-
         Location loc = combatUser.getEntity().getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(1.3);
         Vector axis = VectorUtil.getYawAxis(loc);
 
+        long angle = i * 14;
         for (int j = 0; j < 4; j++) {
-            double up = (i * 4 + j) * 0.05;
             angle += 90;
+            double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 6,
@@ -96,6 +94,9 @@ public final class NeaceA2 extends ActiveSkill {
         }
     }
 
+    /**
+     * 축복 상태 효과 클래스.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class NeaceA2Buff implements StatusEffect {
         static final NeaceA2Buff instance = new NeaceA2Buff();
@@ -112,26 +113,24 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, NeaceA2Info.SPEED);
         }
 
         @Override
-        public void onTick(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull CombatEntity combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
-            if (combatEntity instanceof Damageable)
-                ((Damageable) combatEntity).getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
