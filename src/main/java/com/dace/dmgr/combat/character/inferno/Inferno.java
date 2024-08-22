@@ -77,11 +77,17 @@ public final class Inferno extends Vanguard {
     @Override
     @NonNull
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "안됐네, 다음엔 좀 더 노력해봐!",
-                "어디 그 정도 공격으로 되겠어?",
-                "열정이 부족해! 열정이!"
-        };
+        switch (characterType) {
+            case MAGRITTA:
+                return new String[]{"머리 좀 식혀, 멍청아."};
+            default:
+                return new String[]{
+                        "안됐네, 다음엔 좀 더 노력해봐!",
+                        "어디 그 정도 공격으로 되겠어?",
+                        "열정이 부족해! 열정이!"
+                };
+        }
+
     }
 
     @Override
