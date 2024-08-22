@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.inferno.Inferno;
 import com.dace.dmgr.combat.character.jager.Jager;
+import com.dace.dmgr.combat.character.magritta.Magritta;
 import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.character.quaker.Quaker;
 import com.dace.dmgr.combat.character.silia.Silia;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Getter
 public enum CharacterType {
+    MAGRITTA(Magritta.getInstance()),
     SILIA(Silia.getInstance()),
 
     ARKACE(Arkace.getInstance()),
