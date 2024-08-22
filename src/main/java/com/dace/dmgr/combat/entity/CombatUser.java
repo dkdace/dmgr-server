@@ -309,7 +309,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         moveModule.getSpeedStatus().setBaseValue(speed);
-        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.2));
+        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.4));
     }
 
     /**
