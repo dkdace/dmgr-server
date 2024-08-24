@@ -4,11 +4,13 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
+import com.dace.dmgr.combat.character.inferno.action.InfernoT1Info;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -39,7 +41,7 @@ public final class Jager extends Marksman {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", '\u32D2', 1000, 1.0, 1.0);
+        super("예거", "혹한의 사냥꾼", "DVJager", '\u32D2', 1000, 1.0, 1.0);
     }
 
     @Override
@@ -174,6 +176,15 @@ public final class Jager extends Marksman {
     @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return InfernoT1Info.getInstance();
+
+        return null;
     }
 
     @Override

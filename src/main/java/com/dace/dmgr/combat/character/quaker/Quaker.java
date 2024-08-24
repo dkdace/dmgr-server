@@ -3,10 +3,12 @@ package com.dace.dmgr.combat.character.quaker;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Guardian;
+import com.dace.dmgr.combat.character.inferno.action.InfernoT1Info;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -39,7 +41,7 @@ public final class Quaker extends Guardian {
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
-        super("퀘이커", "DVQuaker", '\u32D3', 2500, 0.85, 1.8);
+        super("퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 2500, 0.85, 1.8);
     }
 
     @Override
@@ -173,6 +175,15 @@ public final class Quaker extends Guardian {
     @NonNull
     public QuakerWeaponInfo getWeaponInfo() {
         return QuakerWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return InfernoT1Info.getInstance();
+
+        return null;
     }
 
     @Override

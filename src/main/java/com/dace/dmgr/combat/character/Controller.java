@@ -28,14 +28,16 @@ public abstract class Controller extends Character {
      * 제어 역할군 전투원 정보 인스턴스를 생성한다.
      *
      * @param name             이름
+     * @param nickname         별명
      * @param skinName         스킨 이름
      * @param icon             전투원 아이콘
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Controller(@NonNull String name, @NonNull String skinName, char icon, int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, skinName, Role.CONTROLLER, icon, health, speedMultiplier, hitboxMultiplier);
+    protected Controller(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int health,
+                         double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.CONTROLLER, icon, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
@@ -63,6 +65,23 @@ public abstract class Controller extends Character {
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CooldownUtil.setCooldown(victim, HEAL_COOLDOWN_ID, RoleTrait2Info.ACTIVATE_DURATION);
     }
+
+    @Override
+    @Nullable
+    public final TraitInfo getTraitInfo(int number) {
+        if (number == 1)
+            return RoleTrait1Info.instance;
+        else if (number == 2)
+            return RoleTrait2Info.instance;
+
+        return getCharacterTraitInfo(number - 2);
+    }
+
+    /**
+     * @see Character#getTraitInfo(int)
+     */
+    @Nullable
+    public abstract TraitInfo getCharacterTraitInfo(int number);
 
     public static final class RoleTrait1Info extends TraitInfo {
         /** 감지 범위 */

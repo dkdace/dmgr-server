@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -38,7 +39,7 @@ public final class Silia extends Scuffler {
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super("실리아", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
+        super("실리아", "고요한 폭풍", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
     }
 
     @Override
@@ -170,6 +171,19 @@ public final class Silia extends Scuffler {
     @NonNull
     public SiliaWeaponInfo getWeaponInfo() {
         return SiliaWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        switch (number) {
+            case 1:
+                return SiliaT1Info.getInstance();
+            case 2:
+                return SiliaT2Info.getInstance();
+            default:
+                return null;
+        }
     }
 
     @Override

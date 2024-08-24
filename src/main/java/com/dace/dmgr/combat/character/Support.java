@@ -9,6 +9,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -25,14 +26,16 @@ public abstract class Support extends Character {
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
      *
      * @param name             이름
+     * @param nickname         별명
      * @param skinName         스킨 이름
      * @param icon             전투원 아이콘
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Support(@NonNull String name, @NonNull String skinName, char icon, int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, skinName, Role.SUPPORT, icon, health, speedMultiplier, hitboxMultiplier);
+    protected Support(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int health,
+                      double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.SUPPORT, icon, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
@@ -68,6 +71,23 @@ public abstract class Support extends Character {
 
         return true;
     }
+
+    @Override
+    @Nullable
+    public final TraitInfo getTraitInfo(int number) {
+        if (number == 1)
+            return RoleTrait1Info.instance;
+        else if (number == 2)
+            return RoleTrait2Info.instance;
+
+        return getCharacterTraitInfo(number - 2);
+    }
+
+    /**
+     * @see Character#getTraitInfo(int)
+     */
+    @Nullable
+    public abstract TraitInfo getCharacterTraitInfo(int number);
 
     public static final class RoleTrait1Info extends TraitInfo {
         /** 이동속도 증가량 */

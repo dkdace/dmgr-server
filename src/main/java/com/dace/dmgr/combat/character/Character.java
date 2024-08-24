@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.character;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
@@ -26,6 +23,9 @@ public abstract class Character {
     /** 이름 */
     @NonNull
     private final String name;
+    /** 별명 */
+    @NonNull
+    private final String nickname;
     /** 스킨 이름 */
     @NonNull
     private final String skinName;
@@ -273,7 +273,16 @@ public abstract class Character {
     public abstract WeaponInfo<? extends Weapon> getWeaponInfo();
 
     /**
-     * 지정한 번호의 패시브 스킬 정보을 반환한다.
+     * 지정한 번호의 특성 정보를 반환한다.
+     *
+     * @param number 특성 번호
+     * @return 특성 정보. 해당 번호의 특성이 존재하지 않으면 {@code null} 반환
+     */
+    @Nullable
+    public abstract TraitInfo getTraitInfo(int number);
+
+    /**
+     * 지정한 번호의 패시브 스킬 정보를 반환한다.
      *
      * @param number 스킬 번호
      * @return 패시브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환
@@ -282,7 +291,7 @@ public abstract class Character {
     public abstract PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number);
 
     /**
-     * 지정한 번호의 액티브 스킬 정보을 반환한다.
+     * 지정한 번호의 액티브 스킬 정보를 반환한다.
      *
      * @param number 스킬 번호
      * @return 액티브 스킬 정보. 해당 번호의 스킬이 존재하지 않으면 {@code null} 반환

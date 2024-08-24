@@ -7,6 +7,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
@@ -19,14 +20,16 @@ public abstract class Guardian extends Character {
      * 수호 역할군 전투원 정보 인스턴스를 생성한다.
      *
      * @param name             이름
+     * @param nickname         별명
      * @param skinName         스킨 이름
      * @param icon             전투원 아이콘
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Guardian(@NonNull String name, @NonNull String skinName, char icon, int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, skinName, Role.GUARDIAN, icon, health, speedMultiplier, hitboxMultiplier);
+    protected Guardian(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int health,
+                       double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.GUARDIAN, icon, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
@@ -48,6 +51,23 @@ public abstract class Guardian extends Character {
             return true;
         }, 1, RoleTrait2Info.DURATION));
     }
+
+    @Override
+    @Nullable
+    public final TraitInfo getTraitInfo(int number) {
+        if (number == 1)
+            return RoleTrait1Info.instance;
+        else if (number == 2)
+            return RoleTrait2Info.instance;
+
+        return getCharacterTraitInfo(number - 2);
+    }
+
+    /**
+     * @see Character#getTraitInfo(int)
+     */
+    @Nullable
+    public abstract TraitInfo getCharacterTraitInfo(int number);
 
     public static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
