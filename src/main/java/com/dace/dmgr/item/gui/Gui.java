@@ -6,8 +6,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
@@ -141,6 +143,19 @@ public abstract class Gui {
 
             for (int i = 0; i < 6; i++)
                 set((column - 1) + i * 9, staticItem);
+        }
+
+        /**
+         * 지정한 칸의 아이템을 제거한다.
+         *
+         * @param index 칸 번호
+         * @throws IndexOutOfBoundsException {@code index}가 인벤토리의 유효 범위를 초과하면 발생
+         */
+        public void remove(int index) {
+            if (index < 0 || index > inventory.getSize() - 1)
+                throw new IndexOutOfBoundsException("'index'가 인벤토리의 유효 범위를 초과함");
+
+            inventory.setItem(index, new ItemStack(Material.AIR));
         }
 
         /**
