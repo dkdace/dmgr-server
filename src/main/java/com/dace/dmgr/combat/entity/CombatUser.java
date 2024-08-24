@@ -309,7 +309,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         moveModule.getSpeedStatus().setBaseValue(speed);
-        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.2));
+        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.4));
     }
 
     /**
@@ -649,14 +649,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param damage   피해량
      */
     private void handleAttackerKillAssists(@NonNull CombatUser attacker, int damage) {
-        new HashMap<>(attacker.killAssistMap).forEach((target, scores) -> {
+        attacker.killAssistMap.keySet().removeIf(target -> {
             if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
                 damageMap.remove(target);
-            if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0) {
-                attacker.killAssistMap.remove(target);
-                return;
-            }
 
+            return CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0;
+        });
+        attacker.killAssistMap.forEach((target, scores) -> {
             for (String id : scores.keySet())
                 if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target + id) == 0)
                     scores.remove(id);
@@ -740,6 +739,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim instanceof CombatUser) {
             Validate.notNull(((CombatUser) victim).getCharacterType());
 
+            ((CombatUser) victim).damageMap.keySet().removeIf(target ->
+                    CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + victim) == 0);
             int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
             int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
             int score = Math.round(((float) damage / totalDamage) * 100);
@@ -888,15 +889,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setHealth(damageModule.getMaxHealth());
         damageModule.clearShield();
         statusEffectModule.clearStatusEffect();
+        damageMap.keySet().removeIf(target -> CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0);
 
         int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
         damageMap.forEach((CombatUser target, Integer damage) -> {
             Validate.notNull(target.character);
             Validate.notNull(target.characterRecord);
 
-            if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
-                return;
-
+            target.killAssistMap.keySet().removeIf(targetAttacker ->
+                    CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + targetAttacker) == 0);
             target.killAssistMap.forEach((targetAttacker, scores) ->
                     scores.values().forEach(supportScore -> {
                         targetAttacker.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore);

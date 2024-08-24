@@ -140,7 +140,7 @@ public final class VellionA2 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (isDurationFinished())
+                if (isDurationFinished() || !canKeep(combatUser, target))
                     return false;
 
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
@@ -154,7 +154,7 @@ public final class VellionA2 extends ActiveSkill {
                         0, 0, 1.5);
                 playUseTickEffect(loc2, i);
 
-                return canKeep(combatUser, target) && target.canBeTargeted();
+                return target.canBeTargeted();
             }, isCancelled -> {
                 if (isCancelled) {
                     onCancelled();
@@ -171,13 +171,13 @@ public final class VellionA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
 
                 TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
-                    if (isDurationFinished() || !target.getStatusEffectModule().hasStatusEffect(vellionA2Mark))
+                    if (isDurationFinished() || !canKeep(combatUser, target) || !target.getStatusEffectModule().hasStatusEffect(vellionA2Mark))
                         return false;
 
                     isEnabled = true;
                     onTick(target, i);
 
-                    return canKeep(combatUser, target);
+                    return true;
                 }, isCancelled2 -> {
                     isEnabled = false;
                     onCancelled();

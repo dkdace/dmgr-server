@@ -58,7 +58,7 @@ public enum CharacterType {
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (clickType != ClickType.LEFT)
+                if (clickType != ClickType.LEFT || !clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
                     return false;
 
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
