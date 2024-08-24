@@ -8,7 +8,6 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Guardian;
-import com.dace.dmgr.combat.character.inferno.action.InfernoT1Info;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -181,7 +180,7 @@ public final class Quaker extends Guardian {
     @Nullable
     public TraitInfo getCharacterTraitInfo(int number) {
         if (number == 1)
-            return InfernoT1Info.getInstance();
+            return QuakerT1Info.getInstance();
 
         return null;
     }

@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
-import com.dace.dmgr.combat.character.inferno.action.InfernoT1Info;
 import com.dace.dmgr.combat.character.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -182,7 +181,7 @@ public final class Jager extends Marksman {
     @Nullable
     public TraitInfo getCharacterTraitInfo(int number) {
         if (number == 1)
-            return InfernoT1Info.getInstance();
+            return JagerT1Info.getInstance();
 
         return null;
     }
