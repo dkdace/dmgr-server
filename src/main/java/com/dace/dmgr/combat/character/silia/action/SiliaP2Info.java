@@ -12,6 +12,6 @@ public final class SiliaP2Info extends PassiveSkillInfo<SiliaP2> {
     private static final SiliaP2Info instance = new SiliaP2Info();
 
     private SiliaP2Info() {
-        super(SiliaP2.class, "상승 기류");
+        super(SiliaP2.class, "상승 기류 - 2");
     }
 }

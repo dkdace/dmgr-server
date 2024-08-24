@@ -7,6 +7,7 @@ import com.mojang.authlib.properties.Property;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -260,6 +261,18 @@ public final class ItemBuilder {
 
         String fullLore = MessageFormat.format(String.join("\n", itemMeta.getLore()), arguments);
         return setLore(fullLore);
+    }
+
+    /**
+     * 아이템에 발광 효과(마법부여)를 적용한다.
+     *
+     * @return {@link ItemBuilder}
+     */
+    @NonNull
+    public ItemBuilder setGlowing() {
+        itemStack.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        return this;
     }
 
     /**

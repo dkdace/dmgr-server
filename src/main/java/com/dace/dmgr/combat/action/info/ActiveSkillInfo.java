@@ -1,7 +1,9 @@
 package com.dace.dmgr.combat.action.info;
 
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * 액티브 스킬 정보를 관리하는 클래스.
@@ -9,6 +11,9 @@ import lombok.NonNull;
  * @param <T> {@link ActiveSkill}을 상속받는 액티브 스킬
  */
 public abstract class ActiveSkillInfo<T extends ActiveSkill> extends SkillInfo<T> {
+    /** 스킬 이름의 접두사 */
+    private static final String PREFIX = "§c§l[액티브 스킬] §4";
+
     /**
      * 액티브 스킬 정보 인스턴스를 생성한다.
      *
@@ -17,8 +22,18 @@ public abstract class ActiveSkillInfo<T extends ActiveSkill> extends SkillInfo<T
      * @param lores      설명 목록
      */
     protected ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull String @NonNull ... lores) {
-        super(skillClass, name, lores);
-        itemStack.setDurability((short) 14);
+        super(skillClass, name, new ItemBuilder(MATERIAL)
+                .setName(PREFIX + name)
+                .setDamage((short) 14)
+                .setLore(lores)
+                .build());
+    }
+
+    /**
+     * @see SkillInfo#SkillInfo(Class, String, ItemStack)
+     */
+    ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ItemStack itemStack) {
+        super(skillClass, name, itemStack);
     }
 
     @Override

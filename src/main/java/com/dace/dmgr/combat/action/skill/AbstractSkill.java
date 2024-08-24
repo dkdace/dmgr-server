@@ -30,8 +30,8 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     protected AbstractSkill(@NonNull CombatUser combatUser, @NonNull SkillInfo<? extends Skill> skillInfo) {
         super(combatUser);
 
-        this.originalItemStack = skillInfo.getItemStack();
-        this.itemStack = skillInfo.getItemStack();
+        this.originalItemStack = skillInfo.getStaticItem().getItemStack();
+        this.itemStack = originalItemStack.clone();
         setCooldown(getDefaultCooldown());
     }
 
