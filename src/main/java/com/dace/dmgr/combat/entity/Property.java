@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.character.magritta.action.MagrittaT1Info;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,9 @@ import lombok.Getter;
 @Getter
 public enum Property {
     /** 빙결 */
-    FREEZE(JagerT1Info.MAX);
+    FREEZE(JagerT1Info.MAX),
+    /** 파쇄 */
+    SHREDDING(MagrittaT1Info.MAX);
 
     /** 최댓값 */
     private final int max;
