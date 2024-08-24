@@ -103,7 +103,7 @@ public abstract class Controller extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 지원 - 2");
+            super("역할: 제어 - 2");
         }
     }
 }

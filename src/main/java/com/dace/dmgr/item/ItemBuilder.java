@@ -270,7 +270,7 @@ public final class ItemBuilder {
      */
     @NonNull
     public ItemBuilder setGlowing() {
-        itemStack.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 1);
+        itemMeta.addEnchant(Enchantment.LOOT_BONUS_BLOCKS, 1, true);
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         return this;
     }
