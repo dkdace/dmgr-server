@@ -660,8 +660,9 @@ public final class Game implements Disposable {
         if (phase != Phase.WAITING) {
             Team team = redAmount < blueAmount ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);
 
-            gameUser.setTeam(team);
             team.teamUsers.add(gameUser);
+            gameUser.setTeam(team);
+            gameUser.onGameStart();
         }
     }
 

@@ -10,6 +10,7 @@ import com.dace.dmgr.item.gui.ChatSoundOption;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,8 +97,12 @@ public final class UserData extends YamlFile {
      * @return 유저 데이터 인스턴스
      */
     @NonNull
-    public static UserData fromPlayer(@NonNull Player player) {
-        return fromUUID(player.getUniqueId());
+    public static UserData fromPlayer(@NonNull OfflinePlayer player) {
+        UserData userData = UserDataRegistry.getInstance().get(player.getUniqueId());
+        if (userData == null)
+            userData = new UserData(player.getUniqueId(), player.getName());
+
+        return userData;
     }
 
     /**
@@ -108,11 +113,7 @@ public final class UserData extends YamlFile {
      */
     @NonNull
     public static UserData fromUUID(@NonNull UUID playerUUID) {
-        UserData userData = UserDataRegistry.getInstance().get(playerUUID);
-        if (userData == null)
-            userData = new UserData(playerUUID, Bukkit.getOfflinePlayer(playerUUID).getName());
-
-        return userData;
+        return fromPlayer(Bukkit.getOfflinePlayer(playerUUID));
     }
 
     /**

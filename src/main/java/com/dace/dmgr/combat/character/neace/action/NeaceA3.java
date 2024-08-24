@@ -72,7 +72,7 @@ public final class NeaceA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A3_USE, combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (combatUser.getKnockbackModule().isKnockbacked() || !target.canBeTargeted() || target.isDisposed())
+                if (!target.canBeTargeted() || target.isDisposed() || combatUser.getKnockbackModule().isKnockbacked())
                     return false;
 
                 Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
