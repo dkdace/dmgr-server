@@ -90,7 +90,7 @@ public abstract class Scuffler extends Character {
                     "",
                     "§f▍ 적을 처치하면 §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도§f가 빨라집니다.",
                     "",
-                    MessageFormat.format("§6{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
+                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
                     MessageFormat.format("§b{0} §f{1}%", TextIcon.WALK_SPEED_INCREASE, SPEED));
         }
     }

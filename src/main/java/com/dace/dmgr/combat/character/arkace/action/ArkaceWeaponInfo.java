@@ -6,13 +6,15 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
+import java.text.MessageFormat;
+
 public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 연사속도 */
     public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_600;
     /** 피해량 */
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 (단위: 블록) */
-    public static final double DAMAGE_WEAKENING_DISTANCE = 25;
+    public static final int DAMAGE_WEAKENING_DISTANCE = 25;
     /** 장탄수 */
     public static final int CAPACITY = 30;
     /** 재장전 시간 (tick) */
@@ -23,16 +25,17 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
     private ArkaceWeaponInfo() {
-        super(ArkaceWeapon.class, RESOURCE.DEFAULT,
-                "HLN-12",
+        super(ArkaceWeapon.class, RESOURCE.DEFAULT, "HLN-12",
                 "",
-                "§f뛰어난 안정성을 가진 전자동 돌격소총입니다.",
-                "§7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
+                "§f▍ 뛰어난 안정성을 가진 전자동 돌격소총입니다.",
+                "§f▍ §7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
                 "",
-                "§c" + TextIcon.DAMAGE + "§f " + DAMAGE + " (" + DAMAGE_WEAKENING_DISTANCE + "m) - " + DAMAGE / 2 + " (" + DAMAGE_WEAKENING_DISTANCE * 2 + "m)",
-                "§c" + TextIcon.ATTACK_SPEED + "§f 0.1초",
-                "§f" + TextIcon.CAPACITY + "§f 30발",
-                "", "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
+                MessageFormat.format("§c{0}§f {1} ~ {2} ({3}m~{4}m)",
+                        TextIcon.DAMAGE, DAMAGE, DAMAGE / 2, DAMAGE_WEAKENING_DISTANCE, DAMAGE_WEAKENING_DISTANCE * 2),
+                MessageFormat.format("§c{0}§f 0.1초 (600/분)", TextIcon.ATTACK_SPEED),
+                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
+                "",
+                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
     }
 
     /**
