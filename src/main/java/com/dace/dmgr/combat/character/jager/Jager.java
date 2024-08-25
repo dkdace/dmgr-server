@@ -81,21 +81,33 @@ public final class Jager extends Marksman {
     @Override
     @NonNull
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "별 거 없군.",
-                "체크 메이트.",
-                "사냥 완료."
-        };
+        switch (characterType) {
+            case MAGRITTA:
+                return new String[]{"망할 녀석...역시 제법이군."};
+            default:
+                return new String[]{
+                        "별 거 없군.",
+                        "체크 메이트.",
+                        "사냥 완료."
+                };
+        }
+
     }
 
     @Override
     @NonNull
     public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "...제길!",
-                "젠장...",
-                "뒤를...부탁하지."
-        };
+        switch (characterType) {
+            case MAGRITTA:
+                return new String[]{"미안..하다..."};
+            default:
+                return new String[]{
+                        "...제길!",
+                        "젠장...",
+                        "뒤를...부탁하지."
+                };
+        }
+
     }
 
     @Override

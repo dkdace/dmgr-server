@@ -573,6 +573,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param isCrit 치명타 여부
      */
     private void playAttackEffect(boolean isCrit) {
+        if (CooldownUtil.getCooldown(this, Cooldown.HIT_SOUND.id) > 0)
+            return;
+
+        CooldownUtil.setCooldown(this, Cooldown.HIT_SOUND.id, Cooldown.HIT_SOUND.duration);
         if (isCrit) {
             user.sendTitle("", "§c§l×", 0, 2, 10);
             TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
@@ -1483,6 +1487,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
         /** 점프대 */
         JUMP_PAD("JumpPad", 10),
+        /** 적 타격 효과음 쿨타임 */
+        HIT_SOUND("HitSound", 1),
         /** 적 타격 시 생명력 홀로그램 */
         HIT_HEALTH_HOLOGRAM("HitHealthHologram", 20),
         /** 적 처치 기여 (데미지 누적) 제한시간 */
