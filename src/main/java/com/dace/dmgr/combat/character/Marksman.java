@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+
+import java.text.MessageFormat;
 
 /**
  * 역할군이 '사격'인 전투원의 정보를 관리하는 클래스.
@@ -72,7 +75,12 @@ public abstract class Marksman extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 사격 - 1");
+            super("역할: 사격 - 1",
+                    "",
+                    "§f▍ 마지막 공격으로 적을 처치하면 " + TextIcon.ULTIMATE + " §7궁극기 충전량",
+                    "§f▍ 을 추가로 얻습니다.",
+                    "",
+                    MessageFormat.format("§f{0} {1}", TextIcon.ULTIMATE, ULTIMATE_CHARGE));
         }
     }
 
@@ -83,7 +91,11 @@ public abstract class Marksman extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 사격 - 2");
+            super("역할: 사격 - 2",
+                    "",
+                    "§f▍ 치명상일 때 §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도§f가 빨라집니다.",
+                    "",
+                    MessageFormat.format("§b{0} §f{1}%", TextIcon.WALK_SPEED_INCREASE, SPEED));
         }
     }
 }

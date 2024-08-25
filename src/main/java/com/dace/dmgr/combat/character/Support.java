@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
@@ -11,6 +12,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 /**
@@ -99,7 +101,13 @@ public abstract class Support extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 지원 - 1");
+            super("역할: 지원 - 1",
+                    "",
+                    "§f▍ 치명상인 아군이 범위 밖에 있을 때 §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도",
+                    "§f▍ 가 빨라집니다.",
+                    "",
+                    MessageFormat.format("§b{0} §f{1}%", TextIcon.WALK_SPEED_INCREASE, SPEED),
+                    MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, DETECT_RADIUS));
         }
     }
 
@@ -112,7 +120,12 @@ public abstract class Support extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 지원 - 2");
+            super("역할: 지원 - 2",
+                    "",
+                    "§f▍ 아군을 치유하면 일정 시간동안 §a" + TextIcon.HEAL + " 회복§f합니다.",
+                    "",
+                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
+                    MessageFormat.format("§a{0} §f{1}/초", TextIcon.HEAL, HEAL_PER_SECOND));
         }
     }
 }

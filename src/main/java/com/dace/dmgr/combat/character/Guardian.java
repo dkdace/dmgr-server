@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+
+import java.text.MessageFormat;
 
 /**
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
@@ -79,7 +82,13 @@ public abstract class Guardian extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 수호 - 1");
+            super("역할: 수호 - 1",
+                    "",
+                    "§f▍ 받는 §5" + TextIcon.KNOCKBACK + " 밀쳐내기 §f효과가 감소하며, 기본",
+                    "§f▍ §6" + TextIcon.DEFENSE_INCREASE + " 방어력§f을 보유합니다.",
+                    "",
+                    MessageFormat.format("§5{0} §f{1}%", TextIcon.KNOCKBACK, KNOCKBACK_RESISTANCE),
+                    MessageFormat.format("§6{0} §f{1}%", TextIcon.DEFENSE_INCREASE, DEFENSE));
         }
     }
 
@@ -92,7 +101,13 @@ public abstract class Guardian extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 수호 - 2");
+            super("역할: 수호 - 2",
+                    "",
+                    "§f▍ 힐 팩을 사용하면 일정 시간동안 추가로",
+                    "§f▍ §a" + TextIcon.HEAL + " 회복§f합니다.",
+                    "",
+                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
+                    MessageFormat.format("§a{0} §f{1}", TextIcon.HEAL, HEAL));
         }
     }
 }

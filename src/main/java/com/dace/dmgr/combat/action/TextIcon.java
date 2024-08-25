@@ -57,8 +57,18 @@ public final class TextIcon {
     public static final char SILENCE = '\u4DD7';
     /** 실명 */
     public static final char BLINDNESS = '\u4DD8';
-    /** 범위 */
-    public static final char RADIUS = '✸';
+    /** 해로운 효과 */
+    public static final char NEGATIVE_EFFECT = '\u4DD9';
+    /** 기절 */
+    public static final char STUN = '\u4DDA';
+    /** 넉백 */
+    public static final char KNOCKBACK = '\u4DDB';
+    /** 속박 */
+    public static final char SNARE = '\u4DDC';
+    /** 고정 */
+    public static final char GROUNDING = '\u4DDD';
     /** 거리 */
-    public static final char DISTANCE = '⬌';
+    public static final char DISTANCE = '\u4DDE';
+    /** 범위 */
+    public static final char RADIUS = '\u4DDF';
 }

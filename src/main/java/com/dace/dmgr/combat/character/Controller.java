@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -15,6 +16,7 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 /**
@@ -91,7 +93,11 @@ public abstract class Controller extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 제어 - 1");
+            super("역할: 제어 - 1",
+                    "",
+                    "§f▍ 치명상인 아군 근처의 적을 탐지합니다.",
+                    "",
+                    MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, DETECT_RADIUS));
         }
     }
 
@@ -104,7 +110,12 @@ public abstract class Controller extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 제어 - 2");
+            super("역할: 제어 - 2",
+                    "",
+                    "§f▍ 일정 시간동안 피해를 받지 않으면 §a" + TextIcon.HEAL + " 회복§f합니다.",
+                    "",
+                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, ACTIVATE_DURATION / 20.0),
+                    MessageFormat.format("§a{0} §f{1}/초", TextIcon.HEAL, HEAL_PER_SECOND));
         }
     }
 }

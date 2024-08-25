@@ -1,11 +1,14 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+
+import java.text.MessageFormat;
 
 /**
  * 역할군이 '돌격'인 전투원의 정보를 관리하는 클래스.
@@ -70,7 +73,13 @@ public abstract class Vanguard extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 돌격 - 1");
+            super("역할: 돌격 - 1",
+                    "",
+                    "§f▍ 받는 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f의 시간과",
+                    "§f▍ §5" + TextIcon.KNOCKBACK + " 밀쳐내기 §f효과가 감소합니다.",
+                    "",
+                    MessageFormat.format("§5{0} §f{1}%", TextIcon.NEGATIVE_EFFECT, STATUS_EFFECT_RESISTANCE),
+                    MessageFormat.format("§5{0} §f{1}%", TextIcon.KNOCKBACK, KNOCKBACK_RESISTANCE));
         }
     }
 
@@ -79,7 +88,10 @@ public abstract class Vanguard extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 돌격 - 2");
+            super("역할: 돌격 - 2",
+                    "",
+                    "§f▍ 힐 팩을 사용하면 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f를",
+                    "§f▍ 제거합니다.");
         }
     }
 }

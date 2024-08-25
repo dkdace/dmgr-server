@@ -56,13 +56,15 @@ public enum CharacterType {
         this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
                 .setDamage((short) 3)
                 .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
-                .setName(MessageFormat.format("§f{0} {1}§l{2} §7§o{3}", character.getIcon(), character.getRole().getColor(), character.getName(),
+                .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}", character.getIcon(), character.getRole().getColor(), character.getName(),
                         character.getNickname()))
-                .setLore("§f전투원 설명", toString())
+                .setLore("",
+                        "§7§n좌클릭§f하여 전투원을 선택합니다.",
+                        "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (!clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
+                if (!player.getOpenInventory().getTitle().contains("전투원 선택"))
                     return false;
 
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
