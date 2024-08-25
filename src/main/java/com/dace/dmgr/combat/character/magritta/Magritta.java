@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -37,7 +38,7 @@ public final class Magritta extends Scuffler {
     private static final Magritta instance = new Magritta();
 
     private Magritta() {
-        super("마그리타", "DVMagrita", '\u32D8', 1200, 1.0, 1.0);
+        super("마그리타", "방화광", "DVMagrita", '\u32D8', 1200, 1.0, 1.0);
     }
 
     @Override
@@ -188,6 +189,15 @@ public final class Magritta extends Scuffler {
     @NonNull
     public MagrittaWeaponInfo getWeaponInfo() {
         return MagrittaWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return MagrittaT1Info.getInstance();
+
+        return null;
     }
 
     @Override
