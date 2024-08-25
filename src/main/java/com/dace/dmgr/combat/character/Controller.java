@@ -31,13 +31,14 @@ public abstract class Controller extends Character {
      * @param nickname         별명
      * @param skinName         스킨 이름
      * @param icon             전투원 아이콘
+     * @param difficulty       난이도
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Controller(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int health,
+    protected Controller(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
                          double speedMultiplier, double hitboxMultiplier) {
-        super(name, nickname, skinName, Role.CONTROLLER, icon, health, speedMultiplier, hitboxMultiplier);
+        super(name, nickname, skinName, Role.CONTROLLER, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override

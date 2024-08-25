@@ -40,7 +40,7 @@ public final class Quaker extends Guardian {
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
-        super("퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 2500, 0.85, 1.8);
+        super("퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
     }
 
     @Override

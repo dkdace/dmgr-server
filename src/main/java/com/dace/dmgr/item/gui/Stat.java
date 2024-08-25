@@ -76,7 +76,7 @@ public final class Stat extends Gui {
             UserData.CharacterRecord characterRecord = userData.getCharacterRecord(characterTypes[i]);
 
             guiController.set(i + 9, CharacterType.valueOf(characterTypes[i].toString()).getGuiItem(), itemBuilder ->
-                    itemBuilder.setLore(
+                    itemBuilder.setLore("",
                             MessageFormat.format("§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
                                     characterRecord.getKill(), characterRecord.getDeath(),
                                     (double) characterRecord.getKill() / (characterRecord.getDeath() == 0 ? 1 : characterRecord.getDeath())),

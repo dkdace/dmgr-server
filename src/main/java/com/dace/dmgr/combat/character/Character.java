@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 전투원 정보를 관리하는 클래스.
  */
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Getter
 public abstract class Character {
     /** 이름 */
@@ -34,6 +34,8 @@ public abstract class Character {
     private final Role role;
     /** 전투원 아이콘 */
     private final char icon;
+    /** 난이도 */
+    private final int difficulty;
     /** 체력 */
     private final int health;
     /** 이동속도 배수 */

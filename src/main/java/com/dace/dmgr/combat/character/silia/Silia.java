@@ -39,7 +39,7 @@ public final class Silia extends Scuffler {
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super("실리아", "고요한 폭풍", "DVSilia", '\u32D1', 1000, 1.0, 1.0);
+        super("실리아", "고요한 폭풍", "DVSilia", '\u32D1', 4, 1000, 1.0, 1.0);
     }
 
     @Override

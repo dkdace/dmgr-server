@@ -9,7 +9,9 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.util.SkinUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -46,9 +48,11 @@ public final class SelectCharInfo extends Gui {
 
         guiController.fillAll(DisplayItem.EMPTY.getStaticItem());
         guiController.set(3, characterType.getGuiItem(), itemBuilder -> itemBuilder.setLore("",
+                "§e✪ 난이도 §7:: §f" + StringFormUtil.getProgressBar(character.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
+                        .replace("§0", "§8"),
                 "§a" + TextIcon.HEAL + " 체력 §7:: §f" + character.getHealth(),
                 "§b" + TextIcon.WALK_SPEED + " 이동속도 배수 §7:: §f" + character.getSpeedMultiplier(),
-                "§6" + TextIcon.RADIUS + " 히트박스 배수 §7:: §f" + character.getHitboxMultiplier()));
+                "§6⬜ 히트박스 배수 §7:: §f" + character.getHitboxMultiplier()));
         guiController.set(5, character.getWeaponInfo().getStaticItem());
 
         guiController.set(20, SelectCharInfoItem.TRAIT.staticItem);

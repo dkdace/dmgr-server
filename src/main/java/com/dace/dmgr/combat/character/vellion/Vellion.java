@@ -42,7 +42,7 @@ public final class Vellion extends Controller {
     private static final Vellion instance = new Vellion();
 
     private Vellion() {
-        super("벨리온", "흑마법사", "DVVellion", '\u32D6', 1000, 1.0, 1.0);
+        super("벨리온", "흑마법사", "DVVellion", '\u32D6', 3, 1000, 1.0, 1.0);
     }
 
     @Override

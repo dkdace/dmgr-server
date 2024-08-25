@@ -37,7 +37,7 @@ public final class Inferno extends Vanguard {
     private static final Inferno instance = new Inferno();
 
     private Inferno() {
-        super("인페르노", "화염 돌격병", "DVInferno", '\u32D7', 2000, 0.9, 1.4);
+        super("인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
     }
 
     @Override
