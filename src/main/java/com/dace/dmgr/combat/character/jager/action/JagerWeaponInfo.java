@@ -1,9 +1,12 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+
+import java.text.MessageFormat;
 
 public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
@@ -32,7 +35,33 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
     private JagerWeaponInfo() {
-        super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR");
+        super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR",
+                "",
+                "§f▍ 두 개의 탄창을 가진 특수 소총으로, §3냉각탄 §f및",
+                "§f▍ §7정조준§f하여 §3저격탄§f을 사격할 수 있습니다.",
+                "",
+                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
+                "",
+                "§7§l[좌클릭] §f냉각탄 / 저격탄 §7§l[우클릭] §f정조준",
+                "§7§l[Q] §f재장전",
+                "",
+                "§3[냉각탄]",
+                "",
+                "§f▍ §7냉각탄§f을 사격하여 §c" + TextIcon.DAMAGE + " 피해§f를 입히고 §5" + TextIcon.WALK_SPEED_DECREASE + " §d빙결",
+                "§f▍ §f시킵니다.",
+                "",
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§5{0}§f {1}", TextIcon.WALK_SPEED_DECREASE, FREEZE),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
+                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
+                "",
+                "§3[저격탄]",
+                "",
+                "§f▍ §7저격탄§f을 사격하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
+                "",
+                MessageFormat.format("§c{0}§f {1} ~ {2} ({3}m~{4}m)",
+                        TextIcon.DAMAGE, SCOPE.DAMAGE, SCOPE.DAMAGE / 2, SCOPE.DAMAGE_WEAKENING_DISTANCE, SCOPE.DAMAGE_WEAKENING_DISTANCE * 2),
+                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, SCOPE.CAPACITY));
     }
 
     /**

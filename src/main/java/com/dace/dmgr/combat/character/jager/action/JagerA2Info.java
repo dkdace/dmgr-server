@@ -1,7 +1,10 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
+
+import java.text.MessageFormat;
 
 public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
     /** 쿨타임 (tick) */
@@ -27,6 +30,19 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
     private static final JagerA2Info instance = new JagerA2Info();
 
     private JagerA2Info() {
-        super(JagerA2.class, "곰덫");
+        super(JagerA2.class, "곰덫",
+                "",
+                "§f▍ 눈에 잘 띄지 않는 §3곰덫§f을 던져 설치합니다.",
+                "§f▍ 밟은 적은 §c" + TextIcon.DAMAGE + " 피해§f를 입고 §5" + TextIcon.SNARE + " 속박§f됩니다.",
+                "",
+                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
+                "",
+                "§7§l[2] §f사용",
+                "",
+                "§3[곰덫]",
+                "",
+                MessageFormat.format("§a{0}§f {1}", TextIcon.HEAL, HEALTH),
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§5{0}§f {1}초", TextIcon.SNARE, SNARE_DURATION / 20.0));
     }
 }
