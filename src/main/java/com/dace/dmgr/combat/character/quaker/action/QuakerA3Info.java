@@ -1,7 +1,10 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
+
+import java.text.MessageFormat;
 
 public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     /** 쿨타임 (tick) */
@@ -31,6 +34,18 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     private static final QuakerA3Info instance = new QuakerA3Info();
 
     private QuakerA3Info() {
-        super(QuakerA3.class, "돌풍 강타");
+        super(QuakerA3.class, "돌풍 강타",
+                "",
+                "§f▍ 검기를 날려 처음 맞은 적을 크게 §5" + TextIcon.KNOCKBACK + " 밀쳐내고",
+                "§f▍ §c" + TextIcon.DAMAGE + " 피해§f와 §5" + TextIcon.SNARE + " 속박§f을 입힙니다. 적이 날아가며",
+                "§f▍ 부딪힌 적에게도 같은 효과를 입힙니다.",
+                "",
+                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§5{0}§f {1}초", TextIcon.SNARE, SNARE_DURATION / 20.0),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
+                "",
+                "§7§l[3] §f사용");
     }
 }
