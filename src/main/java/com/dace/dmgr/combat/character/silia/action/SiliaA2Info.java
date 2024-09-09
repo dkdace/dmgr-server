@@ -1,7 +1,10 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
+
+import java.text.MessageFormat;
 
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     /** 쿨타임 (tick) */
@@ -27,6 +30,16 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     private static final SiliaA2Info instance = new SiliaA2Info();
 
     private SiliaA2Info() {
-        super(SiliaA2.class, "진권풍");
+        super(SiliaA2.class, "진권풍",
+                "",
+                "§f▍ 회오리바람을 날려 적에게 §c" + TextIcon.DAMAGE + " 피해§f를 입히고",
+                "§f▍ §5" + TextIcon.KNOCKBACK + " 공중에 띄웁니다§f. 적중 시 맞은 적의 뒤로",
+                "§f▍ 순간이동합니다.",
+                "",
+                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
+                "",
+                "§7§l[2] [우클릭] §f사용");
     }
 }
