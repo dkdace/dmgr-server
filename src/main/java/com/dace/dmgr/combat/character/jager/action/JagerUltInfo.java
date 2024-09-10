@@ -55,7 +55,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                 MessageFormat.format("§a{0}§f {1}", TextIcon.HEAL, HEALTH),
                 MessageFormat.format("§7{0}§f {1}초", TextIcon.DURATION, DURATION / 20.0),
                 MessageFormat.format("§c{0}§f {1}/초", TextIcon.DAMAGE, DAMAGE_PER_SECOND),
-                MessageFormat.format("§5{0}§f {1}/초", TextIcon.WALK_SPEED_DECREASE, FREEZE_PER_SECOND),
-                MessageFormat.format("§c{0}§f {1}m ~ {2}m (0초~{3}초)", TextIcon.RADIUS, MIN_RADIUS, MAX_RADIUS, MAX_RADIUS_DURATION / 20.0));
+                MessageFormat.format("§c{0}§f {1}m ~ {2}m (0초~{3}초)", TextIcon.RADIUS, MIN_RADIUS, MAX_RADIUS, MAX_RADIUS_DURATION / 20.0),
+                MessageFormat.format("§5{0}§f {1}/초", TextIcon.WALK_SPEED_DECREASE, FREEZE_PER_SECOND));
     }
 }
