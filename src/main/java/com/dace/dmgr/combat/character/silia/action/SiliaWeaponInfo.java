@@ -24,8 +24,8 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     private SiliaWeaponInfo() {
         super(SiliaWeapon.class, RESOURCE.DEFAULT, "접이식 마체테",
                 "",
-                "§f▍ 휴대성이 뛰어난 접이식 마체테입니다. 검기를",
-                "§f▍ 날려 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
+                "§f▍ 휴대성이 뛰어난 접이식 마체테입니다.",
+                "§f▍ 검기를 날려 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
                 "",
                 MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
                 MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
