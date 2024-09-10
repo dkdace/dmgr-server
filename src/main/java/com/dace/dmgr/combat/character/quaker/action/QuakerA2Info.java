@@ -43,10 +43,9 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
                 "",
                 MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
                 MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.STUN, STUN_DURATION / 20.0),
-                MessageFormat.format("§b{0}§f {1}%", TextIcon.WALK_SPEED_DECREASE, SLOW),
-                MessageFormat.format("§b{0}§f {1}초", TextIcon.WALK_SPEED_DECREASE, SLOW_DURATION / 20.0),
                 MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
+                MessageFormat.format("§5{0}§f {1}초", TextIcon.STUN, STUN_DURATION / 20.0),
+                MessageFormat.format("§b{0}§f {1}초 / {2}%", TextIcon.WALK_SPEED_DECREASE, SLOW_DURATION / 20.0, SLOW),
                 "",
                 "§7§l[2] §f사용");
     }
