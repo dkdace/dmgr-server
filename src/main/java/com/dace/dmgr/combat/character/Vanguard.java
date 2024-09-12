@@ -75,8 +75,8 @@ public abstract class Vanguard extends Character {
         private RoleTrait1Info() {
             super("역할: 돌격 - 1",
                     "",
-                    "§f▍ 받는 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f의 시간과",
-                    "§f▍ §5" + TextIcon.KNOCKBACK + " 밀쳐내기 §f효과가 감소합니다.",
+                    "§f▍ 받는 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f의 시간과 §5" + TextIcon.KNOCKBACK + " 밀쳐내기",
+                    "§f▍ 효과가 감소합니다.",
                     "",
                     MessageFormat.format("§5{0} §f{1}%", TextIcon.NEGATIVE_EFFECT, STATUS_EFFECT_RESISTANCE),
                     MessageFormat.format("§5{0} §f{1}%", TextIcon.KNOCKBACK, KNOCKBACK_RESISTANCE));
