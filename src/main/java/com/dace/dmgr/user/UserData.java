@@ -46,6 +46,13 @@ public final class UserData extends YamlFile {
     /** 돈 */
     @Getter
     private int money = 0;
+    /** 차단한 플레이어의 UUID 목록 */
+    @Nullable
+    private List<String> blockedPlayers;
+    /** 경고 횟수 */
+    @Getter
+    private int warning = 0;
+
     /** 랭크 점수 (RR) */
     @Getter
     private int rankRate = 100;
@@ -70,9 +77,6 @@ public final class UserData extends YamlFile {
     /** 탈주 횟수 */
     @Getter
     private int quitCount = 0;
-    /** 차단한 플레이어의 UUID 목록 */
-    @Nullable
-    private List<String> blockedPlayers;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -132,6 +136,7 @@ public final class UserData extends YamlFile {
         this.xp = (int) getLong("xp", xp);
         this.level = (int) getLong("level", level);
         this.money = (int) getLong("money", money);
+        this.warning = (int) getLong("warning", warning);
         this.rankRate = (int) getLong("rankRate", rankRate);
         this.isRanked = getBoolean("isRanked", isRanked);
         this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
@@ -228,6 +233,11 @@ public final class UserData extends YamlFile {
     public void setMoney(int money) {
         this.money = Math.max(0, money);
         set("money", this.money);
+    }
+
+    public void setWarning(int warning) {
+        this.warning = Math.max(0, warning);
+        set("warning", this.warning);
     }
 
     /**

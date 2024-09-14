@@ -66,6 +66,12 @@ commands:
       - 전체
       - wjscp
       - tc
+  경고:
+    description: DMGR Command
+    aliases:
+      - rudrh
+      - warning
+      - warn
   선택:
     permission: admin
     description: DMGR Test command
