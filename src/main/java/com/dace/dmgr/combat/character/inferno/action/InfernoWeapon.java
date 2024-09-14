@@ -79,7 +79,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 break;
             }
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
+                if (reloadModule.getRemainingAmmo() < InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME) {
                     onAmmoEmpty();
                     return;
                 }

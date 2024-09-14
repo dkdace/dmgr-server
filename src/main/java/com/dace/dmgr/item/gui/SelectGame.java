@@ -147,6 +147,9 @@ public final class SelectGame extends Gui {
                     if (gameUser == null) {
                         if (game == null)
                             game = new Game(isRanked, number);
+                        if (!game.canJoin())
+                            return false;
+
                         new GameUser(user, game);
 
                         player.closeInventory();
