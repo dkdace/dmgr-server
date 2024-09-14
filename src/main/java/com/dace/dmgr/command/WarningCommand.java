@@ -3,15 +3,18 @@ package com.dace.dmgr.command;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.DelayTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +28,7 @@ public final class WarningCommand extends BaseCommandExecutor {
     /** 도움말 메시지 */
     private static final String MESSAGE_HELP = StringFormUtil.BAR +
             "\n§a§l/(경고|warn[ing]) (보기|check) [플레이어] - §a자신 또는 대상 플레이어의 누적 경고를 봅니다." +
-            "\n§a§l/(경고|warn[ing]) (주기|add) <플레이어> [사유] - §a플레이어의 경고를 1회 증가합니다." +
+            "\n§a§l/(경고|warn[ing]) (주기|add) <플레이어> [사유...] - §a플레이어의 경고를 1회 증가합니다." +
             "\n§a§l/(경고|warn[ing]) (빼기|sub[tract]) <플레이어> - §a플레이어의 경고를 1회 차감합니다." +
             "\n§a§l/(경고|warn[ing]) (초기화|clear) <플레이어> - §a플레이어의 경고를 초기화합니다." +
             "\n" + StringFormUtil.BAR;
@@ -71,8 +74,8 @@ public final class WarningCommand extends BaseCommandExecutor {
             user.sendMessageWarn(WARN_NO_PERMISSION);
             return;
         }
-        if (args.length == 1 || args.length > 3) {
-            user.sendMessageWarn(WARN_WRONG_USAGE, "/(경고|warn[ing]) (주기|add) <플레이어> [사유]");
+        if (args.length == 1) {
+            user.sendMessageWarn(WARN_WRONG_USAGE, "/(경고|warn[ing]) (주기|add) <플레이어> [사유...]");
             return;
         }
 
@@ -86,17 +89,32 @@ public final class WarningCommand extends BaseCommandExecutor {
             return;
         }
 
-        String reason = args.length == 3 ? args[2] : "없음";
+        String reason = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : null;
 
         targetUserData.setWarning(targetUserData.getWarning() + 1);
         Bukkit.getOnlinePlayers().forEach(target -> {
             User targetUser = User.fromPlayer(target);
             targetUser.sendMessageInfo("");
             targetUser.sendMessageInfo("§e§n{0}§r님이 §e§n{1}§r님에게 경고를 주었습니다.", user.getPlayer().getName(), targetUserData.getPlayerName());
-            targetUser.sendMessageInfo("§f경고 사유 : §6{0}", reason);
+            if (reason != null)
+                targetUser.sendMessageInfo("경고 사유 : §6{0}", reason);
             targetUser.sendMessageInfo("누적 경고 횟수 : §c{0}회", targetUserData.getWarning());
             targetUser.sendMessageInfo("");
         });
+
+        if (targetUserData.getWarning() >= 3) {
+            new DelayTask(() -> {
+                Date endDate = targetUserData.ban((int) Math.pow(3, targetUserData.getWarning() - 2.0), reason);
+
+                Bukkit.getOnlinePlayers().forEach(target -> {
+                    User targetUser = User.fromPlayer(target);
+                    targetUser.sendMessageInfo("");
+                    targetUser.sendMessageInfo("§e§n{0}§r님이 경고 §c3회 §f누적으로 서버에서 차단되었습니다.", targetUserData.getPlayerName());
+                    targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"));
+                    targetUser.sendMessageInfo("");
+                });
+            }, 20);
+        }
     }
 
     /**
@@ -161,7 +179,7 @@ public final class WarningCommand extends BaseCommandExecutor {
             return;
         }
 
-        targetUserData.setWarning(targetUserData.getWarning() - 1);
+        targetUserData.setWarning(0);
         Bukkit.getOnlinePlayers().forEach(target -> {
             User targetUser = User.fromPlayer(target);
             targetUser.sendMessageInfo("");

@@ -142,7 +142,7 @@ public final class User implements Disposable {
             TaskUtil.addTask(this, userData.init()
                     .onFinish(this::onInit)
                     .onError(ex -> TaskUtil.addTask(User.this, new DelayTask(() ->
-                            player.kickPlayer(MESSAGE_KICK_ERR), 60))));
+                            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR), 60))));
     }
 
     /**
