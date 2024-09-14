@@ -72,6 +72,11 @@ commands:
       - rudrh
       - warning
       - warn
+  밴:
+    description: DMGR Command
+    aliases:
+      - qos
+      - ban
   선택:
     permission: admin
     description: DMGR Test command
