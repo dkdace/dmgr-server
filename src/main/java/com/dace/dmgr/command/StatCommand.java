@@ -39,11 +39,11 @@ public final class StatCommand extends BaseCommandExecutor {
                     .orElse(null);
 
             if (targetUserData == null) {
-                user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
+                user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
                 return;
             }
         } else if (args.length > 1) {
-            user.sendMessageWarn("올바른 사용법: §n'/(전적|stat) [플레이어]'");
+            user.sendMessageWarn(WARN_WRONG_USAGE, "/(전적|stat) [플레이어]");
             return;
         }
 
