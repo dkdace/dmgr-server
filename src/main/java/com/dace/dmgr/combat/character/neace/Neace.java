@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -40,7 +41,7 @@ public final class Neace extends Support {
     private static final Neace instance = new Neace();
 
     private Neace() {
-        super("니스", "DVNis", '\u32D5', 1000, 1.0, 1.0);
+        super("니스", "평화주의자", "DVNis", '\u32D5', 1, 1000, 1.0, 1.0);
     }
 
     /**
@@ -179,6 +180,12 @@ public final class Neace extends Support {
     @NonNull
     public NeaceWeaponInfo getWeaponInfo() {
         return NeaceWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        return null;
     }
 
     @Override

@@ -6,8 +6,11 @@ import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
+import java.text.MessageFormat;
 
 /**
  * 전투원 선택 GUI 클래스.
@@ -53,7 +56,8 @@ public final class SelectChar extends Gui {
         SelectCharInfoItem(Material material, int damage, Role role) {
             this.staticItem = new StaticItem("SelectCharInfo" + this, new ItemBuilder(material)
                     .setDamage((short) damage)
-                    .setName(role.getColor() + "§l" + role.getName())
+                    .setName(MessageFormat.format("{0}§l{1} §7§o{2}", role.getColor(), role.getName(),
+                            StringUtils.capitalize(toString().toLowerCase())))
                     .setLore(role.getDescription())
                     .build());
         }

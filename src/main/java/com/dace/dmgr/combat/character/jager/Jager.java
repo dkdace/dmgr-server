@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -39,7 +40,7 @@ public final class Jager extends Marksman {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "DVJager", '\u32D2', 1000, 1.0, 1.0);
+        super("예거", "혹한의 사냥꾼", "DVJager", '\u32D2', 3, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -186,6 +187,15 @@ public final class Jager extends Marksman {
     @NonNull
     public JagerWeaponInfo getWeaponInfo() {
         return JagerWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return JagerT1Info.getInstance();
+
+        return null;
     }
 
     @Override

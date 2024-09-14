@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.character.vellion.Vellion;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
+import com.dace.dmgr.item.gui.SelectCharInfo;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SkinUtil;
 import lombok.Getter;
@@ -19,6 +20,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+
+import java.text.MessageFormat;
 
 /**
  * 지정할 수 있는 전투원의 목록.
@@ -53,22 +56,28 @@ public enum CharacterType {
         this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
                 .setDamage((short) 3)
                 .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
-                .setName("§c" + character.getName())
-                .setLore("§f전투원 설명", toString())
+                .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}", character.getIcon(), character.getRole().getColor(), character.getName(),
+                        character.getNickname()))
+                .setLore("",
+                        "§7§n좌클릭§f하여 전투원을 선택합니다.",
+                        "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
                 .build()) {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (clickType != ClickType.LEFT || !clickItem.getItemMeta().getLore().contains("§f전투원 설명"))
+                if (!player.getOpenInventory().getTitle().contains("전투원 선택"))
                     return false;
 
                 CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
                 if (combatUser == null)
                     return false;
 
-                CharacterType characterType = CharacterType.valueOf(CharacterType.this.toString());
-                combatUser.setCharacterType(characterType);
-
-                player.closeInventory();
+                if (clickType == ClickType.LEFT) {
+                    combatUser.setCharacterType(CharacterType.this);
+                    player.closeInventory();
+                } else if (clickType == ClickType.RIGHT) {
+                    SelectCharInfo selectCharInfo = new SelectCharInfo(CharacterType.this);
+                    selectCharInfo.open(player);
+                }
 
                 return true;
             }

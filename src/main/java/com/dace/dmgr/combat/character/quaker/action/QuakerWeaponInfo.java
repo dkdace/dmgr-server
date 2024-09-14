@@ -1,8 +1,11 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+
+import java.text.MessageFormat;
 
 public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
@@ -21,7 +24,16 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 
     private QuakerWeaponInfo() {
-        super(QuakerWeapon.class, RESOURCE.DEFAULT, "타바르진");
+        super(QuakerWeapon.class, RESOURCE.DEFAULT, "타바르진",
+                "",
+                "§f▍ 거대한 도끼를 휘둘러 근거리에 §c" + TextIcon.DAMAGE + " 광역 피해§f를",
+                "§f▍ 입히고 옆으로 §5" + TextIcon.KNOCKBACK + " 밀쳐냅니다§f.",
+                "",
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
+                "",
+                "§7§l[좌클릭] §f사용");
     }
 
     /**

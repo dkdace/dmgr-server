@@ -1,7 +1,10 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
+
+import java.text.MessageFormat;
 
 public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     /** 쿨타임 (tick) */
@@ -22,6 +25,15 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     private static final InfernoA1Info instance = new InfernoA1Info();
 
     private InfernoA1Info() {
-        super(InfernoA1.class, "점프 부스터");
+        super(InfernoA1.class, "점프 부스터",
+                "",
+                "§f▍ 앞으로 높게 도약하여 착지할 때 §c" + TextIcon.DAMAGE + " 광역 피해",
+                "§f▍ 를 입히고 §5" + TextIcon.KNOCKBACK + " 밀쳐냅니다§f.",
+                "",
+                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
+                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
+                "",
+                "§7§l[1] §f사용");
     }
 }

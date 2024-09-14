@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.info;
 
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -10,7 +11,7 @@ import lombok.NonNull;
 @Getter
 public class TraitInfo extends ActionInfo {
     /** 특성 이름의 접두사 */
-    private static final String PREFIX = "§e§l[특성] §c";
+    private static final String PREFIX = "§b§l[특성] §3";
 
     /**
      * 특성 정보 인스턴스를 생성한다.
@@ -19,15 +20,15 @@ public class TraitInfo extends ActionInfo {
      * @param lores 설명 목록
      */
     protected TraitInfo(@NonNull String name, @NonNull String @NonNull ... lores) {
-        super(name, new ItemBuilder(SkillInfo.MATERIAL)
+        super(name, new StaticItem("TraitInfo" + name, new ItemBuilder(SkillInfo.MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 3)
                 .setLore(lores)
-                .build());
+                .build()));
     }
 
     @Override
     public String toString() {
-        return "§9［" + name + "］";
+        return "§b［" + name + "］";
     }
 }

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -36,7 +37,7 @@ public final class Inferno extends Vanguard {
     private static final Inferno instance = new Inferno();
 
     private Inferno() {
-        super("인페르노", "DVInferno", '\u32D7', 2000, 0.9, 1.4);
+        super("인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
     }
 
     @Override
@@ -181,6 +182,15 @@ public final class Inferno extends Vanguard {
     @NonNull
     public InfernoWeaponInfo getWeaponInfo() {
         return InfernoWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return InfernoT1Info.getInstance();
+
+        return null;
     }
 
     @Override
