@@ -78,6 +78,14 @@ commands:
     aliases:
       - qos
       - ban
+  관리자채팅:
+    permission: admin
+    description: DMGR Command
+    aliases:
+      - rhksflwkcoxld
+      - 관리자
+      - rhksflwk
+      - ac
   선택:
     permission: admin
     description: DMGR Test command

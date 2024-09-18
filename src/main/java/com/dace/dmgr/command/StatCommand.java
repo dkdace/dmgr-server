@@ -51,7 +51,6 @@ public final class StatCommand extends BaseCommandExecutor {
         stat.open(player);
     }
 
-
     @Override
     @Nullable
     protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {

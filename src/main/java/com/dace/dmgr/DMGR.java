@@ -208,6 +208,7 @@ public class DMGR extends JavaPlugin {
         getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
         getCommand("경고").setExecutor(WarningCommand.getInstance());
         getCommand("밴").setExecutor(BanCommand.getInstance());
+        getCommand("관리자채팅").setExecutor(AdminChatCommand.getInstance());
     }
 
     /**

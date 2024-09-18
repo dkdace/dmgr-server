@@ -51,7 +51,6 @@ public final class DMCommand extends BaseCommandExecutor {
         }
     }
 
-
     @Override
     @Nullable
     protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
