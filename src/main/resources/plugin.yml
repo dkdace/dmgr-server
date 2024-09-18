@@ -73,6 +73,7 @@ commands:
       - warning
       - warn
   밴:
+    permission: admin
     description: DMGR Command
     aliases:
       - qos
