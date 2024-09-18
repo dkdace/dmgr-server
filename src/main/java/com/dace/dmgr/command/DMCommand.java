@@ -29,7 +29,7 @@ public final class DMCommand extends BaseCommandExecutor {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
+                user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
                 return;
             }
 
@@ -40,7 +40,7 @@ public final class DMCommand extends BaseCommandExecutor {
             user.sendMessageInfo("");
         } else {
             if (user.getMessageTarget() == null) {
-                user.sendMessageWarn("올바른 사용법: §n'/(귓[속말]|dm) <플레이어>'");
+                user.sendMessageWarn(WARN_WRONG_USAGE, "/(귓[속말]|dm) <플레이어>");
                 return;
             }
 
@@ -50,7 +50,6 @@ public final class DMCommand extends BaseCommandExecutor {
             user.sendMessageInfo("");
         }
     }
-
 
     @Override
     @Nullable

@@ -102,6 +102,10 @@ public final class User implements Disposable {
     @Getter
     @Setter
     private User messageTarget;
+    /** 관리자 채팅 여부 */
+    @Getter
+    @Setter
+    private boolean isAdminChat = false;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -142,7 +146,7 @@ public final class User implements Disposable {
             TaskUtil.addTask(this, userData.init()
                     .onFinish(this::onInit)
                     .onError(ex -> TaskUtil.addTask(User.this, new DelayTask(() ->
-                            player.kickPlayer(MESSAGE_KICK_ERR), 60))));
+                            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR), 60))));
     }
 
     /**

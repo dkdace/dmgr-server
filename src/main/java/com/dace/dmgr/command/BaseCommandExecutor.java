@@ -15,6 +15,13 @@ import java.util.stream.Collectors;
  * 명령어의 응답과 인수 자동완성을 처리하는 클래스.
  */
 public abstract class BaseCommandExecutor implements TabExecutor {
+    /** 플레이어를 찾을 수 없을 때 경고 메시지 */
+    protected static final String WARN_PLAYER_NOT_FOUND = "플레이어를 찾을 수 없습니다.";
+    /** 사용법 알림 경고 메시지 */
+    protected static final String WARN_WRONG_USAGE = "올바른 사용법: §n{0}";
+    /** 권한 없음 경고 메시지 */
+    protected static final String WARN_NO_PERMISSION = "권한이 없습니다.";
+
     @Override
     public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player))

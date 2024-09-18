@@ -42,13 +42,21 @@ public final class OnAsyncPlayerChat implements Listener {
         Bukkit.getServer().getConsoleSender().sendMessage(MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage()));
 
         if (user.getMessageTarget() == null) {
-            GameUser gameUser = GameUser.fromUser(user);
+            if (user.isAdminChat()) {
+                Bukkit.getOnlinePlayers().forEach(target -> {
+                    if (target.isOp())
+                        sendMessage(user, User.fromPlayer(target), "§7§l[관리자] §f" + MessageFormat.format(CHAT_FORMAT,
+                                userData.getDisplayName(), ChatColor.DARK_AQUA + event.getMessage()));
+                });
+            } else {
+                GameUser gameUser = GameUser.fromUser(user);
 
-            if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING) {
-                Bukkit.getOnlinePlayers().forEach((Player target) ->
-                        sendMessage(user, User.fromPlayer(target), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
-            } else
-                gameUser.sendMessage(event.getMessage(), gameUser.isTeamChat());
+                if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
+                    Bukkit.getOnlinePlayers().forEach(target ->
+                            sendMessage(user, User.fromPlayer(target), MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage())));
+                else
+                    gameUser.sendMessage(event.getMessage(), gameUser.isTeamChat());
+            }
         } else {
             sendMessage(user, user, MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), "§7" + event.getMessage()));
             sendMessage(user, user.getMessageTarget(), MessageFormat.format(CHAT_FORMAT,

@@ -27,6 +27,7 @@ public final class HelpCommand extends BaseCommandExecutor {
             "\n§a§l/(귓[속말]|dm) <플레이어> - §a대상 플레이어와의 개인 대화를 시작합니다." +
             "\n§a§l/(차단|block) - §a차단 관련 명령어를 확인합니다." +
             "\n§a§l/(랭킹|rank[ing]) - §a랭킹 관련 명령어를 확인합니다." +
+            "\n§a§l/(경고|warn[ing]) - §a경고 관련 명령어를 확인합니다." +
             "\n" + StringFormUtil.BAR;
     @Getter
     private static final HelpCommand instance = new HelpCommand();
