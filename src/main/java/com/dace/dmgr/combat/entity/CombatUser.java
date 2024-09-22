@@ -956,6 +956,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
                         String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
             user.teleport(deadLocation);
+            entity.setSpectatorTarget(null);
 
             return true;
         }, isCancelled -> {
