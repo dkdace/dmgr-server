@@ -162,7 +162,7 @@ public final class VellionA2 extends ActiveSkill {
                 }
 
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
+                target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 10);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE_READY, combatUser.getEntity().getLocation());
 
@@ -213,7 +213,7 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         private void onTick(@NonNull Damageable target, long i) {
-            target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 4);
+            target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 10);
             if (target instanceof CombatUser)
                 CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
 

@@ -154,11 +154,9 @@ public final class GameUser implements Disposable {
                 onTickOppositeSpawn();
         }
 
-        if (i % 5 == 0) {
-            for (GameUser target : game.getGameUsers()) {
-                if (target.team == team)
-                    GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
-            }
+        if (team != null && i % 5 == 0) {
+            for (GameUser target : team.getTeamUsers())
+                GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
         }
         if (i % 20 == 0)
             updateGameTablist();

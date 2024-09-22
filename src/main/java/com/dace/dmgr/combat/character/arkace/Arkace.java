@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -36,7 +37,7 @@ public final class Arkace extends Marksman {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super("아케이스", "DVArkace", '\u32D0', 1000, 1.0, 1.0);
+        super("아케이스", "슈퍼 솔저", "DVArkace", '\u32D0', 1, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -168,6 +169,12 @@ public final class Arkace extends Marksman {
     @NonNull
     public ArkaceWeaponInfo getWeaponInfo() {
         return ArkaceWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        return null;
     }
 
     @Override

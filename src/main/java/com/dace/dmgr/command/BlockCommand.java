@@ -69,7 +69,7 @@ public final class BlockCommand extends BaseCommandExecutor {
                             .orElse(null);
 
                     if (targetUserData == null) {
-                        user.sendMessageWarn("플레이어를 찾을 수 없습니다.");
+                        user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
                         return;
                     }
 

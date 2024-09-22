@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.quaker;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -39,7 +40,7 @@ public final class Quaker extends Guardian {
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
-        super("퀘이커", "DVQuaker", '\u32D3', 2500, 0.85, 1.8);
+        super("퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
     }
 
     @Override
@@ -173,6 +174,15 @@ public final class Quaker extends Guardian {
     @NonNull
     public QuakerWeaponInfo getWeaponInfo() {
         return QuakerWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return QuakerT1Info.getInstance();
+
+        return null;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
+
+import java.text.MessageFormat;
 
 public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     /** 쿨타임 (tick) */
@@ -27,6 +30,27 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     private static final VellionA2Info instance = new VellionA2Info();
 
     private VellionA2Info() {
-        super(VellionA2.class, "저주 귀속");
+        super(VellionA2.class, "저주 귀속",
+                "",
+                "§f▍ 바라보는 적에게 저주를 걸어 §6" + TextIcon.DEFENSE_DECREASE + " 방어력§f을",
+                "§f▍ 감소시키고 해당 적을 제외한 주변에 지속적인",
+                "§f▍ §c" + TextIcon.DAMAGE + " 광역 피해§f를 입힙니다.",
+                "§f▍ 해당 적이 시야에서 2초간 사라지거나 사거리를",
+                "§f▍ 벗어나면 저주가 풀립니다.",
+                "",
+                MessageFormat.format("§5{0}§f {1}m", TextIcon.DISTANCE, MAX_DISTANCE),
+                MessageFormat.format("§6{0}§f {1}%", TextIcon.DEFENSE_DECREASE, DEFENSE_DECREMENT),
+                MessageFormat.format("§c{0}§f {1}/초", TextIcon.DAMAGE, DAMAGE_PER_SECOND),
+                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
+                "",
+                "§7§l[2] §f사용",
+                "",
+                "§3[취소/재사용 시]",
+                "",
+                "§f▍ 사용을 종료합니다.",
+                "",
+                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
+                "",
+                "§7§l[2] §f해제");
     }
 }

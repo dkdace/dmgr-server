@@ -9,12 +9,17 @@ import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +28,13 @@ import java.util.UUID;
  * 유저의 데이터 정보를 관리하는 클래스.
  */
 public final class UserData extends YamlFile {
+    /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
+    private static final String MESSAGE_BANNED = "§c관리자에 의해 서버에서 차단되었습니다." +
+            "\n" +
+            "\n§f해제 일시 : §e{0}" +
+            "\n" +
+            "\n§7문의 : " + GeneralConfig.getConfig().getAdminContact();
+
     /** 플레이어 UUID */
     @NonNull
     @Getter
@@ -46,6 +58,13 @@ public final class UserData extends YamlFile {
     /** 돈 */
     @Getter
     private int money = 0;
+    /** 차단한 플레이어의 UUID 목록 */
+    @Nullable
+    private List<String> blockedPlayers;
+    /** 경고 횟수 */
+    @Getter
+    private int warning = 0;
+
     /** 랭크 점수 (RR) */
     @Getter
     private int rankRate = 100;
@@ -70,9 +89,6 @@ public final class UserData extends YamlFile {
     /** 탈주 횟수 */
     @Getter
     private int quitCount = 0;
-    /** 차단한 플레이어의 UUID 목록 */
-    @Nullable
-    private List<String> blockedPlayers;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -132,6 +148,7 @@ public final class UserData extends YamlFile {
         this.xp = (int) getLong("xp", xp);
         this.level = (int) getLong("level", level);
         this.money = (int) getLong("money", money);
+        this.warning = (int) getLong("warning", warning);
         this.rankRate = (int) getLong("rankRate", rankRate);
         this.isRanked = getBoolean("isRanked", isRanked);
         this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
@@ -228,6 +245,63 @@ public final class UserData extends YamlFile {
     public void setMoney(int money) {
         this.money = Math.max(0, money);
         set("money", this.money);
+    }
+
+    public void setWarning(int warning) {
+        this.warning = Math.max(0, warning);
+        set("warning", this.warning);
+    }
+
+    /**
+     * 플레이어를 서버에서 차단한다.
+     *
+     * <p>이미 차단된 상태이면 차단 기간을 연장한다.</p>
+     *
+     * @param days   기간 (일). 0 이상의 값
+     * @param reason 차단 사유
+     * @return 차단 해제 날짜
+     */
+    @NonNull
+    public Date ban(int days, @Nullable String reason) {
+        if (reason == null)
+            reason = "없음";
+
+        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+        Date startDate = Date.from(Instant.now());
+        if (banList.isBanned(playerName))
+            startDate = banList.getBanEntry(playerName).getExpiration();
+
+        Date endDate = Date.from(startDate.toInstant().plus(days, ChronoUnit.DAYS));
+        String finalReason = GeneralConfig.getConfig().getMessagePrefix() + MessageFormat.format(MESSAGE_BANNED,
+                DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"));
+        banList.addBan(playerName, reason + "\n\n" + finalReason, endDate, null);
+
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player != null)
+            player.kickPlayer(finalReason);
+
+        return endDate;
+    }
+
+    /**
+     * 플레이어가 서버에서 차단된 상태인 지 확인한다.
+     *
+     * @return 차단 여부
+     */
+    public boolean isBanned() {
+        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+        return banList.isBanned(playerName);
+    }
+
+    /**
+     * 플레이어의 차단을 해제한다.
+     */
+    public void unban() {
+        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+        if (!banList.isBanned(playerName))
+            return;
+
+        banList.pardon(playerName);
     }
 
     /**

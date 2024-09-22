@@ -3,9 +3,10 @@ package com.dace.dmgr.combat.action.info;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.StaticItem;
 import lombok.NonNull;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * 스킬 정보를 관리하는 클래스.
@@ -15,8 +16,6 @@ import org.bukkit.Material;
 public abstract class SkillInfo<T extends Skill> extends ActionInfo {
     /** 스킬 아이템 타입 */
     public static final Material MATERIAL = Material.STAINED_GLASS_PANE;
-    /** 스킬 이름의 접두사 */
-    private static final String PREFIX = "§e§l[스킬] §c";
     /** 스킬 클래스 */
     private final Class<T> skillClass;
 
@@ -25,14 +24,10 @@ public abstract class SkillInfo<T extends Skill> extends ActionInfo {
      *
      * @param skillClass 스킬 클래스
      * @param name       이름
-     * @param lores      설명 목록
+     * @param itemStack  설명 아이템 객체
      */
-    protected SkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull String @NonNull ... lores) {
-        super(name, new ItemBuilder(MATERIAL)
-                .setName(PREFIX + name)
-                .setDamage((short) 15)
-                .setLore(lores)
-                .build());
+    protected SkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ItemStack itemStack) {
+        super(name, new StaticItem("SkillInfo" + name, itemStack));
         this.skillClass = skillClass;
     }
 

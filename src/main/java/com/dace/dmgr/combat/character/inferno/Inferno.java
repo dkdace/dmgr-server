@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
@@ -36,7 +37,7 @@ public final class Inferno extends Vanguard {
     private static final Inferno instance = new Inferno();
 
     private Inferno() {
-        super("인페르노", "DVInferno", '\u32D7', 2000, 0.9, 1.4);
+        super("인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
     }
 
     @Override
@@ -77,11 +78,17 @@ public final class Inferno extends Vanguard {
     @Override
     @NonNull
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "안됐네, 다음엔 좀 더 노력해봐!",
-                "어디 그 정도 공격으로 되겠어?",
-                "열정이 부족해! 열정이!"
-        };
+        switch (characterType) {
+            case MAGRITTA:
+                return new String[]{"머리 좀 식혀, 멍청아."};
+            default:
+                return new String[]{
+                        "안됐네, 다음엔 좀 더 노력해봐!",
+                        "어디 그 정도 공격으로 되겠어?",
+                        "열정이 부족해! 열정이!"
+                };
+        }
+
     }
 
     @Override
@@ -175,6 +182,15 @@ public final class Inferno extends Vanguard {
     @NonNull
     public InfernoWeaponInfo getWeaponInfo() {
         return InfernoWeaponInfo.getInstance();
+    }
+
+    @Override
+    @Nullable
+    public TraitInfo getCharacterTraitInfo(int number) {
+        if (number == 1)
+            return InfernoT1Info.getInstance();
+
+        return null;
     }
 
     @Override

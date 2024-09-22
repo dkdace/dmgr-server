@@ -524,6 +524,60 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
             new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
             new DefinedSound("new.block.conduit.deactivate", 3, 0.8)
+    ),
+    /** 전투 - '마그리타' 무기 - 사용 */
+    COMBAT_MAGRITTA_WEAPON_USE(
+            new DefinedSound("random.gun2.xm1014_1", 3, 1),
+            new DefinedSound("random.gun2.xm1014_1", 3, 0.8),
+            new DefinedSound("random.gun2.spas_12_1", 3, 1),
+            new DefinedSound("random.gun_reverb", 5, 0.9),
+            new DefinedSound("random.gun_reverb", 5, 0.8)
+    ),
+    /** 전투 - '마그리타' 특성 1번 - 사용 */
+    COMBAT_MAGRITTA_T1_USE(new DefinedSound("new.item.trident.hit", 2, 0.8, 0.1)),
+    /** 전투 - '마그리타' 특성 1번 - 최대치 */
+    COMBAT_MAGRITTA_T1_MAX(new DefinedSound(Sound.ENTITY_WITHER_SKELETON_DEATH, 2, 1.5, 0.1)),
+    /** 전투 - '마그리타' 액티브 1번 - 사용 */
+    COMBAT_MAGRITTA_A1_USE(new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6)),
+    /** 전투 - '마그리타' 액티브 1번 - 부착 */
+    COMBAT_MAGRITTA_A1_STUCK(
+            new DefinedSound(Sound.ENTITY_PLAYER_HURT, 0.8, 0.5),
+            new DefinedSound(Sound.ITEM_FLINTANDSTEEL_USE, 0.8, 1.5)
+    ),
+    /** 전투 - '마그리타' 액티브 1번 - 틱 효과음 */
+    COMBAT_MAGRITTA_A1_TICK(new DefinedSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5, 1.8)),
+    /** 전투 - '마그리타' 액티브 1번 - 폭발 */
+    COMBAT_MAGRITTA_A1_EXPLODE(
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 4, 0.8),
+            new DefinedSound(Sound.ENTITY_FIREWORK_LARGE_BLAST, 4, 0.6),
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 4, 0.8),
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 4, 0.5),
+            new DefinedSound("random.explosion_reverb", 6, 1.2)
+    ),
+    /** 전투 - '마그리타' 액티브 2번 - 사용 */
+    COMBAT_MAGRITTA_A2_USE(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 1.5, 2),
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.5, 0.5)
+    ),
+    /** 전투 - '마그리타' 궁극기 - 사용 */
+    COMBAT_MAGRITTA_ULT_USE(
+            new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
+            new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
+            new DefinedSound(Sound.BLOCK_LAVA_EXTINGUISH, 1, 0.6)
+    ),
+    /** 전투 - '마그리타' 궁극기 - 사격 */
+    COMBAT_MAGRITTA_ULT_SHOOT(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.8, 0.1),
+            new DefinedSound("random.gun2.xm1014_1", 3, 1),
+            new DefinedSound("random.gun2.spas_12_1", 3, 1),
+            new DefinedSound("random.gun_reverb", 5, 0.9),
+            new DefinedSound("random.gun_reverb", 5, 0.8)
+    ),
+    /** 전투 - '마그리타' 궁극기 - 사용 종료 */
+    COMBAT_MAGRITTA_ULT_END(
+            new DefinedSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.8),
+            new DefinedSound(Sound.ENTITY_ITEM_BREAK, 3, 0.8),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4)
     );
 
     /** 지정된 효과음 목록 */

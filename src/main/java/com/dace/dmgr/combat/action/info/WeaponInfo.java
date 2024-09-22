@@ -4,10 +4,9 @@ import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.StaticItem;
 import lombok.NonNull;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * 무기 정보를 관리하는 클래스.
@@ -18,7 +17,7 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
     /** 무기 아이템 타입 */
     public static final Material MATERIAL = Material.DIAMOND_HOE;
     /** 무기 이름의 접두사 */
-    private static final String PREFIX = "§e§l[기본무기] §f";
+    private static final String PREFIX = "§7§l[기본무기] §f";
     /** 무기 클래스 */
     private final Class<T> weaponClass;
 
@@ -31,18 +30,12 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      * @param lores       설명 목록
      */
     protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
-        super(name, new ItemBuilder(MATERIAL)
+        super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage(resource)
                 .setLore(lores)
-                .build());
+                .build()));
         this.weaponClass = weaponClass;
-
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setUnbreakable(true);
-        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        itemStack.setItemMeta(itemMeta);
     }
 
     @Override

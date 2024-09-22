@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
@@ -9,7 +10,9 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 /**
@@ -25,14 +28,17 @@ public abstract class Support extends Character {
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
      *
      * @param name             이름
+     * @param nickname         별명
      * @param skinName         스킨 이름
      * @param icon             전투원 아이콘
+     * @param difficulty       난이도
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Support(@NonNull String name, @NonNull String skinName, char icon, int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, skinName, Role.SUPPORT, icon, health, speedMultiplier, hitboxMultiplier);
+    protected Support(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
+                      double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.SUPPORT, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
@@ -69,6 +75,23 @@ public abstract class Support extends Character {
         return true;
     }
 
+    @Override
+    @Nullable
+    public final TraitInfo getTraitInfo(int number) {
+        if (number == 1)
+            return RoleTrait1Info.instance;
+        else if (number == 2)
+            return RoleTrait2Info.instance;
+
+        return getCharacterTraitInfo(number - 2);
+    }
+
+    /**
+     * @see Character#getTraitInfo(int)
+     */
+    @Nullable
+    public abstract TraitInfo getCharacterTraitInfo(int number);
+
     public static final class RoleTrait1Info extends TraitInfo {
         /** 이동속도 증가량 */
         public static final int SPEED = 20;
@@ -78,7 +101,13 @@ public abstract class Support extends Character {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 지원 - 1");
+            super("역할: 지원 - 1",
+                    "",
+                    "§f▍ 치명상인 아군이 범위 밖에 있을 때 §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도",
+                    "§f▍ 가 빨라집니다.",
+                    "",
+                    MessageFormat.format("§b{0} §f{1}%", TextIcon.WALK_SPEED_INCREASE, SPEED),
+                    MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, DETECT_RADIUS));
         }
     }
 
@@ -91,7 +120,12 @@ public abstract class Support extends Character {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 지원 - 2");
+            super("역할: 지원 - 2",
+                    "",
+                    "§f▍ 아군을 치유하면 일정 시간동안 §a" + TextIcon.HEAL + " 회복§f합니다.",
+                    "",
+                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
+                    MessageFormat.format("§a{0} §f{1}/초", TextIcon.HEAL, HEAL_PER_SECOND));
         }
     }
 }

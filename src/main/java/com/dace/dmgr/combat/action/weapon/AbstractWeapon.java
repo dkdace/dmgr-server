@@ -27,7 +27,7 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
     protected AbstractWeapon(@NonNull CombatUser combatUser, @NonNull WeaponInfo<? extends Weapon> weaponInfo) {
         super(combatUser);
 
-        this.itemStack = weaponInfo.getItemStack();
+        this.itemStack = weaponInfo.getStaticItem().getItemStack();
         combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 

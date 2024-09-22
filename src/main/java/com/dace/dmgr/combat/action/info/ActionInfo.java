@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action.info;
 
+import com.dace.dmgr.item.StaticItem;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,16 +19,21 @@ public class ActionInfo {
     /** 이름 */
     @Getter
     protected final String name;
+    /** 설명 정적 아이템 객체 */
+    @Getter
+    protected final StaticItem staticItem;
     /** 설명 아이템 객체 */
     protected final ItemStack itemStack;
 
     /**
-     * 동작의 설명 아이템 객체를 반환한다.
+     * 동작 정보 인스턴스를 생성한다.
      *
-     * @return 설명 아이템 객체
+     * @param name       이름
+     * @param staticItem 설명 정적 아이템 객체
      */
-    @NonNull
-    public final ItemStack getItemStack() {
-        return itemStack.clone();
+    protected ActionInfo(@NonNull String name, @NonNull StaticItem staticItem) {
+        this.name = name;
+        this.staticItem = staticItem;
+        this.itemStack = staticItem.getItemStack();
     }
 }
