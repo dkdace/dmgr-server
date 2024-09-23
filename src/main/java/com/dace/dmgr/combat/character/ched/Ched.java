@@ -8,12 +8,15 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
+import com.dace.dmgr.combat.character.ched.action.ChedP1;
+import com.dace.dmgr.combat.character.ched.action.ChedP1Info;
 import com.dace.dmgr.combat.character.ched.action.ChedWeapon;
 import com.dace.dmgr.combat.character.ched.action.ChedWeaponInfo;
 import com.dace.dmgr.combat.character.inferno.action.InfernoUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -25,6 +28,7 @@ import java.util.StringJoiner;
  * 전투원 - 체드 클래스.
  *
  * @see ChedWeapon
+ * @see ChedP1
  */
 public final class Ched extends Marksman {
     @Getter
@@ -107,7 +111,18 @@ public final class Ched extends Marksman {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+
+        double skillp1Duration = skillp1.getHangTick() / 20.0;
+        double skillp1MaxDuration = ChedP1Info.HANG_DURATION / 20.0;
+
         StringJoiner text = new StringJoiner("    ");
+
+        if (!skillp1.isDurationFinished()) {
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(ChedP1Info.getInstance().toString(), skillp1Duration,
+                    skillp1MaxDuration, 10, '■');
+            text.add(skillp1Display);
+        }
 
         return text.toString();
     }
@@ -132,6 +147,9 @@ public final class Ched extends Marksman {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
+        if (number == 1)
+            return ChedP1Info.getInstance();
+
         return null;
     }
 

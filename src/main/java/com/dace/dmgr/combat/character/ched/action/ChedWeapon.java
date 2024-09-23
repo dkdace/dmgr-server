@@ -43,6 +43,11 @@ public final class ChedWeapon extends AbstractWeapon {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && (combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() || !combatUser.getEntity().hasGravity());
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
@@ -56,6 +61,7 @@ public final class ChedWeapon extends AbstractWeapon {
             }
             case PERIODIC_1: {
                 new ChedWeaponProjectile(power).shoot();
+                combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.AIR));
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_USE, combatUser.getEntity().getLocation(), power + 0.5, power * 0.3);
 
