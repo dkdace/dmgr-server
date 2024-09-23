@@ -336,6 +336,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
             characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+
+        if (i % 5 == 0 && characterType == CharacterType.CHED && !entity.isHandRaised())
+            for (CombatEntity combatEntity : game == null ? CombatEntity.getAllExcluded() : game.getAllCombatEntities()) {
+                if (combatEntity instanceof CombatUser && (((CombatUser) combatEntity).getCharacterType() != CharacterType.CHED ||
+                        !((CombatUser) combatEntity).getEntity().isHandRaised()))
+                    ((CombatUser) combatEntity).getEntity().stopSound("new.item.crossbow.loading_middle");
+            }
     }
 
     /**

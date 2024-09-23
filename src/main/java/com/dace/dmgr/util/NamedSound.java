@@ -233,9 +233,7 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_SHULKER_BOX_OPEN, 1, 0.7)
     ),
     /** 전투 - '퀘이커' 액티브 1번 - 해제 */
-    COMBAT_QUAKER_A1_DISABLE(
-            new DefinedSound(Sound.BLOCK_SHULKER_BOX_CLOSE, 1, 1.4)
-    ),
+    COMBAT_QUAKER_A1_DISABLE(new DefinedSound(Sound.BLOCK_SHULKER_BOX_CLOSE, 1, 1.4)),
     /** 전투 - '퀘이커' 액티브 1번 - 피격 */
     COMBAT_QUAKER_A1_DAMAGE(
             new DefinedSound(Sound.BLOCK_ANVIL_LAND, 0.25, 1.2, 0.1),
@@ -352,9 +350,7 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 1, 1.5)
     ),
     /** 전투 - '니스' 무기 - 사용 (치유 광선) */
-    COMBAT_NEACE_WEAPON_USE_HEAL(
-            new DefinedSound(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2)
-    ),
+    COMBAT_NEACE_WEAPON_USE_HEAL(new DefinedSound(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2)),
     /** 전투 - '니스' 액티브 1번 - 사용 */
     COMBAT_NEACE_A1_USE(
             new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
@@ -508,17 +504,11 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
     ),
     /** 전투 - '인페르노' 궁극기 - 사용 */
-    COMBAT_INFERNO_ULT_USE(
-            new DefinedSound("new.block.respawn_anchor.ambient", 3, 1.2)
-    ),
+    COMBAT_INFERNO_ULT_USE(new DefinedSound("new.block.respawn_anchor.ambient", 3, 1.2)),
     /** 전투 - '인페르노' 궁극기 - 틱 효과음 */
-    COMBAT_INFERNO_ULT_TICK(
-            new DefinedSound(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1)
-    ),
+    COMBAT_INFERNO_ULT_TICK(new DefinedSound(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1)),
     /** 전투 - '인페르노' 궁극기 - 피격 */
-    COMBAT_INFERNO_ULT_DAMAGE(
-            new DefinedSound(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1)
-    ),
+    COMBAT_INFERNO_ULT_DAMAGE(new DefinedSound(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1)),
     /** 전투 - '인페르노' 궁극기 - 파괴 */
     COMBAT_INFERNO_ULT_DEATH(
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
@@ -578,6 +568,28 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.8),
             new DefinedSound(Sound.ENTITY_ITEM_BREAK, 3, 0.8),
             new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4)
+    ),
+    /** 전투 - '체드' 무기 - 충전 */
+    COMBAT_CHED_WEAPON_CHARGE(new DefinedSound("new.item.crossbow.loading_middle", 0.6, 1)),
+    /** 전투 - '체드' 무기 - 사용 */
+    COMBAT_CHED_WEAPON_USE(
+            new DefinedSound("new.item.crossbow.shoot", 0.5, 1.2),
+            new DefinedSound("random.gun.bow", 0.5, 0.8),
+            new DefinedSound("random.gun2.shovel_leftclick", 0.6, 0.85)
+    ),
+    /** 전투 - '체드' 무기 - 타격 */
+    COMBAT_CHED_WEAPON_HIT(new DefinedSound("random.gun.arrowhit", 0.5, 1)),
+    /** 전투 - '체드' 패시브 1번 - 사용 */
+    COMBAT_CHED_P1_USE(new DefinedSound(Sound.BLOCK_STONE_STEP, 1, 0.5, 0.05)),
+    /** 전투 - '체드' 패시브 1번 - 사용 (매달리기) */
+    COMBAT_CHED_P1_USE_HANG(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.7),
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 0.6, 0.85)
+    ),
+    /** 전투 - '체드' 패시브 1번 - 해제 (매달리기) */
+    COMBAT_CHED_P1_DISABLE_HANG(
+            new DefinedSound("new.entity.phantom.flap", 1, 1.8),
+            new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 0.6, 1.4)
     );
 
     /** 지정된 효과음 목록 */
