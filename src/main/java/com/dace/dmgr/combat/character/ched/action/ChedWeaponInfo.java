@@ -37,5 +37,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 1;
+        /** 불화살 */
+        public static final short FIRE = 11;
     }
 }

@@ -590,6 +590,17 @@ public enum NamedSound {
     COMBAT_CHED_P1_DISABLE_HANG(
             new DefinedSound("new.entity.phantom.flap", 1, 1.8),
             new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 0.6, 1.4)
+    ),
+    /** 전투 - '체드' 액티브 1번 - 사용 */
+    COMBAT_CHED_A1_USE(
+            new DefinedSound("new.item.crossbow.loading_end", 0.7, 1.4),
+            new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.7, 2)
+    ),
+    /** 전투 - '체드' 액티브 1번 - 사격 */
+    COMBAT_CHED_A1_SHOOT(
+            new DefinedSound("new.item.crossbow.shoot", 1.4, 1.6),
+            new DefinedSound("random.gun.bow", 1.4, 1.2),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 1.6, 1.4)
     );
 
     /** 지정된 효과음 목록 */

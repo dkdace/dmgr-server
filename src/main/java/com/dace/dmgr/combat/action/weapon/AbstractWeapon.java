@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -47,6 +48,13 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
         super.dispose();
 
         combatUser.getEntity().getInventory().clear(4);
+    }
+
+    @Override
+    public final void displayMaterial(@NonNull Material material) {
+        itemStack.setType(material);
+        if (combatUser.getEntity().getInventory().getItem(4).getDurability() != INVISIBLE_ITEM_DURABILITY)
+            combatUser.getEntity().getInventory().setItem(4, itemStack);
     }
 
     @Override

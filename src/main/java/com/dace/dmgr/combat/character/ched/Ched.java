@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.ched;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -8,10 +9,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
-import com.dace.dmgr.combat.character.ched.action.ChedP1;
-import com.dace.dmgr.combat.character.ched.action.ChedP1Info;
-import com.dace.dmgr.combat.character.ched.action.ChedWeapon;
-import com.dace.dmgr.combat.character.ched.action.ChedWeaponInfo;
+import com.dace.dmgr.combat.character.ched.action.*;
 import com.dace.dmgr.combat.character.inferno.action.InfernoUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -29,6 +27,7 @@ import java.util.StringJoiner;
  *
  * @see ChedWeapon
  * @see ChedP1
+ * @see ChedA1
  */
 public final class Ched extends Marksman {
     @Getter
@@ -112,6 +111,7 @@ public final class Ched extends Marksman {
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        ChedA1 skill1 = combatUser.getSkill(ChedA1Info.getInstance());
 
         double skillp1Duration = skillp1.getHangTick() / 20.0;
         double skillp1MaxDuration = ChedP1Info.HANG_DURATION / 20.0;
@@ -123,6 +123,8 @@ public final class Ched extends Marksman {
                     skillp1MaxDuration, 10, '■');
             text.add(skillp1Display);
         }
+        if (!skill1.isDurationFinished() && skill1.isEnabled())
+            text.add(ChedA1Info.getInstance() + "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f해제");
 
         return text.toString();
     }
@@ -157,6 +159,8 @@ public final class Ched extends Marksman {
     @Nullable
     public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return ChedA1Info.getInstance();
             case 4:
                 return InfernoUltInfo.getInstance();
             default:

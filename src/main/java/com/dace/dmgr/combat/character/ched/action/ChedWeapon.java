@@ -51,11 +51,27 @@ public final class ChedWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                setCooldown();
+                ChedA1 skill1 = combatUser.getSkill(ChedA1Info.getInstance());
 
-                combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.ARROW));
+                if (skill1.isEnabled()) {
+                    setCooldown(ChedA1Info.COOLDOWN);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_CHARGE, combatUser.getEntity().getLocation());
+                    skill1.addStack(-1);
+                    if (skill1.getStack() <= 0)
+                        skill1.setDuration(0);
+
+                    new ChedA1.ChedA1Projectile(combatUser).shoot();
+
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A1_SHOOT, combatUser.getEntity().getLocation());
+                } else {
+                    setCooldown();
+
+                    combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.ARROW));
+                    if (combatUser.getEntity().isHandRaised())
+                        combatUser.getWeapon().setVisible(true);
+
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_CHARGE, combatUser.getEntity().getLocation());
+                }
 
                 break;
             }
