@@ -28,6 +28,7 @@ import java.util.StringJoiner;
  * @see ChedWeapon
  * @see ChedP1
  * @see ChedA1
+ * @see ChedA2
  */
 public final class Ched extends Marksman {
     @Getter
@@ -135,6 +136,11 @@ public final class Ched extends Marksman {
     }
 
     @Override
+    public boolean canFly(@NonNull CombatUser combatUser) {
+        return combatUser.getSkill(ChedA2Info.getInstance()).canUse(ActionKey.SPACE);
+    }
+
+    @Override
     @NonNull
     public ChedWeaponInfo getWeaponInfo() {
         return ChedWeaponInfo.getInstance();
@@ -161,6 +167,8 @@ public final class Ched extends Marksman {
         switch (number) {
             case 1:
                 return ChedA1Info.getInstance();
+            case 2:
+                return ChedA2Info.getInstance();
             case 4:
                 return InfernoUltInfo.getInstance();
             default:

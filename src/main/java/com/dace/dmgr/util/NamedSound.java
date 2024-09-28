@@ -601,6 +601,11 @@ public enum NamedSound {
             new DefinedSound("new.item.crossbow.shoot", 1.4, 1.6),
             new DefinedSound("random.gun.bow", 1.4, 1.2),
             new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 1.6, 1.4)
+    ),
+    /** 전투 - '체드' 액티브 2번 - 사용 */
+    COMBAT_CHED_A2_USE(
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1, 1.3),
+            new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 1, 1)
     );
 
     /** 지정된 효과음 목록 */
