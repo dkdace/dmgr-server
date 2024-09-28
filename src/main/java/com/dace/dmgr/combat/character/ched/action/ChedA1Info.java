@@ -24,6 +24,8 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 95;
 
+    /** 피해 점수 */
+    public static final int DAMAGE_SCORE = 4;
     @Getter
     private static final ChedA1Info instance = new ChedA1Info();
 
