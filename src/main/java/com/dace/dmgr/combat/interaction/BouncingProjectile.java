@@ -96,9 +96,7 @@ public abstract class BouncingProjectile extends Projectile {
 
     @Override
     protected final boolean onHitBlock(@NonNull Block hitBlock) {
-        if (onHitBlockBouncing(hitBlock))
-            return true;
-
+        onHitBlockBouncing(hitBlock);
         if (bouncing == -1 || bouncing-- > 0)
             return handleBounce();
 
@@ -109,9 +107,8 @@ public abstract class BouncingProjectile extends Projectile {
      * 총알이 블록에 맞았을 때 실행할 작업.
      *
      * @param hitBlock 맞은 블록
-     * @return 관통 여부. {@code true} 반환 시 블록 관통, {@code false} 반환 시 도탄됨
      */
-    protected abstract boolean onHitBlockBouncing(@NonNull Block hitBlock);
+    protected abstract void onHitBlockBouncing(@NonNull Block hitBlock);
 
     @Override
     protected final boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {

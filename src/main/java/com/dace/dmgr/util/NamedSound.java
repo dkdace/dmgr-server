@@ -606,7 +606,22 @@ public enum NamedSound {
     COMBAT_CHED_A2_USE(
             new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1, 1.3),
             new DefinedSound(Sound.ENTITY_LLAMA_SWAG, 1, 1)
-    );
+    ),
+    /** 전투 - '체드' 액티브 3번 - 사용 */
+    COMBAT_CHED_A3_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
+            new DefinedSound(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7)
+    ),
+    /** 전투 - '체드' 액티브 3번 - 사용 준비 */
+    COMBAT_CHED_A3_USE_READY(
+            new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.5, 1.4),
+            new DefinedSound(Sound.ENTITY_VEX_CHARGE, 1.5, 1.3),
+            new DefinedSound(Sound.ENTITY_VEX_AMBIENT, 1.5, 1.7),
+            new DefinedSound(Sound.ENTITY_VEX_AMBIENT, 1.5, 1.5)
+    ),
+    /** 전투 - '체드' 액티브 3번 - 틱 효과음 */
+    COMBAT_CHED_A3_TICK(new DefinedSound("new.entity.phantom.flap", 1, 1.3));
 
     /** 지정된 효과음 목록 */
     @NonNull

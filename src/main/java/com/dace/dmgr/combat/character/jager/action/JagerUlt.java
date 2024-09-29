@@ -110,8 +110,8 @@ public final class JagerUlt extends UltimateSkill {
         }
 
         @Override
-        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            return false;
+        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
+            // 미사용
         }
 
         @Override

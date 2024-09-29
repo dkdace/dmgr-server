@@ -13,7 +13,9 @@ import com.dace.dmgr.combat.character.ched.action.*;
 import com.dace.dmgr.combat.character.inferno.action.InfernoUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,6 +31,7 @@ import java.util.StringJoiner;
  * @see ChedP1
  * @see ChedA1
  * @see ChedA2
+ * @see ChedA3
  */
 public final class Ched extends Marksman {
     @Getter
@@ -136,6 +139,17 @@ public final class Ched extends Marksman {
     }
 
     @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        super.onKill(attacker, victim, score, isFinalHit);
+
+        if (!(victim instanceof CombatUser))
+            return;
+
+        if (CooldownUtil.getCooldown(attacker, ChedA3.KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
+    }
+
+    @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         return combatUser.getSkill(ChedA2Info.getInstance()).canUse(ActionKey.SPACE);
     }
@@ -169,6 +183,8 @@ public final class Ched extends Marksman {
                 return ChedA1Info.getInstance();
             case 2:
                 return ChedA2Info.getInstance();
+            case 3:
+                return ChedA3Info.getInstance();
             case 4:
                 return InfernoUltInfo.getInstance();
             default:

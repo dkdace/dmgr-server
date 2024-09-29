@@ -113,8 +113,8 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            return false;
+        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
+            // 미사용
         }
 
         @Override
