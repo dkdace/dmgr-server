@@ -112,7 +112,7 @@ public final class ChedA1 extends StackableSkill {
         private static final ChedA1Burning instance = new ChedA1Burning();
 
         private ChedA1Burning() {
-            super(ChedA1Info.FIRE_DAMAGE_PER_SECOND);
+            super(ChedA1Info.FIRE_DAMAGE_PER_SECOND, true);
         }
     }
 

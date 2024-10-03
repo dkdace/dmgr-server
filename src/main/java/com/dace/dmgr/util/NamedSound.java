@@ -621,7 +621,32 @@ public enum NamedSound {
             new DefinedSound(Sound.ENTITY_VEX_AMBIENT, 1.5, 1.5)
     ),
     /** 전투 - '체드' 액티브 3번 - 틱 효과음 */
-    COMBAT_CHED_A3_TICK(new DefinedSound("new.entity.phantom.flap", 1, 1.3));
+    COMBAT_CHED_A3_TICK(new DefinedSound("new.entity.phantom.flap", 1, 1.3)),
+    /** 전투 - '체드' 궁극기 - 사용 */
+    COMBAT_CHED_ULT_USE(
+            new DefinedSound(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.4),
+            new DefinedSound(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR, 2, 0.8),
+            new DefinedSound("new.entity.squid.squirt", 2, 0.7)
+    ),
+    /** 전투 - '체드' 궁극기 - 사용 준비 */
+    COMBAT_CHED_ULT_USE_READY(
+            new DefinedSound("new.entity.phantom.death", 3, 0.7),
+            new DefinedSound("new.entity.phantom.death", 3, 0.7),
+            new DefinedSound(Sound.ENTITY_WITHER_SHOOT, 3, 0.5),
+            new DefinedSound(Sound.ENTITY_VEX_CHARGE, 3, 0.85)
+    ),
+    /** 전투 - '체드' 궁극기 - 틱 효과음 */
+    COMBAT_CHED_ULT_TICK(new DefinedSound(Sound.ENTITY_ENDERDRAGON_FLAP, 1.5, 1.2)),
+    /** 전투 - '체드' 궁극기 - 폭발 */
+    COMBAT_CHED_ULT_EXPLODE(
+            new DefinedSound(Sound.ITEM_TOTEM_USE, 5, 1.3),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 5, 0.7),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 5, 0.6),
+            new DefinedSound(Sound.ENTITY_GHAST_SHOOT, 5, 0.8),
+            new DefinedSound("random.explosion_reverb", 7, 0.6)
+    ),
+    /** 전투 - '체드' 궁극기 - 화염 지대 틱 효과음 */
+    COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1));
 
     /** 지정된 효과음 목록 */
     @NonNull

@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Marksman;
 import com.dace.dmgr.combat.character.ched.action.*;
-import com.dace.dmgr.combat.character.inferno.action.InfernoUltInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -32,6 +31,7 @@ import java.util.StringJoiner;
  * @see ChedA1
  * @see ChedA2
  * @see ChedA3
+ * @see ChedUlt
  */
 public final class Ched extends Marksman {
     @Getter
@@ -186,7 +186,7 @@ public final class Ched extends Marksman {
             case 3:
                 return ChedA3Info.getInstance();
             case 4:
-                return InfernoUltInfo.getInstance();
+                return ChedUltInfo.getInstance();
             default:
                 return null;
         }
@@ -194,7 +194,7 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    public InfernoUltInfo getUltimateSkillInfo() {
-        return InfernoUltInfo.getInstance();
+    public ChedUltInfo getUltimateSkillInfo() {
+        return ChedUltInfo.getInstance();
     }
 }

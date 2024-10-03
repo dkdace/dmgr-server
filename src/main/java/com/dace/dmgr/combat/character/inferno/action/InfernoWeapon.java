@@ -174,7 +174,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         private static final InfernoWeaponBurning instance = new InfernoWeaponBurning();
 
         private InfernoWeaponBurning() {
-            super(InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND);
+            super(InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND, true);
         }
 
         @Override

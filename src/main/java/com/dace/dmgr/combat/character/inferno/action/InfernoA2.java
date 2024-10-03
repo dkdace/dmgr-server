@@ -113,7 +113,7 @@ public final class InfernoA2 extends ActiveSkill {
         private static final InfernoA2Burning instance = new InfernoA2Burning();
 
         private InfernoA2Burning() {
-            super(InfernoA2Info.FIRE_DAMAGE_PER_SECOND);
+            super(InfernoA2Info.FIRE_DAMAGE_PER_SECOND, true);
         }
     }
 
