@@ -272,8 +272,10 @@ public final class User implements Disposable {
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-        if (CombatUser.fromUser(this) == null)
+        if (CombatUser.fromUser(this) == null) {
+            sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
             updateSidebar();
+        }
 
         GameUser gameUser = GameUser.fromUser(this);
         if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
