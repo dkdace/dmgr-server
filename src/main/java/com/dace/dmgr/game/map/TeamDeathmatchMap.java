@@ -17,7 +17,7 @@ public enum TeamDeathmatchMap implements GameMap {
             new GlobalLocation[]{new GlobalLocation(-114.5, 64, 53.5, -90, 0)}
     ),
     MEDIEVAL("중세풍", Bukkit.getWorld("Medieval"),
-            new GlobalLocation[]{new GlobalLocation(0.5, 63, 126.5, -180, 0)},
+            new GlobalLocation[]{new GlobalLocation(0.5, 63, 126.5, 180, 0)},
             new GlobalLocation[]{new GlobalLocation(1.0, 63, -126.5, 0, 0)}
     );
 
