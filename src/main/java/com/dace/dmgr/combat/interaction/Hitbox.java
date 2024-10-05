@@ -168,7 +168,7 @@ public class Hitbox {
      * @param radius   판정 구체의 반지름. (단위: 블록)
      * @return {@code location}이 히트박스의 내부에 있으면 {@code true} 반환
      */
-    public final boolean isInHitbox(Location location, double radius) {
+    public final boolean isInHitbox(@NonNull Location location, double radius) {
         return getDistance(location) <= radius;
     }
 }
