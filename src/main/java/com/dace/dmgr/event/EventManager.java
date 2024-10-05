@@ -45,6 +45,7 @@ public final class EventManager {
         EventUtil.registerPacketListener(new OnPlayClientUseEntity());
         EventUtil.registerPacketListener(new OnPlayServerUpdateHealth());
         EventUtil.registerPacketListener(new OnPlayServerNamedSoundEffect());
+        EventUtil.registerPacketListener(new OnPlayServerCustomSoundEffect());
         EventUtil.registerPacketListener(new OnPlayServerAbilities());
 //        EventUtil.registerPacketListener(new OnPlayClientLook());
 //        EventUtil.registerPacketListener(new OnPlayClientPositionLook());
