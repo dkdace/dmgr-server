@@ -74,10 +74,13 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(false);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (combatUser.getKnockbackModule().isKnockbacked())
+                return false;
             if (!canActivate())
                 return false;
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);
+            combatUser.getEntity().setFallDistance(0);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())

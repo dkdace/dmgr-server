@@ -81,6 +81,9 @@ public final class ChedP1 extends AbstractSkill {
         float yaw = location.getYaw();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            if (combatUser.getKnockbackModule().isKnockbacked())
+                return false;
+
             Location loc = combatUser.getEntity().getEyeLocation();
             if (combatUser.getEntity().isSneaking() && hangTick > 0) {
                 loc.setYaw(yaw);
@@ -95,6 +98,7 @@ public final class ChedP1 extends AbstractSkill {
             }
             combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.AIR));
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
+            combatUser.getEntity().setFallDistance(0);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_P1_USE, combatUser.getEntity().getLocation());
