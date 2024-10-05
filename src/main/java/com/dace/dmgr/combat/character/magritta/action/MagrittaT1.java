@@ -101,7 +101,7 @@ public final class MagrittaT1 {
         private static final MagrittaT1Burning instance = new MagrittaT1Burning();
 
         private MagrittaT1Burning() {
-            super(MagrittaT1Info.FIRE_DAMAGE_PER_SECOND);
+            super(MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
         }
     }
 }

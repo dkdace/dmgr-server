@@ -49,6 +49,8 @@ public abstract class Bullet {
     /** 총알의 현재 속도 */
     @Nullable
     private Vector velocity;
+    /** 블록 피격 여부 */
+    private boolean isInBlock = false;
 
     /**
      * 총알 인스턴스를 생성한다.
@@ -170,13 +172,22 @@ public abstract class Bullet {
      */
     private boolean handleBlockCollision() {
         Block hitBlock = getLocation().getBlock();
+        Location hitLocation = getLocation().clone();
 
-        if (getVelocity().length() > 0.01)
+        if (!isInBlock && getVelocity().length() > 0.01)
             while (!LocationUtil.isNonSolid(getLocation()))
-                getLocation().subtract(velocity);
+                getLocation().subtract(getVelocity());
 
         onHit();
-        return onHitBlock(hitBlock);
+        if (onHitBlock(hitBlock)) {
+            isInBlock = !LocationUtil.isNonSolid(getLocation().clone().add(getVelocity()));
+            if (isInBlock)
+                location = hitLocation;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -190,7 +201,7 @@ public abstract class Bullet {
         if (target != null && targets.add(target)) {
             onHit();
 
-            boolean isCrit = target instanceof HasCritHitbox && ((HasCritHitbox) target).getCritHitbox().isInHitbox(location, size);
+            boolean isCrit = target instanceof HasCritHitbox && ((HasCritHitbox) target).getCritHitbox().isInHitbox(getLocation(), size);
             return onHitEntity(target, isCrit);
         }
 

@@ -186,9 +186,9 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlockBouncing(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, getLocation(), 1 + getVelocity().length() * 2);
-            return false;
+        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
+            if (getVelocity().length() > 0.01)
+                SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, getLocation(), 1 + getVelocity().length() * 2);
         }
 
         @Override

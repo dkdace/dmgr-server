@@ -3,8 +3,10 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.LocationUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public final class OnPlayerInteract implements Listener {
@@ -14,7 +16,7 @@ public final class OnPlayerInteract implements Listener {
         if (combatUser == null)
             return;
 
-        if (event.hasBlock())
+        if (event.hasBlock() && (LocationUtil.isInteractable(event.getClickedBlock()) || event.getAction() == Action.LEFT_CLICK_BLOCK))
             event.setCancelled(true);
         if (combatUser.getCharacterType() == null)
             return;
