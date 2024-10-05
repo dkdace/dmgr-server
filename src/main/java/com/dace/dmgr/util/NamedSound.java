@@ -140,7 +140,7 @@ public enum NamedSound {
     COMBAT_JAGER_WEAPON_USE_SCOPE(
             new DefinedSound("random.gun2.psg_1_1", 3.5, 1),
             new DefinedSound("random.gun2.m16_1", 3.5, 1),
-            new DefinedSound("random.gun.reverb", 5.5, 0.95)
+            new DefinedSound("random.gun_reverb", 5.5, 0.95)
     ),
     /** 전투 - '예거' 액티브 1번 - 소환 준비 */
     COMBAT_JAGER_A1_SUMMON_READY(new DefinedSound(Sound.ENTITY_WOLF_GROWL, 1, 1)),
