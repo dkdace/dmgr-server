@@ -1,6 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
@@ -16,8 +17,20 @@ public final class OnPlayerInteract implements Listener {
         if (combatUser == null)
             return;
 
-        if (event.hasBlock() && (LocationUtil.isInteractable(event.getClickedBlock()) || event.getAction() == Action.LEFT_CLICK_BLOCK))
-            event.setCancelled(true);
+        if (event.hasBlock()) {
+            if (LocationUtil.isInteractable(event.getClickedBlock()) || event.getAction() == Action.LEFT_CLICK_BLOCK)
+                event.setCancelled(true);
+            if (event.getItem() != null && event.getItem().getType() == WeaponInfo.MATERIAL)
+                switch (event.getClickedBlock().getType()) {
+                    case GRASS:
+                    case DIRT:
+                    case GRASS_PATH:
+                        event.setCancelled(true);
+                        break;
+                    default:
+                        break;
+                }
+        }
         if (combatUser.getCharacterType() == null)
             return;
 
