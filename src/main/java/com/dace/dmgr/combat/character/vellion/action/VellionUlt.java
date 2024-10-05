@@ -267,7 +267,7 @@ public final class VellionUlt extends UltimateSkill {
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
             for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 3, 0.05, 0.50, 0.05, 0);
+                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 3, 0.05, 0.05, 0.05, 0);
             ParticleUtil.play(Particle.CRIT_MAGIC, location, 50, 0, 0, 0, 0.4);
 
             return true;
