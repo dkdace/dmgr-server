@@ -44,10 +44,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
@@ -323,6 +320,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         user.sendActionBar(character.getActionbarString(this));
 
         checkHealPack();
+        checkUltPack();
         checkJumpPad();
         checkFallZone();
         onFootstep();
@@ -383,13 +381,68 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             HologramUtil.editHologram(Cooldown.HEAL_PACK.id + healPackLocation,
                     MessageFormat.format(HEAL_PACK_HOLOGRAM_FORMAT, TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            for (Player player : entity.getWorld().getPlayers()) {
+            for (Player player : location.getWorld().getPlayers()) {
                 HologramUtil.setHologramVisibility(Cooldown.HEAL_PACK.id + healPackLocation,
                         LocationUtil.canPass(player.getPlayer().getEyeLocation(), hologramLoc), player.getPlayer());
             }
 
             return true;
         }, isCancalled -> HologramUtil.removeHologram(Cooldown.HEAL_PACK.id + healPackLocation), 5);
+    }
+
+    /**
+     * 현재 위치의 궁극기 팩을 확인 및 사용한다.
+     */
+    private void checkUltPack() {
+        Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
+        if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getUltPackBlock())
+            return;
+
+        GlobalLocation ultPackLocation = new GlobalLocation(location.getX(), location.getY(), location.getZ());
+
+        if (CooldownUtil.getCooldown(ultPackLocation, Cooldown.ULT_PACK.id) > 0)
+            return;
+        if (getUltGaugePercent() == 1)
+            return;
+
+        useUltPack(ultPackLocation, location);
+    }
+
+    /**
+     * 궁극기 팩 사용 시 실행할 작업.
+     *
+     * @param ultPackLocation 궁극기 팩 위치
+     * @param location        실제 블록 위치
+     */
+    private void useUltPack(@NonNull GlobalLocation ultPackLocation, @NonNull Location location) {
+        CooldownUtil.setCooldown(ultPackLocation, Cooldown.ULT_PACK.id, Cooldown.ULT_PACK.duration);
+        addUltGauge(GeneralConfig.getCombatConfig().getUltPackCharge());
+
+        ParticleUtil.playFirework(location.clone().add(0.5, 1.1, 0.5), 48, 85, 251,
+                255, 255, 255, FireworkEffect.Type.BALL, false, false);
+        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_ULT_PACK, entity.getLocation());
+
+        Location hologramLoc = location.add(0.5, 1.7, 0.5);
+        HologramUtil.addHologram(Cooldown.ULT_PACK.id + ultPackLocation, hologramLoc,
+                MessageFormat.format(HEAL_PACK_HOLOGRAM_FORMAT, TextIcon.COOLDOWN, 0));
+
+        boolean isGame = game != null;
+        new IntervalTask(i -> {
+            long cooldown = CooldownUtil.getCooldown(ultPackLocation, Cooldown.ULT_PACK.id);
+            if (cooldown <= 0)
+                return false;
+            if (isGame && game.isDisposed())
+                return false;
+
+            HologramUtil.editHologram(Cooldown.ULT_PACK.id + ultPackLocation,
+                    MessageFormat.format(HEAL_PACK_HOLOGRAM_FORMAT, TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
+            for (Player player : location.getWorld().getPlayers()) {
+                HologramUtil.setHologramVisibility(Cooldown.ULT_PACK.id + ultPackLocation,
+                        LocationUtil.canPass(player.getPlayer().getEyeLocation(), hologramLoc), player.getPlayer());
+            }
+
+            return true;
+        }, isCancalled -> HologramUtil.removeHologram(Cooldown.ULT_PACK.id + ultPackLocation), 5);
     }
 
     /**
@@ -1482,6 +1535,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private enum Cooldown {
         /** 힐 팩 */
         HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
+        /** 궁극기 팩 */
+        ULT_PACK("UltPack", GeneralConfig.getCombatConfig().getUltPackCooldown()),
         /** 점프대 */
         JUMP_PAD("JumpPad", 10),
         /** 적 타격 효과음 쿨타임 */

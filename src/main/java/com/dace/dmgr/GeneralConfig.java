@@ -112,6 +112,13 @@ public final class GeneralConfig extends YamlFile {
         private long healPackCooldown = 15 * 20;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
+        /** 궁극기 팩에 사용되는 블록의 타입 */
+        @NonNull
+        private Material ultPackBlock = Material.QUARTZ_ORE;
+        /** 궁극기 팩 쿨타임 (tick) */
+        private long ultPackCooldown = 120 * 20;
+        /** 궁극기 팩 충전량 */
+        private long ultPackCharge = 1000;
         /** 점프대에 사용되는 블록의 타입 */
         @NonNull
         private Material jumpPadBlock = Material.SPONGE;
@@ -130,6 +137,9 @@ public final class GeneralConfig extends YamlFile {
             healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
             healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
             healPackHeal = (int) getLong(SECTION + ".healPackHeal", healPackHeal);
+            ultPackBlock = Material.valueOf(getString(SECTION + ".ultPackBlock", ultPackBlock.toString()));
+            ultPackCooldown = getLong(SECTION + ".ultPackCooldown", ultPackCooldown);
+            ultPackCharge = (int) getLong(SECTION + ".ultPackCharge", ultPackCharge);
             jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
             jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
             fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));

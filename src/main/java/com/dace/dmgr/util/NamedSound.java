@@ -39,6 +39,11 @@ public enum NamedSound {
     COMBAT_ULTIMATE_SKILL_USE(new DefinedSound(Sound.ENTITY_WITHER_SPAWN, 1000, 2)),
     /** 전투 - 힐 팩 사용 */
     COMBAT_USE_HEAL_PACK(new DefinedSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.2)),
+    /** 전투 - 궁극기 팩 사용 */
+    COMBAT_USE_ULT_PACK(
+            new DefinedSound(Sound.BLOCK_BREWING_STAND_BREW, 1, 2),
+            new DefinedSound(Sound.ITEM_ARMOR_EQUIP_GOLD, 1, 1.3)
+    ),
     /** 전투 - 점프대 사용 */
     COMBAT_USE_JUMP_PAD(
             new DefinedSound(Sound.ENTITY_PLAYER_SMALL_FALL, 1.5, 1.5, 0.1),
