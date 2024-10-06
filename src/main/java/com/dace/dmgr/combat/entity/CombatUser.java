@@ -433,27 +433,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             footstepDistance += oldLoc.distance(entity.getLocation());
-            if (entity.isOnGround() && footstepDistance > 1.6) {
-                footstepDistance = 0;
-                double volume = 1.2 + fallDistance * 0.05;
+            if (!entity.isOnGround() || footstepDistance <= 1.6)
+                return;
 
+            footstepDistance = 0;
+            double volume;
+            if (entity.isSprinting())
+                volume = 1;
+            else if (!entity.isSneaking())
+                volume = 0.8;
+            else
+                volume = 0.4;
+
+            if (fallDistance > 0.5) {
+                volume = 1.2 + fallDistance * 0.05;
                 if (fallDistance > 6)
                     SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_HIGH, entity.getLocation(), volume);
                 else if (fallDistance > 3)
                     SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_MID, entity.getLocation(), volume);
-                else if (fallDistance > 0)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
-
-                if (entity.isSprinting())
-                    volume = 1;
-                else if (!entity.isSneaking())
-                    volume = 0.8;
                 else
-                    volume = 0.4;
-
-                character.onFootstep(this, volume);
+                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
             }
 
+            character.onFootstep(this, volume);
         }, 1));
     }
 
@@ -464,6 +466,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (weapon != null)
             weapon.dispose();
         skillMap.forEach((skillInfo, skill) -> skill.dispose());
+
+        if (DMGR.getPlugin().isEnabled())
+            SkinUtil.resetSkin(entity);
 
         reset();
     }
