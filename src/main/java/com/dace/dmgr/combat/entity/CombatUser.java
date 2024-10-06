@@ -31,7 +31,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.game.GamePlayMode;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -758,15 +757,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!((CombatUser) victim).getSkill(((CombatUser) victim).getCharacterType().getCharacter().getUltimateSkillInfo()).isDurationFinished())
                 addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
 
-            if (gameUser != null) {
-                gameUser.setKill(gameUser.getKill() + 1);
-                characterRecord.setKill(characterRecord.getKill() + 1);
-                if (gameUser.getGame().getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
-                    gameUser.addTeamScore(1);
-            }
-
             sendPlayerKillMent((CombatUser) victim);
             ((CombatUser) victim).sendPlayerDeathMent(this);
+
+            if (gameUser != null)
+                gameUser.onKill(true);
         } else {
             character.onKill(this, victim, -1, true);
 
@@ -804,7 +799,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         for (GameUser targetGameUser : game.getGameUsers()) {
             targetGameUser.getUser().addBossBar(COMBAT_KILL_BOSSBAR_ID + this,
-                    MessageFormat.format("{0} §4§l-> {1}", attackerNames, victimName),
+                    MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName),
                     BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
 
             TaskUtil.addTask(targetGameUser, new DelayTask(() ->
@@ -902,7 +897,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     scores.values().forEach(supportScore -> {
                         targetAttacker.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore);
                         if (targetAttacker.gameUser != null)
-                            targetAttacker.gameUser.setAssist(targetAttacker.gameUser.getAssist() + 1);
+                            targetAttacker.gameUser.onKill(false);
                     }));
             if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
                 target.addScore("추락사", FALL_ZONE_KILL_SCORE);
@@ -914,23 +909,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 target.playKillEffect();
 
-                if (target.gameUser != null) {
-                    target.gameUser.setAssist(target.gameUser.getAssist() + 1);
-                    target.characterRecord.setKill(target.characterRecord.getKill() + 1);
-                }
+                if (target.gameUser != null)
+                    target.gameUser.onKill(false);
             }
         });
 
         broadcastPlayerKillBossBar();
         selfHarmDamage = 0;
         damageMap.clear();
-
-        if (gameUser != null) {
-            gameUser.setDeath(gameUser.getDeath() + 1);
-            characterRecord.setDeath(characterRecord.getDeath() + 1);
-        }
-
         cancelAction(null);
+
+        if (gameUser != null)
+            gameUser.onDeath();
+
         respawn();
     }
 
@@ -1227,7 +1218,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /**
      * 플레이어의 상태를 초기화한다.
      */
-    public void reset() {
+    private void reset() {
         entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
         entity.getInventory().setHeldItemSlot(4);
         entity.getActivePotionEffects().forEach((potionEffect ->

@@ -70,15 +70,12 @@ public final class GameUser implements Disposable {
     private double score = 0;
     /** 킬 */
     @Getter
-    @Setter
     private int kill = 0;
     /** 데스 */
     @Getter
-    @Setter
     private int death = 0;
     /** 어시스트 */
     @Getter
-    @Setter
     private int assist = 0;
     /** 입힌 피해량 */
     @Getter
@@ -214,6 +211,10 @@ public final class GameUser implements Disposable {
         validate();
         Validate.notNull(team);
 
+        CombatUser defCombatUser = CombatUser.fromUser(user);
+        if (defCombatUser != null)
+            defCombatUser.dispose();
+
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
@@ -227,8 +228,7 @@ public final class GameUser implements Disposable {
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
         user.clearTabListItems();
 
-        if (combatUser == null)
-            combatUser = new CombatUser(this);
+        combatUser = new CombatUser(this);
 
         for (GameUser target : team.getTeamUsers()) {
             GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
@@ -276,17 +276,45 @@ public final class GameUser implements Disposable {
     }
 
     /**
-     * 플레이어가 속한 팀의 팀 점수를 증가시킨다.
+     * 다른 플레이어를 처치했을 때 실행할 작업.
      *
-     * @param increment 증가량
+     * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
      */
-    public void addTeamScore(int increment) {
+    public void onKill(boolean isFinalHit) {
         validate();
+        Validate.notNull(combatUser);
+        Validate.notNull(combatUser.getCharacterType());
 
-        Validate.notNull(team).setScore(team.getScore() + increment);
+        UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
+        characterRecord.setKill(characterRecord.getKill() + 1);
+
+        if (isFinalHit) {
+            kill += 1;
+            if (game.getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
+                Validate.notNull(team).setScore(team.getScore() + 1);
+        } else
+            assist += 1;
     }
 
     /**
+     * 죽었을 때 실행할 작업.
+     */
+    public void onDeath() {
+        validate();
+        Validate.notNull(combatUser);
+        Validate.notNull(combatUser.getCharacterType());
+
+        UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
+        characterRecord.setDeath(characterRecord.getDeath() + 1);
+        death += 1;
+    }
+
+    /**
+     * public void onAssist() {
+     * <p>
+     * }
+     * <p>
+     * /**
      * 리스폰 위치를 반환한다.
      *
      * @return 리스폰 위치
