@@ -112,6 +112,13 @@ public final class GeneralConfig extends YamlFile {
         private long healPackCooldown = 15 * 20;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
+        /** 궁극기 팩에 사용되는 블록의 타입 */
+        @NonNull
+        private Material ultPackBlock = Material.QUARTZ_ORE;
+        /** 궁극기 팩 쿨타임 (tick) */
+        private long ultPackCooldown = 120 * 20;
+        /** 궁극기 팩 충전량 */
+        private long ultPackCharge = 1000;
         /** 점프대에 사용되는 블록의 타입 */
         @NonNull
         private Material jumpPadBlock = Material.SPONGE;
@@ -130,6 +137,9 @@ public final class GeneralConfig extends YamlFile {
             healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
             healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
             healPackHeal = (int) getLong(SECTION + ".healPackHeal", healPackHeal);
+            ultPackBlock = Material.valueOf(getString(SECTION + ".ultPackBlock", ultPackBlock.toString()));
+            ultPackCooldown = getLong(SECTION + ".ultPackCooldown", ultPackCooldown);
+            ultPackCharge = (int) getLong(SECTION + ".ultPackCharge", ultPackCharge);
             jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
             jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
             fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));
@@ -162,6 +172,8 @@ public final class GeneralConfig extends YamlFile {
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */
         private int oppositeSpawnDamagePerSecond = 250;
+        /** 궁극기 팩 활성화 대기 시간 (초) */
+        private int ultPackActivationSeconds = 60;
         /** 예상하는 플레이어의 평균 랭크 점수 */
         private int expectedAverageRankRate = 400;
         /** 예상하는 K/DA 평균 */
@@ -186,6 +198,7 @@ public final class GeneralConfig extends YamlFile {
             waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
             teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
             oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
+            ultPackActivationSeconds = (int) getLong(SECTION + ".ultPackActivationSeconds", ultPackActivationSeconds);
             expectedAverageRankRate = (int) getLong(SECTION + ".expectedAverageKDARatio", expectedAverageRankRate);
             expectedAverageKDARatio = getDouble(SECTION + ".expectedAverageKDARatio", expectedAverageKDARatio);
             expectedAverageScorePerMin = (int) getLong(SECTION + ".expectedAverageScorePerMin", expectedAverageScorePerMin);
