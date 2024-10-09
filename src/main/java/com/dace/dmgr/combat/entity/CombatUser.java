@@ -394,6 +394,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 현재 위치의 궁극기 팩을 확인 및 사용한다.
      */
     private void checkUltPack() {
+        if (game != null && game.getRemainingTime() > game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationSeconds())
+            return;
+
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
         if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getUltPackBlock())
             return;

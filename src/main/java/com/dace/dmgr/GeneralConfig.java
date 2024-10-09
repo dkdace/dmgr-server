@@ -172,6 +172,8 @@ public final class GeneralConfig extends YamlFile {
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */
         private int oppositeSpawnDamagePerSecond = 250;
+        /** 궁극기 팩 활성화 대기 시간 (초) */
+        private int ultPackActivationSeconds = 60;
         /** 예상하는 플레이어의 평균 랭크 점수 */
         private int expectedAverageRankRate = 400;
         /** 예상하는 K/DA 평균 */
@@ -196,6 +198,7 @@ public final class GeneralConfig extends YamlFile {
             waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
             teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
             oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
+            ultPackActivationSeconds = (int) getLong(SECTION + ".ultPackActivationSeconds", ultPackActivationSeconds);
             expectedAverageRankRate = (int) getLong(SECTION + ".expectedAverageKDARatio", expectedAverageRankRate);
             expectedAverageKDARatio = getDouble(SECTION + ".expectedAverageKDARatio", expectedAverageKDARatio);
             expectedAverageScorePerMin = (int) getLong(SECTION + ".expectedAverageScorePerMin", expectedAverageScorePerMin);
