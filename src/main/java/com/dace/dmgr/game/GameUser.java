@@ -317,11 +317,6 @@ public final class GameUser implements Disposable {
     }
 
     /**
-     * public void onAssist() {
-     * <p>
-     * }
-     * <p>
-     * /**
      * 리스폰 위치를 반환한다.
      *
      * @return 리스폰 위치
