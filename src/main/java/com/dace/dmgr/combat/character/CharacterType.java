@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.character.quaker.Quaker;
 import com.dace.dmgr.combat.character.silia.Silia;
 import com.dace.dmgr.combat.character.vellion.Vellion;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.item.gui.SelectCharInfo;
@@ -17,12 +18,14 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SkinUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 /**
  * 지정할 수 있는 전투원의 목록.
@@ -74,6 +77,18 @@ public enum CharacterType {
                     return false;
 
                 if (clickType == ClickType.LEFT) {
+                    GameUser gameUser = combatUser.getGameUser();
+                    boolean isDuplicated = gameUser != null && gameUser.getTeam() != null &&
+                            Arrays.stream(gameUser.getTeam().getTeamUsers()).anyMatch(targetGameUser -> {
+                                CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
+                                Validate.notNull(targetCombatUser);
+
+                                return targetCombatUser.getCharacterType() == CharacterType.this;
+                            });
+
+                    if (isDuplicated)
+                        return false;
+
                     combatUser.setCharacterType(CharacterType.this);
                     player.closeInventory();
                 } else if (clickType == ClickType.RIGHT) {
