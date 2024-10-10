@@ -192,7 +192,7 @@ public final class MagrittaUlt extends UltimateSkill {
             if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), false, false))
                 targets.put(target, targets.getOrDefault(target, 0) + 1);
 
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.QUARTZ_ORE, 0, getLocation(), 4,
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.BONE_BLOCK, 0, getLocation(), 4,
                     0, 0, 0, 0.08);
 
             return false;

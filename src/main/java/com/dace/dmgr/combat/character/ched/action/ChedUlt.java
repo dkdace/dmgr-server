@@ -247,14 +247,15 @@ public final class ChedUlt extends UltimateSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+                if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null,
+                        false, false) && target instanceof CombatUser)
+                    CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+
                 double distance = center.distance(location);
                 int damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0, true);
-                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false)) {
+                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false))
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(getLocation(), location.add(0, 1, 0))
                             .multiply(ChedUltInfo.KNOCKBACK));
-                    if (target instanceof CombatUser)
-                        CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
-                }
 
                 return !(target instanceof Barrier);
             }

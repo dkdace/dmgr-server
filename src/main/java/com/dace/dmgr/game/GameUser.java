@@ -15,6 +15,7 @@ import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -265,14 +266,20 @@ public final class GameUser implements Disposable {
                     user.removeTabListItem(column, row - 2);
                     user.removeTabListItem(column, row - 1);
                 } else {
-                    user.setTabListItem(column, row - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
-                            this.team == targetTeam || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
+                    User targetUser = User.fromPlayer(teamUsers[i].getPlayer());
+
+                    if (this.team == targetTeam || headReveal)
+                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), targetUser);
+                    else
+                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), Skins.getPlayer("crashdummie99"));
                     user.setTabListItem(column, row - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
                             (int) teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
-                            "✔", teamUsers[i].getAssist()), null);
+                            "✔", teamUsers[i].getAssist()), (Skin) null);
                 }
             }
         }
+
+        user.applyTabList();
     }
 
     /**

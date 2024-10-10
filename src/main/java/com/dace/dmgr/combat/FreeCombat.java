@@ -76,6 +76,7 @@ public final class FreeCombat {
 
         user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10, 40, 30, 80);
         user.teleport(waitLocation);
+        user.setInFreeCombat(true);
         HologramUtil.setHologramVisibility(user.getPlayer().getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
 
         CombatUser combatUser = new CombatUser(user);

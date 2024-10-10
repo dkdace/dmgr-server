@@ -30,6 +30,7 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
 import org.bukkit.potion.PotionEffect;
@@ -39,6 +40,7 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -106,6 +108,10 @@ public final class User implements Disposable {
     @Getter
     @Setter
     private boolean isAdminChat = false;
+    /** 자유 전투 입장 여부 */
+    @Getter
+    @Setter
+    private boolean isInFreeCombat = false;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -132,6 +138,19 @@ public final class User implements Disposable {
             user = new User(player);
 
         return user;
+    }
+
+    /**
+     * 열 및 행 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param column 열 번호
+     * @param row    행 번호
+     */
+    private static void validateColumnRow(int column, int row) {
+        if (column < 0 || column > 3)
+            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
+        if (row < 0 || row > 19)
+            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
     }
 
     /**
@@ -163,6 +182,9 @@ public final class User implements Disposable {
         tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
         if (tabList == null)
             tabList = DMGR.getTabbed().newTableTabList(player);
+        tabList.setBatchEnabled(true);
+        clearTabListItems();
+
         HologramUtil.addHologram(player.getName(), player, 0, 2.25, 0, userData.getDisplayName());
         HologramUtil.setHologramVisibility(player.getName(), false, player);
 
@@ -342,11 +364,11 @@ public final class User implements Disposable {
             memoryColor = ChatColor.GOLD;
 
         ChatColor pingColor = ChatColor.RED;
-        if (ping < 60)
+        if (ping < 70)
             pingColor = ChatColor.GREEN;
-        else if (ping < 120)
+        else if (ping < 100)
             pingColor = ChatColor.YELLOW;
-        else if (ping < 180)
+        else if (ping < 130)
             pingColor = ChatColor.GOLD;
 
         ChatColor tpsColor = ChatColor.GREEN;
@@ -381,39 +403,59 @@ public final class User implements Disposable {
                         DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분")),
                 Skins.getPlayer("Olaf_C"));
 
-        Player[] lobbyPlayers = Bukkit.getOnlinePlayers().stream()
-                .filter(target -> GameUser.fromUser(User.fromPlayer(target)) == null && !target.isOp())
-                .toArray(Player[]::new);
-        Player[] gamePlayers = Bukkit.getOnlinePlayers().stream()
-                .filter(target -> GameUser.fromUser(User.fromPlayer(target)) != null && !target.isOp())
-                .toArray(Player[]::new);
-        Player[] adminPlayers = Bukkit.getOnlinePlayers().stream()
+        User[] lobbyUsers = Bukkit.getOnlinePlayers().stream()
+                .filter(target -> !target.isOp())
+                .sorted(Comparator.comparing(HumanEntity::getName))
+                .map(User::fromPlayer)
+                .toArray(User[]::new);
+        User[] adminUsers = Bukkit.getOnlinePlayers().stream()
                 .filter(ServerOperator::isOp)
-                .toArray(Player[]::new);
+                .sorted(Comparator.comparing(HumanEntity::getName))
+                .map(User::fromPlayer)
+                .toArray(User[]::new);
 
-        for (int i = 0; i < 19; i++) {
-            if (i > lobbyPlayers.length - 1)
-                removeTabListItem(1, i + 1);
+        for (int i = 0; i < 38; i++) {
+            if (i > lobbyUsers.length - 1)
+                removeTabListItem(i % 2 == 0 ? 1 : 2, i / 2 + 1);
             else
-                setTabListItem(1, i + 1, UserData.fromPlayer(lobbyPlayers[i]).getDisplayName(), Skins.getPlayer(lobbyPlayers[i]));
+                setTabListItem(i % 2 == 0 ? 1 : 2, i / 2 + 1, lobbyUsers[i].getTablistPlayerName(), lobbyUsers[i]);
         }
-        setTabListItem(1, 0, MessageFormat.format("§a§l§n 로비 인원 §f({0}명)", lobbyPlayers.length), Skins.getDot(ChatColor.GREEN));
+        setTabListItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.length), Skins.getDot(ChatColor.GREEN));
 
         for (int i = 0; i < 19; i++) {
-            if (i > gamePlayers.length - 1)
-                removeTabListItem(2, i + 1);
-            else
-                setTabListItem(2, i + 1, UserData.fromPlayer(gamePlayers[i]).getDisplayName(), Skins.getPlayer(gamePlayers[i]));
-        }
-        setTabListItem(2, 0, MessageFormat.format("§c§l§n 게임 인원 §f({0}명)", gamePlayers.length), Skins.getDot(ChatColor.RED));
-
-        for (int i = 0; i < 19; i++) {
-            if (i > adminPlayers.length - 1)
+            if (i > adminUsers.length - 1)
                 removeTabListItem(3, i + 1);
             else
-                setTabListItem(3, i + 1, UserData.fromPlayer(adminPlayers[i]).getDisplayName(), Skins.getPlayer(adminPlayers[i]));
+                setTabListItem(3, i + 1, adminUsers[i].getTablistPlayerName(), adminUsers[i]);
+
+            setTabListItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.length), Skins.getDot(ChatColor.AQUA));
         }
-        setTabListItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminPlayers.length), Skins.getDot(ChatColor.AQUA));
+
+        applyTabList();
+    }
+
+    /**
+     * 탭리스트에 사용되는 플레이어의 이름을 반환한다.
+     *
+     * @return 이름
+     */
+    @NonNull
+    public String getTablistPlayerName() {
+        String prefix = "§7[로비]";
+
+        GameUser gameUser = GameUser.fromUser(this);
+        if (isInFreeCombat())
+            prefix = "§7[자유 전투]";
+        else if (gameUser != null) {
+            Game game = gameUser.getGame();
+
+            if (game.getGamePlayMode().isRanked())
+                prefix = MessageFormat.format("§6[랭크 게임 {0}]", game.getNumber());
+            else
+                prefix = MessageFormat.format("§a[일반 게임 {0}]", game.getNumber());
+        }
+
+        return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
 
     /**
@@ -466,8 +508,7 @@ public final class User implements Disposable {
 
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
-        if (DMGR.getPlugin().isEnabled())
-            SkinUtil.resetSkin(player);
+        isInFreeCombat = false;
 
         if (userData.isInitialized()) {
             clearSidebar();
@@ -765,12 +806,37 @@ public final class User implements Disposable {
      */
     public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
         Validate.notNull(tabList);
-        if (column < 0 || column > 3)
-            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
-        if (row < 0 || row > 19)
-            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
+        validateColumnRow(column, row);
 
-        tabList.set(column, row, skin == null ? new TextTabItem(content, 0) : new TextTabItem(content, 0, skin));
+        tabList.set(column, row, skin == null ? new TextTabItem(content, -1) : new TextTabItem(content, -1, skin));
+    }
+
+    /**
+     * 플레이어의 탭리스트에서 지정한 항목을 설정한다.
+     *
+     * @param column  열 번호. 0~3 사이의 값
+     * @param row     행 번호. 0~19 사이의 값
+     * @param content 내용
+     * @param user    표시할 플레이어
+     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
+     */
+    public void setTabListItem(int column, int row, @NonNull String content, @NonNull User user) {
+        Validate.notNull(tabList);
+        validateColumnRow(column, row);
+
+        int realPing;
+        if (user.getPing() < 40)
+            realPing = 0;
+        else if (user.getPing() < 70)
+            realPing = 150;
+        else if (user.getPing() < 100)
+            realPing = 300;
+        else if (user.getPing() < 130)
+            realPing = 600;
+        else
+            realPing = 1000;
+
+        tabList.set(column, row, new TextTabItem(content, realPing, Skins.getPlayer(user.getPlayer())));
     }
 
     /**
@@ -782,12 +848,9 @@ public final class User implements Disposable {
      */
     public void removeTabListItem(int column, int row) {
         Validate.notNull(tabList);
-        if (column < 0 || column > 3)
-            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
-        if (row < 0 || row > 19)
-            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
+        validateColumnRow(column, row);
 
-        tabList.remove(column, row);
+        tabList.set(column, row, new TextTabItem("", -1));
     }
 
     /**
@@ -797,7 +860,18 @@ public final class User implements Disposable {
         Validate.notNull(tabList);
 
         for (int i = 0; i < 80; i++)
-            tabList.remove(i);
+            tabList.set(i, new TextTabItem("", -1));
+    }
+
+    /**
+     * 플레이어의 탭리스트 변경 사항을 적용한다.
+     *
+     * <p>탭리스트 내용 변경 후 호출해야 한다.</p>
+     */
+    public void applyTabList() {
+        Validate.notNull(tabList);
+
+        tabList.batchUpdate();
     }
 
     /**

@@ -147,6 +147,8 @@ public final class Ched extends Marksman {
 
         if (CooldownUtil.getCooldown(attacker, ChedA3.KILL_SCORE_COOLDOWN_ID + victim) > 0)
             attacker.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
+        if (CooldownUtil.getCooldown(attacker, ChedUlt.KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("궁극기 보너스", ChedUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override
