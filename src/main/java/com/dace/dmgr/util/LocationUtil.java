@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
@@ -51,8 +52,7 @@ public final class LocationUtil {
         MaterialData materialData = block.getState().getData();
         if ((materialData instanceof Step || materialData instanceof WoodenStep) && block.getType().isOccluding())
             return false;
-        if (materialData instanceof Step || materialData instanceof WoodenStep || materialData instanceof Stairs || materialData instanceof Gate ||
-                materialData instanceof Door || materialData instanceof TrapDoor)
+        if (materialData instanceof Step || materialData instanceof WoodenStep || materialData instanceof Stairs || materialData instanceof Openable)
             return true;
 
         switch (block.getType()) {
@@ -76,6 +76,39 @@ public final class LocationUtil {
             case STONE_PLATE:
             case IRON_PLATE:
             case GOLD_PLATE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * 지정한 블록이 상호작용할 수 있는 블록인 지 확인한다.
+     *
+     * @param block 확인할 블록
+     * @return 상호작용 가능하면 {@code true} 반환
+     */
+    public static boolean isInteractable(@NonNull Block block) {
+        MaterialData materialData = block.getState().getData();
+        if (materialData instanceof Openable || block.getState() instanceof Container)
+            return true;
+
+        switch (block.getType()) {
+            case CAKE_BLOCK:
+            case BEACON:
+            case ANVIL:
+            case ENDER_CHEST:
+            case NOTE_BLOCK:
+            case BED_BLOCK:
+            case WOOD_BUTTON:
+            case STONE_BUTTON:
+            case LEVER:
+            case DAYLIGHT_DETECTOR:
+            case DAYLIGHT_DETECTOR_INVERTED:
+            case DIODE_BLOCK_OFF:
+            case DIODE_BLOCK_ON:
+            case REDSTONE_COMPARATOR_OFF:
+            case REDSTONE_COMPARATOR_ON:
                 return true;
             default:
                 return false;
@@ -197,10 +230,10 @@ public final class LocationUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // loc과 dir을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
      * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
-     * }</pre>
+     * </code></pre>
      *
      * @param location  기준 위치
      * @param direction 기준 방향
@@ -227,10 +260,10 @@ public final class LocationUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // loc의 방향을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
      * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
-     * }</pre>
+     * </code></pre>
      *
      * @param location 기준 위치
      * @param offsetX  왼쪽(-) / 오른쪽(+). (단위: 블록)

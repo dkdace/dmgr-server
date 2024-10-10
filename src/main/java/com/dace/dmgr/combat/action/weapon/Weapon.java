@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.combat.action.Action;
+import lombok.NonNull;
+import org.bukkit.Material;
 
 /**
  * 무기의 상태를 관리하는 인터페이스.
@@ -8,6 +10,13 @@ import com.dace.dmgr.combat.action.Action;
  * @see AbstractWeapon
  */
 public interface Weapon extends Action {
+    /**
+     * 무기 아이템의 타입을 변경한다.
+     *
+     * @param material 아이템 타입
+     */
+    void displayMaterial(@NonNull Material material);
+
     /**
      * 무기 아이템의 내구도를 변경한다.
      *

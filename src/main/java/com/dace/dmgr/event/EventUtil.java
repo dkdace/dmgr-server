@@ -26,18 +26,16 @@ public final class EventUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
-     *
+     * <pre><code>
      * public class OnPlayerJoin implements Listener {
      *     // 이벤트가 발동할 때 호출된다.
      *     // 대상 이벤트(event)는 Event를 상속받는 클래스이다.
-     *     @EventHandler
+     *     {@code @EventHandler}
      *     public static void event(PlayerJoinEvent event) {
      *         Player player = event.getPlayer();
      *     }
      * }
-     *
-     * }</pre>
+     * </code></pre>
      *
      * @param listener 이벤트 처리기
      */
@@ -53,8 +51,7 @@ public final class EventUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
-     *
+     * <pre><code>
      * public class OnPlayServerUpdateHealth extends PacketAdapter {
      *     // 생성자에서 패킷 타입(PacketType)을 지정한다.
      *     public OnPlayServerUpdateHealth() {
@@ -63,7 +60,7 @@ public final class EventUtil {
      *
      *     // 패킷이 송신될 때 호출된다.
      *     // 서버 패킷(PacketType.Play.Server.*)만 구현한다.
-     *     @Override
+     *     {@code @Override}
      *     public void onPacketSending(PacketEvent event) {
      *         // 패킷을 전용 Wrapper 클래스에 할당한다.
      *         WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event.getPacket());
@@ -72,15 +69,14 @@ public final class EventUtil {
      *
      *     // 패킷이 수신될 때 호출된다. (PacketType.Play.Client.* 전용)
      *     // 클라이언트 패킷(PacketType.Play.Client.*)만 구현한다.
-     *     @Override
+     *     {@code @Override}
      *     public void onPacketReceiving(PacketEvent event) {
      *         // 패킷을 전용 Wrapper 클래스에 할당한다.
      *         WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event.getPacket());
      *         Player player = event.getPlayer();
      *     }
      * }
-     *
-     * }</pre>
+     * </code></pre>
      *
      * @param packetAdapter 패킷 이벤트 처리기
      */

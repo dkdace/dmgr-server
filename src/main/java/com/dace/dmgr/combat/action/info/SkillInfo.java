@@ -39,15 +39,13 @@ public abstract class SkillInfo<T extends Skill> extends ActionInfo {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
-     *
+     * <pre><code>
      * public final class TestSkill extends AbstractSkill {
      *     public TestSkill(CombatUser combatUser) {
      *         super(combatUser, TestSkillInfo.getInstance());
      *     }
      * }
-     *
-     * }</pre>
+     * </code></pre>
      *
      * @param combatUser 플레이어 객체
      * @return 스킬 객체

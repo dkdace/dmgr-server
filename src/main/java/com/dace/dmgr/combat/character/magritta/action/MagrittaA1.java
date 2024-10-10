@@ -89,7 +89,7 @@ public final class MagrittaA1 extends ActiveSkill {
         private static final MagrittaA1Burning instance = new MagrittaA1Burning();
 
         private MagrittaA1Burning() {
-            super(MagrittaA1Info.FIRE_DAMAGE_PER_SECOND);
+            super(MagrittaA1Info.FIRE_DAMAGE_PER_SECOND, true);
         }
     }
 

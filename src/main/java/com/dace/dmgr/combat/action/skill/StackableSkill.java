@@ -42,11 +42,6 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
-    protected void onCooldownSet() {
-        addStack(-1);
-    }
-
-    @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && stack > 0;
     }
@@ -92,7 +87,7 @@ public abstract class StackableSkill extends ActiveSkill {
             CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
             runStackCooldown(cooldown);
         } else
-            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, cooldown);
+            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
     }
 
     /**

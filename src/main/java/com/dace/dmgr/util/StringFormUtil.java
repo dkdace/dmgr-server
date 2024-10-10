@@ -27,10 +27,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <흰색>*****<검정색>*****
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10, '*');
-     * }</pre>
+     * </code></pre>
      *
      * @param current 현재 값
      * @param max     최대 값
@@ -68,10 +68,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <흰색>■■■■■<검정색>■■■■■
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10);
-     * }</pre>
+     * </code></pre>
      *
      * @param current 현재 값
      * @param max     최대 값
@@ -90,10 +90,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <흰색>■■■■■<검정색>■■■■■
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE);
-     * }</pre>
+     * </code></pre>
      *
      * @param current 현재 값
      * @param max     최대 값
@@ -113,10 +113,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // [Test] <노란색>****<검정색>****** [40/100]
      * StringFormUtil.getActionbarProgressBar("[Test]", 40, 100, 10, '*');
-     * }</pre>
+     * </code></pre>
      *
      * @param prefix  접두사
      * @param current 현재 값
@@ -159,10 +159,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // [Test] <노란색>****<검정색>****** [{@link TextIcon#DURATION} 40.5]
      * StringFormUtil.getActionbarProgressBar("[Test]", 40.5, 100, 10, '*');
-     * }</pre>
+     * </code></pre>
      *
      * @param prefix  접두사
      * @param current 남은 시간 (tick)
@@ -201,10 +201,10 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // [Test] <노란색>****<검정색>****** [{@link TextIcon#COOLDOWN} 40.5]
      * StringFormUtil.getActionbarCooldownBar("[Test]", 40.5, 100, 10, '*');
-     * }</pre>
+     * </code></pre>
      *
      * @param prefix  접두사
      * @param current 남은 시간 (tick)

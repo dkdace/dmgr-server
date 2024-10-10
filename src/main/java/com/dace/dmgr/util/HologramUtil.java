@@ -30,7 +30,7 @@ public final class HologramUtil {
      * @param location 생성할 위치
      * @param contents 내용 목록
      */
-    public void addHologram(@NonNull String id, @NonNull Location location, @NonNull String @NonNull ... contents) {
+    public static void addHologram(@NonNull String id, @NonNull Location location, @NonNull String @NonNull ... contents) {
         Hologram hologram = hologramMap.computeIfAbsent(id, id2 -> DMGR.getHolographicDisplaysAPI().createHologram(location));
 
         hologram.getVisibilitySettings().setGlobalVisibility(VisibilitySettings.Visibility.VISIBLE);
@@ -51,8 +51,8 @@ public final class HologramUtil {
      * @param offsetZ  Z 오프셋. (단위: 블록)
      * @param contents 내용 목록
      */
-    public void addHologram(@NonNull String id, @NonNull Entity entity,
-                            double offsetX, double offsetY, double offsetZ, @NonNull String @NonNull ... contents) {
+    public static void addHologram(@NonNull String id, @NonNull Entity entity,
+                                   double offsetX, double offsetY, double offsetZ, @NonNull String @NonNull ... contents) {
         if (hologramMap.get(id) != null)
             return;
 
@@ -74,7 +74,7 @@ public final class HologramUtil {
      * @param id       홀로그램 ID
      * @param contents 내용 목록
      */
-    public void editHologram(@NonNull String id, @NonNull String @NonNull ... contents) {
+    public static void editHologram(@NonNull String id, @NonNull String @NonNull ... contents) {
         Hologram hologram = hologramMap.get(id);
         if (hologram == null)
             return;
@@ -97,7 +97,7 @@ public final class HologramUtil {
      * @param isVisible 표시 여부
      * @param player    대상 플레이어
      */
-    public void setHologramVisibility(@NonNull String id, boolean isVisible, @NonNull Player player) {
+    public static void setHologramVisibility(@NonNull String id, boolean isVisible, @NonNull Player player) {
         Hologram hologram = hologramMap.get(id);
         if (hologram == null)
             return;
@@ -113,7 +113,7 @@ public final class HologramUtil {
      * @param isVisible 표시 여부
      * @param players   대상 플레이어 목록
      */
-    public void setHologramVisibility(@NonNull String id, boolean isVisible, @NonNull Player @NonNull ... players) {
+    public static void setHologramVisibility(@NonNull String id, boolean isVisible, @NonNull Player @NonNull ... players) {
         for (Player player : players)
             setHologramVisibility(id, isVisible, player);
     }
@@ -123,7 +123,7 @@ public final class HologramUtil {
      *
      * @param id 홀로그램 ID
      */
-    public void removeHologram(@NonNull String id) {
+    public static void removeHologram(@NonNull String id) {
         Hologram hologram = hologramMap.get(id);
         if (hologram == null)
             return;
@@ -135,7 +135,7 @@ public final class HologramUtil {
     /**
      * 생성된 모든 홀로그램을 제거한다.
      */
-    public void clearHologram() {
+    public static void clearHologram() {
         hologramMap.forEach((id, hologram) -> hologram.delete());
         hologramMap.clear();
         DMGR.getHolographicDisplaysAPI().deleteHolograms();

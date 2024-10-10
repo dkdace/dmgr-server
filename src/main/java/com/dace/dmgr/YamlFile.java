@@ -20,7 +20,7 @@ import java.util.List;
  *
  * <p>Example:</p>
  *
- * <pre>{@code
+ * <pre><code>
  * public class TestFile extends YamlFile {
  *     // ...
  * }
@@ -33,7 +33,7 @@ import java.util.List;
  * }).onError(Exception ex) -> {
  *     // 실패(예외 발생) 시 실행할 작업.
  * });
- * }</pre>
+ * </code></pre>
  */
 public abstract class YamlFile implements Initializable<Void> {
     /** Yaml 설정 객체 */
@@ -213,12 +213,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'에 값 1234 저장
      * yamlFile.set("test", 1234);
      * // 섹션 'user'의 키 'test'에 값 true 저장
      * yamlFile.set("user.test", true);
-     * }</pre>
+     * </code></pre>
      *
      * @param key   키
      * @param value 값
@@ -242,12 +242,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * long value = yamlFile.getLong("test", 0);
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * long value = yamlFile.getLong("user.test", 0);
-     * }</pre>
+     * </code></pre>
      *
      * @param key          키
      * @param defaultValue 기본값
@@ -270,12 +270,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * List<Long> values = yamlFile.getLong("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * List<Long> values = yamlFile.getLong("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값 목록
@@ -298,12 +298,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * long value = yamlFile.getLong("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * long value = yamlFile.getLong("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 0 반환
@@ -321,12 +321,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * double value = yamlFile.getDouble("test", 2.5);
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * double value = yamlFile.getDouble("user.test", 2.5);
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
@@ -348,12 +348,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * List<Double> values = yamlFile.getDouble("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * List<Double> values = yamlFile.getDouble("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값 목록
@@ -376,12 +376,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * double value = yamlFile.getDouble("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * double value = yamlFile.getDouble("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 0 반환
@@ -399,12 +399,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * String value = yamlFile.getString("test", "Default");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * String value = yamlFile.getString("user.test", "Default");
-     * }</pre>
+     * </code></pre>
      *
      * @param key          키
      * @param defaultValue 기본값
@@ -428,12 +428,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * List<String> values = yamlFile.getStringList("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * List<String> values = yamlFile.getStringList("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값 목록
@@ -456,12 +456,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * String value = yamlFile.getString("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * String value = yamlFile.getString("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 빈 문자열 반환
@@ -480,12 +480,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * boolean value = yamlFile.getBoolean("test", false);
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * boolean value = yamlFile.getBoolean("user.test", true);
-     * }</pre>
+     * </code></pre>
      *
      * @param key          키
      * @param defaultValue 기본값
@@ -508,12 +508,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * List<Boolean> values = yamlFile.getBooleanList("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * List<Boolean> values = yamlFile.getBooleanList("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값 목록
@@ -534,12 +534,12 @@ public abstract class YamlFile implements Initializable<Void> {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 키 'test'의 값 불러오기
      * boolean value = yamlFile.getBoolean("test");
      * // 섹션 'user'의 키 'test'의 값 불러오기
      * boolean value = yamlFile.getBoolean("user.test");
-     * }</pre>
+     * </code></pre>
      *
      * @param key 키
      * @return 값. 데이터가 존재하지 않으면 {@code false} 반환

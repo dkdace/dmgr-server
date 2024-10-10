@@ -15,6 +15,7 @@ import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
+import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -70,15 +71,12 @@ public final class GameUser implements Disposable {
     private double score = 0;
     /** 킬 */
     @Getter
-    @Setter
     private int kill = 0;
     /** 데스 */
     @Getter
-    @Setter
     private int death = 0;
     /** 어시스트 */
     @Getter
-    @Setter
     private int assist = 0;
     /** 입힌 피해량 */
     @Getter
@@ -214,6 +212,10 @@ public final class GameUser implements Disposable {
         validate();
         Validate.notNull(team);
 
+        CombatUser defCombatUser = CombatUser.fromUser(user);
+        if (defCombatUser != null)
+            defCombatUser.dispose();
+
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
         player.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
@@ -227,8 +229,7 @@ public final class GameUser implements Disposable {
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
         user.clearTabListItems();
 
-        if (combatUser == null)
-            combatUser = new CombatUser(this);
+        combatUser = new CombatUser(this);
 
         for (GameUser target : team.getTeamUsers()) {
             GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
@@ -265,25 +266,54 @@ public final class GameUser implements Disposable {
                     user.removeTabListItem(column, row - 2);
                     user.removeTabListItem(column, row - 1);
                 } else {
-                    user.setTabListItem(column, row - 2, UserData.fromPlayer(teamUsers[i].getPlayer()).getDisplayName(),
-                            this.team == targetTeam || headReveal ? Skins.getPlayer(teamUsers[i].getPlayer()) : Skins.getPlayer("crashdummie99"));
+                    User targetUser = User.fromPlayer(teamUsers[i].getPlayer());
+
+                    if (this.team == targetTeam || headReveal)
+                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), targetUser);
+                    else
+                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), Skins.getPlayer("crashdummie99"));
                     user.setTabListItem(column, row - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
                             (int) teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
-                            "✔", teamUsers[i].getAssist()), null);
+                            "✔", teamUsers[i].getAssist()), (Skin) null);
                 }
             }
         }
+
+        user.applyTabList();
     }
 
     /**
-     * 플레이어가 속한 팀의 팀 점수를 증가시킨다.
+     * 다른 플레이어를 처치했을 때 실행할 작업.
      *
-     * @param increment 증가량
+     * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
      */
-    public void addTeamScore(int increment) {
+    public void onKill(boolean isFinalHit) {
         validate();
+        Validate.notNull(combatUser);
+        Validate.notNull(combatUser.getCharacterType());
 
-        Validate.notNull(team).setScore(team.getScore() + increment);
+        UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
+        characterRecord.setKill(characterRecord.getKill() + 1);
+
+        if (isFinalHit) {
+            kill += 1;
+            if (game.getGamePlayMode() == GamePlayMode.TEAM_DEATHMATCH)
+                Validate.notNull(team).setScore(team.getScore() + 1);
+        } else
+            assist += 1;
+    }
+
+    /**
+     * 죽었을 때 실행할 작업.
+     */
+    public void onDeath() {
+        validate();
+        Validate.notNull(combatUser);
+        Validate.notNull(combatUser.getCharacterType());
+
+        UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
+        characterRecord.setDeath(characterRecord.getDeath() + 1);
+        death += 1;
     }
 
     /**

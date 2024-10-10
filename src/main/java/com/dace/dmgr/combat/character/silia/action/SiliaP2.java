@@ -63,7 +63,7 @@ public final class SiliaP2 extends AbstractSkill {
 
         Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.1, 0);
         loc.setPitch(0);
-        loc.add(loc.getDirection());
+        loc.add(loc.getDirection().multiply(0.75));
 
         return !LocationUtil.isNonSolid(loc);
     }
@@ -74,12 +74,13 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(false);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (!canActivate())
+            if (combatUser.getKnockbackModule().isKnockbacked())
                 return false;
-            if (wallRideCount <= 0)
+            if (!canActivate())
                 return false;
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);
+            combatUser.getEntity().setFallDistance(0);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
@@ -91,6 +92,7 @@ public final class SiliaP2 extends AbstractSkill {
         }, isCancelled -> {
             onCancelled();
 
+            wallRideCount--;
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
             combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);

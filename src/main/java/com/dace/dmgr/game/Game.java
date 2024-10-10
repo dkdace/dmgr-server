@@ -272,11 +272,29 @@ public final class Game implements Disposable {
     private void onSecondPlaying() {
         gamePlayMode.getGamePlayModeScheduler().onSecond(this);
 
-        if (remainingTime > 0 && remainingTime <= 10) {
-            gameUsers.forEach(gameUser -> {
-                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
-                gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
-            });
+        if (remainingTime > 0) {
+            int ultPackRemainingTime = remainingTime - (gamePlayMode.getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationSeconds());
+
+            if (ultPackRemainingTime >= 0 && ultPackRemainingTime <= 20) {
+                if (ultPackRemainingTime == 5 || ultPackRemainingTime == 10 || ultPackRemainingTime == 20)
+                    gameUsers.forEach(gameUser -> {
+                        SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                        gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 §e" + ultPackRemainingTime + "초 §f후 활성화됩니다.",
+                                0, 20, 20, 40);
+                    });
+                else if (ultPackRemainingTime == 0)
+                    gameUsers.forEach(gameUser -> {
+                        SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                        gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", 0, 20, 20, 40);
+                    });
+            }
+
+            if (remainingTime <= 10) {
+                gameUsers.forEach(gameUser -> {
+                    SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                    gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
+                });
+            }
         }
 
         if (remainingTime == 0) {

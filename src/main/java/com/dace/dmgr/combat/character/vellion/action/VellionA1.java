@@ -177,7 +177,7 @@ public final class VellionA1 extends ActiveSkill {
     }
 
     /**
-     * 벨리온 - 마력 응집체 클래스.
+     * 마력 응집체 클래스.
      */
     public final class VellionA1Entity extends SummonEntity<ArmorStand> {
         /** 피격자 목록 */

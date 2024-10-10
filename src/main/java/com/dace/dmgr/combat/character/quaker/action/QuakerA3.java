@@ -173,7 +173,7 @@ public final class QuakerA3 extends ActiveSkill {
 
                     target.getKnockbackModule().knockback(vec, true);
 
-                    new QuakerA3Area().emit(target.getCenterLocation());
+                    new QuakerA3Area().emit(target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0).add(0, 0.1, 0));
 
                     for (int j = 0; j < 5; j++) {
                         Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);

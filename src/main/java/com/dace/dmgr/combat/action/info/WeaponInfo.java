@@ -25,17 +25,30 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      * 무기 정보 인스턴스를 생성한다.
      *
      * @param weaponClass 무기 클래스
+     * @param material    아이템 타입
      * @param resource    리소스 (내구도)
      * @param name        이름
      * @param lores       설명 목록
      */
-    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
-        super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(MATERIAL)
+    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
+        super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)
                 .setLore(lores)
                 .build()));
         this.weaponClass = weaponClass;
+    }
+
+    /**
+     * 무기 정보 인스턴스를 생성한다.
+     *
+     * @param weaponClass 무기 클래스
+     * @param resource    리소스 (내구도)
+     * @param name        이름
+     * @param lores       설명 목록
+     */
+    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
+        this(weaponClass, MATERIAL, resource, name, lores);
     }
 
     @Override
@@ -51,15 +64,13 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
-     *
+     * <pre><code>
      * public final class TestWeapon extends AbstractWeapon {
      *     public TestWeapon(CombatUser combatUser) {
      *         super(combatUser, TestWeaponInfo.getInstance());
      *     }
      * }
-     *
-     * }</pre>
+     * </code></pre>
      *
      * @param combatUser 플레이어 객체
      * @return 무기 객체

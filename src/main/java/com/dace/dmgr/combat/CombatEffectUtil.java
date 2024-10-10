@@ -93,6 +93,7 @@ public final class CombatEffectUtil {
             case LEAVES_2:
             case SPONGE:
             case HAY_BLOCK:
+            case GRASS_PATH:
                 SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
                 break;
             case DIRT:

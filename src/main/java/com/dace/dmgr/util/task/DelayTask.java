@@ -10,11 +10,11 @@ import org.bukkit.scheduler.BukkitTask;
  *
  * <p>Example:</p>
  *
- * <pre>{@code
+ * <pre><code>
  * new DelayTask(() -> {
  *     // 지정한 딜레이만큼 기다린 후 호출된다.
  * }, 5);
- * }</pre>
+ * </code></pre>
  */
 public final class DelayTask extends Task {
     /** 태스크가 끝났을 때 실행할 작업 */

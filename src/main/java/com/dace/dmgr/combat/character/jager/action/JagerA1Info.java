@@ -50,7 +50,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                 "§f▍ 근처의 적을 탐지하면 추적하며, §5" + TextIcon.SNARE + " 속박§f에",
                 "§f▍ 걸린 적에게 §c" + TextIcon.DAMAGE_INCREASE + " 치명타§f를 입힙니다.",
                 "",
-                MessageFormat.format("§a{0} §f{1}", TextIcon.HEAL, HEALTH),
+                MessageFormat.format("§a{0}§f {1}", TextIcon.HEAL, HEALTH),
                 MessageFormat.format("§f{0} {1}초 (사망 시)", TextIcon.COOLDOWN, COOLDOWN_DEATH / 20.0),
                 MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, ENEMY_DETECT_RADIUS),
                 "",

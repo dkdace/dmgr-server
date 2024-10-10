@@ -298,6 +298,7 @@ public class DamageModule {
                 setShield(id, 0);
             }
 
+        finalDamage = Math.min(finalDamage, getHealth());
         int reducedDamage = Math.max(0, (int) (damage * damageMultiplier) - finalDamage);
 
         if (attacker != null)
