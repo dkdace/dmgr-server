@@ -32,12 +32,12 @@ public final class CombatUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 최종 피해량 : 10 (20m) ~ 5 (40m)
      * int damage = getDistantDamage(10, distance, 20, true)
      * // 최종 피해량 : 20 (10m) ~ 10 (20m) ~ 0 (30m)
      * int damage = getDistantDamage(20, distance, 10, false)
-     * }</pre>
+     * </code></pre>
      *
      * @param damage            피해량
      * @param distance          거리 (단위: 블록). 0 이상의 값

@@ -22,10 +22,10 @@ public final class ConsoleLogger {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // Hello, World!
      * ConsoleLogger.info("Hello, {0}!", "World!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
@@ -50,10 +50,10 @@ public final class ConsoleLogger {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // Hello, World!
      * ConsoleLogger.warn("Hello, {0}!", "World!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
@@ -78,10 +78,10 @@ public final class ConsoleLogger {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // Hello, World!
      * ConsoleLogger.severe("Hello, {0}!", "World!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
@@ -97,10 +97,10 @@ public final class ConsoleLogger {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // "Hello, World!" 및 예외 정보 출력
      * ConsoleLogger.severe("Hello, {0}!", ex, "World!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param exception 예외 객체

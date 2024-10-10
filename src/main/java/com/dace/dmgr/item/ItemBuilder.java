@@ -24,14 +24,14 @@ import java.util.UUID;
  *
  * <p>Example:</p>
  *
- * <pre>{@code
+ * <pre><code>
  * // 이름이 'Test item', 설명이 'Test lore', 수량이 3개인 막대기 생성
  * new ItemBuilder(Material.STICK)
  *     .setName("Test item")
  *     .setLore("Test lore")
  *     .setAmount(3)
  *     .build();
- * }</pre>
+ * </code></pre>
  */
 public final class ItemBuilder {
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
@@ -150,13 +150,13 @@ public final class ItemBuilder {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 최종 이름 : '[!] Test item: STONE'
      * new ItemBuilder(Material.STONE)
      *     .setName("{0} Test item: {1}")
      *     .formatName("[!]", "STONE")
      *     .build();
-     * }</pre>
+     * </code></pre>
      *
      * @param arguments 포맷에 사용할 인자 목록
      * @return {@link ItemBuilder}
@@ -240,7 +240,7 @@ public final class ItemBuilder {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // 최종 설명 :
      * // 'First lore : ONE'
      * // 'Second lore : TWO'
@@ -248,7 +248,7 @@ public final class ItemBuilder {
      *     .setLore("First lore : {0}", "Second lore : {1}")
      *     .formatLore("ONE", "TWO")
      *     .build();
-     * }</pre>
+     * </code></pre>
      *
      * @param arguments 포맷에 사용할 인자 목록
      * @return {@link ItemBuilder}

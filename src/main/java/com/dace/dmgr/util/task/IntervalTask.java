@@ -13,7 +13,7 @@ import java.util.function.Function;
  *
  * <p>Example:</p>
  *
- * <pre>{@code
+ * <pre><code>
  * new IntervalTask(i -> {
  *     // 지정한 횟수만큼 반복하여 호출된다.
  *
@@ -27,7 +27,7 @@ import java.util.function.Function;
  * }, isCancelled -> {
  *     // 타이머가 끝났을 때 호출된다.
  * }, 5);
- * }</pre>
+ * </code></pre>
  */
 public final class IntervalTask extends Task {
     /**

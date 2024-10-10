@@ -535,10 +535,10 @@ public final class User implements Disposable {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §rWorld!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message 메시지
      */
@@ -556,10 +556,10 @@ public final class User implements Disposable {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §r{0}!", "World");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록
@@ -576,10 +576,10 @@ public final class User implements Disposable {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §rWorld!");
-     * }</pre>
+     * </code></pre>
      *
      * @param message 메시지
      */
@@ -598,10 +598,10 @@ public final class User implements Disposable {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §r{0}!", "World");
-     * }</pre>
+     * </code></pre>
      *
      * @param message   메시지
      * @param arguments 포맷에 사용할 인자 목록

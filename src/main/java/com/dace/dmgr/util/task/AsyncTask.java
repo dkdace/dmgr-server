@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  *
  * <p>Example:</p>
  *
- * <pre>{@code
+ * <pre><code>
  * new AsyncTask<Integer>((onFinish, onError) -> {
  *     // 즉시 호출되며 별도의 스레드에서 비동기 작업을 수행한다.
  *
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
  * }).onError(ex -> {
  *     // 작업 실패(예외 발생) 시 호출된다.
  * });
- * }</pre>
+ * </code></pre>
  *
  * @param <T> 태스크 종료 시 반환되는 값의 타입
  */

@@ -230,10 +230,10 @@ public final class LocationUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // loc과 dir을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
      * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
-     * }</pre>
+     * </code></pre>
      *
      * @param location  기준 위치
      * @param direction 기준 방향
@@ -260,10 +260,10 @@ public final class LocationUtil {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
+     * <pre><code>
      * // loc의 방향을 기준으로 2m 오른쪽, 1m 뒤쪽의 위치 반환
      * Location loc = getLocationFromOffset(loc, dir, 2, 0, -1)
-     * }</pre>
+     * </code></pre>
      *
      * @param location 기준 위치
      * @param offsetX  왼쪽(-) / 오른쪽(+). (단위: 블록)

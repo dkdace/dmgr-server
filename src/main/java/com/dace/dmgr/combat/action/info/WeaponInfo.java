@@ -64,15 +64,13 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      *
      * <p>Example:</p>
      *
-     * <pre>{@code
-     *
+     * <pre><code>
      * public final class TestWeapon extends AbstractWeapon {
      *     public TestWeapon(CombatUser combatUser) {
      *         super(combatUser, TestWeaponInfo.getInstance());
      *     }
      * }
-     *
-     * }</pre>
+     * </code></pre>
      *
      * @param combatUser 플레이어 객체
      * @return 무기 객체
