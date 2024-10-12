@@ -22,16 +22,16 @@ import java.util.Arrays;
  * 게임 입장 GUI 클래스.
  */
 public final class SelectGame extends Gui {
+    @Getter
+    private static final SelectGame instance = new SelectGame();
     /** 이전 버튼 GUI 아이템 객체 */
     private static final GuiItem buttonLeft = new ButtonItem.LEFT("SelectGameLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            player.performCommand("메뉴");
+            Warp.getInstance().open(player);
             return true;
         }
     };
-    @Getter
-    private static final SelectGame instance = new SelectGame();
 
     private SelectGame() {
         super(2, "§8게임 시작");

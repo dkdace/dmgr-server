@@ -41,21 +41,19 @@ public final class Menu extends Gui {
         );
 
         guiController.set(19, MenuItem.GAME_START.guiItem);
-        guiController.set(21, MenuItem.WARP.guiItem);
-        guiController.set(23, MenuItem.RECORD.guiItem);
+        guiController.set(21, MenuItem.RECORD.guiItem);
+        guiController.set(23, MenuItem.CORE.guiItem);
         guiController.set(25, MenuItem.ACHIEVEMENT.guiItem);
         guiController.set(37, MenuItem.OPTION.guiItem);
-        guiController.set(39, MenuItem.CORE.guiItem);
-        guiController.set(41, MenuItem.COMMAND.guiItem);
-        guiController.set(43, MenuItem.RANKING.guiItem);
+        guiController.set(39, MenuItem.COMMAND.guiItem);
+        guiController.set(41, MenuItem.RANKING.guiItem);
+        guiController.set(43, MenuItem.LOBBY.guiItem);
         guiController.set(53, MenuItem.EXIT.guiItem);
     }
 
     @AllArgsConstructor
     private enum MenuItem {
-        GAME_START(Material.IRON_SWORD, "게임 시작", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.",
-                player -> SelectGame.getInstance().open(player)),
-        WARP(Material.LEATHER_BOOTS, "이동", "원하는 장소로 이동합니다.",
+        GAME_START(Material.IRON_SWORD, "게임 시작", "게임에 참가합니다.",
                 player -> Warp.getInstance().open(player)),
         RECORD(Material.NAME_TAG, "전적", "개인 전적을 확인합니다.", player -> player.performCommand("전적")),
         ACHIEVEMENT(Material.BOOK, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
@@ -72,15 +70,17 @@ public final class Menu extends Gui {
             Ranking ranking = Ranking.getInstance();
             ranking.open(player);
         }),
+        LOBBY(Material.BED, 14, "로비", "로비로 이동합니다.", player -> player.performCommand("exit")),
         EXIT(new ButtonItem.EXIT("MenuExit"));
 
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
 
-        MenuItem(Material material, String name, String lore, Consumer<Player> action) {
+        MenuItem(Material material, int damage, String name, String lore, Consumer<Player> action) {
             guiItem = new GuiItem("Menu" + this, new ItemBuilder(material)
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
+                    .setDamage((short) damage)
                     .build()) {
                 @Override
                 public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
@@ -91,6 +91,10 @@ public final class Menu extends Gui {
                     return true;
                 }
             };
+        }
+
+        MenuItem(Material material, String name, String lore, Consumer<Player> action) {
+            this(material, 0, name, lore, action);
         }
     }
 }
