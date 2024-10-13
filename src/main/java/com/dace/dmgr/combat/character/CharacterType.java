@@ -64,6 +64,9 @@ public enum CharacterType {
                 .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}", character.getIcon(), character.getRole().getColor(), character.getName(),
                         character.getNickname()))
                 .setLore("",
+                        MessageFormat.format("§f▍ 역할군 : {0}", character.getRole().getColor() + character.getRole().getName() +
+                                (character.getSubRole() == null ? "" : " §f/ " + character.getSubRole().getColor() + character.getSubRole().getName())),
+                        "",
                         "§7§n좌클릭§f하여 전투원을 선택합니다.",
                         "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
                 .build()) {

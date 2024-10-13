@@ -38,7 +38,7 @@ public final class Ched extends Marksman {
     private static final Ched instance = new Ched();
 
     private Ched() {
-        super("체드", "화염 궁수", "DVChed", '\u32D4', 4, 1000, 1.1, 1.0);
+        super(null, "체드", "화염 궁수", "DVChed", '\u32D4', 4, 1000, 1.1, 1.0);
     }
 
     @Override

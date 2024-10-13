@@ -27,6 +27,7 @@ public abstract class Support extends Character {
     /**
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
      *
+     * @param subRole          부 역할군
      * @param name             이름
      * @param nickname         별명
      * @param skinName         스킨 이름
@@ -36,9 +37,9 @@ public abstract class Support extends Character {
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Support(@NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
+    protected Support(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
                       double speedMultiplier, double hitboxMultiplier) {
-        super(name, nickname, skinName, Role.SUPPORT, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
+        super(name, nickname, skinName, Role.SUPPORT, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override

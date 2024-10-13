@@ -29,9 +29,12 @@ public abstract class Character {
     /** 스킨 이름 */
     @NonNull
     private final String skinName;
-    /** 역할군 */
+    /** 주 역할군 */
     @NonNull
     private final Role role;
+    /** 부 역할군 */
+    @Nullable
+    private final Role subRole;
     /** 전투원 아이콘 */
     private final char icon;
     /** 난이도 */
