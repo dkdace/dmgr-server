@@ -162,6 +162,8 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        super.onKill(attacker, victim, score, isFinalHit);
+
         if (!(victim instanceof CombatUser))
             return;
 

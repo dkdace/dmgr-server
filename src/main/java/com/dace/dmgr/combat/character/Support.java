@@ -48,7 +48,7 @@ public abstract class Support extends Character {
         if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
             boolean activate = Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
                     .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .anyMatch(target -> target != null && target.getDamageModule().isLowHealth() &&
+                    .anyMatch(target -> target != null && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2 &&
                             target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
@@ -104,8 +104,8 @@ public abstract class Support extends Character {
         private RoleTrait1Info() {
             super("역할: 지원 - 1",
                     "",
-                    "§f▍ 치명상인 아군이 범위 밖에 있을 때 §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도",
-                    "§f▍ 가 빨라집니다.",
+                    "§f▍ 체력이 절반 이하인 아군이 범위 밖에 있을 때",
+                    "§f▍ §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도§f가 빨라집니다.",
                     "",
                     MessageFormat.format("§b{0} §f{1}%", TextIcon.WALK_SPEED_INCREASE, SPEED),
                     MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, DETECT_RADIUS));

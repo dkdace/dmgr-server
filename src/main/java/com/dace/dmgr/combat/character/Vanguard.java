@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -44,8 +45,9 @@ public abstract class Vanguard extends Character {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onUseHealPack(@NonNull CombatUser combatUser) {
-        combatUser.getStatusEffectModule().clearStatusEffect(false);
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        if (victim instanceof CombatUser)
+            attacker.getStatusEffectModule().clearStatusEffect(false);
     }
 
     @Override
@@ -91,7 +93,7 @@ public abstract class Vanguard extends Character {
         private RoleTrait2Info() {
             super("역할: 돌격 - 2",
                     "",
-                    "§f▍ 힐 팩을 사용하면 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f를",
+                    "§f▍ 적을 처치하면 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f를",
                     "§f▍ 제거합니다.");
         }
     }
