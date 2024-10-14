@@ -104,8 +104,8 @@ public final class InfernoUlt extends UltimateSkill {
             long yaw = index * 6;
             long pitch = index * 5;
 
-            for (int k = 0; k < 6; k++) {
-                yaw += 60;
+            for (int k = 0; k < 5; k++) {
+                yaw += 72;
 
                 Vector vec1 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
                 Vector vec2 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw + 10.0), pitch + 10.0);

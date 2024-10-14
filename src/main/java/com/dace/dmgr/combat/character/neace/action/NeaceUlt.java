@@ -153,19 +153,17 @@ public final class NeaceUlt extends UltimateSkill {
         Location loc = combatUser.getEntity().getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(15);
+        Vector vector = VectorUtil.getRollAxis(loc).multiply(1.5);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        long angle = i * 6;
-        for (int j = 0; j < 8; j++) {
-            angle += 90;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle);
+        long angle = i * 5;
+        for (int j = 0; j < 6; j++) {
+            angle += 120;
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
             Location loc2 = loc.clone().add(vec);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 3,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 1,
                     0.1, 0.1, 0.1, 215, 255, 130);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.GRASS, 0, loc2.clone().add(0, 2, 0),
-                    4, 0.15, 0.4, 0.15, 0);
         }
     }
 

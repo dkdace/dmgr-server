@@ -150,7 +150,7 @@ public final class MagrittaUlt extends UltimateSkill {
         private double distance = 0;
 
         private MagrittaUltHitscan(HashMap<Damageable, Integer> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(16).maxDistance(MagrittaWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, HitscanOption.builder().trailInterval(15).maxDistance(MagrittaWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;
         }
 
@@ -163,11 +163,12 @@ public final class MagrittaUlt extends UltimateSkill {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 1, 0, 0, 0, 0);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 255, 70, 0);
         }
 
         @Override
         protected void onHit() {
+            ParticleUtil.play(Particle.FLAME, getLocation(), 1, 0, 0, 0, 0.15);
             ParticleUtil.play(Particle.LAVA, getLocation(), 1, 0, 0, 0, 0);
         }
 
