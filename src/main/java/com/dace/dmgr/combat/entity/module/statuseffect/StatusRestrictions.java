@@ -37,5 +37,5 @@ final class StatusRestrictions {
     public static final long MOVE = WALK | JUMP;
 
     public static final long SKILL = MOVE_SKILL | ETC_SKILL;
-    publci static final long ACTION = SKILL | WEAPON | ETC_ACTION;
+    public static final long ACTION = SKILL | WEAPON | ETC_ACTION;
 }
