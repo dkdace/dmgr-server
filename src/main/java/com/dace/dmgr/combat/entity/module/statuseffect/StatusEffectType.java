@@ -12,25 +12,28 @@ import lombok.Getter;
 @Getter
 public enum StatusEffectType {
     /** 미분류 */
-    NONE,
+    NONE(StatusRestrictions.NONE),
     /** 속도 증가 */
-    SPEED,
+    SPEED(StatusRestrictions.NONE),
     /** 무적 */
-    INVULNERABLE,
+    INVULNERABLE(StatusRestrictions.DAMAGED),
     /** 둔화 */
-    SLOW,
+    SLOW(StatusRestrictions.NONE),
     /** 기절 */
-    STUN,
+    STUN(StatusRestrictions.MOVE | StatusRestrictions.ACTION),
     /** 속박 */
-    SNARE,
+    SNARE(StatusRestrictions.MOVE | StatusRestrictions.MOVE_SKILL),
     /** 고정 */
-    GROUNDING,
+    GROUNDING(StatusRestrictions.MOVE_SKILL),
     /** 침묵 */
-    SILENCE,
+    SILENCE(StatusRestrictions.SKILL),
     /** 독 */
-    POISON,
+    POISON(StatusRestrictions.NONE),
     /** 화염 */
-    BURNING,
+    BURNING(StatusRestrictions.NONE),
     /** 회복 차단 */
-    HEAL_BLOCK
+    HEAL_BLOCK(StatusRestrictions.HEALED)
+    ;
+
+    final long restrictions;
 }
