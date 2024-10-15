@@ -10,9 +10,9 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = 10 * 20;
     /** 초당 치유량 */
-    public static final int HEAL_PER_SECOND = 120;
+    public static final int HEAL_PER_SECOND = 250;
     /** 최대 치유량 */
-    public static final int MAX_HEAL = 600;
+    public static final int MAX_HEAL = 1000;
     /** 최대 거리 (단위: 블록) */
     public static final int MAX_DISTANCE = 30;
     /** 지속시간 (tick) */
