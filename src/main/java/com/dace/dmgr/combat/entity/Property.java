@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.character.magritta.action.MagrittaT1Info;
+import com.dace.dmgr.combat.character.neace.action.NeaceA1Info;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Property {
+    /** 치유 표식 */
+    HEALING_MARK(NeaceA1Info.MAX_HEAL),
     /** 빙결 */
     FREEZE(JagerT1Info.MAX),
     /** 파쇄 */

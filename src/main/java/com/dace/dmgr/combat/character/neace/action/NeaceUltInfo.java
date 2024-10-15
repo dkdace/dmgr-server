@@ -8,7 +8,7 @@ import java.text.MessageFormat;
 
 public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 6000;
+    public static final int COST = 7000;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.8 * 20);
     /** 시전 중 이동속도 감소량 */

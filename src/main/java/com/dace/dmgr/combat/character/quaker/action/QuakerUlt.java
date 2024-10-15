@@ -122,11 +122,11 @@ public final class QuakerUlt extends UltimateSkill {
         Vector vector = VectorUtil.getPitchAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 4; j++) {
-                Vector axis2 = VectorUtil.getRotatedVector(axis, vector, 13 * (j - 1.5));
-                Vector vector2 = VectorUtil.getRotatedVector(vector, vector, 13 * (j - 1.5));
-                Vector vec = VectorUtil.getRotatedVector(vector2, axis2, 90 + 12 * (i - 3.5));
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 5; j++) {
+                Vector axis2 = VectorUtil.getRotatedVector(axis, vector, 11 * (j - 2.0));
+                Vector vector2 = VectorUtil.getRotatedVector(vector, vector, 11 * (j - 2.0));
+                Vector vec = VectorUtil.getRotatedVector(vector2, axis2, 90 + 11 * (i - 3.5));
                 new QuakerUltProjectile(targets).shoot(loc, vec);
             }
         }
@@ -185,16 +185,16 @@ public final class QuakerUlt extends UltimateSkill {
         private final HashSet<Damageable> targets;
 
         private QuakerUltProjectile(HashSet<Damageable> targets) {
-            super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(14).size(QuakerUltInfo.SIZE)
+            super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(15).size(QuakerUltInfo.SIZE)
                     .maxDistance(QuakerUltInfo.DISTANCE).condition(combatUser::isEnemy).build());
             this.targets = targets;
         }
 
         @Override
         protected void onTrailInterval() {
-            Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 15);
+            Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec.getX(), vec.getY(), vec.getZ(), 1);
-            ParticleUtil.play(Particle.CRIT, getLocation(), 4, 0.2, 0.2, 0.2, 0.1);
+            ParticleUtil.play(Particle.CRIT, getLocation(), 4, 0.2, 0.2, 0.2, 0.15);
         }
 
         @Override

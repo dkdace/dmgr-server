@@ -8,7 +8,7 @@ import java.text.MessageFormat;
 
 public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 2 * 20;
+    public static final long COOLDOWN = 3 * 20;
     /** 이동 강도 */
     public static final double PUSH = 0.9;
     /** 최대 거리 (단위: 블록) */

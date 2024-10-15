@@ -2,7 +2,10 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.NamedSound;
@@ -117,8 +120,6 @@ public final class NeaceA2 extends ActiveSkill {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, NeaceA2Info.SPEED);
         }
 
         @Override
@@ -131,8 +132,6 @@ public final class NeaceA2 extends ActiveSkill {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
     }
 }
