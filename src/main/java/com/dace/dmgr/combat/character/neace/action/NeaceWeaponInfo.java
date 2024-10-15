@@ -40,6 +40,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                 "",
                 "§f▍ 바라보는 아군에게 §7치유 광선§f을 고정하여",
                 "§f▍ 지속적으로 §a" + TextIcon.HEAL + " 치유§f합니다.",
+                "§f▍ §d구원의 표식§f이 있는 아군은 치유할 수 없습니다.",
                 "",
                 MessageFormat.format("§a{0}§f {1}/초", TextIcon.HEAL, HEAL.HEAL_PER_SECOND),
                 MessageFormat.format("§a{0}§f {1}m", TextIcon.DISTANCE, HEAL.MAX_DISTANCE));
