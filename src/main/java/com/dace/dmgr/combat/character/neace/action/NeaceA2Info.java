@@ -8,13 +8,11 @@ import java.text.MessageFormat;
 
 public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 12 * 20;
+    public static final long COOLDOWN = 7 * 20;
     /** 공격력 증가량 */
-    public static final int DAMAGE_INCREMENT = 10;
+    public static final int DAMAGE_INCREMENT = 15;
     /** 방어력 증가량 */
-    public static final int DEFENSE_INCREMENT = 10;
-    /** 이동속도 증가량 */
-    public static final int SPEED = 10;
+    public static final int DEFENSE_INCREMENT = 15;
     /** 지속시간 (tick) */
     public static final long DURATION = 8 * 20;
 
@@ -28,8 +26,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 "",
                 "§f▍ 일정 시간동안 기본 무기의 치유 대상을 §3축복§f할",
                 "§f▍ 수 있습니다.",
-                "§f▍ 사용 중에는 기본 무기의 치유량이 절반으로",
-                "§f▍ 감소합니다.",
+                "§f▍ 사용 중에는 기본 무기로 치유할 수 없습니다.",
                 "",
                 MessageFormat.format("§7{0}§f {1}초", TextIcon.DURATION, DURATION / 20.0),
                 "",
@@ -37,12 +34,10 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 "",
                 "§3[축복]",
                 "",
-                "§f▍ §c" + TextIcon.DAMAGE_INCREASE + " 공격력§f과 §6" + TextIcon.DEFENSE_INCREASE + " 방어력§f, §b" + TextIcon.WALK_SPEED_INCREASE + " 이동 속도§f가",
-                "§f▍ 증가합니다.",
+                "§f▍ §c" + TextIcon.DAMAGE_INCREASE + " 공격력§f과 §6" + TextIcon.DEFENSE_INCREASE + " 방어력§f이 증가합니다.",
                 "",
                 MessageFormat.format("§c{0}§f {1}%", TextIcon.DAMAGE_INCREASE, DAMAGE_INCREMENT),
                 MessageFormat.format("§6{0}§f {1}%", TextIcon.DEFENSE_INCREASE, DEFENSE_INCREMENT),
-                MessageFormat.format("§b{0}§f {1}%", TextIcon.WALK_SPEED_INCREASE, SPEED),
                 "",
                 "§3[지속시간 종료/재사용 시]",
                 "",
