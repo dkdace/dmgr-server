@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Jumpable;
 import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -66,9 +67,8 @@ public final class JumpModule extends MoveModule {
      * @return 점프 가능 여부
      */
     private boolean canJump() {
-        if (combatEntity instanceof Damageable && (((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) ||
-                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
-                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING)))
+        if (combatEntity instanceof Damageable
+                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(StatusRestrictions.JUMP))
             return false;
         return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
     }

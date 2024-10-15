@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
  * 비트 연산({@code ~}, {@code &}, {@code |}, {@code ^})을 이용해 제한될 행동의 조합을 표현할 수 있다.
  */
 @UtilityClass
-final class StatusRestrictions {
+public final class StatusRestrictions {
     /** 행동 제한 없음 */
     public static final long NONE = 0;
 
@@ -17,25 +17,29 @@ final class StatusRestrictions {
     public static final long DAMAGED = 1 << 0;
     /** 피해 입기 */
     public static final long HEALED = 1 << 1;
+    /** 사운드 듣기 */
+    public static final long HEAR = 1 << 2;
 
     /** 일반 이동 */
-    public static final long WALK = 1 << 2;
+    public static final long WALK = 1 << 3;
     /** 점프 */
-    public static final long JUMP = 1 << 3;
+    public static final long JUMP = 1 << 4;
 
     /** 이동기 사용 */
-    public static final long MOVE_SKILL = 1 << 3;
+    public static final long PUSHED = 1 << 5;
+    /** 이동기 사용 */
+    public static final long TELEPORTED = 1 << 6;
     /** 기타 스킬 사용 */
-    public static final long ETC_SKILL = 1 << 4;
+    public static final long USE_SKILL = 1 << 7;
     /** 무기 사용 */
-    public static final long WEAPON = 1 << 5;
-    /** 기타 행동 사용 */
-    public static final long ETC_ACTION = 1 << 6;
+    public static final long USE_WEAPON = 1 << 8;
     
     ////// 마스크 조합 //////
 
+    /** 이동하기 (자발적으로) */
     public static final long MOVE = WALK | JUMP;
-
-    public static final long SKILL = MOVE_SKILL | ETC_SKILL;
-    public static final long ACTION = SKILL | WEAPON | ETC_ACTION;
+    /** 행동하기 */
+    public static final long DO_ACTION = USE_SKILL | USE_WEAPON;
+    /** 이동됨 (스킬 등에 의해) */
+    public static final long MOVED = PUSHED | TELEPORTED;
 }

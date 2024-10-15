@@ -20,13 +20,14 @@ public enum StatusEffectType {
     /** 둔화 */
     SLOW(StatusRestrictions.NONE),
     /** 기절 */
-    STUN(StatusRestrictions.MOVE | StatusRestrictions.ACTION),
+    STUN(StatusRestrictions.MOVE | StatusRestrictions.DO_ACTION),
     /** 속박 */
-    SNARE(StatusRestrictions.MOVE | StatusRestrictions.MOVE_SKILL),
+    SNARE(StatusRestrictions.MOVE | StatusRestrictions.MOVED),
     /** 고정 */
-    GROUNDING(StatusRestrictions.MOVE_SKILL),
+    GROUNDING(StatusRestrictions.MOVED),
     /** 침묵 */
-    SILENCE(StatusRestrictions.SKILL),
+    SILENCE(StatusRestrictions.USE_SKILL | StatusRestrictions.HEAR),
+
     /** 독 */
     POISON(StatusRestrictions.NONE),
     /** 화염 */
