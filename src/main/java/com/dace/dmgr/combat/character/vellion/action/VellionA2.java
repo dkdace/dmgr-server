@@ -33,7 +33,6 @@ public final class VellionA2 extends ActiveSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA2";
 
-    private final VellionA2Mark vellionA2Mark = new VellionA2Mark();
     /** 활성화 완료 여부 */
     @Getter
     private boolean isEnabled = false;
@@ -89,6 +88,8 @@ public final class VellionA2 extends ActiveSkill {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class VellionA2Mark implements StatusEffect {
+        private static final VellionA2Mark instance = new VellionA2Mark();
+
         @Override
         @NonNull
         public StatusEffectType getStatusEffectType() {
@@ -127,7 +128,7 @@ public final class VellionA2 extends ActiveSkill {
         private VellionTarget() {
             super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> combatEntity instanceof Damageable &&
                     ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionA2.this.combatUser) &&
-                    !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(vellionA2Mark));
+                    !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance));
         }
 
         @Override
@@ -162,7 +163,7 @@ public final class VellionA2 extends ActiveSkill {
                 }
 
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 10);
+                target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA2Mark.instance, 10);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE_READY, combatUser.getEntity().getLocation());
 
@@ -171,7 +172,7 @@ public final class VellionA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
 
                 TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
-                    if (isDurationFinished() || !canKeep(combatUser, target) || !target.getStatusEffectModule().hasStatusEffect(vellionA2Mark))
+                    if (isDurationFinished() || !canKeep(combatUser, target) || !target.getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance))
                         return false;
 
                     isEnabled = true;
@@ -213,7 +214,7 @@ public final class VellionA2 extends ActiveSkill {
         }
 
         private void onTick(@NonNull Damageable target, long i) {
-            target.getStatusEffectModule().applyStatusEffect(combatUser, vellionA2Mark, 10);
+            target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA2Mark.instance, 10);
             if (target instanceof CombatUser)
                 CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
 
