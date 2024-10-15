@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity.module;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
 import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;

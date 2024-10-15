@@ -15,7 +15,7 @@ public final class StatusRestrictions {
 
     /** 피해 입기 */
     public static final long DAMAGED = 1 << 0;
-    /** 피해 입기 */
+    /** 치료 받기 */
     public static final long HEALED = 1 << 1;
     /** 사운드 듣기 */
     public static final long HEAR = 1 << 2;
@@ -25,11 +25,11 @@ public final class StatusRestrictions {
     /** 점프 */
     public static final long JUMP = 1 << 4;
 
-    /** 이동기 사용 */
+    /** (스킬 등으로) 밀려남 */
     public static final long PUSHED = 1 << 5;
-    /** 이동기 사용 */
+    /** (스킬 등으로) 텔레포트됨 */
     public static final long TELEPORTED = 1 << 6;
-    /** 기타 스킬 사용 */
+    /** 스킬 사용 */
     public static final long USE_SKILL = 1 << 7;
     /** 무기 사용 */
     public static final long USE_WEAPON = 1 << 8;
