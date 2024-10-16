@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.CooldownUtil;
@@ -273,7 +273,7 @@ public class DamageModule {
     private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
-                combatEntity.getStatusEffectModule().hasAnyRestriction(StatusRestrictions.DAMAGED))
+                combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
             return false;
         if (damage == 0)
             return true;

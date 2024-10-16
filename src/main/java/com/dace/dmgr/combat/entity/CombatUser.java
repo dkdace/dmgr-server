@@ -25,7 +25,7 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
@@ -574,7 +574,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canSprint(this))
             return false;
-        if (statusEffectModule.hasAnyRestriction(StatusRestrictions.WALK))
+        if (statusEffectModule.hasAnyRestriction(CombatRestrictions.SPRINT))
             return false;
         return propertyManager.getValue(Property.FREEZE) < JagerT1Info.NO_SPRINT;
     }
@@ -591,7 +591,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return false;
         if (!character.canFly(this))
             return false;
-        return !statusEffectModule.hasAnyRestriction(StatusRestrictions.MOVE | StatusRestrictions.USE_SKILL);
+        return !statusEffectModule.hasAnyRestriction(CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.USE_SKILL);
     }
 
     @Override
@@ -1352,7 +1352,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actions.forEach(action -> {
             if (isDead() || action == null)
                 return;
-            if (statusEffectModule.hasAllRestriction(StatusRestrictions.DO_ACTION))
+            if (statusEffectModule.hasAllRestriction(CombatRestrictions.USE_ACTION))
                 return;
 
             if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
@@ -1428,7 +1428,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse(actionKey) || statusEffectModule.hasAnyRestriction(StatusRestrictions.USE_SKILL))
+        if (!skill.canUse(actionKey) || statusEffectModule.hasAnyRestriction(CombatRestrictions.USE_SKILL))
             return;
 
         skill.onUse(actionKey);

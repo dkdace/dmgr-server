@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.CooldownUtil;
@@ -143,7 +144,7 @@ public final class StatusEffectModule {
      *
      * @param restrictions 확인할 상태 제한 비트마스크
      * @return 가지고 있는 상태 효과 중 지정한 상태 제한이 하나라도 있으면 {@code true}
-     * @see com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions StatusRestrictions
+     * @see CombatRestrictions StatusRestrictions
      */
     public boolean hasAnyRestriction(long restrictions) {
         for (StatusEffect statusEffect : statusEffects) {
@@ -158,7 +159,7 @@ public final class StatusEffectModule {
      *
      * @param restrictions 확인할 상태 제한 비트마스크
      * @return 가지고 있는 상태 효과 중 지정한 상태 제한이 모두 있으면 {@code true}
-     * @see com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions StatusRestrictions
+     * @see CombatRestrictions StatusRestrictions
      */
     public boolean hasAllRestriction(long restrictions) {
         for (StatusEffect statusEffect : statusEffects) {

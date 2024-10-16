@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -76,7 +76,7 @@ public class MoveModule {
      */
     private boolean canMove() {
         return combatEntity instanceof Damageable
-                && !((Damageable) combatEntity).getStatusEffectModule().hasAllRestriction(StatusRestrictions.MOVE);
+                && !((Damageable) combatEntity).getStatusEffectModule().hasAllRestriction(CombatRestrictions.DEFAULT_MOVE);
     }
 
     /**
@@ -88,7 +88,7 @@ public class MoveModule {
     public final void push(@NonNull Vector velocity, boolean isReset) {
         if (combatEntity instanceof Damageable
                 && !((Damageable) combatEntity).getKnockbackModule().isKnockbacked()
-                && !((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(StatusRestrictions.PUSHED))
+                && !((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.PUSH))
             combatEntity.getEntity().setVelocity(isReset ? velocity : combatEntity.getEntity().getVelocity().add(velocity));
     }
 
@@ -108,7 +108,7 @@ public class MoveModule {
      */
     public final void teleport(@NonNull Location location) {
         if (combatEntity instanceof Damageable
-                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(StatusRestrictions.TELEPORTED))
+                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.TELEPORT))
             return;
 
         if (combatEntity.getEntity() instanceof Player) {

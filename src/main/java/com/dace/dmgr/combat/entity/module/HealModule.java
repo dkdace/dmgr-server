@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.module;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusRestrictions;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;
 import lombok.NonNull;
@@ -99,7 +99,7 @@ public final class HealModule extends DamageModule {
 
         if (getHealth() == getMaxHealth())
             return false;
-        if (combatEntity.getStatusEffectModule().hasAnyRestriction(StatusRestrictions.HEALED))
+        if (combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
             return false;
 
         double healMultiplier = healMultiplierStatus.getValue();
