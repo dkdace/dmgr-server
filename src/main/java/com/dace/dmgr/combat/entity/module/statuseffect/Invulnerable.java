@@ -40,4 +40,9 @@ public class Invulnerable implements StatusEffect {
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
     }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.DAMAGED;
+    }
 }

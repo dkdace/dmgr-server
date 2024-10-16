@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
@@ -68,6 +69,17 @@ public final class JagerT1 {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        }
+
+        @Override
+        public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+            int freezeValue = combatEntity.getPropertyManager().getValue(Property.FREEZE);
+            long restrictions = CombatRestrictions.NONE;
+            if (freezeValue >= JagerT1Info.NO_SPRINT)
+                restrictions |= CombatRestrictions.SPRINT;
+            if (freezeValue >= JagerT1Info.NO_JUMP)
+                restrictions |= CombatRestrictions.JUMP;
+            return restrictions;
         }
     }
 }

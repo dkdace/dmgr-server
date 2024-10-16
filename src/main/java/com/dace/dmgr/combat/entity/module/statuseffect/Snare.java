@@ -48,4 +48,9 @@ public class Snare implements StatusEffect {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
     }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE;
+    }
 }

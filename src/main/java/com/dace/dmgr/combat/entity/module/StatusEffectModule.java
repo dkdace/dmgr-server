@@ -148,7 +148,7 @@ public final class StatusEffectModule {
      */
     public boolean hasAnyRestriction(long restrictions) {
         for (StatusEffect statusEffect : statusEffects) {
-            if ((statusEffect.getStatusEffectType().getRestrictions() & restrictions) != 0)
+            if ((statusEffect.getCombatRestrictions(combatEntity) & restrictions) != 0)
                 return true;
         }
         return false;
@@ -163,7 +163,7 @@ public final class StatusEffectModule {
      */
     public boolean hasAllRestriction(long restrictions) {
         for (StatusEffect statusEffect : statusEffects) {
-            if ((statusEffect.getStatusEffectType().getRestrictions() & restrictions) == restrictions)
+            if ((statusEffect.getCombatRestrictions(combatEntity) & restrictions) == restrictions)
                 return true;
         }
         return false;

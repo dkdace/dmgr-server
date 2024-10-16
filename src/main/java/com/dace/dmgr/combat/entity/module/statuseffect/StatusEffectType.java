@@ -8,33 +8,29 @@ import lombok.Getter;
  *
  * @see StatusEffect
  */
-@AllArgsConstructor
 @Getter
 public enum StatusEffectType {
     /** 미분류 */
-    NONE(CombatRestrictions.NONE),
+    NONE,
     /** 속도 증가 */
-    SPEED(CombatRestrictions.NONE),
+    SPEED,
     /** 무적 */
-    INVULNERABLE(CombatRestrictions.DAMAGED),
+    INVULNERABLE,
     /** 둔화 */
-    SLOW(CombatRestrictions.NONE),
+    SLOW,
     /** 기절 */
-    STUN(CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.USE_ACTION),
+    STUN,
     /** 속박 */
-    SNARE(CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE),
+    SNARE,
     /** 고정 */
-    GROUNDING(CombatRestrictions.ACTION_MOVE),
+    GROUNDING,
     /** 침묵 */
-    SILENCE(CombatRestrictions.USE_SKILL | CombatRestrictions.HEAR),
-
+    SILENCE,
     /** 독 */
-    POISON(CombatRestrictions.NONE),
+    POISON,
     /** 화염 */
-    BURNING(CombatRestrictions.NONE),
+    BURNING,
     /** 회복 차단 */
-    HEAL_BLOCK(CombatRestrictions.HEALED)
+    HEAL_BLOCK,
     ;
-
-    final long restrictions;
 }

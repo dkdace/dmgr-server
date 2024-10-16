@@ -47,4 +47,15 @@ public interface StatusEffect {
      * @param provider     제공자
      */
     void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
+
+    /**
+     * 상태 효과가 있을 때 제한할 행동들.
+     *
+     * @param combatEntity 대상 엔티티
+     * @return 제한할 행동 플래그의 비트 합
+     * @see CombatRestrictions
+     */
+    default long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.NONE;
+    }
 }
