@@ -66,9 +66,7 @@ public final class JumpModule extends MoveModule {
      * @return 점프 가능 여부
      */
     private boolean canJump() {
-        if (combatEntity instanceof Damageable
-                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.JUMP))
-            return false;
-        return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
+        return !((combatEntity instanceof Damageable)
+                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.JUMP));
     }
 }

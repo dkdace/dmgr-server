@@ -569,14 +569,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private boolean canSprint() {
         Validate.notNull(character);
-
-        if (isDead())
-            return false;
-        if (!character.canSprint(this))
-            return false;
-        if (statusEffectModule.hasAnyRestriction(CombatRestrictions.SPRINT))
-            return false;
-        return propertyManager.getValue(Property.FREEZE) < JagerT1Info.NO_SPRINT;
+        return !isDead()
+                && character.canSprint(this)
+                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.SPRINT);
     }
 
     /**
@@ -586,12 +581,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private boolean canFly() {
         Validate.notNull(character);
-
-        if (isDead())
-            return false;
-        if (!character.canFly(this))
-            return false;
-        return !statusEffectModule.hasAnyRestriction(CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.USE_SKILL);
+        return !isDead()
+                && character.canFly(this)
+                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.USE_SKILL);
     }
 
     @Override
