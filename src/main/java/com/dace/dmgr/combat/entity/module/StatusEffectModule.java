@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.CooldownUtil;

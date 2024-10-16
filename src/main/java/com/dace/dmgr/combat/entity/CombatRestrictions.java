@@ -1,4 +1,4 @@
-package com.dace.dmgr.combat.entity.module.statuseffect;
+package com.dace.dmgr.combat.entity;
 
 import lombok.experimental.UtilityClass;
 

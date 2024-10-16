@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Jumpable;
-import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;

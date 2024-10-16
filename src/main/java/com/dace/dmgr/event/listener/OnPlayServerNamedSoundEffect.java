@@ -8,7 +8,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
 import org.bukkit.Location;
