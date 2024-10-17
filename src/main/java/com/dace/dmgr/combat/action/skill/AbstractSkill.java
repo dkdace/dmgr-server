@@ -1,7 +1,9 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.AbstractAction;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.SkillInfo;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -39,6 +41,12 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     protected void onCooldownSet() {
         if (!isDurationFinished())
             setDuration(0);
+    }
+
+    @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey)
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
     }
 
     @Override

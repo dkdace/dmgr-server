@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
@@ -52,5 +53,10 @@ public class Silence implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
+    }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.USE_SKILL | CombatRestrictions.HEAR;
     }
 }

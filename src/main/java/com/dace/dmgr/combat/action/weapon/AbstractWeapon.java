@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action.weapon;
 import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -39,7 +40,9 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.isGlobalCooldownFinished();
+        return super.canUse(actionKey)
+                && combatUser.isGlobalCooldownFinished()
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_WEAPON);
     }
 
     @Override

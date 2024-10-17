@@ -201,7 +201,9 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(VellionP1Info.getInstance()).isCooldownFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
+
+        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]) && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,5 +44,10 @@ public class Snare implements StatusEffect {
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier("Snare");
+    }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE;
     }
 }
