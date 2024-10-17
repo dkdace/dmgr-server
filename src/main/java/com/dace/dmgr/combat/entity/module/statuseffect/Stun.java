@@ -54,6 +54,6 @@ public class Stun implements StatusEffect {
 
     @Override
     public long getCombatRestrictions(@NonNull Damageable combatEntity) {
-        return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.USE_ACTION;
+        return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE | CombatRestrictions.USE_ACTION;
     }
 }
