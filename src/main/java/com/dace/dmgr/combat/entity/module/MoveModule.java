@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;

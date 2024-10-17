@@ -50,7 +50,7 @@ public interface StatusEffect {
     void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
 
     /**
-     * 상태 효과가 있을 때 제한할 행동들.
+     * 상태 효과가 있을 때 제한할 행동들을 반환한다.
      *
      * @param combatEntity 대상 엔티티
      * @return 제한할 행동 플래그의 비트 합

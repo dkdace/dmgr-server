@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.CooldownUtil;
@@ -140,32 +140,34 @@ public final class StatusEffectModule {
     }
 
     /**
-     * 엔티티가 가지고 잇는 효과들이 지정한 상태 제한들을 하나라도 제한하는지 확인한다.
+     * 엔티티가 가지고 있는 효과들이 지정한 상태 제한들을 하나라도 제한하는지 확인한다.
      *
      * @param restrictions 확인할 상태 제한 비트마스크
      * @return 가지고 있는 어떤 상태 효과라도 지정한 상태 제한을 하나라도 포함하면 {@code true}
-     * @see CombatRestrictions StatusRestrictions
+     * @see CombatRestrictions
      */
     public boolean hasAnyRestriction(long restrictions) {
         for (StatusEffect statusEffect : statusEffects) {
             if ((statusEffect.getCombatRestrictions(combatEntity) & restrictions) != 0)
                 return true;
         }
+
         return false;
     }
 
     /**
-     * 엔티티가 가지고 잇는 효과들이 지정한 상태 제한들을 모두 제한하는지 확인한다.
+     * 엔티티가 가지고 있는 효과들이 지정한 상태 제한들을 모두 제한하는지 확인한다.
      *
      * @param restrictions 확인할 상태 제한 비트마스크
      * @return 가지고 있는 모든 상태 효과의 조합이 지정한 상태 제한을 모두 포함하면 {@code true}
-     * @see CombatRestrictions StatusRestrictions
+     * @see CombatRestrictions
      */
     public boolean hasAllRestriction(long restrictions) {
         long combinedRestrictions = CombatRestrictions.NONE;
         for (StatusEffect statusEffect : statusEffects) {
             combinedRestrictions |= statusEffect.getCombatRestrictions(combatEntity);
         }
+
         return (combinedRestrictions & restrictions) == restrictions;
     }
 

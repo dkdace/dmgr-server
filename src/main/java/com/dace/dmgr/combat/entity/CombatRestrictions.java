@@ -4,7 +4,8 @@ import lombok.experimental.UtilityClass;
 
 /**
  * 전투 중 상태 효과, 속성 등으로 제한되는 행동을 나타내는 비트마스크.
- * 비트 연산({@code ~}, {@code &}, {@code |}, {@code ^})을 이용해 제한될 행동의 조합을 표현할 수 있다.
+ * 비트 연산({@code ~}, {@code &}, {@code |}, {@code ^})을 이용해 제한될
+ * 행동의 조합을 표현할 수 있다.
  */
 @UtilityClass
 public final class CombatRestrictions {
@@ -32,7 +33,6 @@ public final class CombatRestrictions {
     public static final long TELEPORT = 1 << 7;
     /** 비행 */
     public static final long FLY = 1 << 8;
-
 
     /** 스킬 사용 */
     public static final long USE_SKILL = 1 << 9;

@@ -44,6 +44,12 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey)
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
+    }
+
+    @Override
     public final long getDuration() {
         return CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
     }
@@ -101,11 +107,5 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     @Override
     public final boolean isDurationFinished() {
         return getDuration() == 0;
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey)
-                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
     }
 }
