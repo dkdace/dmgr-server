@@ -38,11 +38,13 @@ public final class CombatRestrictions {
     public static final long USE_SKILL = 1 << 9;
     /** 무기 사용 */
     public static final long USE_WEAPON = 1 << 10;
+    /** 기본 근접 공격 */
+    public static final long MELEE_ATTACK = 1 << 11;
 
     ////// 마스크 조합 //////
 
     /** 이동기 */
     public static final long ACTION_MOVE = SPRINT | JUMP | PUSH | TELEPORT | FLY;
     /** 행동하기 */
-    public static final long USE_ACTION = USE_SKILL | USE_WEAPON;
+    public static final long USE_ACTION = USE_SKILL | USE_WEAPON | MELEE_ATTACK;
 }

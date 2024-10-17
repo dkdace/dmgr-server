@@ -1418,7 +1418,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse(actionKey) || statusEffectModule.hasAnyRestriction(CombatRestrictions.USE_SKILL))
+        if (!skill.canUse(actionKey))
             return;
 
         skill.onUse(actionKey);

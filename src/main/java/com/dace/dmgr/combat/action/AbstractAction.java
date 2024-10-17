@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -116,7 +117,8 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return isCooldownFinished();
+        return isCooldownFinished()
+                && combatUser.getStatusEffectModule().hasAllRestriction(CombatRestrictions.USE_ACTION);
     }
 
     @Override
