@@ -106,6 +106,6 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey)
-                && combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
     }
 }

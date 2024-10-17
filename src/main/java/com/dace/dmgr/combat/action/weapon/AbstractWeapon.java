@@ -42,7 +42,7 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey)
                 && combatUser.isGlobalCooldownFinished()
-                && combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_WEAPON);
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_WEAPON);
     }
 
     @Override

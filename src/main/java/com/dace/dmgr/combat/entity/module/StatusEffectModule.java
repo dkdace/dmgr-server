@@ -143,7 +143,7 @@ public final class StatusEffectModule {
      * 엔티티가 가지고 잇는 효과들이 지정한 상태 제한들을 하나라도 제한하는지 확인한다.
      *
      * @param restrictions 확인할 상태 제한 비트마스크
-     * @return 가지고 있는 상태 효과 중 지정한 상태 제한이 하나라도 있으면 {@code true}
+     * @return 가지고 있는 어떤 상태 효과라도 지정한 상태 제한을 하나라도 포함하면 {@code true}
      * @see CombatRestrictions StatusRestrictions
      */
     public boolean hasAnyRestriction(long restrictions) {
@@ -158,15 +158,15 @@ public final class StatusEffectModule {
      * 엔티티가 가지고 잇는 효과들이 지정한 상태 제한들을 모두 제한하는지 확인한다.
      *
      * @param restrictions 확인할 상태 제한 비트마스크
-     * @return 가지고 있는 상태 효과 중 지정한 상태 제한이 모두 있으면 {@code true}
+     * @return 가지고 있는 모든 상태 효과의 조합이 지정한 상태 제한을 모두 포함하면 {@code true}
      * @see CombatRestrictions StatusRestrictions
      */
     public boolean hasAllRestriction(long restrictions) {
+        long combinedRestrictions = CombatRestrictions.NONE;
         for (StatusEffect statusEffect : statusEffects) {
-            if ((statusEffect.getCombatRestrictions(combatEntity) & restrictions) == restrictions)
-                return true;
+            combinedRestrictions |= statusEffect.getCombatRestrictions(combatEntity);
         }
-        return false;
+        return (combinedRestrictions & restrictions) == restrictions;
     }
 
     /**

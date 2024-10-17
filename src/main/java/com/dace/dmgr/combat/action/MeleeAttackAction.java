@@ -57,7 +57,7 @@ public final class MeleeAttackAction extends AbstractAction {
         Validate.notNull(combatUser.getCharacterType());
         return super.canUse(actionKey)
                 && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser)
-                && combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
                 && combatUser.isGlobalCooldownFinished();
     }
 
