@@ -30,7 +30,7 @@ public final class CombatRestrictions {
     public static final long PUSH = 1 << 6;
     /** 텔레포트함 */
     public static final long TELEPORT = 1 << 7;
-    /** 텔레포트함 */
+    /** 비행 */
     public static final long FLY = 1 << 8;
 
 
