@@ -651,7 +651,17 @@ public enum NamedSound {
             new DefinedSound("random.explosion_reverb", 7, 0.6)
     ),
     /** 전투 - '체드' 궁극기 - 화염 지대 틱 효과음 */
-    COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1));
+    COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1)),
+    /** 전투 - '팔라스' 무기 - 사용 */
+    COMBAT_PALAS_WEAPON_USE(
+            new DefinedSound("random.gun.vssvintorez", 2.5, 1.3),
+            new DefinedSound("random.gun2.qbz_95_1", 2.5, 0.9),
+            new DefinedSound("random.gun_reverb", 3.5, 1.1)
+    ),
+    /** 전투 - '팔라스' 무기 - 조준 활성화 */
+    COMBAT_PALAS_WEAPON_AIM_ON(new DefinedSound(Sound.ENTITY_WOLF_HOWL, 0.4, 2)),
+    /** 전투 - '팔라스' 무기 - 조준 비활성화 */
+    COMBAT_PALAS_WEAPON_AIM_OFF(new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 0.4, 2));
 
     /** 지정된 효과음 목록 */
     @NonNull
