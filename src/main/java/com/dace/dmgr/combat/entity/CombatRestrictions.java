@@ -30,17 +30,19 @@ public final class CombatRestrictions {
     public static final long PUSH = 1 << 6;
     /** 텔레포트함 */
     public static final long TELEPORT = 1 << 7;
+    /** 텔레포트함 */
+    public static final long FLY = 1 << 8;
 
 
     /** 스킬 사용 */
-    public static final long USE_SKILL = 1 << 8;
+    public static final long USE_SKILL = 1 << 9;
     /** 무기 사용 */
-    public static final long USE_WEAPON = 1 << 9;
-    
+    public static final long USE_WEAPON = 1 << 10;
+
     ////// 마스크 조합 //////
 
     /** 이동기 */
-    public static final long ACTION_MOVE = SPRINT | JUMP | PUSH | TELEPORT;
+    public static final long ACTION_MOVE = SPRINT | JUMP | PUSH | TELEPORT | FLY;
     /** 행동하기 */
     public static final long USE_ACTION = USE_SKILL | USE_WEAPON;
 }

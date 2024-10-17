@@ -581,7 +581,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(character);
         return !isDead()
                 && character.canFly(this)
-                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.USE_SKILL);
+                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.FLY);
     }
 
     @Override
