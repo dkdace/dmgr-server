@@ -23,9 +23,7 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
-import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
@@ -569,15 +567,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private boolean canSprint() {
         Validate.notNull(character);
-
-        if (isDead())
-            return false;
-        if (!character.canSprint(this))
-            return false;
-        if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) || statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) ||
-                statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING))
-            return false;
-        return propertyManager.getValue(Property.FREEZE) < JagerT1Info.NO_SPRINT;
+        return !isDead()
+                && character.canSprint(this)
+                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.SPRINT);
     }
 
     /**
@@ -587,13 +579,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private boolean canFly() {
         Validate.notNull(character);
-
-        if (isDead())
-            return false;
-        if (!character.canFly(this))
-            return false;
-        return !statusEffectModule.hasStatusEffectType(StatusEffectType.STUN) && !statusEffectModule.hasStatusEffectType(StatusEffectType.SNARE) &&
-                !statusEffectModule.hasStatusEffectType(StatusEffectType.GROUNDING) && !statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE);
+        return !isDead()
+                && character.canFly(this)
+                && !statusEffectModule.hasAnyRestriction(CombatRestrictions.FLY);
     }
 
     @Override
@@ -1354,7 +1342,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         actions.forEach(action -> {
             if (isDead() || action == null)
                 return;
-            if (statusEffectModule.hasStatusEffectType(StatusEffectType.STUN))
+            if (statusEffectModule.hasAllRestriction(CombatRestrictions.USE_ACTION))
                 return;
 
             if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
@@ -1430,7 +1418,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param skill     스킬
      */
     private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (!skill.canUse(actionKey) || statusEffectModule.hasStatusEffectType(StatusEffectType.SILENCE))
+        if (!skill.canUse(actionKey))
             return;
 
         skill.onUse(actionKey);

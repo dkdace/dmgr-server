@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -75,8 +75,8 @@ public class MoveModule {
      * @return 이동 가능 여부
      */
     private boolean canMove() {
-        return combatEntity instanceof Damageable && !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) &&
-                !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE);
+        return combatEntity instanceof Damageable
+                && !((Damageable) combatEntity).getStatusEffectModule().hasAllRestriction(CombatRestrictions.DEFAULT_MOVE);
     }
 
     /**
@@ -86,9 +86,9 @@ public class MoveModule {
      * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
      */
     public final void push(@NonNull Vector velocity, boolean isReset) {
-        if (combatEntity instanceof Damageable && !((Damageable) combatEntity).getKnockbackModule().isKnockbacked() &&
-                !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) &&
-                !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING))
+        if (combatEntity instanceof Damageable
+                && !((Damageable) combatEntity).getKnockbackModule().isKnockbacked()
+                && !((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.PUSH))
             combatEntity.getEntity().setVelocity(isReset ? velocity : combatEntity.getEntity().getVelocity().add(velocity));
     }
 
@@ -107,8 +107,8 @@ public class MoveModule {
      * @param location 이동할 위치
      */
     public final void teleport(@NonNull Location location) {
-        if (combatEntity instanceof Damageable && (((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
-                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING)))
+        if (combatEntity instanceof Damageable
+                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.TELEPORT))
             return;
 
         if (combatEntity.getEntity() instanceof Player) {
