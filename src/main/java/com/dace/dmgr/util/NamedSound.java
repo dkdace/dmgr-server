@@ -661,11 +661,30 @@ public enum NamedSound {
     /** 전투 - '팔라스' 무기 - 조준 활성화 */
     COMBAT_PALAS_WEAPON_AIM_ON(new DefinedSound(Sound.ENTITY_WOLF_HOWL, 0.4, 2)),
     /** 전투 - '팔라스' 무기 - 조준 비활성화 */
-    COMBAT_PALAS_WEAPON_AIM_OFF(new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 0.4, 2));
+    COMBAT_PALAS_WEAPON_AIM_OFF(new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 0.4, 2)),
+    /** 전투 - '팔라스' 액티브 1번 - 사용 */
+    COMBAT_PALAS_A1_USE(new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6)),
+    /** 전투 - '팔라스' 액티브 1번 - 사용 준비 */
+    COMBAT_PALAS_A1_USE_READY(
+            new DefinedSound(Sound.ENTITY_ARROW_SHOOT, 1.5, 0.5),
+            new DefinedSound("random.gun.m1911_silencer", 1.5, 0.8)
+    ),
+    /** 전투 - '팔라스' 액티브 1번 - 엔티티 타격 */
+    COMBAT_PALAS_A1_HIT_ENTITY(
+            new DefinedSound(Sound.ENTITY_FIREWORK_TWINKLE, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+            new DefinedSound("random.stab", 2, 2)
+    ),
+    /** 전투 - '팔라스' 액티브 1번 - 틱 효과음 */
+    COMBAT_PALAS_A1_TICK(
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.8)
+    );
 
     /** 지정된 효과음 목록 */
     @NonNull
-    private final DefinedSound @NonNull [] definedSounds;
+    private final DefinedSound
+    @NonNull [] definedSounds;
 
     NamedSound(DefinedSound @NonNull ... definedSounds) {
         this.definedSounds = definedSounds;

@@ -11,13 +11,13 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.NeaceUltInfo;
+import com.dace.dmgr.combat.character.palas.action.PalasA1;
+import com.dace.dmgr.combat.character.palas.action.PalasA1Info;
 import com.dace.dmgr.combat.character.palas.action.PalasWeapon;
 import com.dace.dmgr.combat.character.palas.action.PalasWeaponInfo;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,6 +30,7 @@ import java.util.StringJoiner;
  * 전투원 - 팔라스 클래스.
  *
  * @see PalasWeapon
+ * @see PalasA1
  */
 public final class Palas extends Support {
     /** 치유 점수 */
@@ -150,6 +151,15 @@ public final class Palas extends Support {
     }
 
     @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+        if (!(victim instanceof CombatUser) || score >= 100)
+            return;
+
+        if (CooldownUtil.getCooldown(attacker, PalasA1.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
+    }
+
+    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         return !((PalasWeapon) combatUser.getWeapon()).getAimModule().isAiming();
     }
@@ -176,6 +186,8 @@ public final class Palas extends Support {
     @Nullable
     public ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
         switch (number) {
+            case 1:
+                return PalasA1Info.getInstance();
             case 4:
                 return NeaceUltInfo.getInstance();
             default:
