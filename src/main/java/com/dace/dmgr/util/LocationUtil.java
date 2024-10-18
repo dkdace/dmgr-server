@@ -23,7 +23,7 @@ import java.util.List;
 @UtilityClass
 public final class LocationUtil {
     /** 로비 스폰 위치 */
-    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 72.5, 64, 39.5, 90, 0);
+    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 15.5, 86, 34.5, 90, 0);
     /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
     private static final double CAN_PASS_INTERVAL = 0.25;
     /** {@link LocationUtil#canPass(Location, Location)}의 최대 거리 */
