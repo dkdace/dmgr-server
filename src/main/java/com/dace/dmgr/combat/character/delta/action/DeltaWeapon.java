@@ -31,7 +31,7 @@ public final class DeltaWeapon extends AbstractWeapon implements FullAuto {
     @Nullable
     private Damageable target = null;
 
-    protected DeltaWeapon(@NonNull CombatUser combatUser) {
+    public DeltaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, DeltaWeaponInfo.getInstance());
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
     }
