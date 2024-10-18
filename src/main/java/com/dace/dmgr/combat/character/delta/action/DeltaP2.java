@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.character.delta.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.util.GlowUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -40,15 +42,22 @@ public class DeltaP2 extends AbstractSkill {
         if (combatUser.getGame() == null)
             return;
 
-        Arrays.stream(combatUser.getGame().getAllCombatEntities())
-                .filter(target -> target.isEnemy(combatUser))
-                .filter(target -> combatUser.getCenterLocation().distance(target.getCenterLocation())
-                        <= DeltaP2Info.DETECT_RADIUS)
-                .filter(target -> target instanceof Damageable)
-                .map(target -> (Damageable) target)
-                .filter(target -> target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2)
-                .forEach(combatEntity -> GlowUtil.setGlowing(
-                        combatEntity.getEntity(), ChatColor.RED, combatUser.getEntity(), 1));
+        CombatEntity[] targets = CombatUtil.getNearCombatEntities(
+                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP2Info.DETECT_RADIUS, this::isTarget);
+
+        for (CombatEntity target: targets) {
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 1);
+        }
+    }
+
+    private boolean isTarget(CombatEntity combatEntity) {
+        if (!(combatEntity instanceof Damageable))
+            return false;
+
+        DamageModule damageModule = ((Damageable) combatEntity).getDamageModule();
+
+        return combatEntity.isEnemy(combatUser)
+                && damageModule.getHealth() <= damageModule.getMaxHealth() / 2;
     }
 }
 
