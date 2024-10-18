@@ -25,14 +25,14 @@ public final class Delta extends Controller {
     private static final Delta instance = new Delta();
 
     private Delta() {
-        super("델타", "데이드리머", "DVDelta", '\u32DA', 5, 1024, 1.0, 1.0);
+        super(null, "델타", "데이드리머", "DVDelta", '\u32DA', 5, 1024, 1.0, 1.0);
     }
 
     @Override
     public @NonNull String @NonNull [] getReqHealMent() {
         return new String[] {
                 "데이터 손상이 심각합니다. 즉시 백업을...",
-                "베드 섹터 발생... 가급적 빨리 수리해야겠군요.",
+                "배드 섹터 발생... 가급적 빨리 수리해야겠군요.",
                 "딜레이 발생. 조금 손상을 입은 모양이네요."
         };
     }
@@ -138,7 +138,10 @@ public final class Delta extends Controller {
     @Override
     public @Nullable TraitInfo getCharacterTraitInfo(int number) {
         switch (number) {
+            case 1:
+                return DeltaT1Info.getInstance();
+            default:
+                return null;
         }
-        return null;
     }
 }
