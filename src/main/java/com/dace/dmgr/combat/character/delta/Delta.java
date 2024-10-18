@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.delta;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
@@ -9,6 +10,7 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.delta.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
@@ -100,11 +102,32 @@ public final class Delta extends Controller {
 
     @Override
     public @NonNull String getActionbarString(@NonNull CombatUser combatUser) {
+        DeltaP1 skillp1 = combatUser.getSkill(DeltaP1Info.getInstance());
+
+        double skillp1Cooldown = skillp1.getCooldown() / 20.0;
+        double skillp1MaxCooldown = skillp1.getDefaultCooldown() / 20.0;
+
         StringJoiner text = new StringJoiner("    ");
 
-        // TODO
+        String skillp1Display = null;
+        if (!skillp1.isDurationFinished())
+            skillp1Display = DeltaP1Info.getInstance() + " §a당신은 투명화 상태입니다.";
+        else if (!skillp1.canUse(skillp1.getDefaultActionKeys()[0]))
+            skillp1Display = DeltaP1Info.getInstance() + " §c적이 너무 가까이 있습니다.";
+        else
+            skillp1Display = StringFormUtil.getActionbarCooldownBar(
+                    DeltaP1Info.getInstance().toString(), skillp1Cooldown, skillp1MaxCooldown, 10, '■');
+        text.add(skillp1Display);
 
         return text.toString();
+    }
+
+    @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        if (i % 5 == 0) {
+            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.useAction(ActionKey.PERIODIC_2);
+        }
     }
 
     @Override
