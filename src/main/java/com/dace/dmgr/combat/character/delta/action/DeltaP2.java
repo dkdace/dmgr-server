@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.GlowUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -39,11 +40,13 @@ public class DeltaP2 extends AbstractSkill {
         if (combatUser.getGame() == null)
             return;
 
-        // 감지 범위 내에 있는 적 엔티티에 발광 부여
         Arrays.stream(combatUser.getGame().getAllCombatEntities())
-                .filter(combatEntity -> !combatEntity.getTeamIdentifier().equals(combatUser.getTeamIdentifier()))
-                .filter(combatEntity -> combatUser.getCenterLocation().distance(combatEntity.getCenterLocation())
+                .filter(target -> target.isEnemy(combatUser))
+                .filter(target -> combatUser.getCenterLocation().distance(target.getCenterLocation())
                         <= DeltaP2Info.DETECT_RADIUS)
+                .filter(target -> target instanceof Damageable)
+                .map(target -> (Damageable) target)
+                .filter(target -> target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2)
                 .forEach(combatEntity -> GlowUtil.setGlowing(
                         combatEntity.getEntity(), ChatColor.RED, combatUser.getEntity(), 1));
     }
