@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.module;
 
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.util.CooldownUtil;
 import lombok.Getter;
@@ -64,6 +65,9 @@ public final class KnockbackModule {
      * @see MoveModule#push(Vector, boolean)
      */
     public void knockback(@NonNull Vector velocity, boolean isReset) {
+        if (combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.KNOCKBACKED))
+            return;
+
         CooldownUtil.setCooldown(combatEntity, COOLDOWN_ID, 3);
         Vector finalVelocity = velocity.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
         combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));

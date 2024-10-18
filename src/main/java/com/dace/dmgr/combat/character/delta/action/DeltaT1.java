@@ -81,7 +81,7 @@ public final class DeltaT1 {
         @Override
         public long getCombatRestrictions(@NonNull Damageable combatEntity) {
             return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE | CombatRestrictions.USE_ACTION |
-                    CombatRestrictions.DAMAGED | CombatRestrictions.HEALED;
+                    CombatRestrictions.DAMAGED | CombatRestrictions.HEALED | CombatRestrictions.KNOCKBACKED;
         }
     }
 }
