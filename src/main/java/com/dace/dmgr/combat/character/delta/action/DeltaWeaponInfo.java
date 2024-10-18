@@ -34,6 +34,6 @@ public class DeltaWeaponInfo extends WeaponInfo<DeltaWeapon> {
      */
     @UtilityClass
     public static class RESOURCE {
-        public static final short DEFAULT = 5;
+        public static final short DEFAULT = 20;
     }
 }
