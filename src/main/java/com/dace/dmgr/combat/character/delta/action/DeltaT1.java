@@ -18,6 +18,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public final class DeltaT1 {
+    /**
+     * 피격자를 일정 시간 '잠금' 상태로 만든다.
+     * @param attacker 공격자
+     * @param victim 피격자
+     * @param duration 지속 시간 (단위: tick)
+     */
     static void setLocked(@NonNull CombatUser attacker, @NonNull Damageable victim, int duration) {
         victim.getStatusEffectModule().applyStatusEffect(attacker, new Locked(), duration);
     }
@@ -27,6 +33,9 @@ public final class DeltaT1 {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class Locked implements StatusEffect {
+        /** 수정자 ID */
+        private static final String MODIFIER_ID = "DeltaT1";
+
         private Location startLocation;
         private final Collection<Player> glowViewers = new ArrayList<>();
 
@@ -43,6 +52,8 @@ public final class DeltaT1 {
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getEntity().setGravity(false);
+
+            combatEntity.getKnockbackModule().getResistanceStatus().addModifier(MODIFIER_ID, DeltaT1Info.KNOCKBACK_RESISTANCE);
 
             startLocation = combatEntity.getEntity().getLocation();
 
@@ -73,6 +84,8 @@ public final class DeltaT1 {
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getEntity().setGravity(true);
+
+            combatEntity.getKnockbackModule().getResistanceStatus().removeModifier(MODIFIER_ID);
 
             for (Player glowViewer: glowViewers)
                 GlowUtil.removeGlowing(combatEntity.getEntity(), glowViewer);

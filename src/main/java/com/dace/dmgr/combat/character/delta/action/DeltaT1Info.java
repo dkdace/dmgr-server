@@ -4,6 +4,9 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import lombok.Getter;
 
 public final class DeltaT1Info extends TraitInfo {
+    /** 넉백 저항력 (%) */
+    public static final int KNOCKBACK_RESISTANCE = 100;
+
     @Getter
     private static final DeltaT1Info instance = new DeltaT1Info();
 

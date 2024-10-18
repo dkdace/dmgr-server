@@ -33,7 +33,7 @@ public final class AbilityStatus {
     /**
      * 기본값에 모든 수정자를 적용한 최종 값을 반환한다.
      *
-     * @return {@link AbilityStatus#baseValue} + (100+모든 수정자({@link AbilityStatus#modifiers}) 값의 합)/100
+     * @return {@link AbilityStatus#baseValue} * (100+모든 수정자({@link AbilityStatus#modifiers}) 값의 합)/100
      */
     public double getValue() {
         double valueSum = 0;
