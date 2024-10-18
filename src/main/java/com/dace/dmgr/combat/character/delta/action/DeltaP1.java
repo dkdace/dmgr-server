@@ -5,6 +5,8 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
 
+import java.util.Arrays;
+
 public final class DeltaP1 extends AbstractSkill {
 
     public DeltaP1(@NonNull CombatUser combatUser) {
@@ -29,7 +31,5 @@ public final class DeltaP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-
-
     }
 }
