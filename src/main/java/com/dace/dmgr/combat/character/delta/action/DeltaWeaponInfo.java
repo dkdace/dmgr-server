@@ -8,9 +8,12 @@ import lombok.experimental.UtilityClass;
 import java.text.MessageFormat;
 
 public class DeltaWeaponInfo extends WeaponInfo<DeltaWeapon> {
+    /** 초당 데미지 */
     public static final int DAMAGE_PER_SECOND = 128;
-
+    /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 16;
+    /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
+    public static final long BLOCK_RESET_DELAY = 2 * 20;
 
     @Getter
     private static final DeltaWeaponInfo instance = new DeltaWeaponInfo();
