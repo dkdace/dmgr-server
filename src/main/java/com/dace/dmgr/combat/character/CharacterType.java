@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.character.arkace.Arkace;
 import com.dace.dmgr.combat.character.ched.Ched;
+import com.dace.dmgr.combat.character.delta.Delta;
 import com.dace.dmgr.combat.character.inferno.Inferno;
 import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.character.magritta.Magritta;
@@ -47,7 +48,9 @@ public enum CharacterType {
 
     NEACE(Neace.getInstance()),
 
-    VELLION(Vellion.getInstance());
+    VELLION(Vellion.getInstance()),
+    DELTA(Delta.getInstance()),
+    ;
 
     /** 전투원 정보 */
     @NonNull
