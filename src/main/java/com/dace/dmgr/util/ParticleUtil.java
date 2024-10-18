@@ -32,7 +32,7 @@ public final class ParticleUtil {
                             double offsetY, double offsetZ, double speed) {
         WrapperPlayServerWorldParticles packet = getParticlePacket(particle, location, count, offsetX, offsetY, offsetZ, (float) speed);
 
-        packet.broadcastPacket();
+        location.getWorld().getPlayers().forEach(packet::sendPacket);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class ParticleUtil {
             WrapperPlayServerWorldParticles packet = getRGBParticlePacket(coloredParticle, location, offsetX, offsetY, offsetZ,
                     Math.max(1, red), Math.max(1, green), Math.max(1, blue));
 
-            packet.broadcastPacket();
+            location.getWorld().getPlayers().forEach(packet::sendPacket);
         }
     }
 
@@ -129,7 +129,7 @@ public final class ParticleUtil {
         WrapperPlayServerWorldParticles packet = getBlockParticlePacket(blockParticle, material, data, location, count, offsetX,
                 offsetY, offsetZ, (float) speed);
 
-        packet.broadcastPacket();
+        location.getWorld().getPlayers().forEach(packet::sendPacket);
     }
 
     /**
