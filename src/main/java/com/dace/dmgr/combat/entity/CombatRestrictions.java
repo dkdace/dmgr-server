@@ -15,37 +15,35 @@ public final class CombatRestrictions {
     ////// 기본 마스크 //////
 
     /** 피해 입기 */
-    public static final long DAMAGED        = 1 << 0;
+    public static final long DAMAGED = 1 << 0;
     /** 치료 받기 */
-    public static final long HEALED         = 1 << 1;
+    public static final long HEALED = 1 << 1;
     /** 사운드 듣기 */
-    public static final long HEAR           = 1 << 2;
-    /** 넉백으로 밀려나기 */
-    public static final long KNOCKBACKED    = 1 << 3;
+    public static final long HEAR = 1 << 2;
 
     /** 기본 이동 */
-    public static final long DEFAULT_MOVE   = 1 << 4;
+    public static final long DEFAULT_MOVE = 1 << 3;
     /** 달리기 */
-    public static final long SPRINT         = 1 << 5;
+    public static final long SPRINT = 1 << 4;
     /** 점프 */
-    public static final long JUMP           = 1 << 6;
+    public static final long JUMP = 1 << 5;
     /** 스스로 밀음 */
-    public static final long PUSH           = 1 << 7;
+    public static final long PUSH = 1 << 6;
     /** 텔레포트함 */
-    public static final long TELEPORT       = 1 << 8;
+    public static final long TELEPORT = 1 << 7;
     /** 비행 */
-    public static final long FLY            = 1 << 9;
+    public static final long FLY = 1 << 8;
 
     /** 스킬 사용 */
-    public static final long USE_SKILL      = 1 << 10;
+    public static final long USE_SKILL = 1 << 9;
     /** 무기 사용 */
-    public static final long USE_WEAPON     = 1 << 11;
+    public static final long USE_WEAPON = 1 << 10;
     /** 기본 근접 공격 */
-    public static final long MELEE_ATTACK   = 1 << 12;
+    public static final long MELEE_ATTACK = 1 << 11;
 
     ////// 마스크 조합 //////
 
-    /** 이동기로 인한 움직임 */
+    /** 이동기 */
     public static final long ACTION_MOVE = SPRINT | JUMP | PUSH | TELEPORT | FLY;
     /** 행동하기 */
     public static final long USE_ACTION = USE_SKILL | USE_WEAPON | MELEE_ATTACK;
