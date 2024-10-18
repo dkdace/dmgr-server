@@ -61,6 +61,7 @@ public final class DeltaWeapon extends AbstractWeapon implements FullAuto {
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, DeltaWeaponInfo.BLOCK_RESET_DELAY);
 
+                DeltaP1.cancel(combatUser);
                 target.getDamageModule().damage(combatUser, DeltaWeaponInfo.DAMAGE_PER_SECOND / 20,
                         DamageType.NORMAL, target.getCenterLocation(), false, true);
                 playParticles(target);

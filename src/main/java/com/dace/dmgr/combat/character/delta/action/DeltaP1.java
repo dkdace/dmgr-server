@@ -64,4 +64,14 @@ public final class DeltaP1 extends AbstractSkill {
             combatUser.getEntity().showPlayer(DMGR.getPlugin(), player);
         }
     }
+
+    /**
+     * 델타의 '암호화' 패시브 스킬을 사용 중이라면 해제합니다.
+     * @param combatUser 사용자
+     */
+    public static void cancel(CombatUser combatUser) {
+        DeltaP1 skill = combatUser.getSkill(DeltaP1Info.getInstance());
+        if (!skill.isDurationFinished() && skill.isCancellable())
+            skill.onCancelled();
+    }
 }

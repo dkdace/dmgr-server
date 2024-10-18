@@ -1,11 +1,13 @@
 package com.dace.dmgr.combat.character.delta;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.*;
+import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.delta.action.*;
@@ -125,6 +127,11 @@ public final class Delta extends Controller {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
+            DeltaP1 skillp1 = combatUser.getSkill(DeltaP1Info.getInstance());
+            if (!skillp1.canUse(ActionKey.PERIODIC_1)) {
+                DeltaP1.cancel(combatUser);
+            }
+
             combatUser.useAction(ActionKey.PERIODIC_1);
             combatUser.useAction(ActionKey.PERIODIC_2);
         }
