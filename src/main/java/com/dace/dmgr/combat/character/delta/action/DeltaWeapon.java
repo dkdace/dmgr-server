@@ -57,15 +57,14 @@ public final class DeltaWeapon extends AbstractWeapon implements FullAuto {
                 }
                 target.getDamageModule().damage(combatUser, DeltaWeaponInfo.DAMAGE_PER_SECOND / 20,
                         DamageType.NORMAL, target.getCenterLocation(), false, true);
-                drawParticles(target);
-                // todo: sound 바꾸기
-                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
+                playParticles(target);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_DELTA_WEAPON_USE, combatUser.getEntity().getLocation());
             default:
                 break;
         }
     }
 
-    private void drawParticles(@NonNull Damageable target) {
+    private void playParticles(@NonNull Damageable target) {
         Location location = combatUser.getArmLocation(true);
         for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8)) {
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
