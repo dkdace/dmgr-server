@@ -9,7 +9,7 @@ import java.text.MessageFormat;
 
 public class DeltaWeaponInfo extends WeaponInfo<DeltaWeapon> {
     /** 초당 데미지 */
-    public static final int DAMAGE_PER_SECOND = 128;
+    public static final int DAMAGE_PER_SECOND = 256;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 16;
     /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
