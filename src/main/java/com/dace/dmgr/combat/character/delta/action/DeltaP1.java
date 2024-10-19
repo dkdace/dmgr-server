@@ -6,8 +6,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public final class DeltaP1 extends AbstractSkill {
@@ -35,16 +37,16 @@ public final class DeltaP1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !isEnemyNearby();
+        return super.canUse(actionKey) && !isLivingEnemyNearby();
     }
 
     /**
-     * 감지 범위 이내에 적이 있는지 체크합니다.
+     * 감지 범위 이내에 적 생명체가 있는지 체크합니다.
      * @return 적이 있는지 여부
      */
-    public boolean isEnemyNearby() {
+    public boolean isLivingEnemyNearby() {
         CombatEntity enemy = CombatUtil.getNearCombatEntity(
-                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP1Info.DETECT_RADIUS, combatUser::isEnemy);
+                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP1Info.DETECT_RADIUS, this::isLivingEnemy);
 
         return enemy != null;
     }
@@ -72,6 +74,12 @@ public final class DeltaP1 extends AbstractSkill {
         combatUser.getUser().sendAlert("암호화가 해제되었습니다!");
         combatUser.stopHiding();
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+    }
+
+    private boolean isLivingEnemy(CombatEntity target) {
+        if (!(target instanceof Damageable))
+            return false;
+        return combatUser.isEnemy(target) && ((Damageable) target).getDamageModule().isLiving();
     }
 
     /**

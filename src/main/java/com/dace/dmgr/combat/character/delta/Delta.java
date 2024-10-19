@@ -12,10 +12,13 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.delta.action.*;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -115,7 +118,7 @@ public final class Delta extends Controller {
         String skillp1Display = null;
         if (!skillp1.isDurationFinished())
             skillp1Display = DeltaP1Info.getInstance() + " §a당신은 투명화 상태입니다.";
-        else if (skillp1.isEnemyNearby())
+        else if (skillp1.isLivingEnemyNearby())
             skillp1Display = DeltaP1Info.getInstance() + " §c근처에 적이 있습니다.";
         else
             skillp1Display = StringFormUtil.getActionbarCooldownBar(
@@ -129,13 +132,20 @@ public final class Delta extends Controller {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
             DeltaP1 skillp1 = combatUser.getSkill(DeltaP1Info.getInstance());
-            if (skillp1.isEnemyNearby()) {
+            if (skillp1.isLivingEnemyNearby()) {
                 DeltaP1.cancelAndReset(combatUser);
             }
 
             combatUser.useAction(ActionKey.PERIODIC_1);
             combatUser.useAction(ActionKey.PERIODIC_2);
         }
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+        super.onDamage(victim, attacker, damage, damageType, location, isCrit);
+
+        DeltaP1.cancelAndReset(victim);
     }
 
     @Override
