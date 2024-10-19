@@ -70,11 +70,7 @@ public final class DeltaP1 extends AbstractSkill {
         setDuration(0);
 
         combatUser.getUser().sendAlert("암호화가 해제되었습니다!");
-
-        for (Player player: DMGR.getPlugin().getServer().getOnlinePlayers()) {
-            player.showPlayer(DMGR.getPlugin(), combatUser.getEntity());
-        }
-
+        combatUser.stopHiding();
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 

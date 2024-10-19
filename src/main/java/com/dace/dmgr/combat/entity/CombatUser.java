@@ -1265,6 +1265,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
+     * 플레이어의 은신을 모든 플레이어에게서 해제한다.
+     */
+    public void stopHiding() {
+        for (Player player: DMGR.getPlugin().getServer().getOnlinePlayers()) {
+            player.showPlayer(DMGR.getPlugin(), this.getEntity());
+        }
+    }
+
+    /**
      * 플레이어의 상태를 초기화한다.
      */
     private void reset() {
@@ -1286,6 +1295,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         attackModule.getDamageMultiplierStatus().clearModifier();
         damageModule.getDefenseMultiplierStatus().clearModifier();
         moveModule.getSpeedStatus().clearModifier();
+
+        stopHiding();
     }
 
     /**

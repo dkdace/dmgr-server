@@ -37,16 +37,13 @@ public class DeltaP2 extends AbstractSkill {
     }
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        setCooldown();
-
-        if (combatUser.getGame() == null)
-            return;
+        setDuration();
 
         CombatEntity[] targets = CombatUtil.getNearCombatEntities(
                 combatUser.getGame(), combatUser.getCenterLocation(), DeltaP2Info.DETECT_RADIUS, this::isTarget);
 
         for (CombatEntity target: targets) {
-            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 1);
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 5);
         }
     }
 
