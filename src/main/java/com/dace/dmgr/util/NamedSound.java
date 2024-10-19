@@ -652,6 +652,8 @@ public enum NamedSound {
     ),
     /** 전투 - '체드' 궁극기 - 화염 지대 틱 효과음 */
     COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1)),
+    /** 전투 - '델타' 발소리 */
+    COMBAT_DELTA_FOOTSTEP(new DefinedSound(Sound.ENTITY_IRONGOLEM_STEP, 0.6, 1.2)),
     /** 전투 - '델타' 무기 - 타격 */
     COMBAT_DELTA_WEAPON_USE(new DefinedSound("random.charge", 0.3, 1.2));
 

@@ -15,6 +15,8 @@ import com.dace.dmgr.combat.character.delta.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -146,6 +148,11 @@ public final class Delta extends Controller {
         super.onDamage(victim, attacker, damage, damageType, location, isCrit);
 
         DeltaP1.cancelAndReset(victim);
+    }
+
+    @Override
+    public void onFootstep(@NonNull CombatUser combatUser, double volume) {
+        SoundUtil.playNamedSound(NamedSound.COMBAT_DELTA_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
     }
 
     @Override
