@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.character.neace.action.NeaceWeaponInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -61,7 +60,7 @@ public final class DeltaWeapon extends AbstractWeapon implements FullAuto {
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, DeltaWeaponInfo.BLOCK_RESET_DELAY);
 
-                DeltaP1.cancel(combatUser);
+                DeltaP1.cancelAndReset(combatUser);
                 target.getDamageModule().damage(combatUser, DeltaWeaponInfo.DAMAGE_PER_SECOND / 20,
                         DamageType.NORMAL, target.getCenterLocation(), false, true);
                 playParticles(target);

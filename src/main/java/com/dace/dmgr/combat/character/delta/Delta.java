@@ -115,8 +115,8 @@ public final class Delta extends Controller {
         String skillp1Display = null;
         if (!skillp1.isDurationFinished())
             skillp1Display = DeltaP1Info.getInstance() + " §a당신은 투명화 상태입니다.";
-        else if (!skillp1.canUse(skillp1.getDefaultActionKeys()[0]))
-            skillp1Display = DeltaP1Info.getInstance() + " §c적이 너무 가까이 있습니다.";
+        else if (skillp1.isEnemyNearby())
+            skillp1Display = DeltaP1Info.getInstance() + " §c근처에 적이 있습니다.";
         else
             skillp1Display = StringFormUtil.getActionbarCooldownBar(
                     DeltaP1Info.getInstance().toString(), skillp1Cooldown, skillp1MaxCooldown, 10, '■');
@@ -129,8 +129,8 @@ public final class Delta extends Controller {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
             DeltaP1 skillp1 = combatUser.getSkill(DeltaP1Info.getInstance());
-            if (!skillp1.canUse(ActionKey.PERIODIC_1)) {
-                DeltaP1.cancel(combatUser);
+            if (skillp1.isEnemyNearby()) {
+                DeltaP1.cancelAndReset(combatUser);
             }
 
             combatUser.useAction(ActionKey.PERIODIC_1);
