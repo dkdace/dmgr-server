@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
+import com.dace.dmgr.combat.character.arkace.action.ArkaceUltInfo;
 import com.dace.dmgr.combat.character.delta.action.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
@@ -156,12 +157,17 @@ public final class Delta extends Controller {
 
     @Override
     public @Nullable ActiveSkillInfo<? extends ActiveSkill> getActiveSkillInfo(int number) {
-        return null;
+        switch (number) {
+            case 4:
+                return ArkaceUltInfo.getInstance();
+            default:
+                return null;
+        }
     }
 
     @Override
     public @NonNull UltimateSkillInfo<? extends UltimateSkill> getUltimateSkillInfo() {
-        return null;
+        return ArkaceUltInfo.getInstance();
     }
 
 
