@@ -190,6 +190,9 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             case 10:
                 SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 0.8);
                 break;
+            case 12:
+                SoundUtil.play(Sound.ITEM_BOTTLE_EMPTY, combatUser.getEntity().getLocation(), 0.6, 1.4);
+                break;
             case 14:
                 SoundUtil.play(Sound.BLOCK_IRON_TRAPDOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.3);
                 break;
@@ -200,7 +203,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 SoundUtil.play(Sound.ENTITY_CAT_PURREOW, combatUser.getEntity().getLocation(), 0.6, 1.8);
                 break;
             case 32:
-                SoundUtil.play(Sound.BLOCK_BREWING_STAND_BREW, combatUser.getEntity().getLocation(), 0.6, 1.6);
+                SoundUtil.play(Sound.ITEM_BOTTLE_FILL, combatUser.getEntity().getLocation(), 0.6, 1.4);
                 break;
             case 38:
                 SoundUtil.play("new.block.chain.place", combatUser.getEntity().getLocation(), 0.6, 1.6);
