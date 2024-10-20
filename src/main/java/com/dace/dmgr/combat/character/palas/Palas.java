@@ -11,16 +11,16 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.NeaceUltInfo;
-import com.dace.dmgr.combat.character.palas.action.PalasA1;
-import com.dace.dmgr.combat.character.palas.action.PalasA1Info;
-import com.dace.dmgr.combat.character.palas.action.PalasWeapon;
-import com.dace.dmgr.combat.character.palas.action.PalasWeaponInfo;
+import com.dace.dmgr.combat.character.palas.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +31,7 @@ import java.util.StringJoiner;
  *
  * @see PalasWeapon
  * @see PalasA1
+ * @see PalasA2
  */
 public final class Palas extends Support {
     /** 치유 점수 */
@@ -136,6 +137,13 @@ public final class Palas extends Support {
     }
 
     @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
+        new PalasTarget(combatUser).shoot();
+    }
+
+    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
@@ -188,6 +196,8 @@ public final class Palas extends Support {
         switch (number) {
             case 1:
                 return PalasA1Info.getInstance();
+            case 2:
+                return PalasA2Info.getInstance();
             case 4:
                 return NeaceUltInfo.getInstance();
             default:
@@ -199,5 +209,16 @@ public final class Palas extends Support {
     @NonNull
     public NeaceUltInfo getUltimateSkillInfo() {
         return NeaceUltInfo.getInstance();
+    }
+
+    private static final class PalasTarget extends Target {
+        private PalasTarget(CombatUser combatUser) {
+            super(combatUser, PalasA2Info.MAX_DISTANCE, false, combatEntity -> getTargetedActionCondition(combatUser, combatEntity));
+        }
+
+        @Override
+        protected void onFindEntity(@NonNull Damageable target) {
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
+        }
     }
 }

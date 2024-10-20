@@ -679,6 +679,13 @@ public enum NamedSound {
     COMBAT_PALAS_A1_TICK(
             new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
             new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.8)
+    ),
+    /** 전투 - '팔라스' 액티브 2번 - 사용 */
+    COMBAT_PALAS_A2_USE(
+            new DefinedSound(Sound.ENTITY_FIREWORK_SHOOT, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 2),
+            new DefinedSound("new.entity.puffer_fish.blow_out", 2, 1.8)
     );
 
     /** 지정된 효과음 목록 */
