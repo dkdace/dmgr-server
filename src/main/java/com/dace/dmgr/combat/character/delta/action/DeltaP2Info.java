@@ -15,7 +15,7 @@ public class DeltaP2Info extends PassiveSkillInfo<DeltaP2> {
 
     private DeltaP2Info() {
         super(DeltaP2.class, "취약점 탐지",
-                "체력이 절반 이하인 적의 위치를 탐지합니다.",
+                "§f▍ 체력이 절반 이하인 적의 위치를 탐지합니다.",
                 "",
                 MessageFormat.format("§a{0}§f {1}m", TextIcon.RADIUS, DETECT_RADIUS)
         );
