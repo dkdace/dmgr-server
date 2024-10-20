@@ -32,6 +32,7 @@ import java.util.StringJoiner;
  * @see PalasWeapon
  * @see PalasA1
  * @see PalasA2
+ * @see PalasA3
  */
 public final class Palas extends Support {
     /** 치유 점수 */
@@ -198,6 +199,8 @@ public final class Palas extends Support {
                 return PalasA1Info.getInstance();
             case 2:
                 return PalasA2Info.getInstance();
+            case 3:
+                return PalasA3Info.getInstance();
             case 4:
                 return NeaceUltInfo.getInstance();
             default:
