@@ -82,9 +82,6 @@ public enum CharacterType {
                     return false;
 
                 if (clickType == ClickType.LEFT) {
-                    if (CharacterType.this == PALAS)
-                        return false;
-
                     GameUser gameUser = combatUser.getGameUser();
                     boolean isDuplicated = gameUser != null && gameUser.getTeam() != null &&
                             Arrays.stream(gameUser.getTeam().getTeamUsers()).anyMatch(targetGameUser -> {
