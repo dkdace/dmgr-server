@@ -30,6 +30,7 @@ import java.util.StringJoiner;
  * 전투원 - 팔라스 클래스.
  *
  * @see PalasWeapon
+ * @see PalasP1
  * @see PalasA1
  * @see PalasA2
  * @see PalasA3
@@ -188,6 +189,9 @@ public final class Palas extends Support {
     @Override
     @Nullable
     public PassiveSkillInfo<? extends Skill> getPassiveSkillInfo(int number) {
+        if (number == 1)
+            return PalasP1Info.getInstance();
+
         return null;
     }
 

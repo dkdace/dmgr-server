@@ -280,7 +280,14 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
+                boolean isLowHealth = target.getDamageModule().isLowHealth();
+
+                if (((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true) && isLowHealth) {
+                    PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
+                    skillp1.setHealAmount(PalasWeaponInfo.HEAL);
+                    skillp1.setTarget((Healable) target);
+                    combatUser.useAction(ActionKey.PERIODIC_1);
+                }
 
                 ParticleUtil.play(Particle.WATER_SPLASH, getLocation(), 15, 0, 0, 0, 0);
             }
