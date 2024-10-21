@@ -167,6 +167,8 @@ public final class Palas extends Support {
 
         if (CooldownUtil.getCooldown(attacker, PalasA1.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
             attacker.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
+        if (CooldownUtil.getCooldown(attacker, PalasA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", PalasA2Info.ASSIST_SCORE);
     }
 
     @Override
