@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.Support;
-import com.dace.dmgr.combat.character.neace.action.NeaceUltInfo;
 import com.dace.dmgr.combat.character.palas.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -169,6 +168,8 @@ public final class Palas extends Support {
             attacker.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
         if (CooldownUtil.getCooldown(attacker, PalasA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
             attacker.addScore("처치 지원", PalasA2Info.ASSIST_SCORE);
+        if (CooldownUtil.getCooldown(attacker, PalasUlt.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            attacker.addScore("처치 지원", PalasUltInfo.ASSIST_SCORE);
     }
 
     @Override
@@ -208,7 +209,7 @@ public final class Palas extends Support {
             case 3:
                 return PalasA3Info.getInstance();
             case 4:
-                return NeaceUltInfo.getInstance();
+                return PalasUltInfo.getInstance();
             default:
                 return null;
         }
@@ -216,8 +217,8 @@ public final class Palas extends Support {
 
     @Override
     @NonNull
-    public NeaceUltInfo getUltimateSkillInfo() {
-        return NeaceUltInfo.getInstance();
+    public PalasUltInfo getUltimateSkillInfo() {
+        return PalasUltInfo.getInstance();
     }
 
     private static final class PalasTarget extends Target {

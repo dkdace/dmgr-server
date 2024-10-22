@@ -60,8 +60,8 @@ public final class PalasA2 extends ActiveSkill {
      * 해로운 효과 면역 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class PalasA2Immune implements StatusEffect {
-        private static final PalasA2Immune instance = new PalasA2Immune();
+    static final class PalasA2Immune implements StatusEffect {
+        static final PalasA2Immune instance = new PalasA2Immune();
 
         @Override
         @NonNull
@@ -102,6 +102,7 @@ public final class PalasA2 extends ActiveSkill {
             setCooldown();
             combatUser.getWeapon().onCancelled();
 
+            target.getStatusEffectModule().removeStatusEffect(PalasUlt.PalasUltBuff.instance);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
             if (target instanceof CombatUser) {
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
@@ -116,6 +117,7 @@ public final class PalasA2 extends ActiveSkill {
                         255, 230, 90);
                 ParticleUtil.play(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
             }
+            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_HIT_ENTITY, target.getCenterLocation());
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
         }
     }

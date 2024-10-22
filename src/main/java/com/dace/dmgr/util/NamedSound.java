@@ -684,9 +684,10 @@ public enum NamedSound {
     COMBAT_PALAS_A2_USE(
             new DefinedSound(Sound.ENTITY_FIREWORK_SHOOT, 2, 1.8),
             new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 1.8),
-            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 2),
-            new DefinedSound("new.entity.puffer_fish.blow_out", 2, 1.8)
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 2)
     ),
+    /** 전투 - '팔라스' 액티브 2번 - 엔티티 타격 */
+    COMBAT_PALAS_A2_HIT_ENTITY(new DefinedSound("new.entity.puffer_fish.blow_out", 2, 1.8)),
     /** 전투 - '팔라스' 액티브 3번 - 사용 */
     COMBAT_PALAS_A3_USE(new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6)),
     /** 전투 - '팔라스' 액티브 3번 - 폭발 */
@@ -695,7 +696,15 @@ public enum NamedSound {
             new DefinedSound(Sound.BLOCK_BREWING_STAND_BREW, 2, 1.2),
             new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 1.2),
             new DefinedSound(Sound.BLOCK_GLASS_BREAK, 2, 1.2)
-    );
+    ),
+    /** 전투 - '팔라스' 궁극기 - 사용 */
+    COMBAT_PALAS_ULT_USE(
+            new DefinedSound(Sound.ENTITY_FIREWORK_SHOOT, 3, 1.6),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 3, 1.6),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 3, 1.8)
+    ),
+    /** 전투 - '팔라스' 궁극기 - 엔티티 타격 */
+    COMBAT_PALAS_ULT_HIT_ENTITY(new DefinedSound("new.item.trident.thunder", 3, 1.5));
 
     /** 지정된 효과음 목록 */
     @NonNull
