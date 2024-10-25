@@ -96,6 +96,8 @@ public final class Magritta extends Scuffler {
         switch (characterType) {
             case MAGRITTA:
                 return new String[]{"넌 뭐야!"};
+            case CHED:
+                return new String[]{"불이야!"};
             default:
                 return new String[]{
                         "아직 다 못 불태웠는데...",
@@ -123,7 +125,7 @@ public final class Magritta extends Scuffler {
         StringJoiner text = new StringJoiner("    ");
 
         String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, MagrittaWeaponInfo.CAPACITY,
-                8, '┃');
+                MagrittaWeaponInfo.CAPACITY, '┃');
 
         text.add(weaponDisplay);
         text.add("");

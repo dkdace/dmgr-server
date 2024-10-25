@@ -80,7 +80,8 @@ public final class Arkace extends Marksman {
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
         switch (characterType) {
             case SILIA:
-                return new String[]{"그 원시적인 무기로 뭘 하겠다고 그러나?"};
+            case CHED:
+                return new String[]{"그런 원시적인 무기로 뭘 하겠다고 그러나?"};
             case JAGER:
                 return new String[]{
                         "총은 그렇게 쓰는 물건이 아니다.",
