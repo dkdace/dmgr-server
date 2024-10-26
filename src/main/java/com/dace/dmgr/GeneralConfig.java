@@ -171,6 +171,10 @@ public final class GeneralConfig extends YamlFile {
         private int rankPlacementPlayCount = 5;
         /** 게임 시작까지 필요한 대기 시간 (초) */
         private int waitingTimeSeconds = 30;
+        /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
+        private int headRevealTimeAfterStartSeconds = 20;
+        /** 스폰 지역 확인 Y 좌표 */
+        private int spawnRegionCheckYCoordinate = 41;
         /** 팀 스폰 입장 시 초당 회복량 */
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */
@@ -199,6 +203,8 @@ public final class GeneralConfig extends YamlFile {
             rankMaxPlayerCount = (int) getLong(SECTION + ".rankMaxPlayerCount", rankMaxPlayerCount);
             rankPlacementPlayCount = (int) getLong(SECTION + ".rankPlacementPlayCount", rankPlacementPlayCount);
             waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
+            headRevealTimeAfterStartSeconds = (int) getLong(SECTION + ".headRevealTimeAfterStartSeconds", headRevealTimeAfterStartSeconds);
+            spawnRegionCheckYCoordinate = (int) getLong(SECTION + ".spawnRegionCheckYCoordinate", spawnRegionCheckYCoordinate);
             teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
             oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
             ultPackActivationSeconds = (int) getLong(SECTION + ".ultPackActivationSeconds", ultPackActivationSeconds);

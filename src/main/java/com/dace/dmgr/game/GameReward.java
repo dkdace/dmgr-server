@@ -56,9 +56,9 @@ final class GameReward {
         int value = (int) Math.min(((getKDARatioCorrection(kda) + getScoreCorrection(score, playTime)) * 10 + averageMMR), 1000);
 
         double finalMMR;
-        if (playCount < GeneralConfig.getGameConfig().getMmrPlayCountThreshold()) {
+        if (playCount < GeneralConfig.getGameConfig().getMmrPlayCountThreshold())
             finalMMR = (mmr * playCount / (playCount + 1.0)) + value * (1 / (playCount + 1.0));
-        } else {
+        else {
             playCount = GeneralConfig.getGameConfig().getMmrPlayCountThreshold();
             finalMMR = (mmr * (playCount - 1.0) / (playCount)) + value * (1.0 / (playCount));
         }
@@ -89,8 +89,8 @@ final class GameReward {
      * @return 최종 랭크 점수
      */
     static int getFinalRankRateRanked(int mmr, int rr, double kda, double score, int playTime, int averageRR, @Nullable Boolean isWinner) {
-        return (int) (rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime) +
-                getWinCorrection(isWinner) + getPointCorrection(mmr, rr, averageRR)));
+        return (int) (rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime)
+                + getWinCorrection(isWinner) + getPointCorrection(mmr, rr, averageRR)));
     }
 
     /**
