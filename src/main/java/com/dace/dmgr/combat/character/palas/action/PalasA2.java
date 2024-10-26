@@ -103,6 +103,7 @@ public final class PalasA2 extends ActiveSkill {
             combatUser.getWeapon().onCancelled();
 
             target.getStatusEffectModule().removeStatusEffect(PalasUlt.PalasUltBuff.instance);
+            target.getStatusEffectModule().clearStatusEffect(false);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
             if (target instanceof CombatUser) {
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
