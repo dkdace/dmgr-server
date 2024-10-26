@@ -5,6 +5,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
@@ -49,15 +50,11 @@ public final class OnPlayServerNamedSoundEffect extends PacketAdapter {
         if (combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEAR))
             return true;
 
-        Player target = (Player) location.getWorld().getNearbyEntities(location, 0.3, 0.3, 0.3).stream()
-                .filter(Player.class::isInstance)
-                .findFirst()
-                .orElse(null);
-        if (target != null && target != player) {
-            CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
-            return targetCombatUser != null && targetCombatUser.getCharacterType() == CharacterType.SILIA &&
-                    !targetCombatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished() &&
-                    sound.toString().contains("_STEP") && soundCategory == SoundCategory.PLAYERS;
+        CombatUser targetCombatUser = (CombatUser) CombatUtil.getNearCombatEntity(combatUser.getGame(), location, 0.5, CombatUser.class::isInstance);
+        if (targetCombatUser != null && targetCombatUser != combatUser) {
+            return targetCombatUser.getCharacterType() == CharacterType.SILIA
+                    && !targetCombatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()
+                    && sound.toString().contains("_STEP") && soundCategory == SoundCategory.PLAYERS;
         }
 
         return false;

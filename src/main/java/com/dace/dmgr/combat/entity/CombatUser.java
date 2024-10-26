@@ -162,10 +162,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     private IntervalTask fullAutoTask;
 
-    @Getter
-    @Setter
-    private long time = System.currentTimeMillis();
-
     /**
      * 전투 시스템의 플레이어 인스턴스를 생성한다.
      *
