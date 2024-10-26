@@ -64,6 +64,8 @@ public final class GeneralConfig extends YamlFile {
         /** 리소스팩 URL */
         @NonNull
         private String resourcePackUrl = "";
+        /** 리소스팩 적용 시간 제한 (초) */
+        private int resourcePackTimeout = 8;
         /** 채팅 쿨타임 (tick) */
         private long chatCooldown = 0;
         /** 명령어 쿨타임 (tick) */
@@ -84,6 +86,7 @@ public final class GeneralConfig extends YamlFile {
          */
         private void load() {
             resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
+            resourcePackTimeout = (int) getLong(SECTION + ".resourcePackTimeout", resourcePackTimeout);
             chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
             commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
             rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriodMinutes", rankingUpdatePeriodMinutes);

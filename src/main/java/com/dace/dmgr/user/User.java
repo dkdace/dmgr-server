@@ -56,8 +56,6 @@ public final class User implements Disposable {
     private static final String TITLE_COOLDOWN_ID = "Title";
     /** 액션바 쿨타임 ID */
     private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
-    /** 리소스팩 적용 시간 제한 (tick) */
-    private static final long RESOURCE_PACK_TIMEOUT = 8 * 20L;
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
             "\n" +
@@ -138,19 +136,6 @@ public final class User implements Disposable {
             user = new User(player);
 
         return user;
-    }
-
-    /**
-     * 열 및 행 인자값이 유효하지 않으면 예외를 발생시킨다.
-     *
-     * @param column 열 번호
-     * @param row    행 번호
-     */
-    private static void validateColumnRow(int column, int row) {
-        if (column < 0 || column > 3)
-            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
-        if (row < 0 || row > 19)
-            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
     }
 
     /**
@@ -282,7 +267,7 @@ public final class User implements Disposable {
         TaskUtil.addTask(this, new DelayTask(() -> {
             if (!isResourcePackAccepted)
                 player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_DENY);
-        }, RESOURCE_PACK_TIMEOUT));
+        }, GeneralConfig.getConfig().getResourcePackTimeout() * 20L));
     }
 
     /**
@@ -984,5 +969,18 @@ public final class User implements Disposable {
             nameTagHider.teleport(location);
             player.addPassenger(nameTagHider);
         }
+    }
+
+    /**
+     * 열 및 행 인자값이 유효하지 않으면 예외를 발생시킨다.
+     *
+     * @param column 열 번호
+     * @param row    행 번호
+     */
+    private void validateColumnRow(int column, int row) {
+        if (column < 0 || column > 3)
+            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
+        if (row < 0 || row > 19)
+            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
     }
 }
