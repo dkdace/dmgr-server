@@ -153,7 +153,7 @@ public final class Silia extends Scuffler {
         SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
 
         if (CooldownUtil.getCooldown(attacker, CombatUser.FASTKILL_TIME_LIMIT_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("암살", CombatUser.FASTKILL_SCORE);
+            attacker.addScore("암살", CombatUser.FASTKILL_SCORE * score / 100.0);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
         if (!skillUlt.isDurationFinished()) {

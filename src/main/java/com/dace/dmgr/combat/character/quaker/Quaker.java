@@ -83,9 +83,7 @@ public final class Quaker extends Guardian {
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
         switch (characterType) {
             case ARKACE:
-                return new String[]{
-                        "조국의 방패는 납덩어리에 굴복하지 않는다!"
-                };
+                return new String[]{"조국의 방패는 납덩어리에 굴복하지 않는다!"};
             default:
                 return new String[]{
                         "적을 제거했다!",
@@ -98,10 +96,15 @@ public final class Quaker extends Guardian {
     @Override
     @NonNull
     public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "나는 굴복하지 않는다!",
-                "죽어도 항복은 없다!"
-        };
+        switch (characterType) {
+            case CHED:
+                return new String[]{"정정당당하게 싸워라! 비겁자들!"};
+            default:
+                return new String[]{
+                        "나는 굴복하지 않는다!",
+                        "죽어도 항복은 없다!"
+                };
+        }
     }
 
     @Override

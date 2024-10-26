@@ -137,7 +137,8 @@ public final class ChedA3 extends ActiveSkill {
     private final class ChedA3Projectile extends Projectile {
         private ChedA3Projectile() {
             super(combatUser, ChedA3Info.VELOCITY, ProjectileOption.builder().trailInterval(18).size(ChedA3Info.SIZE)
-                    .condition(combatUser::isEnemy).build());
+                    .condition(combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
+                            combatEntity.isEnemy(ChedA3.this.combatUser)).build());
         }
 
         @Override

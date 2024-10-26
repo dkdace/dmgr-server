@@ -90,6 +90,8 @@ public final class Vellion extends Controller {
                         "거슬리게 하지 말고 꺼져.",
                         "건방지긴."
                 };
+            case CHED:
+                return new String[]{"...미안하구나."};
             default:
                 return new String[]{
                         "내 계획의 일부분이 되어라.",
