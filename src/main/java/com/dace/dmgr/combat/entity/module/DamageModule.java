@@ -4,9 +4,9 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.CooldownUtil;
@@ -187,6 +187,8 @@ public class DamageModule {
             throw new IllegalArgumentException("'health'가 0 이상이어야 함");
 
         maxHealth = health;
+        if (maxHealth < getHealth())
+            setHealth(health);
         ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 
