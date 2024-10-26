@@ -48,30 +48,36 @@ public final class Menu extends Gui {
         guiController.set(39, MenuItem.COMMAND.guiItem);
         guiController.set(41, MenuItem.RANKING.guiItem);
         guiController.set(43, MenuItem.LOBBY.guiItem);
-        guiController.set(53, MenuItem.EXIT.guiItem);
+        guiController.set(53, ButtonItem.Exit.getInstance());
     }
 
     @AllArgsConstructor
     private enum MenuItem {
-        GAME_START(Material.IRON_SWORD, "게임 시작", "게임에 참가합니다.",
+        GAME_START(Material.IRON_SWORD, 0, "게임 시작", "게임에 참가합니다.",
                 player -> Warp.getInstance().open(player)),
-        RECORD(Material.NAME_TAG, "전적", "개인 전적을 확인합니다.", player -> player.performCommand("전적")),
-        ACHIEVEMENT(Material.BOOK, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
-        OPTION(Material.REDSTONE_COMPARATOR, "설정", "설정 관련 메뉴를 확인합니다.", player -> {
-            PlayerOption playerOption = PlayerOption.getInstance();
-            playerOption.open(player);
-        }),
-        CORE(Material.FIREWORK_CHARGE, "코어 확인", "전투원에 할당된 코어를 확인합니다.", player -> player.performCommand("코어")),
-        COMMAND(Material.COMMAND, "명령어 목록", "서버 명령어 목록을 확인합니다.", player -> {
-            player.performCommand("명령어");
-            player.closeInventory();
-        }),
-        RANKING(Material.DIAMOND, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.", player -> {
-            Ranking ranking = Ranking.getInstance();
-            ranking.open(player);
-        }),
-        LOBBY(Material.BED, 14, "로비", "로비로 이동합니다.", player -> player.performCommand("exit")),
-        EXIT(new ButtonItem.EXIT("MenuExit"));
+        RECORD(Material.NAME_TAG, 0, "전적", "개인 전적을 확인합니다.",
+                player -> player.performCommand("전적")),
+        ACHIEVEMENT(Material.BOOK, 0, "업적", "업적 목록을 확인합니다.",
+                player -> player.performCommand("업적")),
+        OPTION(Material.REDSTONE_COMPARATOR, 0, "설정", "설정 관련 메뉴를 확인합니다.",
+                player -> {
+                    PlayerOption playerOption = PlayerOption.getInstance();
+                    playerOption.open(player);
+                }),
+        CORE(Material.FIREWORK_CHARGE, 0, "코어 확인", "전투원에 할당된 코어를 확인합니다.",
+                player -> player.performCommand("코어")),
+        COMMAND(Material.COMMAND, 0, "명령어 목록", "서버 명령어 목록을 확인합니다.",
+                player -> {
+                    player.performCommand("명령어");
+                    player.closeInventory();
+                }),
+        RANKING(Material.DIAMOND, 0, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.",
+                player -> {
+                    Ranking ranking = Ranking.getInstance();
+                    ranking.open(player);
+                }),
+        LOBBY(Material.BED, 14, "로비", "로비로 이동합니다.",
+                player -> player.performCommand("exit"));
 
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
@@ -91,10 +97,6 @@ public final class Menu extends Gui {
                     return true;
                 }
             };
-        }
-
-        MenuItem(Material material, String name, String lore, Consumer<Player> action) {
-            this(material, 0, name, lore, action);
         }
     }
 }

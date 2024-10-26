@@ -30,7 +30,7 @@ public final class Stat extends Gui {
                     "§e플레이 시간 : §f{5}")
             .build());
     /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.LEFT("StatLeft") {
+    private static final GuiItem buttonLeft = new ButtonItem.Left("StatLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
             player.performCommand("메뉴");

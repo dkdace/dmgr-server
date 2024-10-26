@@ -284,7 +284,7 @@ public final class UserData extends YamlFile {
     }
 
     /**
-     * 플레이어가 서버에서 차단된 상태인 지 확인한다.
+     * 플레이어가 서버에서 차단된 상태인지 확인한다.
      *
      * @return 차단 여부
      */
@@ -376,7 +376,7 @@ public final class UserData extends YamlFile {
     }
 
     /**
-     * 지정한 플레이어가 차단되었는 지 확인한다.
+     * 지정한 플레이어가 차단되었는지 확인한다.
      *
      * @param userData 대상 플레이어의 유저 데이터 정보
      * @return 차단 여부

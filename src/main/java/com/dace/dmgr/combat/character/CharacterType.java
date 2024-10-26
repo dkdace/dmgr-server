@@ -52,12 +52,16 @@ public enum CharacterType {
     /** 전투원 정보 */
     @NonNull
     private final Character character;
+    /** 전투원 선택 정보 GUI */
+    @NonNull
+    private final SelectCharInfo selectCharInfo;
     /** GUI 아이템 객체 */
     @NonNull
     private final GuiItem guiItem;
 
     CharacterType(Character character) {
         this.character = character;
+        this.selectCharInfo = new SelectCharInfo(CharacterType.this);
         this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
                 .setDamage((short) 3)
                 .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
@@ -94,10 +98,8 @@ public enum CharacterType {
 
                     combatUser.setCharacterType(CharacterType.this);
                     player.closeInventory();
-                } else if (clickType == ClickType.RIGHT) {
-                    SelectCharInfo selectCharInfo = new SelectCharInfo(CharacterType.this);
+                } else if (clickType == ClickType.RIGHT)
                     selectCharInfo.open(player);
-                }
 
                 return true;
             }

@@ -32,7 +32,7 @@ public final class Warp extends Gui {
         guiController.set(3, WarpItem.FREE_GAME.guiItem);
         guiController.set(5, WarpItem.TRAINING.guiItem);
         guiController.set(7, WarpItem.LEFT.guiItem);
-        guiController.set(8, WarpItem.EXIT.guiItem);
+        guiController.set(8, ButtonItem.Exit.getInstance());
     }
 
     @AllArgsConstructor
@@ -41,16 +41,16 @@ public final class Warp extends Gui {
                 player -> SelectGame.getInstance().open(player)),
         FREE_GAME(Material.GOLD_SWORD, "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.",
                 player -> FreeCombat.start(User.fromPlayer(player))),
-        TRAINING(Material.ARMOR_STAND, "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", player -> {
-        }),
-        LEFT(new ButtonItem.LEFT("WarpLeft") {
+        TRAINING(Material.ARMOR_STAND, "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.",
+                player -> {
+                }),
+        LEFT(new ButtonItem.Left("WarpLeft") {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
                 player.performCommand("메뉴");
                 return true;
             }
-        }),
-        EXIT(new ButtonItem.EXIT("WarpExit"));
+        });
 
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;

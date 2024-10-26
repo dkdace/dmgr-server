@@ -25,7 +25,7 @@ public final class SelectGame extends Gui {
     @Getter
     private static final SelectGame instance = new SelectGame();
     /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.LEFT("SelectGameLeft") {
+    private static final GuiItem buttonLeft = new ButtonItem.Left("SelectGameLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
             Warp.getInstance().open(player);
@@ -103,13 +103,12 @@ public final class SelectGame extends Gui {
 
         SelectGameInfoItem(Material material, String name, String... lores) {
             ItemBuilder itemBuilder = new ItemBuilder(material).setName(name);
-            for (String lore : lores) {
+            for (String lore : lores)
                 itemBuilder.addLore("§f" + lore);
-            }
 
-            String[] gamePlayModeNames =
-                    Arrays.stream(GamePlayMode.values()).filter(gamePlayMode -> this.toString().equals("NORMAL"))
-                            .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
+            String[] gamePlayModeNames = Arrays.stream(GamePlayMode.values())
+                    .filter(gamePlayMode -> this.toString().equals("NORMAL"))
+                    .map(gamePlayMode -> "§e- " + gamePlayMode.getName()).toArray(String[]::new);
             itemBuilder.addLore(gamePlayModeNames);
 
             this.staticItem = new StaticItem("SelectGameInfoItem" + this, itemBuilder.build());

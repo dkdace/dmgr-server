@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public final class SelectCharInfo extends Gui {
     /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.LEFT("SelectCharInfoLeft") {
+    private static final GuiItem buttonLeft = new ButtonItem.Left("SelectCharInfoLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
             SelectChar.getInstance().open(player);
