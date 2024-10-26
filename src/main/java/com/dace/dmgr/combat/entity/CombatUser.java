@@ -992,7 +992,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (cooldown <= 0)
                 return false;
 
-            if (CooldownUtil.getCooldown(user, User.TYPEWRITER_TITLE_COOLDOWN_ID) == 0)
+            if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
                         String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
             user.teleport(deadLocation);

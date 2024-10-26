@@ -51,7 +51,7 @@ import java.util.UUID;
  */
 public final class User implements Disposable {
     /** 타자기 효과 타이틀 쿨타임 ID */
-    public static final String TYPEWRITER_TITLE_COOLDOWN_ID = "TypewriterTitle";
+    private static final String TYPEWRITER_TITLE_COOLDOWN_ID = "TypewriterTitle";
     /** 타이틀 쿨타임 ID */
     private static final String TITLE_COOLDOWN_ID = "Title";
     /** 액션바 쿨타임 ID */
@@ -279,10 +279,14 @@ public final class User implements Disposable {
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-        if (CombatUser.fromUser(this) == null) {
+        CombatUser combatUser = CombatUser.fromUser(this);
+        if (combatUser == null) {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
             updateSidebar();
         }
+
+        HologramUtil.setHologramVisibility(player.getName(), combatUser == null, player.getWorld().getPlayers().toArray(new Player[0]));
+        HologramUtil.setHologramVisibility(player.getName(), false, player);
 
         GameUser gameUser = GameUser.fromUser(this);
         if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
@@ -487,8 +491,6 @@ public final class User implements Disposable {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        HologramUtil.setHologramVisibility(player.getName(), true, Bukkit.getOnlinePlayers().toArray(new Player[0]));
-        HologramUtil.setHologramVisibility(player.getName(), false, player);
         Bukkit.getOnlinePlayers().forEach(target -> GlowUtil.removeGlowing(this.player, target));
 
         clearBossBar();
@@ -714,6 +716,15 @@ public final class User implements Disposable {
             else
                 delay += 1;
         }
+    }
+
+    /**
+     * 플레이어의 타자기 효과 타이틀이 출력 중인지 확인한다.
+     *
+     * @return 출력 중이면 {@code true} 반환
+     */
+    public boolean isTypewriterTitlePrinting() {
+        return CooldownUtil.getCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID) > 0;
     }
 
     /**
