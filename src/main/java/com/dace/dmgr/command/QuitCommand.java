@@ -16,8 +16,6 @@ import java.util.List;
  * 게임 퇴장 명령어 클래스.
  *
  * <p>Usage: /퇴장</p>
- *
- * @see GameUser#dispose()
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class QuitCommand extends BaseCommandExecutor {

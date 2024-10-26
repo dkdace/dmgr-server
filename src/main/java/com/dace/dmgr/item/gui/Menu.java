@@ -60,10 +60,7 @@ public final class Menu extends Gui {
         ACHIEVEMENT(Material.BOOK, 0, "업적", "업적 목록을 확인합니다.",
                 player -> player.performCommand("업적")),
         OPTION(Material.REDSTONE_COMPARATOR, 0, "설정", "설정 관련 메뉴를 확인합니다.",
-                player -> {
-                    PlayerOption playerOption = PlayerOption.getInstance();
-                    playerOption.open(player);
-                }),
+                player -> PlayerOption.getInstance().open(player)),
         CORE(Material.FIREWORK_CHARGE, 0, "코어 확인", "전투원에 할당된 코어를 확인합니다.",
                 player -> player.performCommand("코어")),
         COMMAND(Material.COMMAND, 0, "명령어 목록", "서버 명령어 목록을 확인합니다.",
@@ -72,10 +69,7 @@ public final class Menu extends Gui {
                     player.closeInventory();
                 }),
         RANKING(Material.DIAMOND, 0, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.",
-                player -> {
-                    Ranking ranking = Ranking.getInstance();
-                    ranking.open(player);
-                }),
+                player -> Ranking.getInstance().open(player)),
         LOBBY(Material.BED, 14, "로비", "로비로 이동합니다.",
                 player -> player.performCommand("exit"));
 
