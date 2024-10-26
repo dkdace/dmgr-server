@@ -9,6 +9,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 /**
  * 자유 전투 시스템 클래스.
  */
+@UtilityClass
 public final class FreeCombat {
     /** 자유 전투 지역 이름 */
     public static final String FREE_COMBAT_REGION = "BattlePVP";

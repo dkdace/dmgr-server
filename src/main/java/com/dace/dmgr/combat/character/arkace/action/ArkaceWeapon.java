@@ -188,7 +188,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
             if (isUlt)
                 target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, false);
             else {
-                int damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, distance, ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE, true);
+                int damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, distance, ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
             }
 

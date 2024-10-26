@@ -220,8 +220,8 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
-            int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0, true);
-            int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0, true);
+            int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0);
+            int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0);
             boolean isDamaged = projectile == null ?
                     target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true) :
                     target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
