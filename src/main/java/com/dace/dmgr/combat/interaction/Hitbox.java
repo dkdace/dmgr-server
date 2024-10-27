@@ -58,21 +58,6 @@ public class Hitbox {
     /**
      * 히트박스 인스턴스를 생성한다.
      *
-     * @param location 기준 위치
-     * @param sizeX    가로. (단위: 블록)
-     * @param sizeY    높이. (단위: 블록)
-     * @param sizeZ    세로. (단위: 블록)
-     * @param offsetX  중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록)
-     * @param offsetY  중앙 위치 오프셋. 아래(-) / 위(+). (단위 : 블록)
-     * @param offsetZ  중앙 위치 오프셋. 뒤(-) / 앞(+). (단위 : 블록)
-     */
-    public Hitbox(@NonNull Location location, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ) {
-        this(location, sizeX, sizeY, sizeZ, offsetX, offsetY, offsetZ, 0, 0, 0);
-    }
-
-    /**
-     * 히트박스 인스턴스를 생성한다.
-     *
      * @param location    기존 위치
      * @param sizeX       가로. (단위: 블록)
      * @param sizeY       높이. (단위: 블록)
@@ -96,6 +81,21 @@ public class Hitbox {
         this.axisOffsetY = axisOffsetY;
         this.axisOffsetZ = axisOffsetZ;
         setCenter(location);
+    }
+
+    /**
+     * 히트박스 인스턴스를 생성한다.
+     *
+     * @param location 기준 위치
+     * @param sizeX    가로. (단위: 블록)
+     * @param sizeY    높이. (단위: 블록)
+     * @param sizeZ    세로. (단위: 블록)
+     * @param offsetX  중앙 위치 오프셋. 왼쪽(-) / 오른쪽(+). (단위 : 블록)
+     * @param offsetY  중앙 위치 오프셋. 아래(-) / 위(+). (단위 : 블록)
+     * @param offsetZ  중앙 위치 오프셋. 뒤(-) / 앞(+). (단위 : 블록)
+     */
+    public Hitbox(@NonNull Location location, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ) {
+        this(location, sizeX, sizeY, sizeZ, offsetX, offsetY, offsetZ, 0, 0, 0);
     }
 
     @NonNull
@@ -135,9 +135,8 @@ public class Hitbox {
      */
     @NonNull
     public final Location getNearestLocation(@NonNull Location location) {
-        Vector rotVec = VectorUtil.getRotatedVector(
-                VectorUtil.getRotatedVector(location.toVector().subtract(center.toVector()), new Vector(0, 1, 0), center.getYaw()),
-                new Vector(1, 0, 0), -center.getPitch());
+        Vector rotVec = VectorUtil.getRotatedVector(VectorUtil.getRotatedVector(location.toVector().subtract(center.toVector()),
+                new Vector(0, 1, 0), center.getYaw()), new Vector(1, 0, 0), -center.getPitch());
         Location rotLoc = center.clone().add(rotVec);
         Location cuboidEdge = center.clone().add(
                 (rotLoc.getX() > center.getX() ? 1 : -1) * Math.min(getSizeX() / 2, Math.abs(rotLoc.getX() - center.getX())),
@@ -145,9 +144,8 @@ public class Hitbox {
                 (rotLoc.getZ() > center.getZ() ? 1 : -1) * Math.min(getSizeZ() / 2, Math.abs(rotLoc.getZ() - center.getZ()))
         );
 
-        Vector retVec = VectorUtil.getRotatedVector(
-                VectorUtil.getRotatedVector(cuboidEdge.toVector().subtract(center.toVector()), new Vector(1, 0, 0), center.getPitch()),
-                new Vector(0, 1, 0), -center.getYaw());
+        Vector retVec = VectorUtil.getRotatedVector(VectorUtil.getRotatedVector(cuboidEdge.toVector().subtract(center.toVector()),
+                new Vector(1, 0, 0), center.getPitch()), new Vector(0, 1, 0), -center.getYaw());
         return center.clone().add(retVec);
     }
 
