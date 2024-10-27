@@ -7,7 +7,10 @@ import lombok.Getter;
 import java.text.MessageFormat;
 
 public class DeltaP2Info extends PassiveSkillInfo<DeltaP2> {
-    /** 주시 시간 */
+    /** 업데이트 간격 (단위: 틱) */
+    public static final int UPDATE_TICK = 5;
+
+    /** 주시 시간 (단위: 틱) */
     public static final int GAZING_DURATION = 2 * 20;
     /** 탐지 범위 (단위: 블록) */
     public static final int DETECT_RADIUS = 64;

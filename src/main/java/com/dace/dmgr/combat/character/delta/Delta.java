@@ -137,8 +137,9 @@ public final class Delta extends Controller {
             if (skillp1.isLivingEnemyNearby()) {
                 DeltaP1.cancelAndReset(combatUser);
             }
-
             combatUser.useAction(ActionKey.PERIODIC_1);
+        }
+        if (i % DeltaP2Info.UPDATE_TICK == 0) {
             combatUser.useAction(ActionKey.PERIODIC_2);
         }
     }

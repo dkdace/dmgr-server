@@ -6,19 +6,17 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.interaction.Target;
+import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.GlowUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 public class DeltaP2 extends AbstractSkill {
+
     public DeltaP2(CombatUser combatUser) {
         super(combatUser, DeltaP2Info.getInstance());
     }
@@ -51,7 +49,43 @@ public class DeltaP2 extends AbstractSkill {
         );
 
         for (CombatEntity target: targets) {
-            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 5);
+            if (!(target instanceof Damageable)) continue;
+            Damageable damageable = (Damageable) target;
+
+            damageable.getPropertyManager().addValue(Property.NEURAL_LINK, DeltaP2Info.UPDATE_TICK);
+            damageable.getStatusEffectModule().applyStatusEffect(combatUser, NeuralLinkValue.instance, 5);
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class NeuralLinkValue implements StatusEffect {
+        private static final NeuralLinkValue instance = new NeuralLinkValue();
+
+        @Override
+        public @NonNull StatusEffectType getStatusEffectType() {
+            return StatusEffectType.NONE;
+        }
+
+        @Override
+        public boolean isPositive() {
+            return true;    // 일단 non-negative...
+        }
+
+        @Override
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            // 미사용
+        }
+
+        @Override
+        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+            if (combatEntity.getPropertyManager().getValue(Property.NEURAL_LINK) >= DeltaP2Info.GAZING_DURATION) {
+                GlowUtil.setGlowing(combatEntity.getEntity(), ChatColor.RED, provider.getEntity(), DeltaP2Info.UPDATE_TICK);
+            }
+        }
+
+        @Override
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            combatEntity.getPropertyManager().setValue(Property.NEURAL_LINK, 0);
         }
     }
 }
