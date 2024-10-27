@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
@@ -14,7 +15,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,6 +35,11 @@ import java.util.StringJoiner;
  * @see SiliaUlt
  */
 public final class Silia extends Scuffler {
+    /** 암살 점수 */
+    public static final int FAST_KILL_SCORE = 20;
+    /** 암살 점수 제한시간 (tick) */
+    public static final long FAST_KILL_SCORE_TIME_LIMIT = (long) (2.5 * 20);
+
     @Getter
     private static final Silia instance = new Silia();
 
@@ -152,8 +157,8 @@ public final class Silia extends Scuffler {
         SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
 
-        if (CooldownUtil.getCooldown(attacker, CombatUser.FASTKILL_TIME_LIMIT_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("암살", CombatUser.FASTKILL_SCORE * score / 100.0);
+        if (((CombatUser) victim).getDamageSumRemainingTime(attacker) > GeneralConfig.getCombatConfig().getDamageSumTimeLimit() - FAST_KILL_SCORE_TIME_LIMIT)
+            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
         if (!skillUlt.isDurationFinished()) {

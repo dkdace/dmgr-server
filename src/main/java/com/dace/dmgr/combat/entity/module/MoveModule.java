@@ -76,7 +76,7 @@ public class MoveModule {
      */
     private boolean canMove() {
         return combatEntity instanceof Damageable
-                && !((Damageable) combatEntity).getStatusEffectModule().hasAllRestriction(CombatRestrictions.DEFAULT_MOVE);
+                && !((Damageable) combatEntity).getStatusEffectModule().hasAllRestrictions(CombatRestrictions.DEFAULT_MOVE);
     }
 
     /**

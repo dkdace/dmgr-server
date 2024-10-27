@@ -106,6 +106,8 @@ public final class GeneralConfig extends YamlFile {
         private static final String SECTION = "combat";
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
+        /** 기본 이동속도 */
+        private double defaultSpeed = 0.12;
         /** 리스폰 시간 (tick) */
         private long respawnTime = 200;
         /** 힐 팩에 사용되는 블록의 타입 */
@@ -130,12 +132,21 @@ public final class GeneralConfig extends YamlFile {
         /** 낙사 구역에 사용되는 블록의 타입 */
         @NonNull
         private Material fallZoneBlock = Material.BEDROCK;
+        /** 적 처치 기여 (데미지 누적) 제한시간 (tick) */
+        private long damageSumTimeLimit = 10 * 20;
+        /** 연속 처치 제한시간 (tick) */
+        private long killStreakTimeLimit = 8 * 20;
+        /** 획득 점수 표시 유지시간 (tick) */
+        private long scoreDisplayDuration = 5 * 20;
+        /** 킬 로그 표시 유지시간 (tick) */
+        private long killLogDisplayDuration = 4 * 20;
 
         /**
          * 데이터를 불러온다.
          */
         private void load() {
             idleUltChargePerSecond = (int) getLong(SECTION + ".idleUltChargePerSecond", idleUltChargePerSecond);
+            defaultSpeed = getDouble(SECTION + ".defaultSpeed", defaultSpeed);
             respawnTime = getLong(SECTION + ".respawnTime", respawnTime);
             healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
             healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
@@ -146,6 +157,10 @@ public final class GeneralConfig extends YamlFile {
             jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
             jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
             fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));
+            damageSumTimeLimit = getLong(SECTION + ".damageSumTimeLimit", damageSumTimeLimit);
+            killStreakTimeLimit = getLong(SECTION + ".killStreakTimeLimit", killStreakTimeLimit);
+            scoreDisplayDuration = getLong(SECTION + ".scoreDisplayDuration", scoreDisplayDuration);
+            killLogDisplayDuration = getLong(SECTION + ".killLogDisplayDuration", killLogDisplayDuration);
         }
     }
 

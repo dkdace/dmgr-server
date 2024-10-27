@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public final class HealModule extends DamageModule {
     /** 회복량 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
+
     /** 회복량 배수 값 */
     @NonNull
     private final AbilityStatus healMultiplierStatus;
@@ -97,9 +98,7 @@ public final class HealModule extends DamageModule {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 
-        if (getHealth() == getMaxHealth())
-            return false;
-        if (combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
+        if (getHealth() == getMaxHealth() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
             return false;
 
         double healMultiplier = healMultiplierStatus.getValue();

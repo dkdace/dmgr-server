@@ -17,7 +17,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Burning implements StatusEffect {
     /** 초당 피해량 */
-    private final int dps;
+    private final int damagePerSecond;
     /** 궁극기 충전 여부 */
     private final boolean isUlt;
 
@@ -42,8 +42,8 @@ public abstract class Burning implements StatusEffect {
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         combatEntity.getEntity().setFireTicks(4);
 
-        if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider, dps * 10 / 20,
-                DamageType.NORMAL, null, false, isUlt))
+        if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider,
+                damagePerSecond * 10 / 20, DamageType.NORMAL, null, false, isUlt))
             SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
     }
 

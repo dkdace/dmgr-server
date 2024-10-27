@@ -31,7 +31,7 @@ public interface Damageable extends CombatEntity {
     StatusEffectModule getStatusEffectModule();
 
     /**
-     * 엔티티가 피해를 받을 수 있는 지 확인한다.
+     * 엔티티가 피해를 받을 수 있는지 확인한다.
      *
      * @return 피해를 받을 수 있으면 {@code true} 반환
      * @implSpec {@code true}
@@ -41,7 +41,7 @@ public interface Damageable extends CombatEntity {
     }
 
     /**
-     * 엔티티가 죽을 수 있는 지 확인한다.
+     * 엔티티가 죽을 수 있는지 확인한다.
      *
      * @return 죽을 수 있으면 {@code true} 반환
      * @implSpec {@code true}

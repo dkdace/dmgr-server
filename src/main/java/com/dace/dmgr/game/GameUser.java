@@ -6,13 +6,15 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skin;
@@ -225,11 +227,8 @@ public final class GameUser implements Disposable {
 
         combatUser = new CombatUser(this);
 
-        for (GameUser target : team.getTeamUsers()) {
+        for (GameUser target : team.getTeamUsers())
             GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
-            if (target != this)
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, target.player);
-        }
     }
 
     /**
