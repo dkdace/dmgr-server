@@ -1539,7 +1539,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return
      */
     public boolean isInAngleOfView(@NonNull CombatEntity combatEntity) {
-        final double ANGLE_OF_VIEW = 60;    // 시야각(단위: 육십분법)
+        final double ANGLE_OF_VIEW = 70;    // 시야각 (단위: 육십분법)
 
         Vector toEntity = combatEntity.getCenterLocation().toVector().subtract(getEntity().getEyeLocation().toVector());
         Vector toForward = getEntity().getLocation().getDirection();
