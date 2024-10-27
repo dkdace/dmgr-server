@@ -651,11 +651,65 @@ public enum NamedSound {
             new DefinedSound("random.explosion_reverb", 7, 0.6)
     ),
     /** 전투 - '체드' 궁극기 - 화염 지대 틱 효과음 */
-    COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1));
+    COMBAT_CHED_ULT_FIRE_FLOOR_TICK(new DefinedSound(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1)),
+    /** 전투 - '팔라스' 무기 - 사용 */
+    COMBAT_PALAS_WEAPON_USE(
+            new DefinedSound("random.gun.vssvintorez", 2.5, 1.3),
+            new DefinedSound("random.gun2.qbz_95_1", 2.5, 0.9),
+            new DefinedSound("random.gun_reverb", 3.5, 1.1)
+    ),
+    /** 전투 - '팔라스' 무기 - 조준 활성화 */
+    COMBAT_PALAS_WEAPON_AIM_ON(new DefinedSound(Sound.ENTITY_WOLF_HOWL, 0.4, 2)),
+    /** 전투 - '팔라스' 무기 - 조준 비활성화 */
+    COMBAT_PALAS_WEAPON_AIM_OFF(new DefinedSound(Sound.ENTITY_WOLF_SHAKE, 0.4, 2)),
+    /** 전투 - '팔라스' 액티브 1번 - 사용 */
+    COMBAT_PALAS_A1_USE(new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6)),
+    /** 전투 - '팔라스' 액티브 1번 - 사용 준비 */
+    COMBAT_PALAS_A1_USE_READY(
+            new DefinedSound(Sound.ENTITY_ARROW_SHOOT, 1.5, 0.5),
+            new DefinedSound("random.gun.m1911_silencer", 1.5, 0.8)
+    ),
+    /** 전투 - '팔라스' 액티브 1번 - 엔티티 타격 */
+    COMBAT_PALAS_A1_HIT_ENTITY(
+            new DefinedSound(Sound.ENTITY_FIREWORK_TWINKLE, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+            new DefinedSound("random.stab", 2, 2)
+    ),
+    /** 전투 - '팔라스' 액티브 1번 - 틱 효과음 */
+    COMBAT_PALAS_A1_TICK(
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+            new DefinedSound(Sound.ENTITY_FIREWORK_BLAST, 2, 1.8)
+    ),
+    /** 전투 - '팔라스' 액티브 2번 - 사용 */
+    COMBAT_PALAS_A2_USE(
+            new DefinedSound(Sound.ENTITY_FIREWORK_SHOOT, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 1.8),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 2)
+    ),
+    /** 전투 - '팔라스' 액티브 2번 - 엔티티 타격 */
+    COMBAT_PALAS_A2_HIT_ENTITY(new DefinedSound("new.entity.puffer_fish.blow_out", 2, 1.8)),
+    /** 전투 - '팔라스' 액티브 3번 - 사용 */
+    COMBAT_PALAS_A3_USE(new DefinedSound(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6)),
+    /** 전투 - '팔라스' 액티브 3번 - 폭발 */
+    COMBAT_PALAS_A3_EXPLODE(
+            new DefinedSound(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.7),
+            new DefinedSound(Sound.BLOCK_BREWING_STAND_BREW, 2, 1.2),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 2, 1.2),
+            new DefinedSound(Sound.BLOCK_GLASS_BREAK, 2, 1.2)
+    ),
+    /** 전투 - '팔라스' 궁극기 - 사용 */
+    COMBAT_PALAS_ULT_USE(
+            new DefinedSound(Sound.ENTITY_FIREWORK_SHOOT, 3, 1.6),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 3, 1.6),
+            new DefinedSound(Sound.ENTITY_PLAYER_SWIM, 3, 1.8)
+    ),
+    /** 전투 - '팔라스' 궁극기 - 엔티티 타격 */
+    COMBAT_PALAS_ULT_HIT_ENTITY(new DefinedSound("new.item.trident.thunder", 3, 1.5));
 
     /** 지정된 효과음 목록 */
     @NonNull
-    private final DefinedSound @NonNull [] definedSounds;
+    private final DefinedSound
+    @NonNull [] definedSounds;
 
     NamedSound(DefinedSound @NonNull ... definedSounds) {
         this.definedSounds = definedSounds;

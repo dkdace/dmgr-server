@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.character.inferno.Inferno;
 import com.dace.dmgr.combat.character.jager.Jager;
 import com.dace.dmgr.combat.character.magritta.Magritta;
 import com.dace.dmgr.combat.character.neace.Neace;
+import com.dace.dmgr.combat.character.palas.Palas;
 import com.dace.dmgr.combat.character.quaker.Quaker;
 import com.dace.dmgr.combat.character.silia.Silia;
 import com.dace.dmgr.combat.character.vellion.Vellion;
@@ -46,6 +47,7 @@ public enum CharacterType {
     QUAKER(Quaker.getInstance()),
 
     NEACE(Neace.getInstance()),
+    PALAS(Palas.getInstance()),
 
     VELLION(Vellion.getInstance());
 
