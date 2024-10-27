@@ -1558,6 +1558,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         final boolean[] hitscanResult = new boolean[] {false}; // single-element array for calling-by-reference
 
+        Vector toEntity = combatEntity.getCenterLocation().toVector()
+                .subtract(getEntity().getEyeLocation().toVector());
+
         new Target(this, HitscanOption.MAX_DISTANCE_DEFAULT, false,
                 HitscanOption.CONDITION_DEFAULT, Integer.MAX_VALUE) {
             @Override
@@ -1565,7 +1568,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 if (target.equals(combatEntity))
                     hitscanResult[0] = true;
             }
-        }.shoot();
+        }.shoot(toEntity);
 
         return hitscanResult[0];
     }
