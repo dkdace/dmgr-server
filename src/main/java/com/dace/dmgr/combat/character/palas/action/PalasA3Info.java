@@ -24,6 +24,8 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
 
     /** 효과 점수 */
     public static final int EFFECT_SCORE = 3;
+    /** 처치 지원 점수 */
+    public static final int ASSIST_SCORE = 10;
     @Getter
     private static final PalasA3Info instance = new PalasA3Info();
 

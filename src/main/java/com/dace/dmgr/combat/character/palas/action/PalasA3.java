@@ -14,10 +14,7 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -31,6 +28,9 @@ import org.bukkit.block.Block;
 
 @Getter
 public final class PalasA3 extends ActiveSkill {
+    /** 처치 지원 점수 제한시간 쿨타임 ID */
+    public static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA3AssistScoreTimeLimit";
+
     public PalasA3(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA3Info.getInstance(), 2);
     }
@@ -213,10 +213,16 @@ public final class PalasA3 extends ActiveSkill {
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.isEnemy(combatUser)) {
                     if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
-                            false, true))
+                            false, true)) {
                         target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
-                } else if (target instanceof Healable)
+                        if (target instanceof CombatUser)
+                            CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA3Info.DURATION);
+                    }
+                } else if (target instanceof Healable) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
+                    if (target instanceof CombatUser && target != combatUser)
+                        ((CombatUser) target).addKillAssist(combatUser, PalasA3.ASSIST_SCORE_COOLDOWN_ID, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                }
 
                 if (target instanceof CombatUser && target != combatUser)
                     combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
