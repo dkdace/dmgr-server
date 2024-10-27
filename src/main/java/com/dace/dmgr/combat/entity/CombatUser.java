@@ -25,10 +25,7 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.combat.interaction.HasCritHitbox;
-import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -44,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -1535,8 +1533,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * <p>주의: 블록에 가려졌는지 여부 등은 판단하지 않는다.</p>
      *
-     * @param combatEntity
-     * @return
+     * @param combatEntity 확인할 엔티티
+     * @return 엔티티가 시야각 이내에 있는지 여부
+     * @see CombatUser#isInSight(Damageable)
      */
     public boolean isInAngleOfView(@NonNull CombatEntity combatEntity) {
         final double ANGLE_OF_VIEW = 70;    // 시야각 (단위: 육십분법)
@@ -1544,6 +1543,31 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Vector toEntity = combatEntity.getCenterLocation().toVector().subtract(getEntity().getEyeLocation().toVector());
         Vector toForward = getEntity().getLocation().getDirection();
         return VectorUtil.isAngleLessThan(toEntity, toForward, ANGLE_OF_VIEW);
+    }
+
+    /**
+     * 유저가 엔티티를 볼 수 있는지 확인한다.
+     * 블록을 가려지는 지 여부를 검사한다.
+     *
+     * @param combatEntity 확인할 엔티티
+     * @return 엔티티를 볼 수 있는 지 여부
+     */
+    public boolean isInSight(@NonNull Damageable combatEntity) {
+        if (!isInAngleOfView(combatEntity))
+            return false;
+
+        final boolean[] hitscanResult = new boolean[] {false}; // single-element array for calling-by-reference
+
+        new Target(this, HitscanOption.MAX_DISTANCE_DEFAULT, false,
+                HitscanOption.CONDITION_DEFAULT, Integer.MAX_VALUE) {
+            @Override
+            protected void onFindEntity(@NonNull Damageable target) {
+                if (target.equals(combatEntity))
+                    hitscanResult[0] = true;
+            }
+        }.shoot();
+
+        return hitscanResult[0];
     }
 
     /**

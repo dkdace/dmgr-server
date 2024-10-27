@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.GlowUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -14,6 +15,7 @@ import org.bukkit.ChatColor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DeltaP2 extends AbstractSkill {
@@ -40,7 +42,13 @@ public class DeltaP2 extends AbstractSkill {
         setDuration();
 
         CombatEntity[] targets = CombatUtil.getNearCombatEntities(
-                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP2Info.DETECT_RADIUS, combatUser::isEnemy);
+                combatUser.getGame(),
+                combatUser.getCenterLocation(),
+                DeltaP2Info.DETECT_RADIUS,
+                combatEntity -> combatUser.isEnemy(combatEntity)
+                        && combatEntity instanceof Damageable
+                        && combatUser.isInSight((Damageable) combatEntity)
+        );
 
         for (CombatEntity target: targets) {
             GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 5);
