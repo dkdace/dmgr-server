@@ -1531,6 +1531,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
+     * 엔티티가 시야각 이내에 있는지 확인한다.
+     *
+     * <p>주의: 블록에 가려졌는지 여부 등은 판단하지 않는다.</p>
+     *
+     * @param combatEntity
+     * @return
+     */
+    public boolean isInAngleOfView(@NonNull CombatEntity combatEntity) {
+        final double ANGLE_OF_VIEW = 60;    // 시야각(단위: 육십분법)
+
+        Vector toEntity = combatEntity.getCenterLocation().toVector().subtract(getEntity().getEyeLocation().toVector());
+        Vector toForward = getEntity().getLocation().getDirection();
+        return VectorUtil.isAngleLessThan(toEntity, toForward, ANGLE_OF_VIEW);
+    }
+
+    /**
      * 쿨타임 ID 및 기본 지속시간 목록.
      */
     @AllArgsConstructor
