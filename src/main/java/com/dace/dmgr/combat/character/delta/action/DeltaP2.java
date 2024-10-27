@@ -40,21 +40,11 @@ public class DeltaP2 extends AbstractSkill {
         setDuration();
 
         CombatEntity[] targets = CombatUtil.getNearCombatEntities(
-                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP2Info.DETECT_RADIUS, this::isTarget);
+                combatUser.getGame(), combatUser.getCenterLocation(), DeltaP2Info.DETECT_RADIUS, combatUser::isEnemy);
 
         for (CombatEntity target: targets) {
             GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), 5);
         }
-    }
-
-    private boolean isTarget(CombatEntity combatEntity) {
-        if (!(combatEntity instanceof Damageable))
-            return false;
-
-        DamageModule damageModule = ((Damageable) combatEntity).getDamageModule();
-
-        return combatEntity.isEnemy(combatUser)
-                && damageModule.getHealth() <= damageModule.getMaxHealth() / 2;
     }
 }
 

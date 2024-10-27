@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.character.delta.action.DeltaP2Info;
 import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
 import com.dace.dmgr.combat.character.magritta.action.MagrittaT1Info;
 import com.dace.dmgr.combat.character.neace.action.NeaceA1Info;
@@ -17,7 +18,9 @@ public enum Property {
     /** 빙결 */
     FREEZE(JagerT1Info.MAX),
     /** 파쇄 */
-    SHREDDING(MagrittaT1Info.MAX);
+    SHREDDING(MagrittaT1Info.MAX),
+    /** 뉴럴링크(델타 패시브 2번) */
+    NEURAL_LINK(DeltaP2Info.GAZING_DURATION);
 
     /** 최댓값 */
     private final int max;

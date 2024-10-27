@@ -114,4 +114,18 @@ public final class VectorUtil {
         Vector spread = Vector.getRandom().subtract(new Vector(0.5, 0.5, 0.5)).multiply(amount * vector.length() * 0.01);
         return vector.clone().add(spread);
     }
+
+    /**
+     * 두 벡터 사이의 각이 {@code maxAngle}보다 더 작은지 판단한다.
+     * @param v 벡터
+     * @param w 벡터
+     * @param maxAngle 최대 각도 (60분법)
+     * @return 벡터 각이 {@code maxAngle}보다 작은지 여부
+     */
+    public static boolean isAngleLessThan(@NonNull Vector v, @NonNull Vector w, double maxAngle) {
+        double cosAngle = v.dot(w) / (v.length() * w.length());
+
+        // Note: cos(x) is decreasing function when 0 < x < pi/2
+        return cosAngle > Math.cos(Math.toRadians(maxAngle));
+    }
 }
