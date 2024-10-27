@@ -106,6 +106,8 @@ public final class PalasA2 extends ActiveSkill {
             target.getStatusEffectModule().clearStatusEffect(false);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
             if (target instanceof CombatUser) {
+                ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", 0, 5, 10);
+
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
                 ((CombatUser) target).addKillAssist(combatUser, PalasA2.ASSIST_SCORE_COOLDOWN_ID, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
             }

@@ -107,6 +107,8 @@ public final class PalasUlt extends UltimateSkill {
             target.getStatusEffectModule().removeStatusEffect(PalasA2.PalasA2Immune.instance);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasUltBuff.instance, PalasUltInfo.DURATION);
             if (target instanceof CombatUser) {
+                ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", 0, 5, 10);
+
                 combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
                 ((CombatUser) target).addKillAssist(combatUser, PalasUlt.ASSIST_SCORE_COOLDOWN_ID, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
             }
