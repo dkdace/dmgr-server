@@ -114,14 +114,14 @@ public final class GeneralConfig extends YamlFile {
         @NonNull
         private Material healPackBlock = Material.NETHERRACK;
         /** 힐 팩 쿨타임 (tick) */
-        private long healPackCooldown = 15 * 20;
+        private long healPackCooldown = 15 * 20L;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
         /** 궁극기 팩에 사용되는 블록의 타입 */
         @NonNull
         private Material ultPackBlock = Material.QUARTZ_ORE;
         /** 궁극기 팩 쿨타임 (tick) */
-        private long ultPackCooldown = 120 * 20;
+        private long ultPackCooldown = 120 * 20L;
         /** 궁극기 팩 충전량 */
         private long ultPackCharge = 1000;
         /** 점프대에 사용되는 블록의 타입 */
@@ -133,13 +133,13 @@ public final class GeneralConfig extends YamlFile {
         @NonNull
         private Material fallZoneBlock = Material.BEDROCK;
         /** 적 처치 기여 (데미지 누적) 제한시간 (tick) */
-        private long damageSumTimeLimit = 10 * 20;
+        private long damageSumTimeLimit = 10 * 20L;
         /** 연속 처치 제한시간 (tick) */
-        private long killStreakTimeLimit = 8 * 20;
+        private long killStreakTimeLimit = 8 * 20L;
         /** 획득 점수 표시 유지시간 (tick) */
-        private long scoreDisplayDuration = 5 * 20;
+        private long scoreDisplayDuration = 5 * 20L;
         /** 킬 로그 표시 유지시간 (tick) */
-        private long killLogDisplayDuration = 4 * 20;
+        private long killLogDisplayDuration = 4 * 20L;
 
         /**
          * 데이터를 불러온다.

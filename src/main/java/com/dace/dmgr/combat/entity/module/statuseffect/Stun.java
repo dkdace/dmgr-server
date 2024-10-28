@@ -18,7 +18,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Stun implements StatusEffect {
     @Getter
-    static final Stun instance = new Stun();
+    private static final Stun instance = new Stun();
 
     @Override
     @NonNull

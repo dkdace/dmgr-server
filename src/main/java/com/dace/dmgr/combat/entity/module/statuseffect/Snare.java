@@ -13,7 +13,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Snare implements StatusEffect {
     @Getter
-    static final Snare instance = new Snare();
+    private static final Snare instance = new Snare();
 
     @Override
     @NonNull
