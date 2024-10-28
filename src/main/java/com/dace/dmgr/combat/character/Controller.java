@@ -7,9 +7,9 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 /**
  * 역할군이 '제어'인 전투원의 정보를 관리하는 클래스.
@@ -47,10 +46,10 @@ public abstract class Controller extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
-            Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
-                    .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .filter(target -> target != null && target != combatUser && target.getDamageModule().isLowHealth())
+        if (i % 5 == 0) {
+            combatUser.getEntity().getWorld().getPlayers().stream()
+                    .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
+                    .filter(target -> target != null && target != combatUser && !target.isEnemy(combatUser) && target.getDamageModule().isLowHealth())
                     .forEach(target -> {
                         CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getEntity().getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
@@ -87,10 +86,10 @@ public abstract class Controller extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 감지 범위 */
-        public static final int DETECT_RADIUS = 10;
-        @Getter
+        private static final int DETECT_RADIUS = 10;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -102,12 +101,12 @@ public abstract class Controller extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 초당 치유량 */
-        public static final int HEAL_PER_SECOND = 40;
+        private static final int HEAL_PER_SECOND = 40;
         /** 활성화 시간 (tick) */
-        public static final long ACTIVATE_DURATION = 4 * 20;
-        @Getter
+        private static final long ACTIVATE_DURATION = 4 * 20L;
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {

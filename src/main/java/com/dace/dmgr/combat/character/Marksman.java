@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -69,10 +68,10 @@ public abstract class Marksman extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 궁극기 충전량 */
-        public static final int ULTIMATE_CHARGE = 500;
-        @Getter
+        private static final int ULTIMATE_CHARGE = 500;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -85,10 +84,10 @@ public abstract class Marksman extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 이동속도 증가량 */
-        public static final int SPEED = 10;
-        @Getter
+        private static final int SPEED = 10;
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {

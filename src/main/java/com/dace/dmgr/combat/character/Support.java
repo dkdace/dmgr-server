@@ -4,16 +4,15 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 /**
  * 역할군이 '지원'인 전투원의 정보를 관리하는 클래스.
@@ -37,19 +36,20 @@ public abstract class Support extends Character {
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Support(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
-                      double speedMultiplier, double hitboxMultiplier) {
+    protected Support(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty,
+                      int health, double speedMultiplier, double hitboxMultiplier) {
         super(name, nickname, skinName, Role.SUPPORT, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0 && combatUser.getGame() != null && combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null) {
-            boolean activate = Arrays.stream(combatUser.getGameUser().getTeam().getTeamUsers())
-                    .map(gameUser -> CombatUser.fromUser(gameUser.getUser()))
-                    .anyMatch(target -> target != null && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2 &&
-                            target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
+        if (i % 5 == 0) {
+            boolean activate = combatUser.getEntity().getWorld().getPlayers().stream()
+                    .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
+                    .anyMatch(target -> target != null && !target.isEnemy(combatUser)
+                            && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2
+                            && target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
                 combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait1Info.SPEED);
@@ -93,12 +93,12 @@ public abstract class Support extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 이동속도 증가량 */
-        public static final int SPEED = 20;
+        private static final int SPEED = 20;
         /** 감지 범위 */
-        public static final int DETECT_RADIUS = 20;
-        @Getter
+        private static final int DETECT_RADIUS = 20;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -112,12 +112,12 @@ public abstract class Support extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 초당 치유량 */
-        public static final int HEAL_PER_SECOND = 50;
+        private static final int HEAL_PER_SECOND = 50;
         /** 지속시간 (tick) */
-        public static final long DURATION = 3 * 20;
-        @Getter
+        private static final long DURATION = 3 * 20L;
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {

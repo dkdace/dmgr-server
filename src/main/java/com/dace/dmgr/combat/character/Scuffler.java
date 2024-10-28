@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Speed;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -62,10 +61,10 @@ public abstract class Scuffler extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 궁극기 충전량 */
-        public static final int ULTIMATE_CHARGE = 500;
-        @Getter
+        private static final int ULTIMATE_CHARGE = 500;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -78,12 +77,12 @@ public abstract class Scuffler extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 이동속도 증가량 */
-        public static final int SPEED = 25;
+        private static final int SPEED = 25;
         /** 지속시간 (tick) */
-        public static final long DURATION = (long) (2.5 * 20);
-        @Getter
+        private static final long DURATION = (long) (2.5 * 20);
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
@@ -100,9 +99,10 @@ public abstract class Scuffler extends Character {
      * 속도 증가 상태 효과 클래스.
      */
     private static final class RoleTrait2Speed extends Speed {
-        private static final RoleTrait2Speed instance = new RoleTrait2Speed();
         /** 수정자 ID */
         private static final String MODIFIER_ID = "RoleTrait2";
+
+        private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
         private RoleTrait2Speed() {
             super(MODIFIER_ID, RoleTrait2Info.SPEED);

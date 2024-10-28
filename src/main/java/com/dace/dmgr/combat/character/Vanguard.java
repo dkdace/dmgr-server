@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -31,8 +30,8 @@ public abstract class Vanguard extends Character {
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
-                       double speedMultiplier, double hitboxMultiplier) {
+    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty,
+                       int health, double speedMultiplier, double hitboxMultiplier) {
         super(name, nickname, skinName, Role.VANGUARD, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
@@ -67,12 +66,12 @@ public abstract class Vanguard extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
-        public static final int KNOCKBACK_RESISTANCE = 30;
+        private static final int KNOCKBACK_RESISTANCE = 30;
         /** 상태 효과 저항 */
-        public static final int STATUS_EFFECT_RESISTANCE = 15;
-        @Getter
+        private static final int STATUS_EFFECT_RESISTANCE = 15;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -86,8 +85,7 @@ public abstract class Vanguard extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
-        @Getter
+    private static final class RoleTrait2Info extends TraitInfo {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {

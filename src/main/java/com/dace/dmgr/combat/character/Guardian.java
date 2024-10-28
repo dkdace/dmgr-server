@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -74,12 +73,12 @@ public abstract class Guardian extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
-        public static final int KNOCKBACK_RESISTANCE = 30;
+        private static final int KNOCKBACK_RESISTANCE = 30;
         /** 방어력 */
-        public static final int DEFENSE = 15;
-        @Getter
+        private static final int DEFENSE = 15;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
@@ -93,12 +92,12 @@ public abstract class Guardian extends Character {
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 치유량 */
-        public static final int HEAL = 300;
+        private static final int HEAL = 300;
         /** 지속시간 (tick) */
-        public static final long DURATION = 2 * 20;
-        @Getter
+        private static final long DURATION = 2 * 20L;
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
