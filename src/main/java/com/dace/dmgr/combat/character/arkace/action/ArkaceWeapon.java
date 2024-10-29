@@ -100,7 +100,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @Override
     public void onCancelled() {
         super.onCancelled();
-        reloadModule.setReloading(false);
+        reloadModule.cancel();
     }
 
     @Override

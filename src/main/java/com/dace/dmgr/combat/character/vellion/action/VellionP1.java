@@ -17,7 +17,7 @@ public final class VellionP1 extends AbstractSkill {
     private static final String MODIFIER_ID = "VellionP1";
 
     public VellionP1(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

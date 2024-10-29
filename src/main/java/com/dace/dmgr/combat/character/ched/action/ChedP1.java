@@ -22,7 +22,7 @@ public final class ChedP1 extends AbstractSkill {
     private long hangTick = ChedP1Info.HANG_DURATION;
 
     public ChedP1(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

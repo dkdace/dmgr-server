@@ -15,7 +15,7 @@ public final class ArkaceP1 extends AbstractSkill {
     private static final String MODIFIER_ID = "ArkaceP1";
 
     public ArkaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class ArkaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, ArkaceP1Info.SPRINT_SPEED);
-        combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
+        combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> combatUser.getEntity().isSprinting() &&
                 !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading() && CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) == 0,
@@ -62,6 +62,6 @@ public final class ArkaceP1 extends AbstractSkill {
 
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-        combatUser.getWeapon().displayDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
     }
 }

@@ -9,7 +9,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -65,15 +64,15 @@ public final class LocationConfirmModule extends ConfirmModule {
     }
 
     /**
-     * 위치를 지정할 수 있는 지 확인한다.
+     * 위치를 지정할 수 있는지 확인한다.
      *
      * @return 위치 지정 가능 여부
      */
     public boolean isValid() {
         if (!isChecking)
             return false;
-        if (currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) || !currentLocation.getBlock().isEmpty() ||
-                currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
+        if (currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) || !currentLocation.getBlock().isEmpty()
+                || currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
             return false;
 
         Location loc = skill.getCombatUser().getEntity().getEyeLocation();
@@ -101,9 +100,10 @@ public final class LocationConfirmModule extends ConfirmModule {
 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{pointer.getEntityId()});
-        Bukkit.getOnlinePlayers().forEach((Player player2) -> {
-            if (player != player2)
-                packet.sendPacket(player2);
+
+        player.getWorld().getPlayers().forEach(target -> {
+            if (player != target)
+                packet.sendPacket(target);
         });
     }
 
@@ -128,20 +128,14 @@ public final class LocationConfirmModule extends ConfirmModule {
                 break;
             }
         }
-        currentLocation.setYaw(i * 10);
+        currentLocation.setYaw(i * 10F);
         currentLocation.setPitch(0);
-
         pointer.teleport(currentLocation.clone().add(0, -1.75, 0).add(currentLocation.getDirection().multiply(0.25)));
-        if (isValid()) {
-            GlowUtil.setGlowing(pointer, ChatColor.GREEN, player);
-            skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f설치     §7§l[{1}] §f취소",
-                    acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
-        } else {
-            GlowUtil.setGlowing(pointer, ChatColor.RED, player);
-            skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §c설치     §7§l[{1}] §f취소",
-                    acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
-        }
         pointer.setAI(false);
+
+        GlowUtil.setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED), player);
+        skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
+                acceptKey.getName(), (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey.getName()), 0, 5, 5);
     }
 
     @Override

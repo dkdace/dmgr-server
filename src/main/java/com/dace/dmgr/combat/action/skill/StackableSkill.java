@@ -18,9 +18,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class StackableSkill extends ActiveSkill {
     /** 스킬 스택 충전 쿨타임 ID */
-    protected static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
+    private static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
     /** 스킬 스택 수 */
-    protected int stack = 0;
+    private int stack = 0;
 
     /**
      * @see ActiveSkill#ActiveSkill(CombatUser, ActiveSkillInfo, int)
@@ -139,7 +139,7 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     /**
-     * 스킬의 스택 충전 쿨타임이 끝났는 지 확인한다.
+     * 스킬의 스택 충전 쿨타임이 끝났는지 확인한다.
      *
      * @return 스택 충전 쿨타임 종료 여부
      */

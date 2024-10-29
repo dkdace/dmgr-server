@@ -94,9 +94,9 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     public void onCancelled() {
         super.onCancelled();
 
-        mainWeapon.getAimModule().setAiming(false);
-        mainWeapon.getReloadModule().setReloading(false);
-        mainWeapon.getSwapModule().setSwapping(false);
+        mainWeapon.getAimModule().cancel();
+        mainWeapon.getReloadModule().cancel();
+        mainWeapon.getSwapModule().cancel();
         mainWeapon.getSwapModule().swap();
     }
 

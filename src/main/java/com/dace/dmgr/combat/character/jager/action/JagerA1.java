@@ -92,7 +92,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                 break;
             }
             case LEFT_CLICK: {
-                onAccept();
+                onUse();
 
                 break;
             }
@@ -109,8 +109,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     @Override
     public void onCancelled() {
         super.onCancelled();
-
-        confirmModule.setChecking(false);
+        confirmModule.cancel();
     }
 
     @Override
@@ -128,8 +127,10 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         // 미사용
     }
 
-    @Override
-    public void onAccept() {
+    /**
+     * 사용 시 실행할 작업.
+     */
+    private void onUse() {
         if (!confirmModule.isValid())
             return;
 

@@ -15,7 +15,7 @@ public interface Weapon extends Action {
      *
      * @param material 아이템 타입
      */
-    void displayMaterial(@NonNull Material material);
+    void setMaterial(@NonNull Material material);
 
     /**
      * 무기 아이템의 내구도를 변경한다.
@@ -23,7 +23,7 @@ public interface Weapon extends Action {
      * @param durability 내구도. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    void displayDurability(short durability);
+    void setDurability(short durability);
 
     /**
      * 무기 아이템의 발광(마법 부여) 여부를 설정한다.

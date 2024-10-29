@@ -120,7 +120,7 @@ public final class SiliaUlt extends UltimateSkill {
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
         combatUser.getWeapon().setVisible(true);
         combatUser.getWeapon().setGlowing(true);
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+        combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
 

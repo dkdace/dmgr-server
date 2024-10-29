@@ -13,7 +13,7 @@ public final class NeaceP1 extends AbstractSkill {
     public static final String COOLDOWN_ID = "NeaceP1";
 
     public NeaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

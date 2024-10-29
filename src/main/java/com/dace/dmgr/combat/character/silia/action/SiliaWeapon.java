@@ -122,11 +122,11 @@ public final class SiliaWeapon extends AbstractWeapon {
         if (isStrike) {
             this.isStrike = true;
             combatUser.getWeapon().setGlowing(true);
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+            combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
         } else {
             this.isStrike = false;
             combatUser.getWeapon().setGlowing(false);
-            combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
+            combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
         }
     }
 

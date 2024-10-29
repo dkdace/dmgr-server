@@ -111,9 +111,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
             swapModule.getSubweapon().onCancelled();
         else {
             super.onCancelled();
-            reloadModule.setReloading(false);
-            swapModule.setSwapping(false);
-            aimModule.setAiming(false);
+            reloadModule.cancel();
+            swapModule.cancel();
+            aimModule.cancel();
         }
     }
 

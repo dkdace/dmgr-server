@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -29,10 +28,8 @@ public abstract class ChargeableSkill extends ActiveSkill {
         if (isDurationFinished()) {
             if (isCooldownFinished())
                 displayReady(1);
-            else {
-                long cooldown = CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
-                displayCooldown((int) Math.ceil(cooldown / 20.0));
-            }
+            else
+                displayCooldown((int) Math.ceil(getCooldown() / 20.0));
         } else {
             displayUsing(1);
             addStateValue(-getStateValueDecrement());

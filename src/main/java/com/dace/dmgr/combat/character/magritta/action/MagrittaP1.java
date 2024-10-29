@@ -22,7 +22,7 @@ public final class MagrittaP1 extends AbstractSkill {
     private boolean canActivate = false;
 
     public MagrittaP1(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

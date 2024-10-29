@@ -14,7 +14,7 @@ public interface Reloadable extends Weapon {
     ReloadModule getReloadModule();
 
     /**
-     * 무기를 재장전할 수 있는 지 확인한다.
+     * 무기를 재장전할 수 있는지 확인한다.
      *
      * @return 재장전 가능 여부
      * @implSpec {@code true}

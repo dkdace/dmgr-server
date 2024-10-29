@@ -22,7 +22,7 @@ import org.bukkit.block.Block;
  */
 public final class MeleeAttackAction extends AbstractAction {
     /** 쿨타임 (tick) */
-    private static final long COOLDOWN = 1 * 20;
+    private static final long COOLDOWN = 20;
     /** 피해량 */
     private static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */

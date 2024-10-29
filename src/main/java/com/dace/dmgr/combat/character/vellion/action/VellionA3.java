@@ -72,7 +72,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                 break;
             }
             case LEFT_CLICK: {
-                onAccept();
+                onUse();
 
                 break;
             }
@@ -90,7 +90,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     public void onCancelled() {
         super.onCancelled();
 
-        confirmModule.setChecking(false);
+        confirmModule.cancel();
         if (!isDurationFinished()) {
             setDuration(0);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
@@ -112,8 +112,10 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         // 미사용
     }
 
-    @Override
-    public void onAccept() {
+    /**
+     * 사용 시 실행할 작업.
+     */
+    private void onUse() {
         if (!confirmModule.isValid())
             return;
 
@@ -139,7 +141,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             onCancelled();
             onReady(location);
         }, 1, VellionA3Info.READY_DURATION));
-
     }
 
     /**

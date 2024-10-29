@@ -21,7 +21,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class AbstractAction implements Action {
     /** 동작 쿨타임 ID */
-    protected static final String ACTION_COOLDOWN_ID = "ActionCooldown";
+    private static final String ACTION_COOLDOWN_ID = "ActionCooldown";
 
     /** 플레이어 객체 */
     @NonNull

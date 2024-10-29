@@ -19,7 +19,7 @@ public final class SiliaP2 extends AbstractSkill {
     private int wallRideCount = SiliaP2Info.USE_COUNT;
 
     public SiliaP2(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaP2Info.getInstance());
+        super(combatUser);
     }
 
     @Override

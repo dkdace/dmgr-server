@@ -33,7 +33,6 @@ public final class ReloadModule {
     private int remainingAmmo;
     /** 재장전 상태 */
     @Getter
-    @Setter
     private boolean isReloading = false;
 
     /**
@@ -104,5 +103,12 @@ public final class ReloadModule {
             isReloading = false;
             weapon.onReloadFinished();
         }, 1, reloadDuration));
+    }
+
+    /**
+     * 무기의 재장전을 취소한다.
+     */
+    public void cancel() {
+        isReloading = false;
     }
 }
