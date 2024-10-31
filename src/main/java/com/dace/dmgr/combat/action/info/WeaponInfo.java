@@ -30,7 +30,8 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      * @param name        이름
      * @param lores       설명 목록
      */
-    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
+    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name,
+                         @NonNull String @NonNull ... lores) {
         super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)

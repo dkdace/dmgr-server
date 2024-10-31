@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat.action.info;
 
 import com.dace.dmgr.item.StaticItem;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
  * @see SkillInfo
  * @see TraitInfo
  */
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ActionInfo {
     /** 이름 */
     @Getter

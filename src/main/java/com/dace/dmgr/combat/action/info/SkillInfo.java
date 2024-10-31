@@ -42,7 +42,7 @@ public abstract class SkillInfo<T extends Skill> extends ActionInfo {
      * <pre><code>
      * public final class TestSkill extends AbstractSkill {
      *     public TestSkill(CombatUser combatUser) {
-     *         super(combatUser, TestSkillInfo.getInstance());
+     *         super(combatUser);
      *     }
      * }
      * </code></pre>
