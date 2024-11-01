@@ -27,6 +27,20 @@ public class TraitInfo extends ActionInfo {
                 .build()));
     }
 
+    /**
+     * 특성 정보 인스턴스를 생성한다.
+     *
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
+     */
+    protected TraitInfo(@NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
+        super(name, new StaticItem("TraitInfo" + name, new ItemBuilder(SkillInfo.MATERIAL)
+                .setName(PREFIX + name)
+                .setDamage((short) 3)
+                .setLore(actionInfoLore.toString())
+                .build()));
+    }
+
     @Override
     public String toString() {
         return "§b［" + name + "］";
