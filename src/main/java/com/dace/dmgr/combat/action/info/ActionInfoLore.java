@@ -101,7 +101,7 @@ public final class ActionInfoLore {
         /** 개요 줄바꿈 기준 길이 */
         private static final int SUMMARY_WRAP_LENGTH = 24;
         /** 개요 패턴 정규식. <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타낸다. */
-        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]+:[^\n]+?>");
+        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]*:[^\n]+?>");
         /** 개요 문자열 접두사 */
         private static final String SUMMARY_PREFIX = "§f▍ ";
 
@@ -166,11 +166,13 @@ public final class ActionInfoLore {
                 String group = matcher.group();
                 String[] texts = group.substring(1, group.length() - 1).split(":");
 
-                TextIcon textIcon = TextIcon.valueOf(texts[1]);
+                TextIcon textIcon = texts[1].isEmpty() ? null : TextIcon.valueOf(texts[1]);
+                if (textIcon != null)
+                    texts[1] = textIcon + " ";
                 if (texts[0].isEmpty())
-                    texts[0] = String.valueOf(textIcon.getDefaultColor().getChar());
+                    texts[0] = textIcon == null ? "f" : String.valueOf(textIcon.getDefaultColor().getChar());
 
-                String formatted = MessageFormat.format("§{0}{1} {2}§f", texts[0], textIcon, texts[2]);
+                String formatted = MessageFormat.format("§{0}{1}{2}§f", texts[0], texts[1], texts[2]);
                 String formattedTemp = ChatColor.stripColor(formatted).replace(" ", "\u3000");
                 matcher.appendReplacement(result, formattedTemp);
 
