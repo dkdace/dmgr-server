@@ -24,8 +24,7 @@ import java.util.stream.Collectors;
  */
 public final class ActionInfoLore {
     /** 섹션 문자열 목록 */
-    @NonNull
-    private final String @NonNull [] sections;
+    private final String[] sections;
 
     /**
      * 동작 정보 설명 인스턴스를 생성한다.
@@ -61,11 +60,11 @@ public final class ActionInfoLore {
      * // \u4DC4 100
      * // \u4DC0 100 ~ 50
      * //
-     * // [1][좌클릭] 사용 [우클릭] 해제
+     * // [1] [좌클릭] 사용 [우클릭] 해제
      * //
      * // [재사용 시]
      * //
-     * // ▍ 동작 개요에 대한 내용
+     * // ▍ 아군을 \u4DC4 치유한다.
      * //
      * // \u4DC4 100
      * //
@@ -73,13 +72,13 @@ public final class ActionInfoLore {
      *
      * ActionInfoLore lore = new ActionInfoLore(Section
      *     .builder("동작 개요에 대한 내용")
-     *     .addValueInfo(ChatColor.GREEN, TextIcon.HEAL, 100)
-     *     .addValueInfo(ChatColor.RED, TextIcon.DAMAGE, Format.VARIABLE, 100, 50);
+     *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
+     *     .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, ChatColor.RED, 100, 50);
      *     .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.LEFT_CLICK)
      *     .addActionKeyInfo("해제", ActionKey.RIGHT_CLICK);
      *     .build(),
      *     new NamedSection("재사용 시", Section
-     *         .builder("동작 개요에 대한 내용")
+     *         .builder("아군을 <a:HEAL:치유>한다.")
      *         .addValueInfo(ChatColor.GREEN, TextIcon.HEAL, 100)
      *         .addActionKeyInfo("사용", ActionKey.SLOT_1)
      *         .build()
@@ -102,7 +101,9 @@ public final class ActionInfoLore {
         /** 개요 줄바꿈 기준 길이 */
         private static final int SUMMARY_WRAP_LENGTH = 24;
         /** 개요 패턴 정규식. <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타낸다. */
-        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]:[A-Z_]+:[^\n]+?>");
+        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]+:[^\n]+?>");
+        /** 개요 문자열 접두사 */
+        private static final String SUMMARY_PREFIX = "§f▍ ";
 
         /** 개요 문자열 목록 */
         @NonNull
@@ -131,7 +132,7 @@ public final class ActionInfoLore {
                 for (int i = 0; i < valueInfoList.size(); i++) {
                     ValueInfo valueInfo = valueInfoList.get(i);
                     this.valueInfos[i] = MessageFormat.format(
-                            MessageFormat.format("{0}{1} §f{2}", valueInfo.color, valueInfo.textIcon.getIcon(), valueInfo.type.pattern),
+                            MessageFormat.format("{0}{1} §f{2}", valueInfo.color, valueInfo.textIcon, valueInfo.pattern),
                             valueInfo.arguments);
                 }
             }
@@ -165,7 +166,11 @@ public final class ActionInfoLore {
                 String group = matcher.group();
                 String[] texts = group.substring(1, group.length() - 1).split(":");
 
-                String formatted = MessageFormat.format("§{0}{1} {2}§f", texts[0], TextIcon.valueOf(texts[1]).getIcon(), texts[2]);
+                TextIcon textIcon = TextIcon.valueOf(texts[1]);
+                if (texts[0].isEmpty())
+                    texts[0] = String.valueOf(textIcon.getDefaultColor().getChar());
+
+                String formatted = MessageFormat.format("§{0}{1} {2}§f", texts[0], textIcon, texts[2]);
                 String formattedTemp = ChatColor.stripColor(formatted).replace(" ", "\u3000");
                 matcher.appendReplacement(result, formattedTemp);
 
@@ -174,15 +179,24 @@ public final class ActionInfoLore {
             }
             matcher.appendTail(result);
 
-            return StringUtils.replaceEachRepeatedly(
-                            "§f▍ " + WordUtils.wrap(result.toString(), SUMMARY_WRAP_LENGTH, "\n§f▍ ", false),
-                            formattedTempTexts.toArray(new String[0]),
-                            formattedTexts.toArray(new String[0]))
-                    .split("\n");
+            String wrappedSummary = WordUtils.wrap(
+                    SUMMARY_PREFIX + WordUtils.wrap(result.toString(), SUMMARY_WRAP_LENGTH, "\n" + SUMMARY_PREFIX, false),
+                    1, ". \n" + SUMMARY_PREFIX, false, "\\. ");
+            return StringUtils.replaceEachRepeatedly(wrappedSummary,
+                    formattedTempTexts.toArray(new String[0]), formattedTexts.toArray(new String[0])).split("\n");
         }
 
         /**
          * 빌더 인스턴스를 생성하여 반환한다.
+         *
+         * <p>Example:</p>
+         *
+         * <pre><code>
+         * //
+         * // ▍ 아군을 \u4DC4 치유한다.
+         * Section section = Section.builder("아군을 <a:HEAL:치유>한다.").build();
+         * section.toString();
+         * </code></pre>
          *
          * @param summary 개요. 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을
          *                포함할 수 있는 문자열
@@ -205,12 +219,12 @@ public final class ActionInfoLore {
          * // \u4DC4 100
          * // \u4DC0 100 ~ 50
          * //
-         * // [1][좌클릭] 사용 [우클릭] 해제
+         * // [1] [좌클릭] 사용 [우클릭] 해제
          *
          * Section useSection = Section
          *     .builder("동작 개요에 대한 내용")
-         *     .addValueInfo(ChatColor.GREEN, TextIcon.HEAL, 100)
-         *     .addValueInfo(ChatColor.RED, TextIcon.DAMAGE, Format.VARIABLE, 100, 50);
+         *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
+         *     .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, ChatColor.RED, 100, 50);
          *     .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.LEFT_CLICK)
          *     .addActionKeyInfo("해제", ActionKey.RIGHT_CLICK);
          *     .build();
@@ -274,6 +288,11 @@ public final class ActionInfoLore {
 
             /** 문자열 패턴 */
             private final String pattern;
+
+            @Override
+            public String toString() {
+                return pattern;
+            }
         }
 
         /**
@@ -294,25 +313,23 @@ public final class ActionInfoLore {
              * <p>Example:</p>
              *
              * <pre><code>
-             * // <빨간색>\u4DDE <흰색>10m
-             * builder.addValueInfo(ChatColor.RED, TextIcon.DISTANCE, Format.DISTANCE, 10);
-             * // <빨간색>\u4DC0 <흰색>100 ~ 50
-             * builder.addValueInfo(ChatColor.RED, TextIcon.DAMAGE, Format.VARIABLE, 100, 50);
+             * // <빨간색>\u4DDE <흰색>10 + 20
+             * builder.addValueInfo(TextIcon.DAMAGE, "{0} + {1}", ChatColor.RED, 10, 20);
              * </code></pre>
              *
-             * @param color     텍스트 아이콘 색상
              * @param textIcon  텍스트 아이콘
-             * @param type      포맷 형식
+             * @param pattern   문자열 패턴
+             * @param color     텍스트 아이콘 색상
              * @param arguments 포맷에 사용할 인자 목록
              * @return {@link SectionBuilder}
              */
             @NonNull
-            public SectionBuilder addValueInfo(@NonNull ChatColor color, @NonNull TextIcon textIcon, @NonNull Format type,
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull String pattern, @NonNull ChatColor color,
                                                @NonNull Object @NonNull ... arguments) {
                 if (valueInfos == null)
                     valueInfos = new ArrayList<>();
 
-                valueInfos.add(new ValueInfo(color, textIcon, type, arguments));
+                valueInfos.add(new ValueInfo(textIcon, pattern, color, arguments));
                 return this;
             }
 
@@ -322,18 +339,103 @@ public final class ActionInfoLore {
              * <p>Example:</p>
              *
              * <pre><code>
-             * // <빨간색>\u4DC0 <흰색>100
-             * builder.addValueInfo(ChatColor.RED, TextIcon.DAMAGE, 100);
+             * // <빨간색>\u4DDE <흰색>10 + 20
+             * builder.addValueInfo(TextIcon.DAMAGE, "{0} + {1}", 10, 20);
              * </code></pre>
              *
+             * @param textIcon  텍스트 아이콘
+             * @param pattern   문자열 패턴
+             * @param arguments 포맷에 사용할 인자 목록
+             * @return {@link SectionBuilder}
+             */
+            @NonNull
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull String pattern, @NonNull Object @NonNull ... arguments) {
+                return addValueInfo(textIcon, pattern, textIcon.getDefaultColor(), arguments);
+            }
+
+            /**
+             * 수치 상세 설명을 추가한다.
+             *
+             * <p>Example:</p>
+             *
+             * <pre><code>
+             * // <빨간색>\u4DDE <흰색>10m
+             * builder.addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, ChatColor.RED, 10);
+             * // <빨간색>\u4DC0 <흰색>100 ~ 50
+             * builder.addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, ChatColor.RED, 100, 50);
+             * </code></pre>
+             *
+             * @param textIcon  텍스트 아이콘
+             * @param format    포맷 형식
+             * @param color     텍스트 아이콘 색상
+             * @param arguments 포맷에 사용할 인자 목록
+             * @return {@link SectionBuilder}
+             */
+            @NonNull
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull Format format, @NonNull ChatColor color,
+                                               @NonNull Object @NonNull ... arguments) {
+                return addValueInfo(textIcon, format.pattern, color, arguments);
+            }
+
+            /**
+             * 수치 상세 설명을 추가한다.
+             *
+             * <p>Example:</p>
+             *
+             * <pre><code>
+             * // <흰색>\u4DDE <흰색>10m
+             * builder.addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, 10);
+             * // <빨간색>\u4DC0 <흰색>100 ~ 50
+             * builder.addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, 100, 50);
+             * </code></pre>
+             *
+             * @param textIcon  텍스트 아이콘
+             * @param format    포맷 형식
+             * @param arguments 포맷에 사용할 인자 목록
+             * @return {@link SectionBuilder}
+             */
+            @NonNull
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull Format format, @NonNull Object @NonNull ... arguments) {
+                return addValueInfo(textIcon, format.pattern, textIcon.getDefaultColor(), arguments);
+            }
+
+            /**
+             * 수치 상세 설명을 추가한다.
+             *
+             * <p>Example:</p>
+             *
+             * <pre><code>
+             * // <빨간색>\u4DC0 <흰색>100
+             * builder.addValueInfo(TextIcon.DAMAGE, ChatColor.RED, 100);
+             * </code></pre>
+             *
+             * @param textIcon 텍스트 아이콘
              * @param color    텍스트 아이콘 색상
+             * @param argument 값
+             * @return {@link SectionBuilder}
+             */
+            @NonNull
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull ChatColor color, @NonNull Object argument) {
+                return addValueInfo(textIcon, Format.DEFAULT.pattern, color, argument);
+            }
+
+            /**
+             * 수치 상세 설명을 추가한다.
+             *
+             * <p>Example:</p>
+             *
+             * <pre><code>
+             * // <빨간색>\u4DC0 <흰색>100
+             * builder.addValueInfo(TextIcon.DAMAGE, 100);
+             * </code></pre>
+             *
              * @param textIcon 텍스트 아이콘
              * @param argument 값
              * @return {@link SectionBuilder}
              */
             @NonNull
-            public SectionBuilder addValueInfo(@NonNull ChatColor color, @NonNull TextIcon textIcon, @NonNull Object argument) {
-                return addValueInfo(color, textIcon, Format.DEFAULT, argument);
+            public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull Object argument) {
+                return addValueInfo(textIcon, Format.DEFAULT.pattern, textIcon.getDefaultColor(), argument);
             }
 
             /**
@@ -342,7 +444,7 @@ public final class ActionInfoLore {
              * <p>Example:</p>
              *
              * <pre><code>
-             * // [1][좌클릭] 사용 [우클릭] 해제
+             * // [1] [좌클릭] 사용 [우클릭] 해제
              * builder
              *     .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.LEFT_CLICK)
              *     .addActionKeyInfo("해제", ActionKey.RIGHT_CLICK);
@@ -377,15 +479,15 @@ public final class ActionInfoLore {
          */
         @AllArgsConstructor(access = AccessLevel.PRIVATE)
         private static final class ValueInfo {
-            /** 텍스트 아이콘 색상 */
-            @NonNull
-            private final ChatColor color;
             /** 텍스트 아이콘 */
             @NonNull
             private final TextIcon textIcon;
-            /** 포맷 형식 */
+            /** 문자열 패턴 */
             @NonNull
-            private final Format type;
+            private final String pattern;
+            /** 텍스트 아이콘 색상 */
+            @NonNull
+            private final ChatColor color;
             /** 포맷에 사용할 인자 목록 */
             @NonNull
             private final Object[] arguments;
@@ -425,16 +527,16 @@ public final class ActionInfoLore {
          * <pre><code>
          * // [재사용 시]
          * //
-         * // ▍ 동작 개요에 대한 내용
+         * // ▍ 아군을 \u4DC4 치유한다.
          * //
          * // \u4DC4 100
          * //
          * // [1] 사용
          *
-         * NamedSection useSection = new NamedSection("사용", Section
-         *     .builder("동작 개요에 대한 내용")
-         *     .addValueInfo(ChatColor.GREEN, TextIcon.HEAL, 100)
-         *     .addActionKeyInfo("재사용 시", ActionKey.SLOT_1)
+         * NamedSection useSection = new NamedSection("재사용 시", Section
+         *     .builder("아군을 <a:HEAL:치유>한다.")
+         *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
+         *     .addActionKeyInfo("사용", ActionKey.SLOT_1)
          *     .build());
          * useSection.toString();
          * </code></pre>
