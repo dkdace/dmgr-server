@@ -101,7 +101,7 @@ public final class ActionInfoLore {
         /** 개요 줄바꿈 기준 길이 */
         private static final int SUMMARY_WRAP_LENGTH = 24;
         /** 개요 패턴 정규식. <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타낸다. */
-        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]*:[^\n]+?>");
+        private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]*:[^\n]*?>");
         /** 개요 문자열 접두사 */
         private static final String SUMMARY_PREFIX = "§f▍ ";
 
@@ -164,13 +164,14 @@ public final class ActionInfoLore {
 
             while (matcher.find()) {
                 String group = matcher.group();
-                String[] texts = group.substring(1, group.length() - 1).split(":");
+                String[] texts = StringUtils.splitPreserveAllTokens(group.substring(1, group.length() - 1), ':');
 
                 TextIcon textIcon = texts[1].isEmpty() ? null : TextIcon.valueOf(texts[1]);
-                if (textIcon != null)
-                    texts[1] = textIcon + " ";
                 if (texts[0].isEmpty())
                     texts[0] = textIcon == null ? "f" : String.valueOf(textIcon.getDefaultColor().getChar());
+                texts[1] = textIcon == null ? "§n" : textIcon.toString();
+                if (textIcon != null)
+                    texts[2] = " " + texts[2];
 
                 String formatted = MessageFormat.format("§{0}{1}{2}§f", texts[0], texts[1], texts[2]);
                 String formattedTemp = ChatColor.stripColor(formatted).replace(" ", "\u3000");
@@ -195,10 +196,14 @@ public final class ActionInfoLore {
          * <p>Example:</p>
          *
          * <pre><code>
-         * //
-         * // ▍ 아군을 \u4DC4 치유한다.
-         * Section section = Section.builder("아군을 <a:HEAL:치유>한다.").build();
-         * section.toString();
+         * // ▍ 아군을 <초록색>\u4DC4 치유<흰색>한다.
+         * Section.builder("아군을 <:HEAL:치유>한다.").build();
+         * // ▍ 적에게 <보라색>\u4DC0 피해<흰색>를 입힌다.
+         * Section.builder("적에게 <5:DAMAGE:피해>를 입힌다.").build();
+         * // ▍ <분홍색>특성<흰색>을 적용한다.
+         * Section.builder("<d::특성>을 적용한다.").build();
+         * // ▍ <빨간색>\u4DC0 <흰색>테스트
+         * Section.builder("<:DAMAGE:> 테스트").build();
          * </code></pre>
          *
          * @param summary 개요. 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을
