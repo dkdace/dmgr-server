@@ -181,10 +181,11 @@ public final class ActionInfoLore {
             }
             matcher.appendTail(result);
 
-            String wrappedSummary = WordUtils.wrap(
-                    SUMMARY_PREFIX + WordUtils.wrap(result.toString(), SUMMARY_WRAP_LENGTH, "\n" + SUMMARY_PREFIX, false),
-                    1, ". \n" + SUMMARY_PREFIX, false, "\\. ");
-            return StringUtils.replaceEachRepeatedly(wrappedSummary,
+            StringJoiner finalResult = new StringJoiner(".\n");
+            for (String line : result.toString().split("\\. "))
+                finalResult.add(SUMMARY_PREFIX + WordUtils.wrap(line, SUMMARY_WRAP_LENGTH, "\n" + SUMMARY_PREFIX, false));
+
+            return StringUtils.replaceEach(finalResult.toString(),
                     formattedTempTexts.toArray(new String[0]), formattedTexts.toArray(new String[0])).split("\n");
         }
 
