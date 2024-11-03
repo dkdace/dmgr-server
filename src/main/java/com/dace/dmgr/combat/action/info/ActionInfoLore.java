@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,7 +101,10 @@ public final class ActionInfoLore {
     public static final class Section {
         /** 개요 줄바꿈 기준 길이 */
         private static final int SUMMARY_WRAP_LENGTH = 24;
-        /** 개요 패턴 정규식. <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타낸다. */
+        /**
+         * 개요에 사용할 수 있는 자리 표시자의 패턴 정규식.
+         * <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타냄
+         */
         private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]*:[^\n]*?>");
         /** 개요 문자열 접두사 */
         private static final String SUMMARY_PREFIX = "§f▍ ";
@@ -156,38 +160,58 @@ public final class ActionInfoLore {
          * @param summary 원본 문자열
          * @return 파싱된 문자열 목록
          */
-        private static @NonNull String @NonNull [] parseSummary(@NonNull String summary) {
+        @NonNull
+        private static String @NonNull [] parseSummary(@NonNull String summary) {
             Matcher matcher = SUMMARY_PLACEHOLDER_PATTERN.matcher(summary);
             StringBuffer result = new StringBuffer();
-            ArrayList<String> formattedTexts = new ArrayList<>();
-            ArrayList<String> formattedTempTexts = new ArrayList<>();
+            ArrayList<Pair<String, String>> replaceTexts = new ArrayList<>();
 
             while (matcher.find()) {
                 String group = matcher.group();
-                String[] texts = StringUtils.splitPreserveAllTokens(group.substring(1, group.length() - 1), ':');
-
-                TextIcon textIcon = texts[1].isEmpty() ? null : TextIcon.valueOf(texts[1]);
-                if (texts[0].isEmpty())
-                    texts[0] = textIcon == null ? "f" : String.valueOf(textIcon.getDefaultColor().getChar());
-                texts[1] = textIcon == null ? "§n" : textIcon.toString();
-                if (textIcon != null)
-                    texts[2] = " " + texts[2];
-
-                String formatted = MessageFormat.format("§{0}{1}{2}§f", texts[0], texts[1], texts[2]);
-                String formattedTemp = ChatColor.stripColor(formatted).replace(" ", "\u3000");
+                String formatted = formatPlaceholderPattern(group);
+                String formattedTemp = ChatColor.stripColor(formatted.replace("§n", "\u3000"))
+                        .replace(" ", "\u3000");
                 matcher.appendReplacement(result, formattedTemp);
 
-                formattedTexts.add(formatted);
-                formattedTempTexts.add(formattedTemp);
+                replaceTexts.add(Pair.of(formattedTemp, formatted));
             }
             matcher.appendTail(result);
 
-            StringJoiner finalResult = new StringJoiner(".\n");
+            StringJoiner lineWrapper = new StringJoiner(".\n");
             for (String line : result.toString().split("\\. "))
-                finalResult.add(SUMMARY_PREFIX + WordUtils.wrap(line, SUMMARY_WRAP_LENGTH, "\n" + SUMMARY_PREFIX, false));
+                lineWrapper.add(SUMMARY_PREFIX + WordUtils.wrap(line, SUMMARY_WRAP_LENGTH, "\n" + SUMMARY_PREFIX, false));
 
-            return StringUtils.replaceEach(finalResult.toString(),
-                    formattedTempTexts.toArray(new String[0]), formattedTexts.toArray(new String[0])).split("\n");
+            StringBuilder finalResult = new StringBuilder(lineWrapper.toString());
+            replaceTexts.forEach(replaceText -> {
+                int index = finalResult.indexOf(replaceText.getLeft());
+                if (index == -1)
+                    return;
+
+                finalResult.delete(index, index + replaceText.getLeft().length());
+                finalResult.insert(index, replaceText.getRight());
+            });
+
+            return finalResult.toString().split("\n");
+        }
+
+        /**
+         * 자리 표시자에 포맷을 적용하여 반환한다.
+         *
+         * @param placeholder 적용할 자리 표시자 문자열
+         * @return 포맷이 적용된 문자열
+         */
+        @NonNull
+        private static String formatPlaceholderPattern(@NonNull String placeholder) {
+            String[] texts = StringUtils.splitPreserveAllTokens(placeholder.substring(1, placeholder.length() - 1), ':');
+
+            TextIcon textIcon = texts[1].isEmpty() ? null : TextIcon.valueOf(texts[1]);
+            if (texts[0].isEmpty())
+                texts[0] = textIcon == null ? "f" : String.valueOf(textIcon.getDefaultColor().getChar());
+            texts[1] = textIcon == null ? "§n" : textIcon.toString();
+            if (textIcon != null && !texts[2].isEmpty())
+                texts[2] = " " + texts[2];
+
+            return MessageFormat.format("§{0}{1}{2}§f", texts[0], texts[1], texts[2]);
         }
 
         /**
@@ -206,7 +230,7 @@ public final class ActionInfoLore {
          * Section.builder("<:DAMAGE:> 테스트").build();
          * </code></pre>
          *
-         * @param summary 개요. 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을
+         * @param summary 개요. 자리 표시자 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을
          *                포함할 수 있는 문자열
          * @return {@link SectionBuilder}
          */

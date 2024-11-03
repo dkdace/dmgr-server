@@ -49,7 +49,7 @@ public enum TextIcon {
     /** 이동속도 감소 */
     WALK_SPEED_DECREASE('\u4DD2', ChatColor.AQUA),
     /** 독 */
-    POISON('\u4DD3', ChatColor.DARK_PURPLE),
+    POISON('\u4DD3', ChatColor.RED),
     /** 투명화 */
     INVISIBLE('\u4DD4', ChatColor.WHITE),
     /** 쿨타임 */
