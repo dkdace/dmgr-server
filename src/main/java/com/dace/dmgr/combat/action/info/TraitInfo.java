@@ -16,20 +16,6 @@ public class TraitInfo extends ActionInfo {
     /**
      * 특성 정보 인스턴스를 생성한다.
      *
-     * @param name  이름
-     * @param lores 설명 목록
-     */
-    protected TraitInfo(@NonNull String name, @NonNull String @NonNull ... lores) {
-        super(name, new StaticItem("TraitInfo" + name, new ItemBuilder(SkillInfo.MATERIAL)
-                .setName(PREFIX + name)
-                .setDamage((short) 3)
-                .setLore(lores)
-                .build()));
-    }
-
-    /**
-     * 특성 정보 인스턴스를 생성한다.
-     *
      * @param name           이름
      * @param actionInfoLore 동작 정보 설명
      */
