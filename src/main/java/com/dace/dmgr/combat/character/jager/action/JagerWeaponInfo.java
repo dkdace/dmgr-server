@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
+import org.bukkit.ChatColor;
 
 public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
@@ -26,7 +28,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 장탄수 */
     public static final int CAPACITY = 10;
     /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = 2 * 20;
+    public static final long RELOAD_DURATION = 2 * 20L;
     /** 무기 교체 시간 (tick) */
     public static final long SWAP_DURATION = (long) (0.25 * 20);
     /** 조준 시 이동속도 감소량 */
@@ -36,32 +38,30 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
 
     private JagerWeaponInfo() {
         super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR",
-                "",
-                "§f▍ 두 개의 탄창을 가진 특수 소총으로, §3냉각탄 §f및",
-                "§f▍ §7정조준§f하여 §3저격탄§f을 사격할 수 있습니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                "",
-                "§7§l[좌클릭] §f냉각탄 / 저격탄 §7§l[우클릭] §f정조준",
-                "§7§l[Q] §f재장전",
-                "",
-                "§3[냉각탄]",
-                "",
-                "§f▍ §7냉각탄§f을 사격하여 §c" + TextIcon.DAMAGE + " 피해§f를 입히고 §5" + TextIcon.WALK_SPEED_DECREASE + " §d빙결",
-                "§f▍ §f시킵니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                MessageFormat.format("§5{0}§f {1}", TextIcon.WALK_SPEED_DECREASE, FREEZE),
-                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
-                "",
-                "§3[저격탄]",
-                "",
-                "§f▍ §7저격탄§f을 사격하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1} ~ {2} ({3}m~{4}m)",
-                        TextIcon.DAMAGE, SCOPE.DAMAGE, SCOPE.DAMAGE / 2, SCOPE.DAMAGE_WEAKENING_DISTANCE, SCOPE.DAMAGE_WEAKENING_DISTANCE * 2),
-                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, SCOPE.CAPACITY));
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("두 개의 탄창을 가진 특수 소총으로, <3::냉각탄> 및 정조준하여 <3::저격탄>을 사격할 수 있습니다.")
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
+                        .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)
+                        .addActionKeyInfo("재장전", ActionKey.DROP)
+                        .build(),
+                        new ActionInfoLore.NamedSection("냉각탄", ActionInfoLore.Section
+                                .builder("냉각탄을 사격하여 <:DAMAGE:피해>를 입히고 <5:WALK_SPEED_DECREASE:> <d::빙결>시킵니다.")
+                                .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                                .addValueInfo(TextIcon.WALK_SPEED_DECREASE, ChatColor.DARK_PURPLE, FREEZE)
+                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
+                                .build()
+                        ),
+                        new ActionInfoLore.NamedSection("저격탄", ActionInfoLore.Section
+                                .builder("저격탄을 사격하여 <:DAMAGE:피해>를 입힙니다.")
+                                .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
+                                        SCOPE.DAMAGE, SCOPE.DAMAGE / 2, SCOPE.DAMAGE_WEAKENING_DISTANCE, SCOPE.DAMAGE_WEAKENING_DISTANCE * 2)
+                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, SCOPE.CAPACITY)
+                                .build()
+                        )
+                )
+        );
     }
 
     /**

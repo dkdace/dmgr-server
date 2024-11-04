@@ -184,9 +184,6 @@ public final class ActionInfoLore {
             StringBuilder finalResult = new StringBuilder(lineWrapper.toString());
             replaceTexts.forEach(replaceText -> {
                 int index = finalResult.indexOf(replaceText.getLeft());
-                if (index == -1)
-                    return;
-
                 finalResult.delete(index, index + replaceText.getLeft().length());
                 finalResult.insert(index, replaceText.getRight());
             });
@@ -303,8 +300,14 @@ public final class ActionInfoLore {
             VARIABLE_WITH_DISTANCE("{0} ~ {1} ({2}m~{3}m)"),
             /** 시간. 쿨타임, 지속시간 등 */
             TIME("{0}초"),
+            /** 시간 및 최대 충전량. 스택형 스킬의 쿨타임 등 */
+            TIME_WITH_MAX_STACK("{0}초 / {1}회 충전"),
+            /** 시간 및 충전 시간. 충전형 스킬의 지속시간 등 */
+            TIME_WITH_MAX_TIME("{0}초 / {1}초 충전"),
             /** 시간 및 RPM. 무기의 연사속도 등 */
             TIME_WITH_RPM("{0}초 ({1}/분)"),
+            /** 시간 및 퍼센트 */
+            TIME_WITH_PERCENT("{0}초 / {1}%"),
             /** 장탄수 */
             CAPACITY("{0}발"),
             /** 시간당 값. 초당 피해량, 초당 치유량 등 */

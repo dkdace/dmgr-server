@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
 
 public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     /** 쿨타임 (tick) */
@@ -27,17 +28,18 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
 
     private MagrittaWeaponInfo() {
         super(MagrittaWeapon.class, RESOURCE.DEFAULT, "데스페라도",
-                "",
-                "§f▍ 근거리에 강력한 피해를 입히는 산탄총입니다.",
-                "§f▍ §7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                "§f▍ 산탄이 4발 이상 적중하면 적에게 §d파쇄§f를",
-                "§f▍ 적용합니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1} ~ {2} ({3}m~{4}m) (×{5})", TextIcon.DAMAGE, DAMAGE, DAMAGE / 2, DISTANCE / 2, DISTANCE, PELLET_AMOUNT),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
-                "",
-                "§7§l[좌클릭] §f사격");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("근거리에 강력한 피해를 입히는 산탄총입니다. " +
+                                "사격하여 <:DAMAGE:피해>를 입힙니다. " +
+                                "산탄이 " + PELLET_AMOUNT / 2 + "발 이상 적중하면 적에게 <d::파쇄>를 적용합니다.")
+                        .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE + " (×{4})",
+                                DAMAGE, DAMAGE / 2, DISTANCE / 2, DISTANCE, PELLET_AMOUNT)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
+                        .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
+                        .build()
+                )
+        );
     }
 
     /**

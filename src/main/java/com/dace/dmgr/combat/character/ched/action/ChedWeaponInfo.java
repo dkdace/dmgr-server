@@ -1,12 +1,13 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
-
-import java.text.MessageFormat;
 
 public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     /** 쿨타임 (tick) */
@@ -23,14 +24,14 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
 
     private ChedWeaponInfo() {
         super(ChedWeapon.class, Material.BOW, RESOURCE.DEFAULT, "아폴론",
-                "",
-                "§f▍ 불의 힘이 깃든 체드의 주력 활입니다.",
-                "§f▍ 화살을 걸고 §7발사§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1} ~ {2}", TextIcon.DAMAGE, MAX_DAMAGE / 10, MAX_DAMAGE),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                "",
-                "§7§l[우클릭] §f충전 및 발사");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("불의 힘이 깃든 체드의 주력 활입니다. 화살을 걸고 발사하여 <:DAMAGE:피해>를 입힙니다.")
+                        .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, MAX_DAMAGE / 10, MAX_DAMAGE)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addActionKeyInfo("충전 및 발사", ActionKey.RIGHT_CLICK)
+                        .build()
+                )
+        );
     }
 
     /**

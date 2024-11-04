@@ -1,18 +1,20 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
-
-import java.text.MessageFormat;
+import org.bukkit.ChatColor;
 
 public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 14 * 20;
+    public static final long COOLDOWN = 14 * 20L;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 폭파 시간 (tick) */
-    public static final long EXPLODE_DURATION = 5 * 20;
+    public static final long EXPLODE_DURATION = 5 * 20L;
     /** 피해량 (폭발) */
     public static final int DAMAGE_EXPLODE = 600;
     /** 피해량 (직격) */
@@ -35,27 +37,23 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
 
     private JagerA3Info() {
         super(JagerA3.class, "빙결 수류탄",
-                "",
-                "§f▍ 빙결 수류탄의 핀을 뽑습니다. ",
-                "§f▍ 수류탄은 일정 시간 후 폭발하여 적에게",
-                "§f▍ §c" + TextIcon.DAMAGE + " 광역 피해§f를 입히고 §5" + TextIcon.WALK_SPEED_DECREASE + " §d빙결§f시키며, 적이",
-                "§f▍ 최대치의 빙결을 입으면 §5" + TextIcon.SNARE + " 속박§f됩니다.",
-                "",
-                MessageFormat.format("§7{0}§f {1}초", TextIcon.DURATION, EXPLODE_DURATION / 20.0),
-                MessageFormat.format("§c{0}§f {1} ~ {2} (폭발)", TextIcon.DAMAGE, DAMAGE_EXPLODE, DAMAGE_EXPLODE / 2),
-                MessageFormat.format("§c{0}§f {1} (직격)", TextIcon.DAMAGE, DAMAGE_DIRECT),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
-                MessageFormat.format("§5{0}§f {1} ~ {2}", TextIcon.WALK_SPEED_DECREASE, FREEZE, FREEZE / 2),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.SNARE, SNARE_DURATION / 20.0),
-                "",
-                "§7§l[3] §f사용",
-                "",
-                "§3[재사용 시]",
-                "",
-                "§f▍ 수류탄을 던집니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                "",
-                "§7§l[3] [좌클릭] §f투척");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("빙결 수류탄의 핀을 뽑습니다. " +
+                                "수류탄은 일정 시간 후 폭발하여 적에게 <:DAMAGE:광역 피해>를 입히고 <5:WALK_SPEED_DECREASE:> <d::빙결>시키며, 적이 최대치의 빙결을 입으면 <:SNARE:속박>됩니다.")
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, EXPLODE_DURATION / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", DAMAGE_EXPLODE, DAMAGE_EXPLODE / 2)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE_DIRECT + " (직격)")
+                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.VARIABLE, ChatColor.DARK_PURPLE, FREEZE, FREEZE / 2)
+                        .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION / 20.0)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .build(),
+                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                                .builder("수류탄을 던집니다.")
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                                .addActionKeyInfo("투척", ActionKey.SLOT_3)
+                                .build()
+                        )
+                )
+        );
     }
 }

@@ -1,14 +1,15 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 8 * 20;
+    public static final long COOLDOWN = 8 * 20L;
     /** 이동 거리 (단위: 블록) */
     public static final int MOVE_DISTANCE = 15;
     /** 이동 강도 */
@@ -26,15 +27,16 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
 
     private SiliaA1Info() {
         super(SiliaA1.class, "연풍 가르기",
-                "",
-                "§f▍ 앞으로 빠르게 이동하며 §c" + TextIcon.DAMAGE + " 광역 피해§f를 입힙니다.",
-                "§f▍ 적을 처치하면 " + TextIcon.COOLDOWN + " §7쿨타임§f이 초기화됩니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§f{0} {1}m", TextIcon.DISTANCE, MOVE_DISTANCE),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
-                "",
-                "§7§l[1] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("앞으로 빠르게 이동하며 <:DAMAGE:광역 피해>를 입힙니다. " +
+                                "적을 처치하면 <7:COOLDOWN:쿨타임>이 초기화됩니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MOVE_DISTANCE)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1)
+                        .build()
+                )
+        );
     }
 }

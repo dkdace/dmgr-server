@@ -111,7 +111,7 @@ public final class MagrittaUlt extends UltimateSkill {
             onEnd();
 
             onCancelled();
-        }, 2, MagrittaUltInfo.DURATION / 2));
+        }, MagrittaUltInfo.ATTACK_COOLDOWN, MagrittaUltInfo.DURATION / 2));
     }
 
     /**
