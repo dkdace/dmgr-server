@@ -105,8 +105,8 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true) &&
-                    target instanceof CombatUser)
+            if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true)
+                    && target instanceof CombatUser)
                 combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
 
             return false;

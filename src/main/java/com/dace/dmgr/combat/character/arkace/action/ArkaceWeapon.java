@@ -33,6 +33,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance());
+
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
                 ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
@@ -57,10 +58,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     onAmmoEmpty();
                     return;
                 }
-
-                CooldownUtil.setCooldown(combatUser, ArkaceP1.COOLDOWN_ID, ArkaceWeaponInfo.SPRINT_READY_DURATION + 2);
-
-                if (!combatUser.getSkill(ArkaceP1Info.getInstance()).isDurationFinished()) {
+                if (cancelP1()) {
                     setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
                     return;
                 }
@@ -71,7 +69,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
                         spread *= ArkaceWeaponInfo.SPREAD.SPRINT_MULTIPLIER;
 
-                    Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
+                    Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), spread);
                     new ArkaceWeaponHitscan(false).shoot(dir);
                     reloadModule.consume(1);
 
@@ -95,6 +93,26 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
             default:
                 break;
         }
+    }
+
+    /**
+     * 패시브 1번 스킬을 취소시킨다.
+     *
+     * @return 무기 사용 취소 여부
+     */
+    private boolean cancelP1() {
+        ArkaceP1 skillp1 = combatUser.getSkill(ArkaceP1Info.getInstance());
+        long skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION + 2;
+
+        if (!skillp1.isDurationFinished()) {
+            skillp1.onCancelled();
+            skillp1.setCooldown(skillp1Cooldown);
+
+            return true;
+        }
+
+        skillp1.setCooldown(skillp1Cooldown);
+        return false;
     }
 
     @Override
