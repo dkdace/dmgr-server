@@ -124,14 +124,14 @@ public final class Neace extends Support {
 
         if (!skill2.isDurationFinished()) {
             String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
+                    skill2MaxDuration) + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
             text.add(skill2Display);
         }
         if (!skill3.isDurationFinished())
             text.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+                    skill4MaxDuration);
             text.add(skill4Display);
         }
 

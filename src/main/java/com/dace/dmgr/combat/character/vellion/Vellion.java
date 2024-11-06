@@ -127,19 +127,19 @@ public final class Vellion extends Controller {
         StringJoiner text = new StringJoiner("    ");
 
         if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(VellionP1Info.getInstance().toString(), skillp1Duration, skillp1MaxDuration,
-                    10, '■') + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(VellionP1Info.getInstance().toString(), skillp1Duration, skillp1MaxDuration
+            ) + "  §7[" + skillp1.getDefaultActionKeys()[0].getName() + "] §f해제";
             text.add(skillp1Display);
         } else if (!skillp1.isCooldownFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarCooldownBar(VellionP1Info.getInstance().toString(), skillp1Cooldown, skillp1MaxCooldown,
-                    10, '■');
+            String skillp1Display = StringFormUtil.getActionbarCooldownBar(VellionP1Info.getInstance().toString(), skillp1Cooldown, skillp1MaxCooldown
+            );
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished() && skill2.isEnabled())
             text.add(VellionA2Info.getInstance() + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(VellionUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+                    skill4MaxDuration);
             text.add(skill4Display);
         }
 

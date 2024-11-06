@@ -131,17 +131,17 @@ public final class Magritta extends Scuffler {
         text.add("");
         if (!skillp1.isDurationFinished()) {
             String skillp1Display = StringFormUtil.getActionbarDurationBar(MagrittaP1Info.getInstance().toString(), skillp1Duration,
-                    skillp1MaxDuration, 10, '■');
+                    skillp1MaxDuration);
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished()) {
             String skill2Display = StringFormUtil.getActionbarDurationBar(MagrittaA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■');
+                    skill2MaxDuration);
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(MagrittaUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+                    skill4MaxDuration);
             text.add(skill4Display);
         }
 

@@ -119,15 +119,15 @@ public final class Silia extends Scuffler {
 
         StringJoiner text = new StringJoiner("    ");
 
-        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(), skill3Duration, skill3MaxDuration,
-                10, '■');
+        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(), skill3Duration, skill3MaxDuration
+        );
 
         if (!skill3.isDurationFinished())
             skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
         text.add(skill3Display);
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
             String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+                    skill4MaxDuration);
             text.add(skill4Display);
         }
 

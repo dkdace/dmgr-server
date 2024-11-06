@@ -124,7 +124,7 @@ public final class Ched extends Marksman {
 
         if (!skillp1.isDurationFinished()) {
             String skillp1Display = StringFormUtil.getActionbarDurationBar(ChedP1Info.getInstance().toString(), skillp1Duration,
-                    skillp1MaxDuration, 10, '■');
+                    skillp1MaxDuration);
             text.add(skillp1Display);
         }
         if (!skill1.isDurationFinished() && skill1.isEnabled())
