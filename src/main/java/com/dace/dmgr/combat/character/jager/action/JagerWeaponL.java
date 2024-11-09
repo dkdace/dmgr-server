@@ -38,6 +38,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     public JagerWeaponL(@NonNull CombatUser combatUser) {
         super(combatUser, JagerWeaponInfo.getInstance());
+
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
         aimModule = new AimModule(this, JagerWeaponInfo.SCOPE.ZOOM_LEVEL);
@@ -56,9 +57,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey)) &&
-                !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
-                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
+                && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -80,9 +81,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 new JagerWeaponLProjectile().shoot(dir);
                 reloadModule.consume(1);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -107,20 +108,22 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onCancelled() {
-        if (swapModule.getSwapState() == SwapState.SECONDARY)
+        if (swapModule.getSwapState() == SwapState.SECONDARY) {
             swapModule.getSubweapon().onCancelled();
-        else {
-            super.onCancelled();
-            reloadModule.cancel();
-            swapModule.cancel();
-            aimModule.cancel();
+            return;
         }
+
+        super.onCancelled();
+
+        reloadModule.cancel();
+        swapModule.cancel();
+        aimModule.cancel();
     }
 
     @Override
     public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < JagerWeaponInfo.CAPACITY ||
-                swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < JagerWeaponInfo.SCOPE.CAPACITY;
+        return reloadModule.getRemainingAmmo() < JagerWeaponInfo.CAPACITY
+                || swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < JagerWeaponInfo.SCOPE.CAPACITY;
     }
 
     @Override
@@ -168,13 +171,10 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onSwapStart(@NonNull SwapState swapState) {
-        Location location = combatUser.getEntity().getLocation();
-        if (swapState == SwapState.PRIMARY)
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF, location);
-        else if (swapState == SwapState.SECONDARY)
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON, location);
-
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
+
+        SoundUtil.playNamedSound(swapState == SwapState.PRIMARY ? NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF : NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON,
+                combatUser.getEntity().getLocation());
     }
 
     @Override

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
     /** 처치 점수 제한시간 쿨타임 ID */
-    public static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
+    private static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
 
     /** 위치 확인 모듈 */
     @NonNull
@@ -138,8 +138,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         confirmModule.toggleCheck();
         combatUser.getWeapon().setCooldown(2);
 
-        Wolf wolf = CombatUtil.spawnEntity(Wolf.class, confirmModule.getCurrentLocation());
-        summonEntity = new JagerA1Entity(wolf, combatUser);
+        summonEntity = new JagerA1Entity(CombatUtil.spawnEntity(Wolf.class, confirmModule.getCurrentLocation()), combatUser);
         summonEntity.activate();
     }
 
@@ -149,6 +148,17 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         if (summonEntity != null)
             summonEntity.dispose();
+    }
+
+    /**
+     * 플레이어에게 보너스 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyBonusScore(@NonNull CombatUser victim, int score) {
+        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
     }
 
     /**
@@ -183,6 +193,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     true, false,
                     new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
             );
+
             knockbackModule = new KnockbackModule(this);
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
@@ -226,6 +237,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         @Override
         protected void onTick(long i) {
+            super.onTick(i);
+
             if (!readyTimeModule.isReady())
                 return;
 
@@ -236,10 +249,11 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity.setTamed(true);
 
                     Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
-                                    combatEntity.isEnemy(this));
+                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving()
+                                    && combatEntity.isEnemy(this));
                     if (target != null) {
                         entity.setTarget(target.getEntity());
+
                         SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_ENEMY_DETECT, entity.getLocation());
                     }
                 } else {
@@ -248,8 +262,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity.setTamed(false);
 
                     CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
-                    if (targetCombatEntity == null || targetCombatEntity.isDisposed() ||
-                            (targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()))
+                    if (targetCombatEntity == null || targetCombatEntity.isDisposed()
+                            || (targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()))
                         entity.setTarget(null);
                 }
             }
@@ -265,11 +279,12 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @Override
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
-            CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
 
-            JagerP1 skillp1 = combatUser.getSkill(JagerP1Info.getInstance());
-            skillp1.setTarget(victim);
+            combatUser.getSkill(JagerP1Info.getInstance()).setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
+
+            if (victim instanceof CombatUser)
+                CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override

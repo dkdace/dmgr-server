@@ -31,6 +31,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
+
         this.mainWeapon = mainWeapon;
         reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
     }
