@@ -49,8 +49,8 @@ public final class MagrittaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -130,6 +130,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
             if (target != null) {
                 combatUser.getUser().sendTitle("§b§l부착", "", 0, 5, 10);
+
                 if (target instanceof CombatUser)
                     combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);
             }
@@ -171,7 +172,8 @@ public final class MagrittaA1 extends ActiveSkill {
         private final MagrittaA1Projectile projectile;
 
         private MagrittaA1Area(MagrittaA1Projectile projectile) {
-            super(combatUser, MagrittaA1Info.RADIUS, combatEntity -> combatEntity.isEnemy(MagrittaA1.this.combatUser) || combatEntity == MagrittaA1.this.combatUser);
+            super(combatUser, MagrittaA1Info.RADIUS, combatEntity -> combatEntity.isEnemy(MagrittaA1.this.combatUser)
+                    || combatEntity == MagrittaA1.this.combatUser);
             this.projectile = projectile;
         }
 

@@ -30,6 +30,7 @@ public final class MagrittaUlt extends UltimateSkill {
     /** 활성화 완료 여부 */
     @Getter
     private boolean isEnabled = false;
+    /** 블록 명중 횟수 */
     private int blockHitCount = 0;
 
     public MagrittaUlt(@NonNull CombatUser combatUser) {
@@ -55,7 +56,7 @@ public final class MagrittaUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration(-1);
+        setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) MagrittaUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -MagrittaUltInfo.USE_SLOW);
@@ -76,6 +77,7 @@ public final class MagrittaUlt extends UltimateSkill {
         super.onCancelled();
 
         setDuration(0);
+        isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 
@@ -83,9 +85,8 @@ public final class MagrittaUlt extends UltimateSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        isEnabled = true;
-
         setDuration();
+        isEnabled = true;
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation();
@@ -96,20 +97,19 @@ public final class MagrittaUlt extends UltimateSkill {
                 new MagrittaUltHitscan(targets).shoot(dir);
             }
             targets.forEach((target, hits) -> {
-                if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 4)
+                if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
                     MagrittaT1.addShreddingValue(combatUser, target);
             });
             blockHitCount = 0;
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_ULT_SHOOT, loc, 1);
             CombatUtil.setRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP / 2, MagrittaWeaponInfo.RECOIL.SIDE / 2,
                     MagrittaWeaponInfo.RECOIL.UP_SPREAD / 2, MagrittaWeaponInfo.RECOIL.SIDE_SPREAD / 2, 2, 1);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_ULT_SHOOT, loc, 1);
             TaskUtil.addTask(MagrittaUlt.this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_SHOTGUN_SHELL_DROP, loc), 8));
 
             return true;
         }, isCancelled -> {
             onEnd();
-
             onCancelled();
         }, MagrittaUltInfo.ATTACK_COOLDOWN, MagrittaUltInfo.DURATION / 2));
     }
@@ -118,8 +118,6 @@ public final class MagrittaUlt extends UltimateSkill {
      * 사용 종료 시 실행할 작업.
      */
     private void onEnd() {
-        isEnabled = false;
-
         combatUser.getWeapon().setCooldown(combatUser.getWeapon().getDefaultCooldown() * 2);
         combatUser.getWeapon().setVisible(false);
 
@@ -133,7 +131,8 @@ public final class MagrittaUlt extends UltimateSkill {
         ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
             return true;
         }, 1, 7));
@@ -150,7 +149,8 @@ public final class MagrittaUlt extends UltimateSkill {
         private double distance = 0;
 
         private MagrittaUltHitscan(HashMap<Damageable, Integer> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(15).maxDistance(MagrittaWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, HitscanOption.builder().trailInterval(15).maxDistance(MagrittaWeaponInfo.DISTANCE)
+                    .condition(combatUser::isEnemy).build());
             this.targets = targets;
         }
 

@@ -25,15 +25,17 @@ import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 
-@Getter
 public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
+    /** 블록 명중 횟수 */
     private int blockHitCount = 0;
 
     public MagrittaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaWeaponInfo.getInstance());
+
         reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
     }
 
@@ -50,8 +52,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey)) &&
-                combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
+                && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -73,15 +76,15 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                     new MagrittaWeaponHitscan(targets).shoot(dir);
                 }
                 targets.forEach((target, hits) -> {
-                    if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 4)
+                    if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
                         MagrittaT1.addShreddingValue(combatUser, target);
                 });
                 blockHitCount = 0;
                 reloadModule.consume(1);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_WEAPON_USE, loc);
                 CombatUtil.setRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
                         MagrittaWeaponInfo.RECOIL.SIDE_SPREAD, 3, 1);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_WEAPON_USE, loc);
                 TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_SHOTGUN_SHELL_DROP, loc), 8));
 
                 break;
