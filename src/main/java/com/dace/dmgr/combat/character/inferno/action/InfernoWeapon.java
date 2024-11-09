@@ -40,6 +40,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     public InfernoWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoWeaponInfo.getInstance());
+
         reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
     }
@@ -90,9 +91,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, combatUser.getEntity().getLocation());
                 CombatUtil.setRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
                         InfernoWeaponInfo.FIREBALL.RECOIL.UP_SPREAD, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE_SPREAD, 3, 1);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, combatUser.getEntity().getLocation());
 
                 break;
             }

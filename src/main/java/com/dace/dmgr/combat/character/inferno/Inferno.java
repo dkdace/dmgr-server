@@ -14,7 +14,10 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -109,34 +112,26 @@ public final class Inferno extends Vanguard {
         InfernoA2 skill2 = combatUser.getSkill(InfernoA2Info.getInstance());
         InfernoUlt skill4 = combatUser.getSkill(InfernoUltInfo.getInstance());
 
-        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
-        double skillp1Duration = combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0;
-        double skillp1MaxDuration = InfernoP1Info.DURATION / 20.0;
-        double skill2Duration = skill2.getDuration() / 20.0;
-        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, InfernoWeaponInfo.CAPACITY,
-                10, '■');
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
+                InfernoWeaponInfo.CAPACITY, 10, '■');
 
         text.add(weaponDisplay);
         text.add("");
         if (combatUser.getStatusEffectModule().hasStatusEffect(skillp1buff)) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(), skillp1Duration,
-                    skillp1MaxDuration);
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(),
+                    combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0, InfernoP1Info.DURATION / 20.0);
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(InfernoA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration);
+            String skill2Display = StringFormUtil.getActionbarDurationBar(InfernoA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
+                    skill2.getDefaultDuration() / 20.0);
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(InfernoUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration);
+            String skill4Display = StringFormUtil.getActionbarDurationBar(InfernoUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 
@@ -150,14 +145,15 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished()) {
             CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
-        else {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DAMAGE, victim.getEntity().getLocation(), 1 + damage * 0.001);
-            if (location != null)
-                ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
-                        0, 0, 0, 0.1);
+            return;
         }
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DAMAGE, victim.getEntity().getLocation(), 1 + damage * 0.001);
+        if (location != null)
+            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
+                    0, 0, 0, 0.1);
     }
 
     @Override
@@ -169,8 +165,7 @@ public final class Inferno extends Vanguard {
 
         InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
 
-        if (score < 100 && CooldownUtil.getCooldown(attacker, InfernoA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE);
+        attacker.getSkill(InfernoA2Info.getInstance()).applyAssistScore((CombatUser) victim, score);
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }
