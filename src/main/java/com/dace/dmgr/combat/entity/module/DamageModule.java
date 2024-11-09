@@ -198,6 +198,8 @@ public class DamageModule {
             throw new IllegalArgumentException("'health'가 0 이상이어야 함");
 
         maxHealth = health;
+        if (maxHealth < getHealth())
+            setHealth(health);
         ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 

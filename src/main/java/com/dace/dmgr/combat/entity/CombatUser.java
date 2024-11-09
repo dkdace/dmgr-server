@@ -1225,6 +1225,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         fovValue = 0;
         damageModule.clearShield();
+        statusEffectModule.clearStatusEffect();
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
 
