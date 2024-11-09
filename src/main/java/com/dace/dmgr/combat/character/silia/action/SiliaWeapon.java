@@ -61,8 +61,9 @@ public final class SiliaWeapon extends AbstractWeapon {
             SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
         }
 
-        if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
+        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
+        if (skill3.isCancellable())
+            skill3.onCancelled();
     }
 
     @Override
@@ -119,15 +120,9 @@ public final class SiliaWeapon extends AbstractWeapon {
      * @param isStrike 일격 사용 가능 여부
      */
     void setStrike(boolean isStrike) {
-        if (isStrike) {
-            this.isStrike = true;
-            combatUser.getWeapon().setGlowing(true);
-            combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-        } else {
-            this.isStrike = false;
-            combatUser.getWeapon().setGlowing(false);
-            combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.DEFAULT);
-        }
+        this.isStrike = isStrike;
+        combatUser.getWeapon().setGlowing(isStrike);
+        combatUser.getWeapon().setDurability(isStrike ? SiliaWeaponInfo.RESOURCE.EXTENDED : SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 
     private final class SiliaWeaponProjectile extends Projectile {
@@ -145,8 +140,8 @@ public final class SiliaWeapon extends AbstractWeapon {
                 axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
 
                 vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation().clone().add(vec), 2, 0.05, 0.05, 0.05,
-                        255, 255, 255);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation().clone().add(vec), 2,
+                        0.05, 0.05, 0.05, 255, 255, 255);
             }
         }
 
@@ -213,7 +208,9 @@ public final class SiliaWeapon extends AbstractWeapon {
             if (targets.add(target)) {
                 if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, getLocation(),
                         SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                    target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation()).multiply(SiliaT2Info.KNOCKBACK));
+                    target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation())
+                            .multiply(SiliaT2Info.KNOCKBACK));
+
                     if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
                         combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }

@@ -112,22 +112,16 @@ public final class Silia extends Scuffler {
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
         SiliaUlt skill4 = combatUser.getSkill(SiliaUltInfo.getInstance());
 
-        double skill3Duration = skill3.getStateValue() / 20.0;
-        double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(), skill3Duration, skill3MaxDuration
-        );
-
+        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(),
+                skill3.getStateValue() / 20.0, skill3.getMaxStateValue() / 20.0);
         if (!skill3.isDurationFinished())
-            skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
+            skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0] + "] §f해제";
         text.add(skill3Display);
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration);
+            String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 

@@ -54,11 +54,7 @@ public final class SiliaP2 extends AbstractSkill {
      * @return 활성화 조건
      */
     private boolean canActivate() {
-        if (wallRideCount <= 0)
-            return false;
-
-        Location top = combatUser.getEntity().getEyeLocation().add(0, 0.5, 0);
-        if (!LocationUtil.isNonSolid(top))
+        if (wallRideCount <= 0 || !LocationUtil.isNonSolid(combatUser.getEntity().getEyeLocation().add(0, 0.5, 0)))
             return false;
 
         Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.1, 0);
@@ -74,9 +70,7 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(false);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (combatUser.getKnockbackModule().isKnockbacked())
-                return false;
-            if (!canActivate())
+            if (combatUser.getKnockbackModule().isKnockbacked() || !canActivate())
                 return false;
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);
@@ -112,6 +106,6 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(true);
 
         TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                isCancelled2 -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
+                isCancelled -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }
 }

@@ -76,6 +76,6 @@ public final class SiliaP1 extends AbstractSkill {
         super.onCancelled();
 
         TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                isCancelled2 -> setDuration(0), 1));
+                isCancelled -> setDuration(0), 1));
     }
 }

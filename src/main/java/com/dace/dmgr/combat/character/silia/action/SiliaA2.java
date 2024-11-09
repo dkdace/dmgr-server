@@ -41,16 +41,18 @@ public final class SiliaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
-        if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
+
+        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
+        if (skill3.isCancellable())
+            skill3.onCancelled();
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
 
@@ -140,10 +142,11 @@ public final class SiliaA2 extends ActiveSkill {
                     ParticleUtil.play(Particle.END_ROD, loc2.add(0, 1, 0), 3, 0, 0, 0, 0.05);
                 SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, getLocation());
 
-                if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc) &&
-                        (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
+                if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
+                        && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                     combatUser.getMoveModule().teleport(loc);
                     combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
+
                     if (target instanceof CombatUser)
                         combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
                 }
