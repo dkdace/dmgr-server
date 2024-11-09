@@ -16,6 +16,8 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     public static final int MAX_DAMAGE = 500;
     /** 최대 투사체 속력 (단위: 블록/s) */
     public static final int MAX_VELOCITY = 110;
+    /** 화살 저장 인벤토리 슬롯 */
+    public static final int ARROW_INVENTORY_SLOT = 30;
 
     /** 치명타 점수 */
     public static final int CRIT_SCORE = 6;

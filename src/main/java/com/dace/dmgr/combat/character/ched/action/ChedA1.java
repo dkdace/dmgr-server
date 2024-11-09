@@ -61,7 +61,8 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && (combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() || !combatUser.getEntity().hasGravity());
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
@@ -106,6 +107,19 @@ public final class ChedA1 extends StackableSkill {
     }
 
     /**
+     * 불화살 투사체를 발사한다.
+     */
+    void shoot() {
+        addStack(-1);
+        if (getStack() <= 0)
+            setDuration(0);
+
+        new ChedA1Projectile().shoot();
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A1_SHOOT, combatUser.getEntity().getLocation());
+    }
+
+    /**
      * 화염 상태 효과 클래스.
      */
     private static final class ChedA1Burning extends Burning {
@@ -116,8 +130,8 @@ public final class ChedA1 extends StackableSkill {
         }
     }
 
-    static final class ChedA1Projectile extends Projectile {
-        ChedA1Projectile(@NonNull CombatUser combatUser) {
+    private final class ChedA1Projectile extends Projectile {
+        private ChedA1Projectile() {
             super(combatUser, ChedA1Info.VELOCITY, ProjectileOption.builder().trailInterval(9).hasGravity(true)
                     .condition(combatUser::isEnemy).build());
         }
@@ -149,6 +163,7 @@ public final class ChedA1 extends StackableSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true)) {
                 target.getStatusEffectModule().applyStatusEffect(shooter, ChedA1Burning.instance, ChedA1Info.FIRE_DURATION);
+
                 if (target instanceof CombatUser)
                     ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);
             }

@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -117,18 +116,15 @@ public final class Ched extends Marksman {
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
         ChedA1 skill1 = combatUser.getSkill(ChedA1Info.getInstance());
 
-        double skillp1Duration = skillp1.getHangTick() / 20.0;
-        double skillp1MaxDuration = ChedP1Info.HANG_DURATION / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
         if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(ChedP1Info.getInstance().toString(), skillp1Duration,
-                    skillp1MaxDuration);
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(ChedP1Info.getInstance().toString(), skillp1.getHangTick() / 20.0,
+                    ChedP1Info.HANG_DURATION / 20.0);
             text.add(skillp1Display);
         }
         if (!skill1.isDurationFinished() && skill1.isEnabled())
-            text.add(ChedA1Info.getInstance() + "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f해제");
+            text.add(ChedA1Info.getInstance() + "  §7[" + skill1.getDefaultActionKeys()[0] + "] §f해제");
 
         return text.toString();
     }
@@ -145,10 +141,8 @@ public final class Ched extends Marksman {
         if (!(victim instanceof CombatUser))
             return;
 
-        if (CooldownUtil.getCooldown(attacker, ChedA3.KILL_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
-        if (CooldownUtil.getCooldown(attacker, ChedUlt.KILL_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("궁극기 보너스", ChedUltInfo.KILL_SCORE * score / 100.0);
+        attacker.getSkill(ChedA3Info.getInstance()).applyBonusScore((CombatUser) victim, score);
+        attacker.getSkill(ChedUltInfo.getInstance()).applyBonusScore((CombatUser) victim, score);
     }
 
     @Override

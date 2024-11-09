@@ -95,6 +95,12 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         }
     }
 
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+        reloadModule.cancel();
+    }
+
     /**
      * 패시브 1번 스킬을 취소시킨다.
      *
@@ -113,12 +119,6 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
         skillp1.setCooldown(skillp1Cooldown);
         return false;
-    }
-
-    @Override
-    public void onCancelled() {
-        super.onCancelled();
-        reloadModule.cancel();
     }
 
     @Override
