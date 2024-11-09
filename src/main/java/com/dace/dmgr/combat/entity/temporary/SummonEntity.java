@@ -54,7 +54,6 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
     }
 
     @Override
-    @MustBeInvokedByOverriders
     protected void onTick(long i) {
         if (i > 3 && i % 5 == 0 && showNameTag) {
             entity.getWorld().getPlayers().forEach(target -> {
