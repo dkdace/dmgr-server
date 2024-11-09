@@ -25,7 +25,7 @@ import java.util.HashSet;
 
 public final class QuakerA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerA2AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA2";
 
@@ -130,10 +130,22 @@ public final class QuakerA2 extends ActiveSkill {
         }
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
             return true;
         }, 1, 5));
+    }
+
+    /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", QuakerA2Info.ASSIST_SCORE * score / 100.0);
     }
 
     /**
@@ -206,6 +218,7 @@ public final class QuakerA2 extends ActiveSkill {
                 if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, getLocation(), false, true)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
                     target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
                         CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerA2Info.SLOW_DURATION);

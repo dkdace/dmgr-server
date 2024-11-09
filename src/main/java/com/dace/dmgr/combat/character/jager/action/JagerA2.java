@@ -132,7 +132,7 @@ public final class JagerA2 extends ActiveSkill {
      * 곰덫 클래스.
      */
     @Getter
-    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
+    private final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;

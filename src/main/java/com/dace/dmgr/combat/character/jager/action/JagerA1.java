@@ -165,7 +165,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
      * 설랑 클래스.
      */
     @Getter
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {
+    private final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;

@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 public final class QuakerUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerUltAssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerUlt";
 
@@ -132,10 +132,22 @@ public final class QuakerUlt extends UltimateSkill {
         }
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+            CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
                     (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
             return true;
         }, 1, 6));
+    }
+
+    /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", QuakerUltInfo.ASSIST_SCORE * score / 100.0);
     }
 
     /**
@@ -210,6 +222,7 @@ public final class QuakerUlt extends UltimateSkill {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
                             target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
+
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
                         CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerUltInfo.SLOW_DURATION);
