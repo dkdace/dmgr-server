@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 @Getter
 public final class VellionUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionUltAssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "VellionUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionUlt";
 
@@ -55,10 +55,12 @@ public final class VellionUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration(-1);
-        if (combatUser.getSkill(VellionP1Info.getInstance()).isCancellable())
-            combatUser.getSkill(VellionP1Info.getInstance()).onCancelled();
         combatUser.setGlobalCooldown((int) VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
+
+        VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
+        if (skillp1.isCancellable())
+            skillp1.onCancelled();
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE, combatUser.getEntity().getLocation());
 
@@ -82,6 +84,7 @@ public final class VellionUlt extends UltimateSkill {
         super.onCancelled();
 
         setDuration(0);
+        isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 
@@ -123,9 +126,8 @@ public final class VellionUlt extends UltimateSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        isEnabled = true;
-
         setDuration();
+        isEnabled = true;
         combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
@@ -146,18 +148,17 @@ public final class VellionUlt extends UltimateSkill {
 
             return true;
         }, isCancelled -> {
+            onCancelled();
+
             Location loc = combatUser.getEntity().getEyeLocation();
-            Location loc2 = loc.clone().add(0, 1, 0);
             new VellionUltExplodeArea().emit(loc);
 
+            Location loc2 = loc.add(0, 1, 0);
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc2);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
                     0.3, 0.3, 0.3, 0.4);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 14, loc2, 200,
                     0.3, 0.3, 0.3, 0.4);
-
-            isEnabled = false;
-            onCancelled();
         }, 1, VellionUltInfo.DURATION));
     }
 
@@ -194,6 +195,7 @@ public final class VellionUlt extends UltimateSkill {
                 }
             }
         }
+
         long angle = i * 4;
         for (int j = 0; j < 8; j++) {
             angle += 90;
@@ -205,6 +207,17 @@ public final class VellionUlt extends UltimateSkill {
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.MYCEL, 0, loc2.clone().add(0, 2, 0),
                     4, 0.15, 0.4, 0.15, 0);
         }
+    }
+
+    /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", VellionUltInfo.ASSIST_SCORE * score / 100.0);
     }
 
     /**
@@ -220,8 +233,8 @@ public final class VellionUlt extends UltimateSkill {
 
     private final class VellionUltArea extends Area {
         private VellionUltArea() {
-            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
-                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable
+                    && ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override
@@ -235,6 +248,7 @@ public final class VellionUlt extends UltimateSkill {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, VellionUltSlow.instance, 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+
                 if (target instanceof CombatUser)
                     CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
             }
@@ -245,8 +259,8 @@ public final class VellionUlt extends UltimateSkill {
 
     private final class VellionUltExplodeArea extends Area {
         private VellionUltExplodeArea() {
-            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
-                    ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
+            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable
+                    && ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
         }
 
         @Override
@@ -256,9 +270,10 @@ public final class VellionUlt extends UltimateSkill {
 
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, (int) (target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO), DamageType.FIXED,
-                    null, false, true)) {
+            if (target.getDamageModule().damage(combatUser, (int) (target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO),
+                    DamageType.FIXED, null, false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), VellionUltInfo.STUN_DURATION);
+
                 if (target instanceof CombatUser) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
                     CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, VellionUltInfo.STUN_DURATION);
