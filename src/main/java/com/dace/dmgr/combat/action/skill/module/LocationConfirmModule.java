@@ -135,7 +135,7 @@ public final class LocationConfirmModule extends ConfirmModule {
 
         GlowUtil.setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED), player);
         skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
-                acceptKey.getName(), (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey.getName()), 0, 5, 5);
+                acceptKey, (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey), 0, 5, 5);
     }
 
     @Override

@@ -1,13 +1,11 @@
 package com.dace.dmgr.combat.action;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * 동작 사용 키 목록.
  */
 @AllArgsConstructor
-@Getter
 public enum ActionKey {
     /** 좌클릭 */
     LEFT_CLICK("좌클릭"),

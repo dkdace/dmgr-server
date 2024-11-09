@@ -80,7 +80,7 @@ public class ConfirmModule {
      */
     protected void onCheckTick(long i) {
         skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
-                acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
+                acceptKey, cancelKey), 0, 5, 5);
     }
 
     /**

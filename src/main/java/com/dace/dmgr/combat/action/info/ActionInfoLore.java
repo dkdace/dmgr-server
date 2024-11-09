@@ -148,7 +148,7 @@ public final class ActionInfoLore {
                 for (int i = 0; i < actionKeyInfoList.size(); i++) {
                     ActionKeyInfo actionKeyInfo = actionKeyInfoList.get(i);
                     this.actionKeyInfos[i] = MessageFormat.format("§7§l[{0}] §f{1}",
-                            Arrays.stream(actionKeyInfo.actionKeys).map(ActionKey::getName).collect(Collectors.joining("] [")),
+                            Arrays.stream(actionKeyInfo.actionKeys).map(ActionKey::toString).collect(Collectors.joining("] [")),
                             actionKeyInfo.description);
                 }
             }
