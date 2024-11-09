@@ -52,7 +52,7 @@ public final class NeaceUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration(-1);
+        setDuration();
         combatUser.setGlobalCooldown((int) NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -NeaceUltInfo.READY_SLOW);
 
@@ -121,9 +121,8 @@ public final class NeaceUlt extends UltimateSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        isEnabled = true;
-
         setDuration();
+        isEnabled = true;
         combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_ULT_USE_READY, combatUser.getEntity().getLocation());
@@ -141,7 +140,7 @@ public final class NeaceUlt extends UltimateSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
 
             return true;
-        }, isCancelled2 -> isEnabled = false, 1, NeaceUltInfo.DURATION));
+        }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION));
     }
 
     /**
@@ -160,9 +159,8 @@ public final class NeaceUlt extends UltimateSkill {
         for (int j = 0; j < 6; j++) {
             angle += 120;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
-            Location loc2 = loc.clone().add(vec);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 1,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec), 1,
                     0.1, 0.1, 0.1, 215, 255, 130);
         }
     }

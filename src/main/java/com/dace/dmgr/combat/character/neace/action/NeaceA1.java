@@ -38,7 +38,7 @@ public final class NeaceA1 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new NeaceTarget().shoot();
+        new NeaceA1Target().shoot();
     }
 
     @Override
@@ -96,10 +96,10 @@ public final class NeaceA1 extends ActiveSkill {
         }
     }
 
-    private final class NeaceTarget extends Target {
-        private NeaceTarget() {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity) &&
-                    !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(NeaceA1Mark.instance));
+    private final class NeaceA1Target extends Target {
+        private NeaceA1Target() {
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity)
+                    && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(NeaceA1Mark.instance));
         }
 
         @Override
@@ -120,9 +120,9 @@ public final class NeaceA1 extends ActiveSkill {
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0);
             }
 
-            Location location2 = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
-            Vector vector = VectorUtil.getYawAxis(location2).multiply(0.8);
-            Vector axis = VectorUtil.getRollAxis(location2);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+            Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
+            Vector axis = VectorUtil.getRollAxis(loc);
 
             for (int i = 0; i < 8; i++) {
                 int angle = i * 10;
@@ -131,12 +131,12 @@ public final class NeaceA1 extends ActiveSkill {
                     angle += 72;
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
 
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, location2.clone().add(vec), 2, 0, 0, 0, 0);
+                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc.clone().add(vec), 2, 0, 0, 0, 0);
                 }
             }
             for (int i = 0; i < 7; i++) {
-                Location loc1 = LocationUtil.getLocationFromOffset(location2, -0.525 + i * 0.15, 0, 0);
-                Location loc2 = LocationUtil.getLocationFromOffset(location2, 0, -0.525 + i * 0.15, 0);
+                Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
+                Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
                 ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
             }

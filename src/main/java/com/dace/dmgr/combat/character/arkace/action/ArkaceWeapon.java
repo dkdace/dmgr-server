@@ -110,7 +110,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         ArkaceP1 skillp1 = combatUser.getSkill(ArkaceP1Info.getInstance());
         long skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION + 2;
 
-        if (!skillp1.isDurationFinished()) {
+        if (skillp1.isCancellable()) {
             skillp1.onCancelled();
             skillp1.setCooldown(skillp1Cooldown);
 
