@@ -29,7 +29,7 @@ import org.bukkit.block.Block;
 @Getter
 public final class PalasA3 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA3AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA3AssistScoreTimeLimit";
 
     public PalasA3(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA3Info.getInstance(), 2);
@@ -81,6 +81,17 @@ public final class PalasA3 extends ActiveSkill {
     }
 
     /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", PalasA3Info.ASSIST_SCORE * score / 100.0);
+    }
+
+    /**
      * 체력 증가 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -107,6 +118,7 @@ public final class PalasA3 extends ActiveSkill {
 
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
             combatEntity.getDamageModule().setHealth(combatEntity.getDamageModule().getHealth() + increasedHealth);
+
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", 0, 5, 10);
         }
@@ -148,6 +160,7 @@ public final class PalasA3 extends ActiveSkill {
             decreasedHealth = maxHealth - newMaxHealth;
 
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
+
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l최대 체력 감소", "", 0, 5, 10);
         }
@@ -200,8 +213,8 @@ public final class PalasA3 extends ActiveSkill {
 
         private final class PalasA3Area extends Area {
             private PalasA3Area() {
-                super(combatUser, PalasA3Info.RADIUS, combatEntity -> combatEntity instanceof Damageable &&
-                        ((Damageable) combatEntity).getDamageModule().isLiving());
+                super(combatUser, PalasA3Info.RADIUS, combatEntity -> combatEntity instanceof Damageable
+                        && ((Damageable) combatEntity).getDamageModule().isLiving());
             }
 
             @Override
@@ -215,11 +228,13 @@ public final class PalasA3 extends ActiveSkill {
                     if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
                             false, true)) {
                         target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
+
                         if (target instanceof CombatUser)
                             CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA3Info.DURATION);
                     }
                 } else if (target instanceof Healable) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
+
                     if (target instanceof CombatUser && target != combatUser)
                         ((CombatUser) target).addKillAssist(combatUser, PalasA3.ASSIST_SCORE_COOLDOWN_ID, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
                 }

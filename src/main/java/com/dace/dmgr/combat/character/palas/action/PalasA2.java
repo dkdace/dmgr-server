@@ -22,7 +22,7 @@ import org.bukkit.Particle;
 
 public final class PalasA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA2AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "PalasA2";
 
@@ -48,7 +48,7 @@ public final class PalasA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new PalasTarget().shoot();
+        new PalasA2Target().shoot();
     }
 
     @Override
@@ -91,10 +91,11 @@ public final class PalasA2 extends ActiveSkill {
         }
     }
 
-    private final class PalasTarget extends Target {
-        private PalasTarget() {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, true, combatEntity -> Palas.getTargetedActionCondition(PalasA2.this.combatUser, combatEntity) &&
-                    !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasA2Immune.instance));
+    private final class PalasA2Target extends Target {
+        private PalasA2Target() {
+            super(combatUser, PalasA2Info.MAX_DISTANCE, true, combatEntity ->
+                    Palas.getTargetedActionCondition(PalasA2.this.combatUser, combatEntity)
+                            && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasA2Immune.instance));
         }
 
         @Override
@@ -105,6 +106,7 @@ public final class PalasA2 extends ActiveSkill {
             target.getStatusEffectModule().removeStatusEffect(PalasUlt.PalasUltBuff.instance);
             target.getStatusEffectModule().clearStatusEffect(false);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
+
             if (target instanceof CombatUser) {
                 ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", 0, 5, 10);
 
@@ -113,6 +115,8 @@ public final class PalasA2 extends ActiveSkill {
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_USE, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_HIT_ENTITY, target.getCenterLocation());
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
 
             Location location = combatUser.getArmLocation(false);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
@@ -120,8 +124,6 @@ public final class PalasA2 extends ActiveSkill {
                         255, 230, 90);
                 ParticleUtil.play(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
             }
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_HIT_ENTITY, target.getCenterLocation());
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
         }
     }
 }

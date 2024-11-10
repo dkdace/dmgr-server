@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.character.palas.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -125,13 +124,11 @@ public final class Palas extends Support {
     public String getActionbarString(@NonNull CombatUser combatUser) {
         PalasWeapon weapon = (PalasWeapon) combatUser.getWeapon();
 
-        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, PalasWeaponInfo.CAPACITY,
-                PalasWeaponInfo.CAPACITY, '┃');
-        weaponDisplay += weapon.isActionCooldown() ? " §a■" : " §c□";
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
+                PalasWeaponInfo.CAPACITY, PalasWeaponInfo.CAPACITY, '┃');
+        weaponDisplay += (weapon.isActionCooldown() ? " §a■" : " §c□");
         text.add(weaponDisplay);
 
         return text.toString();
@@ -164,10 +161,8 @@ public final class Palas extends Support {
         if (!(victim instanceof CombatUser) || score >= 100)
             return;
 
-        if (CooldownUtil.getCooldown(attacker, PalasA1.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
-        if (CooldownUtil.getCooldown(attacker, PalasA3.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("처치 지원", PalasA3Info.ASSIST_SCORE);
+        attacker.getSkill(PalasA1Info.getInstance()).applyAssistScore((CombatUser) victim, score);
+        attacker.getSkill(PalasA3Info.getInstance()).applyAssistScore((CombatUser) victim, score);
     }
 
     @Override
