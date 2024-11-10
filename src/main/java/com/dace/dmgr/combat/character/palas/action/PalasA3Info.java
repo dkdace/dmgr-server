@@ -1,14 +1,16 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
-
-import java.text.MessageFormat;
+import org.bukkit.ChatColor;
 
 public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 16 * 20;
+    public static final long COOLDOWN = 16 * 20L;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 최대 체력 증가 비율 */
@@ -20,7 +22,7 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     /** 효과 범위 (단위: 블록) */
     public static final double RADIUS = 5;
     /** 지속시간 (tick) */
-    public static final long DURATION = 6 * 20;
+    public static final long DURATION = 6 * 20L;
 
     /** 효과 점수 */
     public static final int EFFECT_SCORE = 3;
@@ -31,17 +33,16 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
 
     private PalasA3Info() {
         super(PalasA3.class, "R.S.K. 생체 제어 수류탄",
-                "",
-                "§f▍ 특수 수류탄을 던져 범위의 적에게는 §c" + TextIcon.HEAL_DECREASE + " 최대 체력",
-                "§f▍ 을 감소시키고, 아군에게는 §a" + TextIcon.HEAL_INCREASE + " 최대 체력§f을",
-                "§f▍ 증가시킵니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§7{0}§f {1}초", TextIcon.DURATION, DURATION / 20.0),
-                MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, RADIUS),
-                MessageFormat.format("§c{0}§f {1}%", TextIcon.HEAL_DECREASE, 100 * HEALTH_DECREASE_RATIO),
-                MessageFormat.format("§a{0}§f {1}%", TextIcon.HEAL_INCREASE, 100 * HEALTH_INCREASE_RATIO),
-                "",
-                "§7§l[3] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("특수 수류탄을 던져 범위의 적에게는 <c:HEAL_DECREASE:최대 체력>을 감소시키고, 아군에게는 <:HEAL_INCREASE:최대 체력>을 증가시킵니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.HEAL_DECREASE, Format.PERCENT, ChatColor.RED, (int) (100 * HEALTH_DECREASE_RATIO))
+                        .addValueInfo(TextIcon.HEAL_INCREASE, Format.PERCENT, (int) (100 * HEALTH_INCREASE_RATIO))
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_3)
+                        .build()
+                )
+        );
     }
 }

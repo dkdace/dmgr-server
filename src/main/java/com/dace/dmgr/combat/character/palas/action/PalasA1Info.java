@@ -1,14 +1,15 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 12 * 20;
+    public static final long COOLDOWN = 12 * 20L;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (1.2 * 20);
     /** 시전 시간 (tick) */
@@ -29,14 +30,14 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
 
     private PalasA1Info() {
         super(PalasA1.class, "테이저건",
-                "",
-                "§f▍ 테이저건을 발사하여 §c" + TextIcon.DAMAGE + " 피해§f를 입히고",
-                "§f▍ §5" + TextIcon.STUN + " 기절§f시킵니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.STUN, STUN_DURATION / 20.0),
-                "",
-                "§7§l[1] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("테이저건을 발사하여 약간의 <:DAMAGE:피해>를 입히고 <:STUN:기절>시킵니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION / 20.0)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1)
+                        .build()
+                )
+        );
     }
 }
