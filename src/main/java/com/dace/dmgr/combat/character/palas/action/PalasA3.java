@@ -14,7 +14,10 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -62,7 +65,7 @@ public final class PalasA3 extends ActiveSkill {
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
+            Location loc = combatUser.getArmLocation(true);
             new PalasA3Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);

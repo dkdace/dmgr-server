@@ -64,7 +64,7 @@ public final class MagrittaA1 extends ActiveSkill {
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
+            Location loc = combatUser.getArmLocation(true);
             new MagrittaA1Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc, 1, -0.1);
