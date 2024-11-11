@@ -27,7 +27,7 @@ public final class JagerT1 {
      * 빙결 수치 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class FreezeValue implements StatusEffect {
+    private static final class FreezeValue implements StatusEffect {
         private static final FreezeValue instance = new FreezeValue();
         /** 수정자 ID */
         private static final String MODIFIER_ID = "JagerT1";

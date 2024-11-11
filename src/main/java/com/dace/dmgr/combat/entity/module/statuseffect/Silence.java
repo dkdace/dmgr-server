@@ -17,7 +17,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Silence implements StatusEffect {
     @Getter
-    static final Silence instance = new Silence();
+    private static final Silence instance = new Silence();
 
     @Override
     @NonNull

@@ -31,6 +31,7 @@ import org.bukkit.util.Vector;
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "PalasWeaponL";
+
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -42,6 +43,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     public PalasWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, PalasWeaponInfo.getInstance());
+
         reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
         aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
     }
@@ -70,7 +72,6 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                     onAmmoEmpty();
                     return;
                 }
-
                 if (!isActionCooldown) {
                     action();
                     break;
@@ -84,13 +85,13 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
                 new PalasWeaponHitscan().shoot(dir);
-                new PalasWeaponHitscanHeal().shoot(dir);
-                reloadModule.setReloading(false);
+                new PalasWeaponHealHitscan().shoot(dir);
+                reloadModule.cancel();
                 isActionCooldown = false;
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_USE, combatUser.getEntity().getLocation());
                 CombatUtil.setRecoil(combatUser, PalasWeaponInfo.RECOIL.UP, PalasWeaponInfo.RECOIL.SIDE, PalasWeaponInfo.RECOIL.UP_SPREAD,
                         PalasWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
+                SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_USE, combatUser.getEntity().getLocation());
 
                 TaskUtil.addTask(taskRunner, new DelayTask(this::action, getDefaultCooldown()));
 
@@ -122,8 +123,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     public void onCancelled() {
         super.onCancelled();
 
-        reloadModule.setReloading(false);
-        aimModule.setAiming(false);
+        reloadModule.cancel();
+        aimModule.cancel();
     }
 
     /**
@@ -132,7 +133,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     private void action() {
         setCooldown(PalasWeaponInfo.ACTION_COOLDOWN);
 
-        reloadModule.setReloading(false);
+        reloadModule.cancel();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             switch (i.intValue()) {
@@ -223,16 +224,18 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onAimEnable() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_ON, combatUser.getEntity().getLocation());
         combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -PalasWeaponInfo.AIM_SLOW);
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_ON, combatUser.getEntity().getLocation());
     }
 
     @Override
     public void onAimDisable() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_OFF, combatUser.getEntity().getLocation());
         combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+
+        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_OFF, combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -251,7 +254,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 210, 160, 70);
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
+                    0, 0, 0, 210, 160, 70);
         }
 
         @Override
@@ -266,8 +270,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         }
     }
 
-    private final class PalasWeaponHitscanHeal extends Hitscan {
-        private PalasWeaponHitscanHeal() {
+    private final class PalasWeaponHealHitscan extends Hitscan {
+        private PalasWeaponHealHitscan() {
             super(combatUser, HitscanOption.builder().size(PalasWeaponInfo.HEAL_SIZE).condition(combatEntity ->
                     Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity) || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
         }
@@ -280,9 +284,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                boolean isLowHealth = target.getDamageModule().isLowHealth();
-
-                if (((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true) && isLowHealth) {
+                if (((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true) && target.getDamageModule().isLowHealth()) {
                     PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
                     skillp1.setHealAmount(PalasWeaponInfo.HEAL);
                     skillp1.setTarget((Healable) target);

@@ -14,7 +14,7 @@ public interface Movable extends CombatEntity {
     MoveModule getMoveModule();
 
     /**
-     * 엔티티가 움직일 수 있는 지 확인한다.
+     * 엔티티가 움직일 수 있는지 확인한다.
      *
      * @return 이동 가능 여부
      * @implSpec {@code true}

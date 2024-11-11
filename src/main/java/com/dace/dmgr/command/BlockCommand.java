@@ -49,8 +49,7 @@ public final class BlockCommand extends BaseCommandExecutor {
                         return;
                     }
 
-                    BlockList blockList = BlockList.getInstance();
-                    blockList.open(player);
+                    BlockList.getInstance().open(player);
 
                     return;
                 }

@@ -1,16 +1,17 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 12 * 20;
+    public static final long COOLDOWN = 12 * 20L;
     /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = 1 * 20;
+    public static final int GLOBAL_COOLDOWN = 20;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.6 * 20);
     /** 피해량 */
@@ -37,16 +38,15 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
 
     private QuakerA2Info() {
         super(QuakerA2.class, "충격파 일격",
-                "",
-                "§f▍ 바닥을 내려찍어 충격파를 일으켜 §c" + TextIcon.DAMAGE + " 광역 피해§f와",
-                "§f▍ §5" + TextIcon.STUN + " 기절§f을 입히고 §b" + TextIcon.WALK_SPEED_DECREASE + " 이동 속도§f를 감소시킵니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.STUN, STUN_DURATION / 20.0),
-                MessageFormat.format("§b{0}§f {1}초 / {2}%", TextIcon.WALK_SPEED_DECREASE, SLOW_DURATION / 20.0, SLOW),
-                "",
-                "§7§l[2] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("바닥을 내려찍어 충격파를 일으켜 <:DAMAGE:광역 피해>와 <:STUN:기절>을 입히고 <:WALK_SPEED_DECREASE:이동 속도>를 감소시킵니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION / 20.0)
+                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION / 20.0, SLOW)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_2)
+                        .build()
+                )
+        );
     }
 }

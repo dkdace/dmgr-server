@@ -6,13 +6,15 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.GlowUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skin;
@@ -22,7 +24,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,11 +41,6 @@ import java.util.function.BiFunction;
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class GameUser implements Disposable {
-    /** 스폰 지역 확인 Y 좌표 */
-    private static final int SPAWN_REGION_CHECK_Y_COORDINATE = 41;
-    /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
-    private static final int HEAD_REVEAL_TIME_AFTER_GAME_START = 20;
-
     /** 플레이어 객체 */
     @NonNull
     @Getter
@@ -182,8 +178,8 @@ public final class GameUser implements Disposable {
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
-        combatUser.getDamageModule().damage(combatUser,
-                GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.FIXED, null, false, false);
+        combatUser.getDamageModule().damage(combatUser, GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.FIXED,
+                null, false, false);
     }
 
     /**
@@ -223,7 +219,7 @@ public final class GameUser implements Disposable {
         player.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
         user.teleport(getRespawnLocation());
         user.clearChat();
-        HologramUtil.setHologramVisibility(player.getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
+        user.setInFreeCombat(false);
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
                 (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
@@ -231,11 +227,8 @@ public final class GameUser implements Disposable {
 
         combatUser = new CombatUser(this);
 
-        for (GameUser target : team.getTeamUsers()) {
+        for (GameUser target : team.getTeamUsers())
             GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
-            if (target != this)
-                HologramUtil.setHologramVisibility(DamageModule.HEALTH_HOLOGRAM_ID + combatUser, true, target.player);
-        }
     }
 
     /**
@@ -244,13 +237,13 @@ public final class GameUser implements Disposable {
     private void updateGameTablist() {
         user.setTabListHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
                 "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
-                game.getTeams().get(ChatColor.RED).getScore(), game.getTeams().get(ChatColor.BLUE).getScore()));
+                game.getRedTeam().getScore(), game.getBlueTeam().getScore()));
 
-        boolean headReveal = game.getPhase() == Game.Phase.PLAYING &&
-                game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - HEAD_REVEAL_TIME_AFTER_GAME_START;
+        boolean headReveal = game.getPhase() == Game.Phase.PLAYING
+                && game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getHeadRevealTimeAfterStartSeconds();
 
         int column = 0;
-        for (Game.Team targetTeam : new Game.Team[]{game.getTeams().get(ChatColor.RED), game.getTeams().get(ChatColor.BLUE)}) {
+        for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
             column++;
             user.setTabListItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
                     targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().length), Skins.getDot(targetTeam.getColor()));
@@ -353,10 +346,10 @@ public final class GameUser implements Disposable {
      */
     @Nullable
     public Game.Team getSpawnRegionTeam() {
-        if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.REDSTONE_ORE))
-            return game.getTeams().get(ChatColor.RED);
-        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), SPAWN_REGION_CHECK_Y_COORDINATE, Material.LAPIS_ORE))
-            return game.getTeams().get(ChatColor.BLUE);
+        if (LocationUtil.isInSameBlockXZ(player.getLocation(), GeneralConfig.getGameConfig().getSpawnRegionCheckYCoordinate(), Material.REDSTONE_ORE))
+            return game.getRedTeam();
+        else if (LocationUtil.isInSameBlockXZ(player.getLocation(), GeneralConfig.getGameConfig().getSpawnRegionCheckYCoordinate(), Material.LAPIS_ORE))
+            return game.getBlueTeam();
 
         return null;
     }

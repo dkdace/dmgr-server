@@ -92,23 +92,20 @@ public final class JagerA3 extends ActiveSkill {
                     if (isCancelled)
                         return;
 
+                    onCancelled();
+
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
                     explode(loc, null);
-
-                    isEnabled = false;
-                    onCancelled();
                 }, 1, JagerA3Info.EXPLODE_DURATION));
             }, JagerA3Info.READY_DURATION));
         } else {
+            onCancelled();
             combatUser.getWeapon().setCooldown(2);
 
             Location loc = combatUser.getArmLocation(true);
             new JagerA3Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
-
-            isEnabled = false;
-            onCancelled();
         }
     }
 
@@ -122,6 +119,7 @@ public final class JagerA3 extends ActiveSkill {
         super.onCancelled();
 
         setDuration(0);
+        isEnabled = false;
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -131,7 +129,8 @@ public final class JagerA3 extends ActiveSkill {
      * @param location 사용 위치
      */
     private void playTickEffect(@NonNull Location location) {
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3, 0.1, 0.1, 0.1, 120, 220, 240);
+        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3,
+                0.1, 0.1, 0.1, 120, 220, 240);
     }
 
     /**
@@ -208,7 +207,8 @@ public final class JagerA3 extends ActiveSkill {
         private final JagerA3Projectile projectile;
 
         private JagerA3Area(JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, combatEntity -> combatEntity.isEnemy(JagerA3.this.combatUser) || combatEntity == JagerA3.this.combatUser);
+            super(combatUser, JagerA3Info.RADIUS, combatEntity -> combatEntity.isEnemy(JagerA3.this.combatUser)
+                    || combatEntity == JagerA3.this.combatUser);
             this.projectile = projectile;
         }
 
@@ -220,25 +220,25 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
-            int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0, true);
-            int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0, true);
+            int damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0);
+            int freeze = CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0);
             boolean isDamaged = projectile == null ?
                     target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true) :
                     target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
             if (isDamaged) {
-                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK));
+                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                        .multiply(JagerA3Info.KNOCKBACK));
                 JagerT1.addFreezeValue(target, freeze);
 
                 if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, Freeze.instance, JagerA3Info.SNARE_DURATION);
                     if (target != combatUser) {
+                        combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
+                        combatUser.useAction(ActionKey.PERIODIC_1);
+
                         if (target instanceof CombatUser)
                             combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
-
-                        JagerP1 skillp1 = combatUser.getSkill(JagerP1Info.getInstance());
-                        skillp1.setTarget(target);
-                        combatUser.useAction(ActionKey.PERIODIC_1);
                     }
                 }
             }

@@ -15,7 +15,7 @@ public final class PalasP1 extends AbstractSkill {
     private int healAmount;
 
     public PalasP1(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

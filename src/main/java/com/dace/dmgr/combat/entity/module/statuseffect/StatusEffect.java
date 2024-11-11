@@ -18,7 +18,7 @@ public interface StatusEffect {
     StatusEffectType getStatusEffectType();
 
     /**
-     * 상태 효과가 이로운 효과인 지 확인한다.
+     * 상태 효과가 이로운 효과인지 확인한다.
      *
      * @return {@code true} 반환 시 이로운 효과, {@code false} 반환 시 해로운 효과
      */

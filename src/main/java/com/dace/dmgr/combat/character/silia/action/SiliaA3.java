@@ -60,8 +60,8 @@ public final class SiliaA3 extends ChargeableSkill {
 
             int health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth() >=
-                        combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO)
+                if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth()
+                        >= combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO)
                     return false;
 
                 combatUser.getEntity().setFallDistance(0);

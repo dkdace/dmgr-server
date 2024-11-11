@@ -16,15 +16,15 @@ public abstract class PassiveSkillInfo<T extends Skill> extends SkillInfo<T> {
     /**
      * 패시브 스킬 정보 인스턴스를 생성한다.
      *
-     * @param skillClass 스킬 클래스
-     * @param name       이름
-     * @param lores      설명 목록
+     * @param skillClass     스킬 클래스
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
      */
-    protected PassiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull String @NonNull ... lores) {
+    protected PassiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 4)
-                .setLore(lores)
+                .setLore(actionInfoLore.toString())
                 .build());
     }
 

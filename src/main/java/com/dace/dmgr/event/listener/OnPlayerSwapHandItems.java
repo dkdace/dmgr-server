@@ -23,8 +23,8 @@ public final class OnPlayerSwapHandItems implements Listener {
         GameUser gameUser = GameUser.fromUser(user);
         CombatUser combatUser = CombatUser.fromUser(user);
 
-        if ((gameUser != null && gameUser.getTeam() != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()) ||
-                (combatUser != null && LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION))) {
+        if ((gameUser != null && gameUser.getTeam() != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam())
+                || (combatUser != null && LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION))) {
             SelectChar.getInstance().open(player);
             return;
         }
@@ -33,7 +33,6 @@ public final class OnPlayerSwapHandItems implements Listener {
             return;
         }
 
-        Menu menu = Menu.getInstance();
-        menu.open(player);
+        Menu.getInstance().open(player);
     }
 }

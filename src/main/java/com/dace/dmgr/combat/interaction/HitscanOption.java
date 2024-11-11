@@ -14,15 +14,15 @@ import java.util.function.Predicate;
 @Builder
 public final class HitscanOption {
     /** {@link Hitscan#trailInterval} 의 기본값 */
-    public static final int TRAIL_INTERVAL_DEFAULT = 14;
+    static final int TRAIL_INTERVAL_DEFAULT = 14;
     /** {@link Hitscan#startDistance} 의 기본값 */
-    public static final double START_DISTANCE_DEFAULT = 0.5;
+    static final double START_DISTANCE_DEFAULT = 0.5;
     /** {@link Hitscan#maxDistance} 의 기본값 */
-    public static final double MAX_DISTANCE_DEFAULT = 70;
+    static final double MAX_DISTANCE_DEFAULT = 70;
     /** {@link Hitscan#size} 의 기본값 */
-    public static final double SIZE_DEFAULT = 0.05;
+    static final double SIZE_DEFAULT = 0.05;
     /** {@link Hitscan#condition} 의 기본값 */
-    public static final Predicate<CombatEntity> CONDITION_DEFAULT = combatEntity -> true;
+    static final Predicate<CombatEntity> CONDITION_DEFAULT = combatEntity -> true;
 
     /** 트레일 이벤트 ({@link Bullet#onTrailInterval()})를 호출하는 주기. (단위: 판정점 개수) */
     @Builder.Default

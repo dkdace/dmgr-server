@@ -1,16 +1,15 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
-
-import java.text.MessageFormat;
 
 /**
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
@@ -74,41 +73,43 @@ public abstract class Guardian extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
-        public static final int KNOCKBACK_RESISTANCE = 30;
+        private static final int KNOCKBACK_RESISTANCE = 30;
         /** 방어력 */
-        public static final int DEFENSE = 15;
-        @Getter
+        private static final int DEFENSE = 15;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
             super("역할: 수호 - 1",
-                    "",
-                    "§f▍ 받는 §5" + TextIcon.KNOCKBACK + " 밀쳐내기 §f효과가 감소하며, 기본",
-                    "§f▍ §6" + TextIcon.DEFENSE_INCREASE + " 방어력§f을 보유합니다.",
-                    "",
-                    MessageFormat.format("§5{0} §f{1}%", TextIcon.KNOCKBACK, KNOCKBACK_RESISTANCE),
-                    MessageFormat.format("§6{0} §f{1}%", TextIcon.DEFENSE_INCREASE, DEFENSE));
+                    new ActionInfoLore(ActionInfoLore.Section
+                            .builder("받는 <:KNOCKBACK:밀쳐내기> 효과가 감소하며, 기본 <:DEFENSE_INCREASE:방어력>을 보유합니다.")
+                            .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
+                            .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE)
+                            .build()
+                    )
+            );
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo {
         /** 치유량 */
-        public static final int HEAL = 300;
+        private static final int HEAL = 300;
         /** 지속시간 (tick) */
-        public static final long DURATION = 2 * 20;
-        @Getter
+        private static final long DURATION = 2 * 20L;
+
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
             super("역할: 수호 - 2",
-                    "",
-                    "§f▍ 힐 팩을 사용하면 일정 시간동안 추가로",
-                    "§f▍ §a" + TextIcon.HEAL + " 회복§f합니다.",
-                    "",
-                    MessageFormat.format("§7{0} §f{1}초", TextIcon.DURATION, DURATION / 20.0),
-                    MessageFormat.format("§a{0} §f{1}", TextIcon.HEAL, HEAL));
+                    new ActionInfoLore(ActionInfoLore.Section
+                            .builder("힐 팩을 사용하면 일정 시간동안 추가로 <:HEAL:회복>합니다.")
+                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                            .addValueInfo(TextIcon.HEAL, HEAL)
+                            .build()
+                    )
+            );
         }
     }
 }

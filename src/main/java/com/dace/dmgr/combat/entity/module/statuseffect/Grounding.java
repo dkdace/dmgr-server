@@ -15,7 +15,7 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Grounding implements StatusEffect {
     @Getter
-    static final Grounding instance = new Grounding();
+    private static final Grounding instance = new Grounding();
 
     @Override
     @NonNull

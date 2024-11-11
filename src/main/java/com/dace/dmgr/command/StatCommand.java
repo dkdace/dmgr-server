@@ -47,8 +47,7 @@ public final class StatCommand extends BaseCommandExecutor {
             return;
         }
 
-        Stat stat = new Stat(targetUserData);
-        stat.open(player);
+        new Stat(targetUserData).open(player);
     }
 
     @Override

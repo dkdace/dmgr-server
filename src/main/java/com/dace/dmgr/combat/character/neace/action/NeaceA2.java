@@ -2,10 +2,7 @@ package com.dace.dmgr.combat.character.neace.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.NamedSound;
@@ -22,7 +19,7 @@ import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
@@ -98,11 +95,22 @@ public final class NeaceA2 extends ActiveSkill {
     }
 
     /**
+     * 대상에게 축복 효과를 적용한다.
+     *
+     * @param target 적용 대상
+     */
+    void amplifyTarget(@NonNull Healable target) {
+        target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2Buff.instance, 4);
+        if (target instanceof CombatUser)
+            ((CombatUser) target).addKillAssist(combatUser, ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+    }
+
+    /**
      * 축복 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    static final class NeaceA2Buff implements StatusEffect {
-        static final NeaceA2Buff instance = new NeaceA2Buff();
+    private static final class NeaceA2Buff implements StatusEffect {
+        private static final NeaceA2Buff instance = new NeaceA2Buff();
 
         @Override
         @NonNull

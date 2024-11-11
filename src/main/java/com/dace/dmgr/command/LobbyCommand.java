@@ -29,6 +29,7 @@ public final class LobbyCommand extends BaseCommandExecutor {
     protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
+
         if (gameUser != null) {
             Game game = gameUser.getGame();
             if (game.getPhase() == Game.Phase.READY || game.getPhase() == Game.Phase.PLAYING) {

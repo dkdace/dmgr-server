@@ -14,7 +14,7 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Invulnerable implements StatusEffect {
     @Getter
-    static final Invulnerable instance = new Invulnerable();
+    private static final Invulnerable instance = new Invulnerable();
 
     @Override
     @NonNull

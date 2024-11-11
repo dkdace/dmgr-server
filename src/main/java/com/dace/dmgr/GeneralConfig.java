@@ -64,6 +64,8 @@ public final class GeneralConfig extends YamlFile {
         /** 리소스팩 URL */
         @NonNull
         private String resourcePackUrl = "";
+        /** 리소스팩 적용 시간 제한 (초) */
+        private int resourcePackTimeout = 8;
         /** 채팅 쿨타임 (tick) */
         private long chatCooldown = 0;
         /** 명령어 쿨타임 (tick) */
@@ -84,6 +86,7 @@ public final class GeneralConfig extends YamlFile {
          */
         private void load() {
             resourcePackUrl = getString(SECTION + ".resourcePackUrl", resourcePackUrl);
+            resourcePackTimeout = (int) getLong(SECTION + ".resourcePackTimeout", resourcePackTimeout);
             chatCooldown = getLong(SECTION + ".chatCooldown", chatCooldown);
             commandCooldown = getLong(SECTION + ".commandCooldown", commandCooldown);
             rankingUpdatePeriodMinutes = (int) getLong(SECTION + ".rankingUpdatePeriodMinutes", rankingUpdatePeriodMinutes);
@@ -103,20 +106,22 @@ public final class GeneralConfig extends YamlFile {
         private static final String SECTION = "combat";
         /** 초당 궁극기 충전량 */
         private int idleUltChargePerSecond = 10;
+        /** 기본 이동속도 */
+        private double defaultSpeed = 0.12;
         /** 리스폰 시간 (tick) */
         private long respawnTime = 200;
         /** 힐 팩에 사용되는 블록의 타입 */
         @NonNull
         private Material healPackBlock = Material.NETHERRACK;
         /** 힐 팩 쿨타임 (tick) */
-        private long healPackCooldown = 15 * 20;
+        private long healPackCooldown = 15 * 20L;
         /** 힐 팩 회복량 */
         private int healPackHeal = 350;
         /** 궁극기 팩에 사용되는 블록의 타입 */
         @NonNull
         private Material ultPackBlock = Material.QUARTZ_ORE;
         /** 궁극기 팩 쿨타임 (tick) */
-        private long ultPackCooldown = 120 * 20;
+        private long ultPackCooldown = 120 * 20L;
         /** 궁극기 팩 충전량 */
         private long ultPackCharge = 1000;
         /** 점프대에 사용되는 블록의 타입 */
@@ -127,12 +132,21 @@ public final class GeneralConfig extends YamlFile {
         /** 낙사 구역에 사용되는 블록의 타입 */
         @NonNull
         private Material fallZoneBlock = Material.BEDROCK;
+        /** 적 처치 기여 (데미지 누적) 제한시간 (tick) */
+        private long damageSumTimeLimit = 10 * 20L;
+        /** 연속 처치 제한시간 (tick) */
+        private long killStreakTimeLimit = 8 * 20L;
+        /** 획득 점수 표시 유지시간 (tick) */
+        private long scoreDisplayDuration = 5 * 20L;
+        /** 킬 로그 표시 유지시간 (tick) */
+        private long killLogDisplayDuration = 4 * 20L;
 
         /**
          * 데이터를 불러온다.
          */
         private void load() {
             idleUltChargePerSecond = (int) getLong(SECTION + ".idleUltChargePerSecond", idleUltChargePerSecond);
+            defaultSpeed = getDouble(SECTION + ".defaultSpeed", defaultSpeed);
             respawnTime = getLong(SECTION + ".respawnTime", respawnTime);
             healPackBlock = Material.valueOf(getString(SECTION + ".healPackBlock", healPackBlock.toString()));
             healPackCooldown = getLong(SECTION + ".healPackCooldown", healPackCooldown);
@@ -143,6 +157,10 @@ public final class GeneralConfig extends YamlFile {
             jumpPadBlock = Material.valueOf(getString(SECTION + ".jumpPadBlock", jumpPadBlock.toString()));
             jumpPadVelocity = getDouble(SECTION + ".jumpPadVelocity", jumpPadVelocity);
             fallZoneBlock = Material.valueOf(getString(SECTION + ".fallZoneBlock", fallZoneBlock.toString()));
+            damageSumTimeLimit = getLong(SECTION + ".damageSumTimeLimit", damageSumTimeLimit);
+            killStreakTimeLimit = getLong(SECTION + ".killStreakTimeLimit", killStreakTimeLimit);
+            scoreDisplayDuration = getLong(SECTION + ".scoreDisplayDuration", scoreDisplayDuration);
+            killLogDisplayDuration = getLong(SECTION + ".killLogDisplayDuration", killLogDisplayDuration);
         }
     }
 
@@ -168,6 +186,10 @@ public final class GeneralConfig extends YamlFile {
         private int rankPlacementPlayCount = 5;
         /** 게임 시작까지 필요한 대기 시간 (초) */
         private int waitingTimeSeconds = 30;
+        /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 (초) */
+        private int headRevealTimeAfterStartSeconds = 20;
+        /** 스폰 지역 확인 Y 좌표 */
+        private int spawnRegionCheckYCoordinate = 41;
         /** 팀 스폰 입장 시 초당 회복량 */
         private int teamSpawnHealPerSecond = 500;
         /** 상대 팀 스폰 입장 시 초당 피해량 */
@@ -196,6 +218,8 @@ public final class GeneralConfig extends YamlFile {
             rankMaxPlayerCount = (int) getLong(SECTION + ".rankMaxPlayerCount", rankMaxPlayerCount);
             rankPlacementPlayCount = (int) getLong(SECTION + ".rankPlacementPlayCount", rankPlacementPlayCount);
             waitingTimeSeconds = (int) getLong(SECTION + ".waitingTime", waitingTimeSeconds);
+            headRevealTimeAfterStartSeconds = (int) getLong(SECTION + ".headRevealTimeAfterStartSeconds", headRevealTimeAfterStartSeconds);
+            spawnRegionCheckYCoordinate = (int) getLong(SECTION + ".spawnRegionCheckYCoordinate", spawnRegionCheckYCoordinate);
             teamSpawnHealPerSecond = (int) getLong(SECTION + ".teamSpawnHealPerSecond", teamSpawnHealPerSecond);
             oppositeSpawnDamagePerSecond = (int) getLong(SECTION + ".oppositeSpawnDamagePerSecond", oppositeSpawnDamagePerSecond);
             ultPackActivationSeconds = (int) getLong(SECTION + ".ultPackActivationSeconds", ultPackActivationSeconds);

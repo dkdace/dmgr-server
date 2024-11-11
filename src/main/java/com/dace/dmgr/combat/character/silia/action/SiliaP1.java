@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
     public SiliaP1(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override
@@ -76,6 +76,6 @@ public final class SiliaP1 extends AbstractSkill {
         super.onCancelled();
 
         TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                isCancelled2 -> setDuration(0), 1));
+                isCancelled -> setDuration(0), 1));
     }
 }

@@ -1,14 +1,15 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 6 * 20;
+    public static final long COOLDOWN = 6 * 20L;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (1.7 * 20);
     /** 시전 시간 (tick) */
@@ -37,20 +38,18 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
 
     private VellionA1Info() {
         super(VellionA1.class, "마력 집중",
-                "",
-                "§f▍ 개체를 관통하는 마력 응집체를 날려 적에게는",
-                "§f▍ §c" + TextIcon.POISON + " 독 피해§f와 짧은 §5" + TextIcon.SNARE + " 속박§f을 입히고,",
-                "§f▍ 아군에게는 지속적인 §a" + TextIcon.HEAL + " 치유 §f효과를 줍니다.",
-                "§f▍ 벽이나 최대 사거리에 도달하면 되돌아오며 효과를",
-                "§f▍ 다시 입힙니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§f{0} {1}m", TextIcon.DISTANCE, VELOCITY * RETURN_DURATION / 20.0),
-                MessageFormat.format("§f{0} {1}m", TextIcon.RADIUS, RADIUS),
-                MessageFormat.format("§c{0}§f {1}초 / {2}/초", TextIcon.POISON, EFFECT_DURATION / 20.0, POISON_DAMAGE_PER_SECOND),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.SNARE, SNARE_DURATION / 20.0),
-                MessageFormat.format("§a{0}§f {1}초 / {2}/초", TextIcon.HEAL, EFFECT_DURATION / 20.0, HEAL_PER_SECOND),
-                "",
-                "§7§l[1] [우클릭] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("개체를 관통하는 마력 응집체를 날려 적에게는 <:POISON:독 피해>와 짧은 <:SNARE:속박>을 입히고, 아군에게는 지속적인 <:HEAL:치유> 효과를 줍니다. " +
+                                "벽이나 최대 사거리에 도달하면 되돌아오며 효과를 다시 입힙니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.POISON, Format.TIME_WITH_PER_SECOND, EFFECT_DURATION / 20.0, POISON_DAMAGE_PER_SECOND)
+                        .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION / 20.0)
+                        .addValueInfo(TextIcon.HEAL, Format.TIME_WITH_PER_SECOND, EFFECT_DURATION / 20.0, HEAL_PER_SECOND)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, VELOCITY * RETURN_DURATION / 20)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)
+                        .build()
+                )
+        );
     }
 }

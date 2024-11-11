@@ -15,16 +15,14 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public final class ChedUlt extends UltimateSkill {
     /** 처치 점수 제한시간 쿨타임 ID */
-    public static final String KILL_SCORE_COOLDOWN_ID = "ChedUltKillScoreTimeLimit";
+    private static final String KILL_SCORE_COOLDOWN_ID = "ChedUltKillScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "ChedUlt";
     /** 소환한 엔티티 */
@@ -46,8 +44,8 @@ public final class ChedUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && (combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() ||
-                !combatUser.getEntity().hasGravity());
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
@@ -56,14 +54,16 @@ public final class ChedUlt extends UltimateSkill {
 
         setDuration();
         combatUser.setGlobalCooldown((int) ChedUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedA3Info.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedUltInfo.READY_SLOW);
         combatUser.getWeapon().onCancelled();
-        combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.AIR));
+        ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE, combatUser.getEntity().getLocation());
 
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (!combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() && combatUser.getEntity().hasGravity())
+            if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
@@ -78,12 +78,13 @@ public final class ChedUlt extends UltimateSkill {
             Location location = combatUser.getArmLocation(true);
             new ChedUltProjectile().shoot(location);
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE_READY, location);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION);
                 return true;
             }, 1, 20));
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE_READY, location);
         }, 1, ChedUltInfo.READY_DURATION));
     }
 
@@ -143,6 +144,17 @@ public final class ChedUlt extends UltimateSkill {
                     ParticleUtil.play(Particle.FLAME, loc2, 0, vec.getX(), vec.getY(), vec.getZ(), 0.02 + index * 0.003);
             }
         }
+    }
+
+    /**
+     * 플레이어에게 보너스 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyBonusScore(@NonNull CombatUser victim, int score) {
+        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("궁극기 보너스", ChedUltInfo.KILL_SCORE * score / 100.0);
     }
 
     /**
@@ -218,8 +230,7 @@ public final class ChedUlt extends UltimateSkill {
             Location loc = target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0).add(0, 0.1, 0);
             new ChedUltArea().emit(loc);
 
-            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, loc);
-            summonEntity = new ChedUltFireFloor(armorStand, combatUser);
+            summonEntity = new ChedUltFireFloor(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
             summonEntity.activate();
 
             for (Location loc2 : LocationUtil.getLine(getLocation(), loc, 0.4))
@@ -252,8 +263,9 @@ public final class ChedUlt extends UltimateSkill {
                     CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 double distance = center.distance(location);
-                int damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0, true);
-                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false))
+                int damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
+                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null,
+                        false, false))
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(getLocation(), location.add(0, 1, 0))
                             .multiply(ChedUltInfo.KNOCKBACK));
 
@@ -265,7 +277,7 @@ public final class ChedUlt extends UltimateSkill {
     /**
      * 화염 지대 클래스.
      */
-    public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
+    private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
             super(
                     entity,
@@ -331,6 +343,7 @@ public final class ChedUlt extends UltimateSkill {
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                         false, false)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, ChedUltBurning.instance, 10);
+
                     if (target instanceof CombatUser)
                         CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
                 }

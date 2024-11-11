@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
 
 public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
@@ -25,15 +26,15 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
 
     private QuakerWeaponInfo() {
         super(QuakerWeapon.class, RESOURCE.DEFAULT, "타바르진",
-                "",
-                "§f▍ 거대한 도끼를 휘둘러 근거리에 §c" + TextIcon.DAMAGE + " 광역 피해§f를",
-                "§f▍ 입히고 옆으로 §5" + TextIcon.KNOCKBACK + " 밀쳐냅니다§f.",
-                "",
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                "",
-                "§7§l[좌클릭] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("거대한 도끼를 휘둘러 근거리에 <:DAMAGE:광역 피해>를 입히고 옆으로 <:KNOCKBACK:밀쳐냅니다>.")
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                        .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
+                        .build()
+                )
+        );
     }
 
     /**

@@ -26,7 +26,7 @@ import org.bukkit.block.Block;
 
 public final class PalasA1 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA1AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA1AssistScoreTimeLimit";
 
     public PalasA1(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA1Info.getInstance(), 0);
@@ -86,18 +86,30 @@ public final class PalasA1 extends ActiveSkill {
     }
 
     /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", PalasA1Info.ASSIST_SCORE * score / 100.0);
+    }
+
+    /**
      * 기절 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class PalasA1Stun extends Stun {
-        public static final PalasA1Stun instance = new PalasA1Stun();
+        private static final PalasA1Stun instance = new PalasA1Stun();
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             super.onTick(combatEntity, provider, i);
 
             if (combatEntity instanceof CombatUser)
-                CombatUtil.addYawAndPitch(combatEntity.getEntity(), (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20,
+                CombatUtil.addYawAndPitch(combatEntity.getEntity(),
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20,
                         (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20);
 
             if (i % 2 == 0) {

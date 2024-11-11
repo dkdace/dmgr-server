@@ -27,6 +27,7 @@ public final class StatusEffectModule {
     private static final String COOLDOWN_ID = "StatusEffect";
     /** 상태 효과 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
+
     /** 엔티티 객체 */
     @NonNull
     @Getter
@@ -94,11 +95,7 @@ public final class StatusEffectModule {
             statusEffect.onStart(combatEntity, provider);
 
             TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
-                if (combatEntity.isDisposed())
-                    return false;
-                if (getStatusEffectDuration(statusEffect) == 0)
-                    return false;
-                if (!statusEffects.contains(statusEffect))
+                if (combatEntity.isDisposed() || getStatusEffectDuration(statusEffect) == 0 || !statusEffects.contains(statusEffect))
                     return false;
 
                 statusEffect.onTick(combatEntity, provider, i);
@@ -125,7 +122,7 @@ public final class StatusEffectModule {
     }
 
     /**
-     * 엔티티가 지정한 상태 효과 종류에 해당하는 상태 효과를 가지고 있는 지 확인한다.
+     * 엔티티가 지정한 상태 효과 종류에 해당하는 상태 효과를 가지고 있는지 확인한다.
      *
      * @param statusEffectType 확인할 상태 효과 종류
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
@@ -137,6 +134,16 @@ public final class StatusEffectModule {
         }
 
         return false;
+    }
+
+    /**
+     * 엔티티가 지정한 상태 효과를 가지고 있는지 확인한다.
+     *
+     * @param statusEffect 확인할 상태 효과
+     * @return 상태 효과를 가지고 있으면 {@code true} 반환
+     */
+    public boolean hasStatusEffect(@NonNull StatusEffect statusEffect) {
+        return statusEffects.contains(statusEffect);
     }
 
     /**
@@ -162,23 +169,13 @@ public final class StatusEffectModule {
      * @return 가지고 있는 모든 상태 효과의 조합이 지정한 상태 제한을 모두 포함하면 {@code true}
      * @see CombatRestrictions
      */
-    public boolean hasAllRestriction(long restrictions) {
+    public boolean hasAllRestrictions(long restrictions) {
         long combinedRestrictions = CombatRestrictions.NONE;
         for (StatusEffect statusEffect : statusEffects) {
             combinedRestrictions |= statusEffect.getCombatRestrictions(combatEntity);
         }
 
         return (combinedRestrictions & restrictions) == restrictions;
-    }
-
-    /**
-     * 엔티티가 지정한 상태 효과를 가지고 있는 지 확인한다.
-     *
-     * @param statusEffect 확인할 상태 효과
-     * @return 상태 효과를 가지고 있으면 {@code true} 반환
-     */
-    public boolean hasStatusEffect(@NonNull StatusEffect statusEffect) {
-        return statusEffects.contains(statusEffect);
     }
 
     /**

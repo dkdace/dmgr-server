@@ -19,7 +19,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HealBlock implements StatusEffect {
     @Getter
-    static final HealBlock instance = new HealBlock();
+    private static final HealBlock instance = new HealBlock();
 
     @Override
     @NonNull

@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public final class ChatSoundOption extends Gui {
     /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.LEFT("ChatSoundOptionLeft") {
+    private static final GuiItem buttonLeft = new ButtonItem.Left("ChatSoundOptionLeft") {
         @Override
         public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
             PlayerOption.getInstance().open(player);
@@ -40,7 +40,8 @@ public final class ChatSoundOption extends Gui {
             ChatSound chatSound = chatSounds[i];
 
             guiController.set(i, chatSound.guiItem, itemBuilder -> {
-                if (userConfig.getChatSound() == chatSound) itemBuilder.addLore("§a§l선택됨");
+                if (userConfig.getChatSound() == chatSound)
+                    itemBuilder.addLore("§a§l선택됨");
             });
         }
 

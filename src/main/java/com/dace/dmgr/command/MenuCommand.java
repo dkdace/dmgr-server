@@ -24,8 +24,7 @@ public final class MenuCommand extends BaseCommandExecutor {
 
     @Override
     protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
-        Menu menu = Menu.getInstance();
-        menu.open(player);
+        Menu.getInstance().open(player);
     }
 
     @Override

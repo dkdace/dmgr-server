@@ -61,7 +61,6 @@ public final class MagrittaA2 extends ActiveSkill {
                 return false;
 
             Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
-
             ParticleUtil.play(Particle.SMOKE_LARGE, loc, 6, 0.5, 0, 0.5, 0);
             ParticleUtil.play(Particle.FLAME, loc, 4, 0.4, 0, 0.4, 0);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 6,

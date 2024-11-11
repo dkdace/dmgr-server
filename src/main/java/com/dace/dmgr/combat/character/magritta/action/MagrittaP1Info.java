@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import lombok.Getter;
-
-import java.text.MessageFormat;
 
 public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
     /** 초당 치유량 */
@@ -18,11 +18,13 @@ public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
 
     private MagrittaP1Info() {
         super(MagrittaP1.class, "방화광",
-                "",
-                "§f▍ 근처에 불타는 적이 존재하면 §a" + TextIcon.HEAL + " 회복§f합니다.",
-                "",
-                MessageFormat.format("§7{0}§f {1}초", TextIcon.DURATION, DURATION / 20.0),
-                MessageFormat.format("§a{0}§f {1}/초", TextIcon.HEAL, HEAL_PER_SECOND),
-                MessageFormat.format("§a{0}§f {1}m", TextIcon.RADIUS, DETECT_RADIUS));
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("근처에 <:FIRE:불>타는 적이 존재하면 <:HEAL:회복>합니다.")
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
+                        .build()
+                )
+        );
     }
 }

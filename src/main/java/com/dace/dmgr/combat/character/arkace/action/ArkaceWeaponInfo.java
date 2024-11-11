@@ -1,12 +1,13 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
 
 public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 연사속도 */
@@ -26,16 +27,18 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
 
     private ArkaceWeaponInfo() {
         super(ArkaceWeapon.class, RESOURCE.DEFAULT, "HLN-12",
-                "",
-                "§f▍ 뛰어난 안정성을 가진 전자동 돌격소총입니다.",
-                "§f▍ §7사격§f하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1} ~ {2} ({3}m~{4}m)",
-                        TextIcon.DAMAGE, DAMAGE, DAMAGE / 2, DAMAGE_WEAKENING_DISTANCE, DAMAGE_WEAKENING_DISTANCE * 2),
-                MessageFormat.format("§c{0}§f 0.1초 (600/분)", TextIcon.ATTACK_SPEED),
-                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
-                "",
-                "§7§l[우클릭] §f사격 §7§l[Q] §f재장전");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("뛰어난 안정성을 가진 전자동 돌격소총입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
+                        .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
+                                DAMAGE, DAMAGE / 2, DAMAGE_WEAKENING_DISTANCE, DAMAGE_WEAKENING_DISTANCE * 2)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME_WITH_RPM,
+                                60.0 / FIRE_RATE.getRoundsPerMinute(), FIRE_RATE.getRoundsPerMinute())
+                        .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
+                        .addActionKeyInfo("사격", ActionKey.RIGHT_CLICK)
+                        .addActionKeyInfo("재장전", ActionKey.DROP)
+                        .build()
+                )
+        );
     }
 
     /**

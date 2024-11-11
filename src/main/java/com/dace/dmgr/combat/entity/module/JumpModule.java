@@ -36,8 +36,8 @@ public final class JumpModule extends MoveModule {
 
         TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
             if (canJump() && combatEntity.canJump()) {
-                if (((LivingEntity) combatEntity.getEntity()).hasPotionEffect(PotionEffectType.JUMP) &&
-                        ((LivingEntity) combatEntity.getEntity()).getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
+                if (((LivingEntity) combatEntity.getEntity()).hasPotionEffect(PotionEffectType.JUMP)
+                        && ((LivingEntity) combatEntity.getEntity()).getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
                     ((LivingEntity) combatEntity.getEntity()).removePotionEffect(PotionEffectType.JUMP);
             } else
                 ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6,

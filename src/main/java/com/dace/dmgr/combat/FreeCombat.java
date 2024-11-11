@@ -4,19 +4,19 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 /**
  * 자유 전투 시스템 클래스.
  */
+@UtilityClass
 public final class FreeCombat {
     /** 자유 전투 지역 이름 */
     public static final String FREE_COMBAT_REGION = "BattlePVP";
@@ -80,7 +80,6 @@ public final class FreeCombat {
         user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10, 40, 30, 80);
         user.teleport(waitLocation);
         user.setInFreeCombat(true);
-        HologramUtil.setHologramVisibility(user.getPlayer().getName(), false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
 
         CombatUser combatUser = new CombatUser(user);
 

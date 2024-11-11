@@ -8,10 +8,16 @@ import org.bukkit.Location;
  * Pitch가 고정된 히트박스 클래스.
  */
 public final class FixedPitchHitbox extends Hitbox {
+    /**
+     * @see Hitbox#Hitbox(Location, double, double, double, double, double, double)
+     */
     public FixedPitchHitbox(@NonNull Location center, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ) {
         super(center, sizeX, sizeY, sizeZ, offsetX, offsetY, offsetZ);
     }
 
+    /**
+     * @see Hitbox#Hitbox(Location, double, double, double, double, double, double, double, double, double)
+     */
     public FixedPitchHitbox(@NonNull Location center, double sizeX, double sizeY, double sizeZ, double offsetX, double offsetY, double offsetZ,
                             double axisOffsetX, double axisOffsetY, double axisOffsetZ) {
         super(center, sizeX, sizeY, sizeZ, offsetX, offsetY, offsetZ, axisOffsetX, axisOffsetY, axisOffsetZ);

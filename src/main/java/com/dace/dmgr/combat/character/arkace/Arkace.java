@@ -113,27 +113,21 @@ public final class Arkace extends Marksman {
         ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
         ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
 
-        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
-        double skill2Duration = skill2.getDuration() / 20.0;
-        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, ArkaceWeaponInfo.CAPACITY,
-                ArkaceWeaponInfo.CAPACITY, '|');
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
+                ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.CAPACITY, '|');
 
         text.add(weaponDisplay);
         text.add("");
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■');
+            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
+                    skill2.getDefaultDuration() / 20.0);
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 

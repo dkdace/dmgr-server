@@ -15,7 +15,7 @@ public final class InfernoP1 extends AbstractSkill {
     private static final String MODIFIER_ID = "InfernoP1";
 
     public InfernoP1(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override

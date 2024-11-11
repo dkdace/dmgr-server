@@ -14,39 +14,44 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * {@link CombatEntity}의 기본 구현체, 모든 전투 시스템 엔티티의 기반 클래스.
  *
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
-@Getter
 public abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     /** 엔티티 객체 */
     @NonNull
+    @Getter
     protected final T entity;
     /** 속성 목록 관리 객체 */
     @NonNull
+    @Getter
     protected final PropertyManager propertyManager = new PropertyManager();
     /** 이름 */
     @NonNull
+    @Getter
     protected final String name;
     /** 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
     @Nullable
+    @Getter
     protected final Game game;
     /** 히트박스 객체 목록 */
     @NonNull
+    @Getter
     protected final Hitbox @NonNull [] hitboxes;
     /** 활성화 여부 */
+    @Getter
     protected boolean isActivated = false;
     /** 움직임 상태 */
+    @Getter
     protected boolean isMoving = false;
     /** 히트박스의 중앙 위치 */
     @NonNull
     private Location hitboxLocation;
     /** 히트박스의 가능한 최대 크기. (단위: 블록) */
+    @Getter
     private double maxHitboxSize = 0;
 
     /**
@@ -108,7 +113,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         Location oldLoc = entity.getLocation();
 
         TaskUtil.addTask(this, new DelayTask(() -> {
-            isMoving = oldLoc.distance(entity.getLocation()) > 0;
+            isMoving = oldLoc.getWorld() != entity.getWorld() || oldLoc.distance(entity.getLocation()) > 0;
             for (Hitbox hitbox : getHitboxes()) {
                 hitboxLocation = oldLoc;
                 hitbox.setCenter(hitboxLocation);
@@ -126,14 +131,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     public final Location getCenterLocation() {
         return entity.getLocation().add(0, entity.getHeight() / 2, 0);
-    }
-
-    @Override
-    @NonNull
-    public final Location getNearestLocationOfHitboxes(@NonNull Location location) {
-        return Arrays.stream(getHitboxes()).map(hitbox -> hitbox.getNearestLocation(location))
-                .min(Comparator.comparing(loc -> loc.distance(location)))
-                .orElseThrow(() -> new IllegalStateException("가장 가까운 위치를 찾을 수 없음"));
     }
 
     @Override

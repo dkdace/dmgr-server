@@ -17,7 +17,7 @@ public final class VellionP1 extends AbstractSkill {
     private static final String MODIFIER_ID = "VellionP1";
 
     public VellionP1(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override
@@ -63,6 +63,7 @@ public final class VellionP1 extends AbstractSkill {
 
                 return true;
             }, 1, 2));
+
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished() || !combatUser.getEntity().isFlying())
                     return false;
@@ -94,8 +95,7 @@ public final class VellionP1 extends AbstractSkill {
             combatUser.getEntity().setFallDistance(0);
 
             return !combatUser.getEntity().isOnGround();
-        }, isCancelled ->
-                combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
+        }, isCancelled -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_P1_DISABLE, combatUser.getEntity().getLocation());
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,

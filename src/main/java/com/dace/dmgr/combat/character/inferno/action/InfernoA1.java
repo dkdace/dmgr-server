@@ -138,6 +138,7 @@ public final class InfernoA1 extends ActiveSkill {
             if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true))
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
                         .multiply(InfernoA1Info.KNOCKBACK));
+
             ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
 
             return !(target instanceof Barrier);

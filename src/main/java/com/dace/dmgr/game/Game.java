@@ -43,10 +43,14 @@ public final class Game implements Disposable {
     private final int minPlayerCount;
     /** 최대 수용 가능 인원 수 */
     private final int maxPlayerCount;
-    /** 팀 목록 (색상 : 팀) */
+    /** 레드 팀 */
     @NonNull
     @Getter
-    private final EnumMap<ChatColor, Team> teams = new EnumMap<>(ChatColor.class);
+    private final Team redTeam;
+    /** 블루 팀 */
+    @NonNull
+    @Getter
+    private final Team blueTeam;
     /** 게임 모드 */
     @NonNull
     @Getter
@@ -87,8 +91,8 @@ public final class Game implements Disposable {
         this.map = gamePlayMode.getRandomMap();
         minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
-        teams.put(ChatColor.RED, new Team(ChatColor.RED, "레드"));
-        teams.put(ChatColor.BLUE, new Team(ChatColor.BLUE, "블루"));
+        redTeam = new Team(ChatColor.RED, "레드");
+        blueTeam = new Team(ChatColor.BLUE, "블루");
         GameRegistry.getInstance().add(new GameRegistry.KeyPair(isRanked, number), this);
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
@@ -304,7 +308,7 @@ public final class Game implements Disposable {
     }
 
     /**
-     * 게임을 시작할 조건이 충족되었는 지 확인한다.
+     * 게임을 시작할 조건이 충족되었는지 확인한다.
      *
      * @return 게임을 시작할 수 있으면 {@code true} 반환
      */
@@ -354,28 +358,28 @@ public final class Game implements Disposable {
                 .sorted(Comparator.comparing((GameUser gameUser) ->
                         gameUser.getUser().getUserData().getMatchMakingRate()).reversed())
                 .collect(Collectors.toCollection(LinkedList::new));
-        HashSet<GameUser> team1 = new HashSet<>();
-        HashSet<GameUser> team2 = new HashSet<>();
+        HashSet<GameUser> team1users = new HashSet<>();
+        HashSet<GameUser> team2users = new HashSet<>();
         int size = sortedGameUsers.size();
 
         for (int i = 0; i < size / 4; i++)
-            team1.add(sortedGameUsers.pop());
+            team1users.add(sortedGameUsers.pop());
         for (int i = 0; i < size / 2; i++)
-            team2.add(sortedGameUsers.pop());
-        team1.addAll(sortedGameUsers);
+            team2users.add(sortedGameUsers.pop());
+        team1users.addAll(sortedGameUsers);
 
-        Team team1Team = teams.get(ChatColor.RED);
-        Team team2Team = teams.get(ChatColor.BLUE);
+        Team team1Team = redTeam;
+        Team team2Team = blueTeam;
         if (DMGR.getRandom().nextBoolean()) {
-            team1Team = teams.get(ChatColor.BLUE);
-            team2Team = teams.get(ChatColor.RED);
+            team1Team = blueTeam;
+            team2Team = redTeam;
         }
 
-        for (GameUser gameUser : team1) {
+        for (GameUser gameUser : team1users) {
             gameUser.setTeam(team1Team);
             team1Team.teamUsers.add(gameUser);
         }
-        for (GameUser gameUser : team2) {
+        for (GameUser gameUser : team2users) {
             gameUser.setTeam(team2Team);
             team2Team.teamUsers.add(gameUser);
         }
@@ -385,32 +389,29 @@ public final class Game implements Disposable {
      * 게임 종료 시 실행할 작업.
      */
     private void onFinish() {
-        Team winnerTeam = teams.get(ChatColor.RED).score > teams.get(ChatColor.BLUE).score ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);
-        if (teams.get(ChatColor.RED).score == teams.get(ChatColor.BLUE).score)
+        Team winnerTeam = redTeam.score > blueTeam.score ? redTeam : blueTeam;
+        if (redTeam.score == blueTeam.score)
             winnerTeam = null;
 
-        EnumMap<ChatColor, List<GameUser>> scoreRank = new EnumMap<>(ChatColor.class);
-        EnumMap<ChatColor, List<GameUser>> damageRank = new EnumMap<>(ChatColor.class);
-        EnumMap<ChatColor, List<GameUser>> killRank = new EnumMap<>(ChatColor.class);
-        EnumMap<ChatColor, List<GameUser>> defendRank = new EnumMap<>(ChatColor.class);
-        EnumMap<ChatColor, List<GameUser>> healRank = new EnumMap<>(ChatColor.class);
-        for (Team team : teams.values()) {
-            scoreRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
+        HashMap<Team, List<GameUser>> scoreRank = new HashMap<>();
+        HashMap<Team, List<GameUser>> damageRank = new HashMap<>();
+        HashMap<Team, List<GameUser>> killRank = new HashMap<>();
+        HashMap<Team, List<GameUser>> defendRank = new HashMap<>();
+        HashMap<Team, List<GameUser>> healRank = new HashMap<>();
+        for (Team team : new Team[]{redTeam, blueTeam}) {
+            scoreRank.put(team, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getScore).reversed())
                     .collect(Collectors.toList()));
-            damageRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
+            damageRank.put(team, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDamage).reversed())
                     .collect(Collectors.toList()));
-            killRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
+            killRank.put(team, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getKill).reversed())
                     .collect(Collectors.toList()));
-            defendRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
+            defendRank.put(team, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getDefend).reversed())
                     .collect(Collectors.toList()));
-            healRank.put(team.color, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
+            healRank.put(team, team.teamUsers.stream().sorted(Comparator.comparing(GameUser::getHeal).reversed())
                     .collect(Collectors.toList()));
         }
 
         for (GameUser gameUser : gameUsers) {
-            if (gameUser.getTeam() == null)
-                continue;
-
             gameUser.getUser().clearChat();
 
             Boolean isWinner = winnerTeam == null ? null : gameUser.getTeam() == winnerTeam;
@@ -431,11 +432,11 @@ public final class Game implements Disposable {
                 userData.setLoseCount(userData.getLoseCount() + 1);
 
             sendResultReport(gameUser, isWinner,
-                    scoreRank.get(gameUser.getTeam().color).indexOf(gameUser),
-                    damageRank.get(gameUser.getTeam().color).indexOf(gameUser),
-                    killRank.get(gameUser.getTeam().color).indexOf(gameUser),
-                    defendRank.get(gameUser.getTeam().color).indexOf(gameUser),
-                    healRank.get(gameUser.getTeam().color).indexOf(gameUser), moneyEarned, xpEarned, rankEarned);
+                    scoreRank.get(gameUser.getTeam()).indexOf(gameUser),
+                    damageRank.get(gameUser.getTeam()).indexOf(gameUser),
+                    killRank.get(gameUser.getTeam()).indexOf(gameUser),
+                    defendRank.get(gameUser.getTeam()).indexOf(gameUser),
+                    healRank.get(gameUser.getTeam()).indexOf(gameUser), moneyEarned, xpEarned, rankEarned);
         }
     }
 
@@ -636,7 +637,7 @@ public final class Game implements Disposable {
     }
 
     /**
-     * 플레이어가 게임에 참여할 수 있는 지 확인한다.
+     * 플레이어가 게임에 참여할 수 있는지 확인한다.
      *
      * <p>추가 인원을 수용할 수 있고 게임이 진행 중인 상태이며, 양 팀의 인원수가
      * 다를 때 참여 가능하다.</p>
@@ -647,11 +648,8 @@ public final class Game implements Disposable {
         if (gameUsers.size() >= maxPlayerCount)
             return false;
 
-        int redAmount = teams.get(ChatColor.RED).teamUsers.size();
-        int blueAmount = teams.get(ChatColor.BLUE).teamUsers.size();
-
         if (phase != Phase.WAITING)
-            return !gamePlayMode.isRanked() && redAmount != blueAmount;
+            return !gamePlayMode.isRanked() && redTeam.teamUsers.size() != blueTeam.teamUsers.size();
 
         return true;
     }
@@ -669,14 +667,11 @@ public final class Game implements Disposable {
         if (!canJoin())
             return;
 
-        int redAmount = teams.get(ChatColor.RED).teamUsers.size();
-        int blueAmount = teams.get(ChatColor.BLUE).teamUsers.size();
-
         gameUsers.add(gameUser);
         gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.ADD_PREFIX + gameUser.getPlayer().getName()));
 
         if (phase != Phase.WAITING) {
-            Team team = redAmount < blueAmount ? teams.get(ChatColor.RED) : teams.get(ChatColor.BLUE);
+            Team team = redTeam.teamUsers.size() < blueTeam.teamUsers.size() ? redTeam : blueTeam;
 
             team.teamUsers.add(gameUser);
             gameUser.setTeam(team);
@@ -697,7 +692,7 @@ public final class Game implements Disposable {
         gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);
         if (gameUser.getTeam() != null)
-            teams.get(gameUser.getTeam().color).teamUsers.remove(gameUser);
+            gameUser.getTeam().teamUsers.remove(gameUser);
 
         if (phase != Phase.END && gameUsers.isEmpty())
             phase = Phase.END;
@@ -749,7 +744,7 @@ public final class Game implements Disposable {
     /**
      * 게임에서 사용하는 팀 정보를 관리하는 클래스.
      */
-    @RequiredArgsConstructor
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Team {
         /** 팀 색 */
         @NonNull

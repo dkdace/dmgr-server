@@ -20,7 +20,7 @@ import org.bukkit.Particle;
 
 public final class PalasUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "PalasUltAssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "PalasUlt";
 
@@ -40,7 +40,7 @@ public final class PalasUlt extends UltimateSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new PalasTarget().shoot();
+        new PalasUltTarget().shoot();
     }
 
     @Override
@@ -91,10 +91,11 @@ public final class PalasUlt extends UltimateSkill {
         }
     }
 
-    private final class PalasTarget extends Target {
-        private PalasTarget() {
-            super(combatUser, PalasUltInfo.MAX_DISTANCE, true, combatEntity -> Palas.getTargetedActionCondition(PalasUlt.this.combatUser, combatEntity) &&
-                    !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasUltBuff.instance));
+    private final class PalasUltTarget extends Target {
+        private PalasUltTarget() {
+            super(combatUser, PalasUltInfo.MAX_DISTANCE, true, combatEntity ->
+                    Palas.getTargetedActionCondition(PalasUlt.this.combatUser, combatEntity)
+                            && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasUltBuff.instance));
         }
 
         @Override
@@ -106,6 +107,7 @@ public final class PalasUlt extends UltimateSkill {
 
             target.getStatusEffectModule().removeStatusEffect(PalasA2.PalasA2Immune.instance);
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasUltBuff.instance, PalasUltInfo.DURATION);
+
             if (target instanceof CombatUser) {
                 ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", 0, 5, 10);
 
@@ -114,6 +116,10 @@ public final class PalasUlt extends UltimateSkill {
             }
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_ULT_USE, combatUser.getEntity().getLocation());
+            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_ULT_HIT_ENTITY, target.getCenterLocation());
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
+            ParticleUtil.playFirework(target.getCenterLocation(), 255, 70, 75,
+                    200, 0, 0, FireworkEffect.Type.BURST, false, false);
 
             Location location = combatUser.getArmLocation(false);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
@@ -121,10 +127,6 @@ public final class PalasUlt extends UltimateSkill {
                         255, 70, 75);
                 ParticleUtil.play(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
             }
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_ULT_HIT_ENTITY, target.getCenterLocation());
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
-            ParticleUtil.playFirework(target.getCenterLocation(), 255, 70, 75,
-                    200, 0, 0, FireworkEffect.Type.BURST, false, false);
         }
     }
 }

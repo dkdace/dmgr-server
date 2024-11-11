@@ -23,7 +23,7 @@ import org.bukkit.util.Vector;
 @Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA3AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA3AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA3";
 
@@ -72,7 +72,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                 break;
             }
             case LEFT_CLICK: {
-                onAccept();
+                onUse();
 
                 break;
             }
@@ -90,7 +90,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     public void onCancelled() {
         super.onCancelled();
 
-        confirmModule.setChecking(false);
+        confirmModule.cancel();
         if (!isDurationFinished()) {
             setDuration(0);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
@@ -112,8 +112,10 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         // 미사용
     }
 
-    @Override
-    public void onAccept() {
+    /**
+     * 사용 시 실행할 작업.
+     */
+    private void onUse() {
         if (!confirmModule.isValid())
             return;
 
@@ -129,8 +131,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(true);
             for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                        156, 60, 130);
+                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1,
+                        0, 0, 0, 156, 60, 130);
             ParticleUtil.play(Particle.SMOKE_LARGE, location, 30, 0.5, 0.3, 0.5, 0.15);
             ParticleUtil.play(Particle.SPELL_WITCH, location, 70, 1, 0.5, 1, 0.2);
 
@@ -139,7 +141,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             onCancelled();
             onReady(location);
         }, 1, VellionA3Info.READY_DURATION));
-
     }
 
     /**
@@ -205,6 +206,17 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         }
     }
 
+    /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", VellionA3Info.ASSIST_SCORE * score / 100.0);
+    }
+
     private final class VellionA3Area extends Area {
         private VellionA3Area() {
             super(combatUser, VellionA3Info.RADIUS, combatUser::isEnemy);
@@ -221,6 +233,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, HealBlock.getInstance(), 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Silence.getInstance(), 10);
+
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
                     CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);

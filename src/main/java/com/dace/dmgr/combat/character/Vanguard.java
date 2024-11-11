@@ -1,15 +1,14 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
-
-import java.text.MessageFormat;
 
 /**
  * 역할군이 '돌격'인 전투원의 정보를 관리하는 클래스.
@@ -31,8 +30,8 @@ public abstract class Vanguard extends Character {
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty, int health,
-                       double speedMultiplier, double hitboxMultiplier) {
+    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty,
+                       int health, double speedMultiplier, double hitboxMultiplier) {
         super(name, nickname, skinName, Role.VANGUARD, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
@@ -67,34 +66,36 @@ public abstract class Vanguard extends Character {
     @Nullable
     public abstract TraitInfo getCharacterTraitInfo(int number);
 
-    public static final class RoleTrait1Info extends TraitInfo {
-        /** 넉백 저항 */
-        public static final int KNOCKBACK_RESISTANCE = 30;
+    private static final class RoleTrait1Info extends TraitInfo {
         /** 상태 효과 저항 */
-        public static final int STATUS_EFFECT_RESISTANCE = 15;
-        @Getter
+        private static final int STATUS_EFFECT_RESISTANCE = 15;
+        /** 넉백 저항 */
+        private static final int KNOCKBACK_RESISTANCE = 30;
+
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
             super("역할: 돌격 - 1",
-                    "",
-                    "§f▍ 받는 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f의 시간과 §5" + TextIcon.KNOCKBACK + " 밀쳐내기",
-                    "§f▍ 효과가 감소합니다.",
-                    "",
-                    MessageFormat.format("§5{0} §f{1}%", TextIcon.NEGATIVE_EFFECT, STATUS_EFFECT_RESISTANCE),
-                    MessageFormat.format("§5{0} §f{1}%", TextIcon.KNOCKBACK, KNOCKBACK_RESISTANCE));
+                    new ActionInfoLore(ActionInfoLore.Section
+                            .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간과 <:KNOCKBACK:밀쳐내기> 효과가 감소합니다.")
+                            .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
+                            .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
+                            .build()
+                    )
+            );
         }
     }
 
-    public static final class RoleTrait2Info extends TraitInfo {
-        @Getter
+    private static final class RoleTrait2Info extends TraitInfo {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
             super("역할: 돌격 - 2",
-                    "",
-                    "§f▍ 적을 처치하면 모든 §5" + TextIcon.NEGATIVE_EFFECT + " 해로운 효과§f를",
-                    "§f▍ 제거합니다.");
+                    new ActionInfoLore(ActionInfoLore.Section
+                            .builder("적을 처치하면 모든 <:NEGATIVE_EFFECT:해로운 효과>를 제거합니다.")
+                            .build()
+                    )
+            );
         }
     }
 }

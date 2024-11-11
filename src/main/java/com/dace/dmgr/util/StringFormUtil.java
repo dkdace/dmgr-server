@@ -160,22 +160,17 @@ public final class StringFormUtil {
      * <p>Example:</p>
      *
      * <pre><code>
-     * // [Test] <노란색>****<검정색>****** [{@link TextIcon#DURATION} 40.5]
+     * // [Test] <노란색>■■■■<검정색>■■■■■■ [\u4DCD 40.5]
      * StringFormUtil.getActionbarProgressBar("[Test]", 40.5, 100, 10, '*');
      * </code></pre>
      *
      * @param prefix  접두사
      * @param current 남은 시간 (tick)
      * @param max     최대 시간 (tick)
-     * @param length  막대 길이 (글자 수). 1 이상의 값
-     * @param symbol  막대 기호
      * @return 액션바 남은 시간 막대 문자열
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
-    public static String getActionbarDurationBar(@NonNull String prefix, double current, double max, int length, char symbol) {
-        validateArgs(length);
-
+    public static String getActionbarDurationBar(@NonNull String prefix, double current, double max) {
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.RED;
@@ -188,7 +183,7 @@ public final class StringFormUtil {
 
         return new StringJoiner(" §f")
                 .add(prefix)
-                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
+                .add(StringFormUtil.getProgressBar(current, max, color))
                 .add("[" + color + TextIcon.DURATION + " " + currentDisplay + "§f]")
                 .toString();
     }
@@ -202,22 +197,17 @@ public final class StringFormUtil {
      * <p>Example:</p>
      *
      * <pre><code>
-     * // [Test] <노란색>****<검정색>****** [{@link TextIcon#COOLDOWN} 40.5]
+     * // [Test] <노란색>■■■■<검정색>■■■■■■ [\u4DD5 40.5]
      * StringFormUtil.getActionbarCooldownBar("[Test]", 40.5, 100, 10, '*');
      * </code></pre>
      *
      * @param prefix  접두사
      * @param current 남은 시간 (tick)
      * @param max     최대 시간 (tick)
-     * @param length  막대 길이 (글자 수). 1 이상의 값
-     * @param symbol  막대 기호
      * @return 액션바 남은 시간 막대 문자열
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
-    public static String getActionbarCooldownBar(@NonNull String prefix, double current, double max, int length, char symbol) {
-        validateArgs(length);
-
+    public static String getActionbarCooldownBar(@NonNull String prefix, double current, double max) {
         ChatColor color;
         if (current <= max / 4)
             color = ChatColor.WHITE;
@@ -230,7 +220,7 @@ public final class StringFormUtil {
 
         return new StringJoiner(" §f")
                 .add(prefix)
-                .add(StringFormUtil.getProgressBar(current, max, color, length, symbol))
+                .add(StringFormUtil.getProgressBar(current, max, color))
                 .add("[" + color + TextIcon.COOLDOWN + " " + currentDisplay + "§f]")
                 .toString();
     }

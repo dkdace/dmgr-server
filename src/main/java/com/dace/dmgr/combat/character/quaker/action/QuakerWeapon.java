@@ -90,7 +90,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         setVisible(true);
     }
 
-    private class QuakerWeaponAttack extends Hitscan {
+    private final class QuakerWeaponAttack extends Hitscan {
         private final HashSet<Damageable> targets;
 
         private QuakerWeaponAttack(HashSet<Damageable> targets) {

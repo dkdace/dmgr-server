@@ -71,15 +71,6 @@ public interface CombatEntity extends Disposable {
     Location getCenterLocation();
 
     /**
-     * 히트박스 목록에서 지정한 위치까지 가장 가까운 위치를 반환한다.
-     *
-     * @param location 대상 위치
-     * @return 가장 가까운 위치
-     */
-    @NonNull
-    Location getNearestLocationOfHitboxes(@NonNull Location location);
-
-    /**
      * @return 이름
      */
     @NonNull
@@ -120,7 +111,7 @@ public interface CombatEntity extends Disposable {
     void activate();
 
     /**
-     * 지정한 엔티티가 적인 지 확인한다.
+     * 지정한 엔티티가 적인지 확인한다.
      *
      * @param combatEntity 대상 엔티티
      * @return 적이면 {@code true} 반환
@@ -129,14 +120,14 @@ public interface CombatEntity extends Disposable {
     boolean isEnemy(@NonNull CombatEntity combatEntity);
 
     /**
-     * 엔티티가 움직이고 있는 지 확인한다.
+     * 엔티티가 움직이고 있는지 확인한다.
      *
      * @return 움직이고 있으면 {@code true} 반환
      */
     boolean isMoving();
 
     /**
-     * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는 지 확인한다.
+     * 다른 엔티티가 이 엔티티를 대상으로 지정할 수 있는지 확인한다.
      *
      * @return 지정할 수 있으면 {@code true} 반환
      */

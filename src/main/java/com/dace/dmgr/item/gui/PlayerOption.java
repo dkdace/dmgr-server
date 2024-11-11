@@ -38,7 +38,7 @@ public final class PlayerOption extends Gui {
         guiController.set(2, PlayerOptionItem.CROSSHAIR.guiItem);
         guiController.set(3, PlayerOptionItem.CHAT_SOUND.guiItem);
         guiController.set(16, PlayerOptionItem.LEFT.guiItem);
-        guiController.set(17, PlayerOptionItem.EXIT.guiItem);
+        guiController.set(17, ButtonItem.Exit.getInstance());
     }
 
     @AllArgsConstructor
@@ -49,10 +49,7 @@ public final class PlayerOption extends Gui {
                     UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
 
                     userConfig.setKoreanChat(!userConfig.isKoreanChat());
-                    if (userConfig.isKoreanChat())
-                        player.performCommand("kakc chmod 2");
-                    else
-                        player.performCommand("kakc chmod 0");
+                    player.performCommand(userConfig.isKoreanChat() ? "kakc chmod 2" : "kakc chmod 0");
 
                     PlayerOption.getInstance().open(player);
                 }),
@@ -70,14 +67,13 @@ public final class PlayerOption extends Gui {
         CHAT_SOUND("OWIxZTIwNDEwYmI2YzdlNjk2OGFmY2QzZWM4NTU1MjBjMzdhNDBkNTRhNTRlOGRhZmMyZTZiNmYyZjlhMTkxNSJ9fX0=\\",
                 "채팅 효과음 설정", "채팅 효과음을 변경하거나 끕니다.",
                 player -> ChatSoundOption.getInstance().open(player)),
-        LEFT(new ButtonItem.LEFT("PlayerOptionLeft") {
+        LEFT(new ButtonItem.Left("PlayerOptionLeft") {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
                 player.performCommand("메뉴");
                 return true;
             }
-        }),
-        EXIT(new ButtonItem.EXIT("PlayerOptionExit"));
+        });
 
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;

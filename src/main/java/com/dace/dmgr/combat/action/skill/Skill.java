@@ -46,7 +46,7 @@ public interface Skill extends Action {
     void addDuration(long duration);
 
     /**
-     * 스킬의 지속시간이 끝났는 지 확인한다.
+     * 스킬의 지속시간이 끝났는지 확인한다.
      *
      * @return 지속시간 종료 여부
      */
