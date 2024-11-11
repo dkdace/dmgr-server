@@ -571,8 +571,8 @@ public enum NamedSound {
     /** 전투 - '마그리타' 궁극기 - 사용 종료 */
     COMBAT_MAGRITTA_ULT_END(
             new DefinedSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.8),
-            new DefinedSound(Sound.ENTITY_ITEM_BREAK, 3, 0.8),
-            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4)
+            new DefinedSound(Sound.ENTITY_ITEM_BREAK, 2, 0.8),
+            new DefinedSound(Sound.ENTITY_GENERIC_EXPLODE, 2, 1.4)
     ),
     /** 전투 - '체드' 무기 - 충전 */
     COMBAT_CHED_WEAPON_CHARGE(new DefinedSound("new.item.crossbow.loading_middle", 0.6, 1)),
