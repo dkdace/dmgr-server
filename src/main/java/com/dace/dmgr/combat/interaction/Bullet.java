@@ -195,7 +195,8 @@ public abstract class Bullet {
      * @return {@link Bullet#onHitEntity(Damageable, boolean)}의 반환값
      */
     private boolean findTargetAndHandleCollision() {
-        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size, condition.and(Damageable.class::isInstance));
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size,
+                ((Predicate<CombatEntity>) Damageable.class::isInstance).and(condition));
 
         if (target != null && targets.add(target)) {
             onHit();
