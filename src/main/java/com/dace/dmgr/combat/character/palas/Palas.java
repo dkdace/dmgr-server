@@ -32,6 +32,7 @@ import java.util.StringJoiner;
  * @see PalasA1
  * @see PalasA2
  * @see PalasA3
+ * @see PalasUlt
  */
 public final class Palas extends Support {
     /** 치유 점수 */
