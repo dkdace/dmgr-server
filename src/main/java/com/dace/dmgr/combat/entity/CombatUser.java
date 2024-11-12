@@ -639,16 +639,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
                 damageMap.remove(target);
 
-            return CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0;
-        });
-        attacker.killAssistMap.forEach((target, scores) -> {
-            for (String id : scores.keySet())
-                if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target + id) == 0)
-                    scores.remove(id);
+            if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0)
+                return true;
 
             CooldownUtil.setCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
             int sumDamage = damageMap.getOrDefault(target, 0);
             damageMap.put(target, sumDamage + (int) (damage * KILL_SUPPORT_SCORE_RATIO));
+
+            return false;
         });
     }
 
@@ -873,16 +871,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onDeath(this, attacker);
 
-        int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
         damageMap.keySet().removeIf(target -> CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0);
+        int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
         damageMap.forEach((target, damage) -> {
             Validate.notNull(target.character);
 
             target.killAssistMap.keySet().removeIf(targetAttacker ->
                     CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + targetAttacker) == 0);
-            target.killAssistMap.forEach((targetAttacker, scores) ->
-                    scores.values().forEach(supportScore ->
-                            targetAttacker.addScore(MessageFormat.format("§e{0}§f 처치 지원", name), supportScore)));
+            target.killAssistMap.forEach((targetAttacker, scores) -> {
+                scores.keySet().removeIf(scoreId ->
+                        CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + targetAttacker + scoreId) == 0);
+                scores.values().forEach(supportScore -> targetAttacker.addScore("처치 지원", supportScore));
+            });
+
             if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
                 target.addScore("추락사", FALL_ZONE_KILL_SCORE);
 
