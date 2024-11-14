@@ -62,7 +62,6 @@ public abstract class Bullet {
      * @param size          총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록). 0 이상의 값
      * @param condition     대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see HitscanOption
      */
     protected Bullet(@NonNull CombatEntity shooter, int trailInterval, double startDistance, double maxDistance, double size,
                      @NonNull Predicate<@NonNull CombatEntity> condition) {
@@ -85,7 +84,7 @@ public abstract class Bullet {
      * 총알의 위치에 영향을 미침
      */
     @NonNull
-    public final Location getLocation() {
+    protected final Location getLocation() {
         return Validate.notNull(location);
     }
 
@@ -97,7 +96,7 @@ public abstract class Bullet {
      * 총알의 속도에 영향을 미침
      */
     @NonNull
-    public final Vector getVelocity() {
+    protected final Vector getVelocity() {
         return Validate.notNull(velocity);
     }
 
@@ -196,7 +195,8 @@ public abstract class Bullet {
      * @return {@link Bullet#onHitEntity(Damageable, boolean)}의 반환값
      */
     private boolean findTargetAndHandleCollision() {
-        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size, condition.and(Damageable.class::isInstance));
+        Damageable target = (Damageable) CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size,
+                ((Predicate<CombatEntity>) Damageable.class::isInstance).and(condition));
 
         if (target != null && targets.add(target)) {
             onHit();

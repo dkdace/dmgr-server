@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
-
-import java.text.MessageFormat;
 
 public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     /** 쿨타임 (tick) */
@@ -12,7 +13,7 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 스택 충전 쿨타임 (tick) */
-    public static final long STACK_COOLDOWN = 6 * 20;
+    public static final long STACK_COOLDOWN = 6 * 20L;
     /** 최대 스택 충전량 */
     public static final int MAX_STACK = 3;
     /** 피해량 */
@@ -20,7 +21,7 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     /** 초당 화염 피해량 */
     public static final int FIRE_DAMAGE_PER_SECOND = 70;
     /** 화염 지속 시간 (tick) */
-    public static final long FIRE_DURATION = 3 * 20;
+    public static final long FIRE_DURATION = 3 * 20L;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 95;
 
@@ -31,28 +32,25 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
 
     private ChedA1Info() {
         super(ChedA1.class, "불화살",
-                "",
-                "§f▍ 충전 없이 §3불화살§f을 속사할 수 있습니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초 / {2}회 충전", TextIcon.COOLDOWN, STACK_COOLDOWN / 20.0, MAX_STACK),
-                "",
-                "§7§l[1] §f사용",
-                "",
-                "§3[불화살]",
-                "",
-                "§f▍ 불화살을 §7발사§f하여 §c" + TextIcon.DAMAGE + " 피해§f와 §c" + TextIcon.FIRE + " 화염 피해§f를",
-                "§f▍ 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}초 / {2}/초", TextIcon.FIRE, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                "",
-                "§7§l[우클릭] §f발사",
-                "",
-                "§3[전탄 사용/재사용 시]",
-                "",
-                "§f▍ 사용을 종료합니다.",
-                "",
-                "§7§l[1] §f해제");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("충전 없이 <3::불화살>을 속사할 수 있습니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME_WITH_MAX_STACK, STACK_COOLDOWN / 20.0, MAX_STACK)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1)
+                        .build(),
+                        new ActionInfoLore.NamedSection("불화살", ActionInfoLore.Section
+                                .builder("불화살을 발사하여 <:DAMAGE:피해>와 <:FIRE:화염 피해>를 입힙니다.")
+                                .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                                .addActionKeyInfo("발사", ActionKey.RIGHT_CLICK)
+                                .build()
+                        ),
+                        new ActionInfoLore.NamedSection("불화살: 전탄 사용/재사용 시", ActionInfoLore.Section
+                                .builder("사용을 종료합니다.")
+                                .addActionKeyInfo("해제", ActionKey.SLOT_1)
+                                .build()
+                        )
+                )
+        );
     }
 }

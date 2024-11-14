@@ -89,7 +89,7 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
         equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());
         equipment.add(new ItemBuilder(Material.LEATHER_LEGGINGS).build());
         equipment.add(new ItemBuilder(Material.LEATHER_BOOTS).build());
-        equipment.forEach((ItemStack itemStack) -> {
+        equipment.forEach(itemStack -> {
             LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
             leatherArmorMeta.setColor(Color.fromRGB(255, 255, 255));
             itemStack.setItemMeta(leatherArmorMeta);

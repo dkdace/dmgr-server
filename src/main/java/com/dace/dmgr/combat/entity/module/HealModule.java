@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public final class HealModule extends DamageModule {
     /** 회복량 배수 기본값 */
     public static final double DEFAULT_VALUE = 1;
+
     /** 회복량 배수 값 */
     @NonNull
     private final AbilityStatus healMultiplierStatus;
@@ -97,9 +98,7 @@ public final class HealModule extends DamageModule {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 
-        if (getHealth() == getMaxHealth())
-            return false;
-        if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
+        if (getHealth() == getMaxHealth() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
             return false;
 
         double healMultiplier = healMultiplierStatus.getValue();

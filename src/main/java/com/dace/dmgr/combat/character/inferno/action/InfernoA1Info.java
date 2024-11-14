@@ -1,14 +1,15 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 5 * 20;
+    public static final long COOLDOWN = 5 * 20L;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
     /** 수직 이동 강도 */
@@ -26,14 +27,14 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
 
     private InfernoA1Info() {
         super(InfernoA1.class, "점프 부스터",
-                "",
-                "§f▍ 앞으로 높게 도약하여 착지할 때 §c" + TextIcon.DAMAGE + " 광역 피해",
-                "§f▍ 를 입히고 §5" + TextIcon.KNOCKBACK + " 밀쳐냅니다§f.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
-                "",
-                "§7§l[1] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("앞으로 높게 도약하여 착지할 때 <:DAMAGE:광역 피해>를 입히고 <:KNOCKBACK:밀쳐냅니다>.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1)
+                        .build()
+                )
+        );
     }
 }

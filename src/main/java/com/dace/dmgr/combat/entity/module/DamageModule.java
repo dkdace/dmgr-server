@@ -2,21 +2,20 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityStatus;
 import com.dace.dmgr.ConsoleLogger;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.HologramUtil;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -41,13 +40,15 @@ public class DamageModule {
     /** 치명타 배수 기본값 */
     public static final double DEFAULT_CRIT_MULTIPLIER = 2;
     /** 생명력 홀로그램 ID */
-    public static final String HEALTH_HOLOGRAM_ID = "HitHealth";
+    private static final String HEALTH_HOLOGRAM_ID = "HitHealth";
+    /** 적 타격 시 생명력 홀로그램 유지시간 쿨타임 ID */
+    private static final String SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID = "ShowHealthHologram";
     /** 피격 시 애니메이션 쿨타임 ID */
-    private static final String COOLDOWN_ID = "DamageAnimation";
+    private static final String DAMAGE_ANIMATION_COOLDOWN_ID = "DamageAnimation";
 
     /** NMS 플레이어 반환 메소드 객체 */
     private static Method getHandleMethod;
-    /** 플레이어 보호막 설정 메소드 객체 */
+    /** NMS 플레이어 보호막 설정 메소드 객체 */
     private static Method setAbsorptionHeartsMethod;
 
     /** 엔티티 객체 */
@@ -133,7 +134,6 @@ public class DamageModule {
     private void addHealthHologram() {
         HologramUtil.addHologram(HEALTH_HOLOGRAM_ID + combatEntity, combatEntity.getEntity(),
                 0, combatEntity.getEntity().getHeight() + 0.4, 0, "§f");
-        HologramUtil.setHologramVisibility(HEALTH_HOLOGRAM_ID + combatEntity, false, Bukkit.getOnlinePlayers().toArray(new Player[0]));
 
         new IntervalTask(i -> {
             if (combatEntity.isDisposed())
@@ -152,6 +152,18 @@ public class DamageModule {
                 color = ChatColor.GREEN;
 
             HologramUtil.editHologram(HEALTH_HOLOGRAM_ID + combatEntity, StringFormUtil.getProgressBar(current, max, color));
+            combatEntity.getEntity().getWorld().getPlayers().forEach(target -> {
+                CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
+                if (targetCombatUser != null) {
+                    if (combatEntity.isEnemy(targetCombatUser)) {
+                        boolean isVisible = CooldownUtil.getCooldown(targetCombatUser, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity) > 0
+                                && LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
+
+                        HologramUtil.setHologramVisibility(HEALTH_HOLOGRAM_ID + combatEntity, isVisible, target);
+                    } else
+                        HologramUtil.setHologramVisibility(HEALTH_HOLOGRAM_ID + combatEntity, targetCombatUser != combatEntity, target);
+                }
+            });
 
             return true;
         }, isCancelled -> HologramUtil.removeHologram(HEALTH_HOLOGRAM_ID + combatEntity), 1);
@@ -186,11 +198,13 @@ public class DamageModule {
             throw new IllegalArgumentException("'health'가 0 이상이어야 함");
 
         maxHealth = health;
+        if (maxHealth < getHealth())
+            setHealth(health);
         ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
     }
 
     /**
-     * 엔티티가 치명상인 지 확인한다.
+     * 엔티티가 치명상인지 확인한다.
      *
      * @return 체력이 25% 이하이면 {@code true} 반환
      */
@@ -271,8 +285,8 @@ public class DamageModule {
      */
     private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage() ||
-                combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.INVULNERABLE))
+        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage()
+                || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
             return false;
         if (damage == 0)
             return true;
@@ -305,6 +319,8 @@ public class DamageModule {
             attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, critMultiplier != 1, isUlt);
         playHitEffect();
+        if (isShowHealthBar && attacker instanceof CombatUser)
+            CooldownUtil.setCooldown(attacker, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity, 20);
 
         if (getHealth() > finalDamage)
             setHealth(getHealth() - finalDamage);
@@ -402,8 +418,8 @@ public class DamageModule {
      * 엔티티의 피격 효과를 재생한다.
      */
     private void playHitEffect() {
-        if (CooldownUtil.getCooldown(this, COOLDOWN_ID) == 0) {
-            CooldownUtil.setCooldown(this, COOLDOWN_ID, 6);
+        if (CooldownUtil.getCooldown(this, DAMAGE_ANIMATION_COOLDOWN_ID) == 0) {
+            CooldownUtil.setCooldown(this, DAMAGE_ANIMATION_COOLDOWN_ID, 6);
             WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
             packet.setEntityID(combatEntity.getEntity().getEntityId());

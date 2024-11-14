@@ -26,8 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public final class JagerA2 extends ActiveSkill {
@@ -56,8 +54,8 @@ public final class JagerA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
-                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -65,6 +63,7 @@ public final class JagerA2 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
+
         if (summonEntity != null)
             summonEntity.dispose();
 
@@ -124,8 +123,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy() {
-            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, getLocation());
-            summonEntity = new JagerA2Entity(armorStand, combatUser);
+            summonEntity = new JagerA2Entity(CombatUtil.spawnEntity(ArmorStand.class, getLocation()), combatUser);
             summonEntity.activate();
         }
     }
@@ -134,7 +132,7 @@ public final class JagerA2 extends ActiveSkill {
      * 곰덫 클래스.
      */
     @Getter
-    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
+    private final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
         /** 넉백 모듈 */
         @NonNull
         private final KnockbackModule knockbackModule;
@@ -159,6 +157,7 @@ public final class JagerA2 extends ActiveSkill {
                     true, true,
                     new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
             );
+
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
@@ -175,8 +174,6 @@ public final class JagerA2 extends ActiveSkill {
             entity.setMarker(true);
             entity.setSmall(true);
             entity.setVisible(false);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
-                    false), true);
             entity.teleport(entity.getLocation().add(0, 0.05, 0));
             damageModule.setMaxHealth(JagerA2Info.HEALTH);
             damageModule.setHealth(JagerA2Info.HEALTH);
@@ -205,12 +202,14 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onTick(long i) {
+            super.onTick(i);
+
             if (!readyTimeModule.isReady())
                 return;
 
             Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation().add(0, 0.5, 0), 0.8,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving() &&
-                            combatEntity.isEnemy(this));
+                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving()
+                            && combatEntity.isEnemy(this));
             if (target != null)
                 onCatchEnemy(target);
 
@@ -241,6 +240,7 @@ public final class JagerA2 extends ActiveSkill {
             if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
+
                 if (target instanceof CombatUser)
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
             }
@@ -261,8 +261,7 @@ public final class JagerA2 extends ActiveSkill {
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
-            JagerP1 skillp1 = combatUser.getSkill(JagerP1Info.getInstance());
-            skillp1.setTarget(victim);
+            combatUser.getSkill(JagerP1Info.getInstance()).setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
         }
 

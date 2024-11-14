@@ -3,12 +3,10 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -17,10 +15,13 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
-@Getter
 public abstract class ActiveSkill extends AbstractSkill {
     /** 스킬 슬롯 */
-    protected final int slot;
+    private final int slot;
+    /** 원본 스킬 아이템 객체 */
+    private final ItemStack originalItemStack;
+    /** 스킬 아이템 객체 */
+    private ItemStack itemStack;
 
     /**
      * 액티브 스킬 인스턴스를 생성한다.
@@ -31,10 +32,12 @@ public abstract class ActiveSkill extends AbstractSkill {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
-        super(combatUser, activeSkillInfo);
+        super(combatUser);
         if (slot < 0 || slot > 8)
             throw new IllegalArgumentException("'slot'이 0에서 8 사이여야 함");
 
+        this.originalItemStack = activeSkillInfo.getStaticItem().getItemStack();
+        this.itemStack = originalItemStack.clone();
         this.slot = slot;
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
@@ -50,14 +53,10 @@ public abstract class ActiveSkill extends AbstractSkill {
         if (isDurationFinished()) {
             if (isCooldownFinished())
                 displayReady(1);
-            else {
-                long cooldown = CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
-                displayCooldown((int) Math.ceil(cooldown / 20.0));
-            }
-        } else {
-            long duration = CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
-            displayUsing((int) Math.ceil(duration / 20.0));
-        }
+            else
+                displayCooldown((int) Math.ceil(getCooldown() / 20.0));
+        } else
+            displayUsing((int) Math.ceil(getDuration() / 20.0));
     }
 
     @Override

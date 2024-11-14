@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Invulnerable implements StatusEffect {
     @Getter
-    static final Invulnerable instance = new Invulnerable();
+    private static final Invulnerable instance = new Invulnerable();
 
     @Override
     @NonNull
@@ -39,5 +40,10 @@ public class Invulnerable implements StatusEffect {
     @Override
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
+    }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.DAMAGED;
     }
 }

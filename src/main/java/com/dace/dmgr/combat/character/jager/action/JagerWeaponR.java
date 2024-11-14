@@ -31,6 +31,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
         super(combatUser, JagerWeaponInfo.getInstance());
+
         this.mainWeapon = mainWeapon;
         reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
     }
@@ -94,9 +95,9 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     public void onCancelled() {
         super.onCancelled();
 
-        mainWeapon.getAimModule().setAiming(false);
-        mainWeapon.getReloadModule().setReloading(false);
-        mainWeapon.getSwapModule().setSwapping(false);
+        mainWeapon.getAimModule().cancel();
+        mainWeapon.getReloadModule().cancel();
+        mainWeapon.getSwapModule().cancel();
         mainWeapon.getSwapModule().swap();
     }
 
@@ -145,7 +146,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE, true);
+            int damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE);
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
 
             return false;

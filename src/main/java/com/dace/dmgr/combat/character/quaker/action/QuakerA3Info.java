@@ -1,14 +1,15 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 10 * 20;
+    public static final long COOLDOWN = 10 * 20L;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = (int) (0.8 * 20);
     /** 시전 시간 (tick) */
@@ -35,18 +36,17 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
 
     private QuakerA3Info() {
         super(QuakerA3.class, "돌풍 강타",
-                "",
-                "§f▍ 검기를 날려 처음 맞은 적을 크게 §5" + TextIcon.KNOCKBACK + " 밀쳐내고",
-                "§f▍ §c" + TextIcon.DAMAGE + " 피해§f와 §5" + TextIcon.SNARE + " 속박§f을 입힙니다.",
-                "§f▍ 적이 날아가며 부딪힌 적에게도 같은 효과를",
-                "§f▍ 입힙니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, RADIUS),
-                MessageFormat.format("§5{0}§f {1}초", TextIcon.SNARE, SNARE_DURATION / 20.0),
-                "",
-                "§7§l[3] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("검기를 날려 처음 맞은 적을 크게 <:KNOCKBACK:밀쳐내고> <:DAMAGE:피해>와 <:SNARE:속박>을 입힙니다. " +
+                                "적이 날아가며 부딪힌 적에게도 같은 효과를 입힙니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION / 20.0)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_3)
+                        .build()
+                )
+        );
     }
 }

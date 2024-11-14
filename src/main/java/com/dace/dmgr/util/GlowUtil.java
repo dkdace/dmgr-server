@@ -70,7 +70,7 @@ public final class GlowUtil {
     }
 
     /**
-     * 지정한 엔티티가 특정 플레이어에게 발광 상태인 지 확인한다.
+     * 지정한 엔티티가 특정 플레이어에게 발광 상태인지 확인한다.
      *
      * @param entity 확인할 엔티티
      * @param player 대상 플레이어

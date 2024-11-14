@@ -27,7 +27,7 @@ public final class Ranking extends Gui {
         guiController.set(0, RankingItem.RANK_RATE.guiItem);
         guiController.set(1, RankingItem.LEVEL.guiItem);
         guiController.set(7, RankingItem.LEFT.guiItem);
-        guiController.set(8, RankingItem.EXIT.guiItem);
+        guiController.set(8, ButtonItem.Exit.getInstance());
     }
 
     @AllArgsConstructor
@@ -36,14 +36,13 @@ public final class Ranking extends Gui {
                 player -> player.performCommand("랭킹 점수")),
         LEVEL(Material.EXP_BOTTLE, "레벨",
                 player -> player.performCommand("랭킹 레벨")),
-        LEFT(new ButtonItem.LEFT("RankingLeft") {
+        LEFT(new ButtonItem.Left("RankingLeft") {
             @Override
             public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
                 player.performCommand("메뉴");
                 return true;
             }
-        }),
-        EXIT(new ButtonItem.EXIT("RankingExit"));
+        });
 
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;

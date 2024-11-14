@@ -15,7 +15,7 @@ public final class JagerP1 extends AbstractSkill {
     private Damageable target = null;
 
     public JagerP1(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override
@@ -36,7 +36,8 @@ public final class JagerP1 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), JagerP1Info.DURATION);
+        if (target.getDamageModule().isLiving())
+            GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), JagerP1Info.DURATION);
     }
 
     @Override

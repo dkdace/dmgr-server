@@ -17,15 +17,15 @@ public abstract class ActiveSkillInfo<T extends ActiveSkill> extends SkillInfo<T
     /**
      * 액티브 스킬 정보 인스턴스를 생성한다.
      *
-     * @param skillClass 액티브 스킬 클래스
-     * @param name       이름
-     * @param lores      설명 목록
+     * @param skillClass     액티브 스킬 클래스
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
      */
-    protected ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull String @NonNull ... lores) {
+    protected ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 14)
-                .setLore(lores)
+                .setLore(actionInfoLore.toString())
                 .build());
     }
 

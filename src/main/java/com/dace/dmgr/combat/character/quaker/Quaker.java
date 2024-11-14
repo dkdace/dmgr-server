@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
@@ -40,7 +39,7 @@ public final class Quaker extends Guardian {
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
 
     private Quaker() {
-        super("퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
+        super(null, "퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
     }
 
     @Override
@@ -83,9 +82,7 @@ public final class Quaker extends Guardian {
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
         switch (characterType) {
             case ARKACE:
-                return new String[]{
-                        "조국의 방패는 납덩어리에 굴복하지 않는다!"
-                };
+                return new String[]{"조국의 방패는 납덩어리에 굴복하지 않는다!"};
             default:
                 return new String[]{
                         "적을 제거했다!",
@@ -98,10 +95,15 @@ public final class Quaker extends Guardian {
     @Override
     @NonNull
     public String @NonNull [] getDeathMent(@NonNull CharacterType characterType) {
-        return new String[]{
-                "나는 굴복하지 않는다!",
-                "죽어도 항복은 없다!"
-        };
+        switch (characterType) {
+            case CHED:
+                return new String[]{"정정당당하게 싸워라! 비겁자들!"};
+            default:
+                return new String[]{
+                        "나는 굴복하지 않는다!",
+                        "죽어도 항복은 없다!"
+                };
+        }
     }
 
     @Override
@@ -109,16 +111,12 @@ public final class Quaker extends Guardian {
     public String getActionbarString(@NonNull CombatUser combatUser) {
         QuakerA1 skill1 = combatUser.getSkill(QuakerA1Info.getInstance());
 
-        int skill1Health = skill1.getStateValue();
-        int skill1MaxHealth = skill1.getMaxStateValue();
-
         StringJoiner text = new StringJoiner("    ");
 
-        String skill1Display = StringFormUtil.getActionbarProgressBar(QuakerA1Info.getInstance().toString(), skill1Health, skill1MaxHealth,
-                10, '■');
-
+        String skill1Display = StringFormUtil.getActionbarProgressBar(QuakerA1Info.getInstance().toString(),
+                skill1.getStateValue(), skill1.getMaxStateValue(), 10, '■');
         if (!skill1.isDurationFinished())
-            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "][" + skill1.getDefaultActionKeys()[1].getName() + "] §f해제";
+            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0] + "][" + skill1.getDefaultActionKeys()[1] + "] §f해제";
         text.add(skill1Display);
 
         return text.toString();
@@ -147,10 +145,8 @@ public final class Quaker extends Guardian {
         if (!(victim instanceof CombatUser) || score >= 100)
             return;
 
-        if (CooldownUtil.getCooldown(attacker, QuakerA2.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("처치 지원", QuakerA2Info.ASSIST_SCORE);
-        if (CooldownUtil.getCooldown(attacker, QuakerUlt.ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("처치 지원", QuakerUltInfo.ASSIST_SCORE);
+        attacker.getSkill(QuakerA2Info.getInstance()).applyAssistScore((CombatUser) victim, score);
+        attacker.getSkill(QuakerUltInfo.getInstance()).applyAssistScore((CombatUser) victim, score);
     }
 
     @Override
@@ -160,14 +156,14 @@ public final class Quaker extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

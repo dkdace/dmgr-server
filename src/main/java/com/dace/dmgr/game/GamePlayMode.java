@@ -16,6 +16,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 public enum GamePlayMode {
+    /** 팀 데스매치 */
     TEAM_DEATHMATCH("팀 데스매치", 4, 10, TeamDeathmatchMap.values(), false, 20, 600,
             TeamDeathmatchScheduler.getInstance());
 

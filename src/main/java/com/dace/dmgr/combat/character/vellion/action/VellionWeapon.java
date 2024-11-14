@@ -34,8 +34,8 @@ public final class VellionWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking() &&
-                combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

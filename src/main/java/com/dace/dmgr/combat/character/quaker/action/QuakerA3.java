@@ -177,7 +177,8 @@ public final class QuakerA3 extends ActiveSkill {
 
                     for (int j = 0; j < 5; j++) {
                         Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);
-                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 0.6);
+                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 0,
+                                vec2.getX(), vec2.getY(), vec2.getZ(), 0.6);
                     }
 
                     return true;
@@ -204,6 +205,7 @@ public final class QuakerA3 extends ActiveSkill {
                             false, true)) {
                         target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK * 0.5));
                         target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
+
                         if (target instanceof CombatUser)
                             combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
                     }

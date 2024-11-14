@@ -72,6 +72,7 @@ public final class ItemBuilder {
      * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
      * @apiNote 비동기로 실행하지 않음. {@link AsyncTask}와 함께 사용하는 것을 권장
      */
+    @NonNull
     public ItemBuilder setSkullOwner(@NonNull OfflinePlayer player) {
         if (!(itemMeta instanceof SkullMeta))
             throw new IllegalStateException("아이템이 플레이어 머리가 아님");
@@ -87,6 +88,7 @@ public final class ItemBuilder {
      * @return {@link ItemBuilder}
      * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
      */
+    @NonNull
     public ItemBuilder setSkullOwner(@NonNull String skinUrl) {
         if (!(itemMeta instanceof SkullMeta))
             throw new IllegalStateException("아이템이 플레이어 머리가 아님");
@@ -255,7 +257,7 @@ public final class ItemBuilder {
      * @throws IllegalStateException 아이템 설명이 설정되지 않았을 때 발생
      */
     @NonNull
-    public ItemBuilder formatLore(@NonNull Object... arguments) {
+    public ItemBuilder formatLore(@NonNull Object @NonNull ... arguments) {
         if (!itemMeta.hasLore())
             throw new IllegalStateException("아이템의 설명이 아직 설정되지 않음");
 

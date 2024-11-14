@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.NonNull;
 
@@ -17,7 +18,7 @@ public interface StatusEffect {
     StatusEffectType getStatusEffectType();
 
     /**
-     * 상태 효과가 이로운 효과인 지 확인한다.
+     * 상태 효과가 이로운 효과인지 확인한다.
      *
      * @return {@code true} 반환 시 이로운 효과, {@code false} 반환 시 해로운 효과
      */
@@ -47,4 +48,15 @@ public interface StatusEffect {
      * @param provider     제공자
      */
     void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
+
+    /**
+     * 상태 효과가 있을 때 제한할 행동들을 반환한다.
+     *
+     * @param combatEntity 대상 엔티티
+     * @return 제한할 행동 플래그의 비트 합
+     * @see CombatRestrictions
+     */
+    default long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.NONE;
+    }
 }

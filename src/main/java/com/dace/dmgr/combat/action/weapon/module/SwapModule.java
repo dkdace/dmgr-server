@@ -7,7 +7,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.bukkit.ChatColor;
 
 import java.text.MessageFormat;
@@ -32,7 +31,6 @@ public final class SwapModule<T extends Weapon> {
 
     /** 무기 전환 중 여부 */
     @Getter
-    @Setter
     private boolean isSwapping = false;
     /** 무기 전환 상태 */
     @NonNull
@@ -96,5 +94,12 @@ public final class SwapModule<T extends Weapon> {
             swapTo(Swappable.SwapState.SECONDARY);
         else if (swapState == Swappable.SwapState.SECONDARY)
             swapTo(Swappable.SwapState.PRIMARY);
+    }
+
+    /**
+     * 이중 무기의 전환을 취소한다.
+     */
+    public void cancel() {
+        isSwapping = false;
     }
 }

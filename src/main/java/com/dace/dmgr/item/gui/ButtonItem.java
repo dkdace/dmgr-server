@@ -1,6 +1,7 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
@@ -16,9 +17,12 @@ public final class ButtonItem {
     /**
      * 나가기 버튼.
      */
-    public static final class EXIT extends GuiItem {
-        public EXIT(@NonNull String identifier) {
-            super(identifier, new ItemBuilder(Material.CARROT_STICK)
+    public static final class Exit extends GuiItem {
+        @Getter
+        private static final Exit instance = new Exit();
+
+        private Exit() {
+            super("Exit", new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) 8)
                     .setName("§c§l나가기")
                     .build());
@@ -34,8 +38,8 @@ public final class ButtonItem {
     /**
      * 이전 버튼.
      */
-    public abstract static class LEFT extends GuiItem {
-        protected LEFT(@NonNull String identifier) {
+    public abstract static class Left extends GuiItem {
+        protected Left(@NonNull String identifier) {
             super(identifier, new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) 9)
                     .setName("§6§l이전")
@@ -46,8 +50,8 @@ public final class ButtonItem {
     /**
      * 다음 버튼.
      */
-    public abstract static class RIGHT extends GuiItem {
-        protected RIGHT(@NonNull String identifier) {
+    public abstract static class Right extends GuiItem {
+        protected Right(@NonNull String identifier) {
             super(identifier, new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) 10)
                     .setName("§6§l다음")
@@ -58,8 +62,8 @@ public final class ButtonItem {
     /**
      * 위 버튼.
      */
-    public abstract static class UP extends GuiItem {
-        protected UP(@NonNull String identifier) {
+    public abstract static class Up extends GuiItem {
+        protected Up(@NonNull String identifier) {
             super(identifier, new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) 11)
                     .setName("§6§l위로")
@@ -70,8 +74,8 @@ public final class ButtonItem {
     /**
      * 아래 버튼.
      */
-    public abstract static class DOWN extends GuiItem {
-        protected DOWN(@NonNull String identifier) {
+    public abstract static class Down extends GuiItem {
+        protected Down(@NonNull String identifier) {
             super(identifier, new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) 12)
                     .setName("§6§l아래로")

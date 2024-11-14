@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
@@ -16,7 +18,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Stun implements StatusEffect {
     @Getter
-    static final Stun instance = new Stun();
+    private static final Stun instance = new Stun();
 
     @Override
     @NonNull
@@ -42,12 +44,20 @@ public class Stun implements StatusEffect {
 
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-        if (combatEntity instanceof CombatUser)
+        if (combatEntity instanceof CombatUser) {
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l기절함!", "", 0, 2, 10);
+
+            CombatUtil.setYawAndPitch(combatEntity.getEntity(), combatEntity.getEntity().getLocation().getYaw(), combatEntity.getEntity().getLocation().getPitch());
+        }
     }
 
     @Override
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
+    }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.DEFAULT_MOVE | CombatRestrictions.ACTION_MOVE | CombatRestrictions.USE_ACTION;
     }
 }

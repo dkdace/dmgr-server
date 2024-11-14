@@ -37,7 +37,7 @@ public final class Arkace extends Marksman {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super("아케이스", "슈퍼 솔저", "DVArkace", '\u32D0', 1, 1000, 1.0, 1.0);
+        super(null, "아케이스", "슈퍼 솔저", "DVArkace", '\u32D0', 1, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -80,7 +80,8 @@ public final class Arkace extends Marksman {
     public String @NonNull [] getKillMent(@NonNull CharacterType characterType) {
         switch (characterType) {
             case SILIA:
-                return new String[]{"그 원시적인 무기로 뭘 하겠다고 그러나?"};
+            case CHED:
+                return new String[]{"그런 원시적인 무기로 뭘 하겠다고 그러나?"};
             case JAGER:
                 return new String[]{
                         "총은 그렇게 쓰는 물건이 아니다.",
@@ -112,27 +113,21 @@ public final class Arkace extends Marksman {
         ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
         ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
 
-        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
-        double skill2Duration = skill2.getDuration() / 20.0;
-        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, ArkaceWeaponInfo.CAPACITY,
-                ArkaceWeaponInfo.CAPACITY, '|');
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
+                ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.CAPACITY, '|');
 
         text.add(weaponDisplay);
         text.add("");
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■');
+            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
+                    skill2.getDefaultDuration() / 20.0);
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 

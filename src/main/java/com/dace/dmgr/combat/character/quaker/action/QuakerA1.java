@@ -19,8 +19,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,8 +70,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_USE, combatUser.getEntity().getLocation());
 
-            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, combatUser.getEntity().getLocation());
-            summonEntity = new QuakerA1Entity(armorStand, combatUser);
+            summonEntity = new QuakerA1Entity(CombatUtil.spawnEntity(ArmorStand.class, combatUser.getEntity().getLocation()), combatUser);
             summonEntity.activate();
         } else
             onCancelled();
@@ -108,7 +105,7 @@ public final class QuakerA1 extends ChargeableSkill {
     /**
      * 불굴의 방패 클래스.
      */
-    public final class QuakerA1Entity extends Barrier<ArmorStand> {
+    private final class QuakerA1Entity extends Barrier<ArmorStand> {
         private QuakerA1Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
             super(
                     entity,
@@ -129,8 +126,6 @@ public final class QuakerA1 extends ChargeableSkill {
             entity.setAI(false);
             entity.setMarker(true);
             entity.setVisible(false);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
-                    false), true);
             entity.setItemInHand(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
             damageModule.setHealth(getStateValue());
         }

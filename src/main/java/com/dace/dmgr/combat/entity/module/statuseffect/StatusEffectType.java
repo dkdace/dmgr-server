@@ -1,15 +1,10 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * 상태 효과의 종류 목록.
  *
  * @see StatusEffect
  */
-@AllArgsConstructor
-@Getter
 public enum StatusEffectType {
     /** 미분류 */
     NONE,

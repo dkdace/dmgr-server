@@ -29,9 +29,4 @@ public interface Confirmable extends Skill {
      * 확인 모드 비활성화 시 실행할 작업.
      */
     void onCheckDisable();
-
-    /**
-     * 수락 시 실행할 작업.
-     */
-    void onAccept();
 }

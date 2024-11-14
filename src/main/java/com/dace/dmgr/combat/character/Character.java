@@ -29,9 +29,12 @@ public abstract class Character {
     /** 스킨 이름 */
     @NonNull
     private final String skinName;
-    /** 역할군 */
+    /** 주 역할군 */
     @NonNull
     private final Role role;
+    /** 부 역할군 */
+    @Nullable
+    private final Role subRole;
     /** 전투원 아이콘 */
     private final char icon;
     /** 난이도 */
@@ -229,7 +232,7 @@ public abstract class Character {
     }
 
     /**
-     * 전투원이 기본 근접 공격을 사용할 수 있는 지 확인한다.
+     * 전투원이 기본 근접 공격을 사용할 수 있는지 확인한다.
      *
      * @param combatUser 대상 플레이어
      * @return 근접 공격을 사용할 수 있으면 {@code true} 반환
@@ -239,7 +242,7 @@ public abstract class Character {
     }
 
     /**
-     * 전투원이 달리기를 할 수 있는 지 확인한다.
+     * 전투원이 달리기를 할 수 있는지 확인한다.
      *
      * @param combatUser 대상 플레이어
      * @return 달리기 가능 여부
@@ -249,7 +252,7 @@ public abstract class Character {
     }
 
     /**
-     * 전투원이 비행할 수 있는 지 확인한다.
+     * 전투원이 비행할 수 있는지 확인한다.
      *
      * @param combatUser 대상 플레이어
      * @return 비행 가능 여부
@@ -259,7 +262,7 @@ public abstract class Character {
     }
 
     /**
-     * 전투원이 점프를 할 수 있는 지 확인한다.
+     * 전투원이 점프를 할 수 있는지 확인한다.
      *
      * @param combatUser 대상 플레이어
      * @return 점프 가능 여부

@@ -27,6 +27,8 @@ public interface Aimable extends Weapon {
 
     /**
      * 조준 시 확대 레벨(화면이 확대되는 정도) 목록.
+     *
+     * @apiNote 각 단계는 임의로 지정된 값이며, 배율을 의미하지 않음
      */
     @AllArgsConstructor
     @Getter

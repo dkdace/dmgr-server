@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -21,7 +22,7 @@ import org.bukkit.block.Block;
  */
 public final class MeleeAttackAction extends AbstractAction {
     /** 쿨타임 (tick) */
-    private static final long COOLDOWN = 1 * 20;
+    private static final long COOLDOWN = 20;
     /** 피해량 */
     private static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */
@@ -54,7 +55,10 @@ public final class MeleeAttackAction extends AbstractAction {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         Validate.notNull(combatUser.getCharacterType());
-        return super.canUse(actionKey) && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser) && combatUser.isGlobalCooldownFinished();
+        return super.canUse(actionKey)
+                && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser)
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
+                && combatUser.isGlobalCooldownFinished();
     }
 
     @Override

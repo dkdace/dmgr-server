@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,7 +37,7 @@ public final class Magritta extends Scuffler {
     private static final Magritta instance = new Magritta();
 
     private Magritta() {
-        super("마그리타", "방화광", "DVMagrita", '\u32D8', 2, 1200, 1.0, 1.0);
+        super(null, "마그리타", "방화광", "DVMagrita", '\u32D8', 2, 1200, 1.0, 1.0);
     }
 
     @Override
@@ -96,6 +95,8 @@ public final class Magritta extends Scuffler {
         switch (characterType) {
             case MAGRITTA:
                 return new String[]{"넌 뭐야!"};
+            case CHED:
+                return new String[]{"불이야!"};
             default:
                 return new String[]{
                         "아직 다 못 불태웠는데...",
@@ -112,34 +113,26 @@ public final class Magritta extends Scuffler {
         MagrittaA2 skill2 = combatUser.getSkill(MagrittaA2Info.getInstance());
         MagrittaUlt skill4 = combatUser.getSkill(MagrittaUltInfo.getInstance());
 
-        int weaponAmmo = weapon.getReloadModule().getRemainingAmmo();
-        double skillp1Duration = CooldownUtil.getCooldown(combatUser, MagrittaP1.COOLDOWN_ID) / 20.0;
-        double skillp1MaxDuration = MagrittaP1Info.DURATION / 20.0;
-        double skill2Duration = skill2.getDuration() / 20.0;
-        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponAmmo, MagrittaWeaponInfo.CAPACITY,
-                8, '┃');
+        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
+                MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.CAPACITY, '┃');
 
         text.add(weaponDisplay);
         text.add("");
         if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(MagrittaP1Info.getInstance().toString(), skillp1Duration,
-                    skillp1MaxDuration, 10, '■');
+            String skillp1Display = StringFormUtil.getActionbarDurationBar(MagrittaP1Info.getInstance().toString(), skillp1.getDuration() / 20.0,
+                    MagrittaP1Info.DURATION / 20.0);
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(MagrittaA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■');
+            String skill2Display = StringFormUtil.getActionbarDurationBar(MagrittaA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
+                    skill2.getDefaultDuration() / 20.0);
             text.add(skill2Display);
         }
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(MagrittaUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+            String skill4Display = StringFormUtil.getActionbarDurationBar(MagrittaUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 

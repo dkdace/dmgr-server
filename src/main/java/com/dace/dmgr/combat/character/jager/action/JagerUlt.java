@@ -22,15 +22,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class JagerUlt extends UltimateSkill {
     /** 처치 점수 제한시간 쿨타임 ID */
-    public static final String KILL_SCORE_COOLDOWN_ID = "JagerUltKillScoreTimeLimit";
+    private static final String KILL_SCORE_COOLDOWN_ID = "JagerUltKillScoreTimeLimit";
     /** 소환한 엔티티 */
     @Nullable
     private JagerUltEntity summonEntity = null;
@@ -51,8 +49,8 @@ public final class JagerUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
-                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -96,6 +94,17 @@ public final class JagerUlt extends UltimateSkill {
             summonEntity.dispose();
     }
 
+    /**
+     * 플레이어에게 보너스 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyBonusScore(@NonNull CombatUser victim, int score) {
+        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
+    }
+
     private final class JagerUltProjectile extends BouncingProjectile {
         private JagerUltProjectile() {
             super(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).duration(100).hasGravity(true)
@@ -121,8 +130,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onDestroy() {
-            ArmorStand magmaCube = CombatUtil.spawnEntity(ArmorStand.class, getLocation());
-            summonEntity = new JagerUltEntity(magmaCube, combatUser);
+            summonEntity = new JagerUltEntity(CombatUtil.spawnEntity(ArmorStand.class, getLocation()), combatUser);
             summonEntity.activate();
         }
     }
@@ -156,6 +164,7 @@ public final class JagerUlt extends UltimateSkill {
                     true, true,
                     new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
             );
+
             knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule(this);
@@ -173,8 +182,6 @@ public final class JagerUlt extends UltimateSkill {
             entity.setMarker(true);
             entity.setSmall(true);
             entity.setVisible(false);
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
-                    false), true);
             damageModule.setMaxHealth(JagerUltInfo.HEALTH);
             damageModule.setHealth(JagerUltInfo.HEALTH);
 
@@ -193,8 +200,9 @@ public final class JagerUlt extends UltimateSkill {
             if (LocationUtil.isNonSolid(entity.getLocation().add(0, 0.2, 0)))
                 entity.teleport(entity.getLocation().add(0, 0.2, 0));
 
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, entity.getLocation(), 0, 0, -1, 0, 0.3);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, entity.getLocation());
+            Location loc = entity.getLocation();
+            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, 0, -1, 0, 0.3);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, loc);
             playTickEffect();
         }
 
@@ -205,6 +213,8 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onTick(long i) {
+            super.onTick(i);
+
             playTickEffect();
             if (!readyTimeModule.isReady())
                 return;
@@ -223,9 +233,10 @@ public final class JagerUlt extends UltimateSkill {
          * 발생기 표시 효과를 재생한다.
          */
         private void playTickEffect() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 8, 0.6, 0.02, 0.6,
+            Location loc = entity.getLocation();
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 8, 0.6, 0.02, 0.6,
                     96, 220, 255);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, entity.getLocation(), 3, 0.15, 0.02, 0.15,
+            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 3, 0.15, 0.02, 0.15,
                     80, 80, 100);
         }
 
@@ -236,10 +247,10 @@ public final class JagerUlt extends UltimateSkill {
          * @param range 현재 범위. (단위: 블록)
          */
         private void playTickEffect(long i, double range) {
-            if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_TICK, entity.getLocation());
-
             Location loc = entity.getLocation();
+            if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
+                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_TICK, loc);
+
             loc.setYaw(0);
             loc.setPitch(0);
             Vector vector = VectorUtil.getRollAxis(loc);
@@ -254,8 +265,8 @@ public final class JagerUlt extends UltimateSkill {
 
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc1, 0, vec.getX(), -0.6, vec.getZ(), 0.05 * (7 - j));
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, vec.getX(), 0.6, vec.getZ(), -0.05 * (7 - j));
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc1.subtract(0, 2.5, 0), 5, 0, 1.4, 0, 0.04);
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc2.subtract(0, 2.5, 0), 5, 0, 1.4, 0, 0.04);
+                ParticleUtil.play(Particle.SNOW_SHOVEL, loc1.subtract(0, 2.5, 0), 3, 0, 1.4, 0, 0.04);
+                ParticleUtil.play(Particle.SNOW_SHOVEL, loc2.subtract(0, 2.5, 0), 3, 0, 1.4, 0, 0.04);
             }
         }
 
@@ -269,7 +280,9 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
-            CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
+
+            if (victim instanceof CombatUser)
+                CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override
@@ -297,8 +310,9 @@ public final class JagerUlt extends UltimateSkill {
 
         private final class JagerUltArea extends Area {
             private JagerUltArea(double radius) {
-                super(JagerUltEntity.this, radius, combatEntity -> combatEntity.isEnemy(JagerUltEntity.this) &&
-                        combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY() < JagerUltEntity.this.entity.getLocation().getY());
+                super(JagerUltEntity.this, radius, combatEntity -> combatEntity.isEnemy(JagerUltEntity.this)
+                        && combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY()
+                        < JagerUltEntity.this.entity.getLocation().getY());
             }
 
             @Override

@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
@@ -95,11 +95,22 @@ public final class NeaceA2 extends ActiveSkill {
     }
 
     /**
+     * 대상에게 축복 효과를 적용한다.
+     *
+     * @param target 적용 대상
+     */
+    void amplifyTarget(@NonNull Healable target) {
+        target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2Buff.instance, 4);
+        if (target instanceof CombatUser)
+            ((CombatUser) target).addKillAssist(combatUser, ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+    }
+
+    /**
      * 축복 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    static final class NeaceA2Buff implements StatusEffect {
-        static final NeaceA2Buff instance = new NeaceA2Buff();
+    private static final class NeaceA2Buff implements StatusEffect {
+        private static final NeaceA2Buff instance = new NeaceA2Buff();
 
         @Override
         @NonNull
@@ -117,8 +128,6 @@ public final class NeaceA2 extends ActiveSkill {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, NeaceA2Info.SPEED);
         }
 
         @Override
@@ -131,8 +140,6 @@ public final class NeaceA2 extends ActiveSkill {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         }
     }
 }

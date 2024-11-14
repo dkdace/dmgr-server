@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -41,7 +40,7 @@ public final class Neace extends Support {
     private static final Neace instance = new Neace();
 
     private Neace() {
-        super("니스", "평화주의자", "DVNis", '\u32D5', 1, 1000, 1.0, 1.0);
+        super(null, "니스", "평화주의자", "DVNis", '\u32D5', 1, 1000, 1.0, 1.0);
     }
 
     /**
@@ -115,23 +114,18 @@ public final class Neace extends Support {
         NeaceA3 skill3 = combatUser.getSkill(NeaceA3Info.getInstance());
         NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
 
-        double skill2Duration = skill2.getDuration() / 20.0;
-        double skill2MaxDuration = skill2.getDefaultDuration() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
         if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2Duration,
-                    skill2MaxDuration, 10, '■') + "  §7[" + skill2.getDefaultActionKeys()[0].getName() + "] §f해제";
+            String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
+                    skill2.getDefaultDuration() / 20.0) + "  §7[" + skill2.getDefaultActionKeys()[0] + "] §f해제";
             text.add(skill2Display);
         }
         if (!skill3.isDurationFinished())
-            text.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제");
+            text.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0] + "] §f해제");
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+            String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 
@@ -151,7 +145,10 @@ public final class Neace extends Support {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
-        CooldownUtil.setCooldown(victim, NeaceP1.COOLDOWN_ID, NeaceP1Info.ACTIVATE_DURATION);
+
+        NeaceP1 skillp1 = victim.getSkill(NeaceP1Info.getInstance());
+        if (skillp1.isCancellable())
+            skillp1.onCancelled();
     }
 
     @Override
@@ -167,7 +164,6 @@ public final class Neace extends Support {
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
-
         return skill4.isDurationFinished() || skill4.isEnabled();
     }
 

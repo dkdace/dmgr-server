@@ -7,22 +7,20 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public final class ChedA3 extends ActiveSkill {
     /** 처치 점수 제한시간 쿨타임 ID */
-    public static final String KILL_SCORE_COOLDOWN_ID = "ChedA3KillScoreTimeLimit";
+    private static final String KILL_SCORE_COOLDOWN_ID = "ChedA3KillScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "ChedA3";
 
@@ -48,8 +46,8 @@ public final class ChedA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && (combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() ||
-                !combatUser.getEntity().hasGravity());
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        return super.canUse(actionKey) && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
@@ -58,12 +56,14 @@ public final class ChedA3 extends ActiveSkill {
         combatUser.setGlobalCooldown((int) ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedA3Info.READY_SLOW);
         combatUser.getWeapon().onCancelled();
-        combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.AIR));
+        ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE, combatUser.getEntity().getLocation());
 
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (!combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() && combatUser.getEntity().hasGravity())
+            if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
@@ -78,12 +78,13 @@ public final class ChedA3 extends ActiveSkill {
             Location location = combatUser.getArmLocation(true);
             new ChedA3Projectile().shoot(location);
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
+            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE_READY, location);
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 playUseTickEffect(loc, i + ChedA3Info.READY_DURATION);
                 return true;
             }, 1, ChedA3Info.READY_DURATION));
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE_READY, location);
         }, 1, ChedA3Info.READY_DURATION));
     }
 
@@ -134,10 +135,22 @@ public final class ChedA3 extends ActiveSkill {
         }
     }
 
+    /**
+     * 플레이어에게 보너스 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyBonusScore(@NonNull CombatUser victim, int score) {
+        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
+    }
+
     private final class ChedA3Projectile extends Projectile {
         private ChedA3Projectile() {
             super(combatUser, ChedA3Info.VELOCITY, ProjectileOption.builder().trailInterval(18).size(ChedA3Info.SIZE)
-                    .condition(combatUser::isEnemy).build());
+                    .condition(combatEntity -> ((Damageable) combatEntity).getDamageModule().isLiving()
+                            && combatEntity.isEnemy(ChedA3.this.combatUser)).build());
         }
 
         @Override
@@ -187,9 +200,10 @@ public final class ChedA3 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, getLocation(), false, true)) {
                 GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), ChedA3Info.DETECT_DURATION);
-                if (combatUser.getGameUser() != null && combatUser.getGameUser().getTeam() != null)
-                    for (GameUser targetGameUser : combatUser.getGameUser().getTeam().getTeamUsers())
-                        GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, targetGameUser.getPlayer(), ChedA3Info.DETECT_DURATION);
+                combatUser.getEntity().getWorld().getPlayers().stream()
+                        .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
+                        .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
+                        .forEach(teamTarget -> GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, teamTarget.getEntity(), ChedA3Info.DETECT_DURATION));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);

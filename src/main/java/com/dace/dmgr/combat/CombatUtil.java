@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * 전투 시스템에 사용되는 기능을 제공하는 클래스.
@@ -34,20 +35,16 @@ public final class CombatUtil {
      *
      * <pre><code>
      * // 최종 피해량 : 10 (20m) ~ 5 (40m)
-     * int damage = getDistantDamage(10, distance, 20, true)
-     * // 최종 피해량 : 20 (10m) ~ 10 (20m) ~ 0 (30m)
-     * int damage = getDistantDamage(20, distance, 10, false)
+     * int damage = getDistantDamage(10, distance, 20)
      * </code></pre>
      *
      * @param damage            피해량
      * @param distance          거리 (단위: 블록). 0 이상의 값
      * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록). 0 이상의 값
-     * @param isHalf            {@code true}면 최소 피해량이 절반까지만 감소,
-     *                          {@code false}면 최소 피해량이 0이 될 때까지 감소
      * @return 최종 피해량
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static int getDistantDamage(int damage, double distance, double weakeningDistance, boolean isHalf) {
+    public static int getDistantDamage(int damage, double distance, double weakeningDistance) {
         if (distance < 0)
             throw new IllegalArgumentException("'distance'가 0 이상이어야 함");
         if (weakeningDistance < 0)
@@ -59,7 +56,7 @@ public final class CombatUtil {
         distance = distance - weakeningDistance;
         int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
 
-        if (isHalf && finalDamage < damage / 2)
+        if (finalDamage < damage / 2)
             finalDamage = damage / 2;
         else if (finalDamage < 0)
             finalDamage = 0;
@@ -84,11 +81,13 @@ public final class CombatUtil {
         return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
-                        combatEntity.canBeTargeted() &&
-                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted()
+                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
-                                hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
+                        Arrays.stream(combatEntity.getHitboxes())
+                                .mapToDouble(hitbox -> hitbox.getDistance(location))
+                                .min()
+                                .orElse(Double.MAX_VALUE) <= range)
                 .findFirst()
                 .orElse(null);
     }
@@ -115,11 +114,13 @@ public final class CombatUtil {
         return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
-                        combatEntity.canBeTargeted() &&
-                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted()
+                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes()).mapToDouble(hitbox ->
-                                hitbox.getDistance(location)).min().orElse(Double.MAX_VALUE) <= range)
+                        Arrays.stream(combatEntity.getHitboxes())
+                                .mapToDouble(hitbox -> hitbox.getDistance(location))
+                                .min()
+                                .orElse(Double.MAX_VALUE) <= range)
                 .findFirst()
                 .orElse(null);
     }
@@ -141,8 +142,8 @@ public final class CombatUtil {
         return Arrays.stream(CombatEntity.getAllExcluded())
                 .filter(condition)
                 .filter(combatEntity ->
-                        combatEntity.canBeTargeted() &&
-                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted()
+                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .toArray(CombatEntity[]::new);
@@ -170,8 +171,8 @@ public final class CombatUtil {
         return Arrays.stream(game.getAllCombatEntities())
                 .filter(condition)
                 .filter(combatEntity ->
-                        combatEntity.canBeTargeted() &&
-                                location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+                        combatEntity.canBeTargeted()
+                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .toArray(CombatEntity[]::new);
@@ -188,7 +189,7 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 플레이어의 시야(yaw/pitch)를 변경한다.
+     * 지정한 플레이어의 시야(yaw/pitch) 값을 설정한다.
      *
      * @param player 대상 플레이어
      * @param yaw    변경할 yaw
@@ -210,7 +211,7 @@ public final class CombatUtil {
     }
 
     /**
-     * 지정한 플레이어의 시야(yaw/pitch)를 변경한다.
+     * 지정한 플레이어의 시야(yaw/pitch) 값을 추가한다.
      *
      * @param player 대상 플레이어
      * @param yaw    추가할 yaw
@@ -253,17 +254,12 @@ public final class CombatUtil {
         double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
         double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
         boolean first = CooldownUtil.getCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID) == 0;
+        int sum = IntStream.rangeClosed(1, duration).sum();
         CooldownUtil.setCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID, 4);
 
-        int sum = 0;
-        for (int i = 1; i <= duration; i++) {
-            sum += i;
-        }
-        int finalSum = sum;
-
         TaskUtil.addTask(combatUser, new IntervalTask(i -> {
-            double finalUp = (up + finalUpSpread) / ((double) finalSum / (duration - i));
-            double finalSide = (side + finalSideSpread) / ((double) finalSum / (duration - i));
+            double finalUp = (up + finalUpSpread) / ((double) sum / (duration - i));
+            double finalSide = (side + finalSideSpread) / ((double) sum / (duration - i));
             if (first) {
                 finalUp *= firstMultiplier;
                 finalSide *= firstMultiplier;

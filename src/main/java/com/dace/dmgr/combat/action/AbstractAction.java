@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.action;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class AbstractAction implements Action {
     /** 동작 쿨타임 ID */
-    protected static final String ACTION_COOLDOWN_ID = "ActionCooldown";
+    private static final String ACTION_COOLDOWN_ID = "ActionCooldown";
 
     /** 플레이어 객체 */
     @NonNull
@@ -116,7 +117,8 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return isCooldownFinished();
+        return isCooldownFinished()
+                && !combatUser.getStatusEffectModule().hasAllRestrictions(CombatRestrictions.USE_ACTION);
     }
 
     @Override

@@ -12,7 +12,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -21,7 +20,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
-@Getter
 @Setter
 public final class ChedWeapon extends AbstractWeapon {
     /** 활 충전량 */
@@ -44,7 +42,8 @@ public final class ChedWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && (combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished() || !combatUser.getEntity().hasGravity());
+        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
@@ -56,19 +55,15 @@ public final class ChedWeapon extends AbstractWeapon {
                 if (skill1.isEnabled()) {
                     setCooldown(ChedA1Info.COOLDOWN);
 
-                    skill1.addStack(-1);
-                    if (skill1.getStack() <= 0)
-                        skill1.setDuration(0);
-
-                    new ChedA1.ChedA1Projectile(combatUser).shoot();
-
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A1_SHOOT, combatUser.getEntity().getLocation());
+                    skill1.shoot();
                 } else {
                     setCooldown();
+                    setCanShoot(true);
 
-                    combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.ARROW));
-                    if (combatUser.getEntity().isHandRaised())
+                    if (combatUser.getEntity().isHandRaised()) {
+                        combatUser.getWeapon().setVisible(false);
                         combatUser.getWeapon().setVisible(true);
+                    }
 
                     SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_CHARGE, combatUser.getEntity().getLocation());
                 }
@@ -77,7 +72,7 @@ public final class ChedWeapon extends AbstractWeapon {
             }
             case PERIODIC_1: {
                 new ChedWeaponProjectile(power).shoot();
-                combatUser.getEntity().getInventory().setItem(30, new ItemStack(Material.AIR));
+                setCanShoot(false);
 
                 SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_USE, combatUser.getEntity().getLocation(), power + 0.5, power * 0.3);
 
@@ -86,6 +81,15 @@ public final class ChedWeapon extends AbstractWeapon {
             default:
                 break;
         }
+    }
+
+    /**
+     * 무기의 발사 가능 여부를 설정한다.
+     *
+     * @param canShoot 발사 가능 여부
+     */
+    void setCanShoot(boolean canShoot) {
+        combatUser.getEntity().getInventory().setItem(ChedWeaponInfo.ARROW_INVENTORY_SLOT, new ItemStack(canShoot ? Material.ARROW : Material.AIR));
     }
 
     private final class ChedWeaponProjectile extends Projectile {

@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.combat.character.jager.action.JagerT1Info;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Jumpable;
-import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -38,8 +36,8 @@ public final class JumpModule extends MoveModule {
 
         TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
             if (canJump() && combatEntity.canJump()) {
-                if (((LivingEntity) combatEntity.getEntity()).hasPotionEffect(PotionEffectType.JUMP) &&
-                        ((LivingEntity) combatEntity.getEntity()).getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
+                if (((LivingEntity) combatEntity.getEntity()).hasPotionEffect(PotionEffectType.JUMP)
+                        && ((LivingEntity) combatEntity.getEntity()).getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
                     ((LivingEntity) combatEntity.getEntity()).removePotionEffect(PotionEffectType.JUMP);
             } else
                 ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6,
@@ -66,10 +64,7 @@ public final class JumpModule extends MoveModule {
      * @return 점프 가능 여부
      */
     private boolean canJump() {
-        if (combatEntity instanceof Damageable && (((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.STUN) ||
-                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE) ||
-                ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.GROUNDING)))
-            return false;
-        return combatEntity.getPropertyManager().getValue(Property.FREEZE) < JagerT1Info.NO_JUMP;
+        return !((combatEntity instanceof Damageable)
+                && ((Damageable) combatEntity).getStatusEffectModule().hasAnyRestriction(CombatRestrictions.JUMP));
     }
 }

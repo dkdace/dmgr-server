@@ -21,6 +21,7 @@ public final class KnockbackModule {
     private static final String COOLDOWN_ID = "Knockback";
     /** 넉백 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
+
     /** 엔티티 객체 */
     @NonNull
     private final Damageable combatEntity;
@@ -80,7 +81,7 @@ public final class KnockbackModule {
     }
 
     /**
-     * 엔티티가 넉백 효과를 받은 상태인 지 확인한다.
+     * 엔티티가 넉백 효과를 받은 상태인지 확인한다.
      *
      * @return 넉백 효과 상태 여부
      */

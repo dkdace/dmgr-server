@@ -49,8 +49,8 @@ public final class MagrittaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished() &&
-                combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class MagrittaA1 extends ActiveSkill {
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
+            Location loc = combatUser.getArmLocation(true);
             new MagrittaA1Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc, 1, -0.1);
@@ -130,6 +130,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
             if (target != null) {
                 combatUser.getUser().sendTitle("§b§l부착", "", 0, 5, 10);
+
                 if (target instanceof CombatUser)
                     combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);
             }
@@ -171,7 +172,8 @@ public final class MagrittaA1 extends ActiveSkill {
         private final MagrittaA1Projectile projectile;
 
         private MagrittaA1Area(MagrittaA1Projectile projectile) {
-            super(combatUser, MagrittaA1Info.RADIUS, combatEntity -> combatEntity.isEnemy(MagrittaA1.this.combatUser) || combatEntity == MagrittaA1.this.combatUser);
+            super(combatUser, MagrittaA1Info.RADIUS, combatEntity -> combatEntity.isEnemy(MagrittaA1.this.combatUser)
+                    || combatEntity == MagrittaA1.this.combatUser);
             this.projectile = projectile;
         }
 
@@ -184,9 +186,9 @@ public final class MagrittaA1 extends ActiveSkill {
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
             int damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
-                    MagrittaA1Info.RADIUS / 2.0, true);
+                    MagrittaA1Info.RADIUS / 2.0);
             int burning = CombatUtil.getDistantDamage((int) MagrittaA1Info.FIRE_DURATION, distance,
-                    MagrittaA1Info.RADIUS / 2.0, true);
+                    MagrittaA1Info.RADIUS / 2.0);
             if (target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null,
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, MagrittaA1Burning.instance, burning);

@@ -3,17 +3,13 @@ package com.dace.dmgr.combat.character.neace.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 public final class NeaceP1 extends AbstractSkill {
-    /** 쿨타임 ID */
-    public static final String COOLDOWN_ID = "NeaceP1";
-
     public NeaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceP1Info.getInstance());
+        super(combatUser);
     }
 
     @Override
@@ -24,7 +20,7 @@ public final class NeaceP1 extends AbstractSkill {
 
     @Override
     public long getDefaultCooldown() {
-        return 0;
+        return NeaceP1Info.ACTIVATE_DURATION;
     }
 
     @Override
@@ -34,7 +30,7 @@ public final class NeaceP1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) == 0;
+        return super.canUse(actionKey) && isDurationFinished();
     }
 
     @Override
@@ -42,9 +38,6 @@ public final class NeaceP1 extends AbstractSkill {
         setDuration();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (CooldownUtil.getCooldown(combatUser, COOLDOWN_ID) > 0)
-                return false;
-
             combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20, false);
             return true;
         }, isCancelled -> onCancelled(), 1));

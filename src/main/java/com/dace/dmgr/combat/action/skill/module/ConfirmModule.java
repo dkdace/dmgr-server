@@ -7,7 +7,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.text.MessageFormat;
 
@@ -32,7 +31,6 @@ public class ConfirmModule {
 
     /** 확인 중 상태 */
     @Getter
-    @Setter
     protected boolean isChecking = false;
 
     /**
@@ -62,6 +60,13 @@ public class ConfirmModule {
     }
 
     /**
+     * 스킬의 확인 모드를 취소한다.
+     */
+    public final void cancel() {
+        isChecking = false;
+    }
+
+    /**
      * 모듈에서 확인 모드 활성화 시 실행할 작업.
      */
     protected void onCheckEnable() {
@@ -75,7 +80,7 @@ public class ConfirmModule {
      */
     protected void onCheckTick(long i) {
         skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
-                acceptKey.getName(), cancelKey.getName()), 0, 5, 5);
+                acceptKey, cancelKey), 0, 5, 5);
     }
 
     /**

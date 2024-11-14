@@ -6,7 +6,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  * 무기의 정조준 모듈 클래스.
@@ -26,7 +25,6 @@ public final class AimModule {
 
     /** 정조준 상태 */
     @Getter
-    @Setter
     private boolean isAiming = false;
 
     /**
@@ -51,5 +49,12 @@ public final class AimModule {
                 weapon.onAimDisable();
             }, 1));
         }
+    }
+
+    /**
+     * 무기의 정조준을 취소한다.
+     */
+    public void cancel() {
+        isAiming = false;
     }
 }

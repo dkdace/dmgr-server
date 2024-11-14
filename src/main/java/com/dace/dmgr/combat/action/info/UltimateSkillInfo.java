@@ -16,15 +16,15 @@ public abstract class UltimateSkillInfo<T extends UltimateSkill> extends ActiveS
     /**
      * 궁극기 정보 인스턴스를 생성한다.
      *
-     * @param skillClass 궁극기 스킬 클래스
-     * @param name       이름
-     * @param lores      설명 목록
+     * @param skillClass     궁극기 스킬 클래스
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
      */
-    protected UltimateSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull String @NonNull ... lores) {
+    protected UltimateSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 10)
-                .setLore(lores)
+                .setLore(actionInfoLore.toString())
                 .setGlowing()
                 .build());
     }

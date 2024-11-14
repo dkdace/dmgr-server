@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HealBlock implements StatusEffect {
     @Getter
-    static final HealBlock instance = new HealBlock();
+    private static final HealBlock instance = new HealBlock();
 
     @Override
     @NonNull
@@ -48,5 +49,10 @@ public class HealBlock implements StatusEffect {
     @Override
     public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         // 미사용
+    }
+
+    @Override
+    public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+        return CombatRestrictions.HEALED;
     }
 }

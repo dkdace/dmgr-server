@@ -1,37 +1,28 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.combat.action.AbstractAction;
-import com.dace.dmgr.combat.action.info.SkillInfo;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
  */
 public abstract class AbstractSkill extends AbstractAction implements Skill {
     /** 스킬 지속시간 쿨타임 ID */
-    protected static final String SKILL_DURATION_COOLDOWN_ID = "SkillDuration";
-
-    /** 원본 스킬 아이템 객체 */
-    protected final ItemStack originalItemStack;
-    /** 스킬 아이템 객체 */
-    protected ItemStack itemStack;
+    private static final String SKILL_DURATION_COOLDOWN_ID = "SkillDuration";
 
     /**
      * 스킬 인스턴스를 생성한다.
      *
      * @param combatUser 대상 플레이어
-     * @param skillInfo  스킬 정보 객체
      */
-    protected AbstractSkill(@NonNull CombatUser combatUser, @NonNull SkillInfo<? extends Skill> skillInfo) {
+    protected AbstractSkill(@NonNull CombatUser combatUser) {
         super(combatUser);
-
-        this.originalItemStack = skillInfo.getStaticItem().getItemStack();
-        this.itemStack = originalItemStack.clone();
         setCooldown(getDefaultCooldown());
     }
 
@@ -39,6 +30,12 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     protected void onCooldownSet() {
         if (!isDurationFinished())
             setDuration(0);
+    }
+
+    @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey)
+                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
     }
 
     @Override

@@ -24,17 +24,18 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
     /**
      * 무기 정보 인스턴스를 생성한다.
      *
-     * @param weaponClass 무기 클래스
-     * @param material    아이템 타입
-     * @param resource    리소스 (내구도)
-     * @param name        이름
-     * @param lores       설명 목록
+     * @param weaponClass    무기 클래스
+     * @param material       아이템 타입
+     * @param resource       리소스 (내구도)
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
      */
-    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
+    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name,
+                         @NonNull ActionInfoLore actionInfoLore) {
         super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)
-                .setLore(lores)
+                .setLore(actionInfoLore.toString())
                 .build()));
         this.weaponClass = weaponClass;
     }
@@ -42,13 +43,13 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
     /**
      * 무기 정보 인스턴스를 생성한다.
      *
-     * @param weaponClass 무기 클래스
-     * @param resource    리소스 (내구도)
-     * @param name        이름
-     * @param lores       설명 목록
+     * @param weaponClass    무기 클래스
+     * @param resource       리소스 (내구도)
+     * @param name           이름
+     * @param actionInfoLore 동작 정보 설명
      */
-    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull String @NonNull ... lores) {
-        this(weaponClass, MATERIAL, resource, name, lores);
+    protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
+        this(weaponClass, MATERIAL, resource, name, actionInfoLore);
     }
 
     @Override

@@ -86,14 +86,14 @@ public interface Action extends Disposable {
     void addCooldown(long cooldown);
 
     /**
-     * 쿨타임이 끝났는 지 확인한다.
+     * 쿨타임이 끝났는지 확인한다.
      *
      * @return 쿨타임 종료 여부
      */
     boolean isCooldownFinished();
 
     /**
-     * 동작을 사용할 수 있는 지 확인한다.
+     * 동작을 사용할 수 있는지 확인한다.
      *
      * @param actionKey 사용 키
      * @return 사용 가능 여부
@@ -108,7 +108,7 @@ public interface Action extends Disposable {
     void onUse(@NonNull ActionKey actionKey);
 
     /**
-     * 사용 중인 동작을 강제로 취소할 수 있는 지 확인한다.
+     * 사용 중인 동작을 강제로 취소할 수 있는지 확인한다.
      *
      * @return 강제 취소 가능 여부
      * @implSpec {@code true}

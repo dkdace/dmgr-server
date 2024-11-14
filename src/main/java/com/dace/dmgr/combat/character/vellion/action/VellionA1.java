@@ -55,7 +55,8 @@ public final class VellionA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -74,8 +75,7 @@ public final class VellionA1 extends ActiveSkill {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);
-            ArmorStand armorStand = CombatUtil.spawnEntity(ArmorStand.class, loc);
-            summonEntity = new VellionA1Entity(armorStand, combatUser);
+            summonEntity = new VellionA1Entity(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
             summonEntity.activate();
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A1_USE_READY, loc);
@@ -179,7 +179,7 @@ public final class VellionA1 extends ActiveSkill {
     /**
      * 마력 응집체 클래스.
      */
-    public final class VellionA1Entity extends SummonEntity<ArmorStand> {
+    private final class VellionA1Entity extends SummonEntity<ArmorStand> {
         /** 피격자 목록 */
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */
@@ -215,8 +215,8 @@ public final class VellionA1 extends ActiveSkill {
             Vector dir = entity.getLocation().getDirection();
             if (returnTime < 0)
                 dir = LocationUtil.getDirection(entity.getLocation(), location);
-            Location loc = entity.getLocation().add(dir.multiply(VellionA1Info.VELOCITY / 20));
 
+            Location loc = entity.getLocation().add(dir.multiply(VellionA1Info.VELOCITY / 20));
             if (LocationUtil.isNonSolid(loc)) {
                 entity.teleport(loc);
                 if (returnTime < 0 && (loc.distance(location) < 2 || combatUser.isDead()))
@@ -251,8 +251,8 @@ public final class VellionA1 extends ActiveSkill {
 
         private final class VellionA1Area extends Area {
             private VellionA1Area() {
-                super(combatUser, VellionA1Info.RADIUS, combatEntity -> combatEntity != VellionA1.this.combatUser && combatEntity instanceof Damageable &&
-                        ((Damageable) combatEntity).getDamageModule().isLiving());
+                super(combatUser, VellionA1Info.RADIUS, combatEntity -> combatEntity instanceof Damageable && combatEntity != VellionA1.this.combatUser
+                        && ((Damageable) combatEntity).getDamageModule().isLiving());
             }
 
             @Override

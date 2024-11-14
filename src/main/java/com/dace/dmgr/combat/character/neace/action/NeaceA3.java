@@ -43,9 +43,9 @@ public final class NeaceA3 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (isDurationFinished()) {
-            new NeaceTarget().shoot();
-        } else
+        if (isDurationFinished())
+            new NeaceA3Target().shoot();
+        else
             onCancelled();
     }
 
@@ -60,8 +60,8 @@ public final class NeaceA3 extends ActiveSkill {
         setDuration(0);
     }
 
-    private final class NeaceTarget extends Target {
-        private NeaceTarget() {
+    private final class NeaceA3Target extends Target {
+        private NeaceA3Target() {
             super(combatUser, NeaceA3Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA3.this.combatUser, combatEntity));
         }
 
@@ -89,6 +89,7 @@ public final class NeaceA3 extends ActiveSkill {
                 combatUser.getMoveModule().push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
                 ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
+
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
                     Location loc2 = combatUser.getEntity().getLocation().add(0, 1, 0);
                     for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
@@ -106,8 +107,7 @@ public final class NeaceA3 extends ActiveSkill {
                     combatUser.getEntity().setFallDistance(0);
 
                     return !combatUser.getEntity().isOnGround();
-                }, isCancelled2 ->
-                        combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
+                }, isCancelled2 -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
             }, 1, NeaceA3Info.DURATION));
         }
     }

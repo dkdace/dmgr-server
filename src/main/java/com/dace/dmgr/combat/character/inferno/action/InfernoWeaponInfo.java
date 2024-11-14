@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
 
 public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     /** 초당 피해량 */
@@ -31,35 +32,33 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
 
     private InfernoWeaponInfo() {
         super(InfernoWeapon.class, RESOURCE.DEFAULT, "파이어스톰",
-                "",
-                "§f▍ 근거리에 화염을 흩뿌리거나 §3화염탄§f을 발사할",
-                "§f▍ 수 있는 화염방사기입니다.",
-                "",
-                MessageFormat.format("§f{0} {1}발", TextIcon.CAPACITY, CAPACITY),
-                "",
-                "§7§l[우클릭] §f방사 §7§l[좌클릭] §f화염탄",
-                "",
-                "§3[방사]",
-                "",
-                "§f▍ 근거리에 화염을 §7방사§f하여 §c" + TextIcon.DAMAGE + " 광역 피해§f와",
-                "§f▍ §c" + TextIcon.FIRE + " 화염 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1}/초", TextIcon.DAMAGE, DAMAGE_PER_SECOND),
-                MessageFormat.format("§c{0}§f {1}초 / {2}/초", TextIcon.FIRE, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                "",
-                "§3[화염탄]",
-                "",
-                "§f▍ 폭발하는 화염 구체를 발사하여 §c" + TextIcon.DAMAGE + " 광역 피해",
-                "§f▍ 와 §c" + TextIcon.FIRE + " 화염 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1} ~ {2} (폭발)", TextIcon.DAMAGE, FIREBALL.DAMAGE_EXPLODE, FIREBALL.DAMAGE_EXPLODE / 2),
-                MessageFormat.format("§c{0}§f {1} (직격)", TextIcon.DAMAGE, FIREBALL.DAMAGE_DIRECT),
-                MessageFormat.format("§c{0}§f {1}초 ~ {2}초 / {3}/초", TextIcon.FIRE, FIRE_DURATION / 20.0, FIRE_DURATION / 2 / 20.0, FIRE_DAMAGE_PER_SECOND),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, FIREBALL.COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, FIREBALL.DISTANCE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.RADIUS, FIREBALL.RADIUS),
-                MessageFormat.format("§f{0} -{1}", TextIcon.CAPACITY, FIREBALL.CAPACITY_CONSUME));
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("근거리에 화염을 흩뿌리거나 화염탄을 발사할 수 있는 화염방사기입니다.")
+                        .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
+                        .addActionKeyInfo("방사", ActionKey.RIGHT_CLICK)
+                        .addActionKeyInfo("화염탄", ActionKey.LEFT_CLICK)
+                        .build(),
+                        new ActionInfoLore.NamedSection("방사", ActionInfoLore.Section
+                                .builder("근거리에 화염을 방사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
+                                .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                                .build()
+                        ),
+                        new ActionInfoLore.NamedSection("화염탄", ActionInfoLore.Section
+                                .builder("폭발하는 화염 구체를 발사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
+                                .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", FIREBALL.DAMAGE_EXPLODE, FIREBALL.DAMAGE_EXPLODE / 2)
+                                .addValueInfo(TextIcon.DAMAGE, FIREBALL.DAMAGE_DIRECT + " (직격)")
+                                .addValueInfo(TextIcon.FIRE, Format.VARIABLE_TIME_WITH_PER_SECOND,
+                                        FIRE_DURATION / 20.0, FIRE_DURATION / 2 / 20.0, FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, FIREBALL.COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, FIREBALL.DISTANCE)
+                                .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, FIREBALL.RADIUS)
+                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, -FIREBALL.CAPACITY_CONSUME)
+                                .build()
+                        )
+                )
+        );
     }
 
     /**
@@ -68,7 +67,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     @UtilityClass
     public static class FIREBALL {
         /** 쿨타임 (tick) */
-        public static final long COOLDOWN = 1 * 20;
+        public static final long COOLDOWN = 20;
         /** 피해량 (폭발) */
         public static final int DAMAGE_EXPLODE = 100;
         /** 피해량 (직격) */

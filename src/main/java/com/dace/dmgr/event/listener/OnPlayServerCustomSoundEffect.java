@@ -4,8 +4,8 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.user.User;
 import org.bukkit.entity.Player;
 
@@ -22,7 +22,7 @@ public final class OnPlayServerCustomSoundEffect extends PacketAdapter {
         if (combatUser == null)
             return;
 
-        if (combatUser.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SILENCE))
+        if (combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEAR))
             event.setCancelled(true);
     }
 }

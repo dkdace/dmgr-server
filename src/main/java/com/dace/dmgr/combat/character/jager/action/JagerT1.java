@@ -1,9 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.ParticleUtil;
@@ -30,7 +27,7 @@ public final class JagerT1 {
      * 빙결 수치 상태 효과 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class FreezeValue implements StatusEffect {
+    private static final class FreezeValue implements StatusEffect {
         private static final FreezeValue instance = new FreezeValue();
         /** 수정자 ID */
         private static final String MODIFIER_ID = "JagerT1";
@@ -68,6 +65,19 @@ public final class JagerT1 {
             combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        }
+
+        @Override
+        public long getCombatRestrictions(@NonNull Damageable combatEntity) {
+            int freezeValue = combatEntity.getPropertyManager().getValue(Property.FREEZE);
+            long restrictions = CombatRestrictions.NONE;
+
+            if (freezeValue >= JagerT1Info.NO_SPRINT)
+                restrictions |= CombatRestrictions.SPRINT;
+            if (freezeValue >= JagerT1Info.NO_JUMP)
+                restrictions |= CombatRestrictions.JUMP;
+
+            return restrictions;
         }
     }
 }

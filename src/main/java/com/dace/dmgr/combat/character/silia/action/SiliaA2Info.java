@@ -1,16 +1,17 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import lombok.Getter;
 
-import java.text.MessageFormat;
-
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 11 * 20;
+    public static final long COOLDOWN = 11 * 20L;
     /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = 1 * 20;
+    public static final int GLOBAL_COOLDOWN = 20;
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 피해량 */
@@ -31,15 +32,15 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
 
     private SiliaA2Info() {
         super(SiliaA2.class, "진권풍",
-                "",
-                "§f▍ 회오리바람을 날려 적에게 §c" + TextIcon.DAMAGE + " 피해§f를 입히고",
-                "§f▍ §5" + TextIcon.KNOCKBACK + " 공중에 띄웁니다§f.",
-                "§f▍ 적중 시 맞은 적의 뒤로 순간이동합니다.",
-                "",
-                MessageFormat.format("§f{0} {1}초", TextIcon.COOLDOWN, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE),
-                "",
-                "§7§l[2] [우클릭] §f사용");
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("회오리바람을 날려 적에게 <:DAMAGE:피해>를 입히고 <:KNOCKBACK:공중에 띄웁니다>. " +
+                                "적중 시 맞은 적의 뒤로 순간이동합니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.RIGHT_CLICK)
+                        .build()
+                )
+        );
     }
 }

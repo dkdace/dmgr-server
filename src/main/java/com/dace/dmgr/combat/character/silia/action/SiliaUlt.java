@@ -18,7 +18,7 @@ import org.bukkit.Particle;
 public final class SiliaUlt extends UltimateSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "SiliaUlt";
-    /** 일격 활성화 완료 여부 */
+    /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
     public SiliaUlt(@NonNull CombatUser combatUser) {
@@ -47,10 +47,13 @@ public final class SiliaUlt extends UltimateSkill {
         setDuration(-1);
         combatUser.setGlobalCooldown((int) SiliaUltInfo.READY_DURATION);
         combatUser.getWeapon().setVisible(false);
-        if (!combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            combatUser.getSkill(SiliaA3Info.getInstance()).onCancelled();
+
+        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
+        if (skill3.isCancellable())
+            skill3.onCancelled();
 
         float yaw = combatUser.getEntity().getLocation().getYaw();
+
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             playUseTickEffect(i, yaw);
 
@@ -114,19 +117,18 @@ public final class SiliaUlt extends UltimateSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        isEnabled = true;
-
         setDuration();
+        isEnabled = true;
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
         combatUser.getWeapon().setVisible(true);
         combatUser.getWeapon().setGlowing(true);
-        combatUser.getWeapon().displayDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
+        combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), isCancelled2 -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), isCancelled -> {
             isEnabled = false;
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);

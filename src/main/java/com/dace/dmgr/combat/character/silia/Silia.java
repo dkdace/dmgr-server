@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
@@ -14,7 +15,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,11 +35,16 @@ import java.util.StringJoiner;
  * @see SiliaUlt
  */
 public final class Silia extends Scuffler {
+    /** 암살 점수 */
+    public static final int FAST_KILL_SCORE = 20;
+    /** 암살 점수 제한시간 (tick) */
+    public static final long FAST_KILL_SCORE_TIME_LIMIT = (long) (2.5 * 20);
+
     @Getter
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super("실리아", "고요한 폭풍", "DVSilia", '\u32D1', 4, 1000, 1.0, 1.0);
+        super(null, "실리아", "고요한 폭풍", "DVSilia", '\u32D1', 4, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -107,22 +112,16 @@ public final class Silia extends Scuffler {
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
         SiliaUlt skill4 = combatUser.getSkill(SiliaUltInfo.getInstance());
 
-        double skill3Duration = skill3.getStateValue() / 20.0;
-        double skill3MaxDuration = skill3.getMaxStateValue() / 20.0;
-        double skill4Duration = skill4.getDuration() / 20.0;
-        double skill4MaxDuration = skill4.getDefaultDuration() / 20.0;
-
         StringJoiner text = new StringJoiner("    ");
 
-        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(), skill3Duration, skill3MaxDuration,
-                10, '■');
-
+        String skill3Display = StringFormUtil.getActionbarDurationBar(SiliaA3Info.getInstance().toString(),
+                skill3.getStateValue() / 20.0, skill3.getMaxStateValue() / 20.0);
         if (!skill3.isDurationFinished())
-            skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "] §f해제";
+            skill3Display += "  §7[" + skill3.getDefaultActionKeys()[0] + "] §f해제";
         text.add(skill3Display);
         if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4Duration,
-                    skill4MaxDuration, 10, '■');
+            String skill4Display = StringFormUtil.getActionbarDurationBar(SiliaUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
+                    skill4.getDefaultDuration() / 20.0);
             text.add(skill4Display);
         }
 
@@ -152,8 +151,8 @@ public final class Silia extends Scuffler {
         SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
 
-        if (CooldownUtil.getCooldown(attacker, CombatUser.FASTKILL_TIME_LIMIT_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("암살", CombatUser.FASTKILL_SCORE);
+        if (((CombatUser) victim).getDamageSumRemainingTime(attacker) > GeneralConfig.getCombatConfig().getDamageSumTimeLimit() - FAST_KILL_SCORE_TIME_LIMIT)
+            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);
         if (!skillUlt.isDurationFinished()) {

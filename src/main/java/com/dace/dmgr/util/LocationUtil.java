@@ -23,7 +23,7 @@ import java.util.List;
 @UtilityClass
 public final class LocationUtil {
     /** 로비 스폰 위치 */
-    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 72.5, 64, 39.5, 90, 0);
+    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 15.5, 86, 34.5, 90, 0);
     /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
     private static final double CAN_PASS_INTERVAL = 0.25;
     /** {@link LocationUtil#canPass(Location, Location)}의 최대 거리 */
@@ -40,7 +40,7 @@ public final class LocationUtil {
     }
 
     /**
-     * 지정한 블록이 통과할 수 있는 블록인 지 확인한다.
+     * 지정한 블록이 통과할 수 있는 블록인지 확인한다.
      *
      * @param block 확인할 블록
      * @return 통과 가능하면 {@code true} 반환
@@ -83,7 +83,7 @@ public final class LocationUtil {
     }
 
     /**
-     * 지정한 블록이 상호작용할 수 있는 블록인 지 확인한다.
+     * 지정한 블록이 상호작용할 수 있는 블록인지 확인한다.
      *
      * @param block 확인할 블록
      * @return 상호작용 가능하면 {@code true} 반환
@@ -295,7 +295,7 @@ public final class LocationUtil {
     }
 
     /**
-     * 지정한 위치의 특정 Y 좌표에 특정 블록이 있는 지 확인한다.
+     * 지정한 위치의 특정 Y 좌표에 특정 블록이 있는지 확인한다.
      *
      * <p>주로 간단하게 지역을 확인할 때 사용한다.</p>
      *

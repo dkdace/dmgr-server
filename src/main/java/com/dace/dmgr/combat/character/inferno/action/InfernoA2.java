@@ -19,7 +19,7 @@ import org.bukkit.util.Vector;
 
 public final class InfernoA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
-    public static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
+    private static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
 
     public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
@@ -49,13 +49,12 @@ public final class InfernoA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (i % 4 == 0) {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                new InfernoA2Area().emit(loc);
-            }
+            if (i % 4 == 0)
+                new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_TICK, combatUser.getEntity().getLocation());
             ParticleUtil.play(Particle.FLAME, combatUser.getEntity().getLocation().add(0, 1, 0), 2,
@@ -107,6 +106,17 @@ public final class InfernoA2 extends ActiveSkill {
     }
 
     /**
+     * 플레이어에게 처치 지원 점수를 지급한다.
+     *
+     * @param victim 피격자
+     * @param score  점수 (처치 기여도)
+     */
+    public void applyAssistScore(@NonNull CombatUser victim, int score) {
+        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE * score / 100.0);
+    }
+
+    /**
      * 화염 상태 효과 클래스.
      */
     private static final class InfernoA2Burning extends Burning {
@@ -133,6 +143,7 @@ public final class InfernoA2 extends ActiveSkill {
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoA2Burning.instance, 10);
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
                     CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);

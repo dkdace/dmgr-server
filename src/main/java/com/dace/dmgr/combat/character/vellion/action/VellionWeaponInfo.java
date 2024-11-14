@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.info.ActionInfoLore;
+import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-
-import java.text.MessageFormat;
 
 public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     /** 쿨타임 (tick) */
@@ -23,12 +24,15 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
 
     private VellionWeaponInfo() {
         super(VellionWeapon.class, RESOURCE.DEFAULT, "절멸",
-                "",
-                "§f▍ 마법 구체를 발사하여 §c" + TextIcon.DAMAGE + " 피해§f를 입힙니다.",
-                "",
-                MessageFormat.format("§c{0}§f {1}", TextIcon.DAMAGE, DAMAGE),
-                MessageFormat.format("§c{0}§f {1}초", TextIcon.ATTACK_SPEED, COOLDOWN / 20.0),
-                MessageFormat.format("§c{0}§f {1}m", TextIcon.DISTANCE, DISTANCE));
+                new ActionInfoLore(ActionInfoLore.Section
+                        .builder("마법 구체를 발사하여 <:DAMAGE:피해>를 입힙니다.")
+                        .addValueInfo(TextIcon.DAMAGE, DAMAGE)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
+                        .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
+                        .build()
+                )
+        );
     }
 
     /**

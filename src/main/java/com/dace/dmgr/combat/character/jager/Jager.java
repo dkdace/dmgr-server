@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,7 +39,7 @@ public final class Jager extends Marksman {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super("예거", "혹한의 사냥꾼", "DVJager", '\u32D2', 3, 1000, 1.0, 1.0);
+        super(null, "예거", "혹한의 사냥꾼", "DVJager", '\u32D2', 3, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -113,45 +112,39 @@ public final class Jager extends Marksman {
     @Override
     @NonNull
     public String getActionbarString(@NonNull CombatUser combatUser) {
-        JagerWeaponL weapon1 = (JagerWeaponL) combatUser.getWeapon();
-        JagerWeaponR weapon2 = ((JagerWeaponL) combatUser.getWeapon()).getSwapModule().getSubweapon();
+        JagerWeaponL weaponL = (JagerWeaponL) combatUser.getWeapon();
+        JagerWeaponR weaponR = weaponL.getSwapModule().getSubweapon();
         JagerA1 skill1 = combatUser.getSkill(JagerA1Info.getInstance());
         JagerA3 skill3 = combatUser.getSkill(JagerA3Info.getInstance());
 
-        int weapon1Ammo = weapon1.getReloadModule().getRemainingAmmo();
-        int weapon2Ammo = weapon2.getReloadModule().getRemainingAmmo();
-        int skill1Health = skill1.getStateValue();
-        int skill1MaxHealth = skill1.getMaxStateValue();
-
         StringJoiner text = new StringJoiner("    ");
 
-        String weapon1Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon1Ammo, JagerWeaponInfo.CAPACITY,
-                JagerWeaponInfo.CAPACITY, '*');
-        String weapon2Display = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon2Ammo, JagerWeaponInfo.SCOPE.CAPACITY,
-                JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        String skill1Display = StringFormUtil.getActionbarProgressBar(JagerA1Info.getInstance().toString(), skill1Health, skill1MaxHealth,
-                10, '■');
-        if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
-            weapon1Display = "§a" + weapon1Display;
-        else if (weapon1.getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
-            weapon2Display = "§a" + weapon2Display;
+        String weaponLDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponL.getReloadModule().getRemainingAmmo(),
+                JagerWeaponInfo.CAPACITY, JagerWeaponInfo.CAPACITY, '*');
+        String weaponRDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponR.getReloadModule().getRemainingAmmo(),
+                JagerWeaponInfo.SCOPE.CAPACITY, JagerWeaponInfo.SCOPE.CAPACITY, '┃');
+        if (weaponL.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
+            weaponLDisplay = "§a" + weaponLDisplay;
+        else if (weaponL.getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+            weaponRDisplay = "§a" + weaponRDisplay;
 
-        text.add(weapon1Display);
-        text.add(weapon2Display);
+        text.add(weaponLDisplay);
+        text.add(weaponRDisplay);
         text.add("");
+        String skill1Display = StringFormUtil.getActionbarProgressBar(JagerA1Info.getInstance().toString(),
+                skill1.getStateValue(), skill1.getMaxStateValue(), 10, '■');
         if (!skill1.isDurationFinished())
-            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0].getName() + "] §f회수";
+            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0] + "] §f회수";
         text.add(skill1Display);
         if (!skill3.isDurationFinished() && skill3.isEnabled())
-            text.add(JagerA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0].getName() + "][" + skill3.getDefaultActionKeys()[1].getName() + "] §f투척");
+            text.add(JagerA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0] + "][" + skill3.getDefaultActionKeys()[1] + "] §f투척");
 
         return text.toString();
     }
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
-        JagerUlt skillUlt = attacker.getSkill(JagerUltInfo.getInstance());
-        return skillUlt.getSummonEntity() == null;
+        return attacker.getSkill(JagerUltInfo.getInstance()).getSummonEntity() == null;
     }
 
     @Override
@@ -166,16 +159,14 @@ public final class Jager extends Marksman {
         if (!(victim instanceof CombatUser))
             return;
 
-        if (CooldownUtil.getCooldown(attacker, JagerA1.KILL_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
-        if (CooldownUtil.getCooldown(attacker, JagerUlt.KILL_SCORE_COOLDOWN_ID + victim) > 0)
-            attacker.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
+        attacker.getSkill(JagerA1Info.getInstance()).applyBonusScore((CombatUser) victim, score);
+        attacker.getSkill(JagerUltInfo.getInstance()).applyBonusScore((CombatUser) victim, score);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking() &&
-                combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
