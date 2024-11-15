@@ -145,8 +145,8 @@ public final class Quaker extends Guardian {
         if (!(victim instanceof CombatUser) || score >= 100)
             return;
 
-        attacker.getSkill(QuakerA2Info.getInstance()).applyAssistScore((CombatUser) victim, score);
-        attacker.getSkill(QuakerUltInfo.getInstance()).applyAssistScore((CombatUser) victim, score);
+        attacker.getSkill(QuakerA2Info.getInstance()).applyAssistScore((CombatUser) victim);
+        attacker.getSkill(QuakerUltInfo.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override

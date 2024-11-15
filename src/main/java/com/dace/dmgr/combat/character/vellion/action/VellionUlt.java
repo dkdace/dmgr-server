@@ -213,11 +213,10 @@ public final class VellionUlt extends UltimateSkill {
      * 플레이어에게 처치 지원 점수를 지급한다.
      *
      * @param victim 피격자
-     * @param score  점수 (처치 기여도)
      */
-    public void applyAssistScore(@NonNull CombatUser victim, int score) {
-        if (score < 100 && CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
-            combatUser.addScore("처치 지원", VellionUltInfo.ASSIST_SCORE * score / 100.0);
+    public void applyAssistScore(@NonNull CombatUser victim) {
+        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+            combatUser.addScore("처치 지원", VellionUltInfo.ASSIST_SCORE);
     }
 
     /**

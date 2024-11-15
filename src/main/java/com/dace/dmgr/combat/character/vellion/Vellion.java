@@ -160,9 +160,9 @@ public final class Vellion extends Controller {
         if (!(victim instanceof CombatUser) || score >= 100)
             return;
 
-        attacker.getSkill(VellionA2Info.getInstance()).applyAssistScore((CombatUser) victim, score);
-        attacker.getSkill(VellionA3Info.getInstance()).applyAssistScore((CombatUser) victim, score);
-        attacker.getSkill(VellionUltInfo.getInstance()).applyAssistScore((CombatUser) victim, score);
+        attacker.getSkill(VellionA2Info.getInstance()).applyAssistScore((CombatUser) victim);
+        attacker.getSkill(VellionA3Info.getInstance()).applyAssistScore((CombatUser) victim);
+        attacker.getSkill(VellionUltInfo.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override
