@@ -65,11 +65,9 @@ public final class MagrittaT1 {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (!combatEntity.getDamageModule().isLiving() || !(provider instanceof CombatUser))
-                return;
-
-            HologramUtil.addHologram(HOLOGRAM_ID + combatEntity, combatEntity.getEntity(),
-                    0, combatEntity.getEntity().getHeight() + 0.7, 0, "");
+            if (combatEntity.getDamageModule().isLiving() && provider instanceof CombatUser)
+                HologramUtil.addHologram(HOLOGRAM_ID + combatEntity, combatEntity.getEntity(),
+                        0, combatEntity.getEntity().getHeight() + 0.7, 0, "");
         }
 
         @Override

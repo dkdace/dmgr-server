@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -36,8 +37,8 @@ public final class StatusEffectModule {
     @NonNull
     @Getter
     private final AbilityStatus resistanceStatus;
-    /** 적용된 상태 효과 목록 */
-    private final HashSet<StatusEffect> statusEffects = new HashSet<>();
+    /** 적용된 상태 효과 목록 (상태 효과 : 제공자) */
+    private final HashMap<StatusEffect, CombatEntity> statusEffectMap = new HashMap<>();
 
     /**
      * 상태 효과 모듈 인스턴스를 생성한다.
@@ -90,22 +91,24 @@ public final class StatusEffectModule {
 
         if (!hasStatusEffect(statusEffect)) {
             CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
-            statusEffects.add(statusEffect);
+            statusEffectMap.put(statusEffect, provider);
 
             statusEffect.onStart(combatEntity, provider);
 
             TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
-                if (combatEntity.isDisposed() || getStatusEffectDuration(statusEffect) == 0 || !statusEffects.contains(statusEffect))
+                if (getStatusEffectDuration(statusEffect) == 0 || !statusEffectMap.containsKey(statusEffect))
                     return false;
 
                 statusEffect.onTick(combatEntity, provider, i);
 
                 return true;
             }, isCancelled -> {
+                if (statusEffectMap.remove(statusEffect) == null)
+                    return;
+
                 statusEffect.onEnd(combatEntity, provider);
 
                 CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, 0);
-                statusEffects.remove(statusEffect);
             }, 1));
         } else if (getStatusEffectDuration(statusEffect) < finalDuration)
             CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
@@ -128,7 +131,7 @@ public final class StatusEffectModule {
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
     public boolean hasStatusEffectType(@NonNull StatusEffectType statusEffectType) {
-        for (StatusEffect statusEffect : statusEffects) {
+        for (StatusEffect statusEffect : statusEffectMap.keySet()) {
             if (statusEffect.getStatusEffectType() == statusEffectType)
                 return true;
         }
@@ -143,7 +146,7 @@ public final class StatusEffectModule {
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
     public boolean hasStatusEffect(@NonNull StatusEffect statusEffect) {
-        return statusEffects.contains(statusEffect);
+        return statusEffectMap.containsKey(statusEffect);
     }
 
     /**
@@ -154,7 +157,7 @@ public final class StatusEffectModule {
      * @see CombatRestrictions
      */
     public boolean hasAnyRestriction(long restrictions) {
-        for (StatusEffect statusEffect : statusEffects) {
+        for (StatusEffect statusEffect : statusEffectMap.keySet()) {
             if ((statusEffect.getCombatRestrictions(combatEntity) & restrictions) != 0)
                 return true;
         }
@@ -171,9 +174,8 @@ public final class StatusEffectModule {
      */
     public boolean hasAllRestrictions(long restrictions) {
         long combinedRestrictions = CombatRestrictions.NONE;
-        for (StatusEffect statusEffect : statusEffects) {
+        for (StatusEffect statusEffect : statusEffectMap.keySet())
             combinedRestrictions |= statusEffect.getCombatRestrictions(combatEntity);
-        }
 
         return (combinedRestrictions & restrictions) == restrictions;
     }
@@ -184,7 +186,10 @@ public final class StatusEffectModule {
      * @param statusEffectType 제거할 상태 효과 종류
      */
     public void removeStatusEffectType(@NonNull StatusEffectType statusEffectType) {
-        statusEffects.removeIf(statusEffect -> statusEffect.getStatusEffectType() == statusEffectType);
+        new HashSet<>(statusEffectMap.keySet()).forEach(statusEffect -> {
+            if (statusEffect.getStatusEffectType() == statusEffectType)
+                removeStatusEffect(statusEffect);
+        });
     }
 
     /**
@@ -193,14 +198,16 @@ public final class StatusEffectModule {
      * @param statusEffect 제거할 상태 효과
      */
     public void removeStatusEffect(@NonNull StatusEffect statusEffect) {
-        statusEffects.remove(statusEffect);
+        CombatEntity provider = statusEffectMap.remove(statusEffect);
+        if (provider != null)
+            statusEffect.onEnd(combatEntity, provider);
     }
 
     /**
      * 엔티티의 상태 효과를 모두 제거한다.
      */
     public void clearStatusEffect() {
-        statusEffects.clear();
+        new HashSet<>(statusEffectMap.keySet()).forEach(this::removeStatusEffect);
     }
 
     /**
@@ -209,6 +216,9 @@ public final class StatusEffectModule {
      * @param isPositive {@code true}로 지정 시 이로운 효과, {@code false}로 지정 시 해로운 효과만 제거
      */
     public void clearStatusEffect(boolean isPositive) {
-        statusEffects.removeIf(statusEffect -> statusEffect.isPositive() == isPositive);
+        new HashSet<>(statusEffectMap.keySet()).forEach(statusEffect -> {
+            if (statusEffect.isPositive() == isPositive)
+                removeStatusEffect(statusEffect);
+        });
     }
 }

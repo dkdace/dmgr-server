@@ -901,9 +901,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         broadcastPlayerKillBossBar();
 
+        statusEffectModule.clearStatusEffect();
         damageModule.setHealth(damageModule.getMaxHealth());
         damageModule.clearShield();
-        statusEffectModule.clearStatusEffect();
         selfHarmDamage = 0;
         damageMap.clear();
         cancelAction(null);
