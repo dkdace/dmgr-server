@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -83,6 +84,7 @@ public final class ChedP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().setVisible(false);
+        CombatUtil.addYawAndPitch(combatUser.getEntity(), 0, 0);
 
         float yaw = combatUser.getEntity().getEyeLocation().getYaw();
 
@@ -112,7 +114,7 @@ public final class ChedP1 extends AbstractSkill {
             wallRideCount--;
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
-            combatUser.getMoveModule().push(loc.getDirection().multiply(ChedP1Info.PUSH * 1.2), true);
+            combatUser.getMoveModule().push(loc.getDirection().multiply(ChedP1Info.PUSH), true);
         }, 3));
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {

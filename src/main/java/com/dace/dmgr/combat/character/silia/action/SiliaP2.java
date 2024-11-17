@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -68,6 +69,7 @@ public final class SiliaP2 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().setVisible(false);
+        CombatUtil.addYawAndPitch(combatUser.getEntity(), 0, 0);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.getKnockbackModule().isKnockbacked() || !canActivate())
@@ -89,7 +91,7 @@ public final class SiliaP2 extends AbstractSkill {
             wallRideCount--;
             Location loc = combatUser.getEntity().getLocation();
             loc.setPitch(-65);
-            combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH * 1.2), true);
+            combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH), true);
         }, 3, 10));
     }
 
