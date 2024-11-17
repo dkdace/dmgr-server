@@ -23,6 +23,7 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
@@ -450,7 +451,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             footstepDistance += oldLoc.distance(entity.getLocation());
-            if (!entity.isOnGround() || footstepDistance <= 1.6)
+            if (!entity.isOnGround() || footstepDistance <= 1.6 || (characterType == CharacterType.SILIA
+                    && !getSkill(SiliaA3Info.getInstance()).isDurationFinished()))
                 return;
 
             footstepDistance = 0;
