@@ -215,8 +215,7 @@ public final class PalasA3 extends ActiveSkill {
 
         private final class PalasA3Area extends Area {
             private PalasA3Area() {
-                super(combatUser, PalasA3Info.RADIUS, combatEntity -> combatEntity instanceof Damageable
-                        && ((Damageable) combatEntity).getDamageModule().isLiving());
+                super(combatUser, PalasA3Info.RADIUS, Damageable.class::isInstance);
             }
 
             @Override
@@ -226,23 +225,26 @@ public final class PalasA3 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (target.isEnemy(combatUser)) {
-                    if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
-                            false, true)) {
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
+                if (target.getDamageModule().isLiving()) {
+                    if (target.isEnemy(combatUser)) {
+                        if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
+                                false, true)) {
+                            target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
 
-                        if (target instanceof CombatUser)
-                            CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA3Info.DURATION);
+                            if (target instanceof CombatUser)
+                                CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA3Info.DURATION);
+                        }
+                    } else if (target instanceof Healable) {
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
+
+                        if (target instanceof CombatUser && target != combatUser) {
+                            combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
+                            ((CombatUser) target).addKillAssist(combatUser, PalasA3.ASSIST_SCORE_COOLDOWN_ID, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                        }
+
+                        return true;
                     }
-                } else if (target instanceof Healable) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
-
-                    if (target instanceof CombatUser && target != combatUser)
-                        ((CombatUser) target).addKillAssist(combatUser, PalasA3.ASSIST_SCORE_COOLDOWN_ID, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
                 }
-
-                if (target instanceof CombatUser && target != combatUser)
-                    combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
 
                 return !(target instanceof Barrier);
             }
