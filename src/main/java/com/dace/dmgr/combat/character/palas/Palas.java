@@ -162,8 +162,8 @@ public final class Palas extends Support {
         if (!(victim instanceof CombatUser) || score >= 100)
             return;
 
-        attacker.getSkill(PalasA1Info.getInstance()).applyAssistScore((CombatUser) victim, score);
-        attacker.getSkill(PalasA3Info.getInstance()).applyAssistScore((CombatUser) victim, score);
+        attacker.getSkill(PalasA1Info.getInstance()).applyAssistScore((CombatUser) victim);
+        attacker.getSkill(PalasA3Info.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override
