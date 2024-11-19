@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Healable extends Damageable {
     /**
-     * @return 치유 모듈
+     * @return 회복 모듈
      */
     @NonNull
     HealModule getDamageModule();

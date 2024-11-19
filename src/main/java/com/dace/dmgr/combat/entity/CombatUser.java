@@ -95,6 +95,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final AttackModule attackModule;
+    /** 치유 모듈 */
+    @NonNull
+    @Getter
+    private final HealerModule healerModule;
     /** 피해 모듈 */
     @NonNull
     @Getter
@@ -183,6 +187,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
+        healerModule = new HealerModule(this);
         damageModule = new HealModule(this, true, true, true, 0, 1000);
         moveModule = new JumpModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
         critHitbox = hitboxes[3];
@@ -294,7 +299,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onTickLive(long i) {
         Validate.notNull(character);
-        Validate.notNull(characterRecord);
 
         user.sendActionBar(character.getActionbarString(this));
 
@@ -310,8 +314,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (damageModule.isLowHealth())
             CombatEffectUtil.playBleedingEffect(null, entity, 0);
 
-        if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
-            characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+        if (i % 20 == 0) {
+            if (hasCore(Core.REGENERATION))
+                damageModule.heal(this, (int) (damageModule.getMaxHealth() * (Core.REGENERATION.getValues()[0] / 100.0)), false);
+
+            Validate.notNull(characterRecord);
+
+            if (gameUser != null && gameUser.getSpawnRegionTeam() == null)
+                characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+        }
     }
 
     /**
@@ -581,8 +592,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
 
-        if (gameUser != null && victim instanceof CombatUser)
-            gameUser.setDamage(gameUser.getDamage() + damage);
+        if (victim instanceof CombatUser) {
+            if (hasCore(Core.HEALTH_DRAIN))
+                damageModule.heal(this, (int) (damage * (Core.HEALTH_DRAIN.getValues()[0] / 100.0)), false);
+
+            if (gameUser != null)
+                gameUser.setDamage(gameUser.getDamage() + damage);
+        }
     }
 
     /**
@@ -927,12 +943,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Validate.notNull(weapon);
-
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : Cooldown.RESPAWN.duration);
+        long duration = Cooldown.RESPAWN.duration;
+        if (hasCore(Core.RESURRECTION))
+            duration = (long) (duration * (100 - Core.RESURRECTION.getValues()[0]) / 100.0);
+
+        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : duration);
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
@@ -949,6 +967,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             return true;
         }, isCancelled -> {
+            Validate.notNull(weapon);
+
             statusEffectModule.clearStatusEffect();
             entity.setGameMode(GameMode.SURVIVAL);
 
@@ -1184,8 +1204,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void addUltGauge(double value) {
         Validate.notNull(character);
 
-        UltimateSkill ultimateSkill = getSkill(character.getUltimateSkillInfo());
-        addUltGaugePercent(value / ultimateSkill.getCost());
+        UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
+        int cost = skill.getCost();
+        if (hasCore(Core.ULTIMATE))
+            cost = (int) (cost * (100 - Core.ULTIMATE.getValues()[0]) / 100.0);
+
+        addUltGaugePercent(value / cost);
     }
 
     /**
@@ -1242,6 +1266,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule.getResistanceStatus().clearModifier();
         statusEffectModule.getResistanceStatus().clearModifier();
         attackModule.getDamageMultiplierStatus().clearModifier();
+        healerModule.getHealMultiplierStatus().clearModifier();
         damageModule.getDefenseMultiplierStatus().clearModifier();
         moveModule.getSpeedStatus().clearModifier();
         clearCores();
@@ -1440,6 +1465,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
         }
 
+        if (core == Core.STRENGTH)
+            attackModule.getDamageMultiplierStatus().addModifier(Core.STRENGTH.getName(), Core.STRENGTH.getValues()[0]);
+        if (core == Core.RESISTANCE)
+            damageModule.getDefenseMultiplierStatus().addModifier(Core.RESISTANCE.getName(), Core.RESISTANCE.getValues()[0]);
+        if (core == Core.SPEED)
+            moveModule.getSpeedStatus().addModifier(Core.SPEED.getName(), Core.SPEED.getValues()[0]);
+        if (core == Core.HEALING)
+            healerModule.getHealMultiplierStatus().addModifier(Core.HEALING.getName(), Core.HEALING.getValues()[0]);
+        if (core == Core.ENDURANCE)
+            statusEffectModule.getResistanceStatus().addModifier(Core.ENDURANCE.getName(), Core.ENDURANCE.getValues()[0]);
+
         return true;
     }
 
@@ -1462,6 +1498,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 break;
             }
         }
+
+        if (core == Core.STRENGTH)
+            attackModule.getDamageMultiplierStatus().removeModifier(Core.STRENGTH.getName());
+        if (core == Core.RESISTANCE)
+            damageModule.getDefenseMultiplierStatus().removeModifier(Core.RESISTANCE.getName());
+        if (core == Core.SPEED)
+            moveModule.getSpeedStatus().removeModifier(Core.SPEED.getName());
+        if (core == Core.HEALING)
+            healerModule.getHealMultiplierStatus().removeModifier(Core.HEALING.getName());
+        if (core == Core.ENDURANCE)
+            statusEffectModule.getResistanceStatus().removeModifier(Core.RESISTANCE.getName());
 
         return true;
     }

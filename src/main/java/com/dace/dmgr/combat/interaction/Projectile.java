@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -27,6 +28,9 @@ public abstract class Projectile extends Bullet {
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;
+    /** 치유 증가량 */
+    @Getter
+    private final double healIncrement;
 
     /** 반복 횟수 */
     private int loopCount = 0;
@@ -52,6 +56,7 @@ public abstract class Projectile extends Bullet {
             throw new IllegalArgumentException("ProjectileOption의 'duration'이 -1 이상이어야 함");
 
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
+        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
         this.speed = speed;
         this.duration = option.duration;
         this.hasGravity = option.hasGravity;
@@ -71,6 +76,7 @@ public abstract class Projectile extends Bullet {
             throw new IllegalArgumentException("'speed'가 0 이상이어야 함");
 
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
+        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
         this.speed = speed;
         this.duration = ProjectileOption.DURATION_DEFAULT;
         this.hasGravity = ProjectileOption.HAS_GRAVITY_DEFAULT;

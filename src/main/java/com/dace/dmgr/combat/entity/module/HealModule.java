@@ -28,7 +28,7 @@ public final class HealModule extends DamageModule {
     private final AbilityStatus healMultiplierStatus;
 
     /**
-     * 치유 모듈 인스턴스를 생성한다.
+     * 회복 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
@@ -51,7 +51,7 @@ public final class HealModule extends DamageModule {
     }
 
     /**
-     * 치유 모듈 인스턴스를 생성한다.
+     * 회복 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity      대상 엔티티
      * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
@@ -69,7 +69,7 @@ public final class HealModule extends DamageModule {
     }
 
     /**
-     * 치유 모듈 인스턴스를 생성한다.
+     * 회복 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity    대상 엔티티
      * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
@@ -86,6 +86,36 @@ public final class HealModule extends DamageModule {
     }
 
     /**
+     * 엔티티의 치유 로직을 처리한다.
+     *
+     * @param provider           제공자
+     * @param amount             치유량
+     * @param giveHealMultiplier 주는 치유량 배수
+     * @param takeHealMultiplier 받는 치유량 배수
+     * @param isUlt              궁극기 충전 여부
+     * @return 치유 여부. 치유를 받았으면 {@code true} 반환
+     */
+    private boolean handleHeal(@Nullable Healer provider, int amount, double giveHealMultiplier, double takeHealMultiplier, boolean isUlt) {
+        if (combatEntity.getEntity().isDead() || getHealth() == getMaxHealth()
+                || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
+            return false;
+        if (amount == 0)
+            return true;
+
+        int finalAmount = Math.max(0, (int) (amount * (giveHealMultiplier + takeHealMultiplier - 1)));
+        if (getHealth() + finalAmount > getMaxHealth())
+            finalAmount = getMaxHealth() - getHealth();
+
+        if (provider != null)
+            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
+        ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
+
+        setHealth(getHealth() + finalAmount);
+
+        return true;
+    }
+
+    /**
      * 엔티티를 치유한다.
      *
      * @param provider 제공자
@@ -98,21 +128,10 @@ public final class HealModule extends DamageModule {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 
-        if (getHealth() == getMaxHealth() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
-            return false;
+        double giveHealMultiplier = provider == null ? 1 : provider.getHealerModule().getHealMultiplierStatus().getValue();
+        double takeHealMultiplier = healMultiplierStatus.getValue();
 
-        double healMultiplier = healMultiplierStatus.getValue();
-        int finalAmount = Math.max(0, (int) (amount * healMultiplier));
-        if (getHealth() + finalAmount > getMaxHealth())
-            finalAmount = getMaxHealth() - getHealth();
-
-        if (provider != null)
-            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
-        ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
-
-        setHealth(getHealth() + finalAmount);
-
-        return true;
+        return handleHeal(provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
     }
 
     /**
@@ -129,8 +148,12 @@ public final class HealModule extends DamageModule {
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 
         CombatEntity provider = projectile.getShooter();
-        if (provider instanceof Healer)
-            return heal((Healer) provider, amount, isUlt);
+        if (provider instanceof Healer) {
+            double giveHealMultiplier = projectile.getHealIncrement();
+            double takeHealMultiplier = healMultiplierStatus.getValue();
+
+            return handleHeal((Healer) provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
+        }
 
         return false;
     }

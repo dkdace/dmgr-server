@@ -1,11 +1,18 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.entity.module.HealerModule;
 import lombok.NonNull;
 
 /**
  * 다른 엔티티를 치유할 수 있는 엔티티의 인터페이스.
  */
 public interface Healer extends CombatEntity {
+    /**
+     * @return 치유 모듈
+     */
+    @NonNull
+    HealerModule getHealerModule();
+
     /**
      * 엔티티가 다른 엔티티를 치유했을 때 실행될 작업.
      *
