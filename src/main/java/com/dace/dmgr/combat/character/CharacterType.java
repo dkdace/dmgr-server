@@ -15,8 +15,11 @@ import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.item.gui.SelectCharInfo;
+import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SkinUtil;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -81,7 +84,8 @@ public enum CharacterType {
                 if (!player.getOpenInventory().getTitle().contains("전투원 선택"))
                     return false;
 
-                CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+                User user = User.fromPlayer(player);
+                CombatUser combatUser = CombatUser.fromUser(user);
                 if (combatUser == null)
                     return false;
 
@@ -99,7 +103,10 @@ public enum CharacterType {
                         return false;
 
                     combatUser.setCharacterType(CharacterType.this);
+
                     player.closeInventory();
+                    if (!user.getUserData().getCharacterRecord(CharacterType.this).getCores().isEmpty())
+                        TaskUtil.addTask(combatUser, new DelayTask(() -> SelectCore.getInstance().open(player), 10));
                 } else if (clickType == ClickType.RIGHT)
                     selectCharInfo.open(player);
 

@@ -37,7 +37,7 @@ public class StaticItem {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setLocalizedName(identifier);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_POTION_EFFECTS);
         itemMeta.setUnbreakable(true);
         itemStack.setItemMeta(itemMeta);
         this.identifier = identifier;

@@ -2,6 +2,7 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
+import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
 import lombok.AllArgsConstructor;
@@ -62,7 +63,7 @@ public final class Menu extends Gui {
         OPTION(Material.REDSTONE_COMPARATOR, 0, "설정", "설정 관련 메뉴를 확인합니다.",
                 player -> PlayerOption.getInstance().open(player)),
         CORE(Material.FIREWORK_CHARGE, 0, "코어 확인", "전투원에 할당된 코어를 확인합니다.",
-                player -> player.performCommand("코어")),
+                player -> new CoreList(User.fromPlayer(player).getUserData()).open(player)),
         COMMAND(Material.COMMAND, 0, "명령어 목록", "서버 명령어 목록을 확인합니다.",
                 player -> {
                     player.performCommand("명령어");

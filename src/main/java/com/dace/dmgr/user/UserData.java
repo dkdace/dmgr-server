@@ -3,6 +3,7 @@ package com.dace.dmgr.user;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.YamlFile;
+import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
@@ -19,10 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
@@ -532,6 +531,9 @@ public final class UserData extends YamlFile {
         /** 플레이 시간 (초) */
         @Getter
         private int playTime = 0;
+        /** 적용된 코어의 이름 목록 */
+        @Nullable
+        private List<String> cores;
 
         /**
          * 데이터를 불러온다.
@@ -540,6 +542,42 @@ public final class UserData extends YamlFile {
             kill = (int) getLong(SECTION + "." + characterType + ".kill", this.kill);
             death = (int) getLong(SECTION + "." + characterType + ".death", this.death);
             playTime = (int) getLong(SECTION + "." + characterType + ".playTime", this.playTime);
+            cores = getStringList(SECTION + "." + characterType + ".cores");
+        }
+
+        /**
+         * 적용된 코어 목록을 반환한다.
+         *
+         * @return 적용된 코어 목록
+         */
+        @NonNull
+        public Set<@NonNull Core> getCores() {
+            Validate.notNull(cores);
+            return this.cores.stream().map(Core::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class)));
+        }
+
+        /**
+         * 지정한 코어를 적용된 코어 목록에 추가한다.
+         *
+         * @param core 추가할 코어
+         */
+        public void addCore(@NonNull Core core) {
+            Validate.notNull(cores);
+
+            this.cores.add(core.toString());
+            set(SECTION + "." + characterType + ".cores", this.cores);
+        }
+
+        /**
+         * 지정한 코어를 적용된 코어 목록에서 제거한다.
+         *
+         * @param core 제거할 코어
+         */
+        public void removeCore(@NonNull Core core) {
+            Validate.notNull(cores);
+
+            this.cores.remove(core.toString());
+            set(SECTION + "." + characterType + ".cores", this.cores);
         }
 
         public void setKill(int kill) {

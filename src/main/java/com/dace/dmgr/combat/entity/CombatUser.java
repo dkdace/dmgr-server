@@ -6,6 +6,7 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -31,6 +32,7 @@ import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.*;
@@ -47,6 +49,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -71,6 +74,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final int KILLSTREAK_SCORE = 25;
     /** 처치 지원 점수 비율 */
     private static final double KILL_SUPPORT_SCORE_RATIO = 0.2;
+    /** 최대 코어 개수 */
+    private static final int MAX_CORE_AMOUNT = 3;
     /** 사망 대사 홀로그램 ID */
     private static final String DEATH_MENT_HOLOGRAM_ID = "DeathMent";
     /** 기능 블록의 쿨타임 홀로그램 ID */
@@ -90,6 +95,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final AttackModule attackModule;
+    /** 치유 모듈 */
+    @NonNull
+    @Getter
+    private final HealerModule healerModule;
     /** 피해 모듈 */
     @NonNull
     @Getter
@@ -122,6 +131,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final HashMap<SkillInfo<? extends Skill>, Skill> skillMap = new HashMap<>();
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<>();
+    /** 장착한 코어 목록 */
+    private final EnumSet<Core> cores = EnumSet.noneOf(Core.class);
     /** 임시 히트박스 객체 목록 */
     @Nullable
     @Setter
@@ -176,6 +187,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
         attackModule = new AttackModule(this);
+        healerModule = new HealerModule(this);
         damageModule = new HealModule(this, true, true, true, 0, 1000);
         moveModule = new JumpModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
         critHitbox = hitboxes[3];
@@ -287,7 +299,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onTickLive(long i) {
         Validate.notNull(character);
-        Validate.notNull(characterRecord);
 
         user.sendActionBar(character.getActionbarString(this));
 
@@ -303,8 +314,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (damageModule.isLowHealth())
             CombatEffectUtil.playBleedingEffect(null, entity, 0);
 
-        if (i % 20 == 0 && gameUser != null && gameUser.getSpawnRegionTeam() == null)
-            characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+        if (i % 20 == 0) {
+            if (hasCore(Core.REGENERATION))
+                damageModule.heal(this, (int) (damageModule.getMaxHealth() * (Core.REGENERATION.getValues()[0] / 100.0)), false);
+
+            Validate.notNull(characterRecord);
+
+            if (gameUser != null && gameUser.getSpawnRegionTeam() == null)
+                characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+        }
     }
 
     /**
@@ -574,8 +592,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim.getDamageModule().isUltProvider() && isUlt)
             addUltGauge(damage);
 
-        if (gameUser != null && victim instanceof CombatUser)
-            gameUser.setDamage(gameUser.getDamage() + damage);
+        if (victim instanceof CombatUser) {
+            if (hasCore(Core.HEALTH_DRAIN))
+                damageModule.heal(this, (int) (damage * (Core.HEALTH_DRAIN.getValues()[0] / 100.0)), false);
+
+            if (gameUser != null)
+                gameUser.setDamage(gameUser.getDamage() + damage);
+        }
     }
 
     /**
@@ -920,12 +943,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Validate.notNull(weapon);
-
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : Cooldown.RESPAWN.duration);
+        long duration = Cooldown.RESPAWN.duration;
+        if (hasCore(Core.RESURRECTION))
+            duration = (long) (duration * (100 - Core.RESURRECTION.getValues()[0]) / 100.0);
+
+        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : duration);
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
@@ -942,6 +967,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             return true;
         }, isCancelled -> {
+            Validate.notNull(weapon);
+
             statusEffectModule.clearStatusEffect();
             entity.setGameMode(GameMode.SURVIVAL);
 
@@ -1177,8 +1204,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void addUltGauge(double value) {
         Validate.notNull(character);
 
-        UltimateSkill ultimateSkill = getSkill(character.getUltimateSkillInfo());
-        addUltGaugePercent(value / ultimateSkill.getCost());
+        UltimateSkill skill = getSkill(character.getUltimateSkillInfo());
+        int cost = skill.getCost();
+        if (hasCore(Core.ULTIMATE))
+            cost = (int) (cost * (100 - Core.ULTIMATE.getValues()[0]) / 100.0);
+
+        addUltGaugePercent(value / cost);
     }
 
     /**
@@ -1235,8 +1266,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         knockbackModule.getResistanceStatus().clearModifier();
         statusEffectModule.getResistanceStatus().clearModifier();
         attackModule.getDamageMultiplierStatus().clearModifier();
+        healerModule.getHealMultiplierStatus().clearModifier();
         damageModule.getDefenseMultiplierStatus().clearModifier();
         moveModule.getSpeedStatus().clearModifier();
+        clearCores();
     }
 
     /**
@@ -1401,6 +1434,93 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     attacker.addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
             }
         });
+    }
+
+    /**
+     * 지정한 코어를 장착한 상태인지 확인한다.
+     *
+     * @param core 확인할 코어
+     * @return 장착하고 있으면 {@code true} 반환
+     */
+    public boolean hasCore(@NonNull Core core) {
+        return cores.contains(core);
+    }
+
+    /**
+     * 지정한 코어를 장착한 코어 목록에 추가한다.
+     *
+     * @param core 추가할 코어
+     * @return 추가 가능하면 {@code true} 반환
+     */
+    public boolean addCore(@NonNull Core core) {
+        if (cores.size() >= MAX_CORE_AMOUNT)
+            return false;
+
+        cores.add(core);
+
+        for (int i = 27; i <= 29; i++) {
+            if (entity.getInventory().getItem(i) == null) {
+                entity.getInventory().setItem(i, core.getSelectGuiItem().getItemStack());
+                break;
+            }
+        }
+
+        if (core == Core.STRENGTH)
+            attackModule.getDamageMultiplierStatus().addModifier(Core.STRENGTH.getName(), Core.STRENGTH.getValues()[0]);
+        if (core == Core.RESISTANCE)
+            damageModule.getDefenseMultiplierStatus().addModifier(Core.RESISTANCE.getName(), Core.RESISTANCE.getValues()[0]);
+        if (core == Core.SPEED)
+            moveModule.getSpeedStatus().addModifier(Core.SPEED.getName(), Core.SPEED.getValues()[0]);
+        if (core == Core.HEALING)
+            healerModule.getHealMultiplierStatus().addModifier(Core.HEALING.getName(), Core.HEALING.getValues()[0]);
+        if (core == Core.ENDURANCE)
+            statusEffectModule.getResistanceStatus().addModifier(Core.ENDURANCE.getName(), Core.ENDURANCE.getValues()[0]);
+
+        return true;
+    }
+
+    /**
+     * 지정한 코어를 장착한 코어 목록에서 제거한다.
+     *
+     * @param core 제거할 코어
+     * @return 제거 가능하면 {@code true} 반환
+     */
+    public boolean removeCore(@NonNull Core core) {
+        if (cores.isEmpty())
+            return false;
+
+        cores.remove(core);
+
+        for (int i = 27; i <= 29; i++) {
+            ItemStack itemStack = entity.getInventory().getItem(i);
+            if (itemStack != null && StaticItem.fromItemStack(itemStack) == core.getSelectGuiItem()) {
+                entity.getInventory().setItem(i, null);
+                break;
+            }
+        }
+
+        if (core == Core.STRENGTH)
+            attackModule.getDamageMultiplierStatus().removeModifier(Core.STRENGTH.getName());
+        if (core == Core.RESISTANCE)
+            damageModule.getDefenseMultiplierStatus().removeModifier(Core.RESISTANCE.getName());
+        if (core == Core.SPEED)
+            moveModule.getSpeedStatus().removeModifier(Core.SPEED.getName());
+        if (core == Core.HEALING)
+            healerModule.getHealMultiplierStatus().removeModifier(Core.HEALING.getName());
+        if (core == Core.ENDURANCE)
+            statusEffectModule.getResistanceStatus().removeModifier(Core.RESISTANCE.getName());
+
+        return true;
+    }
+
+    /**
+     * 장착한 코어 목록을 초기화한다.
+     */
+    private void clearCores() {
+        cores.clear();
+
+        for (int i = 27; i <= 30; i++)
+            entity.getInventory().setItem(i, new ItemStack(Material.AIR));
     }
 
     /**
