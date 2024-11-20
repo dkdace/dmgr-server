@@ -115,7 +115,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         if (isAmplifying)
             skill2.amplifyTarget(target);
         else if (!target.getStatusEffectModule().hasStatusEffect(NeaceA1.NeaceA1Mark.instance))
-            target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20, true);
+            target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20.0, true);
 
         Location location = combatUser.getArmLocation(true);
         for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8)) {

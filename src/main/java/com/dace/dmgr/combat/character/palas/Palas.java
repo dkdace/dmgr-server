@@ -152,7 +152,7 @@ public final class Palas extends Support {
         super.onGiveHeal(provider, target, amount);
 
         if (provider != target && target instanceof CombatUser)
-            provider.addScore("치유", (double) (HEAL_SCORE * amount) / target.getDamageModule().getMaxHealth());
+            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 
         return true;
     }

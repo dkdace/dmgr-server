@@ -262,7 +262,7 @@ public final class VellionA2 extends ActiveSkill {
 
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                target.getDamageModule().damage(combatUser, VellionA2Info.DAMAGE_PER_SECOND * 10 / 20, DamageType.NORMAL, null,
+                target.getDamageModule().damage(combatUser, VellionA2Info.DAMAGE_PER_SECOND * 10 / 20.0, DamageType.NORMAL, null,
                         false, true);
 
                 for (Location loc2 : LocationUtil.getLine(effectLoc, location, 0.4))

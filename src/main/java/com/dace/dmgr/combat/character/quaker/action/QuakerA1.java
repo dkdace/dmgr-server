@@ -152,7 +152,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             setStateValue((int) damageModule.getHealth());
 
-            combatUser.addScore("피해 막음", (double) (damage * QuakerA1Info.BLOCK_SCORE) / QuakerA1Info.HEALTH);
+            combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             if (location != null)

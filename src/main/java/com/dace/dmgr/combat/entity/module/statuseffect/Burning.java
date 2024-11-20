@@ -43,7 +43,7 @@ public abstract class Burning implements StatusEffect {
         combatEntity.getEntity().setFireTicks(4);
 
         if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider,
-                damagePerSecond * 10 / 20, DamageType.NORMAL, null, false, isUlt))
+                damagePerSecond * 10 / 20.0, DamageType.NORMAL, null, false, isUlt))
             SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
     }
 

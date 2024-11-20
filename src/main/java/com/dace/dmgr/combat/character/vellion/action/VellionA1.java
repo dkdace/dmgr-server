@@ -156,7 +156,7 @@ public final class VellionA1 extends ActiveSkill {
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof Healable && provider instanceof Healer)
-                ((Healable) combatEntity).getDamageModule().heal((Healer) provider, VellionA1Info.HEAL_PER_SECOND / 20, true);
+                ((Healable) combatEntity).getDamageModule().heal((Healer) provider, VellionA1Info.HEAL_PER_SECOND / 20.0, true);
         }
 
         @Override

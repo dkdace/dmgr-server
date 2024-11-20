@@ -86,7 +86,7 @@ public final class NeaceA1 extends ActiveSkill {
                 return;
             }
 
-            if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, NeaceA1Info.HEAL_PER_SECOND / 20, true))
+            if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, NeaceA1Info.HEAL_PER_SECOND / 20.0, true))
                 combatEntity.getPropertyManager().addValue(Property.HEALING_MARK, NeaceA1Info.HEAL_PER_SECOND / 20);
         }
 

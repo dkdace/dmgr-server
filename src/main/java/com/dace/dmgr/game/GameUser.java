@@ -166,7 +166,7 @@ public final class GameUser implements Disposable {
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
                     "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
 
-        combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20, false);
+        combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20.0, false);
     }
 
     /**
@@ -178,7 +178,7 @@ public final class GameUser implements Disposable {
         if (!combatUser.isDead())
             user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
 
-        combatUser.getDamageModule().damage(combatUser, GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20, DamageType.FIXED,
+        combatUser.getDamageModule().damage(combatUser, GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20.0, DamageType.FIXED,
                 null, false, false);
     }
 
@@ -387,7 +387,7 @@ public final class GameUser implements Disposable {
             if (targetCombatUser.getDamageModule().isLowHealth()) {
                 state = "치명상";
                 ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[0];
-            } else if (targetCombatUser.getDamageModule().getHealth() <= targetCombatUser.getDamageModule().getMaxHealth() / 2) {
+            } else if (targetCombatUser.getDamageModule().getHealth() <= targetCombatUser.getDamageModule().getMaxHealth() / 2.0) {
                 state = "체력 낮음";
                 ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[1];
             } else {

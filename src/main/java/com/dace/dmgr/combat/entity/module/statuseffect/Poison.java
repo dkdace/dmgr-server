@@ -52,7 +52,7 @@ public abstract class Poison implements StatusEffect {
                         combatEntity.getEntity().getWidth() / 4, 0.3);
 
             if (i % 10 == 0 && provider instanceof Attacker)
-                combatEntity.getDamageModule().damage((Attacker) provider, damagePerSecond * 10 / 20,
+                combatEntity.getDamageModule().damage((Attacker) provider, damagePerSecond * 10 / 20.0,
                         DamageType.IGNORE_DEFENSE, null, false, true);
         }
     }

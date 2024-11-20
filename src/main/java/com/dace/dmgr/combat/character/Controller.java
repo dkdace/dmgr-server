@@ -60,7 +60,7 @@ public abstract class Controller extends Character {
         }
 
         if (CooldownUtil.getCooldown(combatUser, HEAL_COOLDOWN_ID) == 0)
-            combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20, false);
+            combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
     }
 
     @Override

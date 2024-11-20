@@ -48,7 +48,7 @@ public abstract class Support extends Character {
             boolean activate = combatUser.getEntity().getWorld().getPlayers().stream()
                     .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
                     .anyMatch(target -> target != null && !target.isEnemy(combatUser)
-                            && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2
+                            && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2.0
                             && target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
@@ -66,7 +66,7 @@ public abstract class Support extends Character {
                 CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
 
                 TaskUtil.addTask(provider, new IntervalTask(i -> {
-                    provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20, false);
+                    provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
                     return CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) > 0;
                 }, 2));
             } else
