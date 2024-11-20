@@ -95,14 +95,14 @@ public final class HealModule extends DamageModule {
      * @param isUlt              궁극기 충전 여부
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      */
-    private boolean handleHeal(@Nullable Healer provider, int amount, double giveHealMultiplier, double takeHealMultiplier, boolean isUlt) {
+    private boolean handleHeal(@Nullable Healer provider, double amount, double giveHealMultiplier, double takeHealMultiplier, boolean isUlt) {
         if (combatEntity.getEntity().isDead() || getHealth() == getMaxHealth()
                 || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
             return false;
         if (amount == 0)
             return true;
 
-        int finalAmount = Math.max(0, (int) (amount * (giveHealMultiplier + takeHealMultiplier - 1)));
+        double finalAmount = Math.max(0, amount * (giveHealMultiplier + takeHealMultiplier - 1));
         if (getHealth() + finalAmount > getMaxHealth())
             finalAmount = getMaxHealth() - getHealth();
 
@@ -124,7 +124,7 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public boolean heal(@Nullable Healer provider, int amount, boolean isUlt) {
+    public boolean heal(@Nullable Healer provider, double amount, boolean isUlt) {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 
@@ -143,7 +143,7 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public boolean heal(@NonNull Projectile projectile, int amount, boolean isUlt) {
+    public boolean heal(@NonNull Projectile projectile, double amount, boolean isUlt) {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 

@@ -109,13 +109,13 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     }
 
     @Override
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+    public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
         CombatEffectUtil.playBleedingEffect(location, entity, damage);
     }
 
     @Override
-    public void onTakeHeal(@Nullable Healer provider, int amount, boolean isUlt) {
+    public void onTakeHeal(@Nullable Healer provider, double amount, boolean isUlt) {
         // 미사용
     }
 

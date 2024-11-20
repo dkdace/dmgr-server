@@ -144,7 +144,7 @@ public final class Inferno extends Vanguard {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished()) {
             CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
             return;

@@ -146,11 +146,11 @@ public final class QuakerA1 extends ChargeableSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             super.onDamage(attacker, damage, reducedDamage, damageType, location, isCrit, isUlt);
 
-            addStateValue(-damage);
+            setStateValue((int) damageModule.getHealth());
 
             combatUser.addScore("피해 막음", (double) (damage * QuakerA1Info.BLOCK_SCORE) / QuakerA1Info.HEALTH);
 

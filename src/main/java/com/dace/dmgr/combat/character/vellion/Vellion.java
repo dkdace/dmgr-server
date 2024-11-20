@@ -139,7 +139,7 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
         if (victim.getDamageModule().isLiving()) {
             attacker.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
             attacker.useAction(ActionKey.PERIODIC_1);
@@ -149,7 +149,7 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, damageType, location, isCrit);
 
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
@@ -166,7 +166,7 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         super.onGiveHeal(provider, target, amount);
 
         if (provider != target && target instanceof CombatUser)

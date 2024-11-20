@@ -122,7 +122,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     private final Hitbox critHitbox;
     /** 킬 기여자별 피해량 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 누적 피해량) */
-    private final HashMap<CombatUser, Integer> damageMap = new HashMap<>();
+    private final HashMap<CombatUser, Double> damageMap = new HashMap<>();
     /** 적 처치를 지원하는 플레이어 목록 (기여자 : (점수 ID : 지원 점수)) */
     private final HashMap<CombatUser, HashMap<String, Double>> killAssistMap = new HashMap<>();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
@@ -138,7 +138,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Setter
     private Hitbox @Nullable [] temporaryHitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용한다. */
-    private int selfHarmDamage = 0;
+    private double selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
     private double scoreStreakSum = 0;
     /** 연속 처치 횟수 */
@@ -577,7 +577,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+    public void onAttack(@NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
         if (!isActivated)
             return;
         Validate.notNull(character);
@@ -621,7 +621,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+    public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
         if (!isActivated)
             return;
@@ -643,7 +643,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 damageMap.remove(attacker);
             CooldownUtil.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
 
-            int sumDamage = damageMap.getOrDefault(attacker, 0);
+            double sumDamage = damageMap.getOrDefault(attacker, 0.0);
             damageMap.put((CombatUser) attacker, sumDamage + damage);
 
             handleAttackerKillAssists((CombatUser) attacker, damage);
@@ -659,7 +659,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      * @param damage   피해량
      */
-    private void handleAttackerKillAssists(@NonNull CombatUser attacker, int damage) {
+    private void handleAttackerKillAssists(@NonNull CombatUser attacker, double damage) {
         attacker.killAssistMap.keySet().removeIf(target -> {
             if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
                 damageMap.remove(target);
@@ -668,8 +668,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 return true;
 
             CooldownUtil.setCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
-            int sumDamage = damageMap.getOrDefault(target, 0);
-            damageMap.put(target, sumDamage + (int) (damage * KILL_SUPPORT_SCORE_RATIO));
+            double sumDamage = damageMap.getOrDefault(target, 0.0);
+            damageMap.put(target, sumDamage + damage * KILL_SUPPORT_SCORE_RATIO);
 
             return false;
         });
@@ -690,13 +690,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt) {
+    public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
         Validate.notNull(character);
 
         isUlt = isUlt && getSkill(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
 
         if (target.getDamageModule().isUltProvider() && isUlt) {
-            int ultAmount = amount;
+            double ultAmount = amount;
 
             if (target instanceof CombatUser && ((CombatUser) target).selfHarmDamage > 0)
                 ultAmount = -((CombatUser) target).selfHarmDamage - amount;
@@ -710,7 +710,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
-    public void onTakeHeal(@Nullable Healer provider, int amount, boolean isUlt) {
+    public void onTakeHeal(@Nullable Healer provider, double amount, boolean isUlt) {
         if (!isActivated)
             return;
         Validate.notNull(character);
@@ -728,7 +728,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * @param amount 치유량
      */
-    private void playTakeHealEffect(int amount) {
+    private void playTakeHealEffect(double amount) {
         if (amount >= 100 || amount / 100.0 > DMGR.getRandom().nextDouble())
             ParticleUtil.play(Particle.HEART, entity.getLocation().add(0, entity.getHeight() + 0.3, 0), (int) Math.ceil(amount / 100.0),
                     0.3, 0.1, 0.3, 0);
@@ -751,9 +751,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             ((CombatUser) victim).damageMap.keySet().removeIf(target ->
                     CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + victim) == 0);
 
-            int totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToInt(Integer::intValue).sum();
-            int damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0);
-            int score = Math.round(((float) damage / totalDamage) * 100);
+            double totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToDouble(Double::doubleValue).sum();
+            double damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0.0);
+            int score = (int) Math.round((damage / totalDamage) * 100);
 
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
@@ -897,7 +897,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         character.onDeath(this, attacker);
 
         damageMap.keySet().removeIf(target -> CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0);
-        int totalDamage = damageMap.values().stream().mapToInt(Integer::intValue).sum();
+        double totalDamage = damageMap.values().stream().mapToDouble(Double::doubleValue).sum();
         damageMap.forEach((target, damage) -> {
             Validate.notNull(target.character);
 
@@ -913,7 +913,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 target.addScore("추락사", FALL_ZONE_KILL_SCORE);
 
             if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
-                int score = Math.round(((float) damage / totalDamage) * 100);
+                int score = (int) Math.round(damage / totalDamage * 100);
 
                 target.character.onKill(target, this, score, false);
                 target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);

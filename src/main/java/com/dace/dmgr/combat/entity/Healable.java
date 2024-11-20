@@ -20,7 +20,7 @@ public interface Healable extends Damageable {
      * @param provider 제공자
      * @param amount   치유량
      * @param isUlt    궁극기 충전 여부
-     * @see Healer#onGiveHeal(Healable, int, boolean)
+     * @see Healer#onGiveHeal(Healable, double, boolean)
      */
-    void onTakeHeal(@Nullable Healer provider, int amount, boolean isUlt);
+    void onTakeHeal(@Nullable Healer provider, double amount, boolean isUlt);
 }

@@ -24,7 +24,7 @@ public final class CombatEffectUtil {
      * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBleedingEffect(@Nullable Location location, @Nullable LivingEntity entity, int damage) {
+    public static void playBleedingEffect(@Nullable Location location, @Nullable LivingEntity entity, double damage) {
         if (location == null && entity == null)
             return;
 
@@ -44,7 +44,7 @@ public final class CombatEffectUtil {
      * @param entity   대상 엔티티
      * @param damage   피해량
      */
-    public static void playBreakEffect(@Nullable Location location, @Nullable LivingEntity entity, int damage) {
+    public static void playBreakEffect(@Nullable Location location, @Nullable LivingEntity entity, double damage) {
         if (location == null && entity == null)
             return;
 

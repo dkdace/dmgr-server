@@ -143,12 +143,12 @@ public final class Jager extends Marksman {
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
         return attacker.getSkill(JagerUltInfo.getInstance()).getSummonEntity() == null;
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 

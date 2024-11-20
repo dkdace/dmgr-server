@@ -77,15 +77,15 @@ public final class GameUser implements Disposable {
     /** 입힌 피해량 */
     @Getter
     @Setter
-    private int damage = 0;
+    private double damage = 0;
     /** 막은 피해량 */
     @Getter
     @Setter
-    private int defend = 0;
+    private double defend = 0;
     /** 치유량 */
     @Getter
     @Setter
-    private int heal = 0;
+    private double heal = 0;
     /** 게임 시작 시점 (타임스탬프) */
     @Getter
     private long startTime = 0;

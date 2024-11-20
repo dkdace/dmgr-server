@@ -23,9 +23,9 @@ public interface Attacker extends CombatEntity {
      * @param damageType 피해 타입
      * @param isCrit     치명타 여부
      * @param isUlt      궁극기 충전 여부
-     * @see Damageable#onDamage(Attacker, int, int, DamageType, Location, boolean, boolean)
+     * @see Damageable#onDamage(Attacker, double, double, DamageType, Location, boolean, boolean)
      */
-    void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt);
+    void onAttack(@NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt);
 
     /**
      * 엔티티가 다른 엔티티를 죽였을 때 실행될 작업.

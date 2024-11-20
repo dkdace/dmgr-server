@@ -143,7 +143,7 @@ public final class Neace extends Support {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
 
         NeaceP1 skillp1 = victim.getSkill(NeaceP1Info.getInstance());
@@ -152,7 +152,7 @@ public final class Neace extends Support {
     }
 
     @Override
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         super.onGiveHeal(provider, target, amount);
 
         if (provider != target && target instanceof CombatUser)

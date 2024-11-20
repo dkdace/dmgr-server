@@ -258,7 +258,7 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        public void onAttack(@NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
+        public void onAttack(@NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
             combatUser.getSkill(JagerP1Info.getInstance()).setTarget(victim);
@@ -271,7 +271,7 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakEffect(location, entity, damage);

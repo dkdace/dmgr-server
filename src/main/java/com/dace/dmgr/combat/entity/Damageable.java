@@ -60,9 +60,9 @@ public interface Damageable extends CombatEntity {
      * @param location      맞은 위치
      * @param isCrit        치명타 여부
      * @param isUlt         궁극기 충전 여부
-     * @see Attacker#onAttack(Damageable, int, DamageType, boolean, boolean)
+     * @see Attacker#onAttack(Damageable, double, DamageType, boolean, boolean)
      */
-    void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
+    void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                   boolean isCrit, boolean isUlt);
 
     /**

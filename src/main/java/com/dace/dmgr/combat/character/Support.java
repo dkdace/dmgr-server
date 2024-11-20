@@ -60,7 +60,7 @@ public abstract class Support extends Character {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target) {
             if (CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) == 0) {
                 CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);

@@ -492,10 +492,10 @@ public final class Game implements Disposable {
                         StringFormUtil.BAR,
                 winColor, winText,
                 rankColors[scoreRank], (int) gameUser.getScore(), scoreRank + 1,
-                rankColors[damageRank], gameUser.getDamage(), damageRank + 1,
+                rankColors[damageRank], (int) gameUser.getDamage(), damageRank + 1,
                 rankColors[killRank], gameUser.getKill(), killRank + 1,
-                rankColors[defendRank], gameUser.getDefend(), defendRank + 1,
-                rankColors[healRank], gameUser.getHeal(), healRank + 1,
+                rankColors[defendRank], (int) gameUser.getDefend(), defendRank + 1,
+                rankColors[healRank], (int) gameUser.getHeal(), healRank + 1,
                 gameUser.getDeath(), moneyEarned, xpEarned);
         if (gamePlayMode.isRanked())
             gameUser.getUser().sendMessageInfo(

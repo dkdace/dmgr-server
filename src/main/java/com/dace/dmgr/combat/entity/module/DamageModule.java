@@ -72,7 +72,7 @@ public class DamageModule {
     @Getter
     private final AbilityStatus defenseMultiplierStatus;
     /** 보호막 목록 (보호막 ID : 보호막 양) */
-    private final HashMap<String, Integer> shieldMap = new HashMap<>();
+    private final HashMap<String, Double> shieldMap = new HashMap<>();
     /** 최대 체력 */
     @Getter
     protected int maxHealth;
@@ -139,14 +139,14 @@ public class DamageModule {
             if (combatEntity.isDisposed())
                 return false;
 
-            int current = getHealth();
+            double current = getHealth();
             int max = getMaxHealth();
             ChatColor color;
             if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
                 color = ChatColor.DARK_PURPLE;
-            else if (current <= max / 4)
+            else if (current <= max / 4.0)
                 color = ChatColor.RED;
-            else if (current <= max / 2)
+            else if (current <= max / 2.0)
                 color = ChatColor.YELLOW;
             else
                 color = ChatColor.GREEN;
@@ -174,8 +174,8 @@ public class DamageModule {
      *
      * @return 실제 체력×50 (체력 1줄 기준 1000)
      */
-    public final int getHealth() {
-        return (int) (Math.round(((LivingEntity) combatEntity.getEntity()).getHealth() * 50 * 100) / 100);
+    public final double getHealth() {
+        return ((LivingEntity) combatEntity.getEntity()).getHealth() * 50.0;
     }
 
     /**
@@ -183,7 +183,7 @@ public class DamageModule {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 1000)
      */
-    public final void setHealth(int health) {
+    public final void setHealth(double health) {
         ((LivingEntity) combatEntity.getEntity()).setHealth(Math.min(Math.max(0, health), getMaxHealth()) / 50.0);
     }
 
@@ -209,7 +209,7 @@ public class DamageModule {
      * @return 체력이 25% 이하이면 {@code true} 반환
      */
     public final boolean isLowHealth() {
-        return getHealth() <= getMaxHealth() / 4;
+        return getHealth() <= getMaxHealth() / 4.0;
     }
 
     /**
@@ -217,8 +217,8 @@ public class DamageModule {
      *
      * @return 실제 보호막×50 (체력 1줄 기준 1000)
      */
-    public final int getShield() {
-        return shieldMap.values().stream().mapToInt(Integer::intValue).sum();
+    public final double getShield() {
+        return shieldMap.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
     /**
@@ -227,8 +227,8 @@ public class DamageModule {
      * @param id 보호막 ID
      * @return 실제 보호막×50 (체력 1줄 기준 1000)
      */
-    public final int getShield(@NonNull String id) {
-        return shieldMap.getOrDefault(id, 0);
+    public final double getShield(@NonNull String id) {
+        return shieldMap.getOrDefault(id, 0.0);
     }
 
     /**
@@ -237,7 +237,7 @@ public class DamageModule {
      * @param id     보호막 ID
      * @param shield 실제 보호막×50 (체력 1줄 기준 1000)
      */
-    public final void setShield(@NonNull String id, int shield) {
+    public final void setShield(@NonNull String id, double shield) {
         if (shield <= 0)
             shieldMap.remove(id);
         else
@@ -283,7 +283,7 @@ public class DamageModule {
      * @param isUlt             궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      */
-    private boolean handleDamage(@Nullable Attacker attacker, int damage, double damageMultiplier, double defenseMultiplier,
+    private boolean handleDamage(@Nullable Attacker attacker, double damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage()
                 || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
@@ -297,8 +297,8 @@ public class DamageModule {
                 damageMultiplier = 1;
         }
 
-        damage *= (int) critMultiplier;
-        int finalDamage = Math.max(0, (int) (damage * (1 + damageMultiplier - defenseMultiplier)));
+        damage *= critMultiplier;
+        double finalDamage = Math.max(0, damage * (1 + damageMultiplier - defenseMultiplier));
 
         if (getShield() > 0 && damageType != DamageType.IGNORE_DEFENSE)
             for (String id : shieldMap.keySet()) {
@@ -313,7 +313,7 @@ public class DamageModule {
             }
 
         finalDamage = Math.min(finalDamage, getHealth());
-        int reducedDamage = Math.max(0, (int) (damage * damageMultiplier) - finalDamage);
+        double reducedDamage = Math.max(0, damage * damageMultiplier - finalDamage);
 
         if (attacker != null)
             attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
@@ -345,7 +345,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (damage < 0 || critMultiplier < 0)
             throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
 
@@ -367,7 +367,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         return damage(attacker, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 
@@ -383,7 +383,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+    public final boolean damage(@NonNull Projectile projectile, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (damage < 0 || critMultiplier < 0)
             throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
 
@@ -410,7 +410,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile projectile, int damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public final boolean damage(@NonNull Projectile projectile, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         return damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 

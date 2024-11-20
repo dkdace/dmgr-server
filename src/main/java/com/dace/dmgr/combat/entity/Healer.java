@@ -19,7 +19,7 @@ public interface Healer extends CombatEntity {
      * @param target 수급자
      * @param amount 치유량
      * @param isUlt  궁극기 충전 여부
-     * @see Healable#onTakeHeal(Healer, int, boolean)
+     * @see Healable#onTakeHeal(Healer, double, boolean)
      */
-    void onGiveHeal(@NonNull Healable target, int amount, boolean isUlt);
+    void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt);
 }

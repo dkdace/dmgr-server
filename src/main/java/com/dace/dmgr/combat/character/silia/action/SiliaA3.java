@@ -58,7 +58,7 @@ public final class SiliaA3 extends ChargeableSkill {
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_USE, combatUser.getEntity().getLocation());
 
-            int health = combatUser.getDamageModule().getHealth();
+            double health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth()
                         >= combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO)

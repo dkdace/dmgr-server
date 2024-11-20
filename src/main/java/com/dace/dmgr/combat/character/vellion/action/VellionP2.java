@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public final class VellionP2 extends AbstractSkill {
     /** 최근 피해량 */
-    private int damageAmount;
+    private double damageAmount;
 
     public VellionP2(@NonNull CombatUser combatUser) {
         super(combatUser);

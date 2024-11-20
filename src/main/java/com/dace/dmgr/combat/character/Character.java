@@ -152,9 +152,9 @@ public abstract class Character {
      * @param damageType 피해 타입
      * @param isCrit     치명타 여부
      * @return 궁극기 충전 여부
-     * @see Character#onDamage(CombatUser, Attacker, int, DamageType, Location, boolean)
+     * @see Character#onDamage(CombatUser, Attacker, double, DamageType, Location, boolean)
      */
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, int damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
         return true;
     }
 
@@ -167,9 +167,9 @@ public abstract class Character {
      * @param damageType 피해 타입
      * @param location   맞은 위치
      * @param isCrit     치명타 여부
-     * @see Character#onAttack(CombatUser, Damageable, int, DamageType, boolean)
+     * @see Character#onAttack(CombatUser, Damageable, double, DamageType, boolean)
      */
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         // 미사용
     }
 
@@ -180,9 +180,9 @@ public abstract class Character {
      * @param target   수급자
      * @param amount   치유량
      * @return 궁극기 충전 여부
-     * @see Character#onTakeHeal(CombatUser, Healer, int)
+     * @see Character#onTakeHeal(CombatUser, Healer, double)
      */
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, int amount) {
+    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         return true;
     }
 
@@ -192,9 +192,9 @@ public abstract class Character {
      * @param target   수급자
      * @param provider 제공자
      * @param amount   치유량
-     * @see Character#onGiveHeal(CombatUser, Healable, int)
+     * @see Character#onGiveHeal(CombatUser, Healable, double)
      */
-    public void onTakeHeal(@NonNull CombatUser target, @Nullable Healer provider, int amount) {
+    public void onTakeHeal(@NonNull CombatUser target, @Nullable Healer provider, double amount) {
         // 미사용
     }
 

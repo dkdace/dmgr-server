@@ -143,7 +143,7 @@ public final class Arkace extends Marksman {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, int damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
     }
 
