@@ -33,7 +33,7 @@ public final class VellionP2 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getDamageModule().heal(combatUser, (int) (damageAmount * VellionP2Info.HEAL_DAMAGE_RATIO), false);
+        combatUser.getDamageModule().heal(combatUser, damageAmount * VellionP2Info.HEAL_DAMAGE_RATIO, false);
     }
 
     @Override

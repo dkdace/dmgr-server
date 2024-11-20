@@ -256,7 +256,7 @@ public class DamageModule {
             if (setAbsorptionHeartsMethod == null)
                 setAbsorptionHeartsMethod = nmsPlayer.getClass().getMethod("setAbsorptionHearts", Float.TYPE);
 
-            setAbsorptionHeartsMethod.invoke(nmsPlayer, getShield() / 50F);
+            setAbsorptionHeartsMethod.invoke(nmsPlayer, (float) (getShield() / 50.0));
         } catch (Exception ex) {
             ConsoleLogger.severe("보호막을 표시할 수 없음", ex);
         }

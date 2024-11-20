@@ -46,8 +46,7 @@ public final class ArkaceA2 extends ActiveSkill {
         SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A2_USE, combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            int amount = (int) (ArkaceA2Info.HEAL / ArkaceA2Info.DURATION);
-            if (combatUser.getDamageModule().heal(combatUser, amount, true))
+            if (combatUser.getDamageModule().heal(combatUser, (double) ArkaceA2Info.HEAL / ArkaceA2Info.DURATION, true))
                 combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
 
             playTickEffect(i);

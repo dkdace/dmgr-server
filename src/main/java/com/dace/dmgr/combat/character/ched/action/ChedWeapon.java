@@ -124,7 +124,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, (int) (power * ChedWeaponInfo.MAX_DAMAGE), DamageType.NORMAL, getLocation(),
+            if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, getLocation(),
                     isCrit, true) && target instanceof CombatUser && isCrit)
                 combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
             return false;

@@ -12,7 +12,7 @@ public final class PalasP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Healable target = null;
     /** 최근 치유량 */
-    private int healAmount;
+    private double healAmount;
 
     public PalasP1(@NonNull CombatUser combatUser) {
         super(combatUser);

@@ -316,7 +316,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (i % 20 == 0) {
             if (hasCore(Core.REGENERATION))
-                damageModule.heal(this, (int) (damageModule.getMaxHealth() * (Core.REGENERATION.getValues()[0] / 100.0)), false);
+                damageModule.heal(this, damageModule.getMaxHealth() * Core.REGENERATION.getValues()[0] / 100.0, false);
 
             Validate.notNull(characterRecord);
 
@@ -594,7 +594,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (victim instanceof CombatUser) {
             if (hasCore(Core.HEALTH_DRAIN))
-                damageModule.heal(this, (int) (damage * (Core.HEALTH_DRAIN.getValues()[0] / 100.0)), false);
+                damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValues()[0] / 100.0, false);
 
             if (gameUser != null)
                 gameUser.setDamage(gameUser.getDamage() + damage);

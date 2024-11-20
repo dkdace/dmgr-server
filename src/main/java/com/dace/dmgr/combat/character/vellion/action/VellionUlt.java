@@ -269,7 +269,7 @@ public final class VellionUlt extends UltimateSkill {
 
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, (int) (target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO),
+            if (target.getDamageModule().damage(combatUser, target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO,
                     DamageType.FIXED, null, false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), VellionUltInfo.STUN_DURATION);
 

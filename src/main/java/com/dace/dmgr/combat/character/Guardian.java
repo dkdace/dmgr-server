@@ -47,10 +47,7 @@ public abstract class Guardian extends Character {
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
         TaskUtil.addTask(combatUser, new IntervalTask(i -> {
-            int amount = (int) (RoleTrait2Info.HEAL / RoleTrait2Info.DURATION);
-            if (i == 0)
-                amount += (int) (RoleTrait2Info.HEAL % RoleTrait2Info.DURATION);
-            combatUser.getDamageModule().heal(combatUser, amount, false);
+            combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION, false);
 
             return true;
         }, 1, RoleTrait2Info.DURATION));
