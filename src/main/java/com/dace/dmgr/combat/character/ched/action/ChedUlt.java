@@ -263,7 +263,7 @@ public final class ChedUlt extends UltimateSkill {
                     CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 double distance = center.distance(location);
-                int damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
+                double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
                 if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null,
                         false, false))
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(getLocation(), location.add(0, 1, 0))

@@ -35,7 +35,7 @@ public final class CombatUtil {
      *
      * <pre><code>
      * // 최종 피해량 : 10 (20m) ~ 5 (40m)
-     * int damage = getDistantDamage(10, distance, 20)
+     * double damage = getDistantDamage(10, distance, 20)
      * </code></pre>
      *
      * @param damage            피해량
@@ -44,7 +44,7 @@ public final class CombatUtil {
      * @return 최종 피해량
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static int getDistantDamage(int damage, double distance, double weakeningDistance) {
+    public static double getDistantDamage(double damage, double distance, double weakeningDistance) {
         if (distance < 0)
             throw new IllegalArgumentException("'distance'가 0 이상이어야 함");
         if (weakeningDistance < 0)
@@ -54,10 +54,10 @@ public final class CombatUtil {
             return damage;
 
         distance = distance - weakeningDistance;
-        int finalDamage = (int) ((damage / 2.0) * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0);
+        double finalDamage = damage / 2.0 * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0;
 
-        if (finalDamage < damage / 2)
-            finalDamage = damage / 2;
+        if (finalDamage < damage / 2.0)
+            finalDamage = damage / 2.0;
         else if (finalDamage < 0)
             finalDamage = 0;
 

@@ -185,9 +185,9 @@ public final class MagrittaA1 extends ActiveSkill {
         @Override
         public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
-            int damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
+            double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
                     MagrittaA1Info.RADIUS / 2.0);
-            int burning = CombatUtil.getDistantDamage((int) MagrittaA1Info.FIRE_DURATION, distance,
+            long burning = (long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
                     MagrittaA1Info.RADIUS / 2.0);
             if (target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null,
                     false, true)) {

@@ -282,9 +282,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                int damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance,
+                double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);
-                int burning = CombatUtil.getDistantDamage((int) InfernoWeaponInfo.FIRE_DURATION, distance,
+                long burning = (long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION, distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);
                 if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null,
                         false, true)) {

@@ -186,10 +186,10 @@ public final class MagrittaUlt extends UltimateSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            int damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, distance, MagrittaWeaponInfo.DISTANCE / 2.0);
+            double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, distance, MagrittaWeaponInfo.DISTANCE / 2.0);
             int shredding = target.getPropertyManager().getValue(Property.SHREDDING);
             if (shredding > 0)
-                damage = (int) (damage * (100 + (MagrittaT1Info.DAMAGE_INCREMENT * shredding)) / 100.0);
+                damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
             if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), false, false))
                 targets.put(target, targets.getOrDefault(target, 0) + 1);
 

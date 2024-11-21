@@ -125,7 +125,7 @@ public final class ArkaceA1 extends ActiveSkill {
             @Override
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                int damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, distance, ArkaceA1Info.RADIUS / 2.0);
+                double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, distance, ArkaceA1Info.RADIUS / 2.0);
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true))
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK));
 
