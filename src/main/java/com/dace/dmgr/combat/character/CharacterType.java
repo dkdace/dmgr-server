@@ -29,7 +29,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 /**
  * 지정할 수 있는 전투원의 목록.
@@ -92,7 +91,7 @@ public enum CharacterType {
                 if (clickType == ClickType.LEFT) {
                     GameUser gameUser = combatUser.getGameUser();
                     boolean isDuplicated = gameUser != null && gameUser.getTeam() != null &&
-                            Arrays.stream(gameUser.getTeam().getTeamUsers()).anyMatch(targetGameUser -> {
+                            gameUser.getTeam().getTeamUsers().stream().anyMatch(targetGameUser -> {
                                 CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
                                 Validate.notNull(targetCombatUser);
 

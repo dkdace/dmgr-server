@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.text.MessageFormat;
 import java.time.Instant;
@@ -137,7 +138,8 @@ public final class UserData extends YamlFile {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    public static UserData @NonNull [] getAllUserDatas() {
+    @Unmodifiable
+    public static Collection<@NonNull UserData> getAllUserDatas() {
         return UserDataRegistry.getInstance().getAllUserDatas();
     }
 

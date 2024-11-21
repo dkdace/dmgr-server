@@ -1,6 +1,7 @@
 package com.dace.dmgr;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -26,7 +27,8 @@ public abstract class Registry<K, V> {
      * @param key   키
      * @param value 값
      */
-    public final void add(@NonNull K key, @NonNull V value) {
+    @MustBeInvokedByOverriders
+    public void add(@NonNull K key, @NonNull V value) {
         getMap().putIfAbsent(key, value);
     }
 
@@ -35,7 +37,8 @@ public abstract class Registry<K, V> {
      *
      * @param key 키
      */
-    public final void remove(@NonNull K key) {
+    @MustBeInvokedByOverriders
+    public void remove(@NonNull K key) {
         getMap().remove(key);
     }
 
@@ -46,7 +49,8 @@ public abstract class Registry<K, V> {
      * @return 값
      */
     @Nullable
-    public final V get(@NonNull K key) {
+    @MustBeInvokedByOverriders
+    public V get(@NonNull K key) {
         return getMap().get(key);
     }
 }

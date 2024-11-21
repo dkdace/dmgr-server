@@ -62,7 +62,7 @@ public final class BlockCommand extends BaseCommandExecutor {
                     return;
                 }
                 default: {
-                    UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
+                    UserData targetUserData = UserData.getAllUserDatas().stream()
                             .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
                             .findFirst()
                             .orElse(null);

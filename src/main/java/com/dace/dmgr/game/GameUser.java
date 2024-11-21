@@ -33,7 +33,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.BiFunction;
 
@@ -246,9 +245,9 @@ public final class GameUser implements Disposable {
         for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
             column++;
             user.setTabListItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
-                    targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().length), Skins.getDot(targetTeam.getColor()));
+                    targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().size()), Skins.getDot(targetTeam.getColor()));
 
-            GameUser[] teamUsers = Arrays.stream(targetTeam.getTeamUsers())
+            GameUser[] teamUsers = targetTeam.getTeamUsers().stream()
                     .sorted(Comparator.comparing(GameUser::getScore).reversed())
                     .toArray(GameUser[]::new);
 

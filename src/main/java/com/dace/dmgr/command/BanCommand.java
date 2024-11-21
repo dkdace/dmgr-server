@@ -78,7 +78,7 @@ public final class BanCommand extends BaseCommandExecutor {
         User user = User.fromPlayer(player);
 
         if (args.length >= 1) {
-            UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
+            UserData targetUserData = UserData.getAllUserDatas().stream()
                     .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
                     .findFirst()
                     .orElse(null);

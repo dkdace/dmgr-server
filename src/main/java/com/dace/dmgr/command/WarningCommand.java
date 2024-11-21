@@ -49,7 +49,7 @@ public final class WarningCommand extends BaseCommandExecutor {
 
         UserData targetUserData = user.getUserData();
         if (args.length == 2) {
-            targetUserData = Arrays.stream(UserData.getAllUserDatas())
+            targetUserData = UserData.getAllUserDatas().stream()
                     .filter(target -> target.getPlayerName().equalsIgnoreCase(args[1]))
                     .findFirst()
                     .orElse(null);
@@ -79,7 +79,7 @@ public final class WarningCommand extends BaseCommandExecutor {
             return;
         }
 
-        UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
+        UserData targetUserData = UserData.getAllUserDatas().stream()
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(args[1]))
                 .findFirst()
                 .orElse(null);
@@ -133,7 +133,7 @@ public final class WarningCommand extends BaseCommandExecutor {
             return;
         }
 
-        UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
+        UserData targetUserData = UserData.getAllUserDatas().stream()
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(args[1]))
                 .findFirst()
                 .orElse(null);
@@ -169,7 +169,7 @@ public final class WarningCommand extends BaseCommandExecutor {
             return;
         }
 
-        UserData targetUserData = Arrays.stream(UserData.getAllUserDatas())
+        UserData targetUserData = UserData.getAllUserDatas().stream()
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(args[1]))
                 .findFirst()
                 .orElse(null);

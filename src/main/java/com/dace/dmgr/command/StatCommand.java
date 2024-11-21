@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public final class StatCommand extends BaseCommandExecutor {
 
         UserData targetUserData = user.getUserData();
         if (args.length == 1) {
-            targetUserData = Arrays.stream(UserData.getAllUserDatas())
+            targetUserData = UserData.getAllUserDatas().stream()
                     .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
                     .findFirst()
                     .orElse(null);

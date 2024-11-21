@@ -78,7 +78,7 @@ public final class CombatUtil {
     public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
         validateArgs(range);
 
-        return Arrays.stream(CombatEntity.getAllExcluded())
+        return CombatEntity.getAllExcluded().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()
@@ -111,7 +111,7 @@ public final class CombatUtil {
 
         if (game == null)
             return getNearCombatEntity(location, range, condition);
-        return Arrays.stream(game.getAllCombatEntities())
+        return game.getAllCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()
@@ -139,7 +139,7 @@ public final class CombatUtil {
     public static CombatEntity @NonNull [] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
         validateArgs(range);
 
-        return Arrays.stream(CombatEntity.getAllExcluded())
+        return CombatEntity.getAllExcluded().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()
@@ -168,7 +168,7 @@ public final class CombatUtil {
 
         if (game == null)
             return getNearCombatEntities(location, range, condition);
-        return Arrays.stream(game.getAllCombatEntities())
+        return game.getAllCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()

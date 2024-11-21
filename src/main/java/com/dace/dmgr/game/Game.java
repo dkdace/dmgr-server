@@ -20,6 +20,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -151,8 +152,9 @@ public final class Game implements Disposable {
      * @return 게임에 속한 모든 엔티티
      */
     @NonNull
-    public CombatEntity @NonNull [] getAllCombatEntities() {
-        return combatEntities.toArray(new CombatEntity[0]);
+    @Unmodifiable
+    public Collection<@NonNull CombatEntity> getAllCombatEntities() {
+        return combatEntities;
     }
 
     /**
@@ -176,8 +178,9 @@ public final class Game implements Disposable {
     }
 
     @NonNull
-    public GameUser @NonNull [] getGameUsers() {
-        return gameUsers.toArray(new GameUser[0]);
+    @Unmodifiable
+    public Collection<@NonNull GameUser> getGameUsers() {
+        return gameUsers;
     }
 
     /**
@@ -762,8 +765,9 @@ public final class Game implements Disposable {
         private int score;
 
         @NonNull
-        public GameUser @NonNull [] getTeamUsers() {
-            return teamUsers.toArray(new GameUser[0]);
+        @Unmodifiable
+        public Collection<@NonNull GameUser> getTeamUsers() {
+            return teamUsers;
         }
     }
 }

@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 
@@ -46,18 +47,18 @@ public final class RankUtil {
     private static AsyncTask<@NonNull Integer> updateRanking() {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                UserData[] userDatas = UserData.getAllUserDatas();
-                if (userDatas.length == 0) {
+                Collection<UserData> userDatas = UserData.getAllUserDatas();
+                if (userDatas.isEmpty()) {
                     onFinish.accept(0);
                     return;
                 }
 
-                ranking.put(Indicator.RANK_RATE, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getRankRate).reversed())
+                ranking.put(Indicator.RANK_RATE, userDatas.stream().sorted(Comparator.comparing(UserData::getRankRate).reversed())
                         .toArray(UserData[]::new));
-                ranking.put(Indicator.LEVEL, Arrays.stream(userDatas).sorted(Comparator.comparing(UserData::getLevel).reversed())
+                ranking.put(Indicator.LEVEL, userDatas.stream().sorted(Comparator.comparing(UserData::getLevel).reversed())
                         .toArray(UserData[]::new));
 
-                onFinish.accept(userDatas.length);
+                onFinish.accept(userDatas.size());
             } catch (Exception ex) {
                 onError.accept(ex);
             }

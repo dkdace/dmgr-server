@@ -17,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 /**
  * 전투원 선택 GUI 클래스.
@@ -58,7 +57,7 @@ public final class SelectChar extends Gui {
                 for (CharacterType characterType : CharacterType.values()) {
                     int index = indexes[characterType.getCharacter().getRole().ordinal()]++;
                     boolean isDuplicated = gameUser != null && gameUser.getTeam() != null &&
-                            Arrays.stream(gameUser.getTeam().getTeamUsers()).anyMatch(targetGameUser -> {
+                            gameUser.getTeam().getTeamUsers().stream().anyMatch(targetGameUser -> {
                                 CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
                                 Validate.notNull(targetCombatUser);
 
