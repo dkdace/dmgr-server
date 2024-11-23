@@ -1,6 +1,7 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.YamlFile;
 import com.dace.dmgr.combat.Core;
@@ -8,7 +9,10 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
-import lombok.*;
+import com.dace.dmgr.util.task.AsyncTask;
+import com.dace.dmgr.util.task.Initializable;
+import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.BanList;
@@ -18,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -27,13 +32,13 @@ import java.util.stream.Collectors;
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
  */
-public final class UserData extends YamlFile {
+public final class UserData implements Initializable<Void> {
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = "§c관리자에 의해 서버에서 차단되었습니다." +
             "\n" +
             "\n§f해제 일시 : §e{0}" +
             "\n" +
-            "\n§7문의 : " + GeneralConfig.getConfig().getAdminContact();
+            "\n§7문의 : {1}";
 
     /** 플레이어 UUID */
     @NonNull
@@ -43,52 +48,42 @@ public final class UserData extends YamlFile {
     @NonNull
     @Getter
     private final String playerName;
+
+    /** Yaml 파일 관리 인스턴스 */
+    private final YamlFile yamlFile;
+    /** 경험치 */
+    private final YamlFile.Section.Entry<Integer> xpEntry;
+    /** 레벨 */
+    private final YamlFile.Section.Entry<Integer> levelEntry;
+    /** 돈 */
+    private final YamlFile.Section.Entry<Integer> moneyEntry;
+    /** 차단한 플레이어의 UUID 목록 */
+    private final YamlFile.Section.ListEntry<String> blockedPlayersEntry;
+    /** 경고 횟수 */
+    private final YamlFile.Section.Entry<Integer> warningEntry;
+    /** 랭크 점수 (RR) */
+    private final YamlFile.Section.Entry<Integer> rankRateEntry;
+    /** 랭크게임 배치 완료 여부 */
+    private final YamlFile.Section.Entry<Boolean> isRankedEntry;
+    /** 매치메이킹 점수 (MMR) */
+    private final YamlFile.Section.Entry<Integer> matchMakingRateEntry;
+    /** 일반게임 플레이 횟수 */
+    private final YamlFile.Section.Entry<Integer> normalPlayCountEntry;
+    /** 랭크게임 플레이 횟수 */
+    private final YamlFile.Section.Entry<Integer> rankPlayCountEntry;
+    /** 승리 횟수 */
+    private final YamlFile.Section.Entry<Integer> winCountEntry;
+    /** 패배 횟수 */
+    private final YamlFile.Section.Entry<Integer> loseCountEntry;
+    /** 탈주 횟수 */
+    private final YamlFile.Section.Entry<Integer> quitCountEntry;
+
     /** 유저 개인 설정 */
     @NonNull
     @Getter
-    private final Config config = new Config();
+    private final Config config;
     /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
-    private final EnumMap<CharacterType, CharacterRecord> characterRecordMap = new EnumMap<>(CharacterType.class);
-    /** 경험치 */
-    @Getter
-    private int xp = 0;
-    /** 레벨 */
-    @Getter
-    private int level = 1;
-    /** 돈 */
-    @Getter
-    private int money = 0;
-    /** 차단한 플레이어의 UUID 목록 */
-    @Nullable
-    private List<String> blockedPlayers;
-    /** 경고 횟수 */
-    @Getter
-    private int warning = 0;
-
-    /** 랭크 점수 (RR) */
-    @Getter
-    private int rankRate = 100;
-    /** 랭크게임 배치 완료 여부 */
-    @Getter
-    private boolean isRanked = false;
-    /** 매치메이킹 점수 (MMR) */
-    @Getter
-    private int matchMakingRate = 100;
-    /** 일반게임 플레이 횟수 */
-    @Getter
-    private int normalPlayCount = 0;
-    /** 랭크게임 플레이 판 수 */
-    @Getter
-    private int rankPlayCount = 0;
-    /** 승리 횟수 */
-    @Getter
-    private int winCount = 0;
-    /** 패배 횟수 */
-    @Getter
-    private int loseCount = 0;
-    /** 탈주 횟수 */
-    @Getter
-    private int quitCount = 0;
+    private final EnumMap<CharacterType, CharacterRecord> characterRecordMap;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -97,9 +92,27 @@ public final class UserData extends YamlFile {
      * @param playerName 대상 플레이어 이름
      */
     private UserData(@NonNull UUID playerUUID, @NonNull String playerName) {
-        super("User/" + playerUUID);
+        this.yamlFile = new YamlFile(Paths.get("User", playerUUID + ".yml"));
         this.playerUUID = playerUUID;
         this.playerName = playerName;
+
+        YamlFile.Section section = yamlFile.getDefaultSection();
+        this.xpEntry = section.getEntry("xp", 0);
+        this.levelEntry = section.getEntry("level", 1);
+        this.moneyEntry = section.getEntry("money", 0);
+        this.blockedPlayersEntry = section.getListEntry("blockedPlayers");
+        this.warningEntry = section.getEntry("warning", 0);
+        this.rankRateEntry = section.getEntry("rankRate", 100);
+        this.isRankedEntry = section.getEntry("isRanked", false);
+        this.matchMakingRateEntry = section.getEntry("matchMakingRate", 100);
+        this.normalPlayCountEntry = section.getEntry("normalPlayCount", 0);
+        this.rankPlayCountEntry = section.getEntry("rankPlayCount", 0);
+        this.winCountEntry = section.getEntry("winCount", 0);
+        this.loseCountEntry = section.getEntry("loseCount", 0);
+        this.quitCountEntry = section.getEntry("quitCount", 0);
+
+        this.config = new Config();
+        this.characterRecordMap = new EnumMap<>(CharacterType.class);
         for (CharacterType characterType : CharacterType.values())
             characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
@@ -144,34 +157,30 @@ public final class UserData extends YamlFile {
     }
 
     @Override
-    protected void onInitFinish() {
-        set("playerName", playerName);
-        this.xp = (int) getLong("xp", xp);
-        this.level = (int) getLong("level", level);
-        this.money = (int) getLong("money", money);
-        this.warning = (int) getLong("warning", warning);
-        this.rankRate = (int) getLong("rankRate", rankRate);
-        this.isRanked = getBoolean("isRanked", isRanked);
-        this.matchMakingRate = (int) getLong("matchMakingRate", matchMakingRate);
-        this.normalPlayCount = (int) getLong("normalPlayCount", normalPlayCount);
-        this.rankPlayCount = (int) getLong("rankPlayCount", rankPlayCount);
-        this.winCount = (int) getLong("winCount", winCount);
-        this.loseCount = (int) getLong("loseCount", loseCount);
-        this.quitCount = (int) getLong("quitCount", quitCount);
-        this.blockedPlayers = getStringList("blockedPlayers");
+    @NonNull
+    public AsyncTask<Void> init() {
+        return yamlFile.init()
+                .onFinish(() -> {
+                    yamlFile.getDefaultSection().getEntry("playerName", "").set(playerName);
 
-        config.koreanChat = getBoolean("koreanChat", config.koreanChat);
-        config.nightVision = getBoolean("nightVision", config.nightVision);
-        config.chatSound = getString("chatSound", config.chatSound);
-
-        characterRecordMap.forEach((characterType, characterRecord) -> characterRecord.load());
-
-        ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
+                    ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
+                })
+                .onError(ex -> ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName));
     }
 
     @Override
-    protected void onInitError(@NonNull Exception ex) {
-        ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName);
+    public boolean isInitialized() {
+        return yamlFile.isInitialized();
+    }
+
+    /**
+     * 유저의 데이터 정보를 저장한다.
+     */
+    public void save() {
+        if (DMGR.getPlugin().isEnabled())
+            yamlFile.save();
+        else
+            yamlFile.saveSync();
     }
 
     /**
@@ -186,24 +195,34 @@ public final class UserData extends YamlFile {
     }
 
     /**
+     * @return 경험치
+     */
+    public int getXp() {
+        return xpEntry.get();
+    }
+
+    /**
      * 플레이어의 경험치를 설정하고 필요 경험치를 충족했을 경우 레벨을 증가시킨다.
      *
      * <p>레벨이 증가했을 경우 {@link User#playLevelUpEffect()}를 호출한다.</p>
      *
-     * @param xp 경험치
+     * @param xp 경험치. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setXp(int xp) {
+        Validate.inclusiveBetween(0, Integer.MAX_VALUE, xp);
+        validate();
+
         boolean levelup = false;
 
         while (xp >= getNextLevelXp()) {
             xp -= getNextLevelXp();
-            setLevel(level + 1);
+            levelEntry.set(levelEntry.get() + 1);
 
             levelup = true;
         }
 
-        this.xp = Math.max(0, xp);
-        set("xp", this.xp);
+        xpEntry.set(xp);
 
         if (levelup) {
             Player player = Bukkit.getPlayer(playerUUID);
@@ -216,14 +235,22 @@ public final class UserData extends YamlFile {
     }
 
     /**
+     * @return 레벨
+     */
+    public int getLevel() {
+        return levelEntry.get();
+    }
+
+    /**
      * 현재 레벨에 따른 칭호를 반환한다.
      *
      * @return 레벨 칭호
      */
     @NonNull
     public String getLevelPrefix() {
-        String color;
+        int level = levelEntry.get();
 
+        String color;
         if (level <= 100)
             color = "§f§l";
         else if (level <= 200)
@@ -238,19 +265,212 @@ public final class UserData extends YamlFile {
         return color + "[ Lv." + level + " ]";
     }
 
-    public void setLevel(int level) {
-        this.level = Math.max(0, level);
-        set("level", this.level);
+    /**
+     * @return 돈
+     */
+    public int getMoney() {
+        return moneyEntry.get();
     }
 
+    /**
+     * @param money 돈. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
     public void setMoney(int money) {
-        this.money = Math.max(0, money);
-        set("money", this.money);
+        Validate.inclusiveBetween(0, Integer.MAX_VALUE, money);
+        moneyEntry.set(money);
     }
 
+    /**
+     * @return 경고 횟수
+     */
+    public int getWarning() {
+        return warningEntry.get();
+    }
+
+    /**
+     * @param warning 경고 횟수. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
     public void setWarning(int warning) {
-        this.warning = Math.max(0, warning);
-        set("warning", this.warning);
+        Validate.inclusiveBetween(0, Integer.MAX_VALUE, warning);
+        warningEntry.set(warning);
+    }
+
+    /**
+     * @return 랭크 점수 (RR)
+     */
+    public int getRankRate() {
+        return rankRateEntry.get();
+    }
+
+    /**
+     * 플레이어의 랭크 점수를 설정한다.
+     *
+     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는
+     * {@link User#playTierDownEffect()}를 호출한다.</p>
+     *
+     * @param rankRate 랭크 점수 (RR)
+     */
+    public void setRankRate(int rankRate) {
+        Tier tier = getTier();
+        rankRateEntry.set(rankRate);
+
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null)
+            return;
+
+        User user = User.fromPlayer(player);
+        if (getTier().getMinScore() > tier.getMinScore())
+            user.playTierUpEffect();
+        else if (getTier().getMinScore() < tier.getMinScore())
+            user.playTierDownEffect();
+    }
+
+    /**
+     * @return 랭크게임 배치 완료 여부
+     */
+    public boolean isRanked() {
+        return isRankedEntry.get();
+    }
+
+    /**
+     * @param isRanked 랭크게임 배치 완료 여부
+     */
+    public void setRanked(boolean isRanked) {
+        isRankedEntry.set(isRanked);
+    }
+
+    /**
+     * @return 매치메이킹 점수 (MMR)
+     */
+    public int getMatchMakingRate() {
+        return matchMakingRateEntry.get();
+    }
+
+    /**
+     * @param matchMakingRate 매치메이킹 점수 (MMR)
+     */
+    public void setMatchMakingRate(int matchMakingRate) {
+        matchMakingRateEntry.set(matchMakingRate);
+    }
+
+    /**
+     * @return 일반게임 플레이 횟수
+     */
+    public int getNormalPlayCount() {
+        return normalPlayCountEntry.get();
+    }
+
+    /**
+     * 일반게임 플레이 횟수를 1 증가시킨다.
+     */
+    public void addNormalPlayCount() {
+        normalPlayCountEntry.set(normalPlayCountEntry.get() + 1);
+    }
+
+    /**
+     * @return 랭크게임 플레이 횟수
+     */
+    public int getRankPlayCount() {
+        return rankPlayCountEntry.get();
+    }
+
+    /**
+     * 랭크게임 플레이 횟수를 1 증가시킨다.
+     */
+    public void addRankPlayCount() {
+        rankPlayCountEntry.set(rankPlayCountEntry.get() + 1);
+    }
+
+    /**
+     * @return 승리 횟수
+     */
+    public int getWinCount() {
+        return winCountEntry.get();
+    }
+
+    /**
+     * 승리 횟수를 1 증가시킨다.
+     */
+    public void addWinCount() {
+        winCountEntry.set(winCountEntry.get() + 1);
+    }
+
+    /**
+     * @return 패배 횟수
+     */
+    public int getLoseCount() {
+        return loseCountEntry.get();
+    }
+
+    /**
+     * 패배 횟수를 1 증가시킨다.
+     */
+    public void addLoseCount() {
+        loseCountEntry.set(loseCountEntry.get() + 1);
+    }
+
+    /**
+     * @return 탈주 횟수
+     */
+    public int getQuitCount() {
+        return quitCountEntry.get();
+    }
+
+    /**
+     * 탈주 횟수를 1 증가시킨다.
+     */
+    public void addQuitCount() {
+        quitCountEntry.set(quitCountEntry.get() + 1);
+    }
+
+    /**
+     * 차단한 플레이어 목록을 반환한다.
+     *
+     * @return 차단한 플레이어 목록의 유저 데이터 정보
+     */
+    @NonNull
+    public UserData @NonNull [] getBlockedPlayers() {
+        return blockedPlayersEntry.get().stream()
+                .map(uuid -> UserData.fromUUID(UUID.fromString(uuid)))
+                .toArray(UserData[]::new);
+    }
+
+    /**
+     * 지정한 플레이어가 차단되었는지 확인한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     * @return 차단 여부
+     */
+    public boolean isBlockedPlayer(@NonNull UserData userData) {
+        return blockedPlayersEntry.get().contains(userData.getPlayerUUID().toString());
+    }
+
+    /**
+     * 지정한 플레이어를 차단 목록에 추가한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     */
+    public void addBlockedPlayer(@NonNull UserData userData) {
+        if (!isBlockedPlayer(userData))
+            blockedPlayersEntry.add(userData.getPlayerUUID().toString());
+    }
+
+    /**
+     * 지정한 플레이어를 차단 목록에서 제거한다.
+     *
+     * @param userData 대상 플레이어의 유저 데이터 정보
+     */
+    public void removeBlockedPlayer(@NonNull UserData userData) {
+        blockedPlayersEntry.remove(userData.getPlayerUUID().toString());
+    }
+
+    /**
+     * 차단 목록을 초기화한다.
+     */
+    public void clearBlockedPlayers() {
+        blockedPlayersEntry.set(null);
     }
 
     /**
@@ -261,9 +481,12 @@ public final class UserData extends YamlFile {
      * @param days   기간 (일). 0 이상의 값
      * @param reason 차단 사유
      * @return 차단 해제 날짜
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public Date ban(int days, @Nullable String reason) {
+        Validate.inclusiveBetween(0, Integer.MAX_VALUE, days);
+
         if (reason == null)
             reason = "없음";
 
@@ -274,7 +497,7 @@ public final class UserData extends YamlFile {
 
         Date endDate = Date.from(startDate.toInstant().plus(days, ChronoUnit.DAYS));
         String finalReason = GeneralConfig.getConfig().getMessagePrefix() + MessageFormat.format(MESSAGE_BANNED,
-                DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"));
+                DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"), GeneralConfig.getConfig().getAdminContact());
         banList.addBan(playerName, reason + "\n\n" + finalReason, endDate, null);
 
         Player player = Bukkit.getPlayer(playerUUID);
@@ -306,122 +529,6 @@ public final class UserData extends YamlFile {
     }
 
     /**
-     * 플레이어의 랭크 점수를 설정한다.
-     *
-     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는
-     * {@link User#playTierDownEffect()}를 호출한다.</p>
-     *
-     * @param rankRate 랭크 점수 (RR)
-     */
-    public void setRankRate(int rankRate) {
-        Tier tier = getTier();
-
-        this.rankRate = rankRate;
-        set("rankRate", this.rankRate);
-
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player == null)
-            return;
-
-        User user = User.fromPlayer(player);
-        if (getTier().getMinScore() > tier.getMinScore())
-            user.playTierUpEffect();
-        else if (getTier().getMinScore() < tier.getMinScore())
-            user.playTierDownEffect();
-    }
-
-    public void setRanked(boolean ranked) {
-        this.isRanked = ranked;
-        set("isRanked", this.isRanked);
-    }
-
-    public void setMatchMakingRate(int matchMakingRate) {
-        this.matchMakingRate = matchMakingRate;
-        set("matchMakingRate", this.matchMakingRate);
-    }
-
-    public void setNormalPlayCount(int normalPlayCount) {
-        this.normalPlayCount = Math.max(0, normalPlayCount);
-        set("normalPlayCount", this.normalPlayCount);
-    }
-
-    public void setRankPlayCount(int rankPlayCount) {
-        this.rankPlayCount = Math.max(0, rankPlayCount);
-        set("rankPlayCount", this.rankPlayCount);
-    }
-
-    public void setWinCount(int winCount) {
-        this.winCount = Math.max(0, winCount);
-        set("winCount", this.winCount);
-    }
-
-    public void setLoseCount(int loseCount) {
-        this.loseCount = Math.max(0, loseCount);
-        set("loseCount", this.loseCount);
-    }
-
-    public void setQuitCount(int quitCount) {
-        this.quitCount = Math.max(0, quitCount);
-        set("quitCount", this.quitCount);
-    }
-
-    /**
-     * 차단한 플레이어 목록을 반환한다.
-     *
-     * @return 차단한 플레이어 목록의 유저 데이터 정보
-     */
-    @NonNull
-    public UserData @NonNull [] getBlockedPlayers() {
-        Validate.notNull(blockedPlayers);
-        return this.blockedPlayers.stream().map(uuid -> UserData.fromUUID(UUID.fromString(uuid))).toArray(UserData[]::new);
-    }
-
-    /**
-     * 지정한 플레이어가 차단되었는지 확인한다.
-     *
-     * @param userData 대상 플레이어의 유저 데이터 정보
-     * @return 차단 여부
-     */
-    public boolean isBlockedPlayer(@NonNull UserData userData) {
-        Validate.notNull(blockedPlayers);
-        return this.blockedPlayers.contains(userData.getPlayerUUID().toString());
-    }
-
-    /**
-     * 지정한 플레이어를 차단 목록에 추가한다.
-     *
-     * @param userData 대상 플레이어의 유저 데이터 정보
-     */
-    public void addBlockedPlayer(@NonNull UserData userData) {
-        Validate.notNull(blockedPlayers);
-
-        this.blockedPlayers.add(userData.getPlayerUUID().toString());
-        set("blockedPlayers", this.blockedPlayers);
-    }
-
-    /**
-     * 지정한 플레이어를 차단 목록에서 제거한다.
-     *
-     * @param userData 대상 플레이어의 유저 데이터 정보
-     */
-    public void removeBlockedPlayer(@NonNull UserData userData) {
-        Validate.notNull(blockedPlayers);
-
-        this.blockedPlayers.remove(userData.getPlayerUUID().toString());
-        set("blockedPlayers", this.blockedPlayers);
-    }
-
-    /**
-     * 차단 목록을 초기화한다.
-     */
-    public void clearBlockedPlayers() {
-        Validate.notNull(blockedPlayers);
-
-        this.blockedPlayers.clear();
-        set("blockedPlayers", this.blockedPlayers);
-    }
-
-    /**
      * 전체 게임 플레이 시간을 반환한다.
      *
      * @return 게임 플레이 시간 (초)
@@ -429,7 +536,7 @@ public final class UserData extends YamlFile {
     public int getPlayTime() {
         int totalPlayTime = 0;
         for (CharacterRecord characterRecord : characterRecordMap.values())
-            totalPlayTime += characterRecord.playTime;
+            totalPlayTime += characterRecord.playTimeEntry.get();
 
         return totalPlayTime;
     }
@@ -441,10 +548,11 @@ public final class UserData extends YamlFile {
      */
     @NonNull
     public Tier getTier() {
-        if (!isRanked)
+        if (!isRankedEntry.get())
             return Tier.NONE;
 
         int rank = RankUtil.getRankIndex(RankUtil.Indicator.RANK_RATE, this);
+        int rankRate = rankRateEntry.get();
 
         if (rankRate <= Tier.STONE.getMaxScore())
             return Tier.STONE;
@@ -465,7 +573,7 @@ public final class UserData extends YamlFile {
      * @return 레벨업에 필요한 경험치
      */
     public int getNextLevelXp() {
-        return 250 + (level * 50);
+        return 250 + (levelEntry.get() * 50);
     }
 
     /**
@@ -482,69 +590,126 @@ public final class UserData extends YamlFile {
     /**
      * 유저 개인 설정.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class Config {
         /** 채팅 효과음 */
-        private String chatSound = ChatSoundOption.ChatSound.PLING.toString();
+        private final YamlFile.Section.Entry<String> chatSoundEntry;
         /** 한글 채팅 여부 */
-        @Getter
-        private boolean koreanChat = false;
+        private final YamlFile.Section.Entry<Boolean> koreanChatEntry;
         /** 야간 투시 여부 */
-        @Getter
-        private boolean nightVision = false;
+        private final YamlFile.Section.Entry<Boolean> nightVisionEntry;
 
+        private Config() {
+            YamlFile.Section section = yamlFile.getDefaultSection();
+            this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING.toString());
+            this.koreanChatEntry = section.getEntry("koreanChat", false);
+            this.nightVisionEntry = section.getEntry("nightVision", false);
+        }
+
+        /**
+         * @return 채팅 효과음
+         */
         @NonNull
         public ChatSoundOption.ChatSound getChatSound() {
-            return ChatSoundOption.ChatSound.valueOf(chatSound);
+            return ChatSoundOption.ChatSound.valueOf(chatSoundEntry.get());
         }
 
+        /**
+         * @param chatSound 채팅 효과음
+         */
         public void setChatSound(@NonNull ChatSoundOption.ChatSound chatSound) {
-            this.chatSound = chatSound.toString();
-            set("chatSound", this.chatSound);
+            chatSoundEntry.set(chatSound.toString());
         }
 
-        public void setKoreanChat(boolean koreanChat) {
-            this.koreanChat = koreanChat;
-            set("koreanChat", this.koreanChat);
+        /**
+         * @return 한글 채팅 여부
+         */
+        public boolean isKoreanChat() {
+            return koreanChatEntry.get();
         }
 
-        public void setNightVision(boolean nightVision) {
-            this.nightVision = nightVision;
-            set("nightVision", this.nightVision);
+        /**
+         * @param isKoreanChat 한글 채팅 여부
+         */
+        public void setKoreanChat(boolean isKoreanChat) {
+            koreanChatEntry.set(isKoreanChat);
+        }
+
+        /**
+         * @return 야간 투시 여부
+         */
+        public boolean isNightVision() {
+            return nightVisionEntry.get();
+        }
+
+        /**
+         * @param isNightVision 야간 투시 여부
+         */
+        public void setNightVision(boolean isNightVision) {
+            nightVisionEntry.set(isNightVision);
         }
     }
 
     /**
      * 전투원 기록 정보.
      */
-    @RequiredArgsConstructor
     public final class CharacterRecord {
-        /** 섹션 이름 */
-        private static final String SECTION = "record";
-        /** 전투원 종류 */
-        @NonNull
-        private final CharacterType characterType;
         /** 킬 */
-        @Getter
-        private int kill = 0;
+        private final YamlFile.Section.Entry<Integer> killEntry;
         /** 데스 */
-        @Getter
-        private int death = 0;
+        private final YamlFile.Section.Entry<Integer> deathEntry;
         /** 플레이 시간 (초) */
-        @Getter
-        private int playTime = 0;
+        private final YamlFile.Section.Entry<Integer> playTimeEntry;
         /** 적용된 코어의 이름 목록 */
-        @Nullable
-        private List<String> cores;
+        private final YamlFile.Section.ListEntry<String> coresEntry;
+
+        private CharacterRecord(@NonNull CharacterType characterType) {
+            YamlFile.Section section = yamlFile.getDefaultSection().getSection("record").getSection(characterType.toString());
+            this.killEntry = section.getEntry("kill", 0);
+            this.deathEntry = section.getEntry("death", 0);
+            this.playTimeEntry = section.getEntry("playTime", 0);
+            this.coresEntry = section.getListEntry("cores");
+        }
 
         /**
-         * 데이터를 불러온다.
+         * @return 킬
          */
-        private void load() {
-            kill = (int) getLong(SECTION + "." + characterType + ".kill", this.kill);
-            death = (int) getLong(SECTION + "." + characterType + ".death", this.death);
-            playTime = (int) getLong(SECTION + "." + characterType + ".playTime", this.playTime);
-            cores = getStringList(SECTION + "." + characterType + ".cores");
+        public int getKill() {
+            return killEntry.get();
+        }
+
+        /**
+         * 킬 수를 1 증가시킨다.
+         */
+        public void addKill() {
+            killEntry.set(killEntry.get() + 1);
+        }
+
+        /**
+         * @return 데스
+         */
+        public int getDeath() {
+            return deathEntry.get();
+        }
+
+        /**
+         * 데스 수를 1 증가시킨다.
+         */
+        public void addDeath() {
+            deathEntry.set(deathEntry.get() + 1);
+        }
+
+        /**
+         * @return 플레이 시간 (초)
+         */
+        public int getPlayTime() {
+            return playTimeEntry.get();
+        }
+
+        /**
+         * 플레이 시간을 1초 증가시킨다.
+         */
+        public void addPlayTime() {
+            playTimeEntry.set(playTimeEntry.get() + 1);
         }
 
         /**
@@ -553,9 +718,9 @@ public final class UserData extends YamlFile {
          * @return 적용된 코어 목록
          */
         @NonNull
+        @Unmodifiable
         public Set<@NonNull Core> getCores() {
-            Validate.notNull(cores);
-            return this.cores.stream().map(Core::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class)));
+            return coresEntry.get().stream().map(Core::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class)));
         }
 
         /**
@@ -564,10 +729,8 @@ public final class UserData extends YamlFile {
          * @param core 추가할 코어
          */
         public void addCore(@NonNull Core core) {
-            Validate.notNull(cores);
-
-            this.cores.add(core.toString());
-            set(SECTION + "." + characterType + ".cores", this.cores);
+            if (!coresEntry.get().contains(core.toString()))
+                coresEntry.add(core.toString());
         }
 
         /**
@@ -576,25 +739,7 @@ public final class UserData extends YamlFile {
          * @param core 제거할 코어
          */
         public void removeCore(@NonNull Core core) {
-            Validate.notNull(cores);
-
-            this.cores.remove(core.toString());
-            set(SECTION + "." + characterType + ".cores", this.cores);
-        }
-
-        public void setKill(int kill) {
-            this.kill = kill;
-            set(SECTION + "." + characterType + ".kill", this.kill);
-        }
-
-        public void setDeath(int death) {
-            this.death = death;
-            set(SECTION + "." + characterType + ".death", this.death);
-        }
-
-        public void setPlayTime(int playTime) {
-            this.playTime = playTime;
-            set(SECTION + "." + characterType + ".playTime", this.playTime);
+            coresEntry.remove(core.toString());
         }
     }
 }

@@ -61,7 +61,7 @@ public final class User implements Disposable {
             "\n" +
             "\n§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오." +
             "\n" +
-            "\n§7오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
+            "\n§7오류 문의 : {0}";
     /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_DENY = "§c리소스팩 적용을 활성화 하십시오." +
             "\n" +
@@ -69,7 +69,7 @@ public final class User implements Disposable {
             "\n" +
             "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
             "\n" +
-            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
+            "\n§7다운로드 오류 문의 : {0}";
 
     /** 플레이어 객체 */
     @NonNull
@@ -150,7 +150,8 @@ public final class User implements Disposable {
             TaskUtil.addTask(this, userData.init()
                     .onFinish(this::onInit)
                     .onError(ex -> TaskUtil.addTask(User.this, new DelayTask(() ->
-                            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR), 60))));
+                            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix()
+                                    + MessageFormat.format(MESSAGE_KICK_ERR, GeneralConfig.getConfig().getAdminContact())), 60))));
     }
 
     /**
@@ -213,10 +214,7 @@ public final class User implements Disposable {
                 nameTagHider = null;
             }
 
-            if (DMGR.getPlugin().isEnabled())
-                userData.save();
-            else
-                userData.saveSync();
+            userData.save();
         }
     }
 
@@ -266,7 +264,8 @@ public final class User implements Disposable {
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             if (!isResourcePackAccepted)
-                player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_DENY);
+                player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix()
+                        + MessageFormat.format(MESSAGE_KICK_DENY, GeneralConfig.getConfig().getAdminContact()));
         }, GeneralConfig.getConfig().getResourcePackTimeout() * 20L));
     }
 

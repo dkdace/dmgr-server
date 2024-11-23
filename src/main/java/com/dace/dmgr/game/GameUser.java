@@ -190,7 +190,7 @@ public final class GameUser implements Disposable {
 
         GameUserRegistry.getInstance().remove(user);
         if (game.getPhase() == Game.Phase.READY || game.getPhase() == Game.Phase.PLAYING)
-            user.getUserData().setQuitCount(user.getUserData().getQuitCount() + 1);
+            user.getUserData().addQuitCount();
         game.removePlayer(this);
         TaskUtil.clearTask(this);
     }
@@ -285,7 +285,7 @@ public final class GameUser implements Disposable {
         Validate.notNull(combatUser.getCharacterType());
 
         UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
-        characterRecord.setKill(characterRecord.getKill() + 1);
+        characterRecord.addKill();
 
         if (isFinalHit) {
             kill += 1;
@@ -304,7 +304,7 @@ public final class GameUser implements Disposable {
         Validate.notNull(combatUser.getCharacterType());
 
         UserData.CharacterRecord characterRecord = user.getUserData().getCharacterRecord(combatUser.getCharacterType());
-        characterRecord.setDeath(characterRecord.getDeath() + 1);
+        characterRecord.addDeath();
         death += 1;
     }
 

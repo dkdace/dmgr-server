@@ -430,9 +430,9 @@ public final class Game implements Disposable {
 
             UserData userData = gameUser.getUser().getUserData();
             if (Boolean.TRUE.equals(isWinner))
-                userData.setWinCount(userData.getWinCount() + 1);
+                userData.addWinCount();
             else if (Boolean.FALSE.equals(isWinner))
-                userData.setLoseCount(userData.getLoseCount() + 1);
+                userData.addLoseCount();
 
             sendResultReport(gameUser, isWinner,
                     scoreRank.get(gameUser.getTeam()).indexOf(gameUser),
@@ -597,7 +597,7 @@ public final class Game implements Disposable {
         int gameAverageMMR = (int) gameUser.getGame().getAverageMMR();
 
         userData.setMatchMakingRate(GameReward.getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
-        userData.setNormalPlayCount(normalPlayCount + 1);
+        userData.addNormalPlayCount();
 
         ConsoleLogger.info("{0}의 유저 MMR 변동됨: {1} -> {2}, 일반 매치 플레이 횟수: {3}",
                 gameUser.getPlayer().getName(), mmr, userData.getMatchMakingRate(), normalPlayCount + 1);
@@ -623,7 +623,7 @@ public final class Game implements Disposable {
         int gameAverageRank = (int) gameUser.getGame().getAverageRankRate();
 
         userData.setMatchMakingRate(GameReward.getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
-        userData.setRankPlayCount(rankPlayCount + 1);
+        userData.addRankPlayCount();
 
         if (!userData.isRanked()) {
             if (rankPlayCount + 1 >= GeneralConfig.getGameConfig().getRankPlacementPlayCount()) {

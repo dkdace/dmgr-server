@@ -7,13 +7,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
+import java.text.MessageFormat;
+
 public final class OnPlayerResourcePackStatus implements Listener {
     /** 리소스팩 오류로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c리소스팩 적용 중 오류가 발생했습니다." +
             "\n" +
             "\n§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오." +
             "\n" +
-            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
+            "\n§7다운로드 오류 문의 : {0}";
 
     @EventHandler
     public static void event(PlayerResourcePackStatusEvent event) {
@@ -24,6 +26,7 @@ public final class OnPlayerResourcePackStatus implements Listener {
                 || event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED);
 
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
-            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR);
+            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix()
+                    + MessageFormat.format(MESSAGE_KICK_ERR, GeneralConfig.getConfig().getAdminContact()));
     }
 }

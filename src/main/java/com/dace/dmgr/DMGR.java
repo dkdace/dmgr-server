@@ -20,7 +20,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -127,23 +126,27 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        ConsoleLogger.info("플러그인 활성화 완료");
+        GeneralConfig.getInstance().init()
+                .onFinish(this::loadUserDatas)
+                .onFinish(RankUtil::run)
+                .onFinish(() -> {
+                    EventManager.register();
+                    clearUnusedEntities();
+                    WorldUtil.clearDuplicatedWorlds();
 
-        GeneralConfig.getInstance().init();
-        loadUserDatas().onFinish(RankUtil::run);
-        EventManager.register();
-        clearUnusedEntities();
-        WorldUtil.clearDuplicatedWorlds();
+                    defaultWorld = Bukkit.getWorld("DMGR");
+                    registerCommands();
+                    registerTestCommands();
 
-        defaultWorld = Bukkit.getWorld("DMGR");
-        registerCommands();
-        registerTestCommands();
+                    ConsoleLogger.info("플러그인 활성화 완료");
 
-        Bukkit.getOnlinePlayers().forEach((Player player) -> {
-            User user = User.fromPlayer(player);
-            user.init();
-            user.sendMessageInfo("시스템 재부팅 완료");
-        });
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        User user = User.fromPlayer(player);
+                        user.init();
+                        user.sendMessageInfo("시스템 재부팅 완료");
+                    });
+                })
+                .onError(ex -> ConsoleLogger.severe("플러그인 활성화 실패", ex));
     }
 
     /**
@@ -151,10 +154,11 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        HologramUtil.clearHologram();
+
         ConsoleLogger.info("플러그인 비활성화 완료");
 
-        HologramUtil.clearHologram();
-        Bukkit.getOnlinePlayers().forEach((Player player) -> {
+        Bukkit.getOnlinePlayers().forEach(player -> {
             User user = User.fromPlayer(player);
             user.sendMessageInfo("시스템 재부팅 중...");
             user.dispose();

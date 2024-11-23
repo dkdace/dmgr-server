@@ -321,7 +321,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             Validate.notNull(characterRecord);
 
             if (gameUser != null && gameUser.getSpawnRegionTeam() == null)
-                characterRecord.setPlayTime(characterRecord.getPlayTime() + 1);
+                characterRecord.addPlayTime();
         }
     }
 
