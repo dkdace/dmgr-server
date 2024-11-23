@@ -26,10 +26,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 플러그인 메인 클래스.
@@ -37,28 +38,23 @@ import java.util.UUID;
 public class DMGR extends JavaPlugin {
     /** 일시적인 엔티티의 사용자 지정 이름 */
     public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
+
     /** 난수 생성 객체 */
     @NonNull
     @Getter
     private static final Random random = new Random();
-    /** 기본 월드 객체 */
+    /** 탭리스트 관리 인스턴스 */
     @Nullable
-    private static World defaultWorld;
-
-    /** 탭리스트 관리 객체 */
-    private static Tabbed tabbed = null;
-    /** 홀로그램 관리 객체 */
-    private static HolographicDisplaysAPI holographicDisplaysAPI = null;
-    /** 스킨 API 객체 */
-    private static SkinsRestorerAPI skinsRestorerAPI = null;
-
-    @NonNull
-    public static World getDefaultWorld() {
-        if (defaultWorld == null)
-            throw new IllegalStateException("아직 기본 월드에 접근할 수 없음");
-
-        return defaultWorld;
-    }
+    private static Tabbed tabbed;
+    /** 홀로그램 관리 API 인스턴스 */
+    @Nullable
+    private static HolographicDisplaysAPI holographicDisplaysAPI;
+    /** 스킨 관리 API 인스턴스 */
+    @Nullable
+    private static SkinsRestorerAPI skinsRestorerAPI;
+    /** 기본 월드 인스턴스 */
+    @Nullable
+    private World defaultWorld;
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -70,6 +66,20 @@ public class DMGR extends JavaPlugin {
         return JavaPlugin.getPlugin(DMGR.class);
     }
 
+    /**
+     * @return 기본 월드 인스턴스
+     */
+    @NonNull
+    public static World getDefaultWorld() {
+        if (getPlugin().defaultWorld == null)
+            throw new IllegalStateException("아직 기본 월드에 접근할 수 없음");
+
+        return getPlugin().defaultWorld;
+    }
+
+    /**
+     * @return 탭리스트 관리 인스턴스
+     */
     @NonNull
     public static Tabbed getTabbed() {
         if (tabbed == null)
@@ -77,6 +87,9 @@ public class DMGR extends JavaPlugin {
         return tabbed;
     }
 
+    /**
+     * @return 홀로그램 관리 API 인스턴스
+     */
     @NonNull
     public static HolographicDisplaysAPI getHolographicDisplaysAPI() {
         if (holographicDisplaysAPI == null)
@@ -84,6 +97,9 @@ public class DMGR extends JavaPlugin {
         return holographicDisplaysAPI;
     }
 
+    /**
+     * @return 스킨 관리 API 인스턴스
+     */
     @NonNull
     public static SkinsRestorerAPI getSkinsRestorerAPI() {
         if (skinsRestorerAPI == null)
@@ -175,15 +191,11 @@ public class DMGR extends JavaPlugin {
         if (userDataFiles == null)
             return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
 
-        List<AsyncTask<?>> userDataInitTasks = new ArrayList<>();
-
-        for (File userDataFile : userDataFiles) {
-            UUID uuid = UUID.fromString(FilenameUtils.removeExtension(userDataFile.getName()));
-            UserData userData = UserData.fromUUID(uuid);
-
-            if (!userData.isInitialized())
-                userDataInitTasks.add(userData.init());
-        }
+        List<AsyncTask<?>> userDataInitTasks = Arrays.stream(userDataFiles)
+                .map(userDataFile -> UserData.fromUUID(UUID.fromString(FilenameUtils.removeExtension(userDataFile.getName()))))
+                .filter(userData -> !userData.isInitialized())
+                .map(UserData::init)
+                .collect(Collectors.toList());
 
         return AsyncTask.all(userDataInitTasks);
     }
@@ -192,7 +204,8 @@ public class DMGR extends JavaPlugin {
      * 사용되지 않는 모든 엔티티를 제거한다.
      */
     private void clearUnusedEntities() {
-        Bukkit.getWorlds().stream().flatMap(world -> world.getEntities().stream())
+        Bukkit.getWorlds().stream()
+                .flatMap(world -> world.getEntities().stream())
                 .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
     }
@@ -225,14 +238,14 @@ public class DMGR extends JavaPlugin {
     }
 
     /**
-     * NMS 객체 관리 클래스.
+     * NMS 인스턴스 관리 클래스.
      */
     private static class MinecraftServerNMS {
-        /** 서버 NMS 클래스 */
+        /** 서버 NMS 클래스 인스턴스 */
         private static Class<?> minecraftServerClass;
-        /** TPS 필드 객체 */
+        /** TPS 필드 인스턴스 */
         private static Field recentTpsField;
-        /** 서버 객체 */
+        /** 서버 인스턴스 */
         private static Object minecraftServer;
     }
 }
