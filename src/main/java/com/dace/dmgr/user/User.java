@@ -43,6 +43,7 @@ import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.LongConsumer;
 
 /**
  * 유저 정보 및 상태를 관리하는 클래스.
@@ -177,10 +178,7 @@ public final class User implements Disposable {
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onSecond();
-            return true;
-        }, 20));
+        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i -> onSecond(), 20));
     }
 
     /**
@@ -643,8 +641,6 @@ public final class User implements Disposable {
                 color = ChatColor.RED;
 
             sendActionBar(color + ChatColor.stripColor(message), 16);
-
-            return true;
         }, 1, 3));
     }
 

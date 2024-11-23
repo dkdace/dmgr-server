@@ -23,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.function.LongConsumer;
 
 public final class MagrittaUlt extends UltimateSkill {
     /** 수정자 ID */
@@ -106,9 +107,7 @@ public final class MagrittaUlt extends UltimateSkill {
                     MagrittaWeaponInfo.RECOIL.UP_SPREAD / 2, MagrittaWeaponInfo.RECOIL.SIDE_SPREAD / 2, 2, 1);
             SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_ULT_SHOOT, loc, 1);
             TaskUtil.addTask(MagrittaUlt.this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_SHOTGUN_SHELL_DROP, loc), 8));
-
-            return true;
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
             onEnd();
         }, MagrittaUltInfo.ATTACK_COOLDOWN, MagrittaUltInfo.DURATION / 2));
@@ -130,12 +129,10 @@ public final class MagrittaUlt extends UltimateSkill {
                 0, 0, 0, 0.1);
         ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
-            return true;
-        }, 1, 7));
+        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i ->
+                CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8), 1, 7));
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             combatUser.getWeapon().setVisible(true);

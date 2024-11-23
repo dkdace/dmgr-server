@@ -22,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.function.LongConsumer;
 
 public final class QuakerA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
@@ -86,7 +87,7 @@ public final class QuakerA2 extends ActiveSkill {
                 if (index % 2 == 0)
                     SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE, loc.add(vec));
                 if (index == 11) {
-                    TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled -> {
+                    TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
                         onCancelled();
                         onReady();
                     }, 1));
@@ -129,12 +130,10 @@ public final class QuakerA2 extends ActiveSkill {
             new QuakerA2Projectile(targets).shoot(loc, vec);
         }
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6);
-            return true;
-        }, 1, 5));
+        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
+                CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6), 1, 5));
     }
 
     /**

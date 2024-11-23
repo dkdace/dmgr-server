@@ -58,11 +58,7 @@ public final class NeaceUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_ULT_USE, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            playUseTickEffect(i);
-
-            return true;
-        }, isCancelled -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
             onReady();
         }, 1, NeaceUltInfo.READY_DURATION));

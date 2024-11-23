@@ -12,7 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.function.Function;
+import java.util.function.LongPredicate;
 import java.util.stream.IntStream;
 
 /**
@@ -87,11 +87,11 @@ public abstract class Projectile extends Bullet {
         loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
         sum = IntStream.rangeClosed(0, loopCount).sum();
 
-        TaskUtil.addTask(shooter, new IntervalTask(new Function<Long, Boolean>() {
+        TaskUtil.addTask(shooter, new IntervalTask(new LongPredicate() {
             int count = 0;
 
             @Override
-            public Boolean apply(Long i) {
+            public boolean test(long i) {
                 for (int j = 0; j < loopCount; j++) {
                     if (!onInterval())
                         return false;
@@ -104,7 +104,7 @@ public abstract class Projectile extends Bullet {
 
                 return (duration == -1 || i < duration) && getLocation().distance(origin) < maxDistance;
             }
-        }, isCancelled -> onDestroy(), 1));
+        }, this::onDestroy, 1));
     }
 
     @Override

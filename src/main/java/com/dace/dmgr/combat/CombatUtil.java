@@ -265,8 +265,6 @@ public final class CombatUtil {
                 finalSide *= firstMultiplier;
             }
             addYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
-
-            return true;
         }, 1, duration));
     }
 

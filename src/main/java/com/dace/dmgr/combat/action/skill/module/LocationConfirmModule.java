@@ -57,7 +57,7 @@ public final class LocationConfirmModule extends ConfirmModule {
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getEntity().getLocation();
 
-        new IntervalTask(i -> !skill.isDisposed(), isCancelled -> {
+        new IntervalTask(i -> !skill.isDisposed(), () -> {
             if (pointer != null)
                 pointer.remove();
         }, 1);

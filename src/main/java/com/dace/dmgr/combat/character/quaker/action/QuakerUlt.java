@@ -21,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.function.LongConsumer;
 
 public final class QuakerUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
@@ -131,12 +132,10 @@ public final class QuakerUlt extends UltimateSkill {
             }
         }
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
-                    (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8);
-            return true;
-        }, 1, 6));
+        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
+                CombatUtil.addYawAndPitch(combatUser.getEntity(),
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
+                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8), 1, 6));
     }
 
     /**

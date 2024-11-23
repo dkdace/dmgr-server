@@ -54,11 +54,7 @@ public final class SiliaUlt extends UltimateSkill {
 
         float yaw = combatUser.getEntity().getLocation().getYaw();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            playUseTickEffect(i, yaw);
-
-            return true;
-        }, isCancelled -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> playUseTickEffect(i, yaw), () -> {
             onCancelled();
             onReady();
         }, 1, SiliaUltInfo.READY_DURATION));
@@ -128,7 +124,7 @@ public final class SiliaUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), isCancelled -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
             isEnabled = false;
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);

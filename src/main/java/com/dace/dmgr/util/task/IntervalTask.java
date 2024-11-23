@@ -5,8 +5,8 @@ import lombok.NonNull;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
 
 /**
  * 일정 주기마다 작업을 수행하는 태스크를 실행하는 클래스.
@@ -36,34 +36,26 @@ public final class IntervalTask extends Task {
      * <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
      * 타이머를 종료하려면 {@code false} 반환</p>
      */
-    private final Function<Long, Boolean> onCycle;
-    /**
-     * 태스크가 끝났을 때 실행할 작업.
-     *
-     * <p>{@link IntervalTask#onCycle}에서 {@code false}를 반환하여 끝낸 경우
-     * {@code true}를 인자로 받음</p>
-     */
-    private final Consumer<Boolean> onFinish;
+    private final LongPredicate onCycle;
+    /** 태스크가 끝났을 때 실행할 작업 */
+    private final OnFinish onFinish;
     /** 실행 주기 (tick) */
     private final long period;
     /** 반복 횟수 */
     private final long repeat;
 
     /**
-     * 무한 반복하는 태스크 인스턴스를 생성한다.
+     * 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param onCycle  매 주기마다 실행할 작업.
      *
      *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
      *                 타이머를 종료하려면 {@code false} 반환</p>
-     * @param onFinish 태스크가 끝났을 때 실행할 작업.
-     *
-     *                 <p>{@link IntervalTask#onCycle}에서 {@code false}를 반환하여 끝낸 경우
-     *                 {@code true}를 인자로 받음</p>
+     * @param onFinish 태스크가 끝났을 때 실행할 작업
      * @param period   실행 주기 (tick)
      * @param repeat   반복 횟수
      */
-    public IntervalTask(@NonNull Function<@NonNull Long, @NonNull Boolean> onCycle, @NonNull Consumer<@NonNull Boolean> onFinish, long period, long repeat) {
+    public IntervalTask(@NonNull LongPredicate onCycle, @NonNull OnFinish onFinish, long period, long repeat) {
         this.onCycle = onCycle;
         this.onFinish = onFinish;
         this.period = period;
@@ -73,24 +65,21 @@ public final class IntervalTask extends Task {
     }
 
     /**
-     * 무한 반복하는 태스크 인스턴스를 생성한다.
+     * 무한 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param onCycle  매 주기마다 실행할 작업.
      *
      *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
      *                 타이머를 종료하려면 {@code false} 반환</p>
-     * @param onFinish 태스크가 끝났을 때 실행할 작업.
-     *
-     *                 <p>{@link IntervalTask#onCycle}에서 {@code false}를 반환하여 끝낸 경우
-     *                 {@code true}를 인자로 받음</p>
+     * @param onFinish 태스크가 끝났을 때 실행할 작업
      * @param period   실행 주기 (tick)
      */
-    public IntervalTask(@NonNull Function<@NonNull Long, @NonNull Boolean> onCycle, @NonNull Consumer<@NonNull Boolean> onFinish, long period) {
-        this(onCycle, onFinish, period, 0);
+    public IntervalTask(@NonNull LongPredicate onCycle, @NonNull Runnable onFinish, long period) {
+        this(onCycle, isCancelled -> onFinish.run(), period, 0);
     }
 
     /**
-     * 태스크 인스턴스를 생성한다.
+     * 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param onCycle 매 주기마다 실행할 작업.
      *
@@ -99,13 +88,13 @@ public final class IntervalTask extends Task {
      * @param period  실행 주기 (tick)
      * @param repeat  반복 횟수
      */
-    public IntervalTask(@NonNull Function<@NonNull Long, @NonNull Boolean> onCycle, long period, long repeat) {
+    public IntervalTask(@NonNull LongPredicate onCycle, long period, long repeat) {
         this(onCycle, isCancelled -> {
         }, period, repeat);
     }
 
     /**
-     * 무한 반복하는 태스크 인스턴스를 생성한다.
+     * 무한 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param onCycle 매 주기마다 실행할 작업.
      *
@@ -113,8 +102,58 @@ public final class IntervalTask extends Task {
      *                타이머를 종료하려면 {@code false} 반환</p>
      * @param period  실행 주기 (tick)
      */
-    public IntervalTask(@NonNull Function<@NonNull Long, @NonNull Boolean> onCycle, long period) {
+    public IntervalTask(@NonNull LongPredicate onCycle, long period) {
         this(onCycle, isCancelled -> {
+        }, period, 0);
+    }
+
+    /**
+     * 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
+     *
+     * @param onCycle  매 주기마다 실행할 작업.
+     *
+     *                 <p>인덱스 (0부터 시작)를 인자로 받음</p>
+     * @param onFinish 태스크가 끝났을 때 실행할 작업
+     * @param period   실행 주기 (tick)
+     * @param repeat   반복 횟수
+     */
+    public IntervalTask(@NonNull LongConsumer onCycle, @NonNull Runnable onFinish, long period, long repeat) {
+        this(i -> {
+            onCycle.accept(i);
+            return true;
+        }, isCancalled -> onFinish.run(), period, repeat);
+    }
+
+    /**
+     * 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
+     *
+     * @param onCycle 매 주기마다 실행할 작업.
+     *
+     *                <p>인덱스 (0부터 시작)를 인자로 받음</p>
+     * @param period  실행 주기 (tick)
+     * @param repeat  반복 횟수
+     */
+    public IntervalTask(@NonNull LongConsumer onCycle, long period, long repeat) {
+        this(i -> {
+            onCycle.accept(i);
+            return true;
+        }, isCancelled -> {
+        }, period, repeat);
+    }
+
+    /**
+     * 무한 반복 작업을 수행하는 태스크 인스턴스를 생성한다.
+     *
+     * @param onCycle 매 주기마다 실행할 작업.
+     *
+     *                <p>인덱스 (0부터 시작)를 인자로 받음</p>
+     * @param period  실행 주기 (tick)
+     */
+    public IntervalTask(@NonNull LongConsumer onCycle, long period) {
+        this(i -> {
+            onCycle.accept(i);
+            return true;
+        }, isCancelled -> {
         }, period, 0);
     }
 
@@ -126,12 +165,12 @@ public final class IntervalTask extends Task {
 
             @Override
             public void run() {
-                if (!onCycle.apply(i++)) {
+                if (!onCycle.test(i++)) {
                     end(true);
                     return;
                 }
 
-                if (repeat > 0 && (i >= repeat))
+                if (repeat > 0 && i >= repeat)
                     end(false);
             }
 
@@ -140,5 +179,19 @@ public final class IntervalTask extends Task {
                 dispose();
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
+    }
+
+    /**
+     * 태스크가 끝났을 때 실행할 작업.
+     */
+    @FunctionalInterface
+    public interface OnFinish {
+        /**
+         * 태스크가 끝났을 때 실행할 작업.
+         *
+         * @param isCancelled 취소 여부. {@link IntervalTask#onCycle}에서 {@code false}를
+         *                    반환하여 끝낸 경우 {@code true}
+         */
+        void accept(boolean isCancelled);
     }
 }

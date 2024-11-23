@@ -20,6 +20,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
 
+import java.util.function.LongConsumer;
+
 public final class ChedUlt extends UltimateSkill {
     /** 처치 점수 제한시간 쿨타임 ID */
     private static final String KILL_SCORE_COOLDOWN_ID = "ChedUltKillScoreTimeLimit";
@@ -81,10 +83,8 @@ public final class ChedUlt extends UltimateSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE_READY, location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION);
-                return true;
-            }, 1, 20));
+            TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION),
+                    1, 20));
         }, 1, ChedUltInfo.READY_DURATION));
     }
 

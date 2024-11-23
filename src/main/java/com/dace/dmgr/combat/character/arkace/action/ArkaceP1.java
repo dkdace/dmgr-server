@@ -44,7 +44,7 @@ public final class ArkaceP1 extends AbstractSkill {
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> combatUser.getEntity().isSprinting()
                 && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading(),
-                isCancelled -> onCancelled(), 1));
+                this::onCancelled, 1));
     }
 
     @Override

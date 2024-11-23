@@ -94,8 +94,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         TaskUtil.addTask(this, new IntervalTask(i -> {
             onTick(i);
             updateHitboxTick();
-
-            return true;
         }, 1));
     }
 

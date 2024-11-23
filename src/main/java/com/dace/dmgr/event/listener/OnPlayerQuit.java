@@ -36,7 +36,7 @@ public final class OnPlayerQuit implements Listener {
      */
     private static void playQuitSound() {
         new IntervalTask(i -> {
-            switch (i.intValue()) {
+            switch ((int) i) {
                 case 0:
                     Bukkit.getOnlinePlayers().forEach(player -> SoundUtil.play(Sound.BLOCK_NOTE_PLING, player, 1000, Math.pow(2, -4 / 12.0)));
                     break;
@@ -46,8 +46,6 @@ public final class OnPlayerQuit implements Listener {
                 default:
                     break;
             }
-
-            return true;
         }, 1, 4);
     }
 }

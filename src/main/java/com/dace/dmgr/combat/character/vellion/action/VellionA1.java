@@ -67,11 +67,7 @@ public final class VellionA1 extends ActiveSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A1_USE, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            playUseTickEffect(i);
-
-            return true;
-        }, isCancelled -> {
+        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);

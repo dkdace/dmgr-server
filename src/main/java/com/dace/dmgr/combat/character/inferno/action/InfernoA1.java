@@ -74,7 +74,7 @@ public final class InfernoA1 extends ActiveSkill {
             }
 
             return !combatUser.getEntity().isOnGround();
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
             TaskUtil.addTask(this, new DelayTask(this::onLand, 1));
         }, 1)), 4));

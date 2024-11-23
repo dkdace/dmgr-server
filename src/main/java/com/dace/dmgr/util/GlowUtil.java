@@ -50,7 +50,7 @@ public final class GlowUtil {
                 sendGlowingPacket(entity, player, true);
 
                 return true;
-            }, isCancelled -> {
+            }, () -> {
                 sendGlowingPacket(entity, player, false);
                 sendRemoveTeamPacket(entity, player);
             }, 1);

@@ -57,7 +57,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
 import java.util.stream.Collectors;
 
 /**
@@ -425,7 +426,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
 
             return true;
-        }, isCancalled -> HologramUtil.removeHologram(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation), 5);
+        }, () -> HologramUtil.removeHologram(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation), 5);
     }
 
     /**
@@ -880,7 +881,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
 
             return true;
-        }, isCancelled -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);
+        }, () -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);
     }
 
     @Override
@@ -966,7 +967,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             entity.setSpectatorTarget(null);
 
             return true;
-        }, isCancelled -> {
+        }, () -> {
             Validate.notNull(weapon);
 
             statusEffectModule.clearStatusEffect();
@@ -1118,7 +1119,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
 
             TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) > 0,
-                    isCancelled -> {
+                    () -> {
                         scoreStreakSum = 0;
                         scoreMap.clear();
                         user.clearSidebar();
@@ -1235,11 +1236,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         initActions();
 
         TaskUtil.addTask(this, SkinUtil.applySkin(entity, realCharacter.getSkinName()));
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
-                    1, 0, false, false), true);
-            return true;
-        }, 1, 10));
+        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i ->
+                entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
+                        1, 0, false, false), true), 1, 10));
 
         if (!isActivated)
             activate();
@@ -1375,11 +1374,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id, Cooldown.WEAPON_FULLAUTO.duration);
 
         if (fullAutoTask == null) {
-            fullAutoTask = new IntervalTask(new Function<Long, Boolean>() {
+            fullAutoTask = new IntervalTask(new LongPredicate() {
                 int j = 0;
 
                 @Override
-                public Boolean apply(Long i) {
+                public boolean test(long i) {
                     if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id) == 0)
                         return false;
 

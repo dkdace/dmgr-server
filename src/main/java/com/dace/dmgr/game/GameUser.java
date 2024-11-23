@@ -111,10 +111,7 @@ public final class GameUser implements Disposable {
         GameUserRegistry.getInstance().add(user, this);
         game.addPlayer(this);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick(i);
-            return true;
-        }, 1));
+        TaskUtil.addTask(this, new IntervalTask(this::onTick, 1));
     }
 
     /**

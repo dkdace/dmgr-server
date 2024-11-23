@@ -53,8 +53,6 @@ public class MoveModule {
             if (!canMove() || !combatEntity.canMove())
                 movementSpeed = 0.0001;
             ((Attributable) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(movementSpeed);
-
-            return true;
         }, 1));
     }
 

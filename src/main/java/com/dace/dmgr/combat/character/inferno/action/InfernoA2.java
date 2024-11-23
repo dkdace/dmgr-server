@@ -60,8 +60,6 @@ public final class InfernoA2 extends ActiveSkill {
             ParticleUtil.play(Particle.FLAME, combatUser.getEntity().getLocation().add(0, 1, 0), 2,
                     0.1, 0.1, 0.1, 0.2);
             playTickEffect(i);
-
-            return true;
         }, 1, InfernoA2Info.DURATION));
     }
 

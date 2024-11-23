@@ -95,7 +95,7 @@ public final class VellionP1 extends AbstractSkill {
             combatUser.getEntity().setFallDistance(0);
 
             return !combatUser.getEntity().isOnGround();
-        }, isCancelled -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
+        }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_P1_DISABLE, combatUser.getEntity().getLocation());
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,

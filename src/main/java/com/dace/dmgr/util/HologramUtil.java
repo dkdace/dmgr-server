@@ -65,7 +65,7 @@ public final class HologramUtil {
 
             hologram.setPosition(entity.getLocation().add(offsetX, offsetY, offsetZ));
             return true;
-        }, isCancelled -> HologramUtil.removeHologram(id), 1);
+        }, () -> HologramUtil.removeHologram(id), 1);
     }
 
     /**

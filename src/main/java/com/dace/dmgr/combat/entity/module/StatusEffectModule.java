@@ -102,7 +102,7 @@ public final class StatusEffectModule {
                 statusEffect.onTick(combatEntity, provider, i);
 
                 return true;
-            }, isCancelled -> {
+            }, () -> {
                 if (statusEffectMap.remove(statusEffect) == null)
                     return;
 

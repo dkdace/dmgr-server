@@ -143,7 +143,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                     && CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0
                     && CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0
                     && combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
-                    isCancelled -> NeaceWeapon.this.target = null, 1));
+                    () -> NeaceWeapon.this.target = null, 1));
         }
     }
 

@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  *
  * <pre><code>
  * new AsyncTask<Integer>((onFinish, onError) -> {
- *     // 즉시 호출되며 별도의 스레드에서 비동기 작업을 수행한다.
+ *     // 별도의 스레드에서 비동기 작업을 수행한다.
  *
  *     try {
  *         // 작업 성공 시 호출해야 한다.
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  * @param <T> 태스크 종료 시 반환되는 값의 타입
  */
 public final class AsyncTask<T> extends Task {
-    /** 메서드 체이닝을 위해 사용하는 Future 객체 */
+    /** 메서드 체이닝을 위해 사용하는 Future 인스턴스 */
     private final CompletableFuture<T> future;
     /** 실행할 비동기 작업 */
     private Runnable action;
@@ -64,25 +64,29 @@ public final class AsyncTask<T> extends Task {
     }
 
     /**
-     * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
+     * 지정한 비동기 작업 목록을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param asyncTasks 비동기 태스크 목록
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull AsyncTask<?> @NonNull ... asyncTasks) {
         return new AsyncTask<>(CompletableFuture.allOf(
-                Arrays.stream(asyncTasks).map(asyncTask -> asyncTask.future).toArray(CompletableFuture[]::new)));
+                Arrays.stream(asyncTasks)
+                        .map(asyncTask -> asyncTask.future)
+                        .toArray(CompletableFuture[]::new)));
     }
 
     /**
-     * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
+     * 지정한 비동기 작업 목록을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param asyncTasks 비동기 태스크 목록
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull List<@NonNull AsyncTask<?>> asyncTasks) {
         return new AsyncTask<>(CompletableFuture.allOf(
-                asyncTasks.stream().map(asyncTask -> asyncTask.future).toArray(CompletableFuture[]::new)));
+                asyncTasks.stream()
+                        .map(asyncTask -> asyncTask.future)
+                        .toArray(CompletableFuture[]::new)));
     }
 
     /**
@@ -92,8 +96,8 @@ public final class AsyncTask<T> extends Task {
      *
      *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한
      *               onFinish의 인자값을 인자로 받으며, 다음 onFinish에 사용할 값을 반환해야 함</p>
-     * @param <U>    다음 {@code onFinish) 호출에 사용되는 반환 타입
-     * @return 새로운 AsyncTask
+     * @param <U>    다음 {@code onFinish} 호출에 사용되는 반환 타입
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public <U> AsyncTask<U> onFinish(@NonNull Function<T, @NonNull AsyncTask<U>> action) {
@@ -112,7 +116,7 @@ public final class AsyncTask<T> extends Task {
      *
      *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한
      *               onFinish의 인자값을 인자로 받음</p>
-     * @return 새로운 AsyncTask
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public AsyncTask<Void> onFinish(@NonNull Consumer<T> action) {
@@ -127,7 +131,7 @@ public final class AsyncTask<T> extends Task {
      *
      *               <p>다음 onFinish에 사용할 값을 반환해야 함</p>
      * @param <U>    다음 {@code onFinish} 호출에 사용되는 반환 타입
-     * @return 새로운 AsyncTask
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public <U> AsyncTask<U> onFinish(@NonNull Supplier<@NonNull AsyncTask<U>> action) {
@@ -140,7 +144,7 @@ public final class AsyncTask<T> extends Task {
      * 작업 성공 시 실행할 작업을 지정한다.
      *
      * @param action 태스크가 끝났을 때 실행할 작업.
-     * @return 새로운 AsyncTask
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public AsyncTask<Void> onFinish(@NonNull Runnable action) {
@@ -153,7 +157,7 @@ public final class AsyncTask<T> extends Task {
      * 작업 실패(예외 발생) 시 실행할 작업을 지정한다.
      *
      * @param action 예외 발생 시 실행할 작업. 예외를 인자로 받음
-     * @return AsyncTask
+     * @return {@link AsyncTask}
      */
     @NonNull
     public AsyncTask<T> onError(@NonNull Consumer<@NonNull Exception> action) {
@@ -187,13 +191,14 @@ public final class AsyncTask<T> extends Task {
     }
 
     /**
-     * 성공 및 실패 시 실행할 콜백.
+     * 태스크에서 성공 및 실패 시 실행할 콜백.
      *
      * @param <T> 반환 타입
      */
+    @FunctionalInterface
     public interface Callback<T> {
         /**
-         * 비동기 태스크를 끝낸다.
+         * 태스크에서 성공 및 실패 시 실행할 작업.
          *
          * @param onFinish 작업 성공 시 호출해야 한다.
          * @param onError  작업 실패(예외 발생) 시 호출해야 한다.

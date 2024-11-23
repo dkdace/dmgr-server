@@ -135,9 +135,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                         0, 0, 0, 156, 60, 130);
             ParticleUtil.play(Particle.SMOKE_LARGE, location, 30, 0.5, 0.3, 0.5, 0.15);
             ParticleUtil.play(Particle.SPELL_WITCH, location, 70, 1, 0.5, 1, 0.2);
-
-            return true;
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
             onReady(location);
         }, 1, VellionA3Info.READY_DURATION));
@@ -160,8 +158,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 3, 0.4, 0, 0.4,
                     156, 60, 130);
             playTickEffect(i, loc);
-
-            return true;
         }, 1, VellionA3Info.DURATION));
     }
 

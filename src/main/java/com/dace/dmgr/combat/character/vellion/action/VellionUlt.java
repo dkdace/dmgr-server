@@ -64,14 +64,11 @@ public final class VellionUlt extends UltimateSkill {
 
         SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE, combatUser.getEntity().getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            playUseTickEffect(i);
-
-            return true;
-        }, isCancelled -> new IntervalTask(j -> !combatUser.getEntity().isOnGround(), isCancelled2 -> {
-            setDuration(0);
-            onReady();
-        }, 1), 1, VellionUltInfo.READY_DURATION));
+        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect,
+                () -> new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
+                    setDuration(0);
+                    onReady();
+                }, 1), 1, VellionUltInfo.READY_DURATION));
     }
 
     @Override

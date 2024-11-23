@@ -36,8 +36,6 @@ public final class ReadyTimeModule {
                 isReady = true;
                 combatEntity.onReady();
             }
-
-            return true;
         }, 1));
     }
 }

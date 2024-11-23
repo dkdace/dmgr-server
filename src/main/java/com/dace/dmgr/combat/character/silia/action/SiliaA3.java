@@ -72,7 +72,7 @@ public final class SiliaA3 extends ChargeableSkill {
                 }
 
                 return true;
-            }, isCancelled -> {
+            }, () -> {
                 onCancelled();
                 if (getStateValue() > 0)
                     setCooldown(SiliaA3Info.COOLDOWN_FORCE);

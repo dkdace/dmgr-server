@@ -51,7 +51,7 @@ public class ConfirmModule {
                 onCheckTick(i);
 
                 return true;
-            }, isCancelled -> {
+            }, () -> {
                 isChecking = false;
                 onCheckDisable();
                 skill.onCheckDisable();

@@ -59,9 +59,7 @@ public final class ArkaceA1 extends ActiveSkill {
             new ArkaceA1Projectile().shoot(loc);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_USE, loc);
-
-            return true;
-        }, isCancelled -> TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
+        }, () -> TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.function.LongConsumer;
+
 /**
  * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
@@ -40,10 +42,7 @@ public abstract class ActiveSkill extends AbstractSkill {
         this.itemStack = originalItemStack.clone();
         this.slot = slot;
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick();
-            return true;
-        }, 1));
+        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i -> onTick(), 1));
     }
 
     /**

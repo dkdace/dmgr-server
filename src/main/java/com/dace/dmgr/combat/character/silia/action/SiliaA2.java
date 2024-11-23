@@ -65,9 +65,7 @@ public final class SiliaA2 extends ActiveSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, i * 23 + j * 60).multiply(1.6 - i * 0.2);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc.clone().add(vec), 0, vec.getX(), vec.getY(), vec.getZ(), 0.2);
             }
-
-            return true;
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
 
             new SiliaA2Projectile().shoot();

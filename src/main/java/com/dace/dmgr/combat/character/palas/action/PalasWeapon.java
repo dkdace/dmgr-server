@@ -136,7 +136,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.cancel();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            switch (i.intValue()) {
+            switch ((int) i) {
                 case 1:
                     SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 1.2);
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.4, 0.1);
@@ -157,9 +157,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 default:
                     break;
             }
-
-            return true;
-        }, isCancelled -> {
+        }, () -> {
             isActionCooldown = true;
             reloadModule.consume(1);
         }, 1, PalasWeaponInfo.ACTION_COOLDOWN));

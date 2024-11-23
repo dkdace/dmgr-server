@@ -201,7 +201,7 @@ public final class VellionA2 extends ActiveSkill {
                         new VellionA2Area(target).emit(target.getCenterLocation());
 
                     return true;
-                }, isCancelled2 -> onCancelled(), 1));
+                }, VellionA2.this::onCancelled, 1));
             }, 1, VellionA2Info.READY_DURATION));
         }
 

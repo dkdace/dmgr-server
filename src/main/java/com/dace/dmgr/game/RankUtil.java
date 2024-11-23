@@ -33,8 +33,6 @@ public final class RankUtil {
                         ConsoleLogger.info("전체 랭킹 업데이트 완료, 유저 수 : {0}", length);
                     })
                     .onError(ex -> ConsoleLogger.severe("전체 랭킹 업데이트 실패", ex));
-
-            return true;
         }, GeneralConfig.getConfig().getRankingUpdatePeriodMinutes() * 60 * 20L);
     }
 

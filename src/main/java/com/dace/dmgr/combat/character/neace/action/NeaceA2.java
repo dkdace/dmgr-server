@@ -61,7 +61,7 @@ public final class NeaceA2 extends ActiveSkill {
                     playTickEffect(i);
 
                 return true;
-            }, isCancelled -> combatUser.getWeapon().setGlowing(false), 1));
+            }, () -> combatUser.getWeapon().setGlowing(false), 1));
         } else
             setDuration(0);
     }

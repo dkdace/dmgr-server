@@ -14,6 +14,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
+import java.util.function.LongConsumer;
+
 public final class ChedA2 extends ActiveSkill {
     public ChedA2(@NonNull CombatUser combatUser) {
         super(combatUser, ChedA2Info.getInstance(), 1);
@@ -76,10 +78,9 @@ public final class ChedA2 extends ActiveSkill {
             combatUser.getMoveModule().push(vec, true);
         }, 1, 2));
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, combatUser.getEntity().getLocation(), 1, 0, 0, 0, 0.05);
-            return true;
-        }, 1, 10));
+        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
+                ParticleUtil.play(Particle.EXPLOSION_NORMAL, combatUser.getEntity().getLocation(), 1, 0, 0, 0, 0.05),
+                1, 10));
     }
 
     @Override

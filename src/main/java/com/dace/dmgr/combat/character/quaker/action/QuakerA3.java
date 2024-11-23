@@ -68,9 +68,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (j - 2));
                 new QuakerA3Effect().shoot(loc.clone().add(vec), vec);
             }
-
-            return true;
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
 
             new QuakerA3Projectile().shoot();

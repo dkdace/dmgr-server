@@ -18,6 +18,8 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.function.LongConsumer;
+
 public final class ChedA3 extends ActiveSkill {
     /** 처치 점수 제한시간 쿨타임 ID */
     private static final String KILL_SCORE_COOLDOWN_ID = "ChedA3KillScoreTimeLimit";
@@ -81,10 +83,8 @@ public final class ChedA3 extends ActiveSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE_READY, location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                playUseTickEffect(loc, i + ChedA3Info.READY_DURATION);
-                return true;
-            }, 1, ChedA3Info.READY_DURATION));
+            TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedA3Info.READY_DURATION),
+                    1, ChedA3Info.READY_DURATION));
         }, 1, ChedA3Info.READY_DURATION));
     }
 

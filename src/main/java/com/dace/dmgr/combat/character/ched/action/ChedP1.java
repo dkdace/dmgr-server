@@ -108,7 +108,7 @@ public final class ChedP1 extends AbstractSkill {
             SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_P1_USE, combatUser.getEntity().getLocation());
 
             return true;
-        }, isCancelled -> {
+        }, () -> {
             onCancelled();
 
             wallRideCount--;
@@ -151,7 +151,7 @@ public final class ChedP1 extends AbstractSkill {
 
         setDuration(0);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(), isCancelled -> {
+        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
             wallRideCount = ChedP1Info.USE_COUNT;
             hangTick = ChedP1Info.HANG_DURATION;
         }, 1));

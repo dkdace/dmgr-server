@@ -80,7 +80,7 @@ public final class ChedA1 extends StackableSkill {
                 combatUser.getWeapon().setMaterial(WeaponInfo.MATERIAL);
                 combatUser.getWeapon().setDurability(ChedWeaponInfo.RESOURCE.FIRE);
 
-                TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished(), isCancelled -> onCancelled(), 1));
+                TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished(), this::onCancelled, 1));
             }, ChedA1Info.READY_DURATION));
         } else
             onCancelled();

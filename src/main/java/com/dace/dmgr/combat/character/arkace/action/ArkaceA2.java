@@ -50,8 +50,6 @@ public final class ArkaceA2 extends ActiveSkill {
                 combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
 
             playTickEffect(i);
-
-            return true;
         }, 1, ArkaceA2Info.DURATION));
     }
 

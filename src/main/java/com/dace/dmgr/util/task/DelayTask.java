@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
- * 일정 시간을 기다리는 작업을 수행하는 태스크를 실행하는 클래스.
+ * 일정 시간을 기다린 후 작업을 수행하는 태스크를 실행하는 클래스.
  *
  * <p>Example:</p>
  *
@@ -23,9 +23,9 @@ public final class DelayTask extends Task {
     private final long delay;
 
     /**
-     * 비동기 작업을 수행하는 태스크 인스턴스를 생성한다.
+     * 지연 작업을 수행하는 태스크 인스턴스를 생성한다.
      *
-     * @param onFinish 태스크가 끝났을 때 실행할 작업.
+     * @param onFinish 태스크가 끝났을 때 실행할 작업
      * @param delay    딜레이 (tick)
      */
     public DelayTask(@NonNull Runnable onFinish, long delay) {

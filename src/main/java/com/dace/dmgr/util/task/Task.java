@@ -6,7 +6,7 @@ import lombok.NonNull;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
- * 스케쥴러를 실행하는 태스크 인터페이스.
+ * 스케쥴러를 실행하는 태스크 클래스.
  */
 public abstract class Task implements Disposable {
     /** 비활성화 여부 */
@@ -18,10 +18,8 @@ public abstract class Task implements Disposable {
     /**
      * 태스크 스케쥴러를 실행한다.
      */
-    protected final void run() {
-        if (isDisposed)
-            throw new IllegalStateException("인스턴스가 폐기됨");
-
+    final void run() {
+        validate();
         bukkitTask = getBukkitTask();
     }
 
@@ -39,9 +37,9 @@ public abstract class Task implements Disposable {
     }
 
     /**
-     * Bukkit이 실행하는 태스크 객체를 반환한다.
+     * Bukkit이 실행하는 태스크 인스턴스를 반환한다.
      *
-     * @return 스케쥴러 태스크 객체
+     * @return 스케쥴러 태스크 인스턴스
      */
     @NonNull
     abstract BukkitTask getBukkitTask();

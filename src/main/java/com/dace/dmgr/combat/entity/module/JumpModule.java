@@ -42,8 +42,6 @@ public final class JumpModule extends MoveModule {
             } else
                 ((LivingEntity) combatEntity.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6,
                         false, false), true);
-
-            return true;
         }, 1));
     }
 

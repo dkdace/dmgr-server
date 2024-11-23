@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -96,10 +97,7 @@ public final class Game implements Disposable {
         blueTeam = new Team(ChatColor.BLUE, "블루");
         GameRegistry.getInstance().add(new GameRegistry.KeyPair(isRanked, number), this);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onSecond();
-            return true;
-        }, 20));
+        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i -> onSecond(), 20));
     }
 
     /**

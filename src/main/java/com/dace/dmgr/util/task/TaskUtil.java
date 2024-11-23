@@ -20,10 +20,10 @@ public final class TaskUtil {
     private static final WeakHashMap<Disposable, HashSet<Task>> taskMap = new WeakHashMap<>();
 
     /**
-     * 지정한 객체가 실행하는 태스크를 추가한다.
+     * 지정한 인스턴스가 실행하는 태스크를 추가한다.
      *
-     * @param object 태스크를 실행하는 객체
-     * @param task   태스크 객체
+     * @param object 실행 주체
+     * @param task   태스크
      * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
      */
     public static void addTask(@NonNull Disposable object, @NonNull Task task) {
@@ -37,9 +37,9 @@ public final class TaskUtil {
     }
 
     /**
-     * 지정한 객체가 실행하는 모든 태스크를 중지한다.
+     * 지정한 인스턴스가 실행하는 모든 태스크를 중지한다.
      *
-     * @param object 태스크를 실행하는 객체
+     * @param object 실행 주체
      */
     public static void clearTask(@NonNull Disposable object) {
         HashSet<Task> tasks = taskMap.get(object);

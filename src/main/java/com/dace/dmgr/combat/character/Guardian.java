@@ -11,6 +11,8 @@ import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.LongConsumer;
+
 /**
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
  */
@@ -46,11 +48,9 @@ public abstract class Guardian extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
-        TaskUtil.addTask(combatUser, new IntervalTask(i -> {
-            combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION, false);
-
-            return true;
-        }, 1, RoleTrait2Info.DURATION));
+        TaskUtil.addTask(combatUser, new IntervalTask((LongConsumer) i ->
+                combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION, false),
+                1, RoleTrait2Info.DURATION));
     }
 
     @Override

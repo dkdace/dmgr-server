@@ -7,6 +7,8 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
+import java.util.function.LongConsumer;
+
 public final class NeaceP1 extends AbstractSkill {
     public NeaceP1(@NonNull CombatUser combatUser) {
         super(combatUser);
@@ -37,10 +39,8 @@ public final class NeaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20.0, false);
-            return true;
-        }, isCancelled -> onCancelled(), 1));
+        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
+                combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20.0, false), 1));
     }
 
     @Override

@@ -108,6 +108,6 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(true);
 
         TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                isCancelled -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
+                () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }
 }

@@ -166,7 +166,7 @@ public class DamageModule {
             });
 
             return true;
-        }, isCancelled -> HologramUtil.removeHologram(HEALTH_HOLOGRAM_ID + combatEntity), 1);
+        }, () -> HologramUtil.removeHologram(HEALTH_HOLOGRAM_ID + combatEntity), 1);
     }
 
     /**

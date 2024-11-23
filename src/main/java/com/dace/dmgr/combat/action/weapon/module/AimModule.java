@@ -43,7 +43,7 @@ public final class AimModule {
                 weapon.getCombatUser().setFovValue(zoomLevel.getValue());
 
                 return true;
-            }, isCancelled -> {
+            }, () -> {
                 isAiming = false;
                 weapon.getCombatUser().setFovValue(0);
                 weapon.onAimDisable();

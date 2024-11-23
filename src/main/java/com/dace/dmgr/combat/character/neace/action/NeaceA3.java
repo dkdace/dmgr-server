@@ -107,7 +107,7 @@ public final class NeaceA3 extends ActiveSkill {
                     combatUser.getEntity().setFallDistance(0);
 
                     return !combatUser.getEntity().isOnGround();
-                }, isCancelled2 -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
+                }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
             }, 1, NeaceA3Info.DURATION));
         }
     }
