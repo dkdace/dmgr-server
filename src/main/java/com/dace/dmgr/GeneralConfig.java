@@ -79,7 +79,7 @@ public final class GeneralConfig implements Initializable<Void> {
     @Getter
     public static final class Config {
         /** Yaml 섹션 인스턴스 */
-        private final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("default");
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("default");
 
         /** 리소스팩 URL */
         @NonNull
@@ -109,7 +109,7 @@ public final class GeneralConfig implements Initializable<Void> {
     @Getter
     public static final class CombatConfig {
         /** Yaml 섹션 인스턴스 */
-        private final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("combat");
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("combat");
 
         /** 초당 궁극기 충전량 */
         private final int idleUltChargePerSecond = section.getEntry("idleUltChargePerSecond", 10).get();
@@ -156,7 +156,7 @@ public final class GeneralConfig implements Initializable<Void> {
     @Getter
     public static final class GameConfig {
         /** Yaml 섹션 인스턴스 */
-        private final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("game");
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("game");
 
         /** 일반 게임과 랭크 게임의 최대 방 갯수 */
         private final int maxRoomCount = section.getEntry("maxRoomCount", 5).get();

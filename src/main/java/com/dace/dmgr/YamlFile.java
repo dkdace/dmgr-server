@@ -222,13 +222,23 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (value == null) {
-                    if (defaultValue instanceof Integer)
-                        value = (T) Integer.valueOf(configurationSection.getInt(key, (Integer) defaultValue));
-                    else if (defaultValue instanceof Long)
-                        value = (T) Long.valueOf(configurationSection.getLong(key, (Long) defaultValue));
-                    else if (defaultValue instanceof Double)
-                        value = (T) Double.valueOf(configurationSection.getDouble(key, (Double) defaultValue));
-                    else
+                    if (defaultValue instanceof Number) {
+                        long longValue = configurationSection.getLong(key, ((Number) defaultValue).longValue());
+                        double doubleValue = configurationSection.getDouble(key, ((Number) defaultValue).doubleValue());
+
+                        if (defaultValue instanceof Byte)
+                            value = (T) Byte.valueOf((byte) longValue);
+                        else if (defaultValue instanceof Short)
+                            value = (T) Short.valueOf((short) longValue);
+                        else if (defaultValue instanceof Integer)
+                            value = (T) Integer.valueOf((int) longValue);
+                        else if (defaultValue instanceof Long)
+                            value = (T) Long.valueOf(longValue);
+                        else if (defaultValue instanceof Float)
+                            value = (T) Float.valueOf((float) doubleValue);
+                        else if (defaultValue instanceof Double)
+                            value = (T) Double.valueOf(doubleValue);
+                    } else
                         value = (T) configurationSection.get(key, defaultValue);
                 }
 
