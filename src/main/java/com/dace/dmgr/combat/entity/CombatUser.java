@@ -77,10 +77,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final double KILL_SUPPORT_SCORE_RATIO = 0.2;
     /** 최대 코어 개수 */
     private static final int MAX_CORE_AMOUNT = 3;
-    /** 사망 대사 홀로그램 ID */
-    private static final String DEATH_MENT_HOLOGRAM_ID = "DeathMent";
-    /** 기능 블록의 쿨타임 홀로그램 ID */
-    private static final String BLOCK_COOLDOWN_HOLOGRAM_ID = "BlockCooldown";
     /** 킬 로그 보스바 ID */
     private static final String COMBAT_KILL_BOSSBAR_ID = "CombatKillBossBar";
 
@@ -167,6 +163,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 선택한 전투원 기록 정보 */
     @Nullable
     private UserData.CharacterRecord characterRecord;
+    /** 사망 대사 홀로그램 */
+    @Nullable
+    private TextHologram deathMentHologram;
 
     /**
      * 전투 시스템의 플레이어 인스턴스를 생성한다.
@@ -408,7 +407,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void showBlockHologram(@NonNull GlobalLocation blockLocation, @NonNull Location location, @NonNull Cooldown blockCooldown) {
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
-        HologramUtil.addHologram(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation, hologramLoc, "");
+        TextHologram textHologram = new TextHologram(hologramLoc, player -> LocationUtil.canPass(player.getEyeLocation(), hologramLoc));
 
         boolean isGame = game != null;
         new IntervalTask(i -> {
@@ -418,15 +417,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (isGame && game.isDisposed())
                 return false;
 
-            HologramUtil.editHologram(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation,
-                    MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
-            for (Player player : location.getWorld().getPlayers()) {
-                HologramUtil.setHologramVisibility(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation,
-                        LocationUtil.canPass(player.getPlayer().getEyeLocation(), hologramLoc), player.getPlayer());
-            }
+            textHologram.setContent(MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
 
             return true;
-        }, () -> HologramUtil.removeHologram(BLOCK_COOLDOWN_HOLOGRAM_ID + blockLocation), 5);
+        }, textHologram::dispose, 5);
     }
 
     /**
@@ -504,6 +498,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (weapon != null)
             weapon.dispose();
         skillMap.forEach((skillInfo, skill) -> skill.dispose());
+
+        if (deathMentHologram != null)
+            deathMentHologram.dispose();
 
         if (DMGR.getPlugin().isEnabled())
             SkinUtil.resetSkin(entity);
@@ -868,20 +865,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 break;
 
         hologramLoc.add(0, 1.2, 0);
-        HologramUtil.addHologram(DEATH_MENT_HOLOGRAM_ID + this, hologramLoc, MessageFormat.format("§f{0} \"{1}\"", character.getIcon(), ment));
-
-        new IntervalTask(i -> {
-            long cooldown = CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id);
-            if (cooldown <= 0)
-                return false;
-
-            for (Player player : hologramLoc.getWorld().getPlayers()) {
-                HologramUtil.setHologramVisibility(DEATH_MENT_HOLOGRAM_ID + this,
-                        LocationUtil.canPass(player.getEyeLocation(), hologramLoc), player.getPlayer());
-            }
-
-            return true;
-        }, () -> HologramUtil.removeHologram(DEATH_MENT_HOLOGRAM_ID + this), 5);
+        deathMentHologram = new TextHologram(hologramLoc, player -> LocationUtil.canPass(player.getEyeLocation(), hologramLoc),
+                MessageFormat.format("§f{0} \"{1}\"", character.getIcon(), ment));
     }
 
     @Override
@@ -975,6 +960,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             weapon.reset();
             skillMap.forEach((skillInfo, skill) -> skill.reset());
+
+            if (deathMentHologram != null) {
+                deathMentHologram.dispose();
+                deathMentHologram = null;
+            }
         }, 1));
     }
 

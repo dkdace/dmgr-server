@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
@@ -95,8 +94,8 @@ public final class StatusEffectModule {
 
             statusEffect.onStart(combatEntity, provider);
 
-            TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
-                if (getStatusEffectDuration(statusEffect) == 0 || !statusEffectMap.containsKey(statusEffect))
+            new IntervalTask(i -> {
+                if (combatEntity.isDisposed() || getStatusEffectDuration(statusEffect) == 0 || !statusEffectMap.containsKey(statusEffect))
                     return false;
 
                 statusEffect.onTick(combatEntity, provider, i);
@@ -109,7 +108,7 @@ public final class StatusEffectModule {
                 statusEffect.onEnd(combatEntity, provider);
 
                 CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, 0);
-            }, 1));
+            }, 1);
         } else if (getStatusEffectDuration(statusEffect) < finalDuration)
             CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
     }

@@ -4,13 +4,14 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.HologramUtil;
+import com.dace.dmgr.util.TextHologram;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
@@ -18,15 +19,15 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> {
-    /** 이름표 홀로그램 ID */
-    private static final String NAMETAG_HOLOGRAM_ID = "NameTag";
-
     /** 엔티티를 소환한 플레이어 */
     @NonNull
     @Getter
     protected final CombatUser owner;
     /** 아군에게 이름표 표시 여부 */
     private final boolean showNameTag;
+    /** 이름표 홀로그램 */
+    @Nullable
+    private TextHologram nameTagHologram;
 
     /**
      * 소환 가능한 엔티티 인스턴스를 생성한다.
@@ -47,28 +48,22 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         this.showNameTag = showNameTag;
 
         if (showNameTag)
-            TaskUtil.addTask(this, new DelayTask(() -> HologramUtil.addHologram(NAMETAG_HOLOGRAM_ID + this, entity,
-                    0, entity.getHeight() + 0.7, 0, "§n" + name), 3));
+            TaskUtil.addTask(this, new DelayTask(() ->
+                    nameTagHologram = new TextHologram(entity, player -> {
+                        CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(player));
+                        return targetCombatUser == null || !owner.isEnemy(targetCombatUser);
+                    }, 1, "§n" + name), 3));
         if (isHidden)
             hide();
-    }
-
-    @Override
-    protected void onTick(long i) {
-        if (i > 3 && i % 5 == 0 && showNameTag) {
-            entity.getWorld().getPlayers().forEach(target -> {
-                CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
-                if (targetCombatUser != null && owner.isEnemy(targetCombatUser))
-                    HologramUtil.setHologramVisibility(NAMETAG_HOLOGRAM_ID + this, false, target);
-            });
-        }
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void dispose() {
         super.dispose();
-        HologramUtil.removeHologram(NAMETAG_HOLOGRAM_ID + this);
+
+        if (showNameTag && nameTagHologram != null)
+            nameTagHologram.dispose();
     }
 
     @Override

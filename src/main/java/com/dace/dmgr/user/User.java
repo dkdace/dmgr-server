@@ -85,6 +85,9 @@ public final class User implements Disposable {
     /** 이름표 숨기기용 갑옷 거치대 객체 */
     @Nullable
     private ArmorStand nameTagHider;
+    /** 이름표 홀로그램 */
+    @Nullable
+    private TextHologram nameTagHologram;
     /** 플레이어 사이드바 */
     @Nullable
     private BPlayerBoard sidebar;
@@ -172,8 +175,8 @@ public final class User implements Disposable {
         tabList.setBatchEnabled(true);
         clearTabListItems();
 
-        HologramUtil.addHologram(player.getName(), player, 0, 2.25, 0, userData.getDisplayName());
-        HologramUtil.setHologramVisibility(player.getName(), false, player);
+        nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
+                0, userData.getPlayerName());
 
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
@@ -191,7 +194,6 @@ public final class User implements Disposable {
 
         reset();
         TaskUtil.clearTask(this);
-        HologramUtil.removeHologram(player.getName());
 
         GameUser gameUser = GameUser.fromUser(this);
         if (gameUser != null)
@@ -210,6 +212,10 @@ public final class User implements Disposable {
             if (nameTagHider != null) {
                 nameTagHider.remove();
                 nameTagHider = null;
+            }
+            if (nameTagHologram != null) {
+                nameTagHologram.dispose();
+                nameTagHologram = null;
             }
 
             userData.save();
@@ -281,9 +287,6 @@ public final class User implements Disposable {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
             updateSidebar();
         }
-
-        HologramUtil.setHologramVisibility(player.getName(), combatUser == null, player.getWorld().getPlayers().toArray(new Player[0]));
-        HologramUtil.setHologramVisibility(player.getName(), false, player);
 
         GameUser gameUser = GameUser.fromUser(this);
         if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)

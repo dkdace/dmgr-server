@@ -237,8 +237,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         @Override
         protected void onTick(long i) {
-            super.onTick(i);
-
             if (!readyTimeModule.isReady())
                 return;
 

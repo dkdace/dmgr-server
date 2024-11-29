@@ -8,9 +8,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.HologramUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.TextHologram;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -39,8 +39,6 @@ public class DamageModule {
     public static final double DEFAULT_VALUE = 1;
     /** 치명타 배수 기본값 */
     public static final double DEFAULT_CRIT_MULTIPLIER = 2;
-    /** 생명력 홀로그램 ID */
-    private static final String HEALTH_HOLOGRAM_ID = "HitHealth";
     /** 적 타격 시 생명력 홀로그램 유지시간 쿨타임 ID */
     private static final String SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID = "ShowHealthHologram";
     /** 피격 시 애니메이션 쿨타임 ID */
@@ -132,8 +130,17 @@ public class DamageModule {
      * 생명력 홀로그램을 생성한다.
      */
     private void addHealthHologram() {
-        HologramUtil.addHologram(HEALTH_HOLOGRAM_ID + combatEntity, combatEntity.getEntity(),
-                0, combatEntity.getEntity().getHeight() + 0.4, 0, "§f");
+        TextHologram textHologram = new TextHologram(combatEntity.getEntity(), target -> {
+            CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
+            if (targetCombatUser == null)
+                return true;
+
+            if (combatEntity.isEnemy(targetCombatUser)) {
+                return CooldownUtil.getCooldown(targetCombatUser, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity) > 0
+                        && LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
+            } else
+                return targetCombatUser != combatEntity;
+        }, 0);
 
         new IntervalTask(i -> {
             if (combatEntity.isDisposed())
@@ -151,22 +158,10 @@ public class DamageModule {
             else
                 color = ChatColor.GREEN;
 
-            HologramUtil.editHologram(HEALTH_HOLOGRAM_ID + combatEntity, StringFormUtil.getProgressBar(current, max, color));
-            combatEntity.getEntity().getWorld().getPlayers().forEach(target -> {
-                CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
-                if (targetCombatUser != null) {
-                    if (combatEntity.isEnemy(targetCombatUser)) {
-                        boolean isVisible = CooldownUtil.getCooldown(targetCombatUser, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity) > 0
-                                && LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
-
-                        HologramUtil.setHologramVisibility(HEALTH_HOLOGRAM_ID + combatEntity, isVisible, target);
-                    } else
-                        HologramUtil.setHologramVisibility(HEALTH_HOLOGRAM_ID + combatEntity, targetCombatUser != combatEntity, target);
-                }
-            });
+            textHologram.setContent(StringFormUtil.getProgressBar(current, max, color));
 
             return true;
-        }, () -> HologramUtil.removeHologram(HEALTH_HOLOGRAM_ID + combatEntity), 1);
+        }, textHologram::dispose, 1);
     }
 
     /**

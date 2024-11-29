@@ -202,8 +202,6 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onTick(long i) {
-            super.onTick(i);
-
             if (!readyTimeModule.isReady())
                 return;
 

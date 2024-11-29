@@ -213,8 +213,6 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onTick(long i) {
-            super.onTick(i);
-
             playTickEffect();
             if (!readyTimeModule.isReady())
                 return;
