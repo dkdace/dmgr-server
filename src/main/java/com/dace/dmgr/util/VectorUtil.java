@@ -32,6 +32,7 @@ public final class VectorUtil {
         Location loc = location.clone();
         loc.setYaw(location.getYaw() + 90);
         loc.setPitch(0);
+
         return getRollAxis(location).getCrossProduct(loc.getDirection()).normalize();
     }
 

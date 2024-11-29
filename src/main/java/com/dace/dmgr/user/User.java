@@ -185,7 +185,7 @@ public final class User implements Disposable {
         clearTabListItems();
 
         nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
-                0, userData.getPlayerName());
+                0, userData.getDisplayName());
 
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");

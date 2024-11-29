@@ -141,15 +141,16 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        defaultWorld = Bukkit.getWorld("DMGR");
+
         GeneralConfig.getInstance().init()
                 .onFinish(this::loadUserDatas)
-                .onFinish(RankUtil::run)
                 .onFinish(() -> {
+                    RankUtil.run();
                     EventManager.register();
                     clearUnusedEntities();
                     WorldUtil.clearDuplicatedWorlds();
 
-                    defaultWorld = Bukkit.getWorld("DMGR");
                     registerCommands();
                     registerTestCommands();
 

@@ -3,8 +3,10 @@ package com.dace.dmgr.util;
 import com.dace.dmgr.combat.action.TextIcon;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.StringJoiner;
 
@@ -42,21 +44,18 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color, int length, char symbol) {
-        validateArgs(length);
+        Validate.inclusiveBetween(1, Integer.MAX_VALUE, length);
 
-        if (current < 0) current = 0;
+        if (current < 0)
+            current = 0;
 
         char[] filler = new char[length];
         Arrays.fill(filler, symbol);
         StringBuilder bar = new StringBuilder(new String(filler));
 
-        double percent = current / max;
-
         if (current < max) {
-            int index = ((int) Math.floor(percent * length));
-            if (index < 0) index = 0;
-
-            bar.insert(index, "§0");
+            int index = Math.max(0, (int) Math.floor(current / max * length));
+            bar.insert(index, ChatColor.BLACK);
         }
         bar.insert(0, color);
 
@@ -102,7 +101,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color) {
-        return getProgressBar(current, max, color, 10);
+        return getProgressBar(current, max, color, 10, PROGRESS_DEFAULT_SYMBOL);
     }
 
     /**
@@ -128,7 +127,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getActionbarProgressBar(@NonNull String prefix, int current, int max, int length, char symbol) {
-        validateArgs(length);
+        Validate.inclusiveBetween(1, Integer.MAX_VALUE, length);
 
         ChatColor color;
         if (current <= max / 4)
@@ -138,7 +137,7 @@ public final class StringFormUtil {
         else
             color = ChatColor.WHITE;
 
-        String currentDisplay = String.format("%" + (int) (Math.log10(max) + 1) + "d", current);
+        String currentDisplay = String.format(MessageFormat.format("%{0}d", (int) (Math.log10(max) + 1)), current);
         String maxDisplay = Integer.toString(max);
 
         return new StringJoiner(" §f")
@@ -160,8 +159,8 @@ public final class StringFormUtil {
      * <p>Example:</p>
      *
      * <pre><code>
-     * // [Test] <노란색>■■■■<검정색>■■■■■■ [\u4DCD 40.5]
-     * StringFormUtil.getActionbarProgressBar("[Test]", 40.5, 100, 10, '*');
+     * // [Test] <노란색>■■■■<검정색>■■■■■■ [䷍ 40.5]
+     * StringFormUtil.getActionbarProgressBar("[Test]", 40.5, 100);
      * </code></pre>
      *
      * @param prefix  접두사
@@ -197,8 +196,8 @@ public final class StringFormUtil {
      * <p>Example:</p>
      *
      * <pre><code>
-     * // [Test] <노란색>■■■■<검정색>■■■■■■ [\u4DD5 40.5]
-     * StringFormUtil.getActionbarCooldownBar("[Test]", 40.5, 100, 10, '*');
+     * // [Test] <노란색>■■■■<검정색>■■■■■■ [䷕ 40.5]
+     * StringFormUtil.getActionbarCooldownBar("[Test]", 40.5, 100);
      * </code></pre>
      *
      * @param prefix  접두사
@@ -223,15 +222,5 @@ public final class StringFormUtil {
                 .add(StringFormUtil.getProgressBar(current, max, color))
                 .add("[" + color + TextIcon.COOLDOWN + " " + currentDisplay + "§f]")
                 .toString();
-    }
-
-    /**
-     * 인자값이 유효하지 않으면 예외를 발생시킨다.
-     *
-     * @param length 막대 길이 (글자 수)
-     */
-    private static void validateArgs(int length) {
-        if (length < 1)
-            throw new IllegalArgumentException("'length'가 1 이상이어야 함");
     }
 }

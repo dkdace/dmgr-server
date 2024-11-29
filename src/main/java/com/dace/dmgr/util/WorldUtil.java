@@ -16,8 +16,7 @@ import org.bukkit.World;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -25,9 +24,9 @@ import java.util.Arrays;
  */
 @UtilityClass
 public final class WorldUtil {
-    /** SlimeWorld 플러그인 객체 */
+    /** SlimeWorld 플러그인 인스턴스 */
     private static final SWMPlugin swmPlugin = SWMPlugin.getInstance();
-    /** SlimeWorld 설정 객체 */
+    /** SlimeWorld 설정 인스턴스 */
     private static final WorldsConfig worldsConfig = ConfigManager.getWorldConfig();
 
     /**
@@ -74,13 +73,14 @@ public final class WorldUtil {
     @NonNull
     public static AsyncTask<Void> removeWorld(@NonNull World world) {
         String worldName = world.getName();
-        File file = new File(Bukkit.getWorldContainer(), MessageFormat.format("{0}/{1}.slime",
-                ConfigManager.getDatasourcesConfig().getFileConfig().getPath(), worldName));
+        Path path = Bukkit.getWorldContainer().toPath()
+                .resolve(ConfigManager.getDatasourcesConfig().getFileConfig().getPath())
+                .resolve(worldName + ".slime");
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
                 Bukkit.unloadWorld(world, false);
-                Files.delete(Paths.get(file.getPath()));
+                Files.delete(path);
 
                 onFinish.accept(null);
             } catch (Exception ex) {
@@ -110,7 +110,7 @@ public final class WorldUtil {
                 if (world != null)
                     Bukkit.unloadWorld(world, false);
 
-                Files.delete(Paths.get(file.getPath()));
+                Files.delete(file.toPath());
             } catch (Exception ex) {
                 ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
             }
