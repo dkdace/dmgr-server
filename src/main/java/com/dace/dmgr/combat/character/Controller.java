@@ -11,7 +11,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.GlowUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -55,7 +54,7 @@ public abstract class Controller extends Character {
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
 
                         if (targetCombatEntity != null)
-                            GlowUtil.setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, combatUser.getEntity(), 10);
+                            combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, 10);
                     });
         }
 

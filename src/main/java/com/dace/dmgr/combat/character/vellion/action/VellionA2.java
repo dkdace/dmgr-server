@@ -132,7 +132,7 @@ public final class VellionA2 extends ActiveSkill {
             if (LocationUtil.canPass(((CombatUser) provider).getEntity().getEyeLocation(), combatEntity.getCenterLocation()))
                 CooldownUtil.setCooldown(provider, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
 
-            GlowUtil.setGlowing(combatEntity.getEntity(), ChatColor.RED, provider.getEntity(), 4);
+            ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, 4);
 
             if (combatEntity instanceof CombatUser)
                 CooldownUtil.setCooldown(provider, ASSIST_SCORE_COOLDOWN_ID + combatEntity, 10);

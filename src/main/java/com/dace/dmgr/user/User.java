@@ -1,7 +1,10 @@
 package com.dace.dmgr.user;
 
 import com.comphenix.packetwrapper.WrapperPlayServerBoss;
+import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
+import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
@@ -30,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.ServerOperator;
@@ -40,6 +44,7 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.UUID;
@@ -57,6 +62,8 @@ public final class User implements Disposable {
     private static final String TITLE_COOLDOWN_ID = "Title";
     /** 액션바 쿨타임 ID */
     private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
+    /** 발광 효과 쿨타임 ID */
+    private static final String GLOW_COOLDOWN_ID = "Glow";
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
             "\n" +
@@ -82,6 +89,8 @@ public final class User implements Disposable {
     private final UserData userData;
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
+    /** 발광 효과 적용 엔티티 목록 (발광 엔티티 : 색상) */
+    private final HashMap<Entity, ChatColor> glowingMap = new HashMap<>();
     /** 이름표 숨기기용 갑옷 거치대 객체 */
     @Nullable
     private ArmorStand nameTagHider;
@@ -491,7 +500,7 @@ public final class User implements Disposable {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect ->
                 player.removePotionEffect(potionEffect.getType())));
-        Bukkit.getOnlinePlayers().forEach(target -> GlowUtil.removeGlowing(this.player, target));
+        Bukkit.getOnlinePlayers().forEach(target -> User.fromPlayer(target).removeGlowing(this.player));
 
         clearBossBar();
         teleport(LocationUtil.getLobbyLocation());
@@ -958,6 +967,142 @@ public final class User implements Disposable {
         });
 
         bossBarMap.clear();
+    }
+
+    /**
+     * 지정한 엔티티에게 지속시간동안 발광 효과를 적용한다.
+     *
+     * @param target   발광 효과를 적용할 엔티티
+     * @param color    색상
+     * @param duration 지속시간 (tick). -1로 설정 시 무한 지속
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    public void setGlowing(@NonNull Entity target, @NonNull ChatColor color, long duration) {
+        if (duration < -1)
+            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
+        if (duration == -1)
+            duration = Long.MAX_VALUE;
+
+        sendAddTeamPacket(target, color);
+
+        if (CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) == 0) {
+            CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, duration);
+
+            new IntervalTask(i -> {
+                if (isDisposed() || !target.isValid() || CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) == 0)
+                    return false;
+
+                if (i % 4 == 0)
+                    sendGlowingPacket(target, true);
+
+                return true;
+            }, () -> {
+                sendGlowingPacket(target, false);
+                sendRemoveTeamPacket(target);
+            }, 1);
+        } else if (CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) < duration)
+            CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, duration);
+    }
+
+    /**
+     * 지정한 엔티티에게 발광 효과를 적용한다.
+     *
+     * @param target 발광 효과를 적용할 엔티티
+     * @param color  색상
+     */
+    public void setGlowing(@NonNull Entity target, @NonNull ChatColor color) {
+        setGlowing(target, color, -1);
+    }
+
+    /**
+     * 지정한 엔티티가 발광 상태인지 확인한다.
+     *
+     * @param target 확인할 엔티티
+     * @return 플레이어에게 발광 상태면 {@code true} 반환
+     */
+    public boolean isGlowing(@NonNull Entity target) {
+        return CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) > 0;
+    }
+
+    /**
+     * 지정한 엔티티의 발광 효과를 제거한다.
+     *
+     * @param target 발광 효과가 적용된 엔티티
+     */
+    public void removeGlowing(@NonNull Entity target) {
+        CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, 0);
+    }
+
+    /**
+     * 플레이어에게 발광 효과 패킷을 전송한다.
+     *
+     * @param target    발광 효과를 적용할 엔티티
+     * @param isEnabled 활성화 여부
+     */
+    private void sendGlowingPacket(@NonNull Entity target, boolean isEnabled) {
+        WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata();
+
+        packet.setEntityID(target.getEntityId());
+        WrappedDataWatcher dw = WrappedDataWatcher.getEntityWatcher(target).deepClone();
+        dw.setObject(0, isEnabled ? (byte) (dw.getByte(0) | (1 << 6)) : (byte) (dw.getByte(0) & ~(1 << 6)));
+        packet.setMetadata(dw.getWatchableObjects());
+
+        packet.sendPacket(player);
+    }
+
+    /**
+     * 플레이어에게 팀 추가 패킷을 전송한다.
+     *
+     * @param target 발광 효과를 적용할 엔티티
+     * @param color  색상
+     */
+    private void sendAddTeamPacket(@NonNull Entity target, @NonNull ChatColor color) {
+        sendRemoveTeamPacket(target);
+
+        glowingMap.put(target, color);
+
+        WrapperPlayServerScoreboardTeam packet1 = new WrapperPlayServerScoreboardTeam();
+        WrapperPlayServerScoreboardTeam packet2 = new WrapperPlayServerScoreboardTeam();
+        WrapperPlayServerScoreboardTeam packet3 = new WrapperPlayServerScoreboardTeam();
+        packet1.setName(GLOW_COOLDOWN_ID + color.ordinal());
+        packet2.setName(GLOW_COOLDOWN_ID + color.ordinal());
+        packet3.setName(GLOW_COOLDOWN_ID + color.ordinal());
+
+        packet1.setMode(0);
+
+        packet2.setMode(2);
+        packet2.setNameTagVisibility("never");
+        packet2.setCollisionRule("never");
+        packet2.setPrefix(color + "");
+        packet2.setColor(color.ordinal());
+
+        packet3.setMode(3);
+        packet3.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
+
+        packet1.sendPacket(player);
+        packet2.sendPacket(player);
+        packet3.sendPacket(player);
+    }
+
+    /**
+     * 플레이어에게 팀 제거 패킷을 전송한다.
+     *
+     * @param target 발광 효과가 적용된 엔티티
+     */
+    private void sendRemoveTeamPacket(@NonNull Entity target) {
+        ChatColor color = glowingMap.get(target);
+        if (color == null)
+            return;
+
+        glowingMap.remove(target);
+
+        WrapperPlayServerScoreboardTeam packet = new WrapperPlayServerScoreboardTeam();
+
+        packet.setMode(4);
+        packet.setName(GLOW_COOLDOWN_ID + color.ordinal());
+        packet.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
+
+        packet.sendPacket(player);
     }
 
     /**

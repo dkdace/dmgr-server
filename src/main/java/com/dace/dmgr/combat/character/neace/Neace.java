@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.character.neace.action.*;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -223,7 +222,7 @@ public final class Neace extends Support {
 
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
-            GlowUtil.setGlowing(target.getEntity(), ChatColor.GREEN, shooter.getEntity(), 3);
+            ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, 3);
         }
     }
 }

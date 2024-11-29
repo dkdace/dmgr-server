@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundUtil;
@@ -178,7 +177,7 @@ public final class JagerA2 extends ActiveSkill {
             damageModule.setMaxHealth(JagerA2Info.HEALTH);
             damageModule.setHealth(JagerA2Info.HEALTH);
 
-            GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
+            owner.getUser().setGlowing(entity, ChatColor.WHITE);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_SUMMON, entity.getLocation());
         }
 

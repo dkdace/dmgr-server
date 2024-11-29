@@ -185,7 +185,7 @@ public final class JagerUlt extends UltimateSkill {
             damageModule.setMaxHealth(JagerUltInfo.HEALTH);
             damageModule.setHealth(JagerUltInfo.HEALTH);
 
-            GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
+            owner.getUser().setGlowing(entity, ChatColor.WHITE);
             SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON, entity.getLocation());
         }
 

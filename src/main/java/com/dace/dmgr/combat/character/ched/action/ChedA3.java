@@ -199,11 +199,11 @@ public final class ChedA3 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, getLocation(), false, true)) {
-                GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, combatUser.getEntity(), ChedA3Info.DETECT_DURATION);
+                combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION);
                 combatUser.getEntity().getWorld().getPlayers().stream()
                         .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
                         .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
-                        .forEach(teamTarget -> GlowUtil.setGlowing(target.getEntity(), ChatColor.RED, teamTarget.getEntity(), ChedA3Info.DETECT_DURATION));
+                        .forEach(teamTarget -> teamTarget.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);

@@ -213,8 +213,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
             damageModule.setHealth(getStateValue());
 
-            GlowUtil.setGlowing(entity, ChatColor.WHITE, owner.getEntity());
             SoundUtil.playNamedSound(NamedSound.COMBAT_ENTITY_SUMMON, entity.getLocation());
+            owner.getUser().setGlowing(entity, ChatColor.WHITE);
         }
 
         @Override

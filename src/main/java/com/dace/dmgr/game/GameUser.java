@@ -12,7 +12,6 @@ import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.GlowUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -146,7 +145,7 @@ public final class GameUser implements Disposable {
 
         if (team != null && i % 5 == 0) {
             for (GameUser target : team.getTeamUsers())
-                GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
+                target.getUser().setGlowing(player, ChatColor.BLUE);
         }
         if (i % 20 == 0)
             updateGameTablist();
@@ -224,7 +223,7 @@ public final class GameUser implements Disposable {
         combatUser = new CombatUser(this);
 
         for (GameUser target : team.getTeamUsers())
-            GlowUtil.setGlowing(player, ChatColor.BLUE, target.player);
+            target.getUser().setGlowing(player, ChatColor.BLUE);
     }
 
     /**
