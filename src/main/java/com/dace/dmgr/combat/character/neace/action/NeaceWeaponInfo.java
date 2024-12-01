@@ -5,8 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     /** 쿨타임 (tick) */
@@ -67,5 +69,20 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 5;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8, 1.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 1, 1.5)
+        );
+        /** 사용 (치유 광선) */
+        public static final DefinedSound USE_HEAL = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2));
     }
 }

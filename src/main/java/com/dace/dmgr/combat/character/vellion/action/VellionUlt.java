@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -62,7 +65,7 @@ public final class VellionUlt extends UltimateSkill {
         if (skillp1.isCancellable())
             skillp1.onCancelled();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE, combatUser.getEntity().getLocation());
+        VellionUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect,
                 () -> new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
@@ -127,7 +130,7 @@ public final class VellionUlt extends UltimateSkill {
         isEnabled = true;
         combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_USE_READY, combatUser.getEntity().getLocation());
+        VellionUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
@@ -151,7 +154,7 @@ public final class VellionUlt extends UltimateSkill {
             new VellionUltExplodeArea().emit(loc);
 
             Location loc2 = loc.add(0, 1, 0);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_ULT_EXPLODE, loc2);
+            VellionUltInfo.SOUND.EXPLODE.play(loc2);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
                     0.3, 0.3, 0.3, 0.4);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 14, loc2, 200,

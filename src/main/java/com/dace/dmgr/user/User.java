@@ -30,6 +30,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
@@ -78,6 +79,21 @@ public final class User implements Disposable {
             "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
             "\n" +
             "\n§7다운로드 오류 문의 : {0}";
+    /** 레벨 업 효과음 */
+    private static final DefinedSound LEVEL_UP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("random.good", 1000, 1));
+    /** 티어 승급 효과음 */
+    private static final DefinedSound TIER_UP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.UI_TOAST_CHALLENGE_COMPLETE, 1000, 1.5));
+    /** 티어 강등 효과음 */
+    private static final DefinedSound TIER_DOWN_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_BLAZE_DEATH, 1000, 0.5));
+    /** 경고 액션바 효과음 */
+    private static final DefinedSound ALERT_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("new.block.note_block.bit", 0.25, 0.7));
+    /** 타자기 효과 타이틀 효과음 */
+    private static final DefinedSound TYPEWRITER_TITLE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("new.block.note_block.bass", 1, 1.5));
 
     /** 플레이어 객체 */
     @NonNull
@@ -461,8 +477,8 @@ public final class User implements Disposable {
      */
     public void playLevelUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GENERAL_SUCCESS, player);
             sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", 8, 40, 30, 40);
+            LEVEL_UP_SOUND.play(player);
         }, 100));
     }
 
@@ -471,8 +487,8 @@ public final class User implements Disposable {
      */
     public void playTierUpEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GAME_WIN, player);
             sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
+            TIER_UP_SOUND.play(player);
         }, 80));
     }
 
@@ -481,8 +497,8 @@ public final class User implements Disposable {
      */
     public void playTierDownEffect() {
         TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, player);
             sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
+            TIER_DOWN_SOUND.play(player);
         }, 80));
     }
 
@@ -644,7 +660,7 @@ public final class User implements Disposable {
      * @param message 경고 메시지
      */
     public void sendAlert(@NonNull String message) {
-        SoundUtil.playNamedSound(NamedSound.GENERAL_ALERT, player);
+        ALERT_SOUND.play(player);
         TaskUtil.addTask(this, new IntervalTask(i -> {
             ChatColor color = ChatColor.YELLOW;
             if (i == 1)
@@ -713,7 +729,7 @@ public final class User implements Disposable {
                 CooldownUtil.setCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID, 50);
 
                 sendTitle("", prefix + " §f" + text, 0, 40, 10);
-                SoundUtil.playNamedSound(NamedSound.TYPEWRITER_TITLE, player);
+                TYPEWRITER_TITLE_SOUND.play(player);
             }, delay));
 
             if (nextChar == '.' || nextChar == ',')

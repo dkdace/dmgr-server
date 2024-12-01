@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     /** 쿨타임 (tick) */
@@ -49,5 +52,26 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
                         )
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
+                new DefinedSound.SoundEffect("new.entity.squid.squirt", 2, 1.2)
+        );
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 2, 1),
+                new DefinedSound.SoundEffect("new.block.respawn_anchor.charge", 2, 0.8)
+        );
+        /** 발동 */
+        public static final DefinedSound TRIGGER = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 0.6, 0.7, 0.1));
     }
 }

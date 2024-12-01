@@ -3,8 +3,6 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -56,7 +54,7 @@ public final class SiliaA3 extends ChargeableSkill {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaA3Info.SPEED);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_USE, combatUser.getEntity().getLocation());
+            SiliaA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             double health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -68,7 +66,7 @@ public final class SiliaA3 extends ChargeableSkill {
 
                 if (i >= SiliaA3Info.ACTIVATE_DURATION && !((SiliaWeapon) combatUser.getWeapon()).isStrike()) {
                     ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_ACTIVATE, combatUser.getEntity());
+                    SiliaA3Info.SOUND.ACTIVATE.play(combatUser.getEntity());
                 }
 
                 return true;
@@ -94,6 +92,6 @@ public final class SiliaA3 extends ChargeableSkill {
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A3_DISABLE, combatUser.getEntity().getLocation());
+        SiliaA3Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
     }
 }

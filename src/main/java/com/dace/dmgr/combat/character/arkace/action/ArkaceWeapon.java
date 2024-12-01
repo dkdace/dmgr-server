@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -12,14 +13,15 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -75,12 +77,12 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE, loc);
-                    TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_SHELL_DROP, loc), 8));
+                    ArkaceWeaponInfo.SOUND.USE.play(loc);
+                    TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shoot();
 
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_WEAPON_USE_ULT, loc);
+                    ArkaceWeaponInfo.SOUND.USE_ULT.play(loc);
                 }
 
                 break;
@@ -137,31 +139,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public void onReloadTick(long i) {
-        switch ((int) i) {
-            case 3:
-                SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6, 1.6);
-                break;
-            case 4:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 1.9);
-                break;
-            case 18:
-                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 19:
-                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 1);
-                break;
-            case 20:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 1.8);
-                break;
-            case 26:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 1.7);
-                break;
-            case 27:
-                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.8);
-                break;
-            default:
-                break;
-        }
+        ArkaceWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
     }
 
     @Override

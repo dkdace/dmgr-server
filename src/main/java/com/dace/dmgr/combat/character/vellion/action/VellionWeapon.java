@@ -8,9 +8,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -45,7 +43,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         new VellionWeaponProjectile().shoot();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_WEAPON_USE, combatUser.getEntity().getLocation());
+        VellionWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
     }
 
     private final class VellionWeaponProjectile extends Projectile {

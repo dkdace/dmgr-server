@@ -5,8 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 
 public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     /** 궁극기 필요 충전량 */
@@ -35,6 +38,28 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("new.block.respawn_anchor.ambient", 3, 1.2));
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1));
+        /** 피격 */
+        public static final DefinedSound DAMAGE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1));
+        /** 파괴 */
+        public static final DefinedSound DEATH = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+                new DefinedSound.SoundEffect("new.block.conduit.deactivate", 3, 0.8)
         );
     }
 }

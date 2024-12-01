@@ -12,7 +12,9 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -65,7 +67,7 @@ public final class VellionA1 extends ActiveSkill {
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA1Info.READY_SLOW);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A1_USE, combatUser.getEntity().getLocation());
+        VellionA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
@@ -74,7 +76,7 @@ public final class VellionA1 extends ActiveSkill {
             summonEntity = new VellionA1Entity(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
             summonEntity.activate();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A1_USE_READY, loc);
+            VellionA1Info.SOUND.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION));
     }
 
@@ -268,7 +270,7 @@ public final class VellionA1 extends ActiveSkill {
                         }
 
                         ParticleUtil.play(Particle.CRIT_MAGIC, location, 30, 0, 0, 0, 0.4);
-                        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A1_HIT_ENTITY, location);
+                        VellionA1Info.SOUND.HIT_ENTITY.play(location);
                     } else if (target instanceof Healable)
                         target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA1Heal.instance,
                                 target.getStatusEffectModule().getStatusEffectDuration(VellionA1Heal.instance) + VellionA1Info.EFFECT_DURATION);

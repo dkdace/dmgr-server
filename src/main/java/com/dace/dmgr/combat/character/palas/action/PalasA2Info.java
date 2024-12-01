@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
     /** 쿨타임 (tick) */
@@ -34,5 +37,21 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
                         .build()
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_SHOOT, 2, 1.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_SWIM, 2, 1.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_SWIM, 2, 2)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect("new.entity.puffer_fish.blow_out", 2, 1.8));
     }
 }

@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
     /** 궁극기 필요 충전량 */
@@ -34,6 +37,33 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 1, 0.6)
+        );
+        /** 사격 */
+        public static final DefinedSound SHOOT = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.8, 0.1),
+                new DefinedSound.SoundEffect("random.gun2.xm1014_1", 3, 1),
+                new DefinedSound.SoundEffect("random.gun2.spas_12_1", 3, 1),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.9),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.8)
+        );
+        /** 사용 종료 */
+        public static final DefinedSound END = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ITEM_BREAK, 2, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 2, 1.4)
         );
     }
 }

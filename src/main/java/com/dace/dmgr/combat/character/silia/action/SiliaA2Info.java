@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     /** 쿨타임 (tick) */
@@ -41,6 +44,26 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.RIGHT_CLICK)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 1, 1));
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect("random.swing", 1.5, 0.6),
+                new DefinedSound.SoundEffect("new.item.trident.riptide_3", 1.5, 0.8)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect("random.swing", 1, 0.7, 0.05),
+                new DefinedSound.SoundEffect("new.item.trident.riptide_2", 1, 0.9, 0.05)
         );
     }
 }

@@ -5,8 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     /** 쿨타임 (tick) */
@@ -42,5 +44,18 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 14;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_HURT, 0.8, 0.5),
+                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.8),
+                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.9)
+        );
     }
 }

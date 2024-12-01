@@ -11,9 +11,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -58,7 +56,7 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(false);
             new ArkaceA1Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_USE, loc);
+            ArkaceA1Info.SOUND.USE.play(loc);
         }, () -> TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
     }
 
@@ -90,7 +88,7 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = getLocation().clone().add(0, 0.1, 0);
             new ArkaceA1Area().emit(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_ARKACE_A1_EXPLODE, loc);
+            ArkaceA1Info.SOUND.EXPLODE.play(loc);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 200,
                     2.5, 2.5, 2.5, 32, 250, 225);
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 40, 0.2, 0.2, 0.2, 0.2);

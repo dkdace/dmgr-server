@@ -2,7 +2,7 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -88,14 +88,14 @@ public final class ChatSoundOption extends Gui {
         /** 효과음 */
         @NonNull
         @Getter
-        private final String sound;
+        private final DefinedSound sound;
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
 
         ChatSound(@NonNull String name, @NonNull String sound, Material material) {
             ItemBuilder itemBuilder = new ItemBuilder(material).setName("§e§l" + name);
             this.name = name;
-            this.sound = sound;
+            this.sound = new DefinedSound(new DefinedSound.SoundEffect(sound, 1000, Math.sqrt(2)));
 
             this.guiItem = new GuiItem("ChatSound" + this, itemBuilder.build()) {
                 @Override
@@ -106,7 +106,7 @@ public final class ChatSoundOption extends Gui {
                     UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
                     userConfig.setChatSound(ChatSound.this);
 
-                    SoundUtil.play(sound, player, 1, Math.sqrt(2));
+                    ChatSound.this.sound.play(player);
 
                     ChatSoundOption.getInstance().open(player);
 

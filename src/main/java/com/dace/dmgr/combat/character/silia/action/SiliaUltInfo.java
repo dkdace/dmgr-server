@@ -5,7 +5,9 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
     /** 궁극기 필요 충전량 */
@@ -37,6 +39,20 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect("random.swordhit", 2, 1),
+                new DefinedSound.SoundEffect("random.swordhit", 2, 0.7),
+                new DefinedSound.SoundEffect("new.item.trident.return", 2.5, 1.4),
+                new DefinedSound.SoundEffect("new.item.trident.return", 2.5, 1.2)
         );
     }
 }

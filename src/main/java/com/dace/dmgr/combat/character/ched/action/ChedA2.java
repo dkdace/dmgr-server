@@ -4,9 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -49,7 +47,7 @@ public final class ChedA2 extends ActiveSkill {
         Location location = combatUser.getEntity().getLocation();
         location.setPitch(0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A2_USE, location);
+        ChedA2Info.SOUND.USE.play(location);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location.clone().add(0, 0.5, 0), 20,
                 0.4, 0.1, 0.4, 0.15);
 

@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     /** 쿨타임 (tick) */
@@ -64,5 +67,24 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                         )
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 소환 준비 */
+        public static final DefinedSound SUMMON_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_GROWL, 1, 1));
+        /** 적 감지 */
+        public static final DefinedSound ENEMY_DETECT = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_GROWL, 2, 0.85));
+        /** 피격 */
+        public static final DefinedSound DAMAGE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HURT, 0.4, 1, 0.1));
+        /** 사망 */
+        public static final DefinedSound DEATH = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_DEATH, 1, 1, 0.1));
     }
 }

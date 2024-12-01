@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     /** 궁극기 필요 충전량 */
@@ -40,5 +43,21 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
                         .build()
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_SHOOT, 3, 1.6),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_SWIM, 3, 1.6),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_SWIM, 3, 1.8)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect("new.item.trident.thunder", 3, 1.5));
     }
 }

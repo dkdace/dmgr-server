@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -126,7 +129,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA3Info.READY_SLOW);
         Location location = confirmModule.getCurrentLocation();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A3_USE, combatUser.getEntity().getLocation());
+        VellionA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(true);
@@ -149,7 +152,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     private void onReady(@NonNull Location location) {
         Location loc = location.clone().add(0, 0.1, 0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A3_USE_READY, loc);
+        VellionA3Info.SOUND.USE_READY.play(loc);
 
         TaskUtil.addTask(VellionA3.this, new IntervalTask(i -> {
             if (i % 4 == 0)

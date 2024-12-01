@@ -10,7 +10,9 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -58,7 +60,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A1_USE, location);
+        SiliaA1Info.SOUND.USE.play(location);
 
         HashSet<Damageable> targets = new HashSet<>();
 

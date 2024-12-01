@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
     /** 쿨타임 (tick) */
@@ -47,6 +50,32 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        /** 부착 */
+        public static final DefinedSound STUCK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.8, 0.5),
+                new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.8, 1.5)
+        );
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5, 1.8));
+        /** 폭발 */
+        public static final DefinedSound EXPLODE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 4, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_LARGE_BLAST, 4, 0.6),
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 4, 0.8),
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 4, 0.5),
+                new DefinedSound.SoundEffect("random.explosion_reverb", 6, 1.2)
         );
     }
 }

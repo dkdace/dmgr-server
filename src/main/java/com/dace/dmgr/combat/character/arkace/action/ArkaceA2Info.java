@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
     /** 쿨타임 (tick) */
@@ -30,6 +33,19 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.5, 0.9),
+                new DefinedSound.SoundEffect(Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1.5, 1.4),
+                new DefinedSound.SoundEffect(Sound.ITEM_ARMOR_EQUIP_DIAMOND, 1.5, 1.2)
         );
     }
 }

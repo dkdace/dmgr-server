@@ -3,7 +3,9 @@ package com.dace.dmgr.combat.character.vellion.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -43,7 +45,7 @@ public final class VellionP1 extends AbstractSkill {
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, VellionP1Info.SPEED);
             Location location = combatUser.getEntity().getLocation();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_P1_USE, location);
+            VellionP1Info.SOUND.USE.play(location);
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,
                     0.8, 0, 0.8, 150, 110, 170);
 
@@ -97,7 +99,7 @@ public final class VellionP1 extends AbstractSkill {
             return !combatUser.getEntity().isOnGround();
         }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_P1_DISABLE, combatUser.getEntity().getLocation());
+        VellionP1Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
         ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,
                 0.8, 0, 0.8, 150, 110, 170);
     }

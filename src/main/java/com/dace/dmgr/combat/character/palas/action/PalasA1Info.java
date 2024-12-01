@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     /** 쿨타임 (tick) */
@@ -38,6 +41,32 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ARROW_SHOOT, 1.5, 0.5),
+                new DefinedSound.SoundEffect("random.gun.m1911_silencer", 1.5, 0.8)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_TWINKLE, 2, 1.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+                new DefinedSound.SoundEffect("random.stab", 2, 2)
+        );
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.8)
         );
     }
 }

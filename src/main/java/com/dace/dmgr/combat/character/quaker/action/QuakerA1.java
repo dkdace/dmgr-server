@@ -11,9 +11,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -91,7 +89,7 @@ public final class QuakerA1 extends ChargeableSkill {
         if (summonEntity != null)
             summonEntity.dispose();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DISABLE, combatUser.getEntity().getLocation());
+        QuakerA1Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -154,7 +152,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+            QuakerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
                 CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
@@ -167,7 +165,7 @@ public final class QuakerA1 extends ChargeableSkill {
             onCancelled();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_DEATH, entity.getLocation());
+            QuakerA1Info.SOUND.DEATH.play(entity.getLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(hitboxes[0].getCenter(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);

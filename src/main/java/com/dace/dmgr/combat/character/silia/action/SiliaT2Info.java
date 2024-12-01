@@ -4,7 +4,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class SiliaT2Info extends TraitInfo {
     /** 전역 쿨타임 (tick) */
@@ -31,6 +34,19 @@ public final class SiliaT2Info extends TraitInfo {
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5, 1),
+                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_ATTACK, 1.5, 0.8),
+                new DefinedSound.SoundEffect("random.swordhit", 1.5, 0.7)
         );
     }
 }

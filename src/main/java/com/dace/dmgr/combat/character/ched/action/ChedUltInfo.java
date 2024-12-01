@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     /** 궁극기 필요 충전량 */
@@ -55,5 +58,39 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
                         )
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.4),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR, 2, 0.8),
+                new DefinedSound.SoundEffect("new.entity.squid.squirt", 2, 0.7)
+        );
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect("new.entity.phantom.death", 3, 0.7),
+                new DefinedSound.SoundEffect("new.entity.phantom.death", 3, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SHOOT, 3, 0.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_VEX_CHARGE, 3, 0.85)
+        );
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_FLAP, 1.5, 1.2));
+        /** 폭발 */
+        public static final DefinedSound EXPLODE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ITEM_TOTEM_USE, 5, 1.3),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 5, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 5, 0.6),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 5, 0.8),
+                new DefinedSound.SoundEffect("random.explosion_reverb", 7, 0.6)
+        );
+        /** 화염 지대 틱 효과음 */
+        public static final DefinedSound FIRE_FLOOR_TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_AMBIENT, 2, 0.75, 0.1));
     }
 }

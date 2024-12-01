@@ -12,9 +12,7 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -66,7 +64,7 @@ public final class JagerA2 extends ActiveSkill {
         if (summonEntity != null)
             summonEntity.dispose();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_USE, combatUser.getEntity().getLocation());
+        JagerA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
@@ -74,7 +72,7 @@ public final class JagerA2 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new JagerA2Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
+            CombatEffectUtil.THROW_SOUND.play(loc);
         }, JagerA2Info.READY_DURATION));
     }
 
@@ -178,7 +176,7 @@ public final class JagerA2 extends ActiveSkill {
             damageModule.setHealth(JagerA2Info.HEALTH);
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_SUMMON, entity.getLocation());
+            JagerA2Info.SOUND.SUMMON.play(entity.getLocation());
         }
 
         @Override
@@ -196,7 +194,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         public void onReady() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_SUMMON_READY, entity.getLocation());
+            JagerA2Info.SOUND.SUMMON_READY.play(entity.getLocation());
         }
 
         @Override
@@ -242,7 +240,7 @@ public final class JagerA2 extends ActiveSkill {
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
             }
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_TRIGGER, entity.getLocation());
+            JagerA2Info.SOUND.TRIGGER.play(entity.getLocation());
 
             dispose();
         }
@@ -270,7 +268,7 @@ public final class JagerA2 extends ActiveSkill {
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+            JagerA2Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
 
@@ -280,7 +278,7 @@ public final class JagerA2 extends ActiveSkill {
 
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
                     0.1, 0.1, 0.1, 0.15);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A2_DEATH, entity.getLocation());
+            JagerA2Info.SOUND.DEATH.play(entity.getLocation());
         }
     }
 }

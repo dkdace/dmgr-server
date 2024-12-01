@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
@@ -45,5 +46,24 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
         public static final short DEFAULT = 1;
         /** 불화살 */
         public static final short FIRE = 11;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 충전 */
+        public static final DefinedSound CHARGE = new DefinedSound(
+                new DefinedSound.SoundEffect("new.item.crossbow.loading_middle", 0.6, 1));
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("new.item.crossbow.shoot", 0.5, 1.1),
+                new DefinedSound.SoundEffect("random.gun.bow", 0.5, 0.7),
+                new DefinedSound.SoundEffect("random.gun2.shovel_leftclick", 0.6, 0.75)
+        );
+        /** 타격 */
+        public static final DefinedSound HIT = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun.arrowhit", 0.5, 1));
     }
 }

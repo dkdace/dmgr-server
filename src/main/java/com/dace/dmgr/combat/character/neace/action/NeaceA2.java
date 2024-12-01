@@ -5,9 +5,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -49,7 +47,7 @@ public final class NeaceA2 extends ActiveSkill {
             setDuration();
             combatUser.getWeapon().setGlowing(true);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A2_USE, combatUser.getEntity().getLocation());
+            NeaceA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished() || combatUser.isDead())

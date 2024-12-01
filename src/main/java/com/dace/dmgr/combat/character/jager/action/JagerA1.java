@@ -12,7 +12,8 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -213,8 +214,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
             damageModule.setHealth(getStateValue());
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_ENTITY_SUMMON, entity.getLocation());
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
+            CombatEffectUtil.ENTITY_SUMMON_SOUND.play(entity.getLocation());
         }
 
         @Override
@@ -232,7 +233,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @Override
         public void onReady() {
             entity.setAI(true);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_SUMMON_READY, entity.getLocation());
+            JagerA1Info.SOUND.SUMMON_READY.play(entity.getLocation());
         }
 
         @Override
@@ -254,7 +255,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     if (target != null) {
                         entity.setTarget(target.getEntity());
 
-                        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_ENEMY_DETECT, entity.getLocation());
+                        JagerA1Info.SOUND.ENEMY_DETECT.play(entity.getLocation());
                     }
                 } else {
                     entity.setAngry(true);
@@ -305,7 +306,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                              boolean isCrit, boolean isUlt) {
             setStateValue((int) damageModule.getHealth());
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+            JagerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBleedingEffect(location, entity, damage);
         }
 
@@ -316,7 +317,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A1_DEATH, entity.getLocation());
+            JagerA1Info.SOUND.DEATH.play(entity.getLocation());
         }
     }
 }

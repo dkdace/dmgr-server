@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -12,9 +13,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -59,7 +58,7 @@ public final class MagrittaA1 extends ActiveSkill {
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) MagrittaA1Info.READY_DURATION);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A1_USE, combatUser.getEntity().getLocation());
+        MagrittaA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
@@ -67,7 +66,7 @@ public final class MagrittaA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new MagrittaA1Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc, 1, -0.1);
+            CombatEffectUtil.THROW_SOUND.play(loc, 1, -0.1);
         }, MagrittaA1Info.READY_DURATION));
     }
 
@@ -126,7 +125,7 @@ public final class MagrittaA1 extends ActiveSkill {
          * @param target   부착 대상
          */
         private void onStuck(@NonNull Location location, @Nullable Damageable target) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A1_STUCK, location);
+            MagrittaA1Info.SOUND.STUCK.play(location);
 
             if (target != null) {
                 combatUser.getUser().sendTitle("§b§l부착", "", 0, 5, 10);
@@ -150,7 +149,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 }
 
                 if (i % 2 == 0)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A1_TICK, loc);
+                    MagrittaA1Info.SOUND.TICK.play(loc);
 
                 return true;
             }, isCancelled -> {
@@ -158,7 +157,7 @@ public final class MagrittaA1 extends ActiveSkill {
                         .add(0, 0.1, 0);
                 new MagrittaA1Area(this).emit(loc);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A1_EXPLODE, loc);
+                MagrittaA1Info.SOUND.EXPLODE.play(loc);
                 ParticleUtil.play(Particle.SMOKE_LARGE, loc, 80, 0.3, 0.3, 0.3, 0.1);
                 ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 150, 0.2, 0.2, 0.2, 0.3);
                 ParticleUtil.play(Particle.LAVA, loc, 100, 0.8, 0.8, 0.8, 0);

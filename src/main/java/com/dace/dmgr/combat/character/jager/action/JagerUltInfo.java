@@ -4,8 +4,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 
 public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     /** 궁극기 필요 충전량 */
@@ -58,6 +61,36 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                                 .build()
                         )
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        /** 소환 */
+        public static final DefinedSound SUMMON = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.5, 0.5));
+        /** 소환 준비 대기 */
+        public static final DefinedSound SUMMON_BEFORE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.8, 1.7));
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ITEM_ELYTRA_FLYING, 3, 1.3, 0.2),
+                new DefinedSound.SoundEffect(Sound.ITEM_ELYTRA_FLYING, 3, 1.7, 0.2)
+        );
+        /** 피격 */
+        public static final DefinedSound DAMAGE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.metalhit", 0.4, 1.1, 0.1));
+        /** 파괴 */
+        public static final DefinedSound DEATH = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ITEM_BREAK, 2, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 2, 1.2)
         );
     }
 }

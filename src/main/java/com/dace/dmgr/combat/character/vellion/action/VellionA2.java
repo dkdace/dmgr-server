@@ -11,7 +11,10 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -160,7 +163,7 @@ public final class VellionA2 extends ActiveSkill {
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
             CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE, combatUser.getEntity().getLocation());
+            VellionA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished() || isInvalid(combatUser, target))
@@ -186,7 +189,7 @@ public final class VellionA2 extends ActiveSkill {
 
                 target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA2Mark.instance, 10);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_USE_READY, combatUser.getEntity().getLocation());
+                VellionA2Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
 
                 Location loc = combatUser.getArmLocation(true);
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
@@ -252,7 +255,7 @@ public final class VellionA2 extends ActiveSkill {
                         && combatEntity.isEnemy(VellionA2.this.combatUser));
 
                 effectLoc = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_VELLION_A2_TRIGGER, effectLoc);
+                VellionA2Info.SOUND.TRIGGER.play(effectLoc);
             }
 
             @Override

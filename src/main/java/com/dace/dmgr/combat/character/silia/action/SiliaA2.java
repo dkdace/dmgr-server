@@ -9,7 +9,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -54,7 +56,7 @@ public final class SiliaA2 extends ActiveSkill {
         if (skill3.isCancellable())
             skill3.onCancelled();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE, combatUser.getEntity().getLocation());
+        SiliaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -70,7 +72,7 @@ public final class SiliaA2 extends ActiveSkill {
 
             new SiliaA2Projectile().shoot();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_USE_READY, combatUser.getEntity().getLocation());
+            SiliaA2Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
     }
 
@@ -138,7 +140,7 @@ public final class SiliaA2 extends ActiveSkill {
                 loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
                 for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
                     ParticleUtil.play(Particle.END_ROD, loc2.add(0, 1, 0), 3, 0, 0, 0, 0.05);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_A2_HIT_ENTITY, getLocation());
+                SiliaA2Info.SOUND.HIT_ENTITY.play(getLocation());
 
                 if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
                         && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {

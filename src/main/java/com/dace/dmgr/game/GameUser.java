@@ -13,7 +13,6 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skin;
@@ -365,7 +364,7 @@ public final class GameUser implements Disposable {
         for (GameUser target : (isTeam ? team.getTeamUsers() : game.getGameUsers())) {
             UserData targetUserData = UserData.fromPlayer(target.getPlayer());
             target.getUser().getPlayer().sendMessage(fullMessage);
-            SoundUtil.play(targetUserData.getConfig().getChatSound().getSound(), target.getPlayer(), 1000, 1);
+            targetUserData.getConfig().getChatSound().getSound().play(target.getPlayer(), 1, Math.pow(2, -7 / 12.0) - 1);
         }
     }
 

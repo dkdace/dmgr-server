@@ -3,11 +3,11 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -18,6 +18,10 @@ import java.util.function.LongConsumer;
  * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
 public abstract class ActiveSkill extends AbstractSkill {
+    /** 스킬 준비 효과음 */
+    static final DefinedSound READY_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2, 2));
+
     /** 스킬 슬롯 */
     private final int slot;
     /** 원본 스킬 아이템 객체 */
@@ -61,7 +65,7 @@ public abstract class ActiveSkill extends AbstractSkill {
     @Override
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        READY_SOUND.play(combatUser.getEntity());
     }
 
     @Override

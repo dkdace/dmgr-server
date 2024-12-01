@@ -8,8 +8,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -17,6 +16,7 @@ import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +33,21 @@ import java.util.stream.Collectors;
 public final class Game implements Disposable {
     /** 게임 시작 대기 보스바 ID */
     private static final String GAME_WAIT_BOSSBAR_ID = "GameWait";
+    /** 타이머 효과음 */
+    private static final DefinedSound TIMER_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1000, 1));
+    /** 전투 시작 효과음 */
+    private static final DefinedSound ON_PLAY_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SPAWN, 1000, 1));
+    /** 승리 효과음 */
+    private static final DefinedSound WIN_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.UI_TOAST_CHALLENGE_COMPLETE, 1000, 1.5));
+    /** 패배 효과음 */
+    private static final DefinedSound LOSE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_BLAZE_DEATH, 1000, 0.5));
+    /** 무승부 효과음 */
+    private static final DefinedSound DRAW_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1000, 1));
 
     /** 방 번호 */
     @Getter
@@ -252,7 +267,7 @@ public final class Game implements Disposable {
     private void onSecondReady() {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
-                SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                TIMER_SOUND.play(gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
             });
         }
@@ -262,7 +277,7 @@ public final class Game implements Disposable {
             remainingTime = gamePlayMode.getPlayDuration();
 
             gameUsers.forEach(gameUser -> {
-                SoundUtil.playNamedSound(NamedSound.GAME_ON_PLAY, gameUser.getPlayer());
+                ON_PLAY_SOUND.play(gameUser.getPlayer());
                 gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
                 gameUser.getUser().sendMessageInfo("");
                 gameUser.getUser().sendMessageInfo("§n'/전체'§r 또는 §n'/tc'§r를 입력하여 팀/전체 채팅을 전환할 수 있습니다.");
@@ -283,20 +298,20 @@ public final class Game implements Disposable {
             if (ultPackRemainingTime >= 0 && ultPackRemainingTime <= 20) {
                 if (ultPackRemainingTime == 5 || ultPackRemainingTime == 10 || ultPackRemainingTime == 20)
                     gameUsers.forEach(gameUser -> {
-                        SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                        TIMER_SOUND.play(gameUser.getPlayer());
                         gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 §e" + ultPackRemainingTime + "초 §f후 활성화됩니다.",
                                 0, 20, 20, 40);
                     });
                 else if (ultPackRemainingTime == 0)
                     gameUsers.forEach(gameUser -> {
-                        SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                        TIMER_SOUND.play(gameUser.getPlayer());
                         gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", 0, 20, 20, 40);
                     });
             }
 
             if (remainingTime <= 10) {
                 gameUsers.forEach(gameUser -> {
-                    SoundUtil.playNamedSound(NamedSound.GAME_TIMER, gameUser.getPlayer());
+                    TIMER_SOUND.play(gameUser.getPlayer());
                     gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
                 });
             }
@@ -515,7 +530,7 @@ public final class Game implements Disposable {
     private void playWinEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
-            SoundUtil.playNamedSound(NamedSound.GAME_WIN, gameUser.getPlayer());
+            WIN_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
 
@@ -527,7 +542,7 @@ public final class Game implements Disposable {
     private void playLoseEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
-            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, gameUser.getPlayer());
+            LOSE_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
 
@@ -539,7 +554,7 @@ public final class Game implements Disposable {
     private void playDrawEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
             gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
-            SoundUtil.playNamedSound(NamedSound.GAME_DRAW, gameUser.getPlayer());
+            DRAW_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
 

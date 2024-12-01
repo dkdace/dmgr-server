@@ -12,9 +12,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -60,7 +58,7 @@ public final class PalasA1 extends ActiveSkill {
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A1_USE, combatUser.getEntity().getLocation());
+        PalasA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
@@ -68,7 +66,7 @@ public final class PalasA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new PalasA1Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A1_USE_READY, loc);
+            PalasA1Info.SOUND.USE_READY.play(loc);
         }, PalasA1Info.READY_DURATION));
     }
 
@@ -113,7 +111,7 @@ public final class PalasA1 extends ActiveSkill {
 
             if (i % 2 == 0) {
                 ParticleUtil.play(Particle.CRIT, combatEntity.getCenterLocation(), 20, 0, 0, 0, 0.6);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A1_TICK, combatEntity.getEntity().getLocation());
+                PalasA1Info.SOUND.TICK.play(combatEntity.getEntity().getLocation());
             }
         }
     }
@@ -147,7 +145,7 @@ public final class PalasA1 extends ActiveSkill {
                             240, 230, 50);
                 }
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A1_HIT_ENTITY, getLocation());
+                PalasA1Info.SOUND.HIT_ENTITY.play(getLocation());
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);

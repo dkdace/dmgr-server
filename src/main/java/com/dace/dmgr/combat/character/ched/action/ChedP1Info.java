@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
     /** 벽타기 이동 강도 */
@@ -35,6 +38,26 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
                                 .build()
                         )
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_STONE_STEP, 1, 0.5, 0.05));
+        /** 사용 (매달리기) */
+        public static final DefinedSound USE_HANG = new DefinedSound(
+                new DefinedSound.SoundEffect("new.entity.phantom.flap", 1, 1.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 0.6, 0.85)
+        );
+        /** 해제 (매달리기) */
+        public static final DefinedSound DISABLE_HANG = new DefinedSound(
+                new DefinedSound.SoundEffect("new.entity.phantom.flap", 1, 1.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_SWAG, 0.6, 1.4)
         );
     }
 }

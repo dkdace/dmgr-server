@@ -5,8 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -80,9 +78,9 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation());
+                SiliaP2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
             else
-                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_P2_USE, combatUser.getEntity().getLocation(), 0.1, 0.25);
+                SiliaP2Info.SOUND.USE.play(combatUser.getEntity().getLocation(), 0.1, 0.25);
 
             return true;
         }, isCancelled -> {

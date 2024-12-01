@@ -4,7 +4,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -105,7 +108,7 @@ public final class ChedP1 extends AbstractSkill {
             combatUser.getEntity().setFallDistance(0);
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_P1_USE, combatUser.getEntity().getLocation());
+            ChedP1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             return true;
         }, () -> {
@@ -126,7 +129,7 @@ public final class ChedP1 extends AbstractSkill {
             if (!isHanging) {
                 setHanging(true);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_P1_USE_HANG, combatUser.getEntity().getLocation());
+                ChedP1Info.SOUND.USE_HANG.play(combatUser.getEntity().getLocation());
                 ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 40,
                         0.65, 0, 0.65, 186, 55, 30);
             }
@@ -159,7 +162,7 @@ public final class ChedP1 extends AbstractSkill {
         if (isHanging) {
             setHanging(false);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_P1_DISABLE_HANG, combatUser.getEntity().getLocation());
+            ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getEntity().getLocation());
             ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 40,
                     0.65, 0, 0.65, 186, 55, 30);
         } else

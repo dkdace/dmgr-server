@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
     /** 쿨타임 (tick) */
@@ -45,6 +48,40 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
                                 .build()
                         )
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        /** 소환 */
+        public static final DefinedSound SUMMON = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_HORSE_ARMOR, 0.5, 1.6),
+                new DefinedSound.SoundEffect("random.craft", 0.5, 1.3),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.5, 0.5)
+        );
+        /** 소환 준비 */
+        public static final DefinedSound SUMMON_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.5, 0.5));
+        /** 발동 */
+        public static final DefinedSound TRIGGER = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_SHEEP_SHEAR, 2, 1.2),
+                new DefinedSound.SoundEffect("new.entity.player.hurt_sweet_berry_bush", 2, 0.8),
+                new DefinedSound.SoundEffect("random.metalhit", 2, 1.2)
+        );
+        /** 피격 */
+        public static final DefinedSound DAMAGE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.metalhit", 0.4, 1.1, 0.1));
+        /** 파괴 */
+        public static final DefinedSound DEATH = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 0.8),
+                new DefinedSound.SoundEffect("random.metalhit", 1, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ITEM_BREAK, 1, 0.8)
         );
     }
 }

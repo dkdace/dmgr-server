@@ -8,9 +8,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -115,8 +113,8 @@ public final class PalasUlt extends UltimateSkill {
                 ((CombatUser) target).addKillAssist(combatUser, PalasUlt.ASSIST_SCORE_COOLDOWN_ID, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
             }
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_ULT_USE, combatUser.getEntity().getLocation());
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_ULT_HIT_ENTITY, target.getCenterLocation());
+            PalasUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+            PalasUltInfo.SOUND.HIT_ENTITY.play(target.getCenterLocation());
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
             ParticleUtil.playFirework(target.getCenterLocation(), 255, 70, 75,
                     200, 0, 0, FireworkEffect.Type.BURST, false, false);

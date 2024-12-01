@@ -4,8 +4,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 
 public final class MagrittaT1Info extends TraitInfo {
     /** 지속시간 (tick) */
@@ -34,5 +37,18 @@ public final class MagrittaT1Info extends TraitInfo {
                         .build()
                 )
         );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("new.item.trident.hit", 2, 0.8, 0.1));
+        /** 최대치 */
+        public static final DefinedSound MAX = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SKELETON_DEATH, 2, 1.5, 0.1));
     }
 }

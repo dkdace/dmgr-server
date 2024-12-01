@@ -4,16 +4,23 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
 public abstract class UltimateSkill extends ActiveSkill {
+    /** 궁극기 준비 효과음 */
+    private static final DefinedSound ULTIMATE_READY_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 0.5, 2));
+    /** 궁극기 사용 효과음 */
+    private static final DefinedSound ULTIMATE_USE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SPAWN, 1000, 2));
+
     /**
      * 궁극기 스킬 인스턴스를 생성한다.
      *
@@ -39,7 +46,7 @@ public abstract class UltimateSkill extends ActiveSkill {
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
         super.onCooldownFinished();
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_READY, combatUser.getEntity());
+        ULTIMATE_READY_SOUND.play(combatUser.getEntity());
     }
 
     @Override
@@ -48,7 +55,7 @@ public abstract class UltimateSkill extends ActiveSkill {
         Validate.notNull(combatUser.getCharacterType());
 
         combatUser.setUltGaugePercent(0);
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ULTIMATE_SKILL_USE, combatUser.getEntity().getLocation());
+        ULTIMATE_USE_SOUND.play(combatUser.getEntity().getLocation());
 
         GameUser gameUser = GameUser.fromUser(combatUser.getUser());
         if (gameUser != null)

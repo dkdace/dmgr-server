@@ -5,8 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     /** 쿨타임 (tick) */
@@ -64,5 +67,30 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 13;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun2.xm1014_1", 3, 1),
+                new DefinedSound.SoundEffect("random.gun2.xm1014_1", 3, 0.8),
+                new DefinedSound.SoundEffect("random.gun2.spas_12_1", 3, 1),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.9),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.8)
+        );
+        /** 재장전 */
+        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
+                .add(3, new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_EXTEND, 0.6, 1.3))
+                .add(5, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.6, 1.3))
+                .add(20, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
+                .add(21, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 0.8))
+                .add(22, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 0.7))
+                .add(28, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.6, 0.9))
+                .add(33, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 0.9))
+                .build();
     }
 }

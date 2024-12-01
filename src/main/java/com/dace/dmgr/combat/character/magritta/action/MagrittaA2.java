@@ -4,9 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -54,7 +52,7 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION, 2, false, false), true);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A2_USE, combatUser.getEntity().getLocation());
+        MagrittaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
@@ -72,7 +70,7 @@ public final class MagrittaA2 extends ActiveSkill {
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
             ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_A2_USE, combatUser.getEntity().getLocation());
+            MagrittaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
         }, 1, MagrittaA2Info.DURATION));
     }
 

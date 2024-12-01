@@ -7,7 +7,9 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -108,7 +110,7 @@ public final class NeaceA1 extends ActiveSkill {
 
             target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA1Mark.instance, NeaceA1Info.DURATION);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A1_USE, combatUser.getEntity().getLocation());
+            NeaceA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
             playUseEffect(target);
         }
 

@@ -8,7 +8,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -53,7 +55,7 @@ public final class InfernoA1 extends ActiveSkill {
         Location location = combatUser.getEntity().getLocation();
         location.setPitch(Math.max(-40, Math.min(location.getPitch(), 10)));
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A1_USE, location);
+        InfernoA1Info.SOUND.USE.play(location);
         ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 80, 0.5, 0.2, 0.5, 0.2);
 
         Vector vec = location.getDirection().multiply(InfernoA1Info.PUSH_SIDE);
@@ -101,7 +103,7 @@ public final class InfernoA1 extends ActiveSkill {
         Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
         new InfernoA1Area().emit(loc);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A1_LAND, loc);
+        InfernoA1Info.SOUND.LAND.play(loc);
         Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
         CombatEffectUtil.playBlockHitEffect(loc, floor, 5);
         ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 200, 0.8, 0.1, 0.8, 0.05);

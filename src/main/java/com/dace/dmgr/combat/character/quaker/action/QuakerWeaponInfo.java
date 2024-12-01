@@ -5,8 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 (tick) */
@@ -44,5 +46,27 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 3;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_ATTACK, 1, 0.5),
+                new DefinedSound.SoundEffect("random.gun2.shovel_leftclick", 1, 0.6, 0.1)
+        );
+        /** 타격 */
+        public static final DefinedSound HIT = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_STRONG, 0.8, 0.75, 0.1),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.6, 0.85, 0.1)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 0.9, 0.05),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1.2, 0.1)
+        );
     }
 }

@@ -8,7 +8,9 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -50,13 +52,13 @@ public final class InfernoA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_USE, combatUser.getEntity().getLocation());
+        InfernoA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_A2_TICK, combatUser.getEntity().getLocation());
+            InfernoA2Info.SOUND.TICK.play(combatUser.getEntity().getLocation());
             ParticleUtil.play(Particle.FLAME, combatUser.getEntity().getLocation().add(0, 1, 0), 2,
                     0.1, 0.1, 0.1, 0.2);
             playTickEffect(i);

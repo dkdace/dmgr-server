@@ -6,8 +6,11 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 연사속도 */
@@ -80,5 +83,33 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
         public static final short DEFAULT = 1;
         /** 달리기 */
         public static final short SPRINT = DEFAULT + 1000;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun2.scarlight_1", 3, 1),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 1.2)
+        );
+        /** 사용 (궁극기) */
+        public static final DefinedSound USE_ULT = new DefinedSound(
+                new DefinedSound.SoundEffect("new.block.beacon.deactivate", 4, 2),
+                new DefinedSound.SoundEffect("random.energy", 4, 1.6),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5, 1.2)
+        );
+        /** 재장전 */
+        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
+                .add(3, new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 0.6, 1.6))
+                .add(4, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.6, 1.9))
+                .add(18, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
+                .add(19, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 1))
+                .add(20, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_YES, 0.6, 1.8))
+                .add(26, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.7))
+                .add(27, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_DOOR_OPEN, 0.6, 1.8))
+                .build();
     }
 }

@@ -11,9 +11,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -72,7 +70,7 @@ public final class ChedA1 extends StackableSkill {
             combatUser.getWeapon().onCancelled();
             combatUser.setGlobalCooldown((int) ChedA1Info.READY_DURATION);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A1_USE, combatUser.getEntity().getLocation());
+            ChedA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
@@ -112,7 +110,7 @@ public final class ChedA1 extends StackableSkill {
 
         new ChedA1Projectile().shoot();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A1_SHOOT, combatUser.getEntity().getLocation());
+        ChedA1Info.SOUND.SHOOT.play(combatUser.getEntity().getLocation());
     }
 
     /**
@@ -141,7 +139,7 @@ public final class ChedA1 extends StackableSkill {
 
         @Override
         protected void onHit() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_HIT, getLocation(), 1.5);
+            ChedWeaponInfo.SOUND.HIT.play(getLocation(), 1.5);
         }
 
         @Override

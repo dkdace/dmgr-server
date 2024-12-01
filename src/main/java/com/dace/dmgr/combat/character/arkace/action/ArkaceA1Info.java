@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
     /** 쿨타임 (tick) */
@@ -39,6 +42,24 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.LEFT_CLICK)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun.grenade", 3, 1.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_SHULKER_SHOOT, 3, 1.2)
+        );
+        /** 폭발 */
+        public static final DefinedSound EXPLODE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_LARGE_BLAST, 4, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 4, 1.4),
+                new DefinedSound.SoundEffect("random.gun_reverb2", 6, 0.9)
         );
     }
 }

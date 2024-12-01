@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.character.palas.Palas;
@@ -15,9 +16,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -60,7 +59,7 @@ public final class PalasA3 extends ActiveSkill {
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown((int) PalasA3Info.READY_DURATION);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A3_USE, combatUser.getEntity().getLocation());
+        PalasA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
@@ -68,7 +67,7 @@ public final class PalasA3 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new PalasA3Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
+            CombatEffectUtil.THROW_SOUND.play(loc);
         }, PalasA3Info.READY_DURATION));
     }
 
@@ -195,7 +194,7 @@ public final class PalasA3 extends ActiveSkill {
             Location loc = getLocation().clone().add(0, 0.1, 0);
             new PalasA3Area().emit(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A3_EXPLODE, loc);
+            PalasA3Info.SOUND.EXPLODE.play(loc);
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 4, loc,
                     400, 0.1, 0.1, 0.1, 0.25);
             ParticleUtil.play(Particle.TOTEM, loc, 200, 0.15, 0.15, 0.15, 0.6);

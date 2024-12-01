@@ -43,6 +43,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
@@ -355,8 +356,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK.id, Cooldown.HEAL_PACK.duration);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
         character.onUseHealPack(this);
-        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_HEAL_PACK, entity.getLocation());
 
+        Sound.HEAL_PACK.play(entity.getLocation());
         showBlockHologram(healPackLocation, location, Cooldown.HEAL_PACK);
     }
 
@@ -393,8 +394,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         ParticleUtil.playFirework(location.clone().add(0.5, 1.1, 0.5), 48, 85, 251,
                 255, 255, 255, FireworkEffect.Type.BALL, false, false);
-        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_ULT_PACK, entity.getLocation());
 
+        Sound.ULT_PACK.play(entity.getLocation());
         showBlockHologram(ultPackLocation, location, Cooldown.ULT_PACK);
     }
 
@@ -436,7 +437,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD.id, Cooldown.JUMP_PAD.duration);
 
         moveModule.push(new Vector(0, GeneralConfig.getCombatConfig().getJumpPadVelocity(), 0), true);
-        SoundUtil.playNamedSound(NamedSound.COMBAT_USE_JUMP_PAD, entity.getLocation());
+        Sound.JUMP_PAD.play(entity.getLocation());
     }
 
     /**
@@ -480,11 +481,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (fallDistance > 0.5) {
                 volume = 1.2 + fallDistance * 0.05;
                 if (fallDistance > 6)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_HIGH, entity.getLocation(), volume);
+                    Sound.FALL_HIGH.play(entity.getLocation(), volume);
                 else if (fallDistance > 3)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_MID, entity.getLocation(), volume);
+                    Sound.FALL_MID.play(entity.getLocation(), volume);
                 else
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_FALL_LOW, entity.getLocation(), volume);
+                    Sound.FALL_LOW.play(entity.getLocation(), volume);
             }
 
             character.onFootstep(this, volume);
@@ -611,10 +612,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(this, Cooldown.HIT_SOUND.id, Cooldown.HIT_SOUND.duration);
         if (isCrit) {
             user.sendTitle("", "§c§l×", 0, 2, 10);
-            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK_CRIT, entity), 2));
+            TaskUtil.addTask(this, new DelayTask(() -> Sound.ATTACK_CRIT.play(entity), 2));
         } else {
             user.sendTitle("", "§f×", 0, 2, 10);
-            TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_ATTACK, entity), 2));
+            TaskUtil.addTask(this, new DelayTask(() -> Sound.ATTACK.play(entity), 2));
         }
     }
 
@@ -784,7 +785,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playKillEffect() {
         user.sendTitle("", "§c" + TextIcon.POISON, 0, 2, 10);
-        TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_KILL, entity), 2));
+        TaskUtil.addTask(this, new DelayTask(() -> Sound.KILL.play(entity), 2));
     }
 
     /**
@@ -1615,5 +1616,55 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private final String id;
         /** 기본 지속시간 (tick) */
         private final long duration;
+    }
+
+    /**
+     * 효과음 목록.
+     */
+    @UtilityClass
+    private static final class Sound {
+        /** 힐 팩 */
+        private static final DefinedSound HEAL_PACK = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.5, 1.2));
+        /** 궁극기 팩 */
+        private static final DefinedSound ULT_PACK = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_BREWING_STAND_BREW, 1, 2),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ITEM_ARMOR_EQUIP_GOLD, 1, 1.3)
+        );
+        /** 점프대 */
+        private static final DefinedSound JUMP_PAD = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_SMALL_FALL, 1.5, 1.5, 0.1),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_ITEM_PICKUP, 1.5, 0.8, 0.05),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_ITEM_PICKUP, 1.5, 1.4, 0.05)
+        );
+        /** 추락 (낮음) */
+        private static final DefinedSound FALL_LOW = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_STONE_STEP, 0.3, 0.9, 0.1));
+        /** 추락 (중간) */
+        private static final DefinedSound FALL_MID = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_STONE_STEP, 0.4, 0.9, 0.1),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_SMALL_FALL, 0.4, 0.9, 0.1)
+        );
+        /** 추락 (높음) */
+        private static final DefinedSound FALL_HIGH = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_STONE_STEP, 0.5, 0.8, 0.1),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_STONE_STEP, 0.5, 0.9, 0.1),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_SMALL_FALL, 0.5, 0.9, 0.1)
+        );
+        /** 공격 */
+        private static final DefinedSound ATTACK = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_HURT, 0.8, 1.4),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_BIG_FALL, 1, 0.7)
+        );
+        /** 치명타 */
+        private static final DefinedSound ATTACK_CRIT = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_PLAYER_BIG_FALL, 2, 0.7),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.BLOCK_ANVIL_PLACE, 0.5, 1.8)
+        );
+        /** 처치 */
+        private static final DefinedSound KILL = new DefinedSound(
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2, 1.25),
+                new DefinedSound.SoundEffect(org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1.25)
+        );
     }
 }

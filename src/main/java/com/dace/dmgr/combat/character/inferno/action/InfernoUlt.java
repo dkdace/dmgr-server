@@ -4,7 +4,9 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -58,7 +60,7 @@ public final class InfernoUlt extends UltimateSkill {
 
             Location loc = combatUser.getEntity().getLocation();
             if (i < 24) {
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_USE, loc, 1, i * 0.02);
+                InfernoUltInfo.SOUND.USE.play(loc, 1, i * 0.02);
                 ParticleUtil.play(Particle.LAVA, combatUser.getEntity().getLocation().add(0, 1, 0), 3,
                         1, 1.5, 1, 0.2);
                 playUseTickEffect(i);
@@ -66,7 +68,7 @@ public final class InfernoUlt extends UltimateSkill {
 
             playTickEffect(i);
             if (i % 12 == 0)
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_TICK, loc);
+                InfernoUltInfo.SOUND.TICK.play(loc);
 
             return true;
         }, isCancelled -> {
@@ -74,7 +76,7 @@ public final class InfernoUlt extends UltimateSkill {
                 setDuration(0);
 
                 Location loc = combatUser.getEntity().getLocation();
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DEATH, loc);
+                InfernoUltInfo.SOUND.DEATH.play(loc);
                 ParticleUtil.play(Particle.FLAME, loc, 300, 0.4, 0.4, 0.4, 0.2);
                 ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 250, 0.3, 0.3, 0.3, 0.25);
                 ParticleUtil.play(Particle.SMOKE_LARGE, loc, 150, 0.4, 0.4, 0.4, 0.2);

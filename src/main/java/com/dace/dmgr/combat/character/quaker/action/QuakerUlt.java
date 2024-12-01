@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -84,7 +87,7 @@ public final class QuakerUlt extends UltimateSkill {
 
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
                     if (index % 2 == 0)
-                        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
+                        QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
                         CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
                         onCancelled();
@@ -115,7 +118,7 @@ public final class QuakerUlt extends UltimateSkill {
     private void onReady() {
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0.3, 0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_ULT_USE_READY, loc);
+        QuakerUltInfo.SOUND.USE_READY.play(loc);
         ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
                 0.2, 0.2, 0.2, 0.6);
 

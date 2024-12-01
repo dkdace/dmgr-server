@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
@@ -17,6 +17,50 @@ import org.jetbrains.annotations.Nullable;
  */
 @UtilityClass
 public final class CombatEffectUtil {
+    /** 총기 탄피 효과음 */
+    public static final DefinedSound SHELL_DROP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_MAGMACUBE_JUMP, 0.8, 1, 0.1));
+    /** 산탄총 탄피 효과음 */
+    public static final DefinedSound SHOTGUN_SHELL_DROP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_HORSE_DEATH, 1, 1, 0.1));
+    /** 엔티티 소환 효과음 */
+    public static final DefinedSound ENTITY_SUMMON_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.8, 1));
+    /** 투척 효과음 */
+    public static final DefinedSound THROW_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_WITCH_THROW, 0.8, 0.8));
+    /** 투척물 튕김 효과음 */
+    public static final DefinedSound THROW_BOUNCE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("random.metalhit", 0.1, 1.2, 0.1),
+            new DefinedSound.SoundEffect(Sound.BLOCK_GLASS_BREAK, 0.1, 2)
+    );
+
+    /** 블록 타격 효과음 (잔디) */
+    private static final DefinedSound HIT_BLOCK_GRASS_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_GRASS_BREAK, 0.8, 0.7, 0.1));
+    /** 블록 타격 효과음 (흙) */
+    private static final DefinedSound HIT_BLOCK_DIRT_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_GRAVEL_BREAK, 0.8, 0.7, 0.1));
+    /** 블록 타격 효과음 (돌) */
+    private static final DefinedSound HIT_BLOCK_STONE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_STONE_BREAK, 1, 0.9, 0.1));
+    /** 블록 타격 효과음 (금속) */
+    private static final DefinedSound HIT_BLOCK_METAL_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5, 1.95, 0.1),
+            new DefinedSound.SoundEffect("random.metalhit", 0.8, 1.95, 0.1)
+    );
+    /** 블록 타격 효과음 (목재) */
+    private static final DefinedSound HIT_BLOCK_WOOD_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_WOOD_BREAK, 0.8, 0.8, 0.1),
+            new DefinedSound.SoundEffect("random.stab", 0.8, 1.95, 0.1)
+    );
+    /** 블록 타격 효과음 (유리) */
+    private static final DefinedSound HIT_BLOCK_GLASS_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_GLASS_BREAK, 0.8, 0.7, 0.1));
+    /** 블록 타격 효과음 (양털) */
+    private static final DefinedSound HIT_BLOCK_WOOL_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.BLOCK_CLOTH_BREAK, 1, 0.8, 0.1));
+
     /**
      * 지정한 위치 또는 엔티티에 출혈 효과를 재생한다.
      *
@@ -94,13 +138,13 @@ public final class CombatEffectUtil {
             case SPONGE:
             case HAY_BLOCK:
             case GRASS_PATH:
-                SoundUtil.play(Sound.BLOCK_GRASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                HIT_BLOCK_GRASS_SOUND.play(location, volumeMultiplier);
                 break;
             case DIRT:
             case GRAVEL:
             case SAND:
             case CLAY:
-                SoundUtil.play(Sound.BLOCK_GRAVEL_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                HIT_BLOCK_DIRT_SOUND.play(location, volumeMultiplier);
                 break;
             case STONE:
             case COBBLESTONE:
@@ -128,7 +172,7 @@ public final class CombatEffectUtil {
             case STONE_SLAB2:
             case DOUBLE_STONE_SLAB2:
             case CONCRETE:
-                SoundUtil.play(Sound.BLOCK_STONE_BREAK, location, 1 * volumeMultiplier, 0.9, 0.1);
+                HIT_BLOCK_STONE_SOUND.play(location, volumeMultiplier);
                 break;
             case IRON_BLOCK:
             case GOLD_BLOCK:
@@ -137,8 +181,7 @@ public final class CombatEffectUtil {
             case IRON_TRAPDOOR:
             case CAULDRON:
             case HOPPER:
-                SoundUtil.play(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, location, 0.5 * volumeMultiplier, 1.95, 0.1);
-                SoundUtil.play("random.metalhit", location, 0.8 * volumeMultiplier, 1.95, 0.1);
+                HIT_BLOCK_METAL_SOUND.play(location, volumeMultiplier);
                 break;
             case WOOD:
             case LOG:
@@ -173,8 +216,7 @@ public final class CombatEffectUtil {
             case ACACIA_DOOR:
             case CHEST:
             case BOOKSHELF:
-                SoundUtil.play(Sound.BLOCK_WOOD_BREAK, location, 0.8 * volumeMultiplier, 0.8, 0.1);
-                SoundUtil.play("random.stab", location, 0.8 * volumeMultiplier, 1.95, 0.1);
+                HIT_BLOCK_WOOD_SOUND.play(location, volumeMultiplier);
                 break;
             case GLASS:
             case THIN_GLASS:
@@ -186,11 +228,11 @@ public final class CombatEffectUtil {
             case REDSTONE_LAMP_OFF:
             case REDSTONE_LAMP_ON:
             case SEA_LANTERN:
-                SoundUtil.play(Sound.BLOCK_GLASS_BREAK, location, 0.8 * volumeMultiplier, 0.7, 0.1);
+                HIT_BLOCK_GLASS_SOUND.play(location, volumeMultiplier);
                 break;
             case WOOL:
             case CARPET:
-                SoundUtil.play(Sound.BLOCK_CLOTH_BREAK, location, 1 * volumeMultiplier, 0.8, 0.1);
+                HIT_BLOCK_WOOL_SOUND.play(location, volumeMultiplier);
                 break;
             default:
                 break;

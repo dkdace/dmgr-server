@@ -6,7 +6,6 @@ import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -78,6 +77,6 @@ public final class OnAsyncPlayerChat implements Listener {
             return;
 
         receiver.getPlayer().sendMessage(message);
-        SoundUtil.play(receiverUserData.getConfig().getChatSound().getSound(), receiver.getPlayer(), 1000, Math.sqrt(2));
+        receiverUserData.getConfig().getChatSound().getSound().play(receiver.getPlayer());
     }
 }

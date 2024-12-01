@@ -14,11 +14,12 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -83,7 +84,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE, combatUser.getEntity().getLocation());
+                JagerWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -137,31 +138,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadTick(long i) {
-        switch ((int) i) {
-            case 3:
-                SoundUtil.play(Sound.ENTITY_WOLF_HOWL, combatUser.getEntity().getLocation(), 0.6, 1.7);
-                break;
-            case 4:
-                SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, combatUser.getEntity().getLocation(), 0.6, 1.2);
-                break;
-            case 6:
-                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 0.8);
-                break;
-            case 25:
-                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 27:
-                SoundUtil.play(Sound.ENTITY_CAT_PURREOW, combatUser.getEntity().getLocation(), 0.6, 1.7);
-                break;
-            case 35:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 1.8);
-                break;
-            case 37:
-                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.7);
-                break;
-            default:
-                break;
-        }
+        JagerWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -173,8 +150,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onSwapStart(@NonNull SwapState swapState) {
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
 
-        SoundUtil.playNamedSound(swapState == SwapState.PRIMARY ? NamedSound.COMBAT_JAGER_WEAPON_SWAP_OFF : NamedSound.COMBAT_JAGER_WEAPON_SWAP_ON,
-                combatUser.getEntity().getLocation());
+        (swapState == SwapState.PRIMARY ? JagerWeaponInfo.SOUND.SWAP_OFF : JagerWeaponInfo.SOUND.SWAP_ON).play(combatUser.getEntity().getLocation());
     }
 
     @Override

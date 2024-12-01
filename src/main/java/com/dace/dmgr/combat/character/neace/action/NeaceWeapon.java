@@ -13,7 +13,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -69,7 +71,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 new NeaceWeaponProjectile().shoot();
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE, combatUser.getEntity().getLocation());
+                NeaceWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -85,7 +87,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
+                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getEntity().getLocation());
                 combatUser.getUser().sendTitle("", MessageFormat.format("{0} : {1}§e{2}",
                                 (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished() ?
                                         "§a" + TextIcon.HEAL + " §f치유 중" : "§b" + TextIcon.DAMAGE_INCREASE + " §f강화 중"),

@@ -4,8 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -116,7 +114,7 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        READY_SOUND.play(combatUser.getEntity());
     }
 
     /**

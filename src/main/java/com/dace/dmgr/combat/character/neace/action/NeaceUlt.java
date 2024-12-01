@@ -7,9 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -56,7 +54,7 @@ public final class NeaceUlt extends UltimateSkill {
         combatUser.setGlobalCooldown((int) NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -NeaceUltInfo.READY_SLOW);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_ULT_USE, combatUser.getEntity().getLocation());
+        NeaceUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
@@ -121,7 +119,7 @@ public final class NeaceUlt extends UltimateSkill {
         isEnabled = true;
         combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_ULT_USE_READY, combatUser.getEntity().getLocation());
+        NeaceUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
         ParticleUtil.playFirework(combatUser.getEntity().getLocation(), 215, 255, 130,
                 255, 255, 255, FireworkEffect.Type.STAR, true, false);
 
@@ -133,7 +131,7 @@ public final class NeaceUlt extends UltimateSkill {
             new NeaceUltArea().emit(loc);
 
             playTickEffect(i);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_WEAPON_USE_HEAL, combatUser.getEntity().getLocation());
+            NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getEntity().getLocation());
 
             return true;
         }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION));

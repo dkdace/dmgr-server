@@ -13,12 +13,12 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -37,6 +37,11 @@ public final class Quaker extends Guardian {
     private static final Quaker instance = new Quaker();
     /** 특성 수정자 */
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
+    /** 발소리 */
+    private static final DefinedSound FOOTSTEP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_COW_STEP, 0.3, 0.9, 0.1),
+            new DefinedSound.SoundEffect("new.entity.ravager.step", 0.2, 0.8, 0.1)
+    );
 
     private Quaker() {
         super(null, "퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
@@ -132,7 +137,8 @@ public final class Quaker extends Guardian {
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
-        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
+
+        FOOTSTEP_SOUND.play(combatUser.getEntity().getLocation(), volume);
     }
 
     @Override

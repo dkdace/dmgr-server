@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -11,7 +12,9 @@ import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -19,7 +22,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -84,8 +86,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
                 CombatUtil.setRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
                         MagrittaWeaponInfo.RECOIL.SIDE_SPREAD, 3, 1);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_MAGRITTA_WEAPON_USE, loc);
-                TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_SHOTGUN_SHELL_DROP, loc), 8));
+                MagrittaWeaponInfo.SOUND.USE.play(loc);
+                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
 
                 break;
             }
@@ -121,31 +123,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public void onReloadTick(long i) {
-        switch ((int) i) {
-            case 3:
-                SoundUtil.play(Sound.BLOCK_PISTON_EXTEND, combatUser.getEntity().getLocation(), 0.6, 1.3);
-                break;
-            case 5:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 1.3);
-                break;
-            case 20:
-                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 21:
-                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 0.8);
-                break;
-            case 22:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 0.7);
-                break;
-            case 28:
-                SoundUtil.play(Sound.ENTITY_WOLF_HOWL, combatUser.getEntity().getLocation(), 0.6, 0.9);
-                break;
-            case 33:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 0.9);
-                break;
-            default:
-                break;
-        }
+        MagrittaWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
     }
 
     @Override

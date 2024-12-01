@@ -7,7 +7,9 @@ import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -58,7 +60,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             new SiliaWeaponProjectile().shoot();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_USE, combatUser.getEntity().getLocation());
+            SiliaWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
         }
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
@@ -105,7 +107,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
                 CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
                 if (index < 3)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_T2_USE, loc.add(vec), 1, index * 0.12);
+                    SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index * 0.1);
                 if (index == 7) {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? 0.7 : -0.7), -0.85);
                     onCancelled();
@@ -152,7 +154,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
+            SiliaWeaponInfo.SOUND.HIT_BLOCK.play(getLocation());
             CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
             CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1.5);
 
@@ -165,7 +167,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                     SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
             ParticleUtil.play(Particle.CRIT, getLocation(), 15, 0, 0, 0, 0.4);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, getLocation());
+            SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
 
             return false;
         }
@@ -216,7 +218,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                 }
 
                 ParticleUtil.play(Particle.CRIT, getLocation(), 40, 0, 0, 0, 0.4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_WEAPON_HIT_ENTITY, getLocation());
+                SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
             }
 
             return true;

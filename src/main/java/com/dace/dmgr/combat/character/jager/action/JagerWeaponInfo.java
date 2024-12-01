@@ -6,9 +6,12 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 
 public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
@@ -116,5 +119,39 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 2;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun2.m16_1", 0.8, 1.2),
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.8, 1.7)
+        );
+        /** 전환 활성화 */
+        public static final DefinedSound SWAP_ON = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.6, 1.9));
+        /** 전환 비활성화 */
+        public static final DefinedSound SWAP_OFF = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.9));
+        /** 사용 (저격탄) */
+        public static final DefinedSound USE_SCOPE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun2.psg_1_1", 3.5, 1),
+                new DefinedSound.SoundEffect("random.gun2.m16_1", 3.5, 1),
+                new DefinedSound.SoundEffect("random.gun_reverb", 5.5, 0.95)
+        );
+        /** 재장전 */
+        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
+                .add(3, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.6, 1.7))
+                .add(4, new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.6, 1.2))
+                .add(6, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 0.8))
+                .add(25, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
+                .add(27, new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.6, 1.7))
+                .add(35, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.8))
+                .add(37, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_DOOR_OPEN, 0.6, 1.7))
+                .build();
     }
 }

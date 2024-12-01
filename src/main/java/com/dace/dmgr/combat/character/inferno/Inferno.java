@@ -14,14 +14,14 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.StringJoiner;
@@ -38,6 +38,11 @@ import java.util.StringJoiner;
 public final class Inferno extends Vanguard {
     @Getter
     private static final Inferno instance = new Inferno();
+    /** 발소리 */
+    private static final DefinedSound FOOTSTEP_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("new.entity.panda.step", 0.4, 0.9, 0.1),
+            new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_STEP, 0.3, 0.7, 0.1)
+    );
 
     private Inferno() {
         super(null, "인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
@@ -140,7 +145,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_FOOTSTEP, combatUser.getEntity().getLocation(), volume);
+        FOOTSTEP_SOUND.play(combatUser.getEntity().getLocation(), volume);
     }
 
     @Override
@@ -150,7 +155,7 @@ public final class Inferno extends Vanguard {
             return;
         }
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_ULT_DAMAGE, victim.getEntity().getLocation(), 1 + damage * 0.001);
+        InfernoUltInfo.SOUND.DAMAGE.play(victim.getEntity().getLocation(), 1 + damage * 0.001);
         if (location != null)
             ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
                     0, 0, 0, 0.1);

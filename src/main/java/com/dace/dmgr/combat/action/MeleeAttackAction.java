@@ -7,20 +7,32 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 
 /**
  * 기본 근접 공격 동작 클래스.
  */
 public final class MeleeAttackAction extends AbstractAction {
+    /** 사용 효과음 */
+    private static final DefinedSound USE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.6, 1.1, 0.1));
+    /** 엔티티 타격 효과음 */
+    private static final DefinedSound HIT_ENTITY_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1.1, 0.1),
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1.1, 0.1)
+    );
+    /** 블록 타격 효과음 */
+    private static final DefinedSound HIT_BLOCK_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 0.9, 0.05));
+
     /** 쿨타임 (tick) */
     private static final long COOLDOWN = 20;
     /** 피해량 */
@@ -67,7 +79,7 @@ public final class MeleeAttackAction extends AbstractAction {
         combatUser.setGlobalCooldown((int) COOLDOWN);
         setCooldown();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_USE, combatUser.getEntity().getLocation());
+        USE_SOUND.play(combatUser.getEntity().getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
@@ -86,7 +98,7 @@ public final class MeleeAttackAction extends AbstractAction {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
+            HIT_BLOCK_SOUND.play(getLocation());
             CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
             CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
 
@@ -98,7 +110,7 @@ public final class MeleeAttackAction extends AbstractAction {
             if (target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true))
                 target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_ENTITY, getLocation());
+            HIT_ENTITY_SOUND.play(getLocation());
             ParticleUtil.play(Particle.CRIT, getLocation(), 10, 0, 0, 0, 0.4);
 
             return false;

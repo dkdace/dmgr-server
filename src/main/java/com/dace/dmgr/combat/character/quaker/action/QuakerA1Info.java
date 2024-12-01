@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     /** 쿨타임 (tick) */
@@ -49,6 +52,33 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                                 .build()
                         )
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_FLAP, 1, 0.6),
+                new DefinedSound.SoundEffect(Sound.BLOCK_SHULKER_BOX_OPEN, 1, 0.7)
+        );
+        /** 해제 */
+        public static final DefinedSound DISABLE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_SHULKER_BOX_CLOSE, 1, 1.4));
+        /** 피격 */
+        public static final DefinedSound DAMAGE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_ANVIL_LAND, 0.25, 1.2, 0.1),
+                new DefinedSound.SoundEffect("random.metalhit", 0.3, 0.85, 0.1)
+        );
+        /** 파괴 */
+        public static final DefinedSound DEATH = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_HURT, 2, 0.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.7),
+                new DefinedSound.SoundEffect("random.metalhit", 2, 0.7),
+                new DefinedSound.SoundEffect(Sound.ITEM_SHIELD_BLOCK, 2, 0.5)
         );
     }
 }

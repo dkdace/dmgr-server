@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     /** 쿨타임 (tick) */
@@ -35,6 +38,26 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SHOOT, 3, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 3, 0.8),
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.6)
+        );
+        /** 착지 */
+        public static final DefinedSound LAND = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.3)
         );
     }
 }

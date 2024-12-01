@@ -4,9 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -122,7 +120,7 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_SILIA_ULT_USE_READY, combatUser.getEntity().getLocation());
+        SiliaUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
             isEnabled = false;

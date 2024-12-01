@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -10,7 +11,9 @@ import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -72,13 +75,13 @@ public final class JagerA3 extends ActiveSkill {
             combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
             combatUser.getWeapon().setVisible(false);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE, combatUser.getEntity().getLocation());
+            JagerA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
                 CooldownUtil.setCooldown(combatUser, COOLDOWN_ID, JagerA3Info.EXPLODE_DURATION);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_USE_READY, combatUser.getEntity().getLocation());
+                JagerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
 
                 TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                     if (isDurationFinished())
@@ -105,7 +108,7 @@ public final class JagerA3 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new JagerA3Projectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
+            CombatEffectUtil.THROW_SOUND.play(loc);
         }
     }
 
@@ -143,7 +146,7 @@ public final class JagerA3 extends ActiveSkill {
         Location loc = location.clone().add(0, 0.1, 0);
         new JagerA3Area(projectile).emit(loc);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_A3_EXPLODE, loc);
+        JagerA3Info.SOUND.EXPLODE.play(loc);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, loc,
                 300, 0.2, 0.2, 0.2, 0.5);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.PACKED_ICE, 0, loc,
@@ -187,7 +190,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         protected void onHitBlockBouncing(@NonNull Block hitBlock) {
             if (getVelocity().length() > 0.01)
-                SoundUtil.playNamedSound(NamedSound.COMBAT_THROW_BOUNCE, getLocation(), 1 + getVelocity().length() * 2);
+                CombatEffectUtil.THROW_BOUNCE_SOUND.play(getLocation(), 1 + getVelocity().length() * 2);
         }
 
         @Override

@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
     /** 궁극기 필요 충전량 */
@@ -29,6 +32,24 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1.2),
+                new DefinedSound.SoundEffect("new.block.respawn_anchor.charge", 2, 0.7)
+        );
+        /** 사용 준비 */
+        public static final DefinedSound USE_READY = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1),
+                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON, 3, 1.1)
         );
     }
 }

@@ -2,9 +2,8 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -13,6 +12,10 @@ import org.bukkit.block.Block;
  * 실탄을 발사하는 화기의 총알을 관리하는 클래스.
  */
 public abstract class GunHitscan extends Hitscan {
+    /** 블록 타격 효과음 */
+    private static final DefinedSound HIT_BLOCK_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect("random.gun.ricochet", 0.8, 0.975, 0.05));
+
     /**
      * @see Hitscan#Hitscan(CombatEntity, HitscanOption)
      */
@@ -29,7 +32,7 @@ public abstract class GunHitscan extends Hitscan {
 
     @Override
     protected boolean onHitBlock(@NonNull Block hitBlock) {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_HIT_BLOCK, getLocation());
+        HIT_BLOCK_SOUND.play(getLocation());
         CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
         ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
                 3, 0, 0, 0, 0.1);

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -11,9 +12,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -67,11 +66,10 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 reloadModule.consume(1);
 
                 Location loc = combatUser.getEntity().getLocation();
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_WEAPON_USE_SCOPE, loc);
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
-                TaskUtil.addTask(this, new DelayTask(() -> SoundUtil.playNamedSound(NamedSound.COMBAT_GUN_SHELL_DROP, loc,
-                        1, -0.05), 8));
+                JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
+                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, -0.05), 8));
 
                 break;
             }

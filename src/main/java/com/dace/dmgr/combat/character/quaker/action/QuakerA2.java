@@ -11,7 +11,10 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -85,7 +88,7 @@ public final class QuakerA2 extends ActiveSkill {
                 new QuakerA2Effect().shoot(loc, vec);
 
                 if (index % 2 == 0)
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE, loc.add(vec));
+                    QuakerA2Info.SOUND.USE.play(loc.add(vec));
                 if (index == 11) {
                     TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
                         onCancelled();
@@ -119,7 +122,7 @@ public final class QuakerA2 extends ActiveSkill {
         Location loc = combatUser.getEntity().getLocation();
         loc.setPitch(0);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A2_USE_READY, loc);
+        QuakerA2Info.SOUND.USE_READY.play(loc);
 
         HashSet<Damageable> targets = new HashSet<>();
         Vector vector = VectorUtil.getPitchAxis(loc);

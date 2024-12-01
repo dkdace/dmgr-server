@@ -9,9 +9,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -65,7 +63,7 @@ public final class ChedWeapon extends AbstractWeapon {
                         combatUser.getWeapon().setVisible(true);
                     }
 
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_CHARGE, combatUser.getEntity().getLocation());
+                    ChedWeaponInfo.SOUND.CHARGE.play(combatUser.getEntity().getLocation());
                 }
 
                 break;
@@ -74,7 +72,7 @@ public final class ChedWeapon extends AbstractWeapon {
                 new ChedWeaponProjectile(power).shoot();
                 setCanShoot(false);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_USE, combatUser.getEntity().getLocation(), power + 0.5, power * 0.3);
+                ChedWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation(), power + 0.5, power * 0.2);
 
                 break;
             }
@@ -109,7 +107,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_WEAPON_HIT, getLocation(), power + 0.5);
+            ChedWeaponInfo.SOUND.HIT.play(getLocation(), power + 0.5);
         }
 
         @Override

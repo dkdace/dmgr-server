@@ -15,7 +15,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -23,7 +25,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -91,7 +92,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                 CombatUtil.setRecoil(combatUser, PalasWeaponInfo.RECOIL.UP, PalasWeaponInfo.RECOIL.SIDE, PalasWeaponInfo.RECOIL.UP_SPREAD,
                         PalasWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_USE, combatUser.getEntity().getLocation());
+                PalasWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
                 TaskUtil.addTask(taskRunner, new DelayTask(this::action, getDefaultCooldown()));
 
@@ -136,19 +137,16 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.cancel();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getEntity().getLocation());
+
             switch ((int) i) {
                 case 1:
-                    SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 1.2);
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.4, 0.1);
                     break;
                 case 2:
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.6, 0.15);
                     break;
-                case 3:
-                    SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, combatUser.getEntity().getLocation(), 0.5, 1.4);
-                    break;
                 case 5:
-                    SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 1.2);
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.4, -0.1);
                     break;
                 case 6:
@@ -179,40 +177,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onReloadTick(long i) {
-        switch ((int) i) {
-            case 3:
-                SoundUtil.play("new.ui.stonecutter.take_result", combatUser.getEntity().getLocation(), 0.6, 1.5);
-                break;
-            case 6:
-                SoundUtil.play(Sound.BLOCK_PISTON_CONTRACT, combatUser.getEntity().getLocation(), 0.6, 1.3);
-                break;
-            case 10:
-                SoundUtil.play(Sound.ITEM_FLINTANDSTEEL_USE, combatUser.getEntity().getLocation(), 0.6, 0.8);
-                break;
-            case 12:
-                SoundUtil.play(Sound.ITEM_BOTTLE_EMPTY, combatUser.getEntity().getLocation(), 0.6, 1.4);
-                break;
-            case 14:
-                SoundUtil.play(Sound.BLOCK_IRON_TRAPDOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 1.3);
-                break;
-            case 22:
-                SoundUtil.play(Sound.ENTITY_PLAYER_HURT, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 24:
-                SoundUtil.play(Sound.ENTITY_CAT_PURREOW, combatUser.getEntity().getLocation(), 0.6, 1.8);
-                break;
-            case 32:
-                SoundUtil.play(Sound.ITEM_BOTTLE_FILL, combatUser.getEntity().getLocation(), 0.6, 1.4);
-                break;
-            case 38:
-                SoundUtil.play("new.block.chain.place", combatUser.getEntity().getLocation(), 0.6, 1.6);
-                break;
-            case 41:
-                SoundUtil.play(Sound.BLOCK_IRON_TRAPDOOR_CLOSE, combatUser.getEntity().getLocation(), 0.6, 1.2);
-                break;
-            default:
-                break;
-        }
+        PalasWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -225,7 +190,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -PalasWeaponInfo.AIM_SLOW);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_ON, combatUser.getEntity().getLocation());
+        PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -233,7 +198,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_WEAPON_AIM_OFF, combatUser.getEntity().getLocation());
+        PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getEntity().getLocation());
     }
 
     @Override

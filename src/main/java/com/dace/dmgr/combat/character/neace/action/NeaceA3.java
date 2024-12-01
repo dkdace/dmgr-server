@@ -7,9 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -69,7 +67,7 @@ public final class NeaceA3 extends ActiveSkill {
         protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_NEACE_A3_USE, combatUser.getEntity().getLocation());
+            NeaceA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (!target.canBeTargeted() || target.isDisposed() || combatUser.getKnockbackModule().isKnockbacked())

@@ -17,12 +17,13 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -75,7 +76,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE, combatUser.getEntity().getLocation());
+                InfernoWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -93,7 +94,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 CombatUtil.setRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
                         InfernoWeaponInfo.FIREBALL.RECOIL.UP_SPREAD, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE_SPREAD, 3, 1);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_USE_FIREBALL, combatUser.getEntity().getLocation());
+                InfernoWeaponInfo.SOUND.USE_FIREBALL.play(combatUser.getEntity().getLocation());
 
                 break;
             }
@@ -129,31 +130,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     public void onReloadTick(long i) {
-        switch ((int) i) {
-            case 3:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 6:
-                SoundUtil.play(Sound.BLOCK_FIRE_EXTINGUISH, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 10:
-                SoundUtil.play(Sound.BLOCK_PISTON_EXTEND, combatUser.getEntity().getLocation(), 0.6, 0.7);
-                break;
-            case 27:
-                SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 30:
-                SoundUtil.play(Sound.ENTITY_WOLF_SHAKE, combatUser.getEntity().getLocation(), 0.6, 0.5);
-                break;
-            case 44:
-                SoundUtil.play(Sound.BLOCK_IRON_DOOR_OPEN, combatUser.getEntity().getLocation(), 0.6, 0.7);
-                break;
-            case 47:
-                SoundUtil.play(Sound.ENTITY_IRONGOLEM_ATTACK, combatUser.getEntity().getLocation(), 0.6, 1.4);
-                break;
-            default:
-                break;
-        }
+        InfernoWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
     }
 
     @Override
@@ -261,7 +238,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             Location loc = getLocation().clone().add(0, 0.1, 0);
             new InfernoWeaponLArea().emit(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_INFERNO_WEAPON_FIREBALL_EXPLODE, loc);
+            InfernoWeaponInfo.SOUND.FIREBALL_EXPLODE.play(loc);
             ParticleUtil.play(Particle.SMOKE_LARGE, loc, 40, 0.2, 0.2, 0.2, 0.1);
             ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 80, 0.1, 0.1, 0.1, 0.15);
             ParticleUtil.play(Particle.LAVA, loc, 30, 0.3, 0.3, 0.3, 0);

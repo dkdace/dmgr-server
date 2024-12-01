@@ -9,7 +9,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -74,7 +76,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 0.8 : -0.8), 0.1);
                     if (index % 2 == 0)
-                        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_USE, loc.add(vec));
+                        QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
                         CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? -1 : 1), -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
@@ -111,7 +113,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit() {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT, getLocation());
+            QuakerWeaponInfo.SOUND.HIT.play(getLocation());
         }
 
         @Override
@@ -130,7 +132,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                             -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
                 ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0, 0, 0, 0.4);
-                SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_WEAPON_HIT_ENTITY, getLocation());
+                QuakerWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
             }
 
             return true;

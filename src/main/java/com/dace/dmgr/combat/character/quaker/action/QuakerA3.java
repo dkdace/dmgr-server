@@ -8,7 +8,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -57,7 +59,7 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
         combatUser.playMeleeAttackAnimation(-7, 12, true);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE, combatUser.getEntity().getLocation());
+        QuakerA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -73,7 +75,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             new QuakerA3Projectile().shoot();
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_USE_READY, combatUser.getEntity().getLocation());
+            QuakerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
     }
 
@@ -145,7 +147,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
                 ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec2.getX(), vec2.getY(), vec2.getZ(), 1.4);
             }
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_TICK, getLocation());
+            QuakerA3Info.SOUND.TICK.play(getLocation());
         }
 
         @Override
@@ -155,7 +157,7 @@ public final class QuakerA3 extends ActiveSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, getLocation());
+            QuakerA3Info.SOUND.HIT.play(getLocation());
             CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 5);
             return false;
         }
@@ -209,7 +211,7 @@ public final class QuakerA3 extends ActiveSkill {
                     }
 
                     ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
-                    SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A3_HIT, location);
+                    QuakerA3Info.SOUND.HIT.play(location);
                 }
 
                 return !(target instanceof Barrier);

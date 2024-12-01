@@ -10,7 +10,10 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -60,7 +63,7 @@ public final class ChedUlt extends UltimateSkill {
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE, combatUser.getEntity().getLocation());
+        ChedUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
@@ -80,7 +83,7 @@ public final class ChedUlt extends UltimateSkill {
             Location location = combatUser.getArmLocation(true);
             new ChedUltProjectile().shoot(location);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_USE_READY, location);
+            ChedUltInfo.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
             TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION),
@@ -177,7 +180,7 @@ public final class ChedUlt extends UltimateSkill {
         @Override
         protected void onTrailInterval() {
             playTickEffect();
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_TICK, getLocation());
+            ChedUltInfo.SOUND.TICK.play(getLocation());
         }
 
         private void playTickEffect() {
@@ -236,7 +239,7 @@ public final class ChedUlt extends UltimateSkill {
             for (Location loc2 : LocationUtil.getLine(getLocation(), loc, 0.4))
                 ParticleUtil.play(Particle.FLAME, loc2, 5, 0.05, 0.05, 0.05, 0);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_EXPLODE, loc);
+            ChedUltInfo.SOUND.EXPLODE.play(loc);
             ParticleUtil.play(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0, 0);
             ParticleUtil.play(Particle.SMOKE_LARGE, loc, 400, 0.5, 0.5, 0.5, 0.2);
             ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 600, 0.4, 0.4, 0.4, 0.4);
@@ -305,7 +308,7 @@ public final class ChedUlt extends UltimateSkill {
             new ChedUltFireFloorArea().emit(loc);
 
             if (i % 4 == 0)
-                SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_ULT_FIRE_FLOOR_TICK, loc);
+                ChedUltInfo.SOUND.FIRE_FLOOR_TICK.play(loc);
             playTickEffect();
 
             if (i >= ChedUltInfo.FIRE_FLOOR_DURATION)

@@ -5,8 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     /** 초당 피해량 */
@@ -108,5 +111,40 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     public static class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 12;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_HORSE_BREATHE, 1.5, 0.7),
+                new DefinedSound.SoundEffect(Sound.ENTITY_HORSE_BREATHE, 1.5, 1.3),
+                new DefinedSound.SoundEffect("new.block.soul_sand.fall", 1.5, 0.5)
+        );
+        /** 사용 (화염탄) */
+        public static final DefinedSound USE_FIREBALL = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_SHULKER_SHOOT, 2, 1.5),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 2, 1.1),
+                new DefinedSound.SoundEffect("random.gun.grenade", 2, 0.9)
+        );
+        /** 폭발 (화염탄) */
+        public static final DefinedSound FIREBALL_EXPLODE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 3, 0.8),
+                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.4),
+                new DefinedSound.SoundEffect("random.gun_reverb2", 5, 1)
+        );
+        /** 재장전 */
+        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
+                .add(3, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_YES, 0.6, 0.5))
+                .add(6, new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.6, 0.5))
+                .add(10, new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_EXTEND, 0.6, 0.7))
+                .add(27, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.6, 0.5))
+                .add(30, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 0.5))
+                .add(44, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_DOOR_OPEN, 0.6, 0.7))
+                .add(47, new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_ATTACK, 0.6, 1.4))
+                .build();
     }
 }

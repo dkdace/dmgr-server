@@ -11,7 +11,10 @@ import com.dace.dmgr.combat.entity.HasReadyTime;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -63,13 +66,13 @@ public final class JagerUlt extends UltimateSkill {
         if (summonEntity != null)
             summonEntity.dispose();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_USE, combatUser.getEntity().getLocation());
+        JagerUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             Location loc = combatUser.getArmLocation(true);
             new JagerUltProjectile().shoot(loc);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_THROW, loc);
+            CombatEffectUtil.THROW_SOUND.play(loc);
 
             onCancelled();
         }, JagerUltInfo.READY_DURATION));
@@ -186,7 +189,7 @@ public final class JagerUlt extends UltimateSkill {
             damageModule.setHealth(JagerUltInfo.HEALTH);
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON, entity.getLocation());
+            JagerUltInfo.SOUND.SUMMON.play(entity.getLocation());
         }
 
         @Override
@@ -202,7 +205,7 @@ public final class JagerUlt extends UltimateSkill {
 
             Location loc = entity.getLocation();
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, 0, -1, 0, 0.3);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_SUMMON_BEFORE_READY, loc);
+            JagerUltInfo.SOUND.SUMMON_BEFORE_READY.play(loc);
             playTickEffect();
         }
 
@@ -247,7 +250,7 @@ public final class JagerUlt extends UltimateSkill {
         private void playTickEffect(long i, double range) {
             Location loc = entity.getLocation();
             if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
-                SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_TICK, loc);
+                JagerUltInfo.SOUND.TICK.play(loc);
 
             loc.setYaw(0);
             loc.setPitch(0);
@@ -291,7 +294,7 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DAMAGE, entity.getLocation(), 1 + damage * 0.001);
+            JagerUltInfo.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakEffect(location, entity, damage);
         }
 
@@ -303,7 +306,7 @@ public final class JagerUlt extends UltimateSkill {
                     0.1, 0.1, 0.1, 0.15);
             ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1, 0.1, 0.1, 0.5);
             ParticleUtil.play(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
-            SoundUtil.playNamedSound(NamedSound.COMBAT_JAGER_ULT_DEATH, entity.getLocation());
+            JagerUltInfo.SOUND.DEATH.play(entity.getLocation());
         }
 
         private final class JagerUltArea extends Area {

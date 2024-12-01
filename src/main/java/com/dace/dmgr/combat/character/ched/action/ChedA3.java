@@ -8,7 +8,10 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -60,7 +63,7 @@ public final class ChedA3 extends ActiveSkill {
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE, combatUser.getEntity().getLocation());
+        ChedA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
@@ -80,7 +83,7 @@ public final class ChedA3 extends ActiveSkill {
             Location location = combatUser.getArmLocation(true);
             new ChedA3Projectile().shoot(location);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_USE_READY, location);
+            ChedA3Info.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
             TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedA3Info.READY_DURATION),
@@ -156,7 +159,7 @@ public final class ChedA3 extends ActiveSkill {
         @Override
         protected void onTrailInterval() {
             playTickEffect();
-            SoundUtil.playNamedSound(NamedSound.COMBAT_CHED_A3_TICK, getLocation());
+            ChedA3Info.SOUND.TICK.play(getLocation());
         }
 
         private void playTickEffect() {

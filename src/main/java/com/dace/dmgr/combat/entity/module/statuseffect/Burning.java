@@ -4,11 +4,11 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -16,6 +16,10 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Burning implements StatusEffect {
+    /** 화염 피해 효과음 */
+    private static final DefinedSound BURNING_DAMAGE_SOUND = new DefinedSound(
+            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7, 1, 0.1));
+
     /** 초당 피해량 */
     private final int damagePerSecond;
     /** 궁극기 충전 여부 */
@@ -44,7 +48,7 @@ public abstract class Burning implements StatusEffect {
 
         if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider,
                 damagePerSecond * 10 / 20.0, DamageType.NORMAL, null, false, isUlt))
-            SoundUtil.playNamedSound(NamedSound.COMBAT_DAMAGE_BURNING, combatEntity.getEntity().getLocation());
+            BURNING_DAMAGE_SOUND.play(combatEntity.getEntity().getLocation());
     }
 
     @Override

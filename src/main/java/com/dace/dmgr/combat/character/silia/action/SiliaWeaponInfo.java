@@ -5,8 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /** 피해량 */
@@ -45,5 +47,24 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
         public static final short DEFAULT = 4;
         /** 확장 */
         public static final short EXTENDED = DEFAULT + 1000;
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("random.gun2.knife_leftclick", 0.8, 1),
+                new DefinedSound.SoundEffect("random.swordhit", 0.7, 1.2),
+                new DefinedSound.SoundEffect("new.item.trident.riptide_1", 0.6, 1.3)
+        );
+        /** 엔티티 타격 */
+        public static final DefinedSound HIT_ENTITY = new DefinedSound(
+                new DefinedSound.SoundEffect("random.stab", 1, 0.8, 0.05));
+        /** 블록 타격 */
+        public static final DefinedSound HIT_BLOCK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 0.9, 0.05));
     }
 }

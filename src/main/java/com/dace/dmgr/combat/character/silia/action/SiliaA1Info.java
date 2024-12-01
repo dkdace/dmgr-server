@@ -5,7 +5,9 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
 public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
     /** 쿨타임 (tick) */
@@ -37,6 +39,19 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect("new.item.trident.throw", 1.5, 0.8),
+                new DefinedSound.SoundEffect("random.swordhit", 1.5, 0.8),
+                new DefinedSound.SoundEffect("random.swordhit", 1.5, 0.8)
         );
     }
 }

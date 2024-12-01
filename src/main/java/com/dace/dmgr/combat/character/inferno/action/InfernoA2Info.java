@@ -5,7 +5,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.DefinedSound;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Sound;
 
 public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     /** 쿨타임 (tick) */
@@ -35,6 +38,23 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build()
                 )
+        );
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사용 */
+        public static final DefinedSound USE = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 2, 0.5),
+                new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 2, 0.6)
+        );
+        /** 틱 효과음 */
+        public static final DefinedSound TICK = new DefinedSound(
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.55, 0.1),
+                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
         );
     }
 }

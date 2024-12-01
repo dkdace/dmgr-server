@@ -11,9 +11,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.NamedSound;
 import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -114,8 +112,8 @@ public final class PalasA2 extends ActiveSkill {
                 ((CombatUser) target).addKillAssist(combatUser, PalasA2.ASSIST_SCORE_COOLDOWN_ID, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
             }
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_USE, combatUser.getEntity().getLocation());
-            SoundUtil.playNamedSound(NamedSound.COMBAT_PALAS_A2_HIT_ENTITY, target.getCenterLocation());
+            PalasA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            PalasA2Info.SOUND.HIT_ENTITY.play(target.getCenterLocation());
             ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
 
             Location location = combatUser.getArmLocation(false);
