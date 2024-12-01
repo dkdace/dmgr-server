@@ -1,6 +1,8 @@
 package com.dace.dmgr.item;
 
 import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.DMGR;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -34,6 +36,8 @@ import java.util.UUID;
  * </code></pre>
  */
 public final class ItemBuilder {
+    /** 머리 스킨을 불러올 때 사용하는 토큰의 접두사 */
+    private static final String SKIN_TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
     /** 플레이어 머리 생성에 사용하는 필드 객체 */
     private static Field profileField;
     /** 생성할 아이템 객체 */
@@ -82,23 +86,23 @@ public final class ItemBuilder {
     }
 
     /**
-     * 플레이어 머리 아이템의 지정 플레이어를 지정한 스킨 URL로 설정한다.
+     * 플레이어 머리 아이템의 지정 플레이어를 지정한 스킨 속성으로 설정한다.
      *
-     * @param skinUrl 스킨 URL
+     * @param property 스킨 속성 값
      * @return {@link ItemBuilder}
      * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
      */
     @NonNull
-    public ItemBuilder setSkullOwner(@NonNull String skinUrl) {
+    private ItemBuilder setSkullOwner(@NonNull Property property) {
         if (!(itemMeta instanceof SkullMeta))
             throw new IllegalStateException("아이템이 플레이어 머리가 아님");
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-        gameProfile.getProperties().put("textures", new Property("textures", skinUrl));
+        gameProfile.getProperties().put("textures", property);
 
         try {
             if (profileField == null) {
-                profileField = ((SkullMeta) itemMeta).getClass().getDeclaredField("profile");
+                profileField = itemMeta.getClass().getDeclaredField("profile");
                 profileField.setAccessible(true);
             }
             profileField.set(itemMeta, gameProfile);
@@ -107,6 +111,31 @@ public final class ItemBuilder {
         }
 
         return this;
+    }
+
+    /**
+     * 플레이어 머리 아이템의 지정 플레이어를 지정한 스킨 URL로 설정한다.
+     *
+     * @param skinUrl 스킨 URL
+     * @return {@link ItemBuilder}
+     * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
+     */
+    @NonNull
+    public ItemBuilder setSkullOwner(@NonNull String skinUrl) {
+        return setSkullOwner(new Property("textures", SKIN_TOKEN_PREFIX + skinUrl));
+    }
+
+    /**
+     * 플레이어 머리 아이템의 지정 플레이어를 지정한 전투원으로 설정한다.
+     *
+     * @param characterType 전투원 종류
+     * @return {@link ItemBuilder}
+     * @throws IllegalStateException 아이템이 플레이어 머리가 아니면 발생
+     */
+    @NonNull
+    public ItemBuilder setSkullOwner(@NonNull CharacterType characterType) {
+        return setSkullOwner(new Property("textures",
+                DMGR.getSkinsRestorerAPI().getSkinData(characterType.getCharacter().getSkinName()).getValue()));
     }
 
     /**

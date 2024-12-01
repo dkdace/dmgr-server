@@ -2,7 +2,6 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.SkinUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -81,7 +80,7 @@ public final class PlayerOption extends Gui {
         PlayerOptionItem(String skinUrl, String name, String lore, Consumer<Player> action) {
             this.guiItem = new GuiItem("PlayerOption" + this, new ItemBuilder(Material.SKULL_ITEM)
                     .setDamage((short) 3)
-                    .setSkullOwner(SkinUtil.TOKEN_PREFIX + skinUrl)
+                    .setSkullOwner(skinUrl)
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build()) {

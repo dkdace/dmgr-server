@@ -17,7 +17,6 @@ import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.item.gui.SelectCharInfo;
 import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -68,7 +67,7 @@ public enum CharacterType {
         this.selectCharInfo = new SelectCharInfo(CharacterType.this);
         this.guiItem = new GuiItem(this.toString(), new ItemBuilder(Material.SKULL_ITEM)
                 .setDamage((short) 3)
-                .setSkullOwner(SkinUtil.getSkinUrl(character.getSkinName()))
+                .setSkullOwner(this)
                 .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}", character.getIcon(), character.getRole().getColor(), character.getName(),
                         character.getNickname()))
                 .setLore("",

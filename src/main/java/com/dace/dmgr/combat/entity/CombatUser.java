@@ -504,7 +504,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             deathMentHologram.dispose();
 
         if (DMGR.getPlugin().isEnabled())
-            SkinUtil.resetSkin(entity);
+            user.resetSkin();
 
         reset();
     }
@@ -1226,7 +1226,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.characterRecord = user.getUserData().getCharacterRecord(characterType);
         initActions();
 
-        TaskUtil.addTask(this, SkinUtil.applySkin(entity, realCharacter.getSkinName()));
+        TaskUtil.addTask(this, user.applySkin(realCharacter.getSkinName()));
         TaskUtil.addTask(this, new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,
                         1, 0, false, false), true), 1, 10));

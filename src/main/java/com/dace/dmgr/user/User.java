@@ -5,13 +5,18 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.TextHologram;
+import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -25,6 +30,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.skinsrestorer.api.PlayerWrapper;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
@@ -190,7 +196,7 @@ public final class User implements Disposable {
         disableCollision();
         TaskUtil.addTask(this, new DelayTask(this::updateNameTagHider, 1));
         TaskUtil.addTask(this, new DelayTask(this::sendResourcePack, 10));
-        TaskUtil.addTask(this, SkinUtil.resetSkin(player));
+        TaskUtil.addTask(this, resetSkin());
 
         sidebar = new BPlayerBoard(player, "lobby");
         clearSidebar();
@@ -1139,6 +1145,40 @@ public final class User implements Disposable {
             nameTagHider.teleport(location);
             player.addPassenger(nameTagHider);
         }
+    }
+
+    /**
+     * 플레이어의 스킨을 변경한다.
+     *
+     * @param skinName 적용할 스킨 이름
+     */
+    @NonNull
+    public AsyncTask<Void> applySkin(@NonNull String skinName) {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), skinName);
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
+                onError.accept(ex);
+            }
+        });
+    }
+
+    /**
+     * 플레이어의 스킨을 초기화한다.
+     */
+    @NonNull
+    public AsyncTask<Void> resetSkin() {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), player.getName());
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
+                onError.accept(ex);
+            }
+        });
     }
 
     /**

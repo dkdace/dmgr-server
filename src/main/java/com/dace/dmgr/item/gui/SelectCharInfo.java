@@ -8,7 +8,6 @@ import com.dace.dmgr.combat.character.Character;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.util.SkinUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -99,7 +98,7 @@ public final class SelectCharInfo extends Gui {
         SelectCharInfoItem(String skinUrl, String name) {
             this.staticItem = new StaticItem("PlayerOption" + this, new ItemBuilder(Material.SKULL_ITEM)
                     .setDamage((short) 3)
-                    .setSkullOwner(SkinUtil.TOKEN_PREFIX + skinUrl)
+                    .setSkullOwner(skinUrl)
                     .setName(name)
                     .build());
         }
