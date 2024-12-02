@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,6 +81,8 @@ public final class GeneralConfig implements Initializable<Void> {
     public static final class Config {
         /** Yaml 섹션 인스턴스 */
         private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("default");
+        /** Yaml 로비 위치 섹션 인스턴스 */
+        private static final YamlFile.Section lobbySection = section.getSection("lobbyLocation");
 
         /** 리소스팩 URL */
         @NonNull
@@ -100,6 +103,23 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 관리자 연락처 */
         @NonNull
         private final String adminContact = section.getEntry("adminContact", "디스코드 dkdace (DarkDace＃4671)").get();
+        /** 로비 위치 */
+        private final Location lobbyLocation = new Location(
+                DMGR.getDefaultWorld(),
+                lobbySection.getEntry("x", 0.0).get(),
+                lobbySection.getEntry("y", 0.0).get(),
+                lobbySection.getEntry("z", 0.0).get(),
+                lobbySection.getEntry("yaw", 0F).get(),
+                lobbySection.getEntry("pitch", 0F).get()
+        );
+
+        /**
+         * @return 로비 위치
+         */
+        @NonNull
+        public Location getLobbyLocation() {
+            return lobbyLocation.clone();
+        }
     }
 
     /**

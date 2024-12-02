@@ -311,7 +311,7 @@ public final class GameUser implements Disposable {
     @NonNull
     public Location getRespawnLocation() {
         if (game.getWorld() == null || team == null)
-            return LocationUtil.getLobbyLocation();
+            return GeneralConfig.getConfig().getLobbyLocation();
         if (team.getColor() == ChatColor.RED)
             return game.getMap().getRedTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getRedTeamSpawnIndex()]
                     .toLocation(game.getWorld());
@@ -319,7 +319,7 @@ public final class GameUser implements Disposable {
             return game.getMap().getBlueTeamSpawns()[game.getGamePlayMode().getGamePlayModeScheduler().getBlueTeamSpawnIndex()]
                     .toLocation(game.getWorld());
 
-        return LocationUtil.getLobbyLocation();
+        return GeneralConfig.getConfig().getLobbyLocation();
     }
 
     /**

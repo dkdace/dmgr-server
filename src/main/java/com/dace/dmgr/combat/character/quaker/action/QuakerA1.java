@@ -66,7 +66,7 @@ public final class QuakerA1 extends ChargeableSkill {
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA1Info.USE_SLOW);
             combatUser.setFovValue(0.3);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_USE, combatUser.getEntity().getLocation());
+            QuakerA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
             summonEntity = new QuakerA1Entity(CombatUtil.spawnEntity(ArmorStand.class, combatUser.getEntity().getLocation()), combatUser);
             summonEntity.activate();

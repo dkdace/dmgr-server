@@ -1,6 +1,5 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.DMGR;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -22,22 +21,10 @@ import java.util.List;
  */
 @UtilityClass
 public final class LocationUtil {
-    /** 로비 스폰 위치 */
-    private static final Location lobbyLocation = new Location(DMGR.getDefaultWorld(), 15.5, 86, 34.5, 90, 0);
     /** {@link LocationUtil#canPass(Location, Location)}에서 사용하는 위치 간 간격 */
     private static final double CAN_PASS_INTERVAL = 0.25;
     /** {@link LocationUtil#canPass(Location, Location)}의 최대 거리 */
     private static final int CAN_PASS_MAX_DISTANCE = 70;
-
-    /**
-     * 로비 스폰 위치를 반환한다.
-     *
-     * @return 스폰 위치
-     */
-    @NonNull
-    public static Location getLobbyLocation() {
-        return lobbyLocation.clone();
-    }
 
     /**
      * 지정한 블록이 통과할 수 있는 블록인지 확인한다.

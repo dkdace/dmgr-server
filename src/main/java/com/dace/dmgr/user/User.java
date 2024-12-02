@@ -525,7 +525,7 @@ public final class User implements Disposable {
         Bukkit.getOnlinePlayers().forEach(target -> User.fromPlayer(target).removeGlowing(this.player));
 
         clearBossBar();
-        teleport(LocationUtil.getLobbyLocation());
+        teleport(GeneralConfig.getConfig().getLobbyLocation());
         isInFreeCombat = false;
 
         if (userData.isInitialized()) {
