@@ -94,8 +94,7 @@ public final class AsyncTask<T> extends Task {
      *
      * @param action 태스크가 끝났을 때 실행할 비동기 작업.
      *
-     *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한
-     *               onFinish의 인자값을 인자로 받으며, 다음 onFinish에 사용할 값을 반환해야 함</p>
+     *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한 onFinish의 인자값을 인자로 받으며, 다음 onFinish에 사용할 값을 반환해야 함</p>
      * @param <U>    다음 {@code onFinish} 호출에 사용되는 반환 타입
      * @return 새로운 {@link AsyncTask}
      */
@@ -114,8 +113,7 @@ public final class AsyncTask<T> extends Task {
      *
      * @param action 태스크가 끝났을 때 실행할 작업.
      *
-     *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한
-     *               onFinish의 인자값을 인자로 받음</p>
+     *               <p>{@link AsyncTask#AsyncTask(Callback)}에서 호출한 onFinish의 인자값을 인자로 받음</p>
      * @return 새로운 {@link AsyncTask}
      */
     @NonNull

@@ -33,8 +33,7 @@ public final class IntervalTask extends Task {
     /**
      * 매 주기마다 실행할 작업.
      *
-     * <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
-     * 타이머를 종료하려면 {@code false} 반환</p>
+     * <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환</p>
      */
     private final LongPredicate onCycle;
     /** 태스크가 끝났을 때 실행할 작업 */
@@ -49,8 +48,7 @@ public final class IntervalTask extends Task {
      *
      * @param onCycle  매 주기마다 실행할 작업.
      *
-     *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
-     *                 타이머를 종료하려면 {@code false} 반환</p>
+     *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환</p>
      * @param onFinish 태스크가 끝났을 때 실행할 작업
      * @param period   실행 주기 (tick)
      * @param repeat   반복 횟수
@@ -69,8 +67,7 @@ public final class IntervalTask extends Task {
      *
      * @param onCycle  매 주기마다 실행할 작업.
      *
-     *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
-     *                 타이머를 종료하려면 {@code false} 반환</p>
+     *                 <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환</p>
      * @param onFinish 태스크가 끝났을 때 실행할 작업
      * @param period   실행 주기 (tick)
      */
@@ -83,8 +80,7 @@ public final class IntervalTask extends Task {
      *
      * @param onCycle 매 주기마다 실행할 작업.
      *
-     *                <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
-     *                타이머를 종료하려면 {@code false} 반환</p>
+     *                <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환</p>
      * @param period  실행 주기 (tick)
      * @param repeat  반복 횟수
      */
@@ -98,8 +94,7 @@ public final class IntervalTask extends Task {
      *
      * @param onCycle 매 주기마다 실행할 작업.
      *
-     *                <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환,
-     *                타이머를 종료하려면 {@code false} 반환</p>
+     *                <p>인덱스 (0부터 시작)를 인자로 받으며, 다음 주기로 넘어가려면 {@code true} 반환, 타이머를 종료하려면 {@code false} 반환</p>
      * @param period  실행 주기 (tick)
      */
     public IntervalTask(@NonNull LongPredicate onCycle, long period) {
@@ -189,8 +184,7 @@ public final class IntervalTask extends Task {
         /**
          * 태스크가 끝났을 때 실행할 작업.
          *
-         * @param isCancelled 취소 여부. {@link IntervalTask#onCycle}에서 {@code false}를
-         *                    반환하여 끝낸 경우 {@code true}
+         * @param isCancelled 취소 여부. {@link IntervalTask#onCycle}에서 {@code false}를 반환하여 끝낸 경우 {@code true}
          */
         void accept(boolean isCancelled);
     }

@@ -1,9 +1,9 @@
 package com.dace.dmgr.command;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
  *
  * <p>Usage: /스폰</p>
  *
- * @see LocationUtil#getLobbyLocation()
+ * @see GeneralConfig.Config#getLobbyLocation()
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LobbyCommand extends BaseCommandExecutor {

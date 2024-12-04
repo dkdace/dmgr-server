@@ -76,8 +76,7 @@ public final class DelayedDefinedSound {
     }
 
     /**
-     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수
-     * 있는 소리를 재생한다.
+     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수 있는 소리를 재생한다.
      *
      * @param delayIndex       딜레이 인덱스 (tick). 0 이상의 값
      * @param player           대상 플레이어
@@ -92,8 +91,7 @@ public final class DelayedDefinedSound {
     }
 
     /**
-     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수
-     * 있는 소리를 재생한다.
+     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수 있는 소리를 재생한다.
      *
      * @param delayIndex       딜레이 인덱스 (tick). 0 이상의 값
      * @param player           대상 플레이어
@@ -105,8 +103,7 @@ public final class DelayedDefinedSound {
     }
 
     /**
-     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수
-     * 있는 소리를 재생한다.
+     * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 플레이어만 들을 수 있는 소리를 재생한다.
      *
      * @param delayIndex 딜레이 인덱스 (tick). 0 이상의 값
      * @param player     대상 플레이어
