@@ -324,12 +324,11 @@ public final class LocationUtil {
          *
          * @param location          기준 위치
          * @param velocity          속도
-         * @param maxTravelDistance 최대 이동 거리. (단위: 블록). 0을 초과하는 값.
-         * @throws IllegalArgumentException 인자값이 유효하지 않거나 {@code velocity}의 {@link Vector#length()}가 {@code maxDistance} 이상이면 발생
+         * @param maxTravelDistance 최대 이동 거리. (단위: 블록). 0 이상의 값.
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         private IterableLocation(@NonNull Location location, @NonNull Vector velocity, double maxTravelDistance) {
-            Validate.inclusiveBetween(Math.nextUp(0.0), Double.MAX_VALUE, maxTravelDistance);
-            Validate.exclusiveBetween(0, maxTravelDistance, velocity.length());
+            Validate.inclusiveBetween(0, Double.MAX_VALUE, maxTravelDistance);
 
             this.location = location.clone();
             this.velocity = velocity.clone();
@@ -422,6 +421,11 @@ public final class LocationUtil {
             }
 
             travelDistance += velocity.length();
+            if (travelDistance > iterableLocation.maxTravelDistance) {
+                travelDistance = iterableLocation.maxTravelDistance;
+                return location.add(velocity.normalize().multiply(iterableLocation.maxTravelDistance));
+            }
+
             return location.add(velocity);
         }
     }
