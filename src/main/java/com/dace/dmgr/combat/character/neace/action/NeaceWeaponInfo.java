@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -77,12 +77,12 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8, 1.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 1, 1.5)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(0.8).pitch(1.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1).pitch(1.5).build()
         );
         /** 사용 (치유 광선) */
-        public static final DefinedSound USE_HEAL = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_GUARDIAN_ATTACK, 0.2, 2));
+        public static final SoundEffect USE_HEAL = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(0.2).pitch(2).build());
     }
 }

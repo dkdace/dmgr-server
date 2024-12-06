@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -59,25 +59,25 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 1, 0.8),
-                new DefinedSound.SoundEffect("random.gun2.shovel_leftclick", 1, 0.5),
-                new DefinedSound.SoundEffect("random.gun2.shovel_leftclick", 1, 0.8)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.8).build()
         );
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 2, 0.5),
-                new DefinedSound.SoundEffect("new.item.trident.throw", 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0.7)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(2).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder("new.item.trident.throw").volume(2).pitchVariance(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(2).pitch(0.7).build()
         );
         /** 틱 효과음 */
-        public static final DefinedSound TICK = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 0.6, 0.5));
+        public static final SoundEffect TICK = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(0.6).pitch(0.5).build());
         /** 타격 */
-        public static final DefinedSound HIT = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 2, 0.6),
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_CRIT, 2, 0.7)
+        public static final SoundEffect HIT = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(2).pitch(0.7).build()
         );
     }
 }

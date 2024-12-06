@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
@@ -18,48 +18,54 @@ import org.jetbrains.annotations.Nullable;
 @UtilityClass
 public final class CombatEffectUtil {
     /** 총기 탄피 효과음 */
-    public static final DefinedSound SHELL_DROP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_MAGMACUBE_JUMP, 0.8, 1, 0.1));
+    public static final SoundEffect SHELL_DROP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(1).pitchVariance(0.1).build());
+    /** 총기 탄피 효과음 (중량) */
+    public static final SoundEffect SHELL_DROP_HEAVY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(0.95).pitchVariance(0.1).build());
     /** 산탄총 탄피 효과음 */
-    public static final DefinedSound SHOTGUN_SHELL_DROP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_HORSE_DEATH, 1, 1, 0.1));
+    public static final SoundEffect SHOTGUN_SHELL_DROP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_HORSE_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
     /** 엔티티 소환 효과음 */
-    public static final DefinedSound ENTITY_SUMMON_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 0.8, 1));
+    public static final SoundEffect ENTITY_SUMMON_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.8).pitch(1).build());
     /** 투척 효과음 */
-    public static final DefinedSound THROW_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_WITCH_THROW, 0.8, 0.8));
+    public static final SoundEffect THROW_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.8).build());
+    /** 투척 효과음 (중량) */
+    public static final SoundEffect THROW_HEAVY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.7).build());
     /** 투척물 튕김 효과음 */
-    public static final DefinedSound THROW_BOUNCE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("random.metalhit", 0.1, 1.2, 0.1),
-            new DefinedSound.SoundEffect(Sound.BLOCK_GLASS_BREAK, 0.1, 2)
+    public static final SoundEffect THROW_BOUNCE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.1).pitch(1.2).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.1).pitch(2).build()
     );
 
     /** 블록 타격 효과음 (잔디) */
-    private static final DefinedSound HIT_BLOCK_GRASS_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_GRASS_BREAK, 0.8, 0.7, 0.1));
+    private static final SoundEffect HIT_BLOCK_GRASS_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_GRASS_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (흙) */
-    private static final DefinedSound HIT_BLOCK_DIRT_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_GRAVEL_BREAK, 0.8, 0.7, 0.1));
+    private static final SoundEffect HIT_BLOCK_DIRT_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_GRAVEL_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (돌) */
-    private static final DefinedSound HIT_BLOCK_STONE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_STONE_BREAK, 1, 0.9, 0.1));
+    private static final SoundEffect HIT_BLOCK_STONE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_BREAK).volume(1).pitch(0.9).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (금속) */
-    private static final DefinedSound HIT_BLOCK_METAL_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5, 1.95, 0.1),
-            new DefinedSound.SoundEffect("random.metalhit", 0.8, 1.95, 0.1)
+    private static final SoundEffect HIT_BLOCK_METAL_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.5).pitch(1.95).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.8).pitch(1.95).pitchVariance(0.1).build()
     );
     /** 블록 타격 효과음 (목재) */
-    private static final DefinedSound HIT_BLOCK_WOOD_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_WOOD_BREAK, 0.8, 0.8, 0.1),
-            new DefinedSound.SoundEffect("random.stab", 0.8, 1.95, 0.1)
+    private static final SoundEffect HIT_BLOCK_WOOD_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_WOOD_BREAK).volume(0.8).pitch(0.8).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder("random.stab").volume(0.8).pitch(1.95).pitchVariance(0.1).build()
     );
     /** 블록 타격 효과음 (유리) */
-    private static final DefinedSound HIT_BLOCK_GLASS_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_GLASS_BREAK, 0.8, 0.7, 0.1));
+    private static final SoundEffect HIT_BLOCK_GLASS_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (양털) */
-    private static final DefinedSound HIT_BLOCK_WOOL_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.BLOCK_CLOTH_BREAK, 1, 0.8, 0.1));
+    private static final SoundEffect HIT_BLOCK_WOOL_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_BREAK).volume(1).pitch(0.8).pitchVariance(0.1).build());
 
     /**
      * 지정한 위치 또는 엔티티에 출혈 효과를 재생한다.

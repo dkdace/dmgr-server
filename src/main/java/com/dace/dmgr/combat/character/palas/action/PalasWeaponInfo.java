@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.util.DefinedSound;
-import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -88,35 +88,35 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun.vssvintorez", 2.5, 1.3),
-                new DefinedSound.SoundEffect("random.gun2.qbz_95_1", 2.5, 0.9),
-                new DefinedSound.SoundEffect("random.gun_reverb", 3.5, 1.1)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun.vssvintorez").volume(2.5).pitch(1.3).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.qbz_95_1").volume(2.5).pitch(0.9).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(3.5).pitch(1.1).build()
         );
         /** 조준 활성화 */
-        public static final DefinedSound AIM_ON = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.4, 2));
+        public static final SoundEffect AIM_ON = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.4).pitch(2).build());
         /** 조준 비활성화 */
-        public static final DefinedSound AIM_OFF = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.4, 2));
+        public static final SoundEffect AIM_OFF = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.4).pitch(2).build());
         /** 사용 후 쿨타임 */
-        public static final DelayedDefinedSound ACTION = DelayedDefinedSound.builder()
-                .add(1, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_YES, 0.6, 1.2))
-                .add(3, new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 0.5, 1.4))
-                .add(5, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.6, 1.2))
+        public static final TimedSoundEffect ACTION = TimedSoundEffect.builder()
+                .add(1, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(1.2).build())
+                .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.5).pitch(1.4).build())
+                .add(5, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.2).build())
                 .build();
         /** 재장전 */
-        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
-                .add(3, new DefinedSound.SoundEffect("new.ui.stonecutter.take_result", 0.6, 1.5))
-                .add(6, new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 0.6, 1.3))
-                .add(10, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 0.8))
-                .add(12, new DefinedSound.SoundEffect(Sound.ITEM_BOTTLE_EMPTY, 0.6, 1.4))
-                .add(14, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_TRAPDOOR_OPEN, 0.6, 1.3))
-                .add(22, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
-                .add(24, new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.6, 1.8))
-                .add(32, new DefinedSound.SoundEffect(Sound.ITEM_BOTTLE_FILL, 0.6, 1.4))
-                .add(38, new DefinedSound.SoundEffect("new.block.chain.place", 0.6, 1.6))
-                .add(41, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 0.6, 1.2))
+        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
+                .add(3, SoundEffect.SoundInfo.builder("new.ui.stonecutter.take_result").volume(0.6).pitch(1.5).build())
+                .add(6, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.3).build())
+                .add(10, SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build())
+                .add(12, SoundEffect.SoundInfo.builder(Sound.ITEM_BOTTLE_EMPTY).volume(0.6).pitch(1.4).build())
+                .add(14, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_OPEN).volume(0.6).pitch(1.3).build())
+                .add(22, SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build())
+                .add(24, SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.6).pitch(1.8).build())
+                .add(32, SoundEffect.SoundInfo.builder(Sound.ITEM_BOTTLE_FILL).volume(0.6).pitch(1.4).build())
+                .add(38, SoundEffect.SoundInfo.builder("new.block.chain.place").volume(0.6).pitch(1.6).build())
+                .add(41, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(1.2).build())
                 .build();
     }
 }

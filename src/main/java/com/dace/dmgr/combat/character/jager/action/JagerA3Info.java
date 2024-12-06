@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -66,19 +66,19 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.8, 1.2),
-                new DefinedSound.SoundEffect("new.block.chain.place", 0.8, 1.2)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.8).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder("new.block.chain.place").volume(0.8).pitch(1.2).build()
         );
         /** 폭발 */
-        public static final DefinedSound EXPLODE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_LARGE_BLAST, 4, 0.6),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 4, 1.2),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 4, 1.5),
-                new DefinedSound.SoundEffect("random.explosion_reverb", 6, 1.2)
+        public static final SoundEffect EXPLODE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CURE).volume(4).pitch(1.5).build(),
+                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build()
         );
     }
 }

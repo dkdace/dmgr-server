@@ -60,7 +60,7 @@ public final class InfernoUlt extends UltimateSkill {
 
             Location loc = combatUser.getEntity().getLocation();
             if (i < 24) {
-                InfernoUltInfo.SOUND.USE.play(loc, 1, i * 0.02);
+                InfernoUltInfo.SOUND.USE.play(loc, 1, i / 23.0);
                 ParticleUtil.play(Particle.LAVA, combatUser.getEntity().getLocation().add(0, 1, 0), 3,
                         1, 1.5, 1, 0.2);
                 playUseTickEffect(i);

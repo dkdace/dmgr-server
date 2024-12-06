@@ -14,8 +14,8 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,9 +39,9 @@ public final class Inferno extends Vanguard {
     @Getter
     private static final Inferno instance = new Inferno();
     /** 발소리 */
-    private static final DefinedSound FOOTSTEP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("new.entity.panda.step", 0.4, 0.9, 0.1),
-            new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_STEP, 0.3, 0.7, 0.1)
+    private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("new.entity.panda.step").volume(0.4).pitch(0.9).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build()
     );
 
     private Inferno() {

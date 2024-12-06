@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -50,23 +50,23 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.5, 1.6));
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ARROW_SHOOT, 1.5, 0.5),
-                new DefinedSound.SoundEffect("random.gun.m1911_silencer", 1.5, 0.8)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ARROW_SHOOT).volume(1.5).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder("random.gun.m1911_silencer").volume(1.5).pitch(0.8).build()
         );
         /** 엔티티 타격 */
-        public static final DefinedSound HIT_ENTITY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_TWINKLE, 2, 1.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
-                new DefinedSound.SoundEffect("random.stab", 2, 2)
+        public static final SoundEffect HIT_ENTITY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_TWINKLE).volume(2).pitch(1.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("random.stab").volume(2).pitch(2).build()
         );
         /** 틱 효과음 */
-        public static final DefinedSound TICK = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.6),
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_BLAST, 2, 1.8)
+        public static final SoundEffect TICK = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build()
         );
     }
 }

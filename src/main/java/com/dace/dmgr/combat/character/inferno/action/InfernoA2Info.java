@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -47,14 +47,14 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 2, 0.5),
-                new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 2, 0.6)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.6).build()
         );
         /** 틱 효과음 */
-        public static final DefinedSound TICK = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.55, 0.1),
-                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_AMBIENT, 2, 0.6, 0.1)
+        public static final SoundEffect TICK = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.55).pitchVariance(0.1).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.6).pitchVariance(0.1).build()
         );
     }
 }

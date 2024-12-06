@@ -13,7 +13,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,9 +38,9 @@ public final class Quaker extends Guardian {
     /** 특성 수정자 */
     private static final String TRAIT_MODIFIER_ID = "QuakerT1";
     /** 발소리 */
-    private static final DefinedSound FOOTSTEP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_COW_STEP, 0.3, 0.9, 0.1),
-            new DefinedSound.SoundEffect("new.entity.ravager.step", 0.2, 0.8, 0.1)
+    private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_COW_STEP).volume(0.3).pitch(0.9).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder("new.entity.ravager.step").volume(0.2).pitch(0.8).pitchVariance(0.1).build()
     );
 
     private Quaker() {

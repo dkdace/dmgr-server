@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -63,15 +63,15 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("new.item.crossbow.loading_end", 0.7, 1.4),
-                new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.7, 2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.item.crossbow.loading_end").volume(0.7).pitch(1.4).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.7).pitch(2).build()
         );
         /** 사격 */
-        public static final DefinedSound SHOOT = new DefinedSound(
-                new DefinedSound.SoundEffect("new.item.crossbow.shoot", 1.4, 1.6),
-                new DefinedSound.SoundEffect("random.gun.bow", 1.4, 1.2),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 1.6, 1.4)
+        public static final SoundEffect SHOOT = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(1.4).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("random.gun.bow").volume(1.4).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build()
         );
     }
 }

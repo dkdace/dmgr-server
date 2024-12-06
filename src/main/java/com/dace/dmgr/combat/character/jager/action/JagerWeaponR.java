@@ -69,7 +69,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
                 JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
-                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, -0.05), 8));
+                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_HEAVY_SOUND.play(loc), 8));
 
                 break;
             }

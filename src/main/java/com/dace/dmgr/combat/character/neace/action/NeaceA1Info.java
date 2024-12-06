@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -45,11 +45,11 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
-                new DefinedSound.SoundEffect("new.block.respawn_anchor.charge", 2, 1.4),
-                new DefinedSound.SoundEffect("new.block.note_block.chime", 2, 1.6),
-                new DefinedSound.SoundEffect("new.block.note_block.chime", 2, 1.2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
+                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.2).build()
         );
     }
 }

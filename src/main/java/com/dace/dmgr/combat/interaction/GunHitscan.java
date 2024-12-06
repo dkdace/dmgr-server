@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.NonNull;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -13,8 +13,8 @@ import org.bukkit.block.Block;
  */
 public abstract class GunHitscan extends Hitscan {
     /** 블록 타격 효과음 */
-    private static final DefinedSound HIT_BLOCK_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("random.gun.ricochet", 0.8, 0.975, 0.05));
+    private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.gun.ricochet").volume(0.8).pitch(0.975).pitchVariance(0.05).build());
 
     /**
      * @see Hitscan#Hitscan(CombatEntity, HitscanOption)

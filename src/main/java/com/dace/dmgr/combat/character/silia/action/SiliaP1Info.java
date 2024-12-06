@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -32,9 +32,9 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_SWAG, 0.8, 1.2),
-                new DefinedSound.SoundEffect(Sound.BLOCK_CLOTH_STEP, 0.8, 1.2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.1, 0.8).pitch(1.2, 1.4).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_STEP).volume(0.1, 0.8).pitch(1.2, 1.4).build()
         );
     }
 }

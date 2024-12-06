@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -52,20 +52,20 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 2, 1.6),
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build()
         );
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_FLAP, 1.5, 1.4),
-                new DefinedSound.SoundEffect(Sound.ENTITY_VEX_CHARGE, 1.5, 1.3),
-                new DefinedSound.SoundEffect(Sound.ENTITY_VEX_AMBIENT, 1.5, 1.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_VEX_AMBIENT, 1.5, 1.5)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.4).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_CHARGE).volume(1.5).pitch(1.3).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.5).build()
         );
         /** 틱 효과음 */
-        public static final DefinedSound TICK = new DefinedSound(
-                new DefinedSound.SoundEffect("new.entity.phantom.flap", 1, 1.3));
+        public static final SoundEffect TICK = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.3).build());
     }
 }

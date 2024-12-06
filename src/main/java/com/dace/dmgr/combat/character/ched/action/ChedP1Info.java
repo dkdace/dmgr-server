@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -47,17 +47,17 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_STONE_STEP, 1, 0.5, 0.05));
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(1).pitch(0.525).pitchVariance(0.05).build());
         /** 사용 (매달리기) */
-        public static final DefinedSound USE_HANG = new DefinedSound(
-                new DefinedSound.SoundEffect("new.entity.phantom.flap", 1, 1.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL, 0.6, 0.85)
+        public static final SoundEffect USE_HANG = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.85).build()
         );
         /** 해제 (매달리기) */
-        public static final DefinedSound DISABLE_HANG = new DefinedSound(
-                new DefinedSound.SoundEffect("new.entity.phantom.flap", 1, 1.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_SWAG, 0.6, 1.4)
+        public static final SoundEffect DISABLE_HANG = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build()
         );
     }
 }

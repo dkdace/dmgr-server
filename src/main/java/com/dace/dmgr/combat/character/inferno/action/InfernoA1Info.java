@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -47,17 +47,17 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SHOOT, 3, 0.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GHAST_SHOOT, 3, 0.8),
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.6)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SHOOT).volume(3).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(3).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.6).build()
         );
         /** 착지 */
-        public static final DefinedSound LAND = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 3, 0.5),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 3, 1.3)
+        public static final SoundEffect LAND = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(3).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(3).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(1.3).build()
         );
     }
 }

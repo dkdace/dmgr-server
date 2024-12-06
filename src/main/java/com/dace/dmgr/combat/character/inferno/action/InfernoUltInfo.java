@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -47,19 +47,19 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("new.block.respawn_anchor.ambient", 3, 1.2));
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.ambient").volume(3).pitch(1.2, 1.7).build());
         /** 틱 효과음 */
-        public static final DefinedSound TICK = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_AMBIENT, 2, 0.9, 0.1));
+        public static final SoundEffect TICK = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_AMBIENT).volume(2).pitch(0.9).pitchVariance(0.1).build());
         /** 피격 */
-        public static final DefinedSound DAMAGE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_POP, 0.3, 1.2, 0.1));
+        public static final SoundEffect DAMAGE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_POP).volume(0.3).pitch(1.2).pitchVariance(0.1).build());
         /** 파괴 */
-        public static final DefinedSound DEATH = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 3, 0.8),
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 3, 0.5),
-                new DefinedSound.SoundEffect("new.block.conduit.deactivate", 3, 0.8)
+        public static final SoundEffect DEATH = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.8).build()
         );
     }
 }

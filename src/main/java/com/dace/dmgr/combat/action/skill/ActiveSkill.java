@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -19,8 +19,8 @@ import java.util.function.LongConsumer;
  */
 public abstract class ActiveSkill extends AbstractSkill {
     /** 스킬 준비 효과음 */
-    static final DefinedSound READY_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.2, 2));
+    static final SoundEffect READY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(0.2).pitch(2).build());
 
     /** 스킬 슬롯 */
     private final int slot;

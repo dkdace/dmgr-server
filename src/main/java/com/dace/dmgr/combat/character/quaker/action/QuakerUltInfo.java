@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -63,12 +63,12 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 5, 0.5),
-                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_DEATH, 5, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 5, 0.7),
-                new DefinedSound.SoundEffect(Sound.BLOCK_ANVIL_PLACE, 5, 0.5),
-                new DefinedSound.SoundEffect("random.explosion_reverb", 7, 1.4)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(5).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_DEATH).volume(5).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_PLACE).volume(5).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(1.4).build()
         );
     }
 }

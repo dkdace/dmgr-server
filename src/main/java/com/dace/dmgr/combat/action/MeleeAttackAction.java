@@ -7,8 +7,8 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.DefinedSound;
 import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -22,16 +22,16 @@ import org.bukkit.block.Block;
  */
 public final class MeleeAttackAction extends AbstractAction {
     /** 사용 효과음 */
-    private static final DefinedSound USE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.6, 1.1, 0.1));
+    private static final SoundEffect USE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(0.6).pitch(1.1).pitchVariance(0.1).build());
     /** 엔티티 타격 효과음 */
-    private static final DefinedSound HIT_ENTITY_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1.1, 0.1),
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 1.1, 0.1)
+    private static final SoundEffect HIT_ENTITY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build()
     );
     /** 블록 타격 효과음 */
-    private static final DefinedSound HIT_BLOCK_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 0.9, 0.05));
+    private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
 
     /** 쿨타임 (tick) */
     private static final long COOLDOWN = 20;

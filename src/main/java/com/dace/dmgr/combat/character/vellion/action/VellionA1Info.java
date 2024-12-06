@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -62,19 +62,19 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ENDEREYE_DEATH, 2, 0.8, 0.1),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 2, 1.5)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(2).pitch(1.5).build()
         );
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_SHULKER_SHOOT, 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR, 2, 1.2),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ELDER_GUARDIAN_DEATH, 2, 1.8)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_DEATH).volume(2).pitch(1.8).build()
         );
         /** 엔티티 타격 */
-        public static final DefinedSound HIT_ENTITY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_INFECT, 1, 0.7, 0.05));
+        public static final SoundEffect HIT_ENTITY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build());
     }
 }

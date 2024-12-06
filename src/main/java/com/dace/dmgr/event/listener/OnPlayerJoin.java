@@ -2,9 +2,9 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.DefinedSound;
-import com.dace.dmgr.util.DelayedDefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.TimedSoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -20,9 +20,9 @@ import java.util.function.LongConsumer;
 
 public final class OnPlayerJoin implements Listener {
     /** 입장 효과음 */
-    private static final DelayedDefinedSound JOIN_SOUND = DelayedDefinedSound.builder()
-            .add(0, new DefinedSound.SoundEffect(Sound.BLOCK_NOTE_PLING, 1000, Math.pow(2, -6 / 12.0)))
-            .add(3, new DefinedSound.SoundEffect(Sound.BLOCK_NOTE_PLING, 1000, Math.pow(2, 1 / 12.0)))
+    private static final TimedSoundEffect JOIN_SOUND = TimedSoundEffect.builder()
+            .add(0, SoundEffect.SoundInfo.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, -6 / 12.0)).build())
+            .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, 1 / 12.0)).build())
             .build();
 
     @EventHandler

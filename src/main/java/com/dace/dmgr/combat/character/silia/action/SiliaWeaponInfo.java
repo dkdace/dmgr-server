@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -55,16 +55,16 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun2.knife_leftclick", 0.8, 1),
-                new DefinedSound.SoundEffect("random.swordhit", 0.7, 1.2),
-                new DefinedSound.SoundEffect("new.item.trident.riptide_1", 0.6, 1.3)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun2.knife_leftclick").volume(0.8).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.swordhit").volume(0.7).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder("new.item.trident.riptide_1").volume(0.6).pitch(1.3).build()
         );
         /** 엔티티 타격 */
-        public static final DefinedSound HIT_ENTITY = new DefinedSound(
-                new DefinedSound.SoundEffect("random.stab", 1, 0.8, 0.05));
+        public static final SoundEffect HIT_ENTITY = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.stab").volume(1).pitch(0.8).pitchVariance(0.05).build());
         /** 블록 타격 */
-        public static final DefinedSound HIT_BLOCK = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 0.9, 0.05));
+        public static final SoundEffect HIT_BLOCK = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
     }
 }

@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -43,10 +43,10 @@ public final class SiliaT2Info extends TraitInfo {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5, 1),
-                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_ATTACK, 1.5, 0.8),
-                new DefinedSound.SoundEffect("random.swordhit", 1.5, 0.7)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(1.5).pitch(1, 1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1.5).pitch(0.8, 1).build(),
+                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.7, 0.9).build()
         );
     }
 }

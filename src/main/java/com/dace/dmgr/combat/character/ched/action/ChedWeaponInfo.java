@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
@@ -54,16 +54,16 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 충전 */
-        public static final DefinedSound CHARGE = new DefinedSound(
-                new DefinedSound.SoundEffect("new.item.crossbow.loading_middle", 0.6, 1));
+        public static final SoundEffect CHARGE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.item.crossbow.loading_middle").volume(0.6).pitch(1).build());
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("new.item.crossbow.shoot", 0.5, 1.1),
-                new DefinedSound.SoundEffect("random.gun.bow", 0.5, 0.7),
-                new DefinedSound.SoundEffect("random.gun2.shovel_leftclick", 0.6, 0.75)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(0.3, 0.8).pitch(1.1, 1.25).build(),
+                SoundEffect.SoundInfo.builder("random.gun.bow").volume(0.3, 0.8).pitch(0.7, 0.85).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(0.4, 0.9).pitch(0.75, 0.9).build()
         );
         /** 타격 */
-        public static final DefinedSound HIT = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun.arrowhit", 0.5, 1));
+        public static final SoundEffect HIT = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun.arrowhit").volume(0.3, 0.8).pitch(1).build());
     }
 }

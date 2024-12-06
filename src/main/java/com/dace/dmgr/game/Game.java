@@ -8,7 +8,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -34,20 +34,20 @@ public final class Game implements Disposable {
     /** 게임 시작 대기 보스바 ID */
     private static final String GAME_WAIT_BOSSBAR_ID = "GameWait";
     /** 타이머 효과음 */
-    private static final DefinedSound TIMER_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1000, 1));
+    private static final SoundEffect TIMER_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1000).pitch(1).build());
     /** 전투 시작 효과음 */
-    private static final DefinedSound ON_PLAY_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SPAWN, 1000, 1));
+    private static final SoundEffect ON_PLAY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(1).build());
     /** 승리 효과음 */
-    private static final DefinedSound WIN_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.UI_TOAST_CHALLENGE_COMPLETE, 1000, 1.5));
+    private static final SoundEffect WIN_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
     /** 패배 효과음 */
-    private static final DefinedSound LOSE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_BLAZE_DEATH, 1000, 0.5));
+    private static final SoundEffect LOSE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
     /** 무승부 효과음 */
-    private static final DefinedSound DRAW_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 1000, 1));
+    private static final SoundEffect DRAW_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build());
 
     /** 방 번호 */
     @Getter

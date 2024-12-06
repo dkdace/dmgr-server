@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -16,8 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 public final class OnInventoryClick implements Listener {
     /** GUI 클릭 효과음 */
-    private static final DefinedSound GUI_CLICK_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.UI_BUTTON_CLICK, 1, 1));
+    private static final SoundEffect GUI_CLICK_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_BUTTON_CLICK).build());
 
     @EventHandler
     public static void event(InventoryClickEvent event) {

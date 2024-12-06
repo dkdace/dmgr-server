@@ -72,7 +72,7 @@ public final class ChedWeapon extends AbstractWeapon {
                 new ChedWeaponProjectile(power).shoot();
                 setCanShoot(false);
 
-                ChedWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation(), power + 0.5, power * 0.2);
+                ChedWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation(), power, power);
 
                 break;
             }
@@ -107,7 +107,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit() {
-            ChedWeaponInfo.SOUND.HIT.play(getLocation(), power + 0.5);
+            ChedWeaponInfo.SOUND.HIT.play(getLocation(), power);
         }
 
         @Override

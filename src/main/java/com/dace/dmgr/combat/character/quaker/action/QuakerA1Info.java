@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -61,24 +61,24 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_FLAP, 1, 0.6),
-                new DefinedSound.SoundEffect(Sound.BLOCK_SHULKER_BOX_OPEN, 1, 0.7)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1).pitch(0.7).build()
         );
         /** 해제 */
-        public static final DefinedSound DISABLE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_SHULKER_BOX_CLOSE, 1, 1.4));
+        public static final SoundEffect DISABLE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_CLOSE).volume(1).pitch(1.4).build());
         /** 피격 */
-        public static final DefinedSound DAMAGE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_ANVIL_LAND, 0.25, 1.2, 0.1),
-                new DefinedSound.SoundEffect("random.metalhit", 0.3, 0.85, 0.1)
+        public static final SoundEffect DAMAGE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25).pitch(1.2).pitchVariance(0.1).build(),
+                SoundEffect.SoundInfo.builder("random.metalhit").volume(0.3).pitch(0.85).pitchVariance(0.1).build()
         );
         /** 파괴 */
-        public static final DefinedSound DEATH = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_IRONGOLEM_HURT, 2, 0.5),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.7),
-                new DefinedSound.SoundEffect("random.metalhit", 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.ITEM_SHIELD_BLOCK, 2, 0.5)
+        public static final SoundEffect DEATH = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build()
         );
     }
 }

@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.character.silia.Silia;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -54,17 +54,17 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_SWAG, 0.2, 1),
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 0.15, 1.5)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.5).build()
         );
         /** 해제 */
-        public static final DefinedSound DISABLE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_LLAMA_SWAG, 0.2, 1.2),
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 0.15, 1.7)
+        public static final SoundEffect DISABLE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.7).build()
         );
         /** 일격 활성화 */
-        public static final DefinedSound ACTIVATE = new DefinedSound(
-                new DefinedSound.SoundEffect("new.item.trident.return", 1, 1.2));
+        public static final SoundEffect ACTIVATE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(1).pitch(1.2).build());
     }
 }

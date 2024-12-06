@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -75,16 +75,16 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     @UtilityClass
     public static final class SOUND {
         /** 소환 준비 */
-        public static final DefinedSound SUMMON_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_GROWL, 1, 1));
+        public static final SoundEffect SUMMON_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_GROWL).volume(1).pitch(1).build());
         /** 적 감지 */
-        public static final DefinedSound ENEMY_DETECT = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_GROWL, 2, 0.85));
+        public static final SoundEffect ENEMY_DETECT = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_GROWL).volume(2).pitch(0.85).build());
         /** 피격 */
-        public static final DefinedSound DAMAGE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HURT, 0.4, 1, 0.1));
+        public static final SoundEffect DAMAGE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HURT).volume(0.4).pitch(1).pitchVariance(0.1).build());
         /** 사망 */
-        public static final DefinedSound DEATH = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_DEATH, 1, 1, 0.1));
+        public static final SoundEffect DEATH = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
     }
 }

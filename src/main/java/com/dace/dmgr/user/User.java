@@ -13,7 +13,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.TextHologram;
 import com.dace.dmgr.util.task.AsyncTask;
@@ -86,20 +86,20 @@ public final class User implements Disposable {
             "\n" +
             "\n§7다운로드 오류 문의 : {0}";
     /** 레벨 업 효과음 */
-    private static final DefinedSound LEVEL_UP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("random.good", 1000, 1));
+    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
     /** 티어 승급 효과음 */
-    private static final DefinedSound TIER_UP_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.UI_TOAST_CHALLENGE_COMPLETE, 1000, 1.5));
+    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
     /** 티어 강등 효과음 */
-    private static final DefinedSound TIER_DOWN_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_BLAZE_DEATH, 1000, 0.5));
+    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
     /** 경고 액션바 효과음 */
-    private static final DefinedSound ALERT_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("new.block.note_block.bit", 0.25, 0.7));
+    private static final SoundEffect ALERT_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build());
     /** 타자기 효과 타이틀 효과음 */
-    private static final DefinedSound TYPEWRITER_TITLE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect("new.block.note_block.bass", 1, 1.5));
+    private static final SoundEffect TYPEWRITER_TITLE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("new.block.note_block.bass").volume(1).pitch(1.5).build());
 
     /** 플레이어 객체 */
     @NonNull

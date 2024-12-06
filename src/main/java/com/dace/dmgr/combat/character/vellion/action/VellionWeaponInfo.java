@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -52,10 +52,10 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ENDERDRAGON_HURT, 0.8, 0.5),
-                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.8),
-                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 1, 0.9)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(0.8).pitch(0.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build()
         );
     }
 }

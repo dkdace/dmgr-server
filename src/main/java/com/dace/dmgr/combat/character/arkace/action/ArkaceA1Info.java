@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -51,15 +51,15 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun.grenade", 3, 1.5),
-                new DefinedSound.SoundEffect(Sound.ENTITY_SHULKER_SHOOT, 3, 1.2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun.grenade").volume(3).pitch(1.5).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.2).build()
         );
         /** 폭발 */
-        public static final DefinedSound EXPLODE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_FIREWORK_LARGE_BLAST, 4, 0.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 4, 1.4),
-                new DefinedSound.SoundEffect("random.gun_reverb2", 6, 0.9)
+        public static final SoundEffect EXPLODE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.4).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(6).pitch(0.9).build()
         );
     }
 }

@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Sound;
@@ -15,11 +15,11 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public abstract class UltimateSkill extends ActiveSkill {
     /** 궁극기 준비 효과음 */
-    private static final DefinedSound ULTIMATE_READY_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_LEVELUP, 0.5, 2));
+    private static final SoundEffect ULTIMATE_READY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(0.5).pitch(2).build());
     /** 궁극기 사용 효과음 */
-    private static final DefinedSound ULTIMATE_USE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_WITHER_SPAWN, 1000, 2));
+    private static final SoundEffect ULTIMATE_USE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(2).build());
 
     /**
      * 궁극기 스킬 인스턴스를 생성한다.

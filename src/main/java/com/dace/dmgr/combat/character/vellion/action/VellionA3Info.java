@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -51,16 +51,16 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.7),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GUARDIAN_HURT, 2, 2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_HURT).volume(2).pitch(2).build()
         );
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS, 2, 0.9),
-                new DefinedSound.SoundEffect("new.block.respawn_anchor.set_spawn", 2, 0.6),
-                new DefinedSound.SoundEffect("new.block.respawn_anchor.set_spawn", 2, 0.7)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(2).pitch(0.9).build(),
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.set_spawn").volume(2).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.set_spawn").volume(2).pitch(0.7).build()
         );
     }
 }

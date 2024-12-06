@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -46,24 +46,24 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 1, 0.6),
-                new DefinedSound.SoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 1, 0.6)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(1).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(1).pitch(0.6).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(0.6).build()
         );
         /** 사격 */
-        public static final DefinedSound SHOOT = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.8, 0.1),
-                new DefinedSound.SoundEffect("random.gun2.xm1014_1", 3, 1),
-                new DefinedSound.SoundEffect("random.gun2.spas_12_1", 3, 1),
-                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.9),
-                new DefinedSound.SoundEffect("random.gun_reverb", 5, 0.8)
+        public static final SoundEffect SHOOT = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.spas_12_1").volume(3).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.9).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build()
         );
         /** 사용 종료 */
-        public static final DefinedSound END = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 2, 0.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_ITEM_BREAK, 2, 0.8),
-                new DefinedSound.SoundEffect(Sound.ENTITY_GENERIC_EXPLODE, 2, 1.4)
+        public static final SoundEffect END = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.4).build()
         );
     }
 }

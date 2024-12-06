@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.util.DelayedDefinedSound;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -91,25 +91,25 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun2.scarlight_1", 3, 1),
-                new DefinedSound.SoundEffect("random.gun_reverb", 5, 1.2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun2.scarlight_1").volume(3).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build()
         );
         /** 사용 (궁극기) */
-        public static final DefinedSound USE_ULT = new DefinedSound(
-                new DefinedSound.SoundEffect("new.block.beacon.deactivate", 4, 2),
-                new DefinedSound.SoundEffect("random.energy", 4, 1.6),
-                new DefinedSound.SoundEffect("random.gun_reverb", 5, 1.2)
+        public static final SoundEffect USE_ULT = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
+                SoundEffect.SoundInfo.builder("random.energy").volume(4).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build()
         );
         /** 재장전 */
-        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
-                .add(3, new DefinedSound.SoundEffect(Sound.BLOCK_PISTON_CONTRACT, 0.6, 1.6))
-                .add(4, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_NO, 0.6, 1.9))
-                .add(18, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
-                .add(19, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 1))
-                .add(20, new DefinedSound.SoundEffect(Sound.ENTITY_VILLAGER_YES, 0.6, 1.8))
-                .add(26, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.7))
-                .add(27, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_DOOR_OPEN, 0.6, 1.8))
+        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
+                .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.6).build())
+                .add(4, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.9).build())
+                .add(18, SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build())
+                .add(19, SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(1).build())
+                .add(20, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(1.8).build())
+                .add(26, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.7).build())
+                .add(27, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.8).build())
                 .build();
     }
 }

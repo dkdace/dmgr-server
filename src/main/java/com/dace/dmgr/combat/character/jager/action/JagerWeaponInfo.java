@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.util.DelayedDefinedSound;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -127,31 +127,31 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun2.m16_1", 0.8, 1.2),
-                new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.8, 1.7)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun2.m16_1").volume(0.8).pitch(1.2).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(0.8).pitch(1.7).build()
         );
         /** 전환 활성화 */
-        public static final DefinedSound SWAP_ON = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.6, 1.9));
+        public static final SoundEffect SWAP_ON = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(1.9).build());
         /** 전환 비활성화 */
-        public static final DefinedSound SWAP_OFF = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.9));
+        public static final SoundEffect SWAP_OFF = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.9).build());
         /** 사용 (저격탄) */
-        public static final DefinedSound USE_SCOPE = new DefinedSound(
-                new DefinedSound.SoundEffect("random.gun2.psg_1_1", 3.5, 1),
-                new DefinedSound.SoundEffect("random.gun2.m16_1", 3.5, 1),
-                new DefinedSound.SoundEffect("random.gun_reverb", 5.5, 0.95)
+        public static final SoundEffect USE_SCOPE = new SoundEffect(
+                SoundEffect.SoundInfo.builder("random.gun2.psg_1_1").volume(3.5).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.gun2.m16_1").volume(3.5).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5.5).pitch(0.95).build()
         );
         /** 재장전 */
-        public static final DelayedDefinedSound RELOAD = DelayedDefinedSound.builder()
-                .add(3, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_HOWL, 0.6, 1.7))
-                .add(4, new DefinedSound.SoundEffect(Sound.BLOCK_FIRE_EXTINGUISH, 0.6, 1.2))
-                .add(6, new DefinedSound.SoundEffect(Sound.ITEM_FLINTANDSTEEL_USE, 0.6, 0.8))
-                .add(25, new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT, 0.6, 0.5))
-                .add(27, new DefinedSound.SoundEffect(Sound.ENTITY_CAT_PURREOW, 0.6, 1.7))
-                .add(35, new DefinedSound.SoundEffect(Sound.ENTITY_WOLF_SHAKE, 0.6, 1.8))
-                .add(37, new DefinedSound.SoundEffect(Sound.BLOCK_IRON_DOOR_OPEN, 0.6, 1.7))
+        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
+                .add(3, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(1.7).build())
+                .add(4, SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(0.6).pitch(1.2).build())
+                .add(6, SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build())
+                .add(25, SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build())
+                .add(27, SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.6).pitch(1.7).build())
+                .add(35, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.8).build())
+                .add(37, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.7).build())
                 .build();
     }
 }

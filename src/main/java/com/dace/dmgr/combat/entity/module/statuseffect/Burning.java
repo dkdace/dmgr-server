@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,8 +17,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Burning implements StatusEffect {
     /** 화염 피해 효과음 */
-    private static final DefinedSound BURNING_DAMAGE_SOUND = new DefinedSound(
-            new DefinedSound.SoundEffect(Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7, 1, 0.1));
+    private static final SoundEffect BURNING_DAMAGE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build());
 
     /** 초당 피해량 */
     private final int damagePerSecond;

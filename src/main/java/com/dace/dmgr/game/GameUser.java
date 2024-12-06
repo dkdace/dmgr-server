@@ -364,7 +364,7 @@ public final class GameUser implements Disposable {
         for (GameUser target : (isTeam ? team.getTeamUsers() : game.getGameUsers())) {
             UserData targetUserData = UserData.fromPlayer(target.getPlayer());
             target.getUser().getPlayer().sendMessage(fullMessage);
-            targetUserData.getConfig().getChatSound().getSound().play(target.getPlayer(), 1, Math.pow(2, -7 / 12.0) - 1);
+            targetUserData.getConfig().getChatSound().getSound().play(target.getPlayer());
         }
     }
 

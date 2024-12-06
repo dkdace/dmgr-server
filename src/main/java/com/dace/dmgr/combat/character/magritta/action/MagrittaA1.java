@@ -66,7 +66,7 @@ public final class MagrittaA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new MagrittaA1Projectile().shoot(loc);
 
-            CombatEffectUtil.THROW_SOUND.play(loc, 1, -0.1);
+            CombatEffectUtil.THROW_HEAVY_SOUND.play(loc);
         }, MagrittaA1Info.READY_DURATION));
     }
 

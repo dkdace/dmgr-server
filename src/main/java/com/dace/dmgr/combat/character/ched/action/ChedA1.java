@@ -139,7 +139,7 @@ public final class ChedA1 extends StackableSkill {
 
         @Override
         protected void onHit() {
-            ChedWeaponInfo.SOUND.HIT.play(getLocation(), 1.5);
+            ChedWeaponInfo.SOUND.HIT.play(getLocation());
         }
 
         @Override

@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.util.DefinedSound;
+import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
@@ -60,18 +60,18 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     @UtilityClass
     public static final class SOUND {
         /** 사용 */
-        public static final DefinedSound USE = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
-                new DefinedSound.SoundEffect(Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 0.8),
-                new DefinedSound.SoundEffect("new.entity.squid.squirt", 2, 1.2)
+        public static final SoundEffect USE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder("new.entity.squid.squirt").volume(2).pitch(1.2).build()
         );
         /** 사용 준비 */
-        public static final DefinedSound USE_READY = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.ENTITY_ELDER_GUARDIAN_CURSE, 2, 1),
-                new DefinedSound.SoundEffect("new.block.respawn_anchor.charge", 2, 0.8)
+        public static final SoundEffect USE_READY = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_CURSE).volume(2).pitch(1).build(),
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.8).build()
         );
         /** 발동 */
-        public static final DefinedSound TRIGGER = new DefinedSound(
-                new DefinedSound.SoundEffect(Sound.BLOCK_END_PORTAL_FRAME_FILL, 0.6, 0.7, 0.1));
+        public static final SoundEffect TRIGGER = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(0.6).pitch(0.7).pitchVariance(0.1).build());
     }
 }

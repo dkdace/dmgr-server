@@ -107,7 +107,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
                 CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
                 if (index < 3)
-                    SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index * 0.1);
+                    SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index / 2.0);
                 if (index == 7) {
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? 0.7 : -0.7), -0.85);
                     onCancelled();
