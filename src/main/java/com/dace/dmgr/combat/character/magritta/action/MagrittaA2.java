@@ -4,12 +4,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -59,10 +57,8 @@ public final class MagrittaA2 extends ActiveSkill {
                 return false;
 
             Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
-            ParticleUtil.play(Particle.SMOKE_LARGE, loc, 6, 0.5, 0, 0.5, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 4, 0.4, 0, 0.4, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 6,
-                    1, 1.5, 1, 255, 70, 0);
+            MagrittaA2Info.PARTICLE.TICK_CORE.play(loc);
+            MagrittaA2Info.PARTICLE.TICK_DECO.play(combatUser.getCenterLocation());
 
             return true;
         }, isCancelled -> {

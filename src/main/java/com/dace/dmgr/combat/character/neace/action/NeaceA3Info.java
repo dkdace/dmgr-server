@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
@@ -50,5 +52,18 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.2).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(1.2).pitch(0.7).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 틱 입자 효과 (중심) */
+        public static final ParticleEffect TICK_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(6).horizontalSpread(0.2).horizontalSpread(0.4).speed(0.1).build());
+        /** 틱 입자 효과 (장식) */
+        public static final ParticleEffect TICK_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build());
     }
 }

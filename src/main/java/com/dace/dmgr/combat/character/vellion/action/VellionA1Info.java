@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
@@ -76,5 +79,31 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 - 1 */
+        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        45, 109, 0, 0, 240, 192).build());
+        /** 사용 시 틱 입자 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).build());
+        /** 표시 */
+        public static final ParticleEffect DISPLAY = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 120, 0, 220)
+                        .count(20).horizontalSpread(0.5).verticalSpread(0.5).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 140, 120, 180)
+                        .count(10).horizontalSpread(1.5).verticalSpread(1.5).build(),
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 10).count(8)
+                        .horizontalSpread(0.5).verticalSpread(0.5).speed(0.05).build()
+        );
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(30).speed(0.4).build());
     }
 }

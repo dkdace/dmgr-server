@@ -4,12 +4,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 import java.util.function.LongConsumer;
@@ -48,8 +46,7 @@ public final class ChedA2 extends ActiveSkill {
         location.setPitch(0);
 
         ChedA2Info.SOUND.USE.play(location);
-        ParticleUtil.play(Particle.EXPLOSION_NORMAL, location.clone().add(0, 0.5, 0), 20,
-                0.4, 0.1, 0.4, 0.15);
+        ChedA2Info.PARTICLE.USE.play(location.clone().add(0, 0.5, 0));
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getLocation();
@@ -77,8 +74,7 @@ public final class ChedA2 extends ActiveSkill {
         }, 1, 2));
 
         TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, combatUser.getEntity().getLocation(), 1, 0, 0, 0, 0.05),
-                1, 10));
+                ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getEntity().getLocation()), 1, 10));
     }
 
     @Override

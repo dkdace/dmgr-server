@@ -16,7 +16,6 @@ import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -24,7 +23,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -217,8 +215,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
-                    0, 0, 0, 210, 160, 70);
+            PalasWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
@@ -226,7 +223,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             if (target.isEnemy(combatUser)) {
                 target.getDamageModule().damage(combatUser, PalasWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true);
 
-                ParticleUtil.play(Particle.WATER_SPLASH, getLocation(), 15, 0, 0, 0, 0);
+                PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
             }
 
             return false;
@@ -254,7 +251,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                     combatUser.useAction(ActionKey.PERIODIC_1);
                 }
 
-                ParticleUtil.play(Particle.WATER_SPLASH, getLocation(), 15, 0, 0, 0, 0);
+                PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
             }
 
             return false;

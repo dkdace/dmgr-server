@@ -5,10 +5,13 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
@@ -63,6 +66,25 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(2).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(2).pitch(1.2).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 220, 161, 43)
+                        .count(5).horizontalSpread(0.15).verticalSpread(0.15).build());
+        /** 폭발 */
+        public static final ParticleEffect EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 4)
+                        .count(400).horizontalSpread(0.1).verticalSpread(0.1).speed(0.25).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.TOTEM).count(200).horizontalSpread(0.15).verticalSpread(0.15).speed(0.6).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).count(300).horizontalSpread(1.5).verticalSpread(1.5).speed(1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(300).horizontalSpread(0.6).verticalSpread(0.6).build()
         );
     }
 }

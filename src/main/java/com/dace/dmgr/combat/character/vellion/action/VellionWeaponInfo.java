@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
@@ -57,5 +59,21 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(4).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 80, 30, 110)
+                        .count(6).horizontalSpread(0.25).verticalSpread(0.25).build()
+        );
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(30).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1).build());
     }
 }

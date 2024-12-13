@@ -5,14 +5,12 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -61,8 +59,7 @@ public final class InfernoUlt extends UltimateSkill {
             Location loc = combatUser.getEntity().getLocation();
             if (i < 24) {
                 InfernoUltInfo.SOUND.USE.play(loc, 1, i / 23.0);
-                ParticleUtil.play(Particle.LAVA, combatUser.getEntity().getLocation().add(0, 1, 0), 3,
-                        1, 1.5, 1, 0.2);
+                InfernoUltInfo.PARTICLE.USE_TICK_CORE.play(combatUser.getEntity().getLocation().add(0, 1, 0));
                 playUseTickEffect(i);
             }
 
@@ -77,9 +74,7 @@ public final class InfernoUlt extends UltimateSkill {
 
                 Location loc = combatUser.getEntity().getLocation();
                 InfernoUltInfo.SOUND.DEATH.play(loc);
-                ParticleUtil.play(Particle.FLAME, loc, 300, 0.4, 0.4, 0.4, 0.2);
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 250, 0.3, 0.3, 0.3, 0.25);
-                ParticleUtil.play(Particle.SMOKE_LARGE, loc, 150, 0.4, 0.4, 0.4, 0.2);
+                InfernoUltInfo.PARTICLE.DEATH.play(loc);
             }
 
             combatUser.getDamageModule().setShield(SHIELD_ID, 0);
@@ -117,8 +112,7 @@ public final class InfernoUlt extends UltimateSkill {
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
                 Location loc2 = loc.clone().add(vec1.clone().multiply(2.5));
 
-                ParticleUtil.play(Particle.FLAME, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), 0.2);
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), 0.2);
+                InfernoUltInfo.PARTICLE.USE_TICK_DECO.play(loc2, dir);
             }
         }
     }
@@ -147,10 +141,8 @@ public final class InfernoUlt extends UltimateSkill {
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
                 Location loc2 = loc.clone().add(vec1);
 
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2.clone().add(0, up - 0.5, 0), 0,
-                        dir.getX(), dir.getY(), dir.getZ(), 0.15);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 3, 0, 1, 0,
-                        255, 70, 0);
+                InfernoUltInfo.PARTICLE.TICK_CORE.play(loc2);
+                InfernoUltInfo.PARTICLE.TICK_DECO.play(loc2.clone().add(0, up - 0.5, 0), dir);
             }
         }
     }

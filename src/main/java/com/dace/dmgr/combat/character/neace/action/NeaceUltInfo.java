@@ -5,9 +5,13 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.FireworkEffect;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
@@ -51,5 +55,26 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(1.1).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(1.1).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.GRASS, 0).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
+                        .build()
+        );
+        /** 사용 준비 */
+        public static final FireworkEffect USE_READY = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.STAR, 215, 255, 130)
+                .fadeColor(255, 255, 255).trail().build();
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
+                        .horizontalSpread(0.1).verticalSpread(0.1).build());
     }
 }

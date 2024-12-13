@@ -10,14 +10,12 @@ import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -132,8 +130,7 @@ public final class ChedA3 extends ActiveSkill {
                 Vector dir = LocationUtil.getDirection(location.clone().add(vec), location.clone().add(vec2));
                 Location loc2 = location.clone().add(vec3).add(location.getDirection().multiply(forward));
 
-                ParticleUtil.play(Particle.CRIT_MAGIC, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), -0.25);
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 0, dir.getX(), dir.getY(), dir.getZ(), 0.12);
+                ChedA3Info.PARTICLE.USE_TICK.play(loc2, dir);
             }
         }
     }
@@ -166,31 +163,31 @@ public final class ChedA3 extends ActiveSkill {
             Location loc = getLocation().clone();
             loc.setPitch(0);
 
-            ParticleUtil.play(Particle.CRIT_MAGIC, loc, 20, 0.28, 0.28, 0.28, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, -0.5, -0.6), 8,
-                    0.2, 0.12, 0.2, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, -0.7, -1.2), 8,
-                    0.16, 0.08, 0.16, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, -0.9, -1.8), 8,
-                    0.12, 0.04, 0.12, 0);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
 
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, 0.4, 0.8), 8,
-                    0.1, 0.16, 0.1, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, 0.6, 1), 8,
-                    0.1, 0.16, 0.1, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.4), 8,
-                    0.18, 0.16, 0.18, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.6), 8,
-                    0.24, 0.16, 0.24, 0);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.5, -0.6),
+                    0.2, 0.12);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.7, -1.2),
+                    0.16, 0.08);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.9, -1.8),
+                    0.12, 0.04);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 15, 2.5, 1.5, 2.5,
-                    64, 160, 184);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.4, 0.8),
+                    0.1, 0.16);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.6, 1),
+                    0.1, 0.16);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.4),
+                    0.18, 0.16);
+            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.6),
+                    0.24, 0.16);
 
             for (int i = 0; i < 6; i++) {
-                ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, 0.7 + i * 0.4,
-                        0.3 + i * (i < 3 ? 0.2 : 0.25), 0), 8, 0.1, 0.1 + i * 0.04, 0.1, 0);
-                ParticleUtil.play(Particle.CRIT_MAGIC, LocationUtil.getLocationFromOffset(loc, -0.7 - i * 0.4,
-                        0.3 + i * (i < 3 ? 0.2 : 0.25), 0), 8, 0.1, 0.1 + i * 0.04, 0.1, 0);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                        LocationUtil.getLocationFromOffset(loc, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
+                        0.1, 0.1 + i * 0.04);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                        LocationUtil.getLocationFromOffset(loc, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
+                        0.1, 0.1 + i * 0.04);
             }
         }
 

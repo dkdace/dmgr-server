@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.ParticleEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -14,6 +14,14 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Speed implements StatusEffect {
+    /** 틱 입자 효과 */
+    private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
+            ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB_AMBIENT, 200, 255, 255)
+                    .count(3)
+                    .horizontalSpread(0, 0, 0.25)
+                    .verticalSpread(1, 0, 0.25)
+                    .build());
+
     /** 수정자 ID */
     private final String modifierId;
     /** 이동 속도 증가량 */
@@ -40,9 +48,8 @@ public abstract class Speed implements StatusEffect {
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity.getDamageModule().isLiving())
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB_AMBIENT, combatEntity.getEntity().getLocation().add(0, 0.1, 0),
-                    3, combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4,
-                    200, 255, 255);
+            TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.1, 0), combatEntity.getEntity().getWidth(),
+                    combatEntity.getEntity().getHeight());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -59,5 +60,20 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.5).build(),
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 */
+        public static final ParticleEffect USE = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 150, 110, 170)
+                        .count(50).horizontalSpread(0.8).build());
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 150, 110, 170)
+                        .count(2).horizontalSpread(0.3).build());
     }
 }

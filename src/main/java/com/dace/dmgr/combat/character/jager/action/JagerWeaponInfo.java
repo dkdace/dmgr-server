@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
@@ -153,5 +154,20 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
                 .add(35, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.8).build())
                 .add(37, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.7).build())
                 .build();
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 137, 185, 240)
+                        .build());
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 137, 185, 240)
+                        .count(10).horizontalSpread(0.25).verticalSpread(0.25).build());
     }
 }

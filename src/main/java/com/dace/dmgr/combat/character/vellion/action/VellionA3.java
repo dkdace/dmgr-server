@@ -12,14 +12,12 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -134,10 +132,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(true);
             for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1,
-                        0, 0, 0, 156, 60, 130);
-            ParticleUtil.play(Particle.SMOKE_LARGE, location, 30, 0.5, 0.3, 0.5, 0.15);
-            ParticleUtil.play(Particle.SPELL_WITCH, location, 70, 1, 0.5, 1, 0.2);
+                VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
+            VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);
         }, () -> {
             onCancelled();
             onReady(location);
@@ -158,8 +154,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             if (i % 4 == 0)
                 new VellionA3Area().emit(loc);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 3, 0.4, 0, 0.4,
-                    156, 60, 130);
+            VellionA3Info.PARTICLE.TICK_CORE.play(loc);
             playTickEffect(i, loc);
         }, 1, VellionA3Info.DURATION));
     }
@@ -186,9 +181,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
                 Location loc = location.clone().add(vec.clone().multiply(distance));
 
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, vec.getX(), 0.4, vec.getZ(), 0.1);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
-                        0, 0, 0, 156, 60, 130);
+                VellionA3Info.PARTICLE.TICK_DECO_1.play(loc, vec.setY(0.4));
             }
             double distance2 = index * 0.1 % 2.5;
             long angle2 = index * 44;
@@ -199,8 +192,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
                 Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
                 Vector dir = LocationUtil.getDirection(location.clone().add(vec1), location.clone().add(vec2));
 
-                ParticleUtil.play(Particle.SMOKE_LARGE, location.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
-                        0, dir.getX(), distance2 * 0.1, dir.getZ(), 0.3);
+                VellionA3Info.PARTICLE.TICK_DECO_2.play(location.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
+                        dir.setY(distance2 * 0.1));
             }
         }
     }

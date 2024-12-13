@@ -8,13 +8,11 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 public final class NeaceA1 extends ActiveSkill {
@@ -73,10 +71,7 @@ public final class NeaceA1 extends ActiveSkill {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
-                    4, 0.2, 0.2, 0.2, 215, 255, 130);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
-                    1, 0, 0, 0, 215, 255, 130);
+            NeaceA1Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
 
             if (!(combatEntity instanceof Healable) || !(provider instanceof Healer))
                 return;
@@ -116,11 +111,8 @@ public final class NeaceA1 extends ActiveSkill {
 
         private void playUseEffect(@NonNull Damageable target) {
             Location location = combatUser.getArmLocation(true);
-            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,
-                        215, 255, 130);
-                ParticleUtil.play(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0);
-            }
+            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
+                NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);
 
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
             Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
@@ -133,14 +125,14 @@ public final class NeaceA1 extends ActiveSkill {
                     angle += 72;
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
 
-                    ParticleUtil.play(Particle.VILLAGER_HAPPY, loc.clone().add(vec), 2, 0, 0, 0, 0);
+                    NeaceA1Info.PARTICLE.USE.play(loc.clone().add(vec));
                 }
             }
             for (int i = 0; i < 7; i++) {
                 Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
                 Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
-                ParticleUtil.play(Particle.VILLAGER_HAPPY, loc1, 2, 0, 0, 0, 0);
-                ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 2, 0, 0, 0, 0);
+                NeaceA1Info.PARTICLE.USE.play(loc1);
+                NeaceA1Info.PARTICLE.USE.play(loc2);
             }
         }
     }

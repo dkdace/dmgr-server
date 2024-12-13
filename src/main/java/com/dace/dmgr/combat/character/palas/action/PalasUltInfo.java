@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.FireworkEffect;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
@@ -59,5 +62,31 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.trident.thunder").volume(3).pitch(1.5).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 엔티티 타격 (중심) - 1 */
+        public static final ParticleEffect HIT_ENTITY_CORE_1 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build());
+        /** 엔티티 타격 (중심) - 2 */
+        public static final FireworkEffect HIT_ENTITY_CORE_2 = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BURST, 255, 70, 75)
+                .fadeColor(200, 0, 0).build();
+        /** 엔티티 타격 (장식) */
+        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 75)
+                        .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build()
+        );
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 75)
+                        .count(4).horizontalSpread(1).verticalSpread(1.5).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 50, 24)
+                        .count(2).horizontalSpread(1).verticalSpread(1.5).build()
+        );
     }
 }

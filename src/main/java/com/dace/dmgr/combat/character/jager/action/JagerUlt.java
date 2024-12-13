@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -21,8 +20,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
@@ -117,8 +114,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 15,
-                    0.6, 0.02, 0.6, 96, 220, 255);
+            JagerUltInfo.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -204,9 +200,9 @@ public final class JagerUlt extends UltimateSkill {
                 entity.teleport(entity.getLocation().add(0, 0.2, 0));
 
             Location loc = entity.getLocation();
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 0, 0, -1, 0, 0.3);
+            JagerUltInfo.PARTICLE.SUMMON_BEFORE_READY_TICK.play(loc);
+            JagerUltInfo.PARTICLE.DISPLAY.play(loc);
             JagerUltInfo.SOUND.SUMMON_BEFORE_READY.play(loc);
-            playTickEffect();
         }
 
         @Override
@@ -216,7 +212,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onTick(long i) {
-            playTickEffect();
+            JagerUltInfo.PARTICLE.DISPLAY.play(entity.getLocation());
             if (!readyTimeModule.isReady())
                 return;
 
@@ -228,17 +224,6 @@ public final class JagerUlt extends UltimateSkill {
                 new JagerUltArea(range).emit(entity.getLocation());
             if (i >= JagerUltInfo.DURATION)
                 dispose();
-        }
-
-        /**
-         * 발생기 표시 효과를 재생한다.
-         */
-        private void playTickEffect() {
-            Location loc = entity.getLocation();
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 8, 0.6, 0.02, 0.6,
-                    96, 220, 255);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 3, 0.15, 0.02, 0.15,
-                    80, 80, 100);
         }
 
         /**
@@ -264,10 +249,10 @@ public final class JagerUlt extends UltimateSkill {
                 Location loc1 = loc.clone().add(vec.clone().multiply(range / 6 * j));
                 Location loc2 = loc.clone().subtract(vec.clone().multiply(range / 6 * j));
 
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc1, 0, vec.getX(), -0.6, vec.getZ(), 0.05 * (7 - j));
-                ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, vec.getX(), 0.6, vec.getZ(), -0.05 * (7 - j));
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc1.subtract(0, 2.5, 0), 3, 0, 1.4, 0, 0.04);
-                ParticleUtil.play(Particle.SNOW_SHOVEL, loc2.subtract(0, 2.5, 0), 3, 0, 1.4, 0, 0.04);
+                JagerUltInfo.PARTICLE.TICK_CORE.play(loc1, vec.setY(-0.6), j / 6.0);
+                JagerUltInfo.PARTICLE.TICK_CORE.play(loc2, vec.multiply(-1).setY(-0.6), j / 6.0);
+                JagerUltInfo.PARTICLE.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
+                JagerUltInfo.PARTICLE.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
             }
         }
 
@@ -295,17 +280,14 @@ public final class JagerUlt extends UltimateSkill {
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             JagerUltInfo.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBreakEffect(location, entity, damage);
+            CombatEffectUtil.playBreakEffect(location, this, damage);
         }
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
 
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 120,
-                    0.1, 0.1, 0.1, 0.15);
-            ParticleUtil.play(Particle.CRIT, entity.getLocation(), 80, 0.1, 0.1, 0.1, 0.5);
-            ParticleUtil.play(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0);
+            JagerUltInfo.PARTICLE.DEATH.play(entity.getLocation());
             JagerUltInfo.SOUND.DEATH.play(entity.getLocation());
         }
 

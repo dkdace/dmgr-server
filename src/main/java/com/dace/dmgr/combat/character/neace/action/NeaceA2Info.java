@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -61,5 +62,21 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.4).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                                200, 140, 255, 255, 160, 245)
+                        .count(6).horizontalSpread(0.2).verticalSpread(0.2).build());
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 140, 255, 245)
+                        .count(3).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

@@ -14,14 +14,12 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -172,11 +170,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            if (isUlt)
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1,
-                        0, 0, 0, 0, 230, 255);
-            else
-                ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
+            (isUlt ? ArkaceWeaponInfo.PARTICLE.BULLET_TRAIL_ULT : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
         }
 
         @Override

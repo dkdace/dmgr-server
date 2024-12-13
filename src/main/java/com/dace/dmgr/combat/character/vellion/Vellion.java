@@ -152,7 +152,7 @@ public final class Vellion extends Controller {
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, damageType, location, isCrit);
 
-        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim, damage);
     }
 
     @Override

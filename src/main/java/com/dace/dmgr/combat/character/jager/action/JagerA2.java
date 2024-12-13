@@ -12,15 +12,12 @@ import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.jetbrains.annotations.Nullable;
@@ -104,8 +101,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 17,
-                    0.7, 0, 0.7, 120, 120, 135);
+            JagerA2Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -187,8 +183,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         public void onTickBeforeReady(long i) {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
-                    120, 120, 135);
+            JagerA2Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(entity.getLocation());
             playTickEffect();
         }
 
@@ -216,14 +211,11 @@ public final class JagerA2 extends ActiveSkill {
          */
         private void playTickEffect() {
             for (int i = 0; i < 7; i++) {
-                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2), 1,
-                        0, 0, 0, 0);
-                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2), 1,
-                        0, 0, 0, 0);
+                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
+                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
             }
             for (int i = 0; i < 5; i++)
-                ParticleUtil.play(Particle.TOWN_AURA, entity.getLocation().add(0, 0, 0.4 - i * 0.2), 1,
-                        0, 0, 0, 0);
+                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(0, 0, 0.4 - i * 0.2));
         }
 
         /**
@@ -269,15 +261,14 @@ public final class JagerA2 extends ActiveSkill {
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             JagerA2Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBreakEffect(location, entity, damage);
+            CombatEffectUtil.playBreakEffect(location, this, damage);
         }
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
 
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, entity.getLocation(), 80,
-                    0.1, 0.1, 0.1, 0.15);
+            JagerA2Info.PARTICLE.DEATH.play(entity.getLocation());
             JagerA2Info.SOUND.DEATH.play(entity.getLocation());
         }
     }

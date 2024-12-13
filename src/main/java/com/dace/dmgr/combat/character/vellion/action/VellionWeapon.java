@@ -8,10 +8,8 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class VellionWeapon extends AbstractWeapon {
@@ -55,14 +53,12 @@ public final class VellionWeapon extends AbstractWeapon {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.SPELL_WITCH, loc, 4, 0.1, 0.1, 0.1, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 6, 0.25, 0.25, 0.25,
-                    80, 30, 110);
+            VellionWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.SMOKE_NORMAL, getLocation(), 30, 0.1, 0.1, 0.1, 0.1);
+            VellionWeaponInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override

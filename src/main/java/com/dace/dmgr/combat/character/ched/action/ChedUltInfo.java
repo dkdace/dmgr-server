@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
@@ -92,5 +94,59 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
         /** 화염 지대 틱 효과음 */
         public static final SoundEffect FIRE_FLOOR_TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.75).pitchVariance(0.1).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 - 1 */
+        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(1, 0.02, 0.1)
+                        .build()
+        );
+        /** 사용 시 틱 입자 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(0.1).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(0.16).build()
+        );
+        /** 총알 궤적 (중심) */
+        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.REDSTONE).count(20).horizontalSpread(0.28).verticalSpread(0.28).build());
+        /** 총알 궤적 (모양) */
+        public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.REDSTONE).count(8)
+                        .horizontalSpread(0, 0, 1)
+                        .verticalSpread(1, 0, 1)
+                        .build());
+        /** 총알 궤적 (장식) - 1 */
+        public static final ParticleEffect BULLET_TRAIL_DECO_1 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).build());
+        /** 총알 궤적 (장식) - 2 */
+        public static final ParticleEffect BULLET_TRAIL_DECO_2 = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(-0.25).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(5).horizontalSpread(0.05).verticalSpread(0.05).build());
+        /** 폭발 */
+        public static final ParticleEffect EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_HUGE).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(400).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(600).horizontalSpread(0.4).verticalSpread(0.4).speed(0.4).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(150).horizontalSpread(3).verticalSpread(3).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(400).horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build()
+        );
+        /** 화염 지대 틱 입자 효과 */
+        public static final ParticleEffect FIRE_FLOOR_TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(20).horizontalSpread(4).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(4).build()
+        );
     }
 }

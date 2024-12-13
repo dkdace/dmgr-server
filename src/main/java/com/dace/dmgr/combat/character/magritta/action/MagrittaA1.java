@@ -13,14 +13,12 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,8 +98,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 3,
-                    0.1, 0.1, 0.1, 200, 95, 35);
+            MagrittaA1Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -138,9 +135,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 Location loc = location.clone();
 
                 if (target == null) {
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 6, 0.15, 0.15, 0.15,
-                            200, 30, 15);
-                    ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 4, 0.12, 0.12, 0.12, 0);
+                    MagrittaA1Info.PARTICLE.TICK.play(loc);
                 } else {
                     if ((target instanceof CombatUser && ((CombatUser) target).isDead()) || target.isDisposed())
                         return false;
@@ -158,11 +153,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 new MagrittaA1Area(this).emit(loc);
 
                 MagrittaA1Info.SOUND.EXPLODE.play(loc);
-                ParticleUtil.play(Particle.SMOKE_LARGE, loc, 80, 0.3, 0.3, 0.3, 0.1);
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 150, 0.2, 0.2, 0.2, 0.3);
-                ParticleUtil.play(Particle.LAVA, loc, 100, 0.8, 0.8, 0.8, 0);
-                ParticleUtil.play(Particle.FLAME, loc, 250, 0.2, 0.2, 0.2, 0.15);
-                ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+                MagrittaA1Info.PARTICLE.EXPLODE.play(loc);
             }, 1, MagrittaA1Info.EXPLODE_DURATION));
         }
     }

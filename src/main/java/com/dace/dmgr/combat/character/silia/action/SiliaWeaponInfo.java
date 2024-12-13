@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
@@ -66,5 +68,22 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
         /** 블록 타격 */
         public static final SoundEffect HIT_BLOCK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
+                        .count(2).horizontalSpread(0.05).verticalSpread(0.05).build());
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).speed(0.4).build());
     }
 }

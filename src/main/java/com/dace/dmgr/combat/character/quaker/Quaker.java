@@ -143,7 +143,7 @@ public final class Quaker extends Guardian {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim, damage);
     }
 
     @Override

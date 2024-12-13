@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
@@ -64,6 +67,33 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.4).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
+                        .build());
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).speed(0.15).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).build()
+        );
+        /** 블록 타격 */
+        public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build());
+        /** 사용 종료 */
+        public static final ParticleEffect END = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(50).speed(0.05).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(15).build(),
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
+                        .speed(0.1).build()
         );
     }
 }

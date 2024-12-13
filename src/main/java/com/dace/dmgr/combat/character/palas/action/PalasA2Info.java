@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
@@ -53,5 +55,25 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.puffer_fish.blow_out").volume(2).pitch(1.8).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 엔티티 타격 (중심) */
+        public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build());
+        /** 엔티티 타격 (장식) */
+        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)
+                        .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build()
+        );
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)
+                        .count(4).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

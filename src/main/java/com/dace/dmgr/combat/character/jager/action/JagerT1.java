@@ -3,12 +3,10 @@ package com.dace.dmgr.combat.character.jager.action;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Material;
 
 @UtilityClass
 public final class JagerT1 {
@@ -51,9 +49,8 @@ public final class JagerT1 {
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity.getDamageModule().isLiving())
-                ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 3,
-                        combatEntity.getEntity().getLocation().add(0, 0.5, 0), 1,
-                        combatEntity.getEntity().getWidth() / 2, 0, combatEntity.getEntity().getWidth() / 2, 0);
+                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.5, 0),
+                        combatEntity.getEntity().getWidth());
 
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID,

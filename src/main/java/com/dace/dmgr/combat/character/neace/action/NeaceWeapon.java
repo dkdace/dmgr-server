@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -120,14 +119,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20.0, true);
 
         Location location = combatUser.getArmLocation(true);
-        for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8)) {
-            if (isAmplifying)
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                        140, 255, 245);
-            else
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                        255, 255, 140);
-        }
+        for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8))
+            (isAmplifying ? NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL).play(loc);
     }
 
     private final class NeaceWeaponTarget extends Target {
@@ -158,16 +151,12 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 1, 0.05, 0.05, 0.05,
-                    255, 255, 235);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 3, 0.1, 0.1, 0.1,
-                    255, 255, 200);
+            NeaceWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, getLocation(), 15, 0.2, 0.2, 0.2,
-                    255, 255, 200);
+            NeaceWeaponInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override

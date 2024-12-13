@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
@@ -44,5 +46,21 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(1.5).pitch(2).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(0.5).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 틱 입자 효과 (중심) */
+        public static final ParticleEffect TICK_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(0.5).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).horizontalSpread(0.4).build()
+        );
+        /** 틱 입자 효과 (장식) */
+        public static final ParticleEffect TICK_DECO = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
+                        .count(6).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

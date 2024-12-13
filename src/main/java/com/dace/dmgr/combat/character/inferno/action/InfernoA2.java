@@ -9,13 +9,11 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -59,8 +57,7 @@ public final class InfernoA2 extends ActiveSkill {
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
             InfernoA2Info.SOUND.TICK.play(combatUser.getEntity().getLocation());
-            ParticleUtil.play(Particle.FLAME, combatUser.getEntity().getLocation().add(0, 1, 0), 2,
-                    0.1, 0.1, 0.1, 0.2);
+            InfernoA2Info.PARTICLE.TICK_CORE.play(combatUser.getEntity().getLocation().add(0, 1, 0));
             playTickEffect(i);
         }, 1, InfernoA2Info.DURATION));
     }
@@ -99,8 +96,7 @@ public final class InfernoA2 extends ActiveSkill {
                 Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
                 Location loc2 = loc.clone().add(vec.clone().multiply(1.8));
 
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 0, vec.getX(), vec.getY(), vec.getZ(), 0.32);
-                ParticleUtil.play(Particle.FLAME, loc2, 0, vec.getX(), vec.getY(), vec.getZ(), 0.2);
+                InfernoA2Info.PARTICLE.TICK_DECO.play(loc2, vec);
             }
         }
     }

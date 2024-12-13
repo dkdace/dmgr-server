@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
@@ -76,6 +78,31 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(4).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(4).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 95, 35)
+                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 30, 15)
+                        .count(6).horizontalSpread(0.15).verticalSpread(0.15).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(4).horizontalSpread(0.12).verticalSpread(0.12).build()
+        );
+        /** 폭발 */
+        public static final ParticleEffect EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(80).horizontalSpread(0.3).verticalSpread(0.3).speed(0.1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(150).horizontalSpread(0.2).verticalSpread(0.2).speed(0.3).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(100).horizontalSpread(0.8).verticalSpread(0.8).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(250).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build()
         );
     }
 }

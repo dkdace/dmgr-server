@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -84,5 +85,31 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
         /** 사용 (치유 광선) */
         public static final SoundEffect USE_HEAL = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(0.2).pitch(2).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 235)
+                        .horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 200)
+                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build()
+        );
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 200)
+                        .count(15).horizontalSpread(0.2).verticalSpread(0.2).build());
+        /** 엔티티 타격 (치유 광선) */
+        public static final ParticleEffect HIT_ENTITY_HEAL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 140)
+                        .build());
+        /** 엔티티 타격 (치유 광선 - 축복) */
+        public static final ParticleEffect HIT_ENTITY_HEAL_AMPLIFY = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 140, 255, 245)
+                        .build());
     }
 }

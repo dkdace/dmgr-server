@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -130,8 +129,7 @@ public final class ChedP1 extends AbstractSkill {
                 setHanging(true);
 
                 ChedP1Info.SOUND.USE_HANG.play(combatUser.getEntity().getLocation());
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 40,
-                        0.65, 0, 0.65, 186, 55, 30);
+                ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getEntity().getLocation());
             }
 
             hangTick--;
@@ -163,8 +161,7 @@ public final class ChedP1 extends AbstractSkill {
             setHanging(false);
 
             ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getEntity().getLocation());
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 40,
-                    0.65, 0, 0.65, 186, 55, 30);
+            ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getEntity().getLocation());
         } else
             combatUser.getWeapon().setVisible(true);
     }
@@ -183,8 +180,7 @@ public final class ChedP1 extends AbstractSkill {
             int angle = 360 / 7 * j;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec),
-                    1, 0.24, 0, 0.24, 186, 55, 30);
+            ChedP1Info.PARTICLE.TICK_HANG.play(loc.clone().add(vec));
         }
     }
 

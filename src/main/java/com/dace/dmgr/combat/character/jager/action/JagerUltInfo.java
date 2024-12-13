@@ -4,11 +4,15 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     /** 궁극기 필요 충전량 */
@@ -91,6 +95,42 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.2).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 96, 220, 255)
+                        .count(15).horizontalSpread(0.6).verticalSpread(0.02).build());
+        /** 소환 준비 대기 틱 입자 효과 */
+        public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build());
+        /** 표시 */
+        public static final ParticleEffect DISPLAY = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 96, 220, 255)
+                        .count(8).horizontalSpread(0.6).verticalSpread(0.02).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 80, 80, 100)
+                        .count(3).horizontalSpread(0.15).verticalSpread(0.02).build()
+        );
+        /** 틱 입자 효과 (중심) */
+        public static final ParticleEffect TICK_CORE = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(1, 0.35, 0.05)
+                        .build());
+        /** 틱 입자 효과 (장식) */
+        public static final ParticleEffect TICK_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SNOW_SHOVEL).count(3).verticalSpread(1.4).speed(0.04).build());
+        /** 파괴 */
+        public static final ParticleEffect DEATH = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(120)
+                        .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(80).horizontalSpread(0.1).verticalSpread(0.1).speed(0.5).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build()
         );
     }
 }

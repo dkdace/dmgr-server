@@ -13,14 +13,12 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -171,8 +169,7 @@ public final class QuakerA2 extends ActiveSkill {
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
-                    200, 200, 200);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
         }
 
         @Override
@@ -188,7 +185,7 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected void onDestroy() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
         }
     }
 
@@ -204,8 +201,8 @@ public final class QuakerA2 extends ActiveSkill {
         @Override
         protected void onTrailInterval() {
             Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
-            CombatEffectUtil.playBlockHitEffect(getLocation(), floor, 3);
-            ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0.2, 0.05, 0.2, 0.25);
+            CombatEffectUtil.playHitBlockParticle(getLocation(), floor, 3);
+            QuakerA2Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -226,7 +223,7 @@ public final class QuakerA2 extends ActiveSkill {
                     }
                 }
 
-                ParticleUtil.play(Particle.CRIT, getLocation(), 50, 0, 0, 0, 0.4);
+                QuakerA2Info.PARTICLE.HIT_ENTITY.play(getLocation());
             }
 
             return !(target instanceof Barrier);

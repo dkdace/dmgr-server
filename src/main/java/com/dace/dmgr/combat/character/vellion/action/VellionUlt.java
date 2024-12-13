@@ -12,15 +12,12 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -115,9 +112,7 @@ public final class VellionUlt extends UltimateSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
                 Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                ParticleUtil.play(Particle.SPELL_WITCH, loc2, 3, 0.05, 0.05, 0.05, 0);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 1,
-                        0, 0, 0, 70, 0, 45);
+                VellionUltInfo.PARTICLE.USE_TICK.play(loc2);
             }
         }
     }
@@ -139,11 +134,9 @@ public final class VellionUlt extends UltimateSkill {
             if (i % 4 == 0)
                 new VellionUltArea().emit(combatUser.getEntity().getEyeLocation());
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 4,
-                    0.3, 0, 0.3, 90, 0, 55);
+            VellionUltInfo.PARTICLE.TICK_CORE_1.play(combatUser.getEntity().getEyeLocation().add(0, 1, 0));
             if (i < 8)
-                ParticleUtil.play(Particle.PORTAL, combatUser.getEntity().getEyeLocation().add(0, 1, 0), 40,
-                        0, 0, 0, 1.5);
+                VellionUltInfo.PARTICLE.TICK_CORE_2.play(combatUser.getEntity().getEyeLocation().add(0, 1, 0));
             playTickEffect(i);
 
             return true;
@@ -155,10 +148,7 @@ public final class VellionUlt extends UltimateSkill {
 
             Location loc2 = loc.add(0, 1, 0);
             VellionUltInfo.SOUND.EXPLODE.play(loc2);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 2, loc2, 300,
-                    0.3, 0.3, 0.3, 0.4);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 14, loc2, 200,
-                    0.3, 0.3, 0.3, 0.4);
+            VellionUltInfo.PARTICLE.EXPLODE.play(loc2);
         }, 1, VellionUltInfo.DURATION));
     }
 
@@ -184,14 +174,12 @@ public final class VellionUlt extends UltimateSkill {
                 Location loc2 = loc.clone().add(vec);
 
                 if (j > 0 && j % 10 == 0)
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc2.clone().add(0, 2.5, 0), 20, 0, 2, 0, 0);
+                    VellionUltInfo.PARTICLE.TICK_DECO_1.play(loc2.clone().add(0, 2.5, 0));
                 else {
-                    if (i > 20)
-                        ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.CONCRETE, 14, loc2,
-                                1, 0, 0, 0, 0);
+                    if (i <= 20)
+                        VellionUltInfo.PARTICLE.TICK_DECO_2.play(loc2, j / 49.0);
                     else
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                                (int) (30 + distance * 12), 0, (int) (18 + distance * 10));
+                        VellionUltInfo.PARTICLE.TICK_DECO_3.play(loc2);
                 }
             }
         }
@@ -202,10 +190,8 @@ public final class VellionUlt extends UltimateSkill {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
             Location loc2 = loc.clone().add(vec);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 3, 0.1, 0.1, 0.1,
-                    90, 0, 55);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.MYCEL, 0, loc2.clone().add(0, 2, 0),
-                    4, 0.15, 0.4, 0.15, 0);
+            VellionUltInfo.PARTICLE.TICK_DECO_4.play(loc2);
+            VellionUltInfo.PARTICLE.TICK_DECO_5.play(loc2.clone().add(0, 2, 0));
         }
     }
 
@@ -281,8 +267,8 @@ public final class VellionUlt extends UltimateSkill {
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
             for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 3, 0.05, 0.05, 0.05, 0);
-            ParticleUtil.play(Particle.CRIT_MAGIC, location, 50, 0, 0, 0, 0.4);
+                VellionUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc2);
+            VellionUltInfo.PARTICLE.HIT_ENTITY_CORE.play(location);
 
             return true;
         }

@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
@@ -83,5 +86,27 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(1).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(1).pitch(0.8).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 120, 120, 135)
+                        .count(17).horizontalSpread(0.7).build());
+        /** 소환 준비 대기 틱 입자 효과 */
+        public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 120, 120, 135)
+                        .count(5).horizontalSpread(0.2).verticalSpread(0.2).build());
+        /** 표시 */
+        public static final ParticleEffect DISPLAY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA).build());
+        /** 파괴 */
+        public static final ParticleEffect DEATH = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(80)
+                        .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build());
     }
 }

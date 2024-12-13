@@ -10,13 +10,11 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -107,8 +105,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
-                    200, 200, 200);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
         }
 
         @Override
@@ -118,8 +115,8 @@ public final class QuakerWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 2);
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 2);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -131,7 +128,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                     target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ?
                             -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
-                ParticleUtil.play(Particle.CRIT, getLocation(), 20, 0, 0, 0, 0.4);
+                QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
                 QuakerWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
             }
 
@@ -141,7 +138,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         @Override
         protected void onDestroy() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
         }
     }
 }

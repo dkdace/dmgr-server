@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 
 public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
     /** 쿨타임 (tick) */
@@ -53,5 +55,27 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.8).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(3).horizontalSpread(0.02).verticalSpread(0.02).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build()
+        );
+        /** 총알 궤적 (중심) */
+        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255).build());
+        /** 총알 궤적 (장식) */
+        public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(-0.4).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(40).speed(0.4).build());
     }
 }

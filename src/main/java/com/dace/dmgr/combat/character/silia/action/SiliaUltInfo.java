@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 
 public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
     /** 궁극기 필요 충전량 */
@@ -54,5 +56,19 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                 SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.2).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 입자 효과 (중심) */
+        public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
+                        .count(2).horizontalSpread(0.15).verticalSpread(0.15).build());
+        /** 사용 시 입자 효과 (장식) */
+        public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(2).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());
     }
 }

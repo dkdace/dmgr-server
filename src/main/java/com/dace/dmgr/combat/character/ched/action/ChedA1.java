@@ -11,7 +11,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -19,7 +18,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 @Getter
@@ -133,8 +131,7 @@ public final class ChedA1 extends StackableSkill {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, 0, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 1, 0, 0, 0, 0);
+            ChedA1Info.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
@@ -144,11 +141,9 @@ public final class ChedA1 extends StackableSkill {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
-                    5, 0, 0, 0, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, getLocation(), 15, 0, 0, 0, 0);
-            ParticleUtil.play(Particle.LAVA, getLocation(), 3, 0, 0, 0, 1);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, 1.5);
+            ChedA1Info.PARTICLE.HIT_BLOCK.play(getLocation());
 
             return false;
         }

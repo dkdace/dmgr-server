@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -86,5 +87,16 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
         /** 사망 */
         public static final SoundEffect DEATH = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 소환 준비 대기 틱 입자 효과 */
+        public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 255)
+                        .count(5).horizontalSpread(0.2).verticalSpread(0.2).build());
     }
 }

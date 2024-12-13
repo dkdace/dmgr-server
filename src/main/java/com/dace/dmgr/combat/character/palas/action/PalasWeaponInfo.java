@@ -6,11 +6,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
@@ -118,5 +120,18 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                 .add(38, SoundEffect.SoundInfo.builder("new.block.chain.place").volume(0.6).pitch(1.6).build())
                 .add(41, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(1.2).build())
                 .build();
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 210, 160, 70).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(15).build());
     }
 }

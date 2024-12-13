@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
@@ -41,5 +43,18 @@ public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(1).pitch(1).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 */
+        public static final ParticleEffect USE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(20).horizontalSpread(0.4).verticalSpread(0.1).speed(0.15).build());
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).speed(0.05).build());
     }
 }

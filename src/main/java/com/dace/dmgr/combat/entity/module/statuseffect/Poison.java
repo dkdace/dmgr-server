@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.ParticleEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -19,6 +19,13 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Poison implements StatusEffect {
+    /** 틱 입자 효과 */
+    private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(Particle.DAMAGE_INDICATOR)
+                    .horizontalSpread(0, 0, 0.25)
+                    .verticalSpread(1, 0, 0.25)
+                    .speed(0.3).build());
+
     /** 초당 피해량 */
     private final int damagePerSecond;
 
@@ -47,9 +54,7 @@ public abstract class Poison implements StatusEffect {
                         4, 0, false, false), true);
 
             if (i % 2 == 0)
-                ParticleUtil.play(Particle.DAMAGE_INDICATOR, combatEntity.getCenterLocation(),
-                        1, combatEntity.getEntity().getWidth() / 4, combatEntity.getEntity().getHeight() / 4,
-                        combatEntity.getEntity().getWidth() / 4, 0.3);
+                TICK_PARTICLE.play(combatEntity.getCenterLocation(), combatEntity.getEntity().getWidth(), combatEntity.getEntity().getHeight());
 
             if (i % 10 == 0 && provider instanceof Attacker)
                 combatEntity.getDamageModule().damage((Attacker) provider, damagePerSecond * 10 / 20.0,

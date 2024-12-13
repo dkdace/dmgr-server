@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.ParticleEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -15,6 +15,12 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Slow implements StatusEffect {
+    /** 틱 입자 효과 */
+    private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 12).count(3)
+                    .horizontalSpread(0, 0, 0.5)
+                    .build());
+
     /** 수정자 ID */
     private final String modifierId;
     /** 이동 속도 감소량 */
@@ -41,9 +47,7 @@ public abstract class Slow implements StatusEffect {
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity.getDamageModule().isLiving())
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 12,
-                    combatEntity.getEntity().getLocation().add(0, 0.5, 0), 3,
-                    combatEntity.getEntity().getWidth() / 4, 0, combatEntity.getEntity().getWidth() / 4, 0);
+            TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.5, 0), combatEntity.getEntity().getWidth());
     }
 
     @Override

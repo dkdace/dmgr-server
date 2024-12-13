@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
@@ -73,5 +75,20 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
                 SoundEffect.SoundInfo.builder("random.gun.bow").volume(1.4).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).build()
+        );
+        /** 블록 타격 */
+        public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).build());
     }
 }

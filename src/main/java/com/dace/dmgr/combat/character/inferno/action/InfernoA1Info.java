@@ -5,10 +5,13 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     /** 쿨타임 (tick) */
@@ -59,5 +62,33 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(3).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(1.3).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 */
+        public static final ParticleEffect USE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(80).horizontalSpread(0.5).verticalSpread(0.2).speed(0.2).build());
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).verticalSpread(0.15).speed(0.02).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build()
+        );
+        /** 착지 (중심) */
+        public static final ParticleEffect LAND_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(200).horizontalSpread(0.8).verticalSpread(0.1).speed(0.05).build());
+        /** 착지 (장식) - 1 */
+        public static final ParticleEffect LAND_DECO_1 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(5).speed(0.05).build());
+        /** 착지 (장식) - 2 */
+        public static final ParticleEffect LAND_DECO_2 = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(0.35).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).speed(0.4).build());
     }
 }

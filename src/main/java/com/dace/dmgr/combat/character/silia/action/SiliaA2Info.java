@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
@@ -65,5 +67,31 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                 SoundEffect.SoundInfo.builder("random.swing").volume(1).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(0.2).build());
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(0.25).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
+                        .count(3).horizontalSpread(0.3).verticalSpread(0.3).build()
+        );
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(1, 0.3, 0.4)
+                        .build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).count(3).speed(0.05).build());
     }
 }

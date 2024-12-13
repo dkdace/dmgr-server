@@ -5,10 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
@@ -146,5 +148,38 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                 .add(44, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(0.7).build())
                 .add(47, SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.6).pitch(1.4).build())
                 .build();
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(1, 1.3, 0.8)
+                        .build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
+                        .speedMultiplier(1.45).build()
+        );
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.2).verticalSpread(0.2).speed(0.05).build());
+        /** 블록 타격 */
+        public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).count(2).horizontalSpread(0.07).verticalSpread(0.07).build());
+        /** 총알 궤적 (화염탄) */
+        public static final ParticleEffect BULLET_TRAIL_FIREBALL = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(10).horizontalSpread(0.12).verticalSpread(0.12).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(13).horizontalSpread(0.15).verticalSpread(0.15).speed(0.04).build()
+        );
+        /** 폭발 (화염탄) */
+        public static final ParticleEffect FIREBALL_EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(80).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(30).horizontalSpread(0.3).verticalSpread(0.3).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(80).horizontalSpread(0.2).verticalSpread(0.2).speed(0.1).build()
+        );
     }
 }

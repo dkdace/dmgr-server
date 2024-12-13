@@ -11,14 +11,12 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -74,10 +72,8 @@ public final class SiliaA1 extends ActiveSkill {
 
             TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-                for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3)) {
-                    ParticleUtil.play(Particle.CRIT, loc3, 3, 0.02, 0.02, 0.02, 0);
-                    ParticleUtil.play(Particle.END_ROD, loc3, 1, 0.02, 0.02, 0.02, 0);
-                }
+                for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3))
+                    SiliaA1Info.PARTICLE.TICK.play(loc3);
             }, 1));
         }, () -> {
             onCancelled();
@@ -117,12 +113,11 @@ public final class SiliaA1 extends ActiveSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 15 * (i - 5.5));
                 for (int j = 0; j < 3; j++) {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                            255, 255, 255);
+                    SiliaA1Info.PARTICLE.BULLET_TRAIL_CORE.play(loc2);
 
                     if ((i == 0 || i == 11) && j == 1) {
                         Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 10);
-                        ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, -vec2.getX(), -vec2.getY(), -vec2.getZ(), 0.4);
+                        SiliaA1Info.PARTICLE.BULLET_TRAIL_DECO.play(loc2, vec2);
                     }
                 }
             }
@@ -155,7 +150,8 @@ public final class SiliaA1 extends ActiveSkill {
                 if (targets.add(target)) {
                     target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
                             SiliaT1.isBackAttack(LocationUtil.getDirection(center, location), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
-                    ParticleUtil.play(Particle.CRIT, location, 40, 0, 0, 0, 0.4);
+
+                    SiliaA1Info.PARTICLE.HIT_ENTITY.play(location);
                 }
 
                 return !(target instanceof Barrier);

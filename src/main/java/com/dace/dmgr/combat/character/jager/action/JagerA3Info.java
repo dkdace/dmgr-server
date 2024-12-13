@@ -5,10 +5,13 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
@@ -80,5 +83,32 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CURE).volume(4).pitch(1.5).build(),
                 SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 120, 220, 240)
+                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+        /** 폭발 */
+        public static final ParticleEffect EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.ICE, 0).count(300)
+                        .horizontalSpread(0.2).verticalSpread(0.2).speed(0.5).build(),
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.PACKED_ICE, 0).count(300)
+                        .horizontalSpread(0.2).verticalSpread(0.2).speed(0.5).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(200).speed(0.3).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build()
+        );
+        /** 틱 입자 효과 (빙결) */
+        public static final ParticleEffect FREEZE_TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 120, 220, 240)
+                        .count(5)
+                        .horizontalSpread(0, 0, 0.5)
+                        .verticalSpread(1, 0, 0.5)
+                        .build());
     }
 }

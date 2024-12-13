@@ -16,7 +16,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -24,8 +23,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 @Getter
@@ -185,8 +182,7 @@ public final class PalasA3 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 5,
-                    0.15, 0.15, 0.15, 220, 161, 43);
+            PalasA3Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -195,11 +191,7 @@ public final class PalasA3 extends ActiveSkill {
             new PalasA3Area().emit(loc);
 
             PalasA3Info.SOUND.EXPLODE.play(loc);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.STAINED_GLASS, 4, loc,
-                    400, 0.1, 0.1, 0.1, 0.25);
-            ParticleUtil.play(Particle.TOTEM, loc, 200, 0.15, 0.15, 0.15, 0.6);
-            ParticleUtil.play(Particle.SPELL_INSTANT, loc, 300, 1.5, 1.5, 1.5, 1);
-            ParticleUtil.play(Particle.WATER_SPLASH, loc, 300, 0.6, 0.6, 0.6, 0);
+            PalasA3Info.PARTICLE.EXPLODE.play(loc);
         }
 
         @Override

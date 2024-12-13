@@ -12,14 +12,12 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -119,8 +117,7 @@ public final class QuakerUlt extends UltimateSkill {
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0.3, 0);
 
         QuakerUltInfo.SOUND.USE_READY.play(loc);
-        ParticleUtil.play(Particle.CRIT, LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5), 100,
-                0.2, 0.2, 0.2, 0.6);
+        QuakerUltInfo.PARTICLE.USE_READY.play(LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5));
 
         HashSet<Damageable> targets = new HashSet<>();
         Vector vector = VectorUtil.getPitchAxis(loc);
@@ -173,8 +170,7 @@ public final class QuakerUlt extends UltimateSkill {
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 12, 0.3, 0.3, 0.3,
-                    200, 200, 200);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
         }
 
         @Override
@@ -190,7 +186,7 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected void onDestroy() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 30, 0.15, 0.15, 0.15, 0.05);
+            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
         }
     }
 
@@ -206,8 +202,7 @@ public final class QuakerUlt extends UltimateSkill {
         @Override
         protected void onTrailInterval() {
             Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 0, vec.getX(), vec.getY(), vec.getZ(), 1);
-            ParticleUtil.play(Particle.CRIT, getLocation(), 4, 0.2, 0.2, 0.2, 0.15);
+            QuakerUltInfo.PARTICLE.BULLET_TRAIL.play(getLocation(), vec);
         }
 
         @Override
@@ -230,7 +225,7 @@ public final class QuakerUlt extends UltimateSkill {
                     }
                 }
 
-                ParticleUtil.play(Particle.CRIT, getLocation(), 60, 0, 0, 0, 0.4);
+                QuakerUltInfo.PARTICLE.HIT_ENTITY.play(getLocation());
             }
 
             return !(target instanceof Barrier);

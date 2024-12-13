@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -46,8 +45,7 @@ public final class VellionP1 extends AbstractSkill {
             Location location = combatUser.getEntity().getLocation();
 
             VellionP1Info.SOUND.USE.play(location);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,
-                    0.8, 0, 0.8, 150, 110, 170);
+            VellionP1Info.PARTICLE.USE.play(location);
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 Location loc = combatUser.getEntity().getLocation();
@@ -100,8 +98,7 @@ public final class VellionP1 extends AbstractSkill {
         }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
         VellionP1Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatUser.getEntity().getLocation(), 50,
-                0.8, 0, 0.8, 150, 110, 170);
+        VellionP1Info.PARTICLE.USE.play(combatUser.getEntity().getLocation());
     }
 
     /**
@@ -118,8 +115,7 @@ public final class VellionP1 extends AbstractSkill {
             int angle = 360 / 8 * j;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec),
-                    2, 0.3, 0, 0.3, 150, 110, 170);
+            VellionP1Info.PARTICLE.TICK.play(loc.clone().add(vec));
         }
     }
 }

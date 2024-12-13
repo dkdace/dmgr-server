@@ -8,13 +8,10 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 
 public final class PalasUlt extends UltimateSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
@@ -74,10 +71,7 @@ public final class PalasUlt extends UltimateSkill {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getCenterLocation(), 4,
-                    1, 1.5, 1, 255, 70, 75);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getCenterLocation(), 2,
-                    1, 1.5, 1, 255, 50, 24);
+            PalasUltInfo.PARTICLE.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override
@@ -115,16 +109,12 @@ public final class PalasUlt extends UltimateSkill {
 
             PalasUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
             PalasUltInfo.SOUND.HIT_ENTITY.play(target.getCenterLocation());
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, target.getCenterLocation(), 40, 0.5, 0.5, 0.5, 0.2);
-            ParticleUtil.playFirework(target.getCenterLocation(), 255, 70, 75,
-                    200, 0, 0, FireworkEffect.Type.BURST, false, false);
+            PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_1.play(target.getCenterLocation());
+            PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_2.play(target.getCenterLocation());
 
             Location location = combatUser.getArmLocation(false);
-            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4)) {
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 2, 0.1, 0.1, 0.1,
-                        255, 70, 75);
-                ParticleUtil.play(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
-            }
+            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
+                PalasUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc);
         }
     }
 }

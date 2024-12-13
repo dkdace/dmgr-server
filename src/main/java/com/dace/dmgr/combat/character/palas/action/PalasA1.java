@@ -12,14 +12,12 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class PalasA1 extends ActiveSkill {
@@ -110,7 +108,7 @@ public final class PalasA1 extends ActiveSkill {
                         (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20);
 
             if (i % 2 == 0) {
-                ParticleUtil.play(Particle.CRIT, combatEntity.getCenterLocation(), 20, 0, 0, 0, 0.6);
+                PalasA1Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
                 PalasA1Info.SOUND.TICK.play(combatEntity.getEntity().getLocation());
             }
         }
@@ -123,9 +121,7 @@ public final class PalasA1 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.play(Particle.CRIT, getLocation(), 1, 0, 0, 0, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 1,
-                    0, 0, 0, 240, 230, 50);
+            PalasA1Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -139,10 +135,7 @@ public final class PalasA1 extends ActiveSkill {
                 if (target.getDamageModule().isLiving()) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA1Stun.instance, PalasA1Info.STUN_DURATION);
 
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                            target.getCenterLocation(), 20, target.getEntity().getWidth() / 2,
-                            target.getEntity().getHeight() / 2, target.getEntity().getWidth() / 2,
-                            240, 230, 50);
+                    PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getEntity().getWidth(), target.getEntity().getHeight());
                 }
 
                 PalasA1Info.SOUND.HIT_ENTITY.play(getLocation());

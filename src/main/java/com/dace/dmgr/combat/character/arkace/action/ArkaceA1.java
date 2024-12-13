@@ -11,13 +11,11 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 
 public final class ArkaceA1 extends ActiveSkill {
@@ -78,9 +76,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            ParticleUtil.play(Particle.CRIT_MAGIC, getLocation(), 1, 0, 0, 0, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 1,
-                    0, 0, 0, 32, 250, 225);
+            ArkaceA1Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override
@@ -89,9 +85,7 @@ public final class ArkaceA1 extends ActiveSkill {
             new ArkaceA1Area().emit(loc);
 
             ArkaceA1Info.SOUND.EXPLODE.play(loc);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 200,
-                    2.5, 2.5, 2.5, 32, 250, 225);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc, 40, 0.2, 0.2, 0.2, 0.2);
+            ArkaceA1Info.PARTICLE.EXPLODE.play(loc);
         }
 
         @Override

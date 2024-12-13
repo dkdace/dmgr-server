@@ -9,12 +9,10 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -102,7 +100,7 @@ public final class ChedWeapon extends AbstractWeapon {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, 0, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0, combatUser.getEntity());
+            CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc, combatUser.getEntity());
         }
 
         @Override
@@ -112,10 +110,8 @@ public final class ChedWeapon extends AbstractWeapon {
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, power);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
-                    (int) (power * 5), 0, 0, 0, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, getLocation(), (int) (power * 15), 0, 0, 0, 0);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, power);
+            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, power * 1.5);
 
             return false;
         }

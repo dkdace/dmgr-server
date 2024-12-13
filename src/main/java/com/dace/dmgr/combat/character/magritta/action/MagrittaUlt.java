@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -20,8 +19,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -126,11 +123,7 @@ public final class MagrittaUlt extends UltimateSkill {
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.5);
 
         MagrittaUltInfo.SOUND.END.play(loc);
-        ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.05);
-        ParticleUtil.play(Particle.LAVA, loc, 15, 0, 0, 0, 0);
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, loc, 50,
-                0, 0, 0, 0.1);
-        ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+        MagrittaUltInfo.PARTICLE.END.play(loc);
 
         TaskUtil.addTask(this, new IntervalTask((LongConsumer) i ->
                 CombatUtil.addYawAndPitch(combatUser.getEntity(),
@@ -163,25 +156,25 @@ public final class MagrittaUlt extends UltimateSkill {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 255, 70, 0);
+            MagrittaUltInfo.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.FLAME, getLocation(), 1, 0, 0, 0, 0.15);
-            ParticleUtil.play(Particle.LAVA, getLocation(), 1, 0, 0, 0, 0);
+            MagrittaUltInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
-                    3, 0, 0, 0, 0.1);
-            ParticleUtil.play(Particle.DRIP_LAVA, getLocation(), 1, 0, 0, 0, 0);
+            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, 1);
+            MagrittaUltInfo.PARTICLE.HIT_BLOCK.play(getLocation());
 
-            if (blockHitCount++ > 0)
-                return false;
+            if (blockHitCount++ == 0) {
+                HIT_BLOCK_SOUND.play(getLocation());
+                CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+            }
 
-            return super.onHitBlock(hitBlock);
+            return false;
         }
 
         @Override
@@ -193,8 +186,7 @@ public final class MagrittaUlt extends UltimateSkill {
             if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), false, false))
                 targets.put(target, targets.getOrDefault(target, 0) + 1);
 
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.BONE_BLOCK, 0, getLocation(), 4,
-                    0, 0, 0, 0.08);
+            MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
 
             return false;
         }

@@ -11,11 +11,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
@@ -154,7 +152,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             QuakerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
-                CombatEffectUtil.playBreakEffect(location, entity, damage);
+                CombatEffectUtil.playBreakEffect(location, this, damage);
         }
 
         @Override
@@ -169,9 +167,7 @@ public final class QuakerA1 extends ChargeableSkill {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(hitboxes[0].getCenter(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
-                    ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.IRON_BLOCK, 0, loc, 50,
-                            0.3, 0.3, 0.3, 0.2);
-                    ParticleUtil.play(Particle.CRIT, loc, 50, 0.3, 0.3, 0.3, 0.4);
+                    QuakerA1Info.PARTICLE.DEATH.play(loc);
                 }
             }
         }

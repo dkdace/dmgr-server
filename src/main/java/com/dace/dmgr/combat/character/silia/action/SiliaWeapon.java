@@ -8,14 +8,12 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -142,21 +140,20 @@ public final class SiliaWeapon extends AbstractWeapon {
                 axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
 
                 vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation().clone().add(vec), 2,
-                        0.05, 0.05, 0.05, 255, 255, 255);
+                SiliaWeaponInfo.PARTICLE.BULLET_TRAIL.play(getLocation().clone().add(vec));
             }
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 10, 0.1, 0.1, 0.1, 0.15);
+            SiliaWeaponInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
             SiliaWeaponInfo.SOUND.HIT_BLOCK.play(getLocation());
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1.5);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1.5);
 
             return false;
         }
@@ -166,7 +163,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(),
                     SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
-            ParticleUtil.play(Particle.CRIT, getLocation(), 15, 0, 0, 0, 0.4);
+            SiliaWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
             SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
 
             return false;
@@ -188,19 +185,18 @@ public final class SiliaWeapon extends AbstractWeapon {
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 8, 0.15, 0.15, 0.15,
-                    255, 255, 255);
+            SiliaT2Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, getLocation(), 3, 0.05, 0.05, 0.05, 0.05);
+            SiliaT2Info.PARTICLE.HIT.play(getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1.5);
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1.5);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -217,7 +213,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                         combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }
 
-                ParticleUtil.play(Particle.CRIT, getLocation(), 40, 0, 0, 0, 0.4);
+                SiliaT2Info.PARTICLE.HIT_ENTITY.play(getLocation());
                 SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
             }
 
@@ -227,7 +223,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         @Override
         protected void onDestroy() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 15, 0.08, 0.08, 0.08, 0.08);
+            SiliaT2Info.PARTICLE.BULLET_TRAIL_DECO.play(loc);
         }
     }
 }

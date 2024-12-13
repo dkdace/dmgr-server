@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -59,5 +60,20 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 (매달리기) */
+        public static final ParticleEffect USE_HANG = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 186, 55, 30)
+                        .count(40).horizontalSpread(0.65).build());
+        /** 틱 입자 효과 (매달리기) */
+        public static final ParticleEffect TICK_HANG = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 186, 55, 30)
+                        .horizontalSpread(0.24).build());
     }
 }

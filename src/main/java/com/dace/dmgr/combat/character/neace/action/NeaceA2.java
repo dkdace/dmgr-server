@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -53,10 +52,9 @@ public final class NeaceA2 extends ActiveSkill {
                 if (isDurationFinished() || combatUser.isDead())
                     return false;
 
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatUser.getCenterLocation(), 3,
-                        1, 1.5, 1, 140, 255, 245);
+                NeaceA2Info.PARTICLE.TICK.play(combatUser.getCenterLocation());
                 if (i < 12)
-                    playTickEffect(i);
+                    playUseTickEffect(i);
 
                 return true;
             }, () -> combatUser.getWeapon().setGlowing(false), 1));
@@ -70,11 +68,11 @@ public final class NeaceA2 extends ActiveSkill {
     }
 
     /**
-     * 사용 중 효과를 재생한다.
+     * 사용 시 효과를 재생한다.
      *
      * @param i 인덱스
      */
-    private void playTickEffect(long i) {
+    private void playUseTickEffect(long i) {
         Location loc = combatUser.getEntity().getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
@@ -87,8 +85,7 @@ public final class NeaceA2 extends ActiveSkill {
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec).add(0, up, 0), 6,
-                    0.2, 0.2, 0.2, (int) (200 - i * 5), 255, (int) (i * 8 + 160));
+            NeaceA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
         }
     }
 

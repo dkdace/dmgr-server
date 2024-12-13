@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -187,13 +186,12 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0, 137, 185, 240);
+            JagerWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, getLocation(), 10, 0.25, 0.25, 0.25,
-                    137, 185, 240);
+            JagerWeaponInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override

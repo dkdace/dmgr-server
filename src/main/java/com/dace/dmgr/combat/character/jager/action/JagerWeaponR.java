@@ -12,13 +12,11 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 
 public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     /** 주무기 객체 */
@@ -139,7 +137,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.2, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
+            CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
         }
 
         @Override

@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
@@ -67,5 +69,31 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
         /** 틱 효과음 */
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.3).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT_MAGIC)
+                        .speedMultiplier(-0.25).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
+                        .speedMultiplier(0.12).build()
+        );
+        /** 총알 궤적 (중심) */
+        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(20).horizontalSpread(0.28).verticalSpread(0.28).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 64, 160, 184)
+                        .count(15).horizontalSpread(2.5).verticalSpread(1.5).build()
+        );
+        /** 총알 궤적 (모양) */
+        public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(8)
+                        .horizontalSpread(0, 0, 1)
+                        .verticalSpread(1, 0, 1)
+                        .build());
     }
 }

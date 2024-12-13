@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -75,14 +74,11 @@ public final class ArkaceA2 extends ActiveSkill {
         Vector axis = VectorUtil.getYawAxis(loc);
 
         long angle = i * 10;
-        int red = 250;
         for (int j = 0; j < 3; j++) {
             angle += 120;
-            red -= 30;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc.clone().add(vec), 3,
-                    0, 0.4, 0, red, 255, 36);
+            ArkaceA2Info.PARTICLE.TICK.play(loc.clone().add(vec), j / 2.0);
         }
     }
 }

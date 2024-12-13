@@ -7,13 +7,11 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -86,12 +84,12 @@ public final class NeaceA3 extends ActiveSkill {
 
                 combatUser.getMoveModule().push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
-                ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 6, 0.2, 0.4, 0.2, 0.1);
+                NeaceA3Info.PARTICLE.TICK_CORE.play(loc);
 
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
                     Location loc2 = combatUser.getEntity().getLocation().add(0, 1, 0);
                     for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
-                        ParticleUtil.play(Particle.END_ROD, loc3, 1, 0.02, 0.02, 0.02, 0);
+                        NeaceA3Info.PARTICLE.TICK_DECO.play(loc3);
                 }, 1));
 
                 return true;

@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
@@ -73,5 +75,35 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
         /** 발동 */
         public static final SoundEffect TRIGGER = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(0.6).pitch(0.7).pitchVariance(0.1).build());
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 - 1 */
+        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        200, 140, 130, 130, 230, 155).build());
+        /** 사용 시 틱 입자 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        200, 140, 130, 130, 230, 155).build());
+        /** 표식 */
+        public static final ParticleEffect MARK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 160, 150, 152)
+                        .count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 160, 150, 152).build()
+        );
+        /** 엔티티 타격 (표식 - 중심) */
+        public static final ParticleEffect HIT_ENTITY_MARK_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(15).speed(0.3).build());
+        /** 엔티티 타격 (표식 - 장식) */
+        public static final ParticleEffect HIT_ENTITY_MARK_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).build());
     }
 }

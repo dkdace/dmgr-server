@@ -7,16 +7,12 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -102,11 +98,7 @@ public final class NeaceUlt extends UltimateSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
                 Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                ParticleUtil.play(Particle.VILLAGER_HAPPY, loc2, 3, 0.05, 0.05, 0.05, 0);
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc2, 1, 0, 0, 0,
-                        215, 255, 130);
-                ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.GRASS, 0, loc2, 1,
-                        0, 0, 0, 0);
+                NeaceUltInfo.PARTICLE.USE_TICK.play(loc2);
             }
         }
     }
@@ -120,8 +112,7 @@ public final class NeaceUlt extends UltimateSkill {
         combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
         NeaceUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
-        ParticleUtil.playFirework(combatUser.getEntity().getLocation(), 215, 255, 130,
-                255, 255, 255, FireworkEffect.Type.STAR, true, false);
+        NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getEntity().getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
@@ -154,8 +145,7 @@ public final class NeaceUlt extends UltimateSkill {
             angle += 120;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
 
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc.clone().add(vec), 1,
-                    0.1, 0.1, 0.1, 215, 255, 130);
+            NeaceUltInfo.PARTICLE.TICK.play(loc.clone().add(vec));
         }
     }
 

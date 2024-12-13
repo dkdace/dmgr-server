@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -21,8 +20,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
@@ -119,11 +116,10 @@ public final class VellionA1 extends ActiveSkill {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(0.8 + j * 0.25);
                 Location loc2 = loc.clone().add(vec);
 
-                if (i == 9)
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
+                if (i != 9)
+                    VellionA1Info.PARTICLE.USE_TICK_1.play(loc2, i / 8.0);
                 else
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                            (int) (45 + i * 8), 0, (int) (240 - i * 6));
+                    VellionA1Info.PARTICLE.USE_TICK_2.play(loc2);
             }
         }
     }
@@ -222,22 +218,9 @@ public final class VellionA1 extends ActiveSkill {
             } else if (returnTime < -1)
                 dispose();
 
-            playTickEffect();
+            VellionA1Info.PARTICLE.DISPLAY.play(entity.getLocation());
 
             new VellionA1Area().emit(loc);
-        }
-
-        /**
-         * 표시 효과를 재생한다.
-         */
-        private void playTickEffect() {
-            Location loc = entity.getLocation();
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 20, 0.5, 0.5, 0.5,
-                    120, 0, 220);
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.FALLING_DUST, Material.WOOL, 10, loc, 8,
-                    0.5, 0.5, 0.5, 0.05);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, loc, 10, 1.5, 1.5, 1.5,
-                    140, 120, 180);
         }
 
         @Override
@@ -269,7 +252,7 @@ public final class VellionA1 extends ActiveSkill {
                             target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), VellionA1Info.SNARE_DURATION);
                         }
 
-                        ParticleUtil.play(Particle.CRIT_MAGIC, location, 30, 0, 0, 0, 0.4);
+                        VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
                         VellionA1Info.SOUND.HIT_ENTITY.play(location);
                     } else if (target instanceof Healable)
                         target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA1Heal.instance,

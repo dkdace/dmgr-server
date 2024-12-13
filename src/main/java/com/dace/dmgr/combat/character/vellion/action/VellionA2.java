@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -23,7 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -124,10 +122,7 @@ public final class VellionA2 extends ActiveSkill {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
-                    4, 0.2, 0.2, 0.2, 160, 150, 152);
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0),
-                    1, 0, 0, 0, 160, 150, 152);
+            VellionA2Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
 
             if (!(provider instanceof CombatUser))
                 return;
@@ -171,8 +166,7 @@ public final class VellionA2 extends ActiveSkill {
 
                 Location loc = combatUser.getArmLocation(true);
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.7))
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 1, 0, 0, 0,
-                            (int) (200 - i * 4), 130, (int) (230 - i * 5));
+                    VellionA2Info.PARTICLE.USE_TICK_1.play(loc2, i / 15.0);
                 Location loc2 = LocationUtil.getLocationFromOffset(loc, LocationUtil.getDirection(loc, target.getCenterLocation()),
                         0, 0, 1.5);
                 playUseTickEffect(loc2, i);
@@ -193,7 +187,7 @@ public final class VellionA2 extends ActiveSkill {
 
                 Location loc = combatUser.getArmLocation(true);
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                    ParticleUtil.play(Particle.SPELL_WITCH, loc2, 1, 0, 0, 0, 0);
+                    VellionA2Info.PARTICLE.USE_TICK_2.play(loc2);
 
                 TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
                     if (isDurationFinished() || isInvalid(combatUser, target) || !target.getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance))
@@ -226,11 +220,10 @@ public final class VellionA2 extends ActiveSkill {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(j * 0.2);
                     Location loc = location.clone().add(vec);
 
-                    if (i == 15)
-                        ParticleUtil.play(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
+                    if (i != 15)
+                        VellionA2Info.PARTICLE.USE_TICK_1.play(loc, i / 15.0);
                     else
-                        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc, 1, 0, 0, 0,
-                                (int) (200 - i * 4), 130, (int) (230 - i * 5));
+                        VellionA2Info.PARTICLE.USE_TICK_2.play(loc);
                 }
             }
         }
@@ -269,8 +262,8 @@ public final class VellionA2 extends ActiveSkill {
                         false, true);
 
                 for (Location loc2 : LocationUtil.getLine(effectLoc, location, 0.4))
-                    ParticleUtil.play(Particle.SMOKE_NORMAL, loc2, 1, 0, 0, 0, 0);
-                ParticleUtil.play(Particle.CRIT_MAGIC, location, 15, 0, 0, 0, 0.3);
+                    VellionA2Info.PARTICLE.HIT_ENTITY_MARK_DECO.play(loc2);
+                VellionA2Info.PARTICLE.HIT_ENTITY_MARK_CORE.play(location);
 
                 return !(target instanceof Barrier);
             }

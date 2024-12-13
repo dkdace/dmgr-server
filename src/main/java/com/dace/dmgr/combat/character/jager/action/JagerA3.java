@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
 import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -22,8 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,7 +85,7 @@ public final class JagerA3 extends ActiveSkill {
                         return false;
 
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
-                    playTickEffect(loc);
+                    JagerA3Info.PARTICLE.BULLET_TRAIL.play(loc);
 
                     return true;
                 }, isCancelled -> {
@@ -127,16 +124,6 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     /**
-     * 수류탄 표시 효과를 재생한다.
-     *
-     * @param location 사용 위치
-     */
-    private void playTickEffect(@NonNull Location location) {
-        ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, location, 3,
-                0.1, 0.1, 0.1, 120, 220, 240);
-    }
-
-    /**
      * 수류탄 폭파 시 실행할 작업.
      *
      * @param location   폭파 위치
@@ -147,12 +134,7 @@ public final class JagerA3 extends ActiveSkill {
         new JagerA3Area(projectile).emit(loc);
 
         JagerA3Info.SOUND.EXPLODE.play(loc);
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.ICE, 0, loc,
-                300, 0.2, 0.2, 0.2, 0.5);
-        ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.PACKED_ICE, 0, loc,
-                300, 0.2, 0.2, 0.2, 0.5);
-        ParticleUtil.play(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-        ParticleUtil.play(Particle.FIREWORKS_SPARK, loc, 200, 0, 0, 0, 0.3);
+        JagerA3Info.PARTICLE.EXPLODE.play(loc);
     }
 
     /**
@@ -168,10 +150,8 @@ public final class JagerA3 extends ActiveSkill {
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
 
             if (combatEntity.getDamageModule().isLiving())
-                ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE,
-                        combatEntity.getCenterLocation(), 5, combatEntity.getEntity().getWidth() / 2,
-                        combatEntity.getEntity().getHeight() / 2, combatEntity.getEntity().getWidth() / 2,
-                        120, 220, 240);
+                JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getEntity().getWidth(),
+                        combatEntity.getEntity().getHeight());
         }
     }
 
@@ -184,7 +164,7 @@ public final class JagerA3 extends ActiveSkill {
 
         @Override
         protected void onTrailInterval() {
-            playTickEffect(getLocation());
+            JagerA3Info.PARTICLE.BULLET_TRAIL.play(getLocation());
         }
 
         @Override

@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
@@ -79,5 +81,33 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(2).pitch(0.7).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 (이펙트 - 중심) */
+        public static final ParticleEffect BULLET_TRAIL_EFFECT_CORE = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 200, 200)
+                        .count(2).horizontalSpread(0.12).verticalSpread(0.12).build());
+        /** 총알 궤적 (이펙트 - 장식) */
+        public static final ParticleEffect BULLET_TRAIL_EFFECT_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(3).horizontalSpread(0.07).verticalSpread(0.07).build());
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(1.4).build());
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(50).horizontalSpread(0.2).verticalSpread(0.2).speed(0.4).build());
+        /** 엔티티 타격 (중심) */
+        public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
+                        .speedMultiplier(0.6).build());
+        /** 엔티티 타격 (장식) */
+        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).speed(0.4).build());
     }
 }

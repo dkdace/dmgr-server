@@ -35,6 +35,7 @@ import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.FireworkEffect;
 import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -313,7 +314,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            CombatEffectUtil.playBleedingEffect(null, entity, 0);
+            CombatEffectUtil.playBleedingEffect(null, this, 0);
 
         if (i % 20 == 0) {
             if (hasCore(Core.REGENERATION))
@@ -392,9 +393,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         CooldownUtil.setCooldown(ultPackLocation, Cooldown.ULT_PACK.id, Cooldown.ULT_PACK.duration);
         addUltGauge(GeneralConfig.getCombatConfig().getUltPackCharge());
 
-        ParticleUtil.playFirework(location.clone().add(0.5, 1.1, 0.5), 48, 85, 251,
-                255, 255, 255, FireworkEffect.Type.BALL, false, false);
-
+        PARTICLE.ULT_PACK.play(location.clone().add(0.5, 1.1, 0.5));
         SOUND.ULT_PACK.play(entity.getLocation());
         showBlockHologram(ultPackLocation, location, Cooldown.ULT_PACK);
     }
@@ -728,9 +727,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param amount 치유량
      */
     private void playTakeHealEffect(double amount) {
-        if (amount >= 100 || amount / 100.0 > DMGR.getRandom().nextDouble())
-            ParticleUtil.play(Particle.HEART, entity.getLocation().add(0, entity.getHeight() + 0.3, 0), (int) Math.ceil(amount / 100.0),
-                    0.3, 0.1, 0.3, 0);
+        if (amount >= 100 || amount / 100.0 > Math.random())
+            PARTICLE.HEAL.play(entity.getLocation().add(0, entity.getHeight() + 0.3, 0), amount / 100.0);
     }
 
     @Override
@@ -1666,5 +1664,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 SoundEffect.SoundInfo.builder(org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(2).pitch(1.25).build(),
                 SoundEffect.SoundInfo.builder(org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1).pitch(1.25).build()
         );
+    }
+
+    /**
+     * 입자 효과 목록.
+     */
+    @UtilityClass
+    private static final class PARTICLE {
+        /** 궁극기 팩 */
+        private static final FireworkEffect ULT_PACK = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL, 48, 85, 251)
+                .fadeColor(255, 255, 255).build();
+        /** 회복 */
+        private static final ParticleEffect HEAL = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
+                        .count(0, 0, 1)
+                        .horizontalSpread(0.3).verticalSpread(0.1).build());
     }
 }

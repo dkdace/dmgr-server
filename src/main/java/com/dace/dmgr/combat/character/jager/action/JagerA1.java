@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -226,8 +225,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         @Override
         public void onTickBeforeReady(long i) {
-            ParticleUtil.playRGB(ParticleUtil.ColoredParticle.SPELL_MOB, entity.getLocation(), 5, 0.2, 0.2, 0.2,
-                    255, 255, 255);
+            JagerA1Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(entity.getLocation());
         }
 
         @Override
@@ -307,7 +305,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             setStateValue((int) damageModule.getHealth());
 
             JagerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBleedingEffect(location, entity, damage);
+            CombatEffectUtil.playBleedingEffect(location, this, damage);
         }
 
         @Override

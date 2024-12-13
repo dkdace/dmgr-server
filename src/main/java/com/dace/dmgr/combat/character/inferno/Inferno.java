@@ -14,13 +14,11 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
 
@@ -151,14 +149,13 @@ public final class Inferno extends Vanguard {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
         if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished()) {
-            CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
+            CombatEffectUtil.playBleedingEffect(location, victim, damage);
             return;
         }
 
         InfernoUltInfo.SOUND.DAMAGE.play(victim.getEntity().getLocation(), 1 + damage * 0.001);
         if (location != null)
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.FIRE, 0, location, (int) Math.ceil(damage * 0.04),
-                    0, 0, 0, 0.1);
+            InfernoUltInfo.PARTICLE.DAMAGE.play(location, damage * 0.04);
     }
 
     @Override

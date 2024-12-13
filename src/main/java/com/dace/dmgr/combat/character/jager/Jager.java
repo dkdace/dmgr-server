@@ -149,7 +149,7 @@ public final class Jager extends Marksman {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingEffect(location, victim.getEntity(), damage);
+        CombatEffectUtil.playBleedingEffect(location, victim, damage);
     }
 
     @Override

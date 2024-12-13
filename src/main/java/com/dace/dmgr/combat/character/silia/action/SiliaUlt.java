@@ -4,13 +4,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 
 @Getter
 public final class SiliaUlt extends UltimateSkill {
@@ -98,11 +96,10 @@ public final class SiliaUlt extends UltimateSkill {
 
             for (int k = 0; k < 3; k++) {
                 Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, forward - 0.4 * k);
-                if (k == 2)
-                    ParticleUtil.play(Particle.CRIT, loc2, 2, 0.08, 0.08, 0.08, 0.08);
+                if (k != 2)
+                    SiliaUltInfo.PARTICLE.USE_TICK_CORE.play(loc2);
                 else
-                    ParticleUtil.playRGB(ParticleUtil.ColoredParticle.REDSTONE, loc2, 2,
-                            0.15, 0.15, 0.15, 255, 255, 255);
+                    SiliaUltInfo.PARTICLE.USE_TICK_DECO.play(loc2);
             }
         }
     }

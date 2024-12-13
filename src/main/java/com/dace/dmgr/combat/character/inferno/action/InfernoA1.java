@@ -9,14 +9,12 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -56,7 +54,7 @@ public final class InfernoA1 extends ActiveSkill {
         location.setPitch(Math.max(-40, Math.min(location.getPitch(), 10)));
 
         InfernoA1Info.SOUND.USE.play(location);
-        ParticleUtil.play(Particle.EXPLOSION_NORMAL, location, 80, 0.5, 0.2, 0.5, 0.2);
+        InfernoA1Info.PARTICLE.USE.play(location);
 
         Vector vec = location.getDirection().multiply(InfernoA1Info.PUSH_SIDE);
         vec.setY(vec.getY() + InfernoA1Info.PUSH_UP);
@@ -70,8 +68,7 @@ public final class InfernoA1 extends ActiveSkill {
 
                 for (int j = 0; j < 2; j++) {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc, -0.3 + j * 0.6, 0.8, -0.5);
-                    ParticleUtil.play(Particle.FLAME, loc2, 4, 0, 0.15, 0, 0.02);
-                    ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc2, 0, 0, -1, 0, 0.3);
+                    InfernoA1Info.PARTICLE.USE_TICK.play(loc2);
                 }
             }
 
@@ -105,23 +102,23 @@ public final class InfernoA1 extends ActiveSkill {
 
         InfernoA1Info.SOUND.LAND.play(loc);
         Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
-        CombatEffectUtil.playBlockHitEffect(loc, floor, 5);
-        ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 200, 0.8, 0.1, 0.8, 0.05);
+        CombatEffectUtil.playHitBlockParticle(loc, floor, 5);
+        InfernoA1Info.PARTICLE.LAND_CORE.play(loc);
 
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(0.8);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 18; j++) {
-            int angle = 360 / 18 * j;
+        for (int i = 0; i < 18; i++) {
+            int angle = 360 / 18 * i;
             Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
             Location loc2 = loc.clone().add(vec.clone().multiply(1.5));
             Location loc3 = loc.clone().add(vec);
 
-            ParticleUtil.play(Particle.FLAME, loc2, 5, 0, 0, 0, 0.05);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc3, 0, vec.getX(), vec.getY() + 0.1, vec.getZ(), 0.35);
-            ParticleUtil.play(Particle.EXPLOSION_NORMAL, loc3, 0, vec.getX(), vec.getY() + 0.2, vec.getZ(), 0.35);
+            InfernoA1Info.PARTICLE.LAND_DECO_1.play(loc2);
+            for (int j = 0; j < 2; j++)
+                InfernoA1Info.PARTICLE.LAND_DECO_2.play(loc3, vec.setY(vec.getY() + 0.1));
         }
     }
 
@@ -141,7 +138,7 @@ public final class InfernoA1 extends ActiveSkill {
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
                         .multiply(InfernoA1Info.KNOCKBACK));
 
-            ParticleUtil.play(Particle.CRIT, location, 50, 0, 0, 0, 0.4);
+            InfernoA1Info.PARTICLE.HIT_ENTITY.play(location);
 
             return !(target instanceof Barrier);
         }

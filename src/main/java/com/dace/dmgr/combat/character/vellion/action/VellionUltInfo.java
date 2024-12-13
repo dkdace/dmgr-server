@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
@@ -75,5 +78,55 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.6).build(),
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.8).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 70, 0, 45).build()
+        );
+        /** 틱 입자 효과 (중심) - 1 */
+        public static final ParticleEffect TICK_CORE_1 = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 90, 0, 55)
+                        .count(4).horizontalSpread(0.3).build());
+        /** 틱 입자 효과 (중심) - 2 */
+        public static final ParticleEffect TICK_CORE_2 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.PORTAL).count(40).speed(1.5).build());
+        /** 틱 입자 효과 (장식) - 1 */
+        public static final ParticleEffect TICK_DECO_1 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(20).verticalSpread(2).build());
+        /** 틱 입자 효과 (장식) - 2 */
+        public static final ParticleEffect TICK_DECO_2 = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        30, 126, 0, 0, 18, 98).build());
+        /** 틱 입자 효과 (장식) - 3 */
+        public static final ParticleEffect TICK_DECO_3 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 14).build());
+        /** 틱 입자 효과 (장식) - 4 */
+        public static final ParticleEffect TICK_DECO_4 = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 90, 0, 55)
+                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+        /** 틱 입자 효과 (장식) - 5 */
+        public static final ParticleEffect TICK_DECO_5 = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.MYCEL, 0).count(4)
+                        .horizontalSpread(0.15).verticalSpread(0.4).build());
+        /** 폭발 */
+        public static final ParticleEffect EXPLODE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 2).count(300)
+                        .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build(),
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 14).count(200)
+                        .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build()
+        );
+        /** 엔티티 타격 (중심) */
+        public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(50).speed(0.4).build());
+        /** 엔티티 타격 (장식) */
+        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).build());
     }
 }

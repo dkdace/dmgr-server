@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -47,5 +48,17 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
                 SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.2).build()
         );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 틱 입자 효과 */
+        public static final ParticleEffect TICK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                                220, 160, 255, 255, 36, 36)
+                        .count(3).verticalSpread(0.4).build());
     }
 }

@@ -18,12 +18,10 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -181,13 +179,12 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 return;
 
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 0, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 1.3 - distance * 0.1);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 0, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 1.45);
+            InfernoWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.play(Particle.DRIP_LAVA, getLocation(), 2, 0.07, 0.07, 0.07, 0);
+            InfernoWeaponInfo.PARTICLE.HIT_BLOCK.play(getLocation());
             return false;
         }
 
@@ -200,7 +197,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 combatUser.useAction(ActionKey.PERIODIC_1);
             }
 
-            ParticleUtil.play(Particle.SMOKE_NORMAL, getLocation(), 3, 0.2, 0.2, 0.2, 0.05);
+            InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
 
             return true;
         }
@@ -215,8 +212,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 10, 0.12, 0.12, 0.12, 0);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 13, 0.15, 0.15, 0.15, 0.04);
+            InfernoWeaponInfo.PARTICLE.BULLET_TRAIL_FIREBALL.play(loc);
         }
 
         @Override
@@ -239,10 +235,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             new InfernoWeaponLArea().emit(loc);
 
             InfernoWeaponInfo.SOUND.FIREBALL_EXPLODE.play(loc);
-            ParticleUtil.play(Particle.SMOKE_LARGE, loc, 40, 0.2, 0.2, 0.2, 0.1);
-            ParticleUtil.play(Particle.SMOKE_NORMAL, loc, 80, 0.1, 0.1, 0.1, 0.15);
-            ParticleUtil.play(Particle.LAVA, loc, 30, 0.3, 0.3, 0.3, 0);
-            ParticleUtil.play(Particle.FLAME, loc, 80, 0.2, 0.2, 0.2, 0.1);
+            InfernoWeaponInfo.PARTICLE.FIREBALL_EXPLODE.play(loc);
         }
 
         private final class InfernoWeaponLArea extends Area {

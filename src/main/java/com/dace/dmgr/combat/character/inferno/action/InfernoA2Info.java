@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
@@ -55,6 +57,23 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.55).pitchVariance(0.1).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.6).pitchVariance(0.1).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 틱 입자 효과 (중심) */
+        public static final ParticleEffect TICK_CORE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(2).horizontalSpread(0.1).verticalSpread(0.1).speed(0.2).build());
+        /** 틱 입자 효과 (장식) */
+        public static final ParticleEffect TICK_DECO = new ParticleEffect(
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
+                        .speedMultiplier(0.32).build(),
+                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
+                        .speedMultiplier(0.2).build()
         );
     }
 }

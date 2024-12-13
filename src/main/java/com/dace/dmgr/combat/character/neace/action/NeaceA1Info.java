@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
@@ -50,6 +52,29 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.2).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 사용 */
+        public static final ParticleEffect USE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(2).build());
+        /** 엔티티 타격 */
+        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
+                        .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).build()
+        );
+        /** 표식 */
+        public static final ParticleEffect MARK = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
+                        .count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
+                        .build()
         );
     }
 }

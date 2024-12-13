@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -32,6 +32,9 @@ public final class MeleeAttackAction extends AbstractAction {
     /** 블록 타격 효과음 */
     private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
+    /** 엔티티 타격 효과 */
+    private static final ParticleEffect HIT_ENTITY_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(10).speed(0.4).build());
 
     /** 쿨타임 (tick) */
     private static final long COOLDOWN = 20;
@@ -99,8 +102,8 @@ public final class MeleeAttackAction extends AbstractAction {
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
             HIT_BLOCK_SOUND.play(getLocation());
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1);
 
             return false;
         }
@@ -111,7 +114,7 @@ public final class MeleeAttackAction extends AbstractAction {
                 target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
 
             HIT_ENTITY_SOUND.play(getLocation());
-            ParticleUtil.play(Particle.CRIT, getLocation(), 10, 0, 0, 0, 0.4);
+            HIT_ENTITY_PARTICLE.play(getLocation());
 
             return false;
         }

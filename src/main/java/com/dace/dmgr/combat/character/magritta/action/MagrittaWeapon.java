@@ -13,15 +13,12 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.ParticleUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
@@ -156,24 +153,24 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         @Override
         protected void onTrailInterval() {
             Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            ParticleUtil.play(Particle.CRIT, loc, 1, 0, 0, 0, 0);
+            CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
         }
 
         @Override
         protected void onHit() {
-            ParticleUtil.play(Particle.LAVA, getLocation(), 1, 0, 0, 0, 0);
+            MagrittaWeaponInfo.PARTICLE.HIT.play(getLocation());
         }
 
         @Override
         protected boolean onHitBlock(@NonNull Block hitBlock) {
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, hitBlock.getType(), hitBlock.getData(), getLocation(),
-                    3, 0, 0, 0, 0.1);
-            ParticleUtil.play(Particle.TOWN_AURA, getLocation(), 10, 0, 0, 0, 0);
+            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, 1);
 
-            if (blockHitCount++ > 0)
-                return false;
+            if (blockHitCount++ == 0) {
+                HIT_BLOCK_SOUND.play(getLocation());
+                CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+            }
 
-            return super.onHitBlock(hitBlock);
+            return false;
         }
 
         @Override
@@ -185,8 +182,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
             if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), false, true))
                 targets.put(target, targets.getOrDefault(target, 0) + 1);
 
-            ParticleUtil.playBlock(ParticleUtil.BlockParticle.BLOCK_DUST, Material.BONE_BLOCK, 0, getLocation(), 4,
-                    0, 0, 0, 0.08);
+            MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
 
             return false;
         }

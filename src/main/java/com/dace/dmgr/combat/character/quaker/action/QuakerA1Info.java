@@ -5,9 +5,12 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.util.ParticleEffect;
 import com.dace.dmgr.util.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
@@ -79,6 +82,19 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build()
+        );
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 파괴 */
+        public static final ParticleEffect DEATH = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
+                        .horizontalSpread(0.3).verticalSpread(0.3).speed(0.2).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build()
         );
     }
 }
