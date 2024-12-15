@@ -14,6 +14,8 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     public static final int FIRE_DAMAGE_PER_SECOND = 60;
     /** 효과 범위 (단위: 블록) */
     public static final double RADIUS = 5;
+    /** 회복량 감소 */
+    public static final int HEAL_DECREMENT = 50;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) (2.5 * 20);
 
@@ -27,10 +29,11 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     private InfernoA2Info() {
         super(InfernoA2.class, "불꽃 방출",
                 new ActionInfoLore(ActionInfoLore.Section
-                        .builder("일정 시간동안 주변에 불꽃을 방출하여 <:FIRE:화염 피해>를 입히고 <:GROUNDING:고정>시킵니다.")
+                        .builder("일정 시간동안 주변에 불꽃을 방출하여 <:FIRE:화염 피해>와 <:HEAL_DECREASE:회복량> 감소를 입히고 <:GROUNDING:고정>시킵니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
                         .addValueInfo(TextIcon.FIRE, Format.PER_SECOND, FIRE_DAMAGE_PER_SECOND)
+                        .addValueInfo(TextIcon.HEAL_DECREASE, Format.PERCENT, HEAL_DECREMENT)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build()
