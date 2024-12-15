@@ -184,9 +184,6 @@ public final class Inferno extends Vanguard {
     @Override
     @Nullable
     public TraitInfo getCharacterTraitInfo(int number) {
-        if (number == 1)
-            return InfernoT1Info.getInstance();
-
         return null;
     }
 
