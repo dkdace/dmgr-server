@@ -14,13 +14,15 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.NamedSound;
+import com.dace.dmgr.util.ParticleUtil;
+import com.dace.dmgr.util.SoundUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
@@ -73,12 +75,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 setCooldown();
 
-                double spread = combatUser.isMoving() ? JagerWeaponInfo.SPREAD : 0;
-                if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
-                    spread *= JagerWeaponInfo.SPREAD_SPRINT_MULTIPLIER;
-
-                Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
-                new JagerWeaponLProjectile().shoot(dir);
+                new JagerWeaponLProjectile().shoot();
                 reloadModule.consume(1);
 
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
