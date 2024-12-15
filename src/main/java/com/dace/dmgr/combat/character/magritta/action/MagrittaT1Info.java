@@ -9,7 +9,7 @@ import org.bukkit.ChatColor;
 
 public final class MagrittaT1Info extends TraitInfo {
     /** 지속시간 (tick) */
-    public static final long DURATION = (long) (2.2 * 20);
+    public static final long DURATION = (long) (2.5 * 20);
     /** 공격력 증가량 */
     public static final int DAMAGE_INCREMENT = 8;
     /** 초당 화염 피해량 */
@@ -25,7 +25,7 @@ public final class MagrittaT1Info extends TraitInfo {
     private MagrittaT1Info() {
         super("파쇄",
                 new ActionInfoLore(ActionInfoLore.Section
-                        .builder("<5:DAMAGE_INCREASE:수치>에 비례하여 마그리타로부터 <:DAMAGE_INCREASE:받는 피해>가 증가하는 상태이상입니다. " +
+                        .builder("<5:DAMAGE_INCREASE:수치>에 비례하여 마그리타의 기본 무기로부터 <:DAMAGE_INCREASE:받는 피해>가 증가하는 상태이상입니다. " +
                                 "최대치에 도달하면 불이 붙어 <:FIRE:화염 피해>를 받습니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "최대 " + MAX, ChatColor.DARK_PURPLE)
