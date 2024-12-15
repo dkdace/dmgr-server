@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character.inferno;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -136,6 +137,14 @@ public final class Inferno extends Vanguard {
         }
 
         return text.toString();
+    }
+
+    @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
+        if (i % 5 == 0)
+            combatUser.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
