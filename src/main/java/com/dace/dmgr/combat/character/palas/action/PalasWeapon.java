@@ -136,20 +136,20 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             switch (i.intValue()) {
                 case 1:
                     SoundUtil.play(Sound.ENTITY_VILLAGER_YES, combatUser.getEntity().getLocation(), 0.6, 1.2);
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.4, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.25, 0.1);
                     break;
                 case 2:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.6, 0.15);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.1, 0.2);
                     break;
                 case 3:
                     SoundUtil.play(Sound.BLOCK_LAVA_EXTINGUISH, combatUser.getEntity().getLocation(), 0.5, 1.4);
                     break;
                 case 5:
                     SoundUtil.play(Sound.ENTITY_VILLAGER_NO, combatUser.getEntity().getLocation(), 0.6, 1.2);
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.4, -0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.1, -0.2);
                     break;
                 case 6:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.6, -0.15);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.25, -0.1);
                     break;
                 default:
                     break;
