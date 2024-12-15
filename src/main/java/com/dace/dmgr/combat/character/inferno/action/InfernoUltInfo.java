@@ -12,7 +12,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 8000;
     /** 보호막 */
-    public static final int SHIELD = 3000;
+    public static final int SHIELD = 2500;
     /** 액티브 1번 쿨타임 단축 (tick) */
     public static final long A1_COOLDOWN_DECREMENT = 3 * 20L;
     /** 지속시간 (tick) */
