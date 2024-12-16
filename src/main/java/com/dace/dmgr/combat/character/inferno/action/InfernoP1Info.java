@@ -8,7 +8,9 @@ import lombok.Getter;
 
 public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
     /** 방어력 증가량 */
-    public static final int DEFENSE_INCREMENT = 40;
+    public static final int DEFENSE_INCREMENT = 30;
+    /** 감지 범위 (단위: 블록) */
+    public static final double DETECT_RADIUS = 10;
     /** 지속시간 (tick) */
     public static final long DURATION = (long) (1.5 * 20);
     @Getter
@@ -17,9 +19,10 @@ public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
     private InfernoP1Info() {
         super(InfernoP1.class, "불꽃의 용기",
                 new ActionInfoLore(ActionInfoLore.Section
-                        .builder("기본 무기로 적을 공격하는 동안 <:DEFENSE_INCREASE:방어력>이 증가합니다.")
+                        .builder("근처에 <:FIRE:불>타는 적이 존재하면 <:DEFENSE_INCREASE:방어력>이 증가합니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
                         .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)
+                        .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
                         .build()
                 )
         );

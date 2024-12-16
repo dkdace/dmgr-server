@@ -9,7 +9,7 @@ import lombok.Getter;
 
 public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 12 * 20L;
+    public static final long COOLDOWN = 14 * 20L;
     /** 전역 쿨타임 (tick) */
     public static final int GLOBAL_COOLDOWN = 20;
     /** 시전 시간 (tick) */

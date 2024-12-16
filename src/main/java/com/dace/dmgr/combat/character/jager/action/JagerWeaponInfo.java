@@ -14,15 +14,13 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 (tick) */
     public static final long COOLDOWN = (long) (0.25 * 20);
     /** 피해량 */
-    public static final int DAMAGE = 100;
+    public static final int DAMAGE = 70;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 30;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 100;
-    /** 탄퍼짐 */
-    public static final double SPREAD = 2.5;
-    /** 달리기 탄퍼짐 배수 */
-    public static final double SPREAD_SPRINT_MULTIPLIER = 2.5;
+    /** 투사체 크기 (단위: 블록) */
+    public static final double SIZE = 0.2;
     /** 빙결량 */
     public static final int FREEZE = 15;
     /** 장탄수 */

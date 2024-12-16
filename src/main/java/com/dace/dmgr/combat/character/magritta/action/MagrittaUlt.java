@@ -92,7 +92,8 @@ public final class MagrittaUlt extends UltimateSkill {
             Location loc = combatUser.getEntity().getLocation();
             HashMap<Damageable, Integer> targets = new HashMap<>();
 
-            for (int j = 0; j < MagrittaWeaponInfo.PELLET_AMOUNT; j++) {
+            new MagrittaUltHitscan(targets).shoot();
+            for (int j = 0; j < MagrittaWeaponInfo.PELLET_AMOUNT - 1; j++) {
                 Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), MagrittaWeaponInfo.SPREAD * 1.25);
                 new MagrittaUltHitscan(targets).shoot(dir);
             }

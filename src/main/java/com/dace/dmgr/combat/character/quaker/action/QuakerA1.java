@@ -66,7 +66,6 @@ public final class QuakerA1 extends ChargeableSkill {
             setDuration();
             combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA1Info.USE_SLOW);
-            combatUser.setFovValue(0.3);
 
             SoundUtil.playNamedSound(NamedSound.COMBAT_QUAKER_A1_USE, combatUser.getEntity().getLocation());
 
@@ -87,7 +86,6 @@ public final class QuakerA1 extends ChargeableSkill {
 
         setDuration(0);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
-        combatUser.setFovValue(0);
         if (summonEntity != null)
             summonEntity.dispose();
 

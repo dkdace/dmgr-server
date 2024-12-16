@@ -2,8 +2,10 @@ package com.dace.dmgr.combat.character.inferno.action;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
@@ -20,6 +22,8 @@ import org.bukkit.util.Vector;
 public final class InfernoA2 extends ActiveSkill {
     /** 처치 지원 점수 제한시간 쿨타임 ID */
     private static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
+    /** 수정자 ID */
+    private static final String MODIFIER_ID = "InfernoA2";
 
     public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
@@ -123,6 +127,18 @@ public final class InfernoA2 extends ActiveSkill {
 
         private InfernoA2Burning() {
             super(InfernoA2Info.FIRE_DAMAGE_PER_SECOND, true);
+        }
+
+        @Override
+        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            if (combatEntity instanceof Healable)
+                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER_ID, -InfernoA2Info.HEAL_DECREMENT);
+        }
+
+        @Override
+        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+            if (combatEntity instanceof Healable)
+                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER_ID);
         }
     }
 

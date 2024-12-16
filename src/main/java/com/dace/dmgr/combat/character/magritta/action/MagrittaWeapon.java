@@ -71,7 +71,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 Location loc = combatUser.getEntity().getLocation();
                 HashMap<Damageable, Integer> targets = new HashMap<>();
 
-                for (int i = 0; i < MagrittaWeaponInfo.PELLET_AMOUNT; i++) {
+                new MagrittaWeaponHitscan(targets).shoot();
+                for (int i = 0; i < MagrittaWeaponInfo.PELLET_AMOUNT - 1; i++) {
                     Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), MagrittaWeaponInfo.SPREAD);
                     new MagrittaWeaponHitscan(targets).shoot(dir);
                 }
