@@ -7,10 +7,8 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -27,9 +25,6 @@ import org.bukkit.util.Vector;
 
 @Getter
 public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "InfernoWeapon";
-
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -144,25 +139,13 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     }
 
     /**
-     * 화염 및 융해 상태 효과 클래스.
+     * 화염 상태 효과 클래스.
      */
     private static final class InfernoWeaponBurning extends Burning {
         private static final InfernoWeaponBurning instance = new InfernoWeaponBurning();
 
         private InfernoWeaponBurning() {
             super(InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND, true);
-        }
-
-        @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER_ID, -InfernoT1Info.HEAL_DECREMENT);
-        }
-
-        @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER_ID);
         }
     }
 
@@ -191,11 +174,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
-                    false, true)) {
+                    false, true))
                 target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, InfernoWeaponInfo.FIRE_DURATION);
-
-                combatUser.useAction(ActionKey.PERIODIC_1);
-            }
 
             InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
 
@@ -222,10 +202,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(),
-                    false, true))
-                combatUser.useAction(ActionKey.PERIODIC_1);
-
+            target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
             return false;
         }
 
@@ -261,9 +238,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, burning);
                     target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
                             .multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK));
-
-                    if (target != combatUser)
-                        combatUser.useAction(ActionKey.PERIODIC_1);
                 }
 
                 return !(target instanceof Barrier);

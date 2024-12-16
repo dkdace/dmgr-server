@@ -16,7 +16,6 @@ import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -24,7 +23,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 @Getter
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
@@ -60,7 +58,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey));
+        return (actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey));
     }
 
     @Override
@@ -78,13 +76,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                 setCooldown();
 
-                double spread = combatUser.isMoving() && !aimModule.isAiming() ? PalasWeaponInfo.SPREAD : 0;
-                if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
-                    spread *= PalasWeaponInfo.SPREAD_SPRINT_MULTIPLIER;
-
-                Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), spread);
-                new PalasWeaponHitscan().shoot(dir);
-                new PalasWeaponHealHitscan().shoot(dir);
+                new PalasWeaponHitscan(aimModule.isAiming()).shoot();
+                new PalasWeaponHealHitscan(aimModule.isAiming()).shoot();
                 reloadModule.cancel();
                 isActionCooldown = false;
 
@@ -139,16 +132,16 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
             switch ((int) i) {
                 case 1:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.4, 0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.25, 0.1);
                     break;
                 case 2:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.6, 0.15);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.1, 0.2);
                     break;
                 case 5:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.4, -0.1);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.1, -0.2);
                     break;
                 case 6:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.6, -0.15);
+                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.25, -0.1);
                     break;
                 default:
                     break;
@@ -207,9 +200,10 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     }
 
     private final class PalasWeaponHitscan extends GunHitscan {
-        private PalasWeaponHitscan() {
-            super(combatUser, HitscanOption.builder().trailInterval(8).condition(combatEntity ->
-                    Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity) || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
+        private PalasWeaponHitscan(boolean isAiming) {
+            super(combatUser, (isAiming ? HitscanOption.builder() : HitscanOption.builder().maxDistance(PalasWeaponInfo.DISTANCE)).trailInterval(8)
+                    .condition(combatEntity -> Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity)
+                            || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
         }
 
         @Override
@@ -231,9 +225,11 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     }
 
     private final class PalasWeaponHealHitscan extends Hitscan {
-        private PalasWeaponHealHitscan() {
-            super(combatUser, HitscanOption.builder().size(PalasWeaponInfo.HEAL_SIZE).condition(combatEntity ->
-                    Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity) || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
+        private PalasWeaponHealHitscan(boolean isAiming) {
+            super(combatUser, (isAiming ? HitscanOption.builder() : HitscanOption.builder().maxDistance(PalasWeaponInfo.DISTANCE))
+                    .size(PalasWeaponInfo.HEAL_SIZE)
+                    .condition(combatEntity -> Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity)
+                            || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
         }
 
         @Override

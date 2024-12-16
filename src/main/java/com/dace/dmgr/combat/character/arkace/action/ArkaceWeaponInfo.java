@@ -65,8 +65,6 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      */
     @UtilityClass
     public static class SPREAD {
-        /** 달리기 탄퍼짐 배수 */
-        public static final double SPRINT_MULTIPLIER = 2;
         /** 탄퍼짐 증가량 */
         public static final double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */

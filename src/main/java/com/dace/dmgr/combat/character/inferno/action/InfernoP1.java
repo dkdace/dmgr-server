@@ -7,12 +7,17 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.interaction.Area;
 import lombok.*;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 @Setter
 public final class InfernoP1 extends AbstractSkill {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "InfernoP1";
+    /** 활성화 가능 여부 */
+    private boolean canActivate = false;
 
     public InfernoP1(@NonNull CombatUser combatUser) {
         super(combatUser);
@@ -32,6 +37,23 @@ public final class InfernoP1 extends AbstractSkill {
     @Override
     public long getDefaultDuration() {
         return -1;
+    }
+
+    @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && canActivate();
+    }
+
+    /**
+     * 스킬 활성화 조건을 확인한다.
+     *
+     * @return 활성화 조건
+     */
+    private boolean canActivate() {
+        canActivate = false;
+        new InfernoP1Area().emit(combatUser.getEntity().getLocation().add(0, 0.1, 0));
+
+        return canActivate;
     }
 
     @Override
@@ -76,6 +98,25 @@ public final class InfernoP1 extends AbstractSkill {
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
+        }
+    }
+
+    private final class InfernoP1Area extends Area {
+        private InfernoP1Area() {
+            super(combatUser, InfernoP1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof Damageable
+                    && ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)
+                    && combatEntity.isEnemy(InfernoP1.this.combatUser));
+        }
+
+        @Override
+        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
+            return false;
+        }
+
+        @Override
+        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            canActivate = true;
+            return true;
         }
     }
 }

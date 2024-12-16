@@ -21,15 +21,13 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     /** 사용 후 쿨타임 (tick) */
     public static final long ACTION_COOLDOWN = (long) (0.4 * 20);
     /** 피해량 */
-    public static final int DAMAGE = 250;
+    public static final int DAMAGE = 300;
     /** 치유량 */
-    public static final int HEAL = 250;
+    public static final int HEAL = 300;
     /** 치유 투사체 크기 (단위: 블록) */
     public static final double HEAL_SIZE = 0.2;
-    /** 탄퍼짐 */
-    public static final double SPREAD = 5.0;
-    /** 달리기 탄퍼짐 배수 */
-    public static final double SPREAD_SPRINT_MULTIPLIER = 2.5;
+    /** 사거리 (단위: 블록) */
+    public static final int DISTANCE = 30;
     /** 장탄수 */
     public static final int CAPACITY = 10;
     /** 재장전 시간 (tick) */
@@ -47,10 +45,12 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
         super(PalasWeapon.class, RESOURCE.DEFAULT, "RQ-07",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("생체탄을 발사하는 볼트액션 소총입니다. " +
-                                "사격하여 아군을 <:HEAL:치유>하거나 적에게 <:DAMAGE:피해>를 입힙니다.")
+                                "사격하여 아군을 <:HEAL:치유>하거나 적에게 <:DAMAGE:피해>를 입힙니다. " +
+                                "정조준 시 사거리 제한이 사라집니다.")
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, ChatColor.WHITE, (COOLDOWN + ACTION_COOLDOWN) / 20.0)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.HEAL, HEAL)
+                        .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)

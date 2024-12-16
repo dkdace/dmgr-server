@@ -86,9 +86,9 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         /** 피해 범위 (단위: 블록) */
         public static final double RADIUS = 2.5;
         /** 탄환 소모량 */
-        public static final int CAPACITY_CONSUME = 40;
+        public static final int CAPACITY_CONSUME = 50;
         /** 넉백 강도 */
-        public static final double KNOCKBACK = 0.3;
+        public static final double KNOCKBACK = 0.2;
 
         /**
          * 반동 정보.

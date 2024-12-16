@@ -65,11 +65,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 Location loc = combatUser.getEntity().getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
-                    double spread = combatUser.isMoving() ? fullAutoModule.increaseSpread() : 0;
-                    if (combatUser.getEntity().isSprinting() || !combatUser.getEntity().isOnGround())
-                        spread *= ArkaceWeaponInfo.SPREAD.SPRINT_MULTIPLIER;
-
-                    Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), spread);
+                    Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread());
                     new ArkaceWeaponHitscan(false).shoot(dir);
                     reloadModule.consume(1);
 
