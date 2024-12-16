@@ -15,7 +15,7 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     /** 시전 시간 (tick) */
     public static final long READY_DURATION = (long) (0.3 * 20);
     /** 피해량 */
-    public static final int DAMAGE = 200;
+    public static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */
     public static final double DISTANCE = 40;
     /** 투사체 속력 (단위: 블록/s) */
@@ -25,12 +25,12 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 2;
     /** 속박 시간 (tick) */
-    public static final long SNARE_DURATION = (long) (0.8 * 20);
+    public static final long SNARE_DURATION = (long) (0.5 * 20);
     /** 넉백 강도 */
-    public static final double KNOCKBACK = 1.5;
+    public static final double KNOCKBACK = 2;
 
     /** 피해 점수 */
-    public static final int DAMAGE_SCORE = 5;
+    public static final int DAMAGE_SCORE = 4;
     @Getter
     private static final QuakerA3Info instance = new QuakerA3Info();
 
@@ -38,7 +38,7 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
         super(QuakerA3.class, "돌풍 강타",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("검기를 날려 처음 맞은 적을 크게 <:KNOCKBACK:밀쳐내고> <:DAMAGE:피해>와 <:SNARE:속박>을 입힙니다. " +
-                                "적이 날아가며 부딪힌 적에게도 같은 효과를 입힙니다.")
+                                "적이 벽에 충돌하면 같은 효과를 다시 입히며, 날아가며 부딪힌 적에게도 같은 효과를 입힙니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION / 20.0)
