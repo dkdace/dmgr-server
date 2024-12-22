@@ -407,7 +407,7 @@ public final class LocationUtil {
 
         @Override
         public boolean hasNext() {
-            return travelDistance < iterableLocation.maxTravelDistance;
+            return iterableLocation.maxTravelDistance == Double.MAX_VALUE || travelDistance + velocity.length() < iterableLocation.maxTravelDistance;
         }
 
         @Override
@@ -421,11 +421,6 @@ public final class LocationUtil {
             }
 
             travelDistance += velocity.length();
-            if (travelDistance > iterableLocation.maxTravelDistance) {
-                travelDistance = iterableLocation.maxTravelDistance;
-                return location.add(velocity.normalize().multiply(iterableLocation.maxTravelDistance));
-            }
-
             return location.add(velocity);
         }
     }

@@ -3,7 +3,6 @@ package com.dace.dmgr.util;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
@@ -20,6 +19,8 @@ import java.util.function.Predicate;
  * 텍스트 홀로그램(가상 텍스트 디스플레이) 기능을 관리하는 클래스.
  */
 public final class TextHologram implements Disposable {
+    /** 틱 작업을 처리하는 태스크 */
+    private final IntervalTask onTickTask;
     /** 홀로그램 인스턴스 */
     private final Hologram hologram;
     /** 홀로그램을 볼 수 있는 플레이어의 조건 */
@@ -34,8 +35,7 @@ public final class TextHologram implements Disposable {
     public TextHologram(@NonNull Location location, @NonNull Predicate<@NonNull Player> condition) {
         this.hologram = DMGR.getHolographicDisplaysAPI().createHologram(location);
         this.condition = condition;
-
-        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i -> setVisibility(location.getWorld()), 1));
+        this.onTickTask = new IntervalTask((LongConsumer) i -> setVisibility(location.getWorld()), 1);
     }
 
     /**
@@ -61,7 +61,7 @@ public final class TextHologram implements Disposable {
         this.hologram = DMGR.getHolographicDisplaysAPI().createHologram(entity.getLocation());
         this.condition = condition;
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        this.onTickTask = new IntervalTask(i -> {
             if (!entity.isValid())
                 return false;
 
@@ -69,7 +69,7 @@ public final class TextHologram implements Disposable {
             hologram.setPosition(entity.getLocation().add(0, entity.getHeight() + 0.4 + heightOffset * 0.3, 0));
 
             return true;
-        }, 1));
+        }, 1);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class TextHologram implements Disposable {
         validate();
 
         hologram.delete();
-        TaskUtil.clearTask(this);
+        onTickTask.dispose();
     }
 
     @Override
