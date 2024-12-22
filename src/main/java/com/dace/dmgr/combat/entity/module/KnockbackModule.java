@@ -1,7 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;
@@ -17,8 +18,6 @@ import org.bukkit.util.Vector;
  */
 @Getter
 public final class KnockbackModule {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "Knockback";
     /** 넉백 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
 
@@ -28,6 +27,8 @@ public final class KnockbackModule {
     /** 넉백 저항 값 */
     @NonNull
     private final AbilityStatus resistanceStatus;
+    /** 넉백 타임스탬프 */
+    private Timestamp knockbackTimestamp = Timestamp.now();
 
     /**
      * 넉백 모듈 인스턴스를 생성한다.
@@ -65,7 +66,7 @@ public final class KnockbackModule {
      * @see MoveModule#push(Vector, boolean)
      */
     public void knockback(@NonNull Vector velocity, boolean isReset) {
-        CooldownUtil.setCooldown(combatEntity, COOLDOWN_ID, 3);
+        knockbackTimestamp = Timestamp.now().plus(Timespan.ofTicks(3));
         Vector finalVelocity = velocity.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
         combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));
     }
@@ -86,6 +87,6 @@ public final class KnockbackModule {
      * @return 넉백 효과 상태 여부
      */
     public boolean isKnockbacked() {
-        return CooldownUtil.getCooldown(combatEntity, COOLDOWN_ID) > 0;
+        return knockbackTimestamp.isAfter(Timestamp.now());
     }
 }

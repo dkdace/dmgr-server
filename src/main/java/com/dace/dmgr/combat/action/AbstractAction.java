@@ -5,7 +5,8 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -20,12 +21,11 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class AbstractAction implements Action {
-    /** 동작 쿨타임 ID */
-    private static final String ACTION_COOLDOWN_ID = "ActionCooldown";
-
     /** 플레이어 객체 */
     @NonNull
     protected final CombatUser combatUser;
+    /** 동작 쿨타임 타임스탬프 */
+    private Timestamp actionCooldownTimestamp = Timestamp.now();
     /** 비활성화 여부 */
     private boolean isDisposed = false;
     /** 동작 태스크 실행 객체 */
@@ -53,7 +53,7 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final long getCooldown() {
-        return CooldownUtil.getCooldown(this, ACTION_COOLDOWN_ID);
+        return Math.max(0, Timestamp.now().until(actionCooldownTimestamp).toTicks());
     }
 
     @Override
@@ -61,12 +61,14 @@ public abstract class AbstractAction implements Action {
         if (cooldown < -1)
             throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
 
+        Timespan time = cooldown == -1 ? Timespan.MAX : Timespan.ofTicks(cooldown);
+
         if (isCooldownFinished()) {
-            CooldownUtil.setCooldown(this, ACTION_COOLDOWN_ID, cooldown);
+            actionCooldownTimestamp = Timestamp.now().plus(time);
             runCooldown();
             onCooldownSet();
         } else
-            CooldownUtil.setCooldown(this, ACTION_COOLDOWN_ID, cooldown);
+            actionCooldownTimestamp = Timestamp.now().plus(time);
     }
 
     @Override

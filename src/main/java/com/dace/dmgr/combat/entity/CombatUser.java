@@ -40,13 +40,14 @@ import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -81,6 +82,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final int MAX_CORE_AMOUNT = 3;
     /** 킬 로그 보스바 ID */
     private static final String COMBAT_KILL_BOSSBAR_ID = "CombatKillBossBar";
+    /** 기능 블록(힐 팩 및 궁극기 팩)의 타임스탬프 목록 (위치 : 종료 시점) */
+    private static final HashMap<GlobalLocation, Timestamp> BLOCK_TIMESTAMP_MAP = new HashMap<>();
 
     /** 넉백 모듈 */
     @NonNull
@@ -120,10 +123,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final Hitbox critHitbox;
-    /** 킬 기여자별 피해량 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 누적 피해량) */
-    private final HashMap<CombatUser, Double> damageMap = new HashMap<>();
-    /** 적 처치를 지원하는 플레이어 목록 (기여자 : (점수 ID : 지원 점수)) */
-    private final HashMap<CombatUser, HashMap<String, Double>> killAssistMap = new HashMap<>();
+    /** 킬 기여자별 누적 피해량 목록. 처치 점수 분배에 사용한다. (킬 기여자 : 누적 피해량 정보) */
+    private final HashMap<CombatUser, DamageInfo> damageMap = new HashMap<>();
+    /** 적 처치를 지원하는 플레이어 목록 (기여자 : 처치 지원 정보) */
+    private final HashMap<CombatUser, KillAssistInfo> killAssistMap = new HashMap<>();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작) */
     private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
     /** 스킬 객체 목록 (스킬 정보 : 스킬) */
@@ -132,6 +135,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<>();
     /** 장착한 코어 목록 */
     private final EnumSet<Core> cores = EnumSet.noneOf(Core.class);
+    /** 정의된 타임스탬프 목록 */
+    private final DefinedTimestamp definedTimestamp = new DefinedTimestamp();
+
     /** 임시 히트박스 객체 목록 */
     @Nullable
     @Setter
@@ -151,6 +157,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 무기 객체 */
     @Nullable
     private Weapon weapon;
+    /** 총기의 초탄 반동 타임스탬프 */
+    @Getter
+    @Setter
+    private Timestamp weaponFirstRecoilTimestamp = Timestamp.now();
     /** 연사 무기 사용을 처리하는 태스크 */
     @Nullable
     private IntervalTask fullAutoTask;
@@ -337,7 +347,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         GlobalLocation healPackLocation = new GlobalLocation(location.getX(), location.getY(), location.getZ());
 
-        if (CooldownUtil.getCooldown(healPackLocation, Cooldown.HEAL_PACK.id) > 0)
+        Timestamp expiration = BLOCK_TIMESTAMP_MAP.get(healPackLocation);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             return;
         if (damageModule.getHealth() == damageModule.getMaxHealth())
             return;
@@ -354,12 +365,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void useHealPack(@NonNull GlobalLocation healPackLocation, @NonNull Location location) {
         Validate.notNull(character);
 
-        CooldownUtil.setCooldown(healPackLocation, Cooldown.HEAL_PACK.id, Cooldown.HEAL_PACK.duration);
+        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getHealPackCooldown()));
+        BLOCK_TIMESTAMP_MAP.put(healPackLocation, expiration);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
         character.onUseHealPack(this);
 
         SOUND.HEAL_PACK.play(entity.getLocation());
-        showBlockHologram(healPackLocation, location, Cooldown.HEAL_PACK);
+        showBlockHologram(healPackLocation, location, expiration);
     }
 
     /**
@@ -375,7 +387,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         GlobalLocation ultPackLocation = new GlobalLocation(location.getX(), location.getY(), location.getZ());
 
-        if (CooldownUtil.getCooldown(ultPackLocation, Cooldown.ULT_PACK.id) > 0)
+        Timestamp expiration = BLOCK_TIMESTAMP_MAP.get(ultPackLocation);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             return;
         if (getUltGaugePercent() == 1)
             return;
@@ -390,12 +403,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param location        실제 블록 위치
      */
     private void useUltPack(@NonNull GlobalLocation ultPackLocation, @NonNull Location location) {
-        CooldownUtil.setCooldown(ultPackLocation, Cooldown.ULT_PACK.id, Cooldown.ULT_PACK.duration);
+        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getUltPackCooldown()));
+        BLOCK_TIMESTAMP_MAP.put(ultPackLocation, expiration);
         addUltGauge(GeneralConfig.getCombatConfig().getUltPackCharge());
 
         PARTICLE.ULT_PACK.play(location.clone().add(0.5, 1.1, 0.5));
         SOUND.ULT_PACK.play(entity.getLocation());
-        showBlockHologram(ultPackLocation, location, Cooldown.ULT_PACK);
+        showBlockHologram(ultPackLocation, location, expiration);
     }
 
     /**
@@ -403,24 +417,27 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * @param blockLocation 기능 블록 위치
      * @param location      실제 블록 위치
-     * @param blockCooldown 쿨타임 ID
+     * @param expiration    쿨타임 종료 시점
      */
-    private void showBlockHologram(@NonNull GlobalLocation blockLocation, @NonNull Location location, @NonNull Cooldown blockCooldown) {
+    private void showBlockHologram(@NonNull GlobalLocation blockLocation, @NonNull Location location, @NonNull Timestamp expiration) {
         Location hologramLoc = location.add(0.5, 1.7, 0.5);
         TextHologram textHologram = new TextHologram(hologramLoc, player -> LocationUtil.canPass(player.getEyeLocation(), hologramLoc));
 
         boolean isGame = game != null;
         new IntervalTask(i -> {
-            long cooldown = CooldownUtil.getCooldown(blockLocation, blockCooldown.id);
-            if (cooldown <= 0)
+            if (expiration.isBefore(Timestamp.now()))
                 return false;
             if (isGame && game.isDisposed())
                 return false;
 
-            textHologram.setContent(MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN, Math.ceil(cooldown / 20.0)));
+            textHologram.setContent(MessageFormat.format("§f§l[ §6{0} {1} §f§l]", TextIcon.COOLDOWN,
+                    Math.ceil(Timestamp.now().until(expiration).toSeconds())));
 
             return true;
-        }, textHologram::dispose, 5);
+        }, () -> {
+            BLOCK_TIMESTAMP_MAP.remove(blockLocation);
+            textHologram.dispose();
+        }, 5);
     }
 
     /**
@@ -430,10 +447,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
         if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getJumpPadBlock())
             return;
-        if (CooldownUtil.getCooldown(this, Cooldown.JUMP_PAD.id) > 0)
+        if (definedTimestamp.jumpPad.isAfter(Timestamp.now()))
             return;
 
-        CooldownUtil.setCooldown(this, Cooldown.JUMP_PAD.id, Cooldown.JUMP_PAD.duration);
+        definedTimestamp.jumpPad = Timestamp.now().plus(Timespan.ofTicks(10));
 
         moveModule.push(new Vector(0, GeneralConfig.getCombatConfig().getJumpPadVelocity(), 0), true);
         SOUND.JUMP_PAD.play(entity.getLocation());
@@ -447,7 +464,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (location.getBlock().getType() != GeneralConfig.getCombatConfig().getFallZoneBlock())
             return;
 
-        CooldownUtil.setCooldown(this, Cooldown.FALL_ZONE.id, 10);
+        definedTimestamp.fallZone = Timestamp.now().plus(Timespan.ofTicks(10));
         onDeath(null);
     }
 
@@ -605,10 +622,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param isCrit 치명타 여부
      */
     private void playAttackEffect(boolean isCrit) {
-        if (CooldownUtil.getCooldown(this, Cooldown.HIT_SOUND.id) > 0)
+        if (definedTimestamp.hitSound.isAfter(Timestamp.now()))
             return;
 
-        CooldownUtil.setCooldown(this, Cooldown.HIT_SOUND.id, Cooldown.HIT_SOUND.duration);
+        definedTimestamp.hitSound = Timestamp.now().plus(Timespan.ofTicks(1));
         if (isCrit) {
             user.sendTitle("", "§c§l×", 0, 2, 10);
             TaskUtil.addTask(this, new DelayTask(() -> SOUND.ATTACK_CRIT.play(entity), 2));
@@ -633,16 +650,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             selfHarmDamage += damage;
 
         character.onDamage(this, attacker, damage, damageType, location, isCrit);
+        definedTimestamp.lastDamage = Timestamp.now();
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
         if (attacker instanceof CombatUser) {
-            if (CooldownUtil.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
-                damageMap.remove(attacker);
-            CooldownUtil.setCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
+            DamageInfo damageInfo = damageMap.compute((CombatUser) attacker, (k, v) ->
+                    v == null || v.expiration.isBefore(Timestamp.now()) ? new DamageInfo() : v);
 
-            double sumDamage = damageMap.getOrDefault(attacker, 0.0);
-            damageMap.put((CombatUser) attacker, sumDamage + damage);
+            damageInfo.damage += damage;
 
             handleAttackerKillAssists((CombatUser) attacker, damage);
         }
@@ -659,16 +675,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void handleAttackerKillAssists(@NonNull CombatUser attacker, double damage) {
         attacker.killAssistMap.keySet().removeIf(target -> {
-            if (CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0)
-                damageMap.remove(target);
+            DamageInfo damageInfo = damageMap.compute(target, (k, v) ->
+                    v == null || v.expiration.isBefore(Timestamp.now()) ? new DamageInfo() : v);
 
-            if (CooldownUtil.getCooldown(attacker, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + target) == 0)
+            if (attacker.killAssistMap.get(target).isExpired())
                 return true;
 
-            CooldownUtil.setCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this, Cooldown.DAMAGE_SUM_TIME_LIMIT.duration);
-            double sumDamage = damageMap.getOrDefault(target, 0.0);
-            damageMap.put(target, sumDamage + damage * KILL_SUPPORT_SCORE_RATIO);
-
+            damageInfo.damage += damage * KILL_SUPPORT_SCORE_RATIO;
             return false;
         });
     }
@@ -692,6 +705,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(character);
 
         isUlt = isUlt && getSkill(character.getUltimateSkillInfo()).isDurationFinished() && character.onGiveHeal(this, target, amount);
+
+        if (this != target)
+            definedTimestamp.lastGiveHeal = Timestamp.now();
 
         if (target.getDamageModule().isUltProvider() && isUlt) {
             double ultAmount = amount;
@@ -746,19 +762,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             Validate.notNull(((CombatUser) victim).getCharacterType());
 
             ((CombatUser) victim).damageMap.keySet().removeIf(target ->
-                    CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + victim) == 0);
+                    ((CombatUser) victim).damageMap.get(target).expiration.isBefore(Timestamp.now()));
 
-            double totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToDouble(Double::doubleValue).sum();
-            double damage = ((CombatUser) victim).damageMap.getOrDefault(this, 0.0);
+            double totalDamage = ((CombatUser) victim).damageMap.values().stream().mapToDouble(damageInfo -> damageInfo.damage).sum();
+            DamageInfo damageInfo = ((CombatUser) victim).damageMap.get(this);
+            double damage = damageInfo == null ? 0 : damageInfo.damage;
             int score = (int) Math.round((damage / totalDamage) * 100);
 
             character.onKill(this, victim, score, true);
             addScore(MessageFormat.format("§e{0}§f 처치", victim.getName()), score);
             addScore("결정타", FINAL_HIT_SCORE);
 
-            if (CooldownUtil.getCooldown(this, Cooldown.KILL_STREAK_TIME_LIMIT.id) == 0)
+            if (definedTimestamp.killStreakTimeLimit.isBefore(Timestamp.now()))
                 killStreak = 0;
-            CooldownUtil.setCooldown(this, Cooldown.KILL_STREAK_TIME_LIMIT.id, Cooldown.KILL_STREAK_TIME_LIMIT.duration);
+            definedTimestamp.killStreakTimeLimit = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getKillStreakTimeLimit()));
             if (killStreak++ > 0)
                 addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
@@ -804,7 +821,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
 
             TaskUtil.addTask(targetGameUser, new DelayTask(() ->
-                    targetGameUser.getUser().removeBossBar(COMBAT_KILL_BOSSBAR_ID + this), Cooldown.KILL_LOG_DISPLAY_DURATION.duration));
+                    targetGameUser.getUser().removeBossBar(COMBAT_KILL_BOSSBAR_ID + this), GeneralConfig.getCombatConfig().getKillLogDisplayDuration()));
         }
     }
 
@@ -881,24 +898,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         character.onDeath(this, attacker);
 
-        damageMap.keySet().removeIf(target -> CooldownUtil.getCooldown(target, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this) == 0);
-        double totalDamage = damageMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        damageMap.forEach((target, damage) -> {
+        damageMap.keySet().removeIf(target -> damageMap.get(target).expiration.isBefore(Timestamp.now()));
+        double totalDamage = damageMap.values().stream().mapToDouble(damageInfo -> damageInfo.damage).sum();
+        damageMap.forEach((target, damageInfo) -> {
             Validate.notNull(target.character);
 
-            target.killAssistMap.keySet().removeIf(targetAttacker ->
-                    CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + targetAttacker) == 0);
-            target.killAssistMap.forEach((targetAttacker, scores) -> {
-                scores.keySet().removeIf(scoreId ->
-                        CooldownUtil.getCooldown(target, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + targetAttacker + scoreId) == 0);
-                scores.values().forEach(supportScore -> targetAttacker.addScore("처치 지원", supportScore));
-            });
+            target.killAssistMap.keySet().removeIf(targetAttacker -> target.killAssistMap.get(targetAttacker).isExpired());
+            target.killAssistMap.forEach((targetAttacker, killAssistInfo) ->
+                    killAssistInfo.scoreMap.keySet().removeIf(action -> {
+                        if (killAssistInfo.scoreMap.get(action).getRight().isBefore(Timestamp.now()))
+                            return true;
 
-            if (CooldownUtil.getCooldown(this, Cooldown.FALL_ZONE.id) > 0)
+                        targetAttacker.addScore("처치 지원", killAssistInfo.scoreMap.get(action).getLeft());
+                        return false;
+                    }));
+
+            if (definedTimestamp.fallZone.isAfter(Timestamp.now()))
                 target.addScore("추락사", FALL_ZONE_KILL_SCORE);
 
             if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
-                int score = (int) Math.round(damage / totalDamage * 100);
+                int score = (int) Math.round(damageInfo.damage / totalDamage * 100);
 
                 target.character.onKill(target, this, score, false);
                 target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
@@ -931,22 +950,21 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        long duration = Cooldown.RESPAWN.duration;
+        long duration = GeneralConfig.getCombatConfig().getRespawnTime();
         if (hasCore(Core.RESURRECTION))
             duration = (long) (duration * (100 - Core.RESURRECTION.getValues()[0]) / 100.0);
 
-        CooldownUtil.setCooldown(this, Cooldown.RESPAWN.id, gameUser == null ? 20 : duration);
+        definedTimestamp.respawn = Timestamp.now().plus(Timespan.ofTicks(gameUser == null ? 20 : duration));
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
         TaskUtil.addTask(this, new IntervalTask(i -> {
-            long cooldown = CooldownUtil.getCooldown(CombatUser.this, Cooldown.RESPAWN.id);
-            if (cooldown <= 0)
+            if (definedTimestamp.respawn.isBefore(Timestamp.now()))
                 return false;
 
             if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
-                        String.format("%.1f", cooldown / 20.0)), 0, 5, 10);
+                        String.format("%.1f", Timestamp.now().until(definedTimestamp.respawn).toSeconds())), 0, 5, 10);
             user.teleport(deadLocation);
             entity.setSpectatorTarget(null);
 
@@ -973,7 +991,25 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 사망 후 리스폰 대기 중이면 {@code true} 반환
      */
     public boolean isDead() {
-        return CooldownUtil.getCooldown(this, Cooldown.RESPAWN.id) > 0;
+        return definedTimestamp.respawn.isAfter(Timestamp.now());
+    }
+
+    /**
+     * 마지막 피해를 받은 시점으로부터 지난 시간을 반환한다.
+     *
+     * @return 지난 시간 (tick)
+     */
+    public long getTimeAfterLastDamage() {
+        return definedTimestamp.lastDamage.until(Timestamp.now()).toTicks();
+    }
+
+    /**
+     * 마지막으로 치유한 시점으로부터 지난 시간을 반환한다.
+     *
+     * @return 지난 시간 (tick)
+     */
+    public long getTimeAfterLastGiveHeal() {
+        return definedTimestamp.lastGiveHeal.until(Timestamp.now()).toTicks();
     }
 
     /**
@@ -982,8 +1018,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      * @return 남은 적 처치 기여 제한시간
      */
-    public long getDamageSumRemainingTime(CombatUser attacker) {
-        return CooldownUtil.getCooldown(attacker, Cooldown.DAMAGE_SUM_TIME_LIMIT.id + this);
+    public long getDamageSumRemainingTime(@NonNull CombatUser attacker) {
+        DamageInfo damageInfo = damageMap.get(attacker);
+        return damageInfo == null ? 0 : Math.max(0, Timestamp.now().until(damageInfo.expiration).toTicks());
     }
 
     /**
@@ -1026,27 +1063,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * <p>플레이어가 적을 처치하면 해당 점수를 지정한 플레이어에게 지급한다.</p>
      *
      * @param combatUser 대상 플레이어
-     * @param id         점수 ID
+     * @param action     사용한 동작
      * @param score      지원 점수. 0 이상의 값
      * @param duration   지속시간 (tick). -1로 설정 시 무한 지속
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public void addKillAssist(@NonNull CombatUser combatUser, @NonNull String id, double score, long duration) {
+    public void addKillAssist(@NonNull CombatUser combatUser, @NonNull Action action, double score, long duration) {
         if (score < 0)
             throw new IllegalArgumentException("'score'가 0 이상이어야 함");
         if (duration < -1)
             throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
-        if (duration == -1)
-            duration = Long.MAX_VALUE;
 
-        killAssistMap.putIfAbsent(combatUser, new HashMap<>());
-        HashMap<String, Double> scores = killAssistMap.get(combatUser);
-        scores.put(id, score);
+        Timespan time = duration == -1 ? Timespan.MAX : Timespan.ofTicks(duration);
+        Timestamp expiration = Timestamp.now().plus(time);
 
-        if (CooldownUtil.getCooldown(this, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + combatUser) < duration)
-            CooldownUtil.setCooldown(this, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + combatUser, duration);
-        if (CooldownUtil.getCooldown(this, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + combatUser + id) < duration)
-            CooldownUtil.setCooldown(this, Cooldown.KILL_SUPPORT_TIME_LIMIT.id + combatUser + id, duration);
+        KillAssistInfo killAssistInfo = killAssistMap.computeIfAbsent(combatUser, k -> new KillAssistInfo());
+        killAssistInfo.scoreMap.put(action, Pair.of(score, expiration));
     }
 
     /**
@@ -1055,14 +1087,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 전역 쿨타임 종료 여부
      */
     public boolean isGlobalCooldownFinished() {
-        return CooldownUtil.getCooldown(this, Cooldown.ACTION_GLOBAL_COOLDOWN.id) == 0;
+        return definedTimestamp.actionGlobalCooldown.isBefore(Timestamp.now());
     }
 
     /**
      * 플레이어의 전역 쿨타임을 초기화한다.
      */
     public void resetGlobalCooldown() {
-        CooldownUtil.setCooldown(this, Cooldown.ACTION_GLOBAL_COOLDOWN.id, 0);
+        definedTimestamp.actionGlobalCooldown = Timestamp.now();
         entity.setCooldown(SkillInfo.MATERIAL, 0);
         entity.setCooldown(WeaponInfo.MATERIAL, 0);
     }
@@ -1077,16 +1109,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Validate.notNull(weapon);
         if (cooldown < -1)
             throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
-        if (cooldown == -1)
-            cooldown = Integer.MAX_VALUE;
 
-        if (cooldown < CooldownUtil.getCooldown(this, Cooldown.ACTION_GLOBAL_COOLDOWN.id))
+        Timespan time = cooldown == -1 ? Timespan.MAX : Timespan.ofTicks(cooldown);
+        if (time.compareTo(Timestamp.now().until(definedTimestamp.actionGlobalCooldown)) < 0)
             return;
 
-        CooldownUtil.setCooldown(this, Cooldown.ACTION_GLOBAL_COOLDOWN.id, cooldown);
-        entity.setCooldown(SkillInfo.MATERIAL, cooldown);
-        if (cooldown > weapon.getCooldown())
-            entity.setCooldown(WeaponInfo.MATERIAL, cooldown);
+        definedTimestamp.actionGlobalCooldown = Timestamp.now().plus(time);
+
+        int timeTicks = (int) Math.min(Integer.MAX_VALUE, time.toTicks());
+        entity.setCooldown(SkillInfo.MATERIAL, timeTicks);
+        if (time.toTicks() > weapon.getCooldown())
+            entity.setCooldown(WeaponInfo.MATERIAL, timeTicks);
     }
 
     /**
@@ -1104,17 +1137,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 
-        if (CooldownUtil.getCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id) == 0) {
-            CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
+        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getScoreDisplayDuration()));
+        if (definedTimestamp.scoreDisplay.isBefore(Timestamp.now())) {
+            definedTimestamp.scoreDisplay = expiration;
 
-            TaskUtil.addTask(this, new IntervalTask(i -> CooldownUtil.getCooldown(CombatUser.this, Cooldown.SCORE_DISPLAY_DURATION.id) > 0,
+            TaskUtil.addTask(this, new IntervalTask(i -> definedTimestamp.scoreDisplay.isAfter(Timestamp.now()),
                     () -> {
                         scoreStreakSum = 0;
                         scoreMap.clear();
                         user.clearSidebar();
                     }, 1));
         } else
-            CooldownUtil.setCooldown(this, Cooldown.SCORE_DISPLAY_DURATION.id, Cooldown.SCORE_DISPLAY_DURATION.duration);
+            definedTimestamp.scoreDisplay = expiration;
 
         if (scoreMap.size() > 5)
             scoreMap.remove(scoreMap.keySet().iterator().next());
@@ -1353,14 +1387,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param weapon    무기
      */
     private void handleUseFullAutoWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
+        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(6));
+
         if (fullAutoTask == null || fullAutoTask.isDisposed())
             fullAutoTask = null;
-        else if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id) > 0) {
-            CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id, Cooldown.WEAPON_FULLAUTO.duration);
+        else if (definedTimestamp.weaponFullAutoCooldown.isAfter(Timestamp.now())) {
+            definedTimestamp.weaponFullAutoCooldown = expiration;
             return;
         }
 
-        CooldownUtil.setCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id, Cooldown.WEAPON_FULLAUTO.duration);
+        definedTimestamp.weaponFullAutoCooldown = expiration;
 
         if (fullAutoTask == null) {
             fullAutoTask = new IntervalTask(new LongPredicate() {
@@ -1368,7 +1404,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
                 @Override
                 public boolean test(long i) {
-                    if (CooldownUtil.getCooldown(weapon, Cooldown.WEAPON_FULLAUTO.id) == 0)
+                    if (definedTimestamp.weaponFullAutoCooldown.isBefore(Timestamp.now()))
                         return false;
 
                     if (weapon.canUse(actionKey) && !isDead() && isGlobalCooldownFinished() && ((FullAuto) weapon).getFullAutoModule().isFireTick(i)) {
@@ -1579,44 +1615,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 쿨타임 ID 및 기본 지속시간 목록.
-     */
-    @AllArgsConstructor
-    private enum Cooldown {
-        /** 힐 팩 */
-        HEAL_PACK("HealPack", GeneralConfig.getCombatConfig().getHealPackCooldown()),
-        /** 궁극기 팩 */
-        ULT_PACK("UltPack", GeneralConfig.getCombatConfig().getUltPackCooldown()),
-        /** 점프대 */
-        JUMP_PAD("JumpPad", 10),
-        /** 적 타격 효과음 쿨타임 */
-        HIT_SOUND("HitSound", 1),
-        /** 적 처치 기여 (데미지 누적) 제한시간 */
-        DAMAGE_SUM_TIME_LIMIT("DamageSumTimeLimit", GeneralConfig.getCombatConfig().getDamageSumTimeLimit()),
-        /** 연속 처치 제한시간 */
-        KILL_STREAK_TIME_LIMIT("KillstreakTimeLimit", GeneralConfig.getCombatConfig().getKillStreakTimeLimit()),
-        /** 적 처치 지원 제한시간 */
-        KILL_SUPPORT_TIME_LIMIT("KillSupportTimeLimit", 0),
-        /** 리스폰 시간 */
-        RESPAWN("Respawn", GeneralConfig.getCombatConfig().getRespawnTime()),
-        /** 추락사 */
-        FALL_ZONE("FallZone", 0),
-        /** 동작 전역 쿨타임 */
-        ACTION_GLOBAL_COOLDOWN("ActionGlobalCooldown", 0),
-        /** 획득 점수 표시 유지시간 (tick) */
-        SCORE_DISPLAY_DURATION("ScoreDisplayDuration", GeneralConfig.getCombatConfig().getScoreDisplayDuration()),
-        /** 킬 로그 표시 유지시간 (tick) */
-        KILL_LOG_DISPLAY_DURATION("KillLogDisplayDuration", GeneralConfig.getCombatConfig().getKillLogDisplayDuration()),
-        /** 연사가 가능한 총기류의 쿨타임 */
-        WEAPON_FULLAUTO("WeaponFullauto", 6);
-
-        /** 쿨타임 ID */
-        private final String id;
-        /** 기본 지속시간 (tick) */
-        private final long duration;
-    }
-
-    /**
      * 효과음 목록.
      */
     @UtilityClass
@@ -1679,5 +1677,66 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
                         .count(0, 0, 1)
                         .horizontalSpread(0.3).verticalSpread(0.1).build());
+    }
+
+    /**
+     * 정의된 타임스탬프 목록.
+     */
+    @NoArgsConstructor
+    private static class DefinedTimestamp {
+        /** 점프대 */
+        private Timestamp jumpPad = Timestamp.now();
+        /** 적 타격 효과음 */
+        private Timestamp hitSound = Timestamp.now();
+        /** 연속 처치 제한시간 */
+        private Timestamp killStreakTimeLimit = Timestamp.now();
+        /** 리스폰 */
+        private Timestamp respawn = Timestamp.now();
+        /** 추락사 */
+        private Timestamp fallZone = Timestamp.now();
+        /** 동작 전역 쿨타임 */
+        private Timestamp actionGlobalCooldown = Timestamp.now();
+        /** 획득 점수 표시 */
+        private Timestamp scoreDisplay = Timestamp.now();
+        /** 연사가 가능한 총기류의 쿨타임 */
+        private Timestamp weaponFullAutoCooldown = Timestamp.now();
+        /** 마지막 피격 */
+        private Timestamp lastDamage = Timestamp.now();
+        /** 마지막 치유 */
+        private Timestamp lastGiveHeal = Timestamp.now();
+    }
+
+    /**
+     * 누적 피해량(킬 기여) 정보 클래스.
+     */
+    @NoArgsConstructor
+    private static final class DamageInfo {
+        /** 종료 시점 */
+        private final Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getDamageSumTimeLimit()));
+        /** 누적 피해량 */
+        private double damage = 0;
+    }
+
+    /**
+     * 처치 지원 정보 클래스.
+     */
+    @NoArgsConstructor
+    private static final class KillAssistInfo {
+        /** (동작 : (지원 점수 : 종료 시점)) */
+        private final HashMap<Action, Pair<Double, Timestamp>> scoreMap = new HashMap<>();
+
+        /**
+         * 처치 지원 제한시간이 끝났는지 확인한다.
+         *
+         * @return 제한시간 종료 여부
+         */
+        private boolean isExpired() {
+            for (Pair<Double, Timestamp> scoreInfo : scoreMap.values()) {
+                if (scoreInfo.getRight().isAfter(Timestamp.now()))
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

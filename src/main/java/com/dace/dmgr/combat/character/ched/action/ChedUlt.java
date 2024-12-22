@@ -10,8 +10,9 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -21,13 +22,14 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
 public final class ChedUlt extends UltimateSkill {
-    /** 처치 점수 제한시간 쿨타임 ID */
-    private static final String KILL_SCORE_COOLDOWN_ID = "ChedUltKillScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "ChedUlt";
+    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 소환한 엔티티 */
     private ChedUltFireFloor summonEntity = null;
 
@@ -152,7 +154,8 @@ public final class ChedUlt extends UltimateSkill {
      * @param score  점수 (처치 기여도)
      */
     public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("궁극기 보너스", ChedUltInfo.KILL_SCORE * score / 100.0);
     }
 
@@ -255,7 +258,7 @@ public final class ChedUlt extends UltimateSkill {
             public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null,
                         false, false) && target instanceof CombatUser)
-                    CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                    killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));
 
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
@@ -331,7 +334,7 @@ public final class ChedUlt extends UltimateSkill {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, ChedUltBurning.instance, 10);
 
                     if (target instanceof CombatUser)
-                        CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                        killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));
                 }
 
                 return !(target instanceof Barrier);

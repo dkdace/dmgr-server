@@ -11,7 +11,8 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -20,9 +21,11 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.util.WeakHashMap;
+
 public final class PalasA1 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA1AssistScoreTimeLimit";
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     public PalasA1(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA1Info.getInstance(), 0);
@@ -87,7 +90,8 @@ public final class PalasA1 extends ActiveSkill {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
     }
 
@@ -142,7 +146,7 @@ public final class PalasA1 extends ActiveSkill {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
-                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA1Info.STUN_DURATION);
+                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA1Info.STUN_DURATION)));
                 }
             }
 

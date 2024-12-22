@@ -11,8 +11,9 @@ import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skin;
@@ -50,6 +51,9 @@ public final class GameUser implements Disposable {
     @NonNull
     @Getter
     private final Game game;
+
+    /** 의사소통 GUI 타임스탬프 */
+    private Timestamp communicationTimestamp = Timestamp.now();
     /** 전투 플레이어 객체 */
     @Nullable
     private CombatUser combatUser;
@@ -414,8 +418,6 @@ public final class GameUser implements Disposable {
             return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
         });
 
-        /** 쿨타임 ID */
-        private static final String COOLDOWN_ID = "Communication";
         /** GUI 아이템 객체 */
         private final GuiItem guiItem;
 
@@ -439,9 +441,10 @@ public final class GameUser implements Disposable {
                         return false;
 
                     if (!player.isOp()) {
-                        if (CooldownUtil.getCooldown(user, COOLDOWN_ID) > 0)
+                        if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
                             return false;
-                        CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
+
+                        gameUser.communicationTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown()));
                     }
 
                     gameUser.sendMessage(action.apply(gameUser, combatUser), true);

@@ -13,8 +13,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -26,15 +27,14 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 
 public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
-    /** 대상 초기화 딜레이 쿨타임 ID */
-    private static final String TARGET_RESET_DELAY_COOLDOWN_ID = "TargetResetDelay";
-    /** 대상 위치 통과 불가 시 초기화 딜레이 쿨타임 ID */
-    private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
-
     /** 연사 모듈 */
     @NonNull
     @Getter
     private final FullAutoModule fullAutoModule;
+    /** 대상 초기화 타임스탬프 */
+    private Timestamp targetResetTimestamp = Timestamp.now();
+    /** 대상 위치 통과 불가 시 초기화 타임스탬프 */
+    private Timestamp blockResetTimestamp = Timestamp.now();
     /** 현재 사용 대상 */
     @Nullable
     private Healable target = null;
@@ -82,9 +82,9 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         return;
                 }
 
-                CooldownUtil.setCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID, 4);
+                targetResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
-                    CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
+                    blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
 
                 NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getEntity().getLocation());
                 combatUser.getUser().sendTitle("", MessageFormat.format("{0} : {1}§e{2}",
@@ -132,11 +132,10 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
             NeaceWeapon.this.target = (Healable) target;
-            CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
+            blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
 
             TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed()
-                    && CooldownUtil.getCooldown(combatUser, TARGET_RESET_DELAY_COOLDOWN_ID) > 0
-                    && CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) > 0
+                    && targetResetTimestamp.isAfter(Timestamp.now()) && blockResetTimestamp.isAfter(Timestamp.now())
                     && combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
                     () -> NeaceWeapon.this.target = null, 1));
         }

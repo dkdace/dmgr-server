@@ -5,7 +5,8 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -25,9 +26,6 @@ import java.util.stream.IntStream;
  */
 @UtilityClass
 public final class CombatUtil {
-    /** 총기의 초탄 반동 딜레이 쿨타임 ID */
-    private static final String WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID = "WeaponFirstRecoilDelay";
-
     /**
      * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
      *
@@ -253,9 +251,9 @@ public final class CombatUtil {
 
         double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
         double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
-        boolean first = CooldownUtil.getCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID) == 0;
+        boolean first = combatUser.getWeaponFirstRecoilTimestamp().isBefore(Timestamp.now());
         int sum = IntStream.rangeClosed(1, duration).sum();
-        CooldownUtil.setCooldown(combatUser, WEAPON_FIRST_RECOIL_DELAY_COOLDOWN_ID, 4);
+        combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
 
         TaskUtil.addTask(combatUser, new IntervalTask(i -> {
             double finalUp = (up + finalUpSpread) / ((double) sum / (duration - i));

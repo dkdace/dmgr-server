@@ -5,7 +5,8 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,8 +18,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.text.MessageFormat;
 
 public final class OnAsyncPlayerChat implements Listener {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "Chat";
     /** 채팅의 메시지 포맷 */
     private static final String CHAT_FORMAT = "<{0}> {1}";
 
@@ -31,11 +30,12 @@ public final class OnAsyncPlayerChat implements Listener {
         UserData userData = UserData.fromPlayer(player);
 
         if (!player.isOp()) {
-            if (CooldownUtil.getCooldown(user, COOLDOWN_ID) > 0) {
+            if (user.getChatTimestamp().isAfter(Timestamp.now())) {
                 user.sendMessageWarn("채팅을 천천히 하십시오.");
                 return;
             }
-            CooldownUtil.setCooldown(user, COOLDOWN_ID, GeneralConfig.getConfig().getChatCooldown());
+
+            user.setChatTimestamp(Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown())));
         }
 
         Bukkit.getServer().getConsoleSender().sendMessage(MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage()));

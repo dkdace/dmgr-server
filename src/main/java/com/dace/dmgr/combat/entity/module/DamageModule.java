@@ -7,10 +7,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.TextHologram;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -25,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
@@ -39,10 +37,6 @@ public class DamageModule {
     public static final double DEFAULT_VALUE = 1;
     /** 치명타 배수 기본값 */
     public static final double DEFAULT_CRIT_MULTIPLIER = 2;
-    /** 적 타격 시 생명력 홀로그램 유지시간 쿨타임 ID */
-    private static final String SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID = "ShowHealthHologram";
-    /** 피격 시 애니메이션 쿨타임 ID */
-    private static final String DAMAGE_ANIMATION_COOLDOWN_ID = "DamageAnimation";
 
     /** NMS 플레이어 반환 메소드 객체 */
     private static Method getHandleMethod;
@@ -71,9 +65,13 @@ public class DamageModule {
     private final AbilityStatus defenseMultiplierStatus;
     /** 보호막 목록 (보호막 ID : 보호막 양) */
     private final HashMap<String, Double> shieldMap = new HashMap<>();
+    /** 플레이어별 생명력 홀로그램 타임스탬프 목록 (공격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> showHealthHologramTimestampMap = new WeakHashMap<>();
     /** 최대 체력 */
     @Getter
     protected int maxHealth;
+    /** 피격 시 애니메이션 타임스탬프 */
+    private Timestamp damageAnimationTimestamp = Timestamp.now();
 
     /**
      * 피해 모듈 인스턴스를 생성한다.
@@ -136,7 +134,8 @@ public class DamageModule {
                 return true;
 
             if (combatEntity.isEnemy(targetCombatUser)) {
-                return CooldownUtil.getCooldown(targetCombatUser, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity) > 0
+                Timestamp expiration = showHealthHologramTimestampMap.get(targetCombatUser);
+                return expiration != null && expiration.isAfter(Timestamp.now())
                         && LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
             } else
                 return targetCombatUser != combatEntity;
@@ -315,7 +314,7 @@ public class DamageModule {
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, critMultiplier != 1, isUlt);
         playHitEffect();
         if (isShowHealthBar && attacker instanceof CombatUser)
-            CooldownUtil.setCooldown(attacker, SHOW_HEALTH_HOLOGRAM_COOOLDOWN_ID + combatEntity, 20);
+            showHealthHologramTimestampMap.put((CombatUser) attacker, Timestamp.now().plus(Timespan.ofSeconds(1)));
 
         if (getHealth() > finalDamage)
             setHealth(getHealth() - finalDamage);
@@ -413,8 +412,8 @@ public class DamageModule {
      * 엔티티의 피격 효과를 재생한다.
      */
     private void playHitEffect() {
-        if (CooldownUtil.getCooldown(this, DAMAGE_ANIMATION_COOLDOWN_ID) == 0) {
-            CooldownUtil.setCooldown(this, DAMAGE_ANIMATION_COOLDOWN_ID, 6);
+        if (damageAnimationTimestamp.isBefore(Timestamp.now())) {
+            damageAnimationTimestamp = Timestamp.now().plus(Timespan.ofTicks(6));
             WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
 
             packet.setEntityID(combatEntity.getEntity().getEntityId());

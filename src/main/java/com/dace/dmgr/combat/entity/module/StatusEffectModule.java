@@ -5,10 +5,12 @@ import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.HashMap;
@@ -23,8 +25,6 @@ import java.util.HashSet;
  * @see Damageable
  */
 public final class StatusEffectModule {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "StatusEffect";
     /** 상태 효과 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
 
@@ -36,8 +36,8 @@ public final class StatusEffectModule {
     @NonNull
     @Getter
     private final AbilityStatus resistanceStatus;
-    /** 적용된 상태 효과 목록 (상태 효과 : 제공자) */
-    private final HashMap<StatusEffect, CombatEntity> statusEffectMap = new HashMap<>();
+    /** 적용된 상태 효과 목록 (상태 효과 : 상태 효과 정보) */
+    private final HashMap<StatusEffect, StatusEffectInfo> statusEffectMap = new HashMap<>();
 
     /**
      * 상태 효과 모듈 인스턴스를 생성한다.
@@ -81,16 +81,17 @@ public final class StatusEffectModule {
     public void applyStatusEffect(@NonNull CombatEntity provider, @NonNull StatusEffect statusEffect, long duration) {
         if (duration < -1)
             throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
-        if (duration == -1)
-            duration = Long.MAX_VALUE;
 
-        long finalDuration = statusEffect.isPositive() ? duration : (long) (duration * (Math.max(0, 2 - resistanceStatus.getValue())));
-        if (finalDuration == 0)
+        Timespan time = duration == -1 ? Timespan.MAX : Timespan.ofTicks(duration);
+        if (!statusEffect.isPositive())
+            time = Timespan.ofMilliseconds((long) (time.toMilliseconds() * (Math.max(0, 2 - resistanceStatus.getValue()))));
+        if (time.toMilliseconds() <= 0)
             return;
 
-        if (!hasStatusEffect(statusEffect)) {
-            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
-            statusEffectMap.put(statusEffect, provider);
+        StatusEffectInfo statusEffectInfo = statusEffectMap.computeIfAbsent(statusEffect, k -> new StatusEffectInfo(provider));
+
+        if (statusEffectInfo.expiration.isBefore(Timestamp.now())) {
+            statusEffectInfo.expiration = Timestamp.now().plus(time);
 
             statusEffect.onStart(combatEntity, provider);
 
@@ -106,11 +107,9 @@ public final class StatusEffectModule {
                     return;
 
                 statusEffect.onEnd(combatEntity, provider);
-
-                CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, 0);
             }, 1);
-        } else if (getStatusEffectDuration(statusEffect) < finalDuration)
-            CooldownUtil.setCooldown(this, COOLDOWN_ID + statusEffect, finalDuration);
+        } else if (getStatusEffectDuration(statusEffect) < time.toTicks())
+            statusEffectInfo.expiration = Timestamp.now().plus(time);
     }
 
     /**
@@ -120,7 +119,8 @@ public final class StatusEffectModule {
      * @return 남은 시간 (tick)
      */
     public long getStatusEffectDuration(@NonNull StatusEffect statusEffect) {
-        return CooldownUtil.getCooldown(this, COOLDOWN_ID + statusEffect);
+        StatusEffectInfo statusEffectInfo = statusEffectMap.get(statusEffect);
+        return statusEffectInfo == null ? 0 : Math.max(0, Timestamp.now().until(statusEffectInfo.expiration).toTicks());
     }
 
     /**
@@ -197,9 +197,9 @@ public final class StatusEffectModule {
      * @param statusEffect 제거할 상태 효과
      */
     public void removeStatusEffect(@NonNull StatusEffect statusEffect) {
-        CombatEntity provider = statusEffectMap.remove(statusEffect);
-        if (provider != null)
-            statusEffect.onEnd(combatEntity, provider);
+        StatusEffectInfo statusEffectInfo = statusEffectMap.remove(statusEffect);
+        if (statusEffectInfo != null)
+            statusEffect.onEnd(combatEntity, statusEffectInfo.provier);
     }
 
     /**
@@ -219,5 +219,16 @@ public final class StatusEffectModule {
             if (statusEffect.isPositive() == isPositive)
                 removeStatusEffect(statusEffect);
         });
+    }
+
+    /**
+     * 적용된 상태 효과 정보 클래스.
+     */
+    @RequiredArgsConstructor
+    private static final class StatusEffectInfo {
+        /** 제공자 */
+        private final CombatEntity provier;
+        /** 종료 시점 */
+        private Timestamp expiration = Timestamp.now();
     }
 }

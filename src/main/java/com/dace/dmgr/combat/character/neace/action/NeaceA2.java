@@ -15,8 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "NeaceA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "NeaceA2";
 
@@ -97,7 +95,7 @@ public final class NeaceA2 extends ActiveSkill {
     void amplifyTarget(@NonNull Healable target) {
         target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2Buff.instance, 4);
         if (target instanceof CombatUser)
-            ((CombatUser) target).addKillAssist(combatUser, ASSIST_SCORE_COOLDOWN_ID, NeaceA2Info.ASSIST_SCORE, 4);
+            ((CombatUser) target).addKillAssist(combatUser, this, NeaceA2Info.ASSIST_SCORE, 4);
     }
 
     /**

@@ -8,8 +8,9 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -19,13 +20,14 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
 public final class ChedA3 extends ActiveSkill {
-    /** 처치 점수 제한시간 쿨타임 ID */
-    private static final String KILL_SCORE_COOLDOWN_ID = "ChedA3KillScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "ChedA3";
+    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     public ChedA3(@NonNull CombatUser combatUser) {
         super(combatUser, ChedA3Info.getInstance(), 2);
@@ -142,7 +144,8 @@ public final class ChedA3 extends ActiveSkill {
      * @param score  점수 (처치 기여도)
      */
     public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
     }
 
@@ -207,7 +210,7 @@ public final class ChedA3 extends ActiveSkill {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
-                    CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + target, ChedA3Info.KILL_SCORE_TIME_LIMIT);
+                    killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedA3Info.KILL_SCORE_TIME_LIMIT)));
                 }
             }
 

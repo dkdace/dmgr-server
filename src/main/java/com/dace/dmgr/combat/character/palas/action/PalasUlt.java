@@ -14,8 +14,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 
 public final class PalasUlt extends UltimateSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasUltAssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "PalasUlt";
 
@@ -104,7 +102,7 @@ public final class PalasUlt extends UltimateSkill {
                 ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", 0, 5, 10);
 
                 combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
-                ((CombatUser) target).addKillAssist(combatUser, PalasUlt.ASSIST_SCORE_COOLDOWN_ID, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
+                ((CombatUser) target).addKillAssist(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
             }
 
             PalasUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());

@@ -17,8 +17,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 
 public final class PalasA2 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "PalasA2";
 
@@ -106,7 +104,7 @@ public final class PalasA2 extends ActiveSkill {
                 ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", 0, 5, 10);
 
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
-                ((CombatUser) target).addKillAssist(combatUser, PalasA2.ASSIST_SCORE_COOLDOWN_ID, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
+                ((CombatUser) target).addKillAssist(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
             }
 
             PalasA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());

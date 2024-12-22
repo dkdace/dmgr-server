@@ -12,10 +12,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.SoundEffect;
-import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.TextHologram;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -27,6 +24,7 @@ import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -63,14 +61,8 @@ import java.util.function.LongConsumer;
  * @see UserData
  */
 public final class User implements Disposable {
-    /** 타자기 효과 타이틀 쿨타임 ID */
-    private static final String TYPEWRITER_TITLE_COOLDOWN_ID = "TypewriterTitle";
-    /** 타이틀 쿨타임 ID */
-    private static final String TITLE_COOLDOWN_ID = "Title";
-    /** 액션바 쿨타임 ID */
-    private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
-    /** 발광 효과 쿨타임 ID */
-    private static final String GLOW_COOLDOWN_ID = "Glow";
+    /** 발광 효과의 팀 패킷 이름 */
+    private static final String GLOWING_TEAM_PACKET_NAME = "Glowing";
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
             "\n" +
@@ -111,8 +103,22 @@ public final class User implements Disposable {
     private final UserData userData;
     /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
     private final HashMap<String, UUID> bossBarMap = new HashMap<>();
-    /** 발광 효과 적용 엔티티 목록 (발광 엔티티 : 색상) */
-    private final HashMap<Entity, ChatColor> glowingMap = new HashMap<>();
+    /** 발광 효과 적용 엔티티 목록 (발광 엔티티 : 발광 효과 정보) */
+    private final HashMap<Entity, GlowingInfo> glowingMap = new HashMap<>();
+    /** 채팅 타임스탬프 */
+    @Getter
+    @Setter
+    private Timestamp chatTimestamp = Timestamp.now();
+    /** 명령어 타임스탬프 */
+    @Getter
+    @Setter
+    private Timestamp commandTimestamp = Timestamp.now();
+    /** 타자기 효과 타이틀 타임스탬프 */
+    private Timestamp typewriterTitleTimestamp = Timestamp.now();
+    /** 타이틀 덮어쓰기 타임스탬프 */
+    private Timestamp titleOverrideTimestamp = Timestamp.now();
+    /** 액션바 덮어쓰기 타임스탬프 */
+    private Timestamp actionBarOverrideTimestamp = Timestamp.now();
     /** 이름표 숨기기용 갑옷 거치대 객체 */
     @Nullable
     private ArmorStand nameTagHider;
@@ -643,8 +649,8 @@ public final class User implements Disposable {
             throw new IllegalArgumentException("'overrideTicks'가 0 이상이어야 함");
 
         if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, ACTION_BAR_COOLDOWN_ID, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, ACTION_BAR_COOLDOWN_ID) > 0)
+            actionBarOverrideTimestamp = Timestamp.now().plus(Timespan.ofTicks(overrideTicks));
+        else if (actionBarOverrideTimestamp.isAfter(Timestamp.now()))
             return;
 
         TextComponent actionBar = new TextComponent(message);
@@ -694,8 +700,8 @@ public final class User implements Disposable {
             throw new IllegalArgumentException("'fadeIn', 'stay', 'fadeOut' 및 'overrideTicks'가 0 이상이어야 함");
 
         if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, TITLE_COOLDOWN_ID, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, TITLE_COOLDOWN_ID) > 0)
+            titleOverrideTimestamp = Timestamp.now().plus(Timespan.ofTicks(overrideTicks));
+        else if (titleOverrideTimestamp.isAfter(Timestamp.now()))
             return;
 
         player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
@@ -732,7 +738,7 @@ public final class User implements Disposable {
 
             TaskUtil.addTask(this, new DelayTask(() -> {
                 text.append(nextChar);
-                CooldownUtil.setCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID, 50);
+                typewriterTitleTimestamp = Timestamp.now().plus(Timespan.ofSeconds(2.5));
 
                 sendTitle("", prefix + " §f" + text, 0, 40, 10);
                 TYPEWRITER_TITLE_SOUND.play(player);
@@ -753,7 +759,7 @@ public final class User implements Disposable {
      * @return 출력 중이면 {@code true} 반환
      */
     public boolean isTypewriterTitlePrinting() {
-        return CooldownUtil.getCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID) > 0;
+        return typewriterTitleTimestamp.isAfter(Timestamp.now());
     }
 
     /**
@@ -1002,16 +1008,18 @@ public final class User implements Disposable {
     public void setGlowing(@NonNull Entity target, @NonNull ChatColor color, long duration) {
         if (duration < -1)
             throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
-        if (duration == -1)
-            duration = Long.MAX_VALUE;
+
+        Timespan time = duration == -1 ? Timespan.MAX : Timespan.ofTicks(duration);
 
         sendAddTeamPacket(target, color);
 
-        if (CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) == 0) {
-            CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, duration);
+        GlowingInfo glowingInfo = glowingMap.computeIfAbsent(target, k -> new GlowingInfo(color));
+
+        if (glowingInfo.expiration.isBefore(Timestamp.now())) {
+            glowingInfo.expiration = Timestamp.now().plus(time);
 
             new IntervalTask(i -> {
-                if (isDisposed() || !target.isValid() || CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) == 0)
+                if (isDisposed() || !target.isValid() || !glowingMap.containsKey(target) || glowingInfo.expiration.isBefore(Timestamp.now()))
                     return false;
 
                 if (i % 4 == 0)
@@ -1019,11 +1027,13 @@ public final class User implements Disposable {
 
                 return true;
             }, () -> {
+                removeGlowing(target);
+
                 sendGlowingPacket(target, false);
                 sendRemoveTeamPacket(target);
             }, 1);
-        } else if (CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) < duration)
-            CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, duration);
+        } else if (time.compareTo(Timestamp.now().until(glowingInfo.expiration)) > 0)
+            glowingInfo.expiration = Timestamp.now().plus(time);
     }
 
     /**
@@ -1043,7 +1053,8 @@ public final class User implements Disposable {
      * @return 플레이어에게 발광 상태면 {@code true} 반환
      */
     public boolean isGlowing(@NonNull Entity target) {
-        return CooldownUtil.getCooldown(target, GLOW_COOLDOWN_ID + this) > 0;
+        GlowingInfo glowingInfo = glowingMap.get(target);
+        return glowingInfo != null && glowingInfo.expiration.isAfter(Timestamp.now());
     }
 
     /**
@@ -1052,7 +1063,7 @@ public final class User implements Disposable {
      * @param target 발광 효과가 적용된 엔티티
      */
     public void removeGlowing(@NonNull Entity target) {
-        CooldownUtil.setCooldown(target, GLOW_COOLDOWN_ID + this, 0);
+        glowingMap.remove(target);
     }
 
     /**
@@ -1081,14 +1092,12 @@ public final class User implements Disposable {
     private void sendAddTeamPacket(@NonNull Entity target, @NonNull ChatColor color) {
         sendRemoveTeamPacket(target);
 
-        glowingMap.put(target, color);
-
         WrapperPlayServerScoreboardTeam packet1 = new WrapperPlayServerScoreboardTeam();
         WrapperPlayServerScoreboardTeam packet2 = new WrapperPlayServerScoreboardTeam();
         WrapperPlayServerScoreboardTeam packet3 = new WrapperPlayServerScoreboardTeam();
-        packet1.setName(GLOW_COOLDOWN_ID + color.ordinal());
-        packet2.setName(GLOW_COOLDOWN_ID + color.ordinal());
-        packet3.setName(GLOW_COOLDOWN_ID + color.ordinal());
+        packet1.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+        packet2.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+        packet3.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
 
         packet1.setMode(0);
 
@@ -1112,16 +1121,14 @@ public final class User implements Disposable {
      * @param target 발광 효과가 적용된 엔티티
      */
     private void sendRemoveTeamPacket(@NonNull Entity target) {
-        ChatColor color = glowingMap.get(target);
-        if (color == null)
+        GlowingInfo glowingInfo = glowingMap.get(target);
+        if (glowingInfo == null)
             return;
-
-        glowingMap.remove(target);
 
         WrapperPlayServerScoreboardTeam packet = new WrapperPlayServerScoreboardTeam();
 
         packet.setMode(4);
-        packet.setName(GLOW_COOLDOWN_ID + color.ordinal());
+        packet.setName(GLOWING_TEAM_PACKET_NAME + glowingInfo.color.ordinal());
         packet.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
 
         packet.sendPacket(player);
@@ -1192,5 +1199,16 @@ public final class User implements Disposable {
             throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
         if (row < 0 || row > 19)
             throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
+    }
+
+    /**
+     * 발광 효과 정보 클래스.
+     */
+    @RequiredArgsConstructor
+    private static final class GlowingInfo {
+        /** 색상 */
+        private final ChatColor color;
+        /** 종료 시점 */
+        private Timestamp expiration = Timestamp.now();
     }
 }

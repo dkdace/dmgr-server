@@ -4,7 +4,8 @@ import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -13,8 +14,8 @@ import lombok.NonNull;
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
  */
 public abstract class AbstractSkill extends AbstractAction implements Skill {
-    /** 스킬 지속시간 쿨타임 ID */
-    private static final String SKILL_DURATION_COOLDOWN_ID = "SkillDuration";
+    /** 스킬 지속시간 타임스탬프 */
+    private Timestamp skillDurationTimestamp = Timestamp.now();
 
     /**
      * 스킬 인스턴스를 생성한다.
@@ -40,7 +41,7 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
     @Override
     public final long getDuration() {
-        return CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
+        return Math.max(0, Timestamp.now().until(skillDurationTimestamp).toTicks());
     }
 
     @Override
@@ -48,11 +49,13 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
         if (duration < -1)
             throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
 
+        Timespan time = duration == -1 ? Timespan.MAX : Timespan.ofTicks(duration);
+
         if (isDurationFinished()) {
-            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
+            skillDurationTimestamp = Timestamp.now().plus(time);
             runDuration();
         } else {
-            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
+            skillDurationTimestamp = Timestamp.now().plus(time);
             if (duration == 0)
                 onDurationFinished();
         }

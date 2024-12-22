@@ -11,8 +11,9 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -25,15 +26,17 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Getter
 public final class VellionA2 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA2AssistScoreTimeLimit";
-    /** 대상 위치 통과 불가 시 초기화 딜레이 쿨타임 ID */
-    private static final String BLOCK_RESET_DELAY_COOLDOWN_ID = "BlockResetDelay";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA2";
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
+    /** 대상 위치 통과 불가 시 초기화 타임스탬프 */
+    private Timestamp blockResetTimestamp = Timestamp.now();
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -91,7 +94,8 @@ public final class VellionA2 extends ActiveSkill {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", VellionA2Info.ASSIST_SCORE);
     }
 
@@ -124,16 +128,8 @@ public final class VellionA2 extends ActiveSkill {
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             VellionA2Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
 
-            if (!(provider instanceof CombatUser))
-                return;
-
-            if (LocationUtil.canPass(((CombatUser) provider).getEntity().getEyeLocation(), combatEntity.getCenterLocation()))
-                CooldownUtil.setCooldown(provider, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
-
-            ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, 4);
-
-            if (combatEntity instanceof CombatUser)
-                CooldownUtil.setCooldown(provider, ASSIST_SCORE_COOLDOWN_ID + combatEntity, 10);
+            if (provider instanceof CombatUser)
+                ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, 4);
         }
 
         @Override
@@ -156,7 +152,7 @@ public final class VellionA2 extends ActiveSkill {
             setDuration();
             combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
-            CooldownUtil.setCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID, VellionA2Info.BLOCK_RESET_DELAY);
+            blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(VellionA2Info.BLOCK_RESET_DELAY));
 
             VellionA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 
@@ -193,9 +189,15 @@ public final class VellionA2 extends ActiveSkill {
                     if (isDurationFinished() || isInvalid(combatUser, target) || !target.getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance))
                         return false;
 
+                    if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
+                        blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(VellionA2Info.BLOCK_RESET_DELAY));
+
                     target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA2Mark.instance, 10);
                     if (i % 10 == 0)
                         new VellionA2Area(target).emit(target.getCenterLocation());
+
+                    if (target instanceof CombatUser)
+                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
 
                     return true;
                 }, VellionA2.this::onCancelled, 1));
@@ -236,7 +238,7 @@ public final class VellionA2 extends ActiveSkill {
          * @return 유지할 수 없으면 {@code true} 반환
          */
         private boolean isInvalid(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-            return target.isDisposed() || CooldownUtil.getCooldown(combatUser, BLOCK_RESET_DELAY_COOLDOWN_ID) == 0
+            return target.isDisposed() || blockResetTimestamp.isBefore(Timestamp.now())
                     || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > VellionA2Info.MAX_DISTANCE;
         }
 

@@ -10,8 +10,9 @@ import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -21,13 +22,14 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 @Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "VellionA3AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "VellionA3";
-
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
@@ -204,7 +206,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", VellionA3Info.ASSIST_SCORE);
     }
 
@@ -227,7 +230,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
-                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
+                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
                 }
             }
 

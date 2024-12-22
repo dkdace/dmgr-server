@@ -11,8 +11,9 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -23,13 +24,14 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
 public final class QuakerA2 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "QuakerA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "QuakerA2";
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     public QuakerA2(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA2Info.getInstance(), 1);
@@ -143,7 +145,8 @@ public final class QuakerA2 extends ActiveSkill {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", QuakerA2Info.ASSIST_SCORE);
     }
 
@@ -219,7 +222,7 @@ public final class QuakerA2 extends ActiveSkill {
 
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
-                        CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, QuakerA2Info.SLOW_DURATION);
+                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerA2Info.SLOW_DURATION)));
                     }
                 }
 

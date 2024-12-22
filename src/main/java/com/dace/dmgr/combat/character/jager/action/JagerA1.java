@@ -12,7 +12,8 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -22,9 +23,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.WeakHashMap;
+
 public final class JagerA1 extends ChargeableSkill implements Confirmable {
-    /** 처치 점수 제한시간 쿨타임 ID */
-    private static final String KILL_SCORE_COOLDOWN_ID = "JagerA1KillScoreTimeLimit";
+    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     /** 위치 확인 모듈 */
     @NonNull
@@ -157,7 +160,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
      * @param score  점수 (처치 기여도)
      */
     public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
     }
 
@@ -285,7 +289,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             combatUser.useAction(ActionKey.PERIODIC_1);
 
             if (victim instanceof CombatUser)
-                CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
+                killScoreTimeLimitTimestampMap.put((CombatUser) victim, Timestamp.now().plus(Timespan.ofTicks(JagerA1Info.KILL_SCORE_TIME_LIMIT)));
         }
 
         @Override

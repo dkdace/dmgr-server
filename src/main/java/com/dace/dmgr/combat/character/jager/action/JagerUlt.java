@@ -11,8 +11,9 @@ import com.dace.dmgr.combat.entity.HasReadyTime;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -25,10 +26,12 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.WeakHashMap;
+
 @Getter
 public final class JagerUlt extends UltimateSkill {
-    /** 처치 점수 제한시간 쿨타임 ID */
-    private static final String KILL_SCORE_COOLDOWN_ID = "JagerUltKillScoreTimeLimit";
+    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 소환한 엔티티 */
     @Nullable
     private JagerUltEntity summonEntity = null;
@@ -101,7 +104,8 @@ public final class JagerUlt extends UltimateSkill {
      * @param score  점수 (처치 기여도)
      */
     public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        if (CooldownUtil.getCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
     }
 
@@ -268,7 +272,7 @@ public final class JagerUlt extends UltimateSkill {
             owner.onAttack(victim, damage, damageType, isCrit, isUlt);
 
             if (victim instanceof CombatUser)
-                CooldownUtil.setCooldown(combatUser, KILL_SCORE_COOLDOWN_ID + victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
+                killScoreTimeLimitTimestampMap.put((CombatUser) victim, Timestamp.now().plus(Timespan.ofTicks(JagerUltInfo.KILL_SCORE_TIME_LIMIT)));
         }
 
         @Override

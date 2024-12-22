@@ -11,8 +11,9 @@ import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.*;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -26,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class JagerA3 extends ActiveSkill {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "ExplodeDuration";
+    /** 폭발 타임스탬프 */
+    private Timestamp explodeTimestamp = Timestamp.now();
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -76,7 +77,7 @@ public final class JagerA3 extends ActiveSkill {
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
-                CooldownUtil.setCooldown(combatUser, COOLDOWN_ID, JagerA3Info.EXPLODE_DURATION);
+                explodeTimestamp = Timestamp.now().plus(Timespan.ofTicks(JagerA3Info.EXPLODE_DURATION));
 
                 JagerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
 
@@ -158,7 +159,7 @@ public final class JagerA3 extends ActiveSkill {
     private final class JagerA3Projectile extends BouncingProjectile {
         private JagerA3Projectile() {
             super(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(CooldownUtil.getCooldown(combatUser, COOLDOWN_ID)).hasGravity(true)
+                    .duration(Timestamp.now().until(explodeTimestamp).toTicks()).hasGravity(true)
                     .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
         }
 

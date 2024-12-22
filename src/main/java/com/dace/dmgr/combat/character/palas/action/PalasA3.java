@@ -15,20 +15,21 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-@Getter
+import java.util.WeakHashMap;
+
 public final class PalasA3 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "PalasA3AssistScoreTimeLimit";
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     public PalasA3(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA3Info.getInstance(), 2);
@@ -85,7 +86,8 @@ public final class PalasA3 extends ActiveSkill {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", PalasA3Info.ASSIST_SCORE);
     }
 
@@ -223,14 +225,14 @@ public final class PalasA3 extends ActiveSkill {
                             target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
 
                             if (target instanceof CombatUser)
-                                CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, PalasA3Info.DURATION);
+                                assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA3Info.DURATION)));
                         }
                     } else if (target instanceof Healable) {
                         target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
 
                         if (target instanceof CombatUser && target != combatUser) {
                             combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
-                            ((CombatUser) target).addKillAssist(combatUser, PalasA3.ASSIST_SCORE_COOLDOWN_ID, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                            ((CombatUser) target).addKillAssist(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
                         }
 
                         return true;

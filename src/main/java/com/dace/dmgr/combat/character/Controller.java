@@ -5,15 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.CooldownUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,9 +17,6 @@ import org.jetbrains.annotations.Nullable;
  * 역할군이 '제어'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Controller extends Character {
-    /** 회복 쿨타임 ID */
-    private static final String HEAL_COOLDOWN_ID = "RoleTrait2Heal";
-
     /**
      * 제어 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -58,14 +51,8 @@ public abstract class Controller extends Character {
                     });
         }
 
-        if (CooldownUtil.getCooldown(combatUser, HEAL_COOLDOWN_ID) == 0)
+        if (combatUser.getTimeAfterLastDamage() > RoleTrait2Info.ACTIVATE_DURATION)
             combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CooldownUtil.setCooldown(victim, HEAL_COOLDOWN_ID, RoleTrait2Info.ACTIVATE_DURATION);
     }
 
     @Override

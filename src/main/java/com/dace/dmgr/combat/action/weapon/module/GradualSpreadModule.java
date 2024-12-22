@@ -2,7 +2,8 @@ package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import lombok.NonNull;
 
 /**
@@ -15,9 +16,6 @@ import lombok.NonNull;
  * @see FullAuto
  */
 public final class GradualSpreadModule extends FullAutoModule {
-    /** 쿨타임 ID */
-    private static final String COOLDOWN_ID = "SpreadRecovery";
-
     /** 사용 횟수당 탄퍼짐 증가량 */
     private final double spreadIncrement;
     /** 점진적 탄퍼짐이 적용되는 시점 (사용 횟수) */
@@ -25,6 +23,8 @@ public final class GradualSpreadModule extends FullAutoModule {
     /** 최대 탄퍼짐에 도달하는 시점 (사용 횟수) */
     private final int shotsToReachMaxSpread;
 
+    /** 탄퍼짐 복구 타임스탬프 */
+    private Timestamp recoveryTimestamp = Timestamp.now();
     /** 연속으로 무기를 사용한 횟수 */
     private int continuousShots = 0;
 
@@ -56,11 +56,11 @@ public final class GradualSpreadModule extends FullAutoModule {
      * @return 탄퍼짐 수치. 연속으로 사용하지 않으면 자동으로 0이 됨
      */
     public double increaseSpread() {
-        if (CooldownUtil.getCooldown(weapon, COOLDOWN_ID) == 0)
+        if (recoveryTimestamp.isBefore(Timestamp.now()))
             continuousShots = 0;
 
         continuousShots++;
-        CooldownUtil.setCooldown(weapon, COOLDOWN_ID, 4);
+        recoveryTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
 
         int shots = Math.min(continuousShots, shotsToReachMaxSpread) - shotsToStartSpread;
         if (shots <= 0)

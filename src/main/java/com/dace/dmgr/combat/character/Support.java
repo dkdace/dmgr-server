@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -20,8 +19,6 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Support extends Character {
     /** 수정자 ID */
     private static final String MODIFIER_ID = "RoleTrait1";
-    /** 회복 쿨타임 ID */
-    private static final String HEAL_COOLDOWN_ID = "RoleTrait2Heal";
 
     /**
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
@@ -61,16 +58,11 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        if (provider != target) {
-            if (CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) == 0) {
-                CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
-
-                TaskUtil.addTask(provider, new IntervalTask(i -> {
-                    provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
-                    return CooldownUtil.getCooldown(provider, HEAL_COOLDOWN_ID) > 0;
-                }, 2));
-            } else
-                CooldownUtil.setCooldown(provider, HEAL_COOLDOWN_ID, RoleTrait2Info.DURATION);
+        if (provider != target && provider.getTimeAfterLastGiveHeal() > RoleTrait2Info.DURATION) {
+            TaskUtil.addTask(provider, new IntervalTask(i -> {
+                provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
+                return provider.getTimeAfterLastGiveHeal() <= RoleTrait2Info.DURATION;
+            }, 2));
         }
 
         return true;

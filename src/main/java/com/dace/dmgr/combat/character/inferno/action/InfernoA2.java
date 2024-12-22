@@ -10,7 +10,8 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -19,11 +20,13 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.WeakHashMap;
+
 public final class InfernoA2 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 쿨타임 ID */
-    private static final String ASSIST_SCORE_COOLDOWN_ID = "InfernoA2AssistScoreTimeLimit";
     /** 수정자 ID */
     private static final String MODIFIER_ID = "InfernoA2";
+    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
+    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
     public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), 1);
@@ -111,7 +114,8 @@ public final class InfernoA2 extends ActiveSkill {
      * @param victim 피격자
      */
     public void applyAssistScore(@NonNull CombatUser victim) {
-        if (CooldownUtil.getCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + victim) > 0)
+        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
+        if (expiration != null && expiration.isAfter(Timestamp.now()))
             combatUser.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE);
     }
 
@@ -157,7 +161,7 @@ public final class InfernoA2 extends ActiveSkill {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
-                    CooldownUtil.setCooldown(combatUser, ASSIST_SCORE_COOLDOWN_ID + target, 10);
+                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
                 }
             }
 

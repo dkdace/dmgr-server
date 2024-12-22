@@ -3,7 +3,8 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -15,8 +16,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class StackableSkill extends ActiveSkill {
-    /** 스킬 스택 충전 쿨타임 ID */
-    private static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
+    /** 스킬 스택 충전 쿨타임 타임스탬프 */
+    private Timestamp skillStackCooldownTimestamp = Timestamp.now();
     /** 스킬 스택 수 */
     private int stack = 0;
 
@@ -66,7 +67,7 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 스택 충전 쿨타임 (tick)
      */
     public final long getStackCooldown() {
-        return CooldownUtil.getCooldown(this, SKILL_STACK_COOLDOWN_ID);
+        return Math.max(0, Timestamp.now().until(skillStackCooldownTimestamp).toTicks());
     }
 
     /**
@@ -81,11 +82,13 @@ public abstract class StackableSkill extends ActiveSkill {
         if (stack >= getMaxStack())
             return;
 
+        Timespan time = cooldown == -1 ? Timespan.MAX : Timespan.ofTicks(cooldown);
+
         if (isStackCooldownFinished()) {
-            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
+            skillStackCooldownTimestamp = Timestamp.now().plus(time);
             runStackCooldown(cooldown);
         } else
-            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
+            skillStackCooldownTimestamp = Timestamp.now().plus(time);
     }
 
     /**
