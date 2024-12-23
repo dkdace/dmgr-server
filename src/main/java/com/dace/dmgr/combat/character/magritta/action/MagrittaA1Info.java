@@ -39,6 +39,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("일정 시간 후 폭발하는 폭탄을 던져 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입히고, <d::파쇄>를 적용합니다. " +
                                 "적에게 부착할 수 있습니다.")
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", DAMAGE_EXPLODE, DAMAGE_EXPLODE / 2)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE_DIRECT + " (직격)")
                         .addValueInfo(TextIcon.FIRE, Format.VARIABLE_TIME_WITH_PER_SECOND,
