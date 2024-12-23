@@ -136,7 +136,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
         setDuration();
         confirmModule.toggleCheck();
-        combatUser.getWeapon().setCooldown(2);
+        combatUser.setGlobalCooldown(1);
 
         summonEntity = new JagerA1Entity(CombatUtil.spawnEntity(Wolf.class, confirmModule.getCurrentLocation()), combatUser);
         summonEntity.activate();

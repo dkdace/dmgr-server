@@ -59,7 +59,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
+        return (actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
                 && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
@@ -85,7 +85,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 break;
             }
             case RIGHT_CLICK: {
-                setCooldown(2);
+                combatUser.setGlobalCooldown(1);
                 onCancelled();
 
                 aimModule.toggleAim();
