@@ -51,6 +51,6 @@ public final class NeaceP1 extends AbstractSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setCooldown();
     }
 }
