@@ -247,7 +247,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity.setAngry(false);
                     entity.setSitting(true);
                     entity.setTamed(true);
-                    damageModule.setMaxHealth(JagerA2Info.HEALTH);
+                    damageModule.setMaxHealth(JagerA1Info.HEALTH);
                     damageModule.setHealth(getStateValue());
 
                     Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
@@ -262,7 +262,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     entity.setAngry(true);
                     entity.setSitting(false);
                     entity.setTamed(false);
-                    damageModule.setMaxHealth(JagerA2Info.HEALTH);
+                    damageModule.setMaxHealth(JagerA1Info.HEALTH);
                     damageModule.setHealth(getStateValue());
 
                     CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
