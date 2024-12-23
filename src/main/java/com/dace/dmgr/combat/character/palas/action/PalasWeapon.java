@@ -95,7 +95,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 break;
             }
             case RIGHT_CLICK: {
-                setCooldown(2);
+                combatUser.setGlobalCooldown(1);
                 if (aimModule.isAiming()) {
                     onCancelled();
                     return;
