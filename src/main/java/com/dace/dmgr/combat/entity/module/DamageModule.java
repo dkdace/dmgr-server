@@ -307,18 +307,20 @@ public class DamageModule {
             }
 
         finalDamage = Math.min(finalDamage, getHealth());
-        double reducedDamage = Math.max(0, damage * damageMultiplier - finalDamage);
+
+        boolean isKilled = getHealth() <= finalDamage;
+        if (!isKilled)
+            setHealth(getHealth() - finalDamage);
 
         if (attacker != null)
             attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
+        double reducedDamage = Math.max(0, damage * damageMultiplier - finalDamage);
         combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, critMultiplier != 1, isUlt);
         playHitEffect();
         if (isShowHealthBar && attacker instanceof CombatUser)
             showHealthHologramTimestampMap.put((CombatUser) attacker, Timestamp.now().plus(Timespan.ofSeconds(1)));
 
-        if (getHealth() > finalDamage)
-            setHealth(getHealth() - finalDamage);
-        else {
+        if (isKilled) {
             if (attacker != null)
                 attacker.onKill(combatEntity);
             combatEntity.onDeath(attacker);

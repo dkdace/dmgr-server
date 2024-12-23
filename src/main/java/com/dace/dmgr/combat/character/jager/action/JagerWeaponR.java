@@ -46,7 +46,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
+        return actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 break;
             }
             case RIGHT_CLICK: {
-                setCooldown(2);
+                combatUser.setGlobalCooldown(1);
                 onCancelled();
 
                 break;

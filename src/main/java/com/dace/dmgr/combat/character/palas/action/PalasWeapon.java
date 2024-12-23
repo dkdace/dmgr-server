@@ -90,7 +90,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 break;
             }
             case RIGHT_CLICK: {
-                setCooldown(2);
+                combatUser.setGlobalCooldown(1);
                 if (aimModule.isAiming()) {
                     onCancelled();
                     return;
@@ -240,12 +240,14 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @Override
         protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
             if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                if (((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true) && target.getDamageModule().isLowHealth()) {
+                if (target.getDamageModule().isLowHealth()) {
                     PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
                     skillp1.setHealAmount(PalasWeaponInfo.HEAL);
                     skillp1.setTarget((Healable) target);
                     combatUser.useAction(ActionKey.PERIODIC_1);
                 }
+
+                ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 
                 PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
             }
