@@ -45,7 +45,7 @@ public final class NeaceP1 extends AbstractSkill {
 
     @Override
     public boolean isCancellable() {
-        return !isDurationFinished();
+        return !isDurationFinished() || !isCooldownFinished();
     }
 
     @Override
