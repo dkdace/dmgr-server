@@ -69,7 +69,7 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(2).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.throw").volume(2).pitchVariance(0.7).build(),
+                SoundEffect.SoundInfo.builder("new.item.trident.throw").volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(2).pitch(0.7).build()
         );
         /** 틱 효과음 */
