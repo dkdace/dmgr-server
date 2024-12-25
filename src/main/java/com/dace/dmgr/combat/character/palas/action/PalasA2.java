@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -101,7 +102,7 @@ public final class PalasA2 extends ActiveSkill {
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
 
             if (target instanceof CombatUser) {
-                ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", 0, 5, 10);
+                ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
                 ((CombatUser) target).addKillAssist(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);

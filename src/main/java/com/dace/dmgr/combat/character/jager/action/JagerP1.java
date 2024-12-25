@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.util.Timespan;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -36,7 +37,7 @@ public final class JagerP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (target.getDamageModule().isLiving())
-            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, JagerP1Info.DURATION);
+            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(JagerP1Info.DURATION));
     }
 
     @Override

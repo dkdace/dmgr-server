@@ -50,7 +50,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -80,8 +79,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final double KILL_SUPPORT_SCORE_RATIO = 0.2;
     /** 최대 코어 개수 */
     private static final int MAX_CORE_AMOUNT = 3;
-    /** 킬 로그 보스바 ID */
-    private static final String COMBAT_KILL_BOSSBAR_ID = "CombatKillBossBar";
     /** 기능 블록(힐 팩 및 궁극기 팩)의 타임스탬프 목록 (위치 : 종료 시점) */
     private static final HashMap<GlobalLocation, Timestamp> BLOCK_TIMESTAMP_MAP = new HashMap<>();
 
@@ -203,7 +200,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule = new HealModule(this, true, true, true, 0, 1000);
         moveModule = new JumpModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
         critHitbox = hitboxes[3];
-        user.clearSidebar();
+        user.getSidebarManager().clear();
     }
 
     /**
@@ -627,10 +624,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         definedTimestamp.hitSound = Timestamp.now().plus(Timespan.ofTicks(1));
         if (isCrit) {
-            user.sendTitle("", "§c§l×", 0, 2, 10);
+            user.sendTitle("", "§c§l×", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
             TaskUtil.addTask(this, new DelayTask(() -> SOUND.ATTACK_CRIT.play(entity), 2));
         } else {
-            user.sendTitle("", "§f×", 0, 2, 10);
+            user.sendTitle("", "§f×", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
             TaskUtil.addTask(this, new DelayTask(() -> SOUND.ATTACK.play(entity), 2));
         }
     }
@@ -799,7 +796,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 엔티티를 처치했을 때 효과를 재생한다.
      */
     private void playKillEffect() {
-        user.sendTitle("", "§c" + TextIcon.POISON, 0, 2, 10);
+        user.sendTitle("", "§c" + TextIcon.POISON, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
         TaskUtil.addTask(this, new DelayTask(() -> SOUND.KILL.play(entity), 2));
     }
 
@@ -814,14 +811,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         String attackerNames = damageMap.keySet().stream().map(CombatUser::getPlayerKillBossBarName)
                 .collect(Collectors.joining(", "));
         String victimName = getPlayerKillBossBarName();
+        BossBarDisplay bossBarDisplay = new BossBarDisplay(MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName));
 
         for (GameUser targetGameUser : game.getGameUsers()) {
-            targetGameUser.getUser().addBossBar(COMBAT_KILL_BOSSBAR_ID + this,
-                    MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName),
-                    BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
+            bossBarDisplay.show(targetGameUser.getPlayer());
 
-            TaskUtil.addTask(targetGameUser, new DelayTask(() ->
-                    targetGameUser.getUser().removeBossBar(COMBAT_KILL_BOSSBAR_ID + this), GeneralConfig.getCombatConfig().getKillLogDisplayDuration()));
+            new DelayTask(() -> bossBarDisplay.hide(targetGameUser.getPlayer()), GeneralConfig.getCombatConfig().getKillLogDisplayDuration());
         }
     }
 
@@ -964,7 +959,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
-                        String.format("%.1f", Timestamp.now().until(definedTimestamp.respawn).toSeconds())), 0, 5, 10);
+                                String.format("%.1f", Timestamp.now().until(definedTimestamp.respawn).toSeconds())), Timespan.ZERO, Timespan.ofTicks(5),
+                        Timespan.ofTicks(10));
             user.teleport(deadLocation);
             entity.setSpectatorTarget(null);
 
@@ -1145,7 +1141,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                     () -> {
                         scoreStreakSum = 0;
                         scoreMap.clear();
-                        user.clearSidebar();
+                        user.getSidebarManager().clear();
                     }, 1));
         } else
             definedTimestamp.scoreDisplay = expiration;
@@ -1156,7 +1152,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         scoreStreakSum += score;
         scoreMap.put(context, scoreMap.getOrDefault(context, 0.0) + score);
 
-        user.clearSidebar();
+        user.getSidebarManager().clear();
         sendScoreSidebar();
     }
 
@@ -1165,10 +1161,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void sendScoreSidebar() {
         int i = 0;
-        user.setSidebarName("§a+" + (int) scoreStreakSum);
-        user.editSidebar(i++, "");
+        user.getSidebarManager().setName("§a+" + (int) scoreStreakSum);
+        user.getSidebarManager().set(i++, "");
         for (Map.Entry<String, Double> entry : scoreMap.entrySet())
-            user.editSidebar(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));
+            user.getSidebarManager().set(i++, StringUtils.center(MessageFormat.format("§f{0} §a[+{1}]", entry.getKey(), entry.getValue().intValue()), 30));
     }
 
     /**

@@ -14,6 +14,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 public final class Timespan implements Comparable<Timespan> {
+    /** 0의 값을 가진 기간 */
+    public static final Timespan ZERO = Timespan.ofMilliseconds(0);
     /** 사용 가능한 최솟값의 기간 */
     public static final Timespan MIN = Timespan.ofMilliseconds(Long.MIN_VALUE);
     /** 사용 가능한 최댓값의 기간 */

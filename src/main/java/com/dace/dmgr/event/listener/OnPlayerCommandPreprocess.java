@@ -19,13 +19,13 @@ public final class OnPlayerCommandPreprocess implements Listener {
             event.setCancelled(true);
 
         if (!player.isOp()) {
-            if (user.getCommandTimestamp().isAfter(Timestamp.now())) {
+            if (user.getCommandCooldownTimestamp().isAfter(Timestamp.now())) {
                 user.sendMessageWarn("동작이 너무 빠릅니다.");
                 event.setCancelled(true);
                 return;
             }
 
-            user.setCommandTimestamp(Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getCommandCooldown())));
+            user.setCommandCooldownTimestamp(Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getCommandCooldown())));
         }
     }
 }

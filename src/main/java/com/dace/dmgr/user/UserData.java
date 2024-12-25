@@ -148,7 +148,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 모든 유저의 데이터 정보를 반환한다.
      *
-     * @return 모든 유저 데이터 정보 객체
+     * @return 유저 데이터 정보 인스턴스 목록
      */
     @NonNull
     @Unmodifiable

@@ -162,7 +162,7 @@ public final class GameUser implements Disposable {
 
         if (game.getPhase() == Game.Phase.PLAYING && !combatUser.isDead())
             user.sendTitle("", (combatUser.getCharacterType() == null) ? "§b§nF키§b를 눌러 전투원을 선택하십시오." :
-                    "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", 0, 10, 10);
+                    "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", Timespan.ZERO, Timespan.ofTicks(10), Timespan.ofTicks(10));
 
         combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20.0, false);
     }
@@ -174,7 +174,7 @@ public final class GameUser implements Disposable {
         Validate.notNull(combatUser);
 
         if (!combatUser.isDead())
-            user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", 0, 10, 10, 20);
+            user.sendTitle("", "§c상대 팀의 스폰 지역입니다.", Timespan.ZERO, Timespan.ofTicks(10), Timespan.ofTicks(10), Timespan.ofTicks(20));
 
         combatUser.getDamageModule().damage(combatUser, GeneralConfig.getGameConfig().getOppositeSpawnDamagePerSecond() / 20.0, DamageType.FIXED,
                 null, false, false);
@@ -219,9 +219,10 @@ public final class GameUser implements Disposable {
         user.clearChat();
         user.setInFreeCombat(false);
 
-        user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10,
-                (game.getPhase() == Game.Phase.READY) ? game.getGamePlayMode().getReadyDuration() * 20 : 40, 30, 80);
-        user.clearTabListItems();
+        user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofTicks(10),
+                Timespan.ofTicks(game.getPhase() == Game.Phase.READY ? game.getGamePlayMode().getReadyDuration() * 20L : 40), Timespan.ofTicks(30),
+                Timespan.ofTicks(80));
+        user.getTabListManager().clearItems();
 
         combatUser = new CombatUser(this);
 
@@ -233,7 +234,9 @@ public final class GameUser implements Disposable {
      * 게임 탭리스트를 업데이트한다.
      */
     private void updateGameTablist() {
-        user.setTabListHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
+        User.TabListManager tabListManager = user.getTabListManager();
+
+        tabListManager.setHeader("\n" + (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName() +
                 "\n" + MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
                 game.getRedTeam().getScore(), game.getBlueTeam().getScore()));
 
@@ -243,7 +246,7 @@ public final class GameUser implements Disposable {
         int column = 0;
         for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
             column++;
-            user.setTabListItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
+            tabListManager.setItem(column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
                     targetTeam.getColor(), targetTeam.getName(), targetTeam.getTeamUsers().size()), Skins.getDot(targetTeam.getColor()));
 
             GameUser[] teamUsers = targetTeam.getTeamUsers().stream()
@@ -254,23 +257,21 @@ public final class GameUser implements Disposable {
                 int row = (i + 1) * 3;
 
                 if (i > teamUsers.length - 1) {
-                    user.removeTabListItem(column, row - 2);
-                    user.removeTabListItem(column, row - 1);
+                    tabListManager.removeItem(column, row - 2);
+                    tabListManager.removeItem(column, row - 1);
                 } else {
                     User targetUser = User.fromPlayer(teamUsers[i].getPlayer());
 
                     if (this.team == targetTeam || headReveal)
-                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), targetUser);
+                        tabListManager.setItem(column, row - 2, targetUser.getUserData().getDisplayName(), targetUser);
                     else
-                        user.setTabListItem(column, row - 2, targetUser.getUserData().getDisplayName(), Skins.getPlayer("crashdummie99"));
-                    user.setTabListItem(column, row - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
+                        tabListManager.setItem(column, row - 2, targetUser.getUserData().getDisplayName(), Skins.getPlayer("crashdummie99"));
+                    tabListManager.setItem(column, row - 1, MessageFormat.format("§7✪ §f{0}   §7{1} §f{2}   §7{3} §f{4}   §7{5} §f{6}",
                             (int) teamUsers[i].getScore(), TextIcon.DAMAGE, teamUsers[i].getKill(), TextIcon.POISON, teamUsers[i].getDeath(),
                             "✔", teamUsers[i].getAssist()), (Skin) null);
                 }
             }
         }
-
-        user.applyTabList();
     }
 
     /**

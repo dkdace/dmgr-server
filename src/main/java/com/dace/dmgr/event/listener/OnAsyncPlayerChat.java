@@ -30,12 +30,12 @@ public final class OnAsyncPlayerChat implements Listener {
         UserData userData = UserData.fromPlayer(player);
 
         if (!player.isOp()) {
-            if (user.getChatTimestamp().isAfter(Timestamp.now())) {
+            if (user.getChatCooldownTimestamp().isAfter(Timestamp.now())) {
                 user.sendMessageWarn("채팅을 천천히 하십시오.");
                 return;
             }
 
-            user.setChatTimestamp(Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown())));
+            user.setChatCooldownTimestamp(Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown())));
         }
 
         Bukkit.getServer().getConsoleSender().sendMessage(MessageFormat.format(CHAT_FORMAT, userData.getDisplayName(), event.getMessage()));

@@ -148,7 +148,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", 0, 2, 10);
+                ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
             if (combatEntity.getDamageModule().isLiving())
                 JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getEntity().getWidth(),

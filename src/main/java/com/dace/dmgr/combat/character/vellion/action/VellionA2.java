@@ -121,7 +121,7 @@ public final class VellionA2 extends ActiveSkill {
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, -VellionA2Info.DEFENSE_DECREMENT);
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", 0, 5, 10);
+                ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
         }
 
         @Override
@@ -129,14 +129,14 @@ public final class VellionA2 extends ActiveSkill {
             VellionA2Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
 
             if (provider instanceof CombatUser)
-                ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, 4);
+                ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(4));
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§f저주가 풀림", "", 0, 5, 10);
+                ((CombatUser) combatEntity).getUser().sendTitle("§f저주가 풀림", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
         }
     }
 

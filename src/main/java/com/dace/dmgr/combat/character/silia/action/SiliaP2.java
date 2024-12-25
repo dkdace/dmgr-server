@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -75,7 +76,8 @@ public final class SiliaP2 extends AbstractSkill {
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);
-            combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
+            combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
+                    Timespan.ofTicks(10), Timespan.ofTicks(5));
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
                 SiliaP2Info.SOUND.USE.play(combatUser.getEntity().getLocation(), 1, 0);

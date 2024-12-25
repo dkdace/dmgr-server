@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action.skill.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -80,7 +81,7 @@ public class ConfirmModule {
      */
     protected void onCheckTick(long i) {
         skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
-                acceptKey, cancelKey), 0, 5, 5);
+                acceptKey, cancelKey), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
     }
 
     /**

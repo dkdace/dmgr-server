@@ -93,7 +93,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                                 (target instanceof CombatUser && ((CombatUser) target).getCharacterType() != null ?
                                         ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : ""),
                                 target.getName()),
-                        0, 5, 5);
+                        Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
 
                 healTarget(target);
 

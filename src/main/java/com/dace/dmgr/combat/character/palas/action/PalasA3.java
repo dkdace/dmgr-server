@@ -120,7 +120,8 @@ public final class PalasA3 extends ActiveSkill {
             combatEntity.getDamageModule().setHealth(combatEntity.getDamageModule().getHealth() + increasedHealth);
 
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", 0, 5, 10);
+                ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", Timespan.ZERO, Timespan.ofTicks(5),
+                        Timespan.ofTicks(10));
         }
 
         @Override
@@ -162,7 +163,8 @@ public final class PalasA3 extends ActiveSkill {
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
 
             if (combatEntity instanceof CombatUser)
-                ((CombatUser) combatEntity).getUser().sendTitle("§c§l최대 체력 감소", "", 0, 5, 10);
+                ((CombatUser) combatEntity).getUser().sendTitle("§c§l최대 체력 감소", "", Timespan.ZERO, Timespan.ofTicks(5),
+                        Timespan.ofTicks(10));
         }
 
         @Override

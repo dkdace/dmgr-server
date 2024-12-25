@@ -14,6 +14,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.Timespan;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -222,7 +223,7 @@ public final class Neace extends Support {
 
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
-            ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, 3);
+            ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, Timespan.ofTicks(3));
         }
     }
 }

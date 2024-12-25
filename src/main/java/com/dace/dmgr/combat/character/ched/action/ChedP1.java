@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -105,7 +106,8 @@ public final class ChedP1 extends AbstractSkill {
             ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);
-            combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), 0, 10, 5);
+            combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
+                    Timespan.ofTicks(10), Timespan.ofTicks(5));
 
             ChedP1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
 

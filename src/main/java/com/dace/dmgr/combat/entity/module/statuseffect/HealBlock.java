@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.util.Timespan;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,7 @@ public class HealBlock implements StatusEffect {
     @Override
     public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", 0, 5, 10);
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
     }
 
     @Override

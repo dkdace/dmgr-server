@@ -1,6 +1,5 @@
 package com.dace.dmgr.game;
 
-import com.comphenix.packetwrapper.WrapperPlayServerBoss;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;
@@ -8,9 +7,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.SoundEffect;
-import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.WorldUtil;
+import com.dace.dmgr.util.*;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -19,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -31,8 +29,6 @@ import java.util.stream.Collectors;
  * 게임의 정보와 진행을 관리하는 클래스.
  */
 public final class Game implements Disposable {
-    /** 게임 시작 대기 보스바 ID */
-    private static final String GAME_WAIT_BOSSBAR_ID = "GameWait";
     /** 타이머 효과음 */
     private static final SoundEffect TIMER_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1000).pitch(1).build());
@@ -48,7 +44,12 @@ public final class Game implements Disposable {
     /** 무승부 효과음 */
     private static final SoundEffect DRAW_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build());
-
+    /** 게임 시작 대기 보스바 목록 */
+    private final BossBarDisplay[] gameWaitBossBars = new BossBarDisplay[]{
+            new BossBarDisplay("§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오."),
+            new BossBarDisplay(""),
+            new BossBarDisplay("", BarColor.GREEN, BarStyle.SOLID)
+    };
     /** 방 번호 */
     @Getter
     private final int number;
@@ -247,18 +248,15 @@ public final class Game implements Disposable {
      * @param gameUser 대상 플레이어
      */
     private void sendBossBarWaiting(@NonNull GameUser gameUser) {
-        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '1', "§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오.",
-                BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '2',
-                MessageFormat.format("§c게임을 시작하려면 최소 {0}명이 필요합니다.", minPlayerCount),
-                BarColor.WHITE, WrapperPlayServerBoss.BarStyle.PROGRESS, 0);
-        gameUser.getUser().addBossBar(GAME_WAIT_BOSSBAR_ID + '3',
-                MessageFormat.format("§a§l{0} §f[{1}§f/{2} 명]",
-                        (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"), (canStart() ? "§f" : "§c") + gameUsers.size(),
-                        maxPlayerCount),
-                BarColor.GREEN,
-                WrapperPlayServerBoss.BarStyle.PROGRESS,
-                canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTimeSeconds() : 1);
+        gameWaitBossBars[1].setTitle(MessageFormat.format("§c게임을 시작하려면 최소 {0}명이 필요합니다.", minPlayerCount));
+        gameWaitBossBars[2].setTitle(MessageFormat.format("§a§l{0} §f[{1}§f/{2} 명]",
+                (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"),
+                (canStart() ? "§f" : "§c") + gameUsers.size(),
+                maxPlayerCount));
+        gameWaitBossBars[2].setProgress(canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTimeSeconds() : 1);
+
+        for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
+            gameWaitBossBar.show(gameUser.getPlayer());
     }
 
     /**
@@ -268,7 +266,7 @@ public final class Game implements Disposable {
         if (remainingTime > 0 && remainingTime <= 5) {
             gameUsers.forEach(gameUser -> {
                 TIMER_SOUND.play(gameUser.getPlayer());
-                gameUser.getUser().sendTitle("§f" + remainingTime, "", 0, 5, 10, 10);
+                gameUser.getUser().sendTitle("§f" + remainingTime, "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10), Timespan.ofTicks(10));
             });
         }
 
@@ -278,7 +276,7 @@ public final class Game implements Disposable {
 
             gameUsers.forEach(gameUser -> {
                 ON_PLAY_SOUND.play(gameUser.getPlayer());
-                gameUser.getUser().sendTitle("§c§l전투 시작", "", 0, 40, 20, 40);
+                gameUser.getUser().sendTitle("§c§l전투 시작", "", Timespan.ZERO, Timespan.ofTicks(40), Timespan.ofTicks(20), Timespan.ofTicks(40));
                 gameUser.getUser().sendMessageInfo("");
                 gameUser.getUser().sendMessageInfo("§n'/전체'§r 또는 §n'/tc'§r를 입력하여 팀/전체 채팅을 전환할 수 있습니다.");
                 gameUser.getUser().sendMessageInfo("");
@@ -300,19 +298,21 @@ public final class Game implements Disposable {
                     gameUsers.forEach(gameUser -> {
                         TIMER_SOUND.play(gameUser.getPlayer());
                         gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 §e" + ultPackRemainingTime + "초 §f후 활성화됩니다.",
-                                0, 20, 20, 40);
+                                Timespan.ZERO, Timespan.ofTicks(20), Timespan.ofTicks(20), Timespan.ofTicks(40));
                     });
                 else if (ultPackRemainingTime == 0)
                     gameUsers.forEach(gameUser -> {
                         TIMER_SOUND.play(gameUser.getPlayer());
-                        gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", 0, 20, 20, 40);
+                        gameUser.getUser().sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", Timespan.ZERO, Timespan.ofTicks(20),
+                                Timespan.ofTicks(20), Timespan.ofTicks(40));
                     });
             }
 
             if (remainingTime <= 10) {
                 gameUsers.forEach(gameUser -> {
                     TIMER_SOUND.play(gameUser.getPlayer());
-                    gameUser.getUser().sendTitle("", "§c" + remainingTime, 0, 5, 10, 10);
+                    gameUser.getUser().sendTitle("", "§c" + remainingTime, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10),
+                            Timespan.ofTicks(10));
                 });
             }
         }
@@ -346,7 +346,9 @@ public final class Game implements Disposable {
             divideTeam();
 
             gameUsers.forEach(gameUser -> {
-                gameUser.getUser().clearBossBar();
+                for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
+                    gameWaitBossBar.hide(gameUser.getPlayer());
+
                 gameUser.onGameStart();
             });
         }).onError(ex -> {
@@ -529,7 +531,8 @@ public final class Game implements Disposable {
      */
     private void playWinEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
-            gameUser.getUser().sendTitle("§b§l승리", "", 8, 40, 30, 40);
+            gameUser.getUser().sendTitle("§b§l승리", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
             WIN_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
@@ -541,7 +544,8 @@ public final class Game implements Disposable {
      */
     private void playLoseEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
-            gameUser.getUser().sendTitle("§c§l패배", "", 8, 40, 30, 40);
+            gameUser.getUser().sendTitle("§c§l패배", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
             LOSE_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
@@ -553,7 +557,8 @@ public final class Game implements Disposable {
      */
     private void playDrawEffect(@NonNull GameUser gameUser) {
         new DelayTask(() -> {
-            gameUser.getUser().sendTitle("§e§l무승부", "", 8, 40, 30, 40);
+            gameUser.getUser().sendTitle("§e§l무승부", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
             DRAW_SOUND.play(gameUser.getPlayer());
         }, 40);
     }
@@ -703,7 +708,8 @@ public final class Game implements Disposable {
     void removePlayer(@NonNull GameUser gameUser) {
         validate();
 
-        gameUser.getUser().clearBossBar();
+        for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
+            gameWaitBossBar.hide(gameUser.getPlayer());
 
         gameUsers.forEach(target -> target.getUser().sendMessageInfo(StringFormUtil.REMOVE_PREFIX + gameUser.getPlayer().getName()));
         gameUsers.remove(gameUser);

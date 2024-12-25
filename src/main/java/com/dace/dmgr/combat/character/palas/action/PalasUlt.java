@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -99,7 +100,7 @@ public final class PalasUlt extends UltimateSkill {
             target.getStatusEffectModule().applyStatusEffect(combatUser, PalasUltBuff.instance, PalasUltInfo.DURATION);
 
             if (target instanceof CombatUser) {
-                ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", 0, 5, 10);
+                ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
                 ((CombatUser) target).addKillAssist(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);

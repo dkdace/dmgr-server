@@ -5,6 +5,7 @@ import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -74,7 +75,8 @@ public final class FreeCombat {
         if (CombatUser.fromUser(user) != null)
             return;
 
-        user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", 10, 40, 30, 80);
+        user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofTicks(10), Timespan.ofTicks(40), Timespan.ofTicks(30),
+                Timespan.ofTicks(80));
         user.teleport(waitLocation);
         user.setInFreeCombat(true);
 

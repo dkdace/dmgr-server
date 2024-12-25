@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -134,7 +135,7 @@ public final class LocationConfirmModule extends ConfirmModule {
 
         skill.getCombatUser().getUser().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));
         skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
-                acceptKey, (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey), 0, 5, 5);
+                acceptKey, (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
     }
 
     @Override

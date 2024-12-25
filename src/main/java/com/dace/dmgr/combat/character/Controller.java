@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.Timespan;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -47,7 +48,7 @@ public abstract class Controller extends Character {
                                 RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
 
                         if (targetCombatEntity != null)
-                            combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, 10);
+                            combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(10));
                     });
         }
 

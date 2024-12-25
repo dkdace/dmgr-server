@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -125,7 +126,7 @@ public final class MagrittaA1 extends ActiveSkill {
             MagrittaA1Info.SOUND.STUCK.play(location);
 
             if (target != null) {
-                combatUser.getUser().sendTitle("§b§l부착", "", 0, 5, 10);
+                combatUser.getUser().sendTitle("§b§l부착", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);

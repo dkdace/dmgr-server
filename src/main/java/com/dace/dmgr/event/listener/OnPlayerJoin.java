@@ -5,6 +5,7 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.TimedSoundEffect;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -34,7 +35,7 @@ public final class OnPlayerJoin implements Listener {
 
         event.setJoinMessage(StringFormUtil.ADD_PREFIX + player.getName());
 
-        user.sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", 0, 100, 60);
+        user.sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", Timespan.ZERO, Timespan.ofSeconds(5), Timespan.ofSeconds(3));
         TaskUtil.addTask(user, new DelayTask(user::clearChat, 10));
 
         new DelayTask(() -> {

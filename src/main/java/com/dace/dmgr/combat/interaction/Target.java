@@ -61,6 +61,6 @@ public abstract class Target extends Hitscan {
     @Override
     protected final void onDestroy() {
         if (alertOnFail && currentTarget == null)
-            ((CombatUser) shooter).getUser().sendAlert("대상을 찾을 수 없습니다.");
+            ((CombatUser) shooter).getUser().sendAlertActionBar("대상을 찾을 수 없습니다.");
     }
 }

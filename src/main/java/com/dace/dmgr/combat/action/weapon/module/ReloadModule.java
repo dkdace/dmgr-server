@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -89,7 +90,7 @@ public final class ReloadModule {
 
             String time = String.format("%.1f", (reloadDuration - i) / 20.0);
             weapon.getCombatUser().getUser().sendActionBar(MessageFormat.format("§c§l재장전... {0} §f[{1}초]",
-                    StringFormUtil.getProgressBar(i, reloadDuration, ChatColor.WHITE), time), 2);
+                    StringFormUtil.getProgressBar(i, reloadDuration, ChatColor.WHITE), time), Timespan.ofTicks(2));
             weapon.onReloadTick(i);
 
             return true;
@@ -97,7 +98,7 @@ public final class ReloadModule {
             if (isCancelled)
                 return;
 
-            weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", 6);
+            weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", Timespan.ofTicks(6));
 
             remainingAmmo = capacity;
             isReloading = false;

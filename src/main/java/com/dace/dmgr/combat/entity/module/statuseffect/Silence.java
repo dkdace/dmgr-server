@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.util.Timespan;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class Silence implements StatusEffect {
         if (combatEntity instanceof CombatUser) {
             Validate.notNull(((CombatUser) combatEntity).getCharacterType());
 
-            ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", 0, 5, 10);
+            ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
             if (provider instanceof CombatUser)
                 ((CombatUser) combatEntity).cancelSkill((CombatUser) provider);
