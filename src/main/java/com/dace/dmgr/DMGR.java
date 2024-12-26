@@ -170,8 +170,6 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        getHolographicDisplaysAPI().deleteHolograms();
-
         ConsoleLogger.info("플러그인 비활성화 완료");
 
         Bukkit.getOnlinePlayers().forEach(player -> {
@@ -179,6 +177,8 @@ public class DMGR extends JavaPlugin {
             user.sendMessageInfo("시스템 재부팅 중...");
             user.dispose();
         });
+
+        getHolographicDisplaysAPI().deleteHolograms();
     }
 
     /**

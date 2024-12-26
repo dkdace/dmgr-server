@@ -28,9 +28,9 @@ public final class Timespan implements Comparable<Timespan> {
     /** 초 : 분 */
     private static final int SECONDS_TO_MINUTES = TICKS_TO_SECONDS * 60;
     /** 분 : 시간 */
-    private static final int MINUTES_TO_HOURS = TICKS_TO_SECONDS * 60;
+    private static final int MINUTES_TO_HOURS = SECONDS_TO_MINUTES * 60;
     /** 시간 : 일 */
-    private static final int HOURS_TO_DAYS = TICKS_TO_SECONDS * 24;
+    private static final int HOURS_TO_DAYS = MINUTES_TO_HOURS * 24;
 
     /** 시간 (ms) */
     private final long milliseconds;

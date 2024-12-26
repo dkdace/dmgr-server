@@ -78,7 +78,7 @@ public final class FireworkEffect {
             Validate.inclusiveBetween(0, 255, green);
             Validate.inclusiveBetween(0, 255, blue);
 
-            mcBuilder.withFade(Color.fromRGB(red, green, blue).mixDyes());
+            mcBuilder.withFade(Color.fromRGB(red, green, blue));
 
             return this;
         }
