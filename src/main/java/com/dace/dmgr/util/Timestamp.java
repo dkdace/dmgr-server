@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import java.util.Date;
+
 /**
  * 시각(타임스탬프) 을 나타내는 클래스.
  */
@@ -89,6 +91,16 @@ public final class Timestamp implements Comparable<Timestamp> {
     @NonNull
     public Timespan until(@NonNull Timestamp timestamp) {
         return Timespan.ofMilliseconds(timestamp.timestampMillis - timestampMillis);
+    }
+
+    /**
+     * 타임스탬프를 Date로 바꿔 반환한다.
+     *
+     * @return 새로운 {@link Date}
+     */
+    @NonNull
+    public Date toDate() {
+        return new Date(timestampMillis);
     }
 
     @Override

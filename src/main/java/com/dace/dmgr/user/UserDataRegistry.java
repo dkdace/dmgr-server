@@ -5,9 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,8 +29,8 @@ final class UserDataRegistry extends Registry<UUID, UserData> {
      * @return 모든 유저 데이터 정보 객체
      */
     @NonNull
-    @Unmodifiable
+    @UnmodifiableView
     public Collection<@NonNull UserData> getAllUserDatas() {
-        return map.values();
+        return Collections.unmodifiableCollection(map.values());
     }
 }

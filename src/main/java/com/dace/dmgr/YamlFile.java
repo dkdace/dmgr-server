@@ -9,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -301,7 +302,7 @@ public final class YamlFile implements Initializable<Void> {
              */
             @Override
             @NonNull
-            @Unmodifiable
+            @UnmodifiableView
             @SuppressWarnings("unchecked")
             public List<@NonNull T> get() {
                 validate();
@@ -309,7 +310,7 @@ public final class YamlFile implements Initializable<Void> {
                 if (super.value == null)
                     super.value = (List<T>) configurationSection.getList(super.key, super.defaultValue);
 
-                return super.value;
+                return Collections.unmodifiableList(super.value);
             }
 
             /**

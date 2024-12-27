@@ -42,7 +42,7 @@ public final class BlockCommand extends BaseCommandExecutor {
                 case "목록":
                 case "ahrfhr":
                 case "list": {
-                    if (userData.getBlockedPlayers().length == 0) {
+                    if (userData.getBlockedPlayers().isEmpty()) {
                         user.sendMessageWarn("차단한 플레이어가 없습니다.");
                         player.closeInventory();
 

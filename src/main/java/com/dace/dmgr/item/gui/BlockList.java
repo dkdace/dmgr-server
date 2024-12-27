@@ -12,6 +12,9 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * 차단 목록 GUI 클래스.
  */
@@ -39,11 +42,11 @@ public final class BlockList extends Gui {
     public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         UserData userData = UserData.fromPlayer(player);
 
-        UserData[] blockedPlayers = userData.getBlockedPlayers();
+        Set<UserData> blockedPlayers = userData.getBlockedPlayers();
         new AsyncTask<Void>((onFinish, onError) -> {
-            for (int i = 0; i < Math.min(blockedPlayers.length, 27); i++) {
-                UserData blockedPlayer = blockedPlayers[i];
-
+            int i = 0;
+            for (Iterator<UserData> iterator = blockedPlayers.iterator(); i < blockedPlayers.size() && iterator.hasNext(); i++) {
+                UserData blockedPlayer = iterator.next();
                 guiController.set(i, playerInto, itemBuilder -> itemBuilder.setName(blockedPlayer.getDisplayName())
                         .setSkullOwner(Bukkit.getOfflinePlayer(blockedPlayer.getPlayerUUID())));
             }

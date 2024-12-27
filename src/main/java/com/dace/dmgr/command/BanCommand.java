@@ -2,6 +2,8 @@ package com.dace.dmgr.command;
 
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,7 @@ public final class BanCommand extends BaseCommandExecutor {
         int days = Integer.parseInt(args[1]);
         String reason = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : null;
 
-        Date endDate = targetUserData.ban(days, reason);
+        Timestamp expiration = targetUserData.ban(Timespan.ofDays(days), reason);
 
         Bukkit.getOnlinePlayers().forEach(target -> {
             User targetUser = User.fromPlayer(target);
@@ -68,7 +69,7 @@ public final class BanCommand extends BaseCommandExecutor {
             targetUser.sendMessageInfo("§e§n{0}§r님이 §e§n{1}§r님을 서버에서 차단했습니다.", user.getPlayer().getName(), targetUserData.getPlayerName());
             if (reason != null)
                 targetUser.sendMessageInfo("차단 사유 : §6{0}", reason);
-            targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"));
+            targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"));
             targetUser.sendMessageInfo("");
         });
     }

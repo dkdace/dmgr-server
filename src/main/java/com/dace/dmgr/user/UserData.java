@@ -9,6 +9,8 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
@@ -20,12 +22,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,11 +34,13 @@ import java.util.stream.Collectors;
  */
 public final class UserData implements Initializable<Void> {
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
-    private static final String MESSAGE_BANNED = "§c관리자에 의해 서버에서 차단되었습니다." +
+    private static final String MESSAGE_BANNED = "{0}§c관리자에 의해 서버에서 차단되었습니다." +
             "\n" +
-            "\n§f해제 일시 : §e{0}" +
+            "\n§f해제 일시 : §e{1}" +
             "\n" +
-            "\n§7문의 : {1}";
+            "\n§7문의 : {2}";
+    /** Yaml 파일 경로의 디렉터리 이름 */
+    private static final String DIRECTORY_NAME = "User";
 
     /** 플레이어 UUID */
     @NonNull
@@ -77,7 +79,6 @@ public final class UserData implements Initializable<Void> {
     private final YamlFile.Section.Entry<Integer> loseCountEntry;
     /** 탈주 횟수 */
     private final YamlFile.Section.Entry<Integer> quitCountEntry;
-
     /** 유저 개인 설정 */
     @NonNull
     @Getter
@@ -92,9 +93,9 @@ public final class UserData implements Initializable<Void> {
      * @param playerName 대상 플레이어 이름
      */
     private UserData(@NonNull UUID playerUUID, @NonNull String playerName) {
-        this.yamlFile = new YamlFile(Paths.get("User", playerUUID + ".yml"));
         this.playerUUID = playerUUID;
         this.playerName = playerName;
+        this.yamlFile = new YamlFile(Paths.get(DIRECTORY_NAME, playerUUID + ".yml"));
 
         YamlFile.Section section = yamlFile.getDefaultSection();
         this.xpEntry = section.getEntry("xp", 0);
@@ -151,7 +152,7 @@ public final class UserData implements Initializable<Void> {
      * @return 유저 데이터 정보 인스턴스 목록
      */
     @NonNull
-    @Unmodifiable
+    @UnmodifiableView
     public static Collection<@NonNull UserData> getAllUserDatas() {
         return UserDataRegistry.getInstance().getAllUserDatas();
     }
@@ -176,11 +177,13 @@ public final class UserData implements Initializable<Void> {
     /**
      * 유저의 데이터 정보를 저장한다.
      */
-    public void save() {
+    @Nullable
+    public AsyncTask<Void> save() {
         if (DMGR.getPlugin().isEnabled())
-            yamlFile.save();
-        else
-            yamlFile.saveSync();
+            return yamlFile.save();
+
+        yamlFile.saveSync();
+        return null;
     }
 
     /**
@@ -229,8 +232,7 @@ public final class UserData implements Initializable<Void> {
             if (player == null)
                 return;
 
-            User user = User.fromPlayer(player);
-            user.playLevelUpEffect();
+            User.fromPlayer(player).playLevelUpEffect();
         }
     }
 
@@ -307,8 +309,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어의 랭크 점수를 설정한다.
      *
-     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는
-     * {@link User#playTierDownEffect()}를 호출한다.</p>
+     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는 {@link User#playTierDownEffect()}를 호출한다.</p>
      *
      * @param rankRate 랭크 점수 (RR)
      */
@@ -431,10 +432,11 @@ public final class UserData implements Initializable<Void> {
      * @return 차단한 플레이어 목록의 유저 데이터 정보
      */
     @NonNull
-    public UserData @NonNull [] getBlockedPlayers() {
-        return blockedPlayersEntry.get().stream()
+    @UnmodifiableView
+    public Set<@NonNull UserData> getBlockedPlayers() {
+        return Collections.unmodifiableSet(blockedPlayersEntry.get().stream()
                 .map(uuid -> UserData.fromUUID(UUID.fromString(uuid)))
-                .toArray(UserData[]::new);
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -476,35 +478,28 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어를 서버에서 차단한다.
      *
-     * <p>이미 차단된 상태이면 차단 기간을 연장한다.</p>
-     *
-     * @param days   기간 (일). 0 이상의 값
-     * @param reason 차단 사유
-     * @return 차단 해제 날짜
+     * @param duration 차단 기간
+     * @param reason   차단 사유
+     * @return 차단 해제 시점
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
-    public Date ban(int days, @Nullable String reason) {
-        Validate.inclusiveBetween(0, Integer.MAX_VALUE, days);
-
+    public Timestamp ban(@NonNull Timespan duration, @Nullable String reason) {
         if (reason == null)
             reason = "없음";
 
-        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
-        Date startDate = Date.from(Instant.now());
-        if (banList.isBanned(playerName))
-            startDate = banList.getBanEntry(playerName).getExpiration();
-
-        Date endDate = Date.from(startDate.toInstant().plus(days, ChronoUnit.DAYS));
-        String finalReason = GeneralConfig.getConfig().getMessagePrefix() + MessageFormat.format(MESSAGE_BANNED,
-                DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"), GeneralConfig.getConfig().getAdminContact());
-        banList.addBan(playerName, reason + "\n\n" + finalReason, endDate, null);
+        Timestamp expiration = Timestamp.now().plus(duration);
+        String finalReason = MessageFormat.format(MESSAGE_BANNED,
+                GeneralConfig.getConfig().getMessagePrefix(),
+                DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"),
+                GeneralConfig.getConfig().getAdminContact());
+        Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, expiration.toDate(), null);
 
         Player player = Bukkit.getPlayer(playerUUID);
         if (player != null)
             player.kickPlayer(finalReason);
 
-        return endDate;
+        return expiration;
     }
 
     /**
@@ -513,12 +508,11 @@ public final class UserData implements Initializable<Void> {
      * @return 차단 여부
      */
     public boolean isBanned() {
-        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
-        return banList.isBanned(playerName);
+        return Bukkit.getBanList(BanList.Type.NAME).isBanned(playerName);
     }
 
     /**
-     * 플레이어의 차단을 해제한다.
+     * 플레이어의 서버 차단을 해제한다.
      */
     public void unban() {
         BanList banList = Bukkit.getBanList(BanList.Type.NAME);
@@ -531,14 +525,13 @@ public final class UserData implements Initializable<Void> {
     /**
      * 전체 게임 플레이 시간을 반환한다.
      *
-     * @return 게임 플레이 시간 (초)
+     * @return 게임 플레이 시간
      */
-    public int getPlayTime() {
-        int totalPlayTime = 0;
-        for (CharacterRecord characterRecord : characterRecordMap.values())
-            totalPlayTime += characterRecord.playTimeEntry.get();
-
-        return totalPlayTime;
+    @NonNull
+    public Timespan getPlayTime() {
+        return Timespan.ofSeconds(characterRecordMap.values().stream()
+                .mapToInt(characterRecord -> characterRecord.playTimeEntry.get())
+                .sum());
     }
 
     /**
@@ -583,8 +576,11 @@ public final class UserData implements Initializable<Void> {
      */
     @NonNull
     public String getDisplayName() {
-        return MessageFormat.format("{0} {1} {2}{3}§f", getTier().getPrefix(), getLevelPrefix(),
-                (Bukkit.getOfflinePlayer(playerUUID).isOp() ? "§a" : "§f"), playerName);
+        return MessageFormat.format("{0} {1} {2}{3}§f",
+                getTier().getPrefix(),
+                getLevelPrefix(),
+                (Bukkit.getOfflinePlayer(playerUUID).isOp() ? "§a" : "§f"),
+                playerName);
     }
 
     /**
@@ -699,10 +695,11 @@ public final class UserData implements Initializable<Void> {
         }
 
         /**
-         * @return 플레이 시간 (초)
+         * @return 플레이 시간
          */
-        public int getPlayTime() {
-            return playTimeEntry.get();
+        @NonNull
+        public Timespan getPlayTime() {
+            return Timespan.ofSeconds(playTimeEntry.get());
         }
 
         /**
@@ -718,9 +715,11 @@ public final class UserData implements Initializable<Void> {
          * @return 적용된 코어 목록
          */
         @NonNull
-        @Unmodifiable
+        @UnmodifiableView
         public Set<@NonNull Core> getCores() {
-            return coresEntry.get().stream().map(Core::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class)));
+            return Collections.unmodifiableSet(coresEntry.get().stream()
+                    .map(Core::valueOf)
+                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class))));
         }
 
         /**

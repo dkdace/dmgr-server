@@ -62,7 +62,7 @@ public final class Stat extends Gui {
                             (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
                             userData.getQuitCount(),
                             (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
-                            DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분"), "");
+                            DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분"), "");
                 })
         );
 
@@ -81,7 +81,7 @@ public final class Stat extends Gui {
                                     characterRecord.getKill(), characterRecord.getDeath(),
                                     (double) characterRecord.getKill() / (characterRecord.getDeath() == 0 ? 1 : characterRecord.getDeath())),
                             MessageFormat.format("§e플레이 시간 : §f{0}",
-                                    DurationFormatUtils.formatDuration(characterRecord.getPlayTime() * 1000L, "d일 H시간 m분"))));
+                                    DurationFormatUtils.formatDuration(characterRecord.getPlayTime().toMilliseconds(), "d일 H시간 m분"))));
         }
     }
 }

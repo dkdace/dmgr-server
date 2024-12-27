@@ -425,7 +425,7 @@ public final class User implements Disposable {
                         (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("MHF_TNT2"));
         tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
-                        DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분")),
+                        DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")),
                 Skins.getPlayer("Olaf_C"));
 
         updateLobbyTabListUsers();

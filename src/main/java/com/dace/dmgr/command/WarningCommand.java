@@ -3,6 +3,8 @@ package com.dace.dmgr.command;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.util.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,13 +105,13 @@ public final class WarningCommand extends BaseCommandExecutor {
 
         if (targetUserData.getWarning() >= 3) {
             new DelayTask(() -> {
-                Date endDate = targetUserData.ban((int) Math.pow(3, targetUserData.getWarning() - 2.0), reason);
+                Timestamp expiration = targetUserData.ban(Timespan.ofDays(Math.pow(3, targetUserData.getWarning() - 2)), reason);
 
                 Bukkit.getOnlinePlayers().forEach(target -> {
                     User targetUser = User.fromPlayer(target);
                     targetUser.sendMessageInfo("");
                     targetUser.sendMessageInfo("§e§n{0}§r님이 경고 §c3회 §f누적으로 서버에서 차단되었습니다.", targetUserData.getPlayerName());
-                    targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(endDate, "YYYY-MM-dd HH:mm:ss"));
+                    targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"));
                     targetUser.sendMessageInfo("");
                 });
             }, 20);
