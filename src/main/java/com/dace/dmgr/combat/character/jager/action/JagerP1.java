@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.ChatColor;

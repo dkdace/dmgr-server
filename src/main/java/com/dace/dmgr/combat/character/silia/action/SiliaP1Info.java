@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;

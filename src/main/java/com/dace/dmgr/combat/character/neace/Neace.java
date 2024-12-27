@@ -14,7 +14,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;

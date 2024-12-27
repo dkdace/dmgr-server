@@ -2,8 +2,8 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.Timespan;
-import com.dace.dmgr.util.Timestamp;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

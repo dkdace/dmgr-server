@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;

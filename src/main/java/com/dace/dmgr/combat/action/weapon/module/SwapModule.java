@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.action.weapon.module;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;

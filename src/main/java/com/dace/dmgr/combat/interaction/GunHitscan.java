@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 

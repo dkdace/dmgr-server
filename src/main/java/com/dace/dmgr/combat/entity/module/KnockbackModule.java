@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.Timespan;
-import com.dace.dmgr.util.Timestamp;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.LivingEntity;

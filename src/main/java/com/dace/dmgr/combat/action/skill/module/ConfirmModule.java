@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.action.skill.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;

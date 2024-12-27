@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.util.Timespan;
-import com.dace.dmgr.util.Timestamp;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import lombok.NonNull;
 
 /**

@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

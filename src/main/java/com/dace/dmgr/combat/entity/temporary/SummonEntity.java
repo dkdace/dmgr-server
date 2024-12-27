@@ -4,7 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.TextHologram;
+import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;

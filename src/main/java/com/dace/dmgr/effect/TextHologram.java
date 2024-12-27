@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.effect;
 
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Disposable;

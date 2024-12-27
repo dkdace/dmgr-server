@@ -5,7 +5,7 @@ import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.Timespan;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;

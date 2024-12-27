@@ -3,7 +3,7 @@ package com.dace.dmgr.game.scheduler;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.BossBarDisplay;
+import com.dace.dmgr.effect.BossBarDisplay;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

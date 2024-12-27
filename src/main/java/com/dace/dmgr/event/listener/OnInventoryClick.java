@@ -4,7 +4,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

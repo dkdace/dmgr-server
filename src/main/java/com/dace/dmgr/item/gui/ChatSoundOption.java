@@ -2,7 +2,7 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;

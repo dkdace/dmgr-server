@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.effect;
 
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.AccessLevel;

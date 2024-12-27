@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.util.ParticleEffect;
+import com.dace.dmgr.effect.ParticleEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

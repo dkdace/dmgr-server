@@ -1,4 +1,4 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.effect;
 
 import com.comphenix.packetwrapper.WrapperPlayServerWorldParticles;
 import com.comphenix.protocol.wrappers.EnumWrappers;

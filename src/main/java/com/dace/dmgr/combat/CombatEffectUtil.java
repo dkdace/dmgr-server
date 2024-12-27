@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.ParticleEffect;
-import com.dace.dmgr.util.SoundEffect;
+import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
