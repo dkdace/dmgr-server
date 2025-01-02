@@ -7,9 +7,13 @@ import com.dace.dmgr.*;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
+import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
+import com.dace.dmgr.event.listener.OnPlayerCommandPreprocess;
+import com.dace.dmgr.event.listener.OnPlayerJoin;
+import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -36,6 +40,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
@@ -66,6 +71,14 @@ public final class User implements Disposable {
             "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
             "\n" +
             "\n§7다운로드 오류 문의 : {1}";
+    /** 리소스팩 적용 중 오류로 강제퇴장 시 표시되는 메시지 */
+    private static final String MESSAGE_KICK_RESOURCE_ERR = "{0}§c리소스팩 적용 중 오류가 발생했습니다." +
+            "\n" +
+            "\n§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오." +
+            "\n" +
+            "\n§7다운로드 오류 문의 : {1}";
+    /** 채팅의 메시지 포맷 패턴 */
+    private static final String CHAT_FORMAT_PATTERN = "<{0}> {1}";
     /** 레벨 업 효과음 */
     private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
@@ -104,12 +117,8 @@ public final class User implements Disposable {
     private final WeakHashMap<Entity, GlowingInfo> glowingInfoMap = new WeakHashMap<>();
 
     /** 채팅 쿨타임 타임스탬프 */
-    @Getter
-    @Setter
     private Timestamp chatCooldownTimestamp = Timestamp.now();
     /** 명령어 쿨타임 타임스탬프 */
-    @Getter
-    @Setter
     private Timestamp commandCooldownTimestamp = Timestamp.now();
     /** 타자기 효과 타이틀 타임스탬프 */
     private Timestamp typewriterTitleTimestamp = Timestamp.now();
@@ -128,7 +137,6 @@ public final class User implements Disposable {
     @Setter
     private int ping = 0;
     /** 리소스팩 적용 수락 여부 */
-    @Setter
     private boolean isResourcePackAccepted = false;
     /** 현재 귓속말 대상 */
     @Nullable
@@ -207,6 +215,8 @@ public final class User implements Disposable {
 
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
+
+        sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", Timespan.ZERO, Timespan.ofSeconds(5), Timespan.ofSeconds(3));
 
         taskManager.add(new IntervalTask((LongConsumer) i -> onSecond(), 20));
     }
@@ -298,6 +308,22 @@ public final class User implements Disposable {
                 player.kickPlayer(message);
             }
         }, GeneralConfig.getConfig().getResourcePackTimeout() * 20L));
+    }
+
+    /**
+     * 리소스팩 적용 상태가 변경되었을 때 실행할 작업.
+     *
+     * @param status 리소스팩 적용 상태
+     * @see OnPlayerResourcePackStatus
+     */
+    public void onResourcePackStatus(@NonNull PlayerResourcePackStatusEvent.Status status) {
+        isResourcePackAccepted = status == PlayerResourcePackStatusEvent.Status.ACCEPTED
+                || status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED;
+
+        if (status == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
+            player.kickPlayer(MessageFormat.format(MESSAGE_KICK_RESOURCE_ERR,
+                    GeneralConfig.getConfig().getMessagePrefix(),
+                    GeneralConfig.getConfig().getAdminContact()));
     }
 
     /**
@@ -436,12 +462,9 @@ public final class User implements Disposable {
     private void updateLobbyTabListUsers() {
         List<User> lobbyUsers = new ArrayList<>();
         List<User> adminUsers = new ArrayList<>();
-        Bukkit.getOnlinePlayers().stream()
-                .sorted(Comparator.comparing(Player::getName))
-                .forEach(target -> {
-                    User targetUser = User.fromPlayer(target);
-                    (target.isOp() ? adminUsers : lobbyUsers).add(targetUser);
-                });
+        UserRegistry.getInstance().getAllUsers().stream()
+                .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
+                .forEach(target -> (target.getPlayer().isOp() ? adminUsers : lobbyUsers).add(target));
 
         tabListManager.setItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.size()), Skins.getDot(ChatColor.GREEN));
         for (int i = 0; i < 38; i++) {
@@ -488,6 +511,93 @@ public final class User implements Disposable {
         }
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
+    }
+
+    /**
+     * 서버에 접속했을 때 실행할 작업.
+     *
+     * @see OnPlayerJoin
+     */
+    public void onJoin() {
+        init();
+        reset();
+
+        taskManager.add(new DelayTask(this::clearChat, 10));
+    }
+
+    /**
+     * 채팅을 입력했을 때 실행할 작업.
+     *
+     * @param message 입력 메시지
+     * @see OnAsyncPlayerChat
+     */
+    public void onChat(@NonNull String message) {
+        if (!player.isOp()) {
+            if (chatCooldownTimestamp.isAfter(Timestamp.now())) {
+                sendMessageWarn("채팅을 천천히 하십시오.");
+                return;
+            }
+
+            chatCooldownTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown()));
+        }
+
+        if (messageTarget == null) {
+            if (isAdminChat()) {
+                UserRegistry.getInstance().getAllUsers().stream()
+                        .filter(target -> target.getPlayer().isOp())
+                        .forEach(target -> sendChatMessage(target, ChatColor.DARK_AQUA + message));
+            } else
+                UserRegistry.getInstance().getAllUsers().forEach(target -> sendChatMessage(target, message));
+        } else {
+            sendChatMessage(this, ChatColor.GRAY + message);
+            sendChatMessage(messageTarget, ChatColor.GRAY + message);
+        }
+    }
+
+    /**
+     * 수신 플레이어에게 채팅 메시지를 전송하고 효과음을 재생한다.
+     *
+     * @param receiver 수신 플레이어
+     * @param message  메시지
+     */
+    private void sendChatMessage(@NonNull User receiver, @NonNull String message) {
+        UserData receiverUserData = receiver.getUserData();
+        if (receiverUserData.isBlockedPlayer(userData))
+            return;
+
+        String pattern = CHAT_FORMAT_PATTERN;
+        String name = userData.getDisplayName();
+
+        if (messageTarget == receiver) {
+            if (this != receiver)
+                name += "§7님의 개인 메시지§f";
+        } else if (isAdminChat)
+            pattern = "§7§l[관리자] §f" + pattern;
+
+        message = MessageFormat.format(pattern, name, message);
+
+        receiver.getPlayer().sendMessage(message);
+        receiverUserData.getConfig().getChatSound().getSound().play(receiver.getPlayer());
+    }
+
+    /**
+     * 명령어를 입력했을 때 실행할 작업.
+     *
+     * @return 성공 여부. 입력이 유효하면 {@code true} 반환
+     * @see OnPlayerCommandPreprocess
+     */
+    public boolean onCommand() {
+        if (player.isOp())
+            return true;
+
+        if (commandCooldownTimestamp.isAfter(Timestamp.now())) {
+            sendMessageWarn("동작이 너무 빠릅니다.");
+            return false;
+        }
+
+        commandCooldownTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getCommandCooldown()));
+
+        return true;
     }
 
     /**
@@ -539,7 +649,7 @@ public final class User implements Disposable {
 
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         isInFreeCombat = false;
-        Bukkit.getOnlinePlayers().forEach(target -> User.fromPlayer(target).removeGlowing(this.player));
+        UserRegistry.getInstance().getAllUsers().forEach(target -> target.removeGlowing(this.player));
 
         if (userData.isInitialized()) {
             sidebarManager.clear();

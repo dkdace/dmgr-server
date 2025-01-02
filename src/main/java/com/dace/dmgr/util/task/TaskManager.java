@@ -28,6 +28,8 @@ public final class TaskManager implements Disposable {
      * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
      */
     public void add(@NonNull Task task) {
+        validate();
+
         task.validate();
         Validate.validState(tasks.add(task));
 
@@ -38,6 +40,8 @@ public final class TaskManager implements Disposable {
      * 추가된 작동 중인 모든 태스크를 종료한다.
      */
     public void dispose() {
+        validate();
+
         tasks.stream().filter(task -> !task.isDisposed).forEach(Task::dispose);
         tasks.clear();
         isDisposed = true;
