@@ -223,24 +223,24 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (value == null) {
-                    if (defaultValue instanceof Number) {
-                        long longValue = configurationSection.getLong(key, ((Number) defaultValue).longValue());
-                        double doubleValue = configurationSection.getDouble(key, ((Number) defaultValue).doubleValue());
+                    Object getValue = configurationSection.get(key, defaultValue);
 
-                        if (defaultValue instanceof Byte)
-                            value = (T) Byte.valueOf((byte) longValue);
-                        else if (defaultValue instanceof Short)
-                            value = (T) Short.valueOf((short) longValue);
-                        else if (defaultValue instanceof Integer)
-                            value = (T) Integer.valueOf((int) longValue);
-                        else if (defaultValue instanceof Long)
-                            value = (T) Long.valueOf(longValue);
-                        else if (defaultValue instanceof Float)
-                            value = (T) Float.valueOf((float) doubleValue);
-                        else if (defaultValue instanceof Double)
-                            value = (T) Double.valueOf(doubleValue);
-                    } else
-                        value = (T) configurationSection.get(key, defaultValue);
+                    if (getValue.getClass().isInstance(defaultValue))
+                        value = (T) getValue;
+                    else if (defaultValue instanceof Byte)
+                        value = (T) Byte.valueOf(((Number) getValue).byteValue());
+                    else if (defaultValue instanceof Short)
+                        value = (T) Short.valueOf(((Number) getValue).shortValue());
+                    else if (defaultValue instanceof Integer)
+                        value = (T) Integer.valueOf(((Number) getValue).intValue());
+                    else if (defaultValue instanceof Long)
+                        value = (T) Long.valueOf(((Number) getValue).longValue());
+                    else if (defaultValue instanceof Float)
+                        value = (T) Float.valueOf(((Number) getValue).floatValue());
+                    else if (defaultValue instanceof Double)
+                        value = (T) Double.valueOf(((Number) getValue).doubleValue());
+                    else
+                        value = defaultValue;
                 }
 
                 return value;
@@ -266,9 +266,6 @@ public final class YamlFile implements Initializable<Void> {
             public void set(@Nullable T value) {
                 validate();
 
-                if (this.value == value)
-                    return;
-
                 this.value = value;
                 configurationSection.set(key, value == defaultValue ? null : value);
             }
@@ -282,7 +279,7 @@ public final class YamlFile implements Initializable<Void> {
          */
         public final class ListEntry<T> extends Entry<List<T>> {
             private ListEntry(@NonNull String key) {
-                super(key, new ArrayList<>());
+                super(key, Collections.emptyList());
             }
 
             /**
@@ -308,7 +305,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (super.value == null)
-                    super.value = (List<T>) configurationSection.getList(super.key, super.defaultValue);
+                    super.value = (List<T>) configurationSection.getList(super.key, new ArrayList<>());
 
                 return Collections.unmodifiableList(super.value);
             }
@@ -328,7 +325,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (super.value == null)
-                    super.value = super.defaultValue;
+                    super.value = new ArrayList<>();
 
                 super.value.add(value);
                 set(super.value);
