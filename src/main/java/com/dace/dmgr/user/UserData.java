@@ -1,16 +1,11 @@
 package com.dace.dmgr.user;
 
-import com.dace.dmgr.ConsoleLogger;
-import com.dace.dmgr.DMGR;
-import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.YamlFile;
+import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.gui.ChatSoundOption;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
@@ -144,6 +139,20 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     public static UserData fromUUID(@NonNull UUID playerUUID) {
         return fromPlayer(Bukkit.getOfflinePlayer(playerUUID));
+    }
+
+    /**
+     * 지정한 이름에 해당하는 플레이어의 유저 데이터 정보 인스턴스를 반환한다.
+     *
+     * @param playerName 플레이어 이름
+     * @return 유저 데이터 인스턴스. 존재하지 않으면 {@code null} 반환
+     */
+    @Nullable
+    public static UserData fromPlayerName(@NonNull String playerName) {
+        return UserDataRegistry.getInstance().getAllUserDatas().stream()
+                .filter(target -> target.getPlayerName().equalsIgnoreCase(playerName))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

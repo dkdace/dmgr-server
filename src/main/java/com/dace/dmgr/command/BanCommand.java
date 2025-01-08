@@ -1,60 +1,56 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.user.User;
-import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import lombok.AccessLevel;
+import com.dace.dmgr.user.User;
+import com.dace.dmgr.user.UserData;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 서버 차단(밴) 명령어 클래스.
  *
- * <p>Usage: /밴 <플레이어> [기간(일)] [사유...]</p>
+ * @see UserData#ban(Timespan, String)
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BanCommand extends BaseCommandExecutor {
+public final class BanCommand extends CommandHandler {
     @Getter
     private static final BanCommand instance = new BanCommand();
+
+    private BanCommand() {
+        super("밴", new ParameterList(true, ParameterType.PLAYER_NAME, ParameterType.INTEGER, ParameterType.STRING));
+    }
 
     /**
      * 밴 해제 명령어.
      *
-     * @param player         입력자
+     * @param sender         입력자
      * @param targetUserData 대상 플레이어
      */
-    private static void unban(@NonNull Player player, @NonNull UserData targetUserData) {
+    private void unban(@NonNull Player sender, @NonNull UserData targetUserData) {
         targetUserData.unban();
 
-        Bukkit.getOnlinePlayers().forEach(target -> {
-            User targetUser = User.fromPlayer(target);
-            targetUser.sendMessageInfo("");
-            targetUser.sendMessageInfo("§e§n{0}§r님이 §e§n{1}§r님의 서버 차단을 해제했습니다.", player.getName(), targetUserData.getPlayerName());
-            targetUser.sendMessageInfo("");
-        });
+        Bukkit.getOnlinePlayers().forEach(target ->
+                User.fromPlayer(target).sendMessageInfo("\n§e§n{0}§r님이 §e§n{1}§r님의 서버 차단을 해제했습니다.\n",
+                        sender.getName(),
+                        targetUserData.getPlayerName()));
     }
 
     /**
      * 밴 명령어.
      *
-     * @param user           입력자
+     * @param sender         입력자
      * @param targetUserData 대상 플레이어
      * @param args           인수 목록
      */
-    private static void ban(@NonNull User user, @NonNull UserData targetUserData, @NonNull String @NonNull [] args) {
+    private void ban(@NonNull Player sender, @NonNull UserData targetUserData, @NonNull String @NonNull [] args) {
         if (!StringUtils.isNumeric(args[1])) {
-            user.sendMessageWarn(WARN_WRONG_USAGE, "/(밴|ban) <플레이어> [기간(일)] [사유...]");
+            sendWarnWrongUsage(sender);
             return;
         }
 
@@ -63,50 +59,38 @@ public final class BanCommand extends BaseCommandExecutor {
 
         Timestamp expiration = targetUserData.ban(Timespan.ofDays(days), reason);
 
-        Bukkit.getOnlinePlayers().forEach(target -> {
-            User targetUser = User.fromPlayer(target);
-            targetUser.sendMessageInfo("");
-            targetUser.sendMessageInfo("§e§n{0}§r님이 §e§n{1}§r님을 서버에서 차단했습니다.", user.getPlayer().getName(), targetUserData.getPlayerName());
+        User.getAllUsers().forEach(target -> {
+            target.sendMessageInfo("\n§e§n{0}§r님이 §e§n{1}§r님을 서버에서 차단했습니다.",
+                    sender.getPlayer().getName(),
+                    targetUserData.getPlayerName());
             if (reason != null)
-                targetUser.sendMessageInfo("차단 사유 : §6{0}", reason);
-            targetUser.sendMessageInfo("차단 해제 일시 : §c§n{0}", DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"));
-            targetUser.sendMessageInfo("");
+                target.sendMessageInfo("차단 사유 : §6{0}", reason);
+            target.sendMessageInfo("차단 해제 일시 : §c§n{0}\n", DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"));
         });
     }
 
     @Override
-    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
-        User user = User.fromPlayer(player);
+    protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
+        User user = User.fromPlayer(sender);
 
-        if (args.length >= 1) {
-            UserData targetUserData = UserData.getAllUserDatas().stream()
-                    .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
-                    .findFirst()
-                    .orElse(null);
+        if (args.length == 0) {
+            sendWarnWrongUsage(sender);
+            return;
+        }
 
-            if (targetUserData == null) {
-                user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
-                return;
-            }
+        UserData targetUserData = UserData.fromPlayerName(args[0]);
+        if (targetUserData == null) {
+            sendWarnPlayerNotFound(sender);
+            return;
+        }
 
-            if (args.length == 1) {
-                if (targetUserData.isBanned())
-                    unban(player, targetUserData);
-                else
-                    user.sendMessageWarn("해당 플레이어는 차단된 상태가 아닙니다.");
-            } else
-                ban(user, targetUserData, args);
+        if (args.length == 1) {
+            if (targetUserData.isBanned())
+                unban(sender, targetUserData);
+            else
+                user.sendMessageWarn("해당 플레이어는 차단된 상태가 아닙니다.");
         } else
-            user.sendMessageWarn(WARN_WRONG_USAGE, "/(밴|ban) <플레이어> [기간(일)] [사유...]");
-    }
-
-    @Override
-    @Nullable
-    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
-        if (args.length != 1)
-            return null;
-
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+            ban(sender, targetUserData, args);
     }
 }
 

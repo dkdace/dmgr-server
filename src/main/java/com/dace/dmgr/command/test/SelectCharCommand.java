@@ -15,8 +15,6 @@ import org.bukkit.entity.Player;
 /**
  * 전투원 선택 명령어 클래스.
  *
- * <p>Usage: /선택 플레이어 전투원</p>
- *
  * @see CombatUser#setCharacterType(CharacterType)
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -16,6 +16,7 @@ import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -214,18 +215,18 @@ public class DMGR extends JavaPlugin {
      * 모든 명령어를 등록한다.
      */
     private void registerCommands() {
-        getCommand("스폰").setExecutor(LobbyCommand.getInstance());
-        getCommand("메뉴").setExecutor(MenuCommand.getInstance());
-        getCommand("퇴장").setExecutor(QuitCommand.getInstance());
-        getCommand("명령어").setExecutor(HelpCommand.getInstance());
-        getCommand("전적").setExecutor(StatCommand.getInstance());
-        getCommand("귓속말").setExecutor(DMCommand.getInstance());
-        getCommand("차단").setExecutor(BlockCommand.getInstance());
-        getCommand("랭킹").setExecutor(RankingCommand.getInstance());
-        getCommand("채팅").setExecutor(TeamChatCommand.getInstance());
-        getCommand("경고").setExecutor(WarningCommand.getInstance());
-        getCommand("밴").setExecutor(BanCommand.getInstance());
-        getCommand("관리자채팅").setExecutor(AdminChatCommand.getInstance());
+        Validate.notNull(LobbyCommand.getInstance());
+        Validate.notNull(MenuCommand.getInstance());
+        Validate.notNull(QuitCommand.getInstance());
+        Validate.notNull(HelpCommand.getInstance());
+        Validate.notNull(StatCommand.getInstance());
+        Validate.notNull(DMCommand.getInstance());
+        Validate.notNull(BlockCommand.getInstance());
+        Validate.notNull(RankingCommand.getInstance());
+        Validate.notNull(TeamChatCommand.getInstance());
+        Validate.notNull(WarningCommand.getInstance());
+        Validate.notNull(BanCommand.getInstance());
+        Validate.notNull(AdminChatCommand.getInstance());
     }
 
     /**

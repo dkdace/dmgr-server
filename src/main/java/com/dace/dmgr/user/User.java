@@ -46,6 +46,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -180,6 +181,17 @@ public final class User implements Disposable {
             user = new User(player);
 
         return user;
+    }
+
+    /**
+     * 모든 유저 정보를 반환한다.
+     *
+     * @return 유저 정보 인스턴스 목록
+     */
+    @NonNull
+    @UnmodifiableView
+    public static Collection<@NonNull User> getAllUsers() {
+        return UserRegistry.getInstance().getAllUsers();
     }
 
     /**
