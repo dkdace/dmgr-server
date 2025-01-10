@@ -10,7 +10,6 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Container;
 import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
@@ -67,39 +66,6 @@ public final class LocationUtil {
             case STONE_PLATE:
             case IRON_PLATE:
             case GOLD_PLATE:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * 지정한 블록이 상호작용할 수 있는 블록인지 확인한다.
-     *
-     * @param block 확인할 블록
-     * @return 상호작용 가능하면 {@code true} 반환
-     */
-    public static boolean isInteractable(@NonNull Block block) {
-        MaterialData materialData = block.getState().getData();
-        if (materialData instanceof Openable || block.getState() instanceof Container)
-            return true;
-
-        switch (block.getType()) {
-            case CAKE_BLOCK:
-            case BEACON:
-            case ANVIL:
-            case ENDER_CHEST:
-            case NOTE_BLOCK:
-            case BED_BLOCK:
-            case WOOD_BUTTON:
-            case STONE_BUTTON:
-            case LEVER:
-            case DAYLIGHT_DETECTOR:
-            case DAYLIGHT_DETECTOR_INVERTED:
-            case DIODE_BLOCK_OFF:
-            case DIODE_BLOCK_ON:
-            case REDSTONE_COMPARATOR_OFF:
-            case REDSTONE_COMPARATOR_ON:
                 return true;
             default:
                 return false;

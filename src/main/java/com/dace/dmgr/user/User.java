@@ -59,25 +59,28 @@ import java.util.function.LongConsumer;
  */
 public final class User implements Disposable {
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
-    private static final String MESSAGE_KICK_ERR = "{0}§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
-            "\n" +
-            "\n§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오." +
-            "\n" +
-            "\n§7오류 문의 : {1}";
+    private static final String MESSAGE_KICK_ERR = String.join("\n",
+            "{0}§c유저 데이터를 불러오는 중 오류가 발생했습니다.",
+            "",
+            "§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오.",
+            "",
+            "§7오류 문의 : {1}");
     /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
-    private static final String MESSAGE_KICK_DENY = "{0}§c리소스팩 적용을 활성화 하십시오." +
-            "\n" +
-            "\n§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용" +
-            "\n" +
-            "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
-            "\n" +
-            "\n§7다운로드 오류 문의 : {1}";
+    private static final String MESSAGE_KICK_DENY = String.join("\n",
+            "{0}§c리소스팩 적용을 활성화 하십시오.",
+            "",
+            "§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용",
+            "",
+            "§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오.",
+            "",
+            "§7다운로드 오류 문의 : {1}");
     /** 리소스팩 적용 중 오류로 강제퇴장 시 표시되는 메시지 */
-    private static final String MESSAGE_KICK_RESOURCE_ERR = "{0}§c리소스팩 적용 중 오류가 발생했습니다." +
-            "\n" +
-            "\n§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오." +
-            "\n" +
-            "\n§7다운로드 오류 문의 : {1}";
+    private static final String MESSAGE_KICK_RESOURCE_ERR = String.join("\n",
+            "{0}§c리소스팩 적용 중 오류가 발생했습니다.",
+            "",
+            "§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오.",
+            "",
+            "§7다운로드 오류 문의 : {1}");
     /** 채팅의 메시지 포맷 패턴 */
     private static final String CHAT_FORMAT_PATTERN = "<{0}> {1}";
     /** 레벨 업 효과음 */

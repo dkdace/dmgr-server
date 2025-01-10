@@ -2,21 +2,30 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-public final class OnPlayerItemHeld implements Listener {
-    @EventHandler
-    public static void event(PlayerItemHeldEvent event) {
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
-        int newSlot = event.getNewSlot();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnPlayerItemHeld extends EventListener<PlayerItemHeldEvent> {
+    @Getter
+    private static final OnPlayerItemHeld instance = new OnPlayerItemHeld();
 
+    @Override
+    @EventHandler
+    protected void onEvent(@NonNull PlayerItemHeldEvent event) {
+        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
         if (combatUser == null)
             return;
 
         event.setCancelled(true);
+
+        int newSlot = event.getNewSlot();
         if (combatUser.getCharacterType() == null || newSlot >= 4)
             return;
 

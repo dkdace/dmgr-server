@@ -1,7 +1,7 @@
 package com.dace.dmgr;
 
-import com.dace.dmgr.event.EventManager;
 import com.dace.dmgr.command.CommandHandlerManager;
+import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -144,6 +144,7 @@ public class DMGR extends JavaPlugin {
                 .onFinish(this::loadUserDatas)
                 .onFinish(() -> {
                     RankUtil.run();
+                    EventListenerManager.register();
                     CommandHandlerManager.register();
                     CommandHandlerManager.registerTestCommands();
                     clearUnusedEntities();

@@ -29,11 +29,12 @@ import java.util.stream.Collectors;
  */
 public final class UserData implements Initializable<Void> {
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
-    private static final String MESSAGE_BANNED = "{0}§c관리자에 의해 서버에서 차단되었습니다." +
-            "\n" +
-            "\n§f해제 일시 : §e{1}" +
-            "\n" +
-            "\n§7문의 : {2}";
+    private static final String MESSAGE_BANNED = String.join("\n",
+            "{0}§c관리자에 의해 서버에서 차단되었습니다.",
+            "",
+            "§f해제 일시 : §e{1}",
+            "",
+            "§7문의 : {2}");
     /** Yaml 파일 경로의 디렉터리 이름 */
     private static final String DIRECTORY_NAME = "User";
 

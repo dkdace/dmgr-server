@@ -1,34 +1,38 @@
 package com.dace.dmgr.event.listener;
 
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
+import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public final class OnPlayClientUseEntity extends PacketAdapter {
-    public OnPlayClientUseEntity() {
-        super(DMGR.getPlugin(), PacketType.Play.Client.USE_ENTITY);
+public final class OnPlayClientUseEntity extends PacketEventListener<WrapperPlayClientUseEntity> {
+    @Getter
+    private static final OnPlayClientUseEntity instance = new OnPlayClientUseEntity();
+
+    private OnPlayClientUseEntity() {
+        super(WrapperPlayClientUseEntity.class);
     }
 
     @Override
-    public void onPacketReceiving(PacketEvent event) {
-        WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
+    protected void onEvent(@NonNull PacketEvent event) {
+        WrapperPlayClientUseEntity packet = createPacketWrapper(event);
         Player player = event.getPlayer();
-        Entity entity = packet.getTarget(event);
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+        Entity target = packet.getTarget(event);
 
-        if (!player.isOp() && entity instanceof Hanging)
+        if (!player.isOp() && target instanceof Hanging)
             event.setCancelled(true);
 
+        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
         if (combatUser == null)
             return;
 
