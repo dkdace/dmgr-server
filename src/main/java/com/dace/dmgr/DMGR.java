@@ -1,10 +1,7 @@
 package com.dace.dmgr;
 
-import com.dace.dmgr.command.*;
-import com.dace.dmgr.command.test.DummyCommand;
-import com.dace.dmgr.command.test.GameTestCommand;
-import com.dace.dmgr.command.test.SelectCharCommand;
 import com.dace.dmgr.event.EventManager;
+import com.dace.dmgr.command.CommandHandlerManager;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -16,7 +13,6 @@ import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -148,12 +144,10 @@ public class DMGR extends JavaPlugin {
                 .onFinish(this::loadUserDatas)
                 .onFinish(() -> {
                     RankUtil.run();
-                    EventManager.register();
+                    CommandHandlerManager.register();
+                    CommandHandlerManager.registerTestCommands();
                     clearUnusedEntities();
                     WorldUtil.clearDuplicatedWorlds();
-
-                    registerCommands();
-                    registerTestCommands();
 
                     ConsoleLogger.info("플러그인 활성화 완료");
 
@@ -209,33 +203,6 @@ public class DMGR extends JavaPlugin {
                 .flatMap(world -> world.getEntities().stream())
                 .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
-    }
-
-    /**
-     * 모든 명령어를 등록한다.
-     */
-    private void registerCommands() {
-        Validate.notNull(LobbyCommand.getInstance());
-        Validate.notNull(MenuCommand.getInstance());
-        Validate.notNull(QuitCommand.getInstance());
-        Validate.notNull(HelpCommand.getInstance());
-        Validate.notNull(StatCommand.getInstance());
-        Validate.notNull(DMCommand.getInstance());
-        Validate.notNull(BlockCommand.getInstance());
-        Validate.notNull(RankingCommand.getInstance());
-        Validate.notNull(TeamChatCommand.getInstance());
-        Validate.notNull(WarningCommand.getInstance());
-        Validate.notNull(BanCommand.getInstance());
-        Validate.notNull(AdminChatCommand.getInstance());
-    }
-
-    /**
-     * 모든 테스트용 명령어를 등록한다.
-     */
-    private void registerTestCommands() {
-        getCommand("선택").setExecutor(SelectCharCommand.getInstance());
-        getCommand("소환").setExecutor(DummyCommand.getInstance());
-        getCommand("게임").setExecutor(GameTestCommand.getInstance());
     }
 
     /**
