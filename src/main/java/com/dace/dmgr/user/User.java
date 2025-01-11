@@ -322,7 +322,7 @@ public final class User implements Disposable {
                         GeneralConfig.getConfig().getAdminContact());
                 player.kickPlayer(message);
             }
-        }, GeneralConfig.getConfig().getResourcePackTimeout() * 20L));
+        }, GeneralConfig.getConfig().getResourcePackTimeout().toTicks()));
     }
 
     /**
@@ -553,7 +553,7 @@ public final class User implements Disposable {
                 return;
             }
 
-            chatCooldownTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown()));
+            chatCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getChatCooldown());
         }
 
         if (messageTarget == null) {
@@ -610,7 +610,7 @@ public final class User implements Disposable {
             return false;
         }
 
-        commandCooldownTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getCommandCooldown()));
+        commandCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getCommandCooldown());
 
         return true;
     }

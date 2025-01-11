@@ -29,13 +29,13 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.effect.*;
 import com.dace.dmgr.effect.FireworkEffect;
+import com.dace.dmgr.effect.*;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -361,7 +361,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void useHealPack(@NonNull GlobalLocation healPackLocation, @NonNull Location location) {
         Validate.notNull(character);
 
-        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getHealPackCooldown()));
+        Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getHealPackCooldown());
         BLOCK_TIMESTAMP_MAP.put(healPackLocation, expiration);
         damageModule.heal(this, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
         character.onUseHealPack(this);
@@ -374,7 +374,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 현재 위치의 궁극기 팩을 확인 및 사용한다.
      */
     private void checkUltPack() {
-        if (game != null && game.getRemainingTime() > game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationSeconds())
+        if (game != null && game.getRemainingTime() > game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationTime().toSeconds())
             return;
 
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
@@ -399,7 +399,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param location        실제 블록 위치
      */
     private void useUltPack(@NonNull GlobalLocation ultPackLocation, @NonNull Location location) {
-        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getUltPackCooldown()));
+        Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getUltPackCooldown());
         BLOCK_TIMESTAMP_MAP.put(ultPackLocation, expiration);
         addUltGauge(GeneralConfig.getCombatConfig().getUltPackCharge());
 
@@ -771,7 +771,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (definedTimestamp.killStreakTimeLimit.isBefore(Timestamp.now()))
                 killStreak = 0;
-            definedTimestamp.killStreakTimeLimit = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getKillStreakTimeLimit()));
+            definedTimestamp.killStreakTimeLimit = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
             if (killStreak++ > 0)
                 addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
@@ -815,7 +815,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         for (GameUser targetGameUser : game.getGameUsers()) {
             bossBarDisplay.show(targetGameUser.getPlayer());
 
-            new DelayTask(() -> bossBarDisplay.hide(targetGameUser.getPlayer()), GeneralConfig.getCombatConfig().getKillLogDisplayDuration());
+            new DelayTask(() -> bossBarDisplay.hide(targetGameUser.getPlayer()), GeneralConfig.getCombatConfig().getKillLogDisplayDuration().toTicks());
         }
     }
 
@@ -944,7 +944,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
-        long duration = GeneralConfig.getCombatConfig().getRespawnTime();
+        long duration = GeneralConfig.getCombatConfig().getRespawnTime().toTicks();
         if (hasCore(Core.RESURRECTION))
             duration = (long) (duration * (100 - Core.RESURRECTION.getValues()[0]) / 100.0);
 
@@ -1132,7 +1132,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser != null)
             gameUser.setScore(gameUser.getScore() + score);
 
-        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getScoreDisplayDuration()));
+        Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getScoreDisplayDuration());
         if (definedTimestamp.scoreDisplay.isBefore(Timestamp.now())) {
             definedTimestamp.scoreDisplay = expiration;
 
@@ -1707,7 +1707,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NoArgsConstructor
     private static final class DamageInfo {
         /** 종료 시점 */
-        private final Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getCombatConfig().getDamageSumTimeLimit()));
+        private final Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getDamageSumTimeLimit());
         /** 누적 피해량 */
         private double damage = 0;
     }

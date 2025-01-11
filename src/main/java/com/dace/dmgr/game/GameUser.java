@@ -1,8 +1,6 @@
 package com.dace.dmgr.game;
 
-import com.dace.dmgr.DMGR;
-import com.dace.dmgr.Disposable;
-import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.*;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
@@ -12,8 +10,6 @@ import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import com.keenant.tabbed.util.Skin;
@@ -241,7 +237,7 @@ public final class GameUser implements Disposable {
                 game.getRedTeam().getScore(), game.getBlueTeam().getScore()));
 
         boolean headReveal = game.getPhase() == Game.Phase.PLAYING
-                && game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getHeadRevealTimeAfterStartSeconds();
+                && game.getRemainingTime() < game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart().toSeconds();
 
         int column = 0;
         for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
@@ -445,7 +441,7 @@ public final class GameUser implements Disposable {
                         if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
                             return false;
 
-                        gameUser.communicationTimestamp = Timestamp.now().plus(Timespan.ofTicks(GeneralConfig.getConfig().getChatCooldown()));
+                        gameUser.communicationTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getChatCooldown());
                     }
 
                     gameUser.sendMessage(action.apply(gameUser, combatUser), true);

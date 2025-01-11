@@ -111,7 +111,7 @@ final class GameReward {
      * @return 게임 점수 보정치
      */
     private static double getScoreCorrection(double score, long playTime) {
-        return ((score / GeneralConfig.getGameConfig().getExpectedAverageScorePerMin()) / playTime / 60) * 20;
+        return ((score / GeneralConfig.getGameConfig().getExpectedAverageScorePerMinute()) / playTime / 60) * 20;
     }
 
     /**

@@ -6,7 +6,8 @@ import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.map.GameMap;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -85,7 +86,7 @@ public final class Game implements Disposable {
     private long startTime = 0;
     /** 다음 진행 단계까지 남은 시간 (초) */
     @Getter
-    private int remainingTime = GeneralConfig.getGameConfig().getWaitingTimeSeconds();
+    private int remainingTime = (int) GeneralConfig.getGameConfig().getWaitingTime().toSeconds();
     /** 게임 진행 단계 */
     @NonNull
     @Getter
@@ -227,7 +228,7 @@ public final class Game implements Disposable {
         gameUsers.forEach(this::sendBossBarWaiting);
 
         if (!canStart()) {
-            remainingTime = GeneralConfig.getGameConfig().getWaitingTimeSeconds();
+            remainingTime = (int) GeneralConfig.getGameConfig().getWaitingTime().toSeconds();
             return;
         }
 
@@ -252,7 +253,7 @@ public final class Game implements Disposable {
                 (gamePlayMode.isRanked() ? "§6§l랭크" : "§a§l일반"),
                 (canStart() ? "§f" : "§c") + gameUsers.size(),
                 maxPlayerCount));
-        gameWaitBossBars[2].setProgress(canStart() ? (double) remainingTime / GeneralConfig.getGameConfig().getWaitingTimeSeconds() : 1);
+        gameWaitBossBars[2].setProgress(canStart() ? remainingTime / GeneralConfig.getGameConfig().getWaitingTime().toSeconds() : 1);
 
         for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
             gameWaitBossBar.show(gameUser.getPlayer());
@@ -290,7 +291,7 @@ public final class Game implements Disposable {
         gamePlayMode.getGamePlayModeScheduler().onSecond(this);
 
         if (remainingTime > 0) {
-            int ultPackRemainingTime = remainingTime - (gamePlayMode.getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationSeconds());
+            int ultPackRemainingTime = (int) (remainingTime - (gamePlayMode.getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationTime().toSeconds()));
 
             if (ultPackRemainingTime >= 0 && ultPackRemainingTime <= 20) {
                 if (ultPackRemainingTime == 5 || ultPackRemainingTime == 10 || ultPackRemainingTime == 20)
