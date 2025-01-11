@@ -583,7 +583,7 @@ public final class User implements Disposable {
         String pattern = CHAT_FORMAT_PATTERN;
         String name = userData.getDisplayName();
 
-        if (messageTarget == receiver) {
+        if (messageTarget != null) {
             if (this != receiver)
                 name += "§7님의 개인 메시지§f";
         } else if (isAdminChat)
