@@ -3,25 +3,24 @@ package com.dace.dmgr.item.gui;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
  * 코어 선택 GUI 클래스.
  */
-public final class SelectCore extends Gui {
-    @Getter
-    private static final SelectCore instance = new SelectCore();
+public final class SelectCore extends ChestGUI {
+    /**
+     * 코어 선택 GUI 인스턴스를 생성한다.
+     *
+     * @param player GUI 표시 대상 플레이어
+     */
+    public SelectCore(@NonNull Player player) {
+        super(3, "§c§l코어 선택", player);
 
-    private SelectCore() {
-        super(3, "§c§l코어 선택");
-    }
-
-    @Override
-    public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
         if (combatUser == null || combatUser.getCharacterType() == null)
@@ -30,10 +29,10 @@ public final class SelectCore extends Gui {
         Set<Core> cores = user.getUserData().getCharacterRecord(combatUser.getCharacterType()).getCores();
 
         int i = 0;
-        for (Core core : cores) {
+        for (Iterator<Core> iterator = cores.iterator(); iterator.hasNext(); i++) {
+            Core core = iterator.next();
             if (!combatUser.hasCore(core))
-                guiController.set(i, core.getSelectGuiItem());
-            i++;
+                set(i, core.getSelectItem());
         }
     }
 }

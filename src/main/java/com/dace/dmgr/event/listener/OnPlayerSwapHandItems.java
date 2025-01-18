@@ -35,7 +35,7 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
 
             if (gameUser != null && gameUser.getTeam() != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()
                     || LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION)) {
-                SelectChar.getInstance().open(player);
+                new SelectChar(player);
                 return;
             }
             if (combatUser.getCharacterType() != null) {
@@ -44,6 +44,6 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
             }
         }
 
-        Menu.getInstance().open(player);
+        new Menu(player);
     }
 }

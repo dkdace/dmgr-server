@@ -5,8 +5,8 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.GuiItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.LocationUtil;
@@ -24,12 +24,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
@@ -208,9 +207,9 @@ public final class GameUser implements Disposable {
 
         startTime = System.currentTimeMillis();
         player.getInventory().setHeldItemSlot(4);
-        player.getInventory().setItem(9, CommunicationItem.REQ_HEAL.guiItem.getItemStack());
-        player.getInventory().setItem(10, CommunicationItem.SHOW_ULT.guiItem.getItemStack());
-        player.getInventory().setItem(11, CommunicationItem.REQ_RALLY.guiItem.getItemStack());
+        user.getGui().set(9, CommunicationItem.REQ_HEAL.definedItem);
+        user.getGui().set(10, CommunicationItem.SHOW_ULT.definedItem);
+        user.getGui().set(11, CommunicationItem.REQ_RALLY.definedItem);
         user.teleport(getRespawnLocation());
         user.clearChat();
         user.setInFreeCombat(false);
@@ -374,7 +373,7 @@ public final class GameUser implements Disposable {
      */
     private enum CommunicationItem {
         /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", (target, targetCombatUser) -> {
+        REQ_HEAL("§a치료 요청", targetCombatUser -> {
             Validate.notNull(targetCombatUser.getCharacterType());
 
             String state;
@@ -393,7 +392,7 @@ public final class GameUser implements Disposable {
             return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
         }),
         /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", (gameUser, targetCombatUser) -> {
+        SHOW_ULT("§a궁극기 상태", targetCombatUser -> {
             Validate.notNull(targetCombatUser.getCharacterType());
 
             String ment;
@@ -407,7 +406,7 @@ public final class GameUser implements Disposable {
             return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
         }),
         /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", (gameUser, targetCombatUser) -> {
+        REQ_RALLY("§a집결 요청", targetCombatUser -> {
             Validate.notNull(targetCombatUser.getCharacterType());
 
             String[] ments = targetCombatUser.getCharacterType().getCharacter().getReqRallyMent();
@@ -415,41 +414,39 @@ public final class GameUser implements Disposable {
             return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
         });
 
-        /** GUI 아이템 객체 */
-        private final GuiItem guiItem;
+        /** GUI 아이템 */
+        private final DefinedItem definedItem;
 
-        CommunicationItem(String name, BiFunction<GameUser, CombatUser, String> action) {
-            ItemBuilder itemBuilder = new ItemBuilder(Material.STAINED_GLASS_PANE)
-                    .setDamage((short) 5)
-                    .setName(name);
-
-            this.guiItem = new GuiItem("CommunicationItem" + this, itemBuilder.build()) {
-                @Override
-                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                    if (clickType != ClickType.LEFT)
-                        return false;
-
-                    User user = User.fromPlayer(player);
-                    CombatUser combatUser = CombatUser.fromUser(user);
-                    if (combatUser == null || !combatUser.isActivated())
-                        return false;
-                    GameUser gameUser = GameUser.fromUser(user);
-                    if (gameUser == null || gameUser.getTeam() == null)
-                        return false;
-
-                    if (!player.isOp()) {
-                        if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
+        CommunicationItem(String name, Function<CombatUser, String> action) {
+            this.definedItem = new DefinedItem(
+                    new ItemBuilder(Material.STAINED_GLASS_PANE)
+                            .setDamage((short) 5)
+                            .setName(name)
+                            .build(),
+                    (clickType, player) -> {
+                        if (clickType != ClickType.LEFT)
                             return false;
 
-                        gameUser.communicationTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getChatCooldown());
-                    }
+                        User user = User.fromPlayer(player);
+                        CombatUser combatUser = CombatUser.fromUser(user);
+                        if (combatUser == null || !combatUser.isActivated())
+                            return false;
+                        GameUser gameUser = GameUser.fromUser(user);
+                        if (gameUser == null || gameUser.getTeam() == null)
+                            return false;
 
-                    gameUser.sendMessage(action.apply(gameUser, combatUser), true);
-                    player.closeInventory();
+                        if (!player.isOp()) {
+                            if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
+                                return false;
 
-                    return true;
-                }
-            };
+                            gameUser.communicationTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getChatCooldown());
+                        }
+
+                        gameUser.sendMessage(action.apply(combatUser), true);
+                        player.closeInventory();
+
+                        return true;
+                    });
         }
     }
 }

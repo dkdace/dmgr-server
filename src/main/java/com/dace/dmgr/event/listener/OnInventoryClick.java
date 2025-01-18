@@ -3,8 +3,9 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.event.EventListener;
-import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.item.gui.GuiItem;
+import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.gui.ChestGUI;
+import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -32,23 +34,28 @@ public final class OnInventoryClick extends EventListener<InventoryClickEvent> {
             return;
 
         Player player = (Player) event.getWhoClicked();
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+        User user = User.fromPlayer(player);
+        CombatUser combatUser = CombatUser.fromUser(user);
 
         if (combatUser != null)
             event.setCancelled(true);
 
+        Inventory inventory = event.getClickedInventory();
         ItemStack itemStack = event.getCurrentItem();
-        if (itemStack == null || itemStack.getType() == Material.AIR)
+        if (inventory == null || itemStack == null || itemStack.getType() == Material.AIR)
             return;
 
-        StaticItem staticItem = StaticItem.fromItemStack(itemStack);
-        if (staticItem == null)
+        GUI gui = inventory == player.getInventory() ? user.getGui() : ChestGUI.fromInventory(inventory);
+        if (gui == null)
+            return;
+
+        DefinedItem definedItem = gui.get(event.getSlot());
+        if (definedItem == null)
             return;
 
         event.setCancelled(true);
 
-        if (staticItem instanceof GuiItem && event.getClick() != ClickType.DOUBLE_CLICK
-                && ((GuiItem) staticItem).onClick(event.getClick(), itemStack, player))
+        if (event.getClick() != ClickType.DOUBLE_CLICK && definedItem.getOnClick().apply(event.getClick(), player))
             GUI_CLICK_SOUND.play(player);
     }
 }

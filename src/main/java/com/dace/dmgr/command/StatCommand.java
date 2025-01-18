@@ -39,7 +39,7 @@ public final class StatCommand extends CommandHandler {
             }
         }
 
-        new Stat(targetUserData).open(sender);
+        new Stat(sender, targetUserData);
     }
 }
 

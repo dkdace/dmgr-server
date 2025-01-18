@@ -5,6 +5,8 @@ import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.game.RankUtil;
 import com.dace.dmgr.game.Tier;
+import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
@@ -16,6 +18,7 @@ import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -591,6 +594,17 @@ public final class UserData implements Initializable<Void> {
                 getLevelPrefix(),
                 (Bukkit.getOfflinePlayer(playerUUID).isOp() ? "§a" : "§f"),
                 playerName);
+    }
+
+    /**
+     * 플레이어의 프로필 정보 아이템을 반환한다.
+     *
+     * @return 프로필 정보 아이템
+     * @see PlayerSkullUtil#fromPlayer(OfflinePlayer)
+     */
+    @NonNull
+    public ItemStack getProfileItem() {
+        return new ItemBuilder(PlayerSkullUtil.fromPlayer(Bukkit.getOfflinePlayer(playerUUID))).setName(getDisplayName()).build();
     }
 
     /**

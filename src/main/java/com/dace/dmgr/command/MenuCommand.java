@@ -20,6 +20,6 @@ public final class MenuCommand extends CommandHandler {
 
     @Override
     protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
-        Menu.getInstance().open(sender);
+        new Menu(sender);
     }
 }

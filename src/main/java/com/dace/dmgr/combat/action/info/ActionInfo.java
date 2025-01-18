@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.action.info;
 
-import com.dace.dmgr.item.StaticItem;
+import com.dace.dmgr.item.DefinedItem;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +18,7 @@ public class ActionInfo {
     protected final String name;
     /** 설명 정적 아이템 객체 */
     @Getter
-    protected final StaticItem staticItem;
+    protected final DefinedItem definedItem;
     /** 설명 아이템 객체 */
     protected final ItemStack itemStack;
 
@@ -26,11 +26,11 @@ public class ActionInfo {
      * 동작 정보 인스턴스를 생성한다.
      *
      * @param name       이름
-     * @param staticItem 설명 정적 아이템 객체
+     * @param definedItem 설명 정적 아이템 객체
      */
-    protected ActionInfo(@NonNull String name, @NonNull StaticItem staticItem) {
+    protected ActionInfo(@NonNull String name, @NonNull DefinedItem definedItem) {
         this.name = name;
-        this.staticItem = staticItem;
-        this.itemStack = staticItem.getItemStack();
+        this.definedItem = definedItem;
+        this.itemStack = definedItem.getItemStack();
     }
 }

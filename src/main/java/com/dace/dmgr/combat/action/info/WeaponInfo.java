@@ -3,8 +3,8 @@ package com.dace.dmgr.combat.action.info;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.StaticItem;
 import lombok.NonNull;
 import org.bukkit.Material;
 
@@ -32,7 +32,7 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      */
     protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name,
                          @NonNull ActionInfoLore actionInfoLore) {
-        super(name, new StaticItem("WeaponInfo" + name, new ItemBuilder(material)
+        super(name, new DefinedItem(new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)
                 .setLore(actionInfoLore.toString())

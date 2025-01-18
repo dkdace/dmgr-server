@@ -54,8 +54,11 @@ public final class RankingCommand extends CommandHandler {
 
         user.sendMessageInfo(StringFormUtil.BAR);
         for (int i = 0; i < ranking.length; i++)
-            user.sendMessageInfo(MessageFormat.format("{0}§l[ {1} ] {2} {3}", i < 3 ? rankColors[i] : "§7§l",
-                    String.format("%02d", i + 1), ranking[i].getDisplayName(), valueFunction.apply(ranking[i])));
+            user.sendMessageInfo(MessageFormat.format("{0}§l[ {1} ] {2} {3}",
+                    i < 3 ? rankColors[i] : "§7§l",
+                    String.format("%02d", i + 1),
+                    ranking[i].getDisplayName(),
+                    valueFunction.apply(ranking[i])));
 
         user.sendMessageInfo("\n" +
                 "§c* 실제 기록이 반영되기까지 다소 시간이 걸릴 수 있습니다.\n" +

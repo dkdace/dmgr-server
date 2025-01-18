@@ -29,6 +29,7 @@ public final class EventListenerManager {
         Validate.notNull(OnEntityTarget.getInstance());
         Validate.notNull(OnFoodLevelChange.getInstance());
         Validate.notNull(OnInventoryClick.getInstance());
+        Validate.notNull(OnInventoryClose.getInstance());
         Validate.notNull(OnPlayerArmorStandManipulate.getInstance());
         Validate.notNull(OnPlayerBucketEmpty.getInstance());
         Validate.notNull(OnPlayerBucketFill.getInstance());

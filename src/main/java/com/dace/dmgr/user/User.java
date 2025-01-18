@@ -13,6 +13,7 @@ import com.dace.dmgr.event.listener.OnPlayerJoin;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
@@ -119,6 +120,10 @@ public final class User implements Disposable {
     private final SidebarManager sidebarManager;
     /** 발광 효과 정보 목록 (발광 엔티티 : 발광 효과 정보) */
     private final WeakHashMap<Entity, GlowingInfo> glowingInfoMap = new WeakHashMap<>();
+    /** 플레이어 인벤토리 GUI */
+    @NonNull
+    @Getter
+    private final GUI gui;
 
     /** 채팅 쿨타임 타임스탬프 */
     private Timestamp chatCooldownTimestamp = Timestamp.now();
@@ -167,6 +172,7 @@ public final class User implements Disposable {
         this.taskManager = new TaskManager();
         this.tabListManager = new TabListManager(player);
         this.sidebarManager = new SidebarManager(player);
+        this.gui = new GUI(player.getInventory());
 
         UserRegistry.getInstance().add(player, this);
     }
@@ -656,12 +662,12 @@ public final class User implements Disposable {
 
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
-        player.getInventory().clear();
         player.setExp(0);
         player.setLevel(0);
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach((potionEffect -> player.removePotionEffect(potionEffect.getType())));
 
+        gui.clear();
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         isInFreeCombat = false;
         UserRegistry.getInstance().getAllUsers().forEach(target -> target.removeGlowing(this.player));

@@ -63,7 +63,7 @@ public final class BlockCommand extends CommandHandler {
                 return;
             }
 
-            BlockList.getInstance().open(sender);
+            new BlockList(sender);
         }
     }
 

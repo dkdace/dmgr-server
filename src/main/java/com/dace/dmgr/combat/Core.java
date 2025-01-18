@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.item.gui.GuiItem;
+import com.dace.dmgr.item.gui.ChestGUI;
 import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
@@ -11,9 +11,6 @@ import lombok.NonNull;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
 import java.text.MessageFormat;
@@ -38,56 +35,44 @@ public enum Core {
     /** 수치 값 목록 */
     @Getter
     private final double @NonNull [] values;
-    /** 정적 아이템 객체 */
+    /** 코어 선택 GUI 아이템 */
     @NonNull
     @Getter
-    private final StaticItem staticItem;
-    /** 선택용 GUI 아이템 객체 */
-    @NonNull
-    @Getter
-    private final GuiItem selectGuiItem;
+    private final DefinedItem selectItem;
 
     Core(String name, String description, int red, int green, int blue, double... values) {
         this.name = name;
         this.values = values;
 
-        ItemStack itemStack = new ItemBuilder(Material.FIREWORK_CHARGE)
+        this.selectItem = new DefinedItem(new ItemBuilder(Material.FIREWORK_CHARGE)
+                .editItemMeta(itemMeta ->
+                        ((FireworkEffectMeta) itemMeta).setEffect(FireworkEffect.builder().withColor(Color.fromRGB(red, green, blue)).build()))
                 .setName(MessageFormat.format("§b{0}의 코어", name))
                 .setLore("",
                         "§7장착 시 다음 효과 적용:",
-                        "§9" + MessageFormat.format(description, Arrays.stream(values).boxed().toArray()))
-                .build();
-        FireworkEffectMeta itemMeta = (FireworkEffectMeta) itemStack.getItemMeta();
-        itemMeta.setEffect(FireworkEffect.builder()
-                .withColor(Color.fromRGB(red, green, blue))
-                .build());
-        itemStack.setItemMeta(itemMeta);
-
-        this.staticItem = new StaticItem("Core" + this, itemStack);
-        this.selectGuiItem = new GuiItem("CoreSelect" + this, new ItemBuilder(itemStack)
-                .addLore("",
+                        "§9" + MessageFormat.format(description, Arrays.stream(values).boxed().toArray()),
+                        "",
                         "§7§n클릭§f하여 코어를 장착하거나 제거합니다.")
-                .build()) {
-            @Override
-            public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                if (!player.getOpenInventory().getTitle().contains("코어 선택"))
-                    return false;
+                .build(),
+                (clickType, player) -> {
+                    ChestGUI gui = ChestGUI.fromInventory(player.getOpenInventory().getTopInventory());
+                    if (!(gui instanceof SelectCore))
+                        return false;
 
-                CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-                if (combatUser == null)
-                    return false;
+                    CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+                    if (combatUser == null)
+                        return false;
 
-                boolean pass;
-                if (combatUser.hasCore(Core.this))
-                    pass = combatUser.removeCore(Core.this);
-                else
-                    pass = combatUser.addCore(Core.this);
-                if (pass)
-                    SelectCore.getInstance().open(player);
+                    boolean pass;
+                    if (combatUser.hasCore(Core.this))
+                        pass = combatUser.removeCore(Core.this);
+                    else
+                        pass = combatUser.addCore(Core.this);
+                    if (pass)
+                        new SelectCore(player);
 
-                return pass;
-            }
-        };
+                    return pass;
+                });
     }
 
     /**

@@ -32,7 +32,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.*;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.item.StaticItem;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.LocationUtil;
@@ -50,7 +50,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -1478,8 +1477,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         cores.add(core);
 
         for (int i = 27; i <= 29; i++) {
-            if (entity.getInventory().getItem(i) == null) {
-                entity.getInventory().setItem(i, core.getSelectGuiItem().getItemStack());
+            if (user.getGui().get(i) == null) {
+                user.getGui().set(i, core.getSelectItem());
                 break;
             }
         }
@@ -1511,9 +1510,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         cores.remove(core);
 
         for (int i = 27; i <= 29; i++) {
-            ItemStack itemStack = entity.getInventory().getItem(i);
-            if (itemStack != null && StaticItem.fromItemStack(itemStack) == core.getSelectGuiItem()) {
-                entity.getInventory().setItem(i, null);
+            DefinedItem definedItem = user.getGui().get(i);
+            if (definedItem == core.getSelectItem()) {
+                user.getGui().remove(i);
                 break;
             }
         }
@@ -1539,7 +1538,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         cores.clear();
 
         for (int i = 27; i <= 30; i++)
-            entity.getInventory().setItem(i, new ItemStack(Material.AIR));
+            user.getGui().remove(i);
     }
 
     /**

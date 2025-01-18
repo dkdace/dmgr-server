@@ -42,7 +42,7 @@ public abstract class ActiveSkill extends AbstractSkill {
         if (slot < 0 || slot > 8)
             throw new IllegalArgumentException("'slot'이 0에서 8 사이여야 함");
 
-        this.originalItemStack = activeSkillInfo.getStaticItem().getItemStack();
+        this.originalItemStack = activeSkillInfo.getDefinedItem().getItemStack();
         this.itemStack = originalItemStack.clone();
         this.slot = slot;
 

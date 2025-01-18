@@ -1,51 +1,42 @@
 package com.dace.dmgr.item.gui;
 
+import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * 메뉴 - 채팅 효과음 설정 GUI 클래스.
  */
-public final class ChatSoundOption extends Gui {
-    /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.Left("ChatSoundOptionLeft") {
-        @Override
-        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            PlayerOption.getInstance().open(player);
-            return true;
-        }
-    };
-    @Getter
-    private static final ChatSoundOption instance = new ChatSoundOption();
+public final class ChatSoundOption extends ChestGUI {
+    /**
+     * 채팅 효과음 설정 GUI 인스턴스를 생성한다.
+     *
+     * @param player GUI 표시 대상 플레이어
+     */
+    public ChatSoundOption(@NonNull Player player) {
+        super(2, "§8채팅 효과음 설정", player);
 
-    private ChatSoundOption() {
-        super(2, "§8채팅 효과음 설정");
-    }
+        fillRow(1, GUIItem.EMPTY);
 
-    @Override
-    public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
         UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
-
         ChatSound[] chatSounds = ChatSound.values();
 
-        guiController.fillRow(2, DisplayItem.EMPTY.getStaticItem());
         for (int i = 0; i < chatSounds.length; i++) {
             ChatSound chatSound = chatSounds[i];
 
-            guiController.set(i, chatSound.guiItem, itemBuilder -> {
+            set(i, chatSound.definedItem, itemBuilder -> {
                 if (userConfig.getChatSound() == chatSound)
                     itemBuilder.addLore("§a§l선택됨");
             });
         }
 
-        guiController.set(17, buttonLeft);
+        set(1, 8, new GUIItem.Previous(PlayerOption::new));
     }
 
     /**
@@ -53,7 +44,7 @@ public final class ChatSoundOption extends Gui {
      */
     public enum ChatSound {
         /** 음소거 */
-        MUTE("음소거", "", Material.BARRIER),
+        MUTE("음소거", "mute", Material.BARRIER),
         /** 플링 */
         PLING("플링", "new.block.note_block.pling", Material.GLOWSTONE),
         /** 하프 */
@@ -81,38 +72,30 @@ public final class ChatSoundOption extends Gui {
         /** 벤조 */
         BANJO("벤조", "new.block.note_block.banjo", Material.HAY_BLOCK);
 
-        /** 이름 */
-        @NonNull
-        @Getter
-        private final String name;
         /** 효과음 */
         @NonNull
         @Getter
         private final SoundEffect sound;
-        /** GUI 아이템 객체 */
-        private final GuiItem guiItem;
+        /** GUI 아이템 */
+        private final DefinedItem definedItem;
 
-        ChatSound(@NonNull String name, @NonNull String sound, Material material) {
-            ItemBuilder itemBuilder = new ItemBuilder(material).setName("§e§l" + name);
-            this.name = name;
+        ChatSound(String name, String sound, Material material) {
             this.sound = new SoundEffect(SoundEffect.SoundInfo.builder(sound).volume(1000).pitch(Math.sqrt(2)).build());
 
-            this.guiItem = new GuiItem("ChatSound" + this, itemBuilder.build()) {
-                @Override
-                public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-                    if (clickType != ClickType.LEFT)
-                        return false;
+            this.definedItem = new DefinedItem(new ItemBuilder(material).setName("§e§l" + name).build(),
+                    (clickType, player) -> {
+                        if (clickType != ClickType.LEFT)
+                            return false;
 
-                    UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
-                    userConfig.setChatSound(ChatSound.this);
+                        UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
+                        userConfig.setChatSound(this);
 
-                    ChatSound.this.sound.play(player);
+                        this.sound.play(player);
 
-                    ChatSoundOption.getInstance().open(player);
+                        new ChatSoundOption(player);
 
-                    return true;
-                }
-            };
+                        return true;
+                    });
         }
     }
 }

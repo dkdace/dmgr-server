@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.action.info;
 
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.StaticItem;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -20,7 +20,7 @@ public class TraitInfo extends ActionInfo {
      * @param actionInfoLore 동작 정보 설명
      */
     protected TraitInfo(@NonNull String name, @NonNull ActionInfoLore actionInfoLore) {
-        super(name, new StaticItem("TraitInfo" + name, new ItemBuilder(SkillInfo.MATERIAL)
+        super(name, new DefinedItem(new ItemBuilder(SkillInfo.MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 3)
                 .setLore(actionInfoLore.toString())

@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.action.info;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.item.StaticItem;
+import com.dace.dmgr.item.DefinedItem;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +27,7 @@ public abstract class SkillInfo<T extends Skill> extends ActionInfo {
      * @param itemStack  설명 아이템 객체
      */
     protected SkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ItemStack itemStack) {
-        super(name, new StaticItem("SkillInfo" + name, itemStack));
+        super(name, new DefinedItem(itemStack));
         this.skillClass = skillClass;
     }
 
