@@ -213,6 +213,12 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int teamSpawnHealPerSecond = section.getEntry("team_spawn_heal_per_second", 500).get();
         /** 상대 팀 스폰 입장 시 초당 피해량 */
         private final int oppositeSpawnDamagePerSecond = section.getEntry("opposite_spawn_damage_per_second", 250).get();
+        /** 레드 팀 스폰 식별 블록 타입 */
+        @NonNull
+        private final Material redTeamSpawnBlock = Material.valueOf(section.getEntry("red_team_spawn_block", Material.REDSTONE_ORE.toString()).get());
+        /** 블루 팀 스폰 식별 블록 타입 */
+        @NonNull
+        private final Material blueTeamSpawnBlock = Material.valueOf(section.getEntry("blue_team_spawn_block", Material.LAPIS_ORE.toString()).get());
         /** 궁극기 팩 활성화 대기 시간 */
         @NonNull
         private final Timespan ultPackActivationTime = Timespan.ofSeconds(section.getEntry("ult_pack_activation_time_seconds", 60.0).get());

@@ -2,6 +2,7 @@ package com.dace.dmgr.util.task;
 
 import com.dace.dmgr.Disposable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 
@@ -14,6 +15,7 @@ import java.util.HashSet;
  *
  * @see Task
  */
+@NoArgsConstructor
 public final class TaskManager implements Disposable {
     /** 태스크 목록 */
     private final HashSet<Task> tasks = new HashSet<>();

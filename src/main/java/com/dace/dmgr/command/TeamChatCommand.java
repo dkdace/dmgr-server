@@ -1,6 +1,5 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
@@ -25,12 +24,12 @@ public final class TeamChatCommand extends CommandHandler {
         User user = User.fromPlayer(sender);
         GameUser gameUser = GameUser.fromUser(user);
 
-        if (gameUser == null || gameUser.getGame().getPhase() != Game.Phase.READY && gameUser.getGame().getPhase() != Game.Phase.PLAYING) {
+        if (gameUser == null) {
             user.sendMessageWarn("게임 진행 중에만 사용할 수 있습니다.");
             return;
         }
 
         gameUser.setTeamChat(!gameUser.isTeamChat());
-        user.sendMessageInfo("전체 채팅이 {0} §r되었습니다.", gameUser.isTeamChat() ? "§a§l활성화" : "§c§l비활성화");
+        user.sendMessageInfo("전체 채팅이 {0} §r되었습니다.", gameUser.isTeamChat() ? "§c§l비활성화" : "§a§l활성화");
     }
 }

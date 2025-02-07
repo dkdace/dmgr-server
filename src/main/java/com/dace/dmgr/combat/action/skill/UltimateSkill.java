@@ -3,8 +3,8 @@ package com.dace.dmgr.combat.action.skill;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.game.GameUser;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Sound;
@@ -57,9 +57,9 @@ public abstract class UltimateSkill extends ActiveSkill {
         combatUser.setUltGaugePercent(0);
         ULTIMATE_USE_SOUND.play(combatUser.getEntity().getLocation());
 
-        GameUser gameUser = GameUser.fromUser(combatUser.getUser());
+        GameUser gameUser = combatUser.getGameUser();
         if (gameUser != null)
-            gameUser.sendMessage("§l" + combatUser.getCharacterType().getCharacter().getUltUseMent(), false);
+            gameUser.broadcastChatMessage("§l" + combatUser.getCharacterType().getCharacter().getUltUseMent(), false);
     }
 
     /**

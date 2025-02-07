@@ -2,11 +2,11 @@ package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -109,7 +109,7 @@ public final class CombatUtil {
 
         if (game == null)
             return getNearCombatEntity(location, range, condition);
-        return game.getAllCombatEntities().stream()
+        return game.getCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()
@@ -166,7 +166,7 @@ public final class CombatUtil {
 
         if (game == null)
             return getNearCombatEntities(location, range, condition);
-        return game.getAllCombatEntities().stream()
+        return game.getCombatEntities().stream()
                 .filter(condition)
                 .filter(combatEntity ->
                         combatEntity.canBeTargeted()

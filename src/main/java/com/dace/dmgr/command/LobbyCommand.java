@@ -1,6 +1,5 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
@@ -26,11 +25,8 @@ public final class LobbyCommand extends CommandHandler {
         GameUser gameUser = GameUser.fromUser(user);
 
         if (gameUser != null) {
-            Game game = gameUser.getGame();
-            if (game.getPhase() == Game.Phase.READY || game.getPhase() == Game.Phase.PLAYING) {
-                user.sendMessageWarn("게임 진행 중에 나가려면 §n'/quit'§r 또는 §n'/q'§r를 입력하십시오.");
-                return;
-            }
+            user.sendMessageWarn("게임 진행 중에 나가려면 §n'/quit'§r 또는 §n'/q'§r를 입력하십시오.");
+            return;
         }
 
         user.reset();

@@ -31,10 +31,9 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
 
         if (combatUser != null) {
-            GameUser gameUser = GameUser.fromUser(combatUser.getUser());
+            GameUser gameUser = combatUser.getGameUser();
 
-            if (gameUser != null && gameUser.getTeam() != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam()
-                    || LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION)) {
+            if (gameUser != null && gameUser.isInSpawn() || LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION)) {
                 new SelectChar(player);
                 return;
             }

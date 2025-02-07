@@ -90,7 +90,7 @@ public enum CharacterType {
 
                     if (clickType == ClickType.LEFT) {
                         GameUser gameUser = combatUser.getGameUser();
-                        boolean isDuplicated = gameUser != null && gameUser.getTeam() != null && gameUser.getTeam().getTeamUsers().stream()
+                        boolean isDuplicated = gameUser != null && gameUser.getTeam().getTeamUsers().stream()
                                 .anyMatch(targetGameUser -> {
                                     CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
                                     Validate.notNull(targetCombatUser);

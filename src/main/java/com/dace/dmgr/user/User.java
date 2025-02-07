@@ -11,7 +11,7 @@ import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
 import com.dace.dmgr.event.listener.OnPlayerCommandPreprocess;
 import com.dace.dmgr.event.listener.OnPlayerJoin;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
-import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.util.StringFormUtil;
@@ -109,7 +109,7 @@ public final class User implements Disposable {
     @Getter
     private final UserData userData;
     /** 태스크 관리 인스턴스 */
-    private final TaskManager taskManager;
+    private final TaskManager taskManager = new TaskManager();
     /** 플레이어 탭리스트 관리 인스턴스 */
     @NonNull
     @Getter
@@ -152,6 +152,10 @@ public final class User implements Disposable {
     @Getter
     @Setter
     private User messageTarget;
+    /** 현재 입장한 게임 방 */
+    @Nullable
+    @Getter
+    private GameRoom gameRoom;
     /** 관리자 채팅 여부 */
     @Getter
     @Setter
@@ -169,7 +173,6 @@ public final class User implements Disposable {
     private User(@NonNull Player player) {
         this.player = player;
         this.userData = UserData.fromPlayer(player);
-        this.taskManager = new TaskManager();
         this.tabListManager = new TabListManager(player);
         this.sidebarManager = new SidebarManager(player);
         this.gui = new GUI(player.getInventory());
@@ -252,9 +255,8 @@ public final class User implements Disposable {
 
         reset();
 
-        GameUser gameUser = GameUser.fromUser(this);
-        if (gameUser != null)
-            gameUser.dispose();
+        if (gameRoom != null)
+            quitGame();
 
         taskManager.dispose();
         tabListManager.delete();
@@ -362,7 +364,7 @@ public final class User implements Disposable {
         }
 
         GameUser gameUser = GameUser.fromUser(this);
-        if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
+        if (gameUser == null)
             updateLobbyTabList();
 
         tabListManager.update();
@@ -523,13 +525,10 @@ public final class User implements Disposable {
     private String getTabListPlayerName() {
         String prefix = "§7[로비]";
 
-        GameUser gameUser = GameUser.fromUser(this);
         if (isInFreeCombat())
             prefix = "§7[자유 전투]";
-        else if (gameUser != null) {
-            Game game = gameUser.getGame();
-            prefix = MessageFormat.format(game.getGamePlayMode().isRanked() ? "§6[랭크 게임 {0}]" : "§a[일반 게임 {0}]", game.getNumber());
-        }
+        else if (gameRoom != null)
+            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 게임 {0}]" : "§a[일반 게임 {0}]", gameRoom.getNumber());
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
@@ -567,8 +566,14 @@ public final class User implements Disposable {
                 UserRegistry.getInstance().getAllUsers().stream()
                         .filter(target -> target.getPlayer().isOp())
                         .forEach(target -> sendChatMessage(target, ChatColor.DARK_AQUA + message));
-            } else
-                UserRegistry.getInstance().getAllUsers().forEach(target -> sendChatMessage(target, message));
+            } else {
+                GameUser gameUser = GameUser.fromUser(this);
+
+                if (gameUser == null)
+                    UserRegistry.getInstance().getAllUsers().forEach(target -> sendChatMessage(target, message));
+                else
+                    gameUser.broadcastChatMessage(message, gameUser.isTeamChat());
+            }
         } else {
             sendChatMessage(this, ChatColor.GRAY + message);
             sendChatMessage(messageTarget, ChatColor.GRAY + message);
@@ -665,12 +670,16 @@ public final class User implements Disposable {
         player.setExp(0);
         player.setLevel(0);
         player.setWalkSpeed(0.2F);
-        player.getActivePotionEffects().forEach((potionEffect -> player.removePotionEffect(potionEffect.getType())));
+        player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
 
         gui.clear();
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         isInFreeCombat = false;
-        UserRegistry.getInstance().getAllUsers().forEach(target -> target.removeGlowing(this.player));
+
+        UserRegistry.getInstance().getAllUsers().forEach(target -> {
+            removeGlowing(target.getPlayer());
+            target.removeGlowing(this.player);
+        });
 
         if (userData.isInitialized()) {
             sidebarManager.clear();
@@ -965,6 +974,34 @@ public final class User implements Disposable {
             nameTagHider.teleport(location);
             player.addPassenger(nameTagHider);
         }
+    }
+
+    /**
+     * 플레이어를 지정한 게임 방에 입장시킨다.
+     *
+     * @param gameRoom 대상 게임 방
+     */
+    public void joinGame(@NonNull GameRoom gameRoom) {
+        validate();
+
+        if (this.gameRoom != null || !gameRoom.canJoin())
+            return;
+
+        this.gameRoom = gameRoom;
+        gameRoom.onJoin(this);
+    }
+
+    /**
+     * 플레이어를 현재 입장한 게임 방에서 퇴장시킨다.
+     */
+    public void quitGame() {
+        validate();
+
+        if (gameRoom == null)
+            return;
+
+        gameRoom.onQuit(this);
+        gameRoom = null;
     }
 
     /**

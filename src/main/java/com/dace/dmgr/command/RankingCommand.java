@@ -1,6 +1,6 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.game.RankUtil;
+import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.StringFormUtil;
@@ -10,12 +10,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Function;
 
 /**
  * 랭킹 명령어 클래스.
  *
- * @see RankUtil
+ * @see RankManager
  */
 public final class RankingCommand extends CommandHandler {
     @Getter
@@ -43,26 +46,30 @@ public final class RankingCommand extends CommandHandler {
      * 랭킹 결과를 전송한다.
      *
      * @param sender        입력자
-     * @param indicator     랭킹 데이터 지표
+     * @param rankType      랭킹 데이터 항목
      * @param valueFunction 항목 값 반환에 실행할 작업
      */
-    private static void sendResult(@NonNull Player sender, @NonNull RankUtil.Indicator indicator,
+    private static void sendResult(@NonNull Player sender, @NonNull RankManager.RankType rankType,
                                    @NonNull Function<@NonNull UserData, @NonNull String> valueFunction) {
-        User user = User.fromPlayer(sender);
-        UserData[] ranking = RankUtil.getRanking(indicator, RANK_LIMIT);
-        ChatColor[] rankColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD};
+        List<UserData> ranking = RankManager.getInstance().getRanking(rankType, RANK_LIMIT);
+        ChatColor[] rankColors = {ChatColor.YELLOW, ChatColor.WHITE, ChatColor.GOLD, ChatColor.DARK_GRAY};
 
-        user.sendMessageInfo(StringFormUtil.BAR);
-        for (int i = 0; i < ranking.length; i++)
-            user.sendMessageInfo(MessageFormat.format("{0}§l[ {1} ] {2} {3}",
-                    i < 3 ? rankColors[i] : "§7§l",
+        StringJoiner text = new StringJoiner("\n").add(StringFormUtil.BAR);
+        int i = 0;
+        for (Iterator<UserData> iterator = ranking.iterator(); iterator.hasNext(); i++) {
+            UserData userData = iterator.next();
+
+            text.add(MessageFormat.format("{0}§l[ {1} ] {2} {3}",
+                    rankColors[Math.min(i, 3)],
                     String.format("%02d", i + 1),
-                    ranking[i].getDisplayName(),
-                    valueFunction.apply(ranking[i])));
+                    userData.getDisplayName(),
+                    valueFunction.apply(userData)));
+        }
 
-        user.sendMessageInfo("\n" +
+        text.add("\n" +
                 "§c* 실제 기록이 반영되기까지 다소 시간이 걸릴 수 있습니다.\n" +
                 StringFormUtil.BAR);
+        User.fromPlayer(sender).sendMessageInfo(text.toString());
     }
 
     @Override
@@ -80,7 +87,7 @@ public final class RankingCommand extends CommandHandler {
 
         @Override
         protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
-            sendResult(sender, RankUtil.Indicator.RANK_RATE, userData ->
+            sendResult(sender, RankManager.RankType.RANK_RATE, userData ->
                     MessageFormat.format("§f- §b{0}점", userData.getRankRate()));
         }
     }
@@ -95,7 +102,7 @@ public final class RankingCommand extends CommandHandler {
 
         @Override
         protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
-            sendResult(sender, RankUtil.Indicator.LEVEL, userData -> "");
+            sendResult(sender, RankManager.RankType.LEVEL, userData -> "");
         }
     }
 }

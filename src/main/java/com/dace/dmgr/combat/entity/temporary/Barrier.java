@@ -59,6 +59,6 @@ public abstract class Barrier<T extends Entity> extends SummonEntity<T> implemen
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
         if (owner.getGameUser() != null)
-            owner.getGameUser().setDefend(owner.getGameUser().getDefend() + damage);
+            owner.getGameUser().addDefend(damage);
     }
 }

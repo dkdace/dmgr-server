@@ -1,8 +1,6 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.event.EventListener;
-import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,12 +26,8 @@ public final class OnAsyncPlayerChat extends EventListener<AsyncPlayerChatEvent>
 
         String message = event.getMessage();
         User user = User.fromPlayer(event.getPlayer());
-        GameUser gameUser = GameUser.fromUser(user);
 
-        if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
-            user.onChat(message);
-        else
-            gameUser.sendMessage(message, gameUser.isTeamChat());
+        user.onChat(message);
 
         Bukkit.getConsoleSender().sendMessage(MessageFormat.format(CHAT_FORMAT_PATTERN, user.getUserData().getDisplayName(), message));
     }

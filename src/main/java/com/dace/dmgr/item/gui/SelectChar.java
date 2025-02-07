@@ -56,7 +56,7 @@ public final class SelectChar extends ChestGUI {
                     if (gameUser == null)
                         return;
 
-                    boolean isDuplicated = gameUser.getTeam() != null && gameUser.getTeam().getTeamUsers().stream()
+                    boolean isDuplicated = gameUser.getTeam().getTeamUsers().stream()
                             .anyMatch(targetGameUser -> {
                                 CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
                                 Validate.notNull(targetCombatUser);

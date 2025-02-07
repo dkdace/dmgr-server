@@ -327,7 +327,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             Validate.notNull(characterRecord);
 
-            if (gameUser != null && gameUser.getSpawnRegionTeam() == null)
+            if (gameUser != null && !gameUser.isInSpawn())
                 characterRecord.addPlayTime();
         }
     }
@@ -373,7 +373,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 현재 위치의 궁극기 팩을 확인 및 사용한다.
      */
     private void checkUltPack() {
-        if (game != null && game.getRemainingTime() > game.getGamePlayMode().getPlayDuration() - GeneralConfig.getGameConfig().getUltPackActivationTime().toSeconds())
+        if (game != null && !game.isUltPackActivated())
             return;
 
         Location location = entity.getLocation().subtract(0, 0.5, 0).getBlock().getLocation();
@@ -524,7 +524,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public boolean canBeTargeted() {
         if (!isActivated)
             return false;
-        if (gameUser != null && gameUser.getSpawnRegionTeam() == gameUser.getTeam())
+        if (gameUser != null && gameUser.isInSpawn())
             return false;
         if (LocationUtil.isInRegion(entity, "BattlePVP"))
             return false;
@@ -535,7 +535,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Override
     @NonNull
     public String getTeamIdentifier() {
-        return gameUser == null || gameUser.getTeam() == null ? name : gameUser.getTeam().getName();
+        return gameUser == null ? name : gameUser.getTeam().getType().getName();
     }
 
     /**
@@ -607,7 +607,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValues()[0] / 100.0, false);
 
             if (gameUser != null)
-                gameUser.setDamage(gameUser.getDamage() + damage);
+                gameUser.addDamage(damage);
         }
     }
 
@@ -659,7 +659,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         if (gameUser != null)
-            gameUser.setDefend(gameUser.getDefend() + reducedDamage);
+            gameUser.addDefend(reducedDamage);
     }
 
     /**
@@ -715,7 +715,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         if (gameUser != null && target instanceof CombatUser)
-            gameUser.setHeal(gameUser.getHeal() + amount);
+            gameUser.addHeal(amount);
     }
 
     @Override
@@ -827,7 +827,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private String getPlayerKillBossBarName() {
         Validate.notNull(character);
 
-        ChatColor color = gameUser == null || gameUser.getTeam() == null ? ChatColor.WHITE : gameUser.getTeam().getColor();
+        ChatColor color = gameUser == null ? ChatColor.WHITE : gameUser.getTeam().getType().getColor();
 
         return MessageFormat.format("§f{0}{1}§l {2}", character.getIcon(), color, name);
     }
@@ -940,7 +940,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getRespawnLocation()).add(0, 2, 0);
+        Location deadLocation = (gameUser == null ? FreeCombat.getWaitLocation() : gameUser.getSpawnLocation()).add(0, 2, 0);
         user.teleport(deadLocation);
 
         long duration = GeneralConfig.getCombatConfig().getRespawnTime().toTicks();
@@ -1129,7 +1129,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (score < 0)
             throw new IllegalArgumentException("'score'가 0 이상이어야 함");
         if (gameUser != null)
-            gameUser.setScore(gameUser.getScore() + score);
+            gameUser.addScore(score);
 
         Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getScoreDisplayDuration());
         if (definedTimestamp.scoreDisplay.isBefore(Timestamp.now())) {
@@ -1601,7 +1601,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NonNull
     public String getFormattedMessage(@NonNull String message) {
-        ChatColor color = gameUser == null || gameUser.getTeam() == null ? ChatColor.YELLOW : gameUser.getTeam().getColor();
+        ChatColor color = gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getType().getColor();
 
         return MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}", color,
                 (!isActivated() || character == null ? "미선택" : "§f" + character.getIcon() + " " + color + "§l" + character.getName()),

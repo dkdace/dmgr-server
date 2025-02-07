@@ -1,9 +1,8 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.game.Game;
-import com.dace.dmgr.game.GamePlayMode;
-import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.GameRoom;
+import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
@@ -36,8 +35,8 @@ public final class SelectGame extends ChestGUI {
         set(1, 8, new GUIItem.Previous(Warp::new));
 
         for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
-            set(0, i + 2, SelectGameItem.NORMAL.get(i));
-            set(1, i + 2, SelectGameItem.RANK.get(i));
+            set(0, i + 2, SelectGameItem.NORMAL.create(i));
+            set(1, i + 2, SelectGameItem.RANK.create(i));
         }
     }
 
@@ -86,14 +85,30 @@ public final class SelectGame extends ChestGUI {
         private final int minPlayerCount;
         private final int maxPlayerCount;
 
+        @NonNull
+        private static String getPhaseName(@NonNull GameRoom gameRoom) {
+            switch (gameRoom.getPhase()) {
+                case WAITING:
+                    return "§c대기 중";
+                case PLAYING:
+                    if (gameRoom.getGame().isPlaying())
+                        return "§a게임 진행";
+                    else
+                        return "§a게임 준비";
+                case FINISHED:
+                default:
+                    return "§c종료됨";
+            }
+        }
+
         /**
-         * 지정한 방 번호에 해당하는 게임 방 아이템을 반환한다.
+         * 지정한 방 번호에 해당하는 게임 방 아이템을 생성하여 반환한다.
          *
          * @param number 방 번호
          * @return 게임 방 아이템
          */
         @NonNull
-        private DefinedItem get(int number) {
+        private DefinedItem create(int number) {
             ItemBuilder itemBuilder = new ItemBuilder(Material.STAINED_GLASS_PANE)
                     .setDamage((short) 5)
                     .setName(MessageFormat.format(name, number))
@@ -102,21 +117,19 @@ public final class SelectGame extends ChestGUI {
                             "§e게임 모드 : §f{3}",
                             "§e경과 시간 : §f{4}");
 
-            Game game = Game.fromNumber(isRanked, number);
+            GameRoom gameRoom = GameRoom.fromNumber(isRanked, number);
 
             String gameUserCount = "0";
             String phase = "§8--";
             String playMode = "§8--";
             String displayTime = "§8--";
-            if (game != null) {
-                gameUserCount = (game.getGameUsers().size() >= minPlayerCount ? "§f" : "§c") + game.getGameUsers().size();
-                phase = (game.getPhase() == Game.Phase.WAITING ? "§c" : "§a") + game.getPhase().getName();
+            if (gameRoom != null) {
+                gameUserCount = (gameRoom.getUsers().size() >= minPlayerCount ? "§f" : "§c") + gameRoom.getUsers().size();
+                phase = getPhaseName(gameRoom);
 
-                if (game.getPhase() != Game.Phase.WAITING) {
-                    playMode = game.getGamePlayMode().getName();
-
-                    long playTime = System.currentTimeMillis() - game.getStartTime();
-                    displayTime = DurationFormatUtils.formatDuration(playTime, "mm:ss", true);
+                if (gameRoom.getPhase() == GameRoom.Phase.PLAYING) {
+                    playMode = gameRoom.getGame().getGamePlayMode().getName();
+                    displayTime = DurationFormatUtils.formatDuration(gameRoom.getGame().getElapsedTime().toMilliseconds(), "mm:ss", true);
                 }
             }
 
@@ -127,14 +140,12 @@ public final class SelectGame extends ChestGUI {
                     return false;
 
                 User user = User.fromPlayer(player);
-                if (GameUser.fromUser(user) == null) {
-                    Game selectGame = Game.fromNumber(isRanked, number);
-                    if (selectGame == null)
-                        selectGame = new Game(isRanked, number);
-                    else if (!selectGame.canJoin())
-                        return false;
+                if (user.getGameRoom() == null) {
+                    GameRoom selectGameRoom = GameRoom.fromNumber(isRanked, number);
+                    if (selectGameRoom == null)
+                        selectGameRoom = new GameRoom(isRanked, number);
 
-                    new GameUser(user, selectGame);
+                    user.joinGame(selectGameRoom);
 
                     player.closeInventory();
                 }

@@ -2,17 +2,18 @@ package com.dace.dmgr;
 
 import com.dace.dmgr.command.CommandHandlerManager;
 import com.dace.dmgr.event.EventListenerManager;
-import com.dace.dmgr.game.RankUtil;
+import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.WorldUtil;
 import com.dace.dmgr.util.task.AsyncTask;
+import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.Getter;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 public class DMGR extends JavaPlugin {
     /** 일시적인 엔티티의 사용자 지정 이름 */
     public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
+    /** 임시 복제 월드 이름의 접두사 */
+    public static final String TEMPORARY_WORLD_NAME_PREFIX = "_";
 
     /** 난수 생성 객체 */
     @NonNull
@@ -143,12 +147,12 @@ public class DMGR extends JavaPlugin {
         GeneralConfig.getInstance().init()
                 .onFinish(this::loadUserDatas)
                 .onFinish(() -> {
-                    RankUtil.run();
+                    Validate.notNull(RankManager.getInstance());
                     EventListenerManager.register();
                     CommandHandlerManager.register();
                     CommandHandlerManager.registerTestCommands();
                     clearUnusedEntities();
-                    WorldUtil.clearDuplicatedWorlds();
+                    clearDuplicatedWorlds();
 
                     ConsoleLogger.info("플러그인 활성화 완료");
 
@@ -204,6 +208,30 @@ public class DMGR extends JavaPlugin {
                 .flatMap(world -> world.getEntities().stream())
                 .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
                 .forEach(Entity::remove);
+    }
+
+    /**
+     * 모든 복제 월드를 삭제한다.
+     */
+    private void clearDuplicatedWorlds() {
+        File worldDir = new File(Bukkit.getWorldContainer(), ConfigManager.getDatasourcesConfig().getFileConfig().getPath());
+        File[] worldFiles = worldDir.listFiles();
+        if (worldFiles == null)
+            return;
+
+        Arrays.stream(worldFiles)
+                .filter(file -> file.getName().startsWith(TEMPORARY_WORLD_NAME_PREFIX))
+                .forEach(file -> {
+                    try {
+                        World world = Bukkit.getWorld(file.getName().replace(".slime", ""));
+                        if (world != null)
+                            Bukkit.unloadWorld(world, false);
+
+                        Files.delete(file.toPath());
+                    } catch (Exception ex) {
+                        ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
+                    }
+                });
     }
 
     /**

@@ -3,7 +3,7 @@ package com.dace.dmgr.user;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.character.CharacterType;
-import com.dace.dmgr.game.RankUtil;
+import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.PlayerSkullUtil;
@@ -557,7 +557,7 @@ public final class UserData implements Initializable<Void> {
         if (!isRankedEntry.get())
             return Tier.NONE;
 
-        int rank = RankUtil.getRankIndex(RankUtil.Indicator.RANK_RATE, this);
+        int rank = RankManager.getInstance().getRankIndex(RankManager.RankType.RANK_RATE, this);
         int rankRate = rankRateEntry.get();
 
         if (rankRate <= Tier.STONE.getMaxScore())
