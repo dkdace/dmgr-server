@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
  * 유저의 데이터 정보를 관리하는 클래스.
  */
 public final class UserData implements Initializable<Void> {
+    /** 유저 데이터 목록 (UUID : 유저 데이터 정보) */
+    private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
+
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
             "{0}§c관리자에 의해 서버에서 차단되었습니다.",
@@ -116,7 +119,7 @@ public final class UserData implements Initializable<Void> {
         for (CharacterType characterType : CharacterType.values())
             characterRecordMap.put(characterType, new CharacterRecord(characterType));
 
-        UserDataRegistry.getInstance().add(playerUUID, this);
+        USER_DATA_MAP.put(playerUUID, this);
     }
 
     /**
@@ -127,7 +130,7 @@ public final class UserData implements Initializable<Void> {
      */
     @NonNull
     public static UserData fromPlayer(@NonNull OfflinePlayer player) {
-        UserData userData = UserDataRegistry.getInstance().get(player.getUniqueId());
+        UserData userData = USER_DATA_MAP.get(player.getUniqueId());
         if (userData == null)
             userData = new UserData(player.getUniqueId(), player.getName());
 
@@ -153,7 +156,7 @@ public final class UserData implements Initializable<Void> {
      */
     @Nullable
     public static UserData fromPlayerName(@NonNull String playerName) {
-        return UserDataRegistry.getInstance().getAllUserDatas().stream()
+        return getAllUserDatas().stream()
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(playerName))
                 .findFirst()
                 .orElse(null);
@@ -167,7 +170,7 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     @UnmodifiableView
     public static Collection<@NonNull UserData> getAllUserDatas() {
-        return UserDataRegistry.getInstance().getAllUserDatas();
+        return Collections.unmodifiableCollection(USER_DATA_MAP.values());
     }
 
     @Override

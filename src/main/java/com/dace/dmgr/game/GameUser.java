@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.function.Function;
 
@@ -40,6 +41,9 @@ import java.util.function.Function;
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class GameUser implements Disposable {
+    /** 게임 유저 목록 (유저 정보 : 게임 유저 정보) */
+    private static final HashMap<User, GameUser> GAME_USER_MAP = new HashMap<>();
+
     /** 플레이어 인스턴스 */
     @NonNull
     @Getter
@@ -101,7 +105,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalStateException 해당 {@code user}가 지정한 {@code game}의 방에 입장하지 않았거나 GameUser가 이미 존재하면 발생
      */
     GameUser(@NonNull User user, @NonNull Game game, @NonNull Game.Team team) {
-        Validate.validState(GameUserRegistry.getInstance().get(user) == null);
+        Validate.validState(GAME_USER_MAP.get(user) == null);
         Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game);
 
         this.user = user;
@@ -114,7 +118,7 @@ public final class GameUser implements Disposable {
             defCombatUser.dispose();
         this.combatUser = new CombatUser(this);
 
-        GameUserRegistry.getInstance().add(user, this);
+        GAME_USER_MAP.put(user, this);
 
         game.onAddGameUser(this);
 
@@ -131,7 +135,7 @@ public final class GameUser implements Disposable {
      */
     @Nullable
     public static GameUser fromUser(@NonNull User user) {
-        return GameUserRegistry.getInstance().get(user);
+        return GAME_USER_MAP.get(user);
     }
 
     private void onInit() {
@@ -208,12 +212,12 @@ public final class GameUser implements Disposable {
 
         user.reset();
 
-        GameUserRegistry.getInstance().remove(user);
+        GAME_USER_MAP.remove(user);
     }
 
     @Override
     public boolean isDisposed() {
-        return GameUserRegistry.getInstance().get(user) == null;
+        return GAME_USER_MAP.get(user) == null;
     }
 
     /**

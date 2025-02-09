@@ -59,6 +59,9 @@ import java.util.function.LongConsumer;
  * @see UserData
  */
 public final class User implements Disposable {
+    /** 유저 목록 (플레이어 : 유저 정보) */
+    private static final HashMap<Player, User> USER_MAP = new HashMap<>();
+
     /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_ERR = String.join("\n",
             "{0}§c유저 데이터를 불러오는 중 오류가 발생했습니다.",
@@ -177,7 +180,7 @@ public final class User implements Disposable {
         this.sidebarManager = new SidebarManager(player);
         this.gui = new GUI(player.getInventory());
 
-        UserRegistry.getInstance().add(player, this);
+        USER_MAP.put(player, this);
     }
 
     /**
@@ -188,7 +191,7 @@ public final class User implements Disposable {
      */
     @NonNull
     public static User fromPlayer(@NonNull Player player) {
-        User user = UserRegistry.getInstance().get(player);
+        User user = USER_MAP.get(player);
         if (user == null)
             user = new User(player);
 
@@ -203,7 +206,7 @@ public final class User implements Disposable {
     @NonNull
     @UnmodifiableView
     public static Collection<@NonNull User> getAllUsers() {
-        return UserRegistry.getInstance().getAllUsers();
+        return Collections.unmodifiableCollection(USER_MAP.values());
     }
 
     /**
@@ -276,7 +279,7 @@ public final class User implements Disposable {
             userData.save();
         }
 
-        UserRegistry.getInstance().remove(player);
+        USER_MAP.remove(player);
     }
 
     @Override
@@ -485,7 +488,7 @@ public final class User implements Disposable {
     private void updateLobbyTabListUsers() {
         List<User> lobbyUsers = new ArrayList<>();
         List<User> adminUsers = new ArrayList<>();
-        UserRegistry.getInstance().getAllUsers().stream()
+        getAllUsers().stream()
                 .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
                 .forEach(target -> (target.getPlayer().isOp() ? adminUsers : lobbyUsers).add(target));
 
@@ -563,14 +566,14 @@ public final class User implements Disposable {
 
         if (messageTarget == null) {
             if (isAdminChat()) {
-                UserRegistry.getInstance().getAllUsers().stream()
+                getAllUsers().stream()
                         .filter(target -> target.getPlayer().isOp())
                         .forEach(target -> sendChatMessage(target, ChatColor.DARK_AQUA + message));
             } else {
                 GameUser gameUser = GameUser.fromUser(this);
 
                 if (gameUser == null)
-                    UserRegistry.getInstance().getAllUsers().forEach(target -> sendChatMessage(target, message));
+                    getAllUsers().forEach(target -> sendChatMessage(target, message));
                 else
                     gameUser.broadcastChatMessage(message, gameUser.isTeamChat());
             }
@@ -676,7 +679,7 @@ public final class User implements Disposable {
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         isInFreeCombat = false;
 
-        UserRegistry.getInstance().getAllUsers().forEach(target -> {
+        getAllUsers().forEach(target -> {
             removeGlowing(target.getPlayer());
             target.removeGlowing(this.player);
         });

@@ -7,7 +7,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
 
@@ -23,9 +23,9 @@ public interface CombatEntity extends Disposable {
      * @return 게임에 소속되지 않은 모든 엔티티
      */
     @NonNull
-    @Unmodifiable
+    @UnmodifiableView
     static Collection<@NonNull CombatEntity> getAllExcluded() {
-        return CombatEntityRegistry.getInstance().getAllExcluded();
+        return CombatEntityRegistry.getInstance().valuesExcluded();
     }
 
     /**

@@ -17,10 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 게임 방의 정보와 상태를 관리하는 클래스.
@@ -28,6 +25,9 @@ import java.util.Set;
  * @see Game
  */
 public final class GameRoom implements Disposable {
+    /** 게임 방 목록 ((랭크 여부 : 방 번호) : 게임 방) */
+    private static final HashMap<Pair<Boolean, Integer>, GameRoom> GAME_ROOM_MAP = new HashMap<>();
+
     /** 게임 시작 대기 보스바 목록 */
     private final BossBarDisplay[] gameWaitBossBars = new BossBarDisplay[]{
             new BossBarDisplay("§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오."),
@@ -67,14 +67,14 @@ public final class GameRoom implements Disposable {
      */
     public GameRoom(boolean isRanked, int number) {
         Pair<Boolean, Integer> checkPair = Pair.of(isRanked, number);
-        Validate.validState(GameRoomRegistry.getInstance().get(checkPair) == null);
+        Validate.validState(GAME_ROOM_MAP.get(checkPair) == null);
 
         this.pair = checkPair;
         this.minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
         this.maxPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMaxPlayerCount() : GeneralConfig.getGameConfig().getNormalMaxPlayerCount();
         this.game = new Game(this);
 
-        GameRoomRegistry.getInstance().add(pair, this);
+        GAME_ROOM_MAP.put(pair, this);
 
         for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
             addBossBar(gameWaitBossBar);
@@ -89,7 +89,7 @@ public final class GameRoom implements Disposable {
      */
     @Nullable
     public static GameRoom fromNumber(boolean isRanked, int number) {
-        return GameRoomRegistry.getInstance().get(Pair.of(isRanked, number));
+        return GAME_ROOM_MAP.get(Pair.of(isRanked, number));
     }
 
     /**
@@ -112,12 +112,12 @@ public final class GameRoom implements Disposable {
         if (!users.isEmpty())
             new ArrayList<>(users).forEach(User::quitGame);
 
-        GameRoomRegistry.getInstance().remove(pair);
+        GAME_ROOM_MAP.remove(pair);
     }
 
     @Override
     public boolean isDisposed() {
-        return GameRoomRegistry.getInstance().get(pair) == null;
+        return GAME_ROOM_MAP.get(pair) == null;
     }
 
     /**

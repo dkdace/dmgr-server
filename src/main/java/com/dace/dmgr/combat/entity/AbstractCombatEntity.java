@@ -83,7 +83,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         if (game != null)
             game.addCombatEntity(this);
 
-        CombatEntityRegistry.getInstance().add(entity, this);
+        CombatEntityRegistry.getInstance().put(entity, this);
     }
 
     @Override
