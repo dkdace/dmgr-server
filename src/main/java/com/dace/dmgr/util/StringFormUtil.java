@@ -44,7 +44,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getProgressBar(double current, double max, @NonNull ChatColor color, int length, char symbol) {
-        Validate.inclusiveBetween(1, Integer.MAX_VALUE, length);
+        Validate.isTrue(length >= 1, "length >= 1 (%d)", length);
 
         if (current < 0)
             current = 0;
@@ -126,7 +126,7 @@ public final class StringFormUtil {
      */
     @NonNull
     public static String getActionbarProgressBar(@NonNull String prefix, int current, int max, int length, char symbol) {
-        Validate.inclusiveBetween(1, Integer.MAX_VALUE, length);
+        Validate.isTrue(length >= 1, "length >= 1 (%d)", length);
 
         ChatColor color;
         if (current <= max / 4)

@@ -34,6 +34,10 @@ public final class TimedSoundEffect {
         return new Builder();
     }
 
+    private static void validateDelayIndex(long delayIndex) {
+        Validate.isTrue(delayIndex >= 0, "delayIndex >= 0 (%d)", delayIndex);
+    }
+
     /**
      * 지정한 딜레이 인덱스에 해당하는 효과음이 있으면, 지정한 위치에 소리를 재생한다.
      *
@@ -42,7 +46,7 @@ public final class TimedSoundEffect {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void play(long delayIndex, @NonNull Location location) {
-        Validate.inclusiveBetween(0, Long.MAX_VALUE, delayIndex);
+        validateDelayIndex(delayIndex);
 
         SoundEffect soundEffect = timedSoundEffects.get(delayIndex);
         if (soundEffect != null)
@@ -57,7 +61,7 @@ public final class TimedSoundEffect {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void play(long delayIndex, @NonNull Player player) {
-        Validate.inclusiveBetween(0, Long.MAX_VALUE, delayIndex);
+        validateDelayIndex(delayIndex);
 
         SoundEffect soundEffect = timedSoundEffects.get(delayIndex);
         if (soundEffect != null)
@@ -81,7 +85,7 @@ public final class TimedSoundEffect {
          */
         @NonNull
         public Builder add(long delayIndex, @NonNull SoundEffect.SoundInfo @NonNull ... soundInfos) {
-            Validate.inclusiveBetween(0, Long.MAX_VALUE, delayIndex);
+            validateDelayIndex(delayIndex);
 
             timedSoundEffects.put(delayIndex, new SoundEffect(soundInfos));
             return this;

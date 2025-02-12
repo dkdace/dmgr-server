@@ -105,8 +105,8 @@ public final class GameUser implements Disposable {
      * @throws IllegalStateException 해당 {@code user}가 지정한 {@code game}의 방에 입장하지 않았거나 GameUser가 이미 존재하면 발생
      */
     GameUser(@NonNull User user, @NonNull Game game, @NonNull Game.Team team) {
-        Validate.validState(GAME_USER_MAP.get(user) == null);
-        Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game);
+        Validate.validState(GAME_USER_MAP.get(user) == null, "GameUser가 이미 존재함");
+        Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game, "user.getGameRoom().getGame() == game (false)");
 
         this.user = user;
         this.player = user.getPlayer();
@@ -282,7 +282,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addScore(double score) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, score);
+        Validate.isTrue(score >= 0, "score >= 0 (%f)", score);
         validate();
 
         this.score += score;
@@ -295,7 +295,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addDamage(double damage) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, damage);
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
         validate();
 
         this.damage += damage;
@@ -308,7 +308,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addDefend(double defend) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, defend);
+        Validate.isTrue(defend >= 0, "defend >= 0 (%f)", defend);
         validate();
 
         this.defend += defend;
@@ -321,7 +321,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addHeal(double heal) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, heal);
+        Validate.isTrue(heal >= 0, "heal >= 0 (%f)", heal);
         validate();
 
         this.heal += heal;

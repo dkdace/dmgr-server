@@ -229,7 +229,7 @@ public final class UserData implements Initializable<Void> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setXp(int xp) {
-        Validate.inclusiveBetween(0, Integer.MAX_VALUE, xp);
+        Validate.isTrue(xp >= 0, "xp >= 0 (%d)", xp);
         validate();
 
         boolean levelup = false;
@@ -295,7 +295,7 @@ public final class UserData implements Initializable<Void> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setMoney(int money) {
-        Validate.inclusiveBetween(0, Integer.MAX_VALUE, money);
+        Validate.isTrue(money >= 0, "money >= 0 (%d)", money);
         moneyEntry.set(money);
     }
 
@@ -311,7 +311,7 @@ public final class UserData implements Initializable<Void> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setWarning(int warning) {
-        Validate.inclusiveBetween(0, Integer.MAX_VALUE, warning);
+        Validate.isTrue(warning >= 0, "warning >= 0 (%d)", warning);
         warningEntry.set(warning);
     }
 

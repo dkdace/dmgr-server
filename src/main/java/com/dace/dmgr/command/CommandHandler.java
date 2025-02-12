@@ -45,8 +45,8 @@ public abstract class CommandHandler implements TabExecutor {
      */
     protected CommandHandler(@NonNull String name, @Nullable ParameterList parameterList) {
         this.command = DMGR.getPlugin().getCommand(name);
-        Validate.validState(!(command.getExecutor() instanceof CommandHandler));
-        Validate.notNull(command).setExecutor(this);
+        Validate.validState(!(command.getExecutor() instanceof CommandHandler), "CommandHandler가 이미 등록됨");
+        Validate.notNull(command, "명령어 %s가 존재하지 않음", name).setExecutor(this);
 
         this.parameterList = parameterList;
     }
@@ -277,7 +277,7 @@ public abstract class CommandHandler implements TabExecutor {
 
             subcommands.add(this);
             for (String keyword : keywords)
-                Validate.validState(keywordsSubcommandMap.put(keyword, this) == null);
+                Validate.validState(keywordsSubcommandMap.put(keyword, this) == null, "Subcommand가 이미 등록됨");
         }
 
         /**

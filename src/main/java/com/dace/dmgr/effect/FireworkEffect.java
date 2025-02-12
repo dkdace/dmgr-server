@@ -33,11 +33,14 @@ public final class FireworkEffect {
      */
     @NonNull
     public static Builder builder(@NonNull org.bukkit.FireworkEffect.Type type, int red, int green, int blue) {
-        Validate.inclusiveBetween(0, 255, red);
-        Validate.inclusiveBetween(0, 255, green);
-        Validate.inclusiveBetween(0, 255, blue);
-
+        validateRGB(red, green, blue);
         return new Builder(org.bukkit.FireworkEffect.builder().with(type).withColor(Color.fromRGB(red, green, blue)));
+    }
+
+    private static void validateRGB(int red, int green, int blue) {
+        Validate.inclusiveBetween(0, 255, red, "255 >= red >= 0 (%d)", red);
+        Validate.inclusiveBetween(0, 255, green, "255 >= green >= 0 (%d)", green);
+        Validate.inclusiveBetween(0, 255, blue, "255 >= blue >= 0 (%d)", blue);
     }
 
     /**
@@ -74,12 +77,9 @@ public final class FireworkEffect {
          */
         @NonNull
         public Builder fadeColor(int red, int green, int blue) {
-            Validate.inclusiveBetween(0, 255, red);
-            Validate.inclusiveBetween(0, 255, green);
-            Validate.inclusiveBetween(0, 255, blue);
+            validateRGB(red, green, blue);
 
             mcBuilder.withFade(Color.fromRGB(red, green, blue));
-
             return this;
         }
 

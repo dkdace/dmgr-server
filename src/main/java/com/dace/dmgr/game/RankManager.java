@@ -76,7 +76,7 @@ public final class RankManager {
     @NonNull
     @UnmodifiableView
     public List<@NonNull UserData> getRanking(@NonNull RankManager.RankType rankType, int limit) {
-        Validate.inclusiveBetween(1, Integer.MAX_VALUE, limit);
+        Validate.isTrue(limit >= 1, "limit >= 1 (%d)", limit);
 
         List<UserData> userDatas = rankingMap.get(rankType);
         if (userDatas == null)

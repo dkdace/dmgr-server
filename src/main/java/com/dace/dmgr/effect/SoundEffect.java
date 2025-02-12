@@ -33,8 +33,8 @@ public final class SoundEffect {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void play(@NonNull Location location, double volumeScale, double pitchScale) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, volumeScale);
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, pitchScale);
+        Validate.isTrue(volumeScale >= 0, "volumeScale >= 0 (%f)", volumeScale);
+        Validate.isTrue(pitchScale >= 0, "pitchScale >= 0 (%f)", pitchScale);
 
         for (SoundInfo soundInfo : soundInfos)
             soundInfo.play(location, volumeScale, pitchScale);
@@ -69,8 +69,8 @@ public final class SoundEffect {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void play(@NonNull Player player, double volumeScale, double pitchScale) {
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, volumeScale);
-        Validate.inclusiveBetween(0, Double.MAX_VALUE, pitchScale);
+        Validate.isTrue(volumeScale >= 0, "volumeScale >= 0 (%f)", volumeScale);
+        Validate.isTrue(pitchScale >= 0, "pitchScale >= 0 (%f)", pitchScale);
 
         for (SoundInfo soundInfo : soundInfos)
             soundInfo.play(player, volumeScale, pitchScale);
@@ -213,8 +213,8 @@ public final class SoundEffect {
              */
             @NonNull
             public Builder volume(double minVolume, double maxVolume) {
-                Validate.inclusiveBetween(0, Double.MAX_VALUE, minVolume);
-                Validate.inclusiveBetween(minVolume, Double.MAX_VALUE, maxVolume);
+                Validate.isTrue(minVolume >= 0, "minVolume >= 0", minVolume);
+                Validate.isTrue(maxVolume >= minVolume, "maxVolume >= %f (%f)", minVolume, maxVolume);
 
                 this.minVolume = minVolume;
                 this.maxVolume = maxVolume;
@@ -246,8 +246,8 @@ public final class SoundEffect {
              */
             @NonNull
             public Builder pitch(double minPitch, double maxPitch) {
-                Validate.inclusiveBetween(0.5, 2, minPitch);
-                Validate.inclusiveBetween(minPitch, 2, maxPitch);
+                Validate.inclusiveBetween(0.5, 2.0, minPitch, "2 >= minPitch >= 0.5 (%f)", minPitch);
+                Validate.inclusiveBetween(minPitch, 2.0, maxPitch, "2 >= maxPitch >= %f (%f)", minPitch, maxPitch);
 
                 this.minPitch = minPitch;
                 this.maxPitch = maxPitch;
@@ -276,7 +276,7 @@ public final class SoundEffect {
              */
             @NonNull
             public Builder pitchVariance(double pitchVariance) {
-                Validate.inclusiveBetween(0, Double.MAX_VALUE, pitchVariance);
+                Validate.isTrue(pitchVariance >= 0, "pitchVariance >= 0 (%f)", pitchVariance);
 
                 this.pitchVariance = pitchVariance;
                 return this;

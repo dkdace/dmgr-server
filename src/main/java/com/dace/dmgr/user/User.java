@@ -1178,6 +1178,11 @@ public final class User implements Disposable {
             clearItems();
         }
 
+        private static void validateColumnRow(int column, int row) {
+            Validate.inclusiveBetween(0, 3, column, "3 >= column >= 0 (%d)", column);
+            Validate.inclusiveBetween(0, 19, row, "19 >= row >= 0 (%d)", row);
+        }
+
         /**
          * 탭리스트 헤더(상단부)의 내용을 지정한다.
          *
@@ -1206,8 +1211,7 @@ public final class User implements Disposable {
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         public void setItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
-            Validate.inclusiveBetween(0, 3, column);
-            Validate.inclusiveBetween(0, 19, row);
+            validateColumnRow(column, row);
 
             tabList.set(column, row, skin == null
                     ? new TextTabItem(content, -1)
@@ -1224,8 +1228,7 @@ public final class User implements Disposable {
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         public void setItem(int column, int row, @NonNull String content, @NonNull User user) {
-            Validate.inclusiveBetween(0, 3, column);
-            Validate.inclusiveBetween(0, 19, row);
+            validateColumnRow(column, row);
 
             int realPing;
             if (user.ping < 50)
@@ -1250,10 +1253,7 @@ public final class User implements Disposable {
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         public void removeItem(int column, int row) {
-            Validate.notNull(tabList);
-            Validate.inclusiveBetween(0, 3, column);
-            Validate.inclusiveBetween(0, 19, row);
-
+            validateColumnRow(column, row);
             tabList.set(column, row, BLANK_TAB_ITEM);
         }
 
@@ -1261,8 +1261,6 @@ public final class User implements Disposable {
          * 탭리스트의 모든 항목을 제거한다.
          */
         public void clearItems() {
-            Validate.notNull(tabList);
-
             for (int i = 0; i < 80; i++)
                 tabList.set(i, BLANK_TAB_ITEM);
         }
@@ -1313,7 +1311,7 @@ public final class User implements Disposable {
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         public void set(int line, @NonNull String content) {
-            Validate.inclusiveBetween(0, 14, line);
+            Validate.inclusiveBetween(0, 14, line, "14 >= line >= 0 (%d)", line);
 
             ChatColor[] chatColors = ChatColor.values();
             sidebar.set(chatColors[line] + content, 14 - line);
@@ -1326,7 +1324,7 @@ public final class User implements Disposable {
          * @throws IllegalArgumentException {@code contents}의 길이가 15를 초과하면 발생
          */
         public void setAll(@NonNull String @NonNull ... contents) {
-            Validate.inclusiveBetween(0, 14, contents.length);
+            Validate.inclusiveBetween(0, 15, contents.length, "contents.length <= 15 (%d)", contents.length);
 
             for (int i = 0; i < contents.length; i++)
                 set(i, contents[i]);

@@ -84,7 +84,7 @@ public final class BossBarDisplay {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void setProgress(double progress) {
-        Validate.inclusiveBetween(0, 1, progress);
+        Validate.inclusiveBetween(0.0, 1.0, progress, "1 >= progress >= 0 (%f)", progress);
         bossBar.setProgress(progress);
     }
 

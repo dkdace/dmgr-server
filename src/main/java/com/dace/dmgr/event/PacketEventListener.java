@@ -58,10 +58,8 @@ public abstract class PacketEventListener<T extends AbstractPacket> extends Pack
     private static PacketType getPacketType(@NonNull Class<? extends AbstractPacket> packetWrapperClass) {
         try {
             return (PacketType) packetWrapperClass.getDeclaredField("TYPE").get(null);
-        } catch (NoSuchFieldException ex) {
-            throw new UnsupportedOperationException("해당 패킷 이벤트 처리기를 생성할 수 없음");
         } catch (Exception ex) {
-            ConsoleLogger.severe("패킷 이벤트 처리 인스턴스 생성 실패", ex);
+            ConsoleLogger.severe("PacketEventListener 인스턴스 생성 실패", ex);
         }
 
         throw new UnsupportedOperationException();
@@ -81,8 +79,6 @@ public abstract class PacketEventListener<T extends AbstractPacket> extends Pack
                 packetWrapperConstructor = packetWrapperClass.getDeclaredConstructor(PacketContainer.class);
 
             return packetWrapperConstructor.newInstance(event.getPacket());
-        } catch (NoSuchMethodException ex) {
-            throw new UnsupportedOperationException("해당 PacketWrapper를 생성할 수 없음");
         } catch (Exception ex) {
             ConsoleLogger.severe("PacketWrapper 인스턴스 생성 실패", ex);
         }

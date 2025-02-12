@@ -36,11 +36,11 @@ public class GUI {
      *
      * @param index 칸 번호 (인덱스). 0 이상의 값
      * @return 사전 정의된 아이템. 존재하지 않으면 {@code null} 반환
-     * @throws IllegalArgumentException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
+     * @throws IndexOutOfBoundsException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
      */
     @Nullable
     public final DefinedItem get(int index) {
-        Validate.inclusiveBetween(0, inventory.getSize() - 1L, index);
+        validateIndex(index);
         return definedItems[index];
     }
 
@@ -49,10 +49,10 @@ public class GUI {
      *
      * @param index       칸 번호 (인덱스). 0 이상의 값
      * @param definedItem 사전 정의된 아이템
-     * @throws IllegalArgumentException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
+     * @throws IndexOutOfBoundsException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
      */
     public final void set(int index, @NonNull DefinedItem definedItem) {
-        Validate.inclusiveBetween(0, inventory.getSize() - 1L, index);
+        validateIndex(index);
 
         definedItems[index] = definedItem;
         inventory.setItem(index, definedItem.getItemStack());
@@ -64,7 +64,7 @@ public class GUI {
      * @param index         칸 번호 (인덱스). 0 이상의 값
      * @param definedItem   사전 정의된 아이템
      * @param itemConverter 아이템 편집에 실행할 작업. {@link ItemBuilder}를 인자로 받아 아이템 변환에 사용
-     * @throws IllegalArgumentException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
+     * @throws IndexOutOfBoundsException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
      */
     public final void set(int index, @NonNull DefinedItem definedItem, @NonNull Consumer<@NonNull ItemBuilder> itemConverter) {
         set(index, definedItem);
@@ -89,10 +89,10 @@ public class GUI {
      * 지정한 번호의 칸에 있는 아이템을 제거한다.
      *
      * @param index 칸 번호 (인덱스). 0 이상의 값
-     * @throws IllegalArgumentException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
+     * @throws IndexOutOfBoundsException {@code index}가 유효하지 않거나 인벤토리 크기 이상이면 발생
      */
     public final void remove(int index) {
-        Validate.inclusiveBetween(0, inventory.getSize() - 1L, index);
+        validateIndex(index);
 
         definedItems[index] = null;
         inventory.clear(index);
@@ -104,5 +104,9 @@ public class GUI {
     public final void clear() {
         for (int i = 0; i < inventory.getSize(); i++)
             remove(i);
+    }
+
+    private void validateIndex(int index) {
+        Validate.validIndex(definedItems, index, "%d > index >= 0 (%d)", definedItems.length, index);
     }
 }

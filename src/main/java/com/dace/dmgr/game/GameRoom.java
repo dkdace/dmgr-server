@@ -63,11 +63,11 @@ public final class GameRoom implements Disposable {
      *
      * @param isRanked 랭크 여부
      * @param number   방 번호
-     * @throws IllegalStateException 해당 {@code isRanked}, {@code number}의 Game이 이미 존재하면 발생
+     * @throws IllegalStateException 해당 {@code isRanked}, {@code number}의 GameRoom이 이미 존재하면 발생
      */
     public GameRoom(boolean isRanked, int number) {
         Pair<Boolean, Integer> checkPair = Pair.of(isRanked, number);
-        Validate.validState(GAME_ROOM_MAP.get(checkPair) == null);
+        Validate.validState(GAME_ROOM_MAP.get(checkPair) == null, "GameRoom이 이미 존재함");
 
         this.pair = checkPair;
         this.minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();

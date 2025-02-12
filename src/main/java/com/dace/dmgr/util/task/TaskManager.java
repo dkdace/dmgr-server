@@ -33,7 +33,7 @@ public final class TaskManager implements Disposable {
         validate();
 
         task.validate();
-        Validate.validState(tasks.add(task));
+        Validate.validState(tasks.add(task), "task가 이미 추가됨");
 
         tasks.removeIf(Task::isDisposed);
     }

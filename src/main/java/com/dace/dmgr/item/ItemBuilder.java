@@ -75,7 +75,7 @@ public final class ItemBuilder {
      */
     @NonNull
     public ItemBuilder setAmount(int amount) {
-        Validate.inclusiveBetween(0, Integer.MAX_VALUE, amount);
+        Validate.isTrue(amount >= 1, "amount >= 1 (%d)", amount);
 
         itemStack.setAmount(amount);
         return this;
@@ -90,7 +90,7 @@ public final class ItemBuilder {
      */
     @NonNull
     public ItemBuilder setDamage(short damage) {
-        Validate.inclusiveBetween(0, Short.MAX_VALUE, damage);
+        Validate.isTrue(damage >= 0, "damage >= 0 (%d)", damage);
 
         itemStack.setDurability(damage);
         return this;
@@ -130,7 +130,7 @@ public final class ItemBuilder {
      */
     @NonNull
     public ItemBuilder formatName(@NonNull Object @NonNull ... arguments) {
-        Validate.validState(itemMeta.hasDisplayName());
+        Validate.validState(itemMeta.hasDisplayName(), "아이템 이름이 설정되지 않음");
 
         setName(MessageFormat.format(itemMeta.getDisplayName(), arguments));
         return this;
@@ -213,7 +213,7 @@ public final class ItemBuilder {
      */
     @NonNull
     public ItemBuilder formatLore(@NonNull Object @NonNull ... arguments) {
-        Validate.validState(itemMeta.hasLore());
+        Validate.validState(itemMeta.hasLore(), "아이템 설명이 설정되지 않음");
 
         String fullLore = MessageFormat.format(String.join("\n", itemMeta.getLore()), arguments);
         return setLore(fullLore);

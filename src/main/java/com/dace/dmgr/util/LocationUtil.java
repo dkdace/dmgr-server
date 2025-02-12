@@ -110,7 +110,7 @@ public final class LocationUtil {
      */
     @NonNull
     public static Vector getDirection(@NonNull Location start, @NonNull Location end) {
-        Validate.isTrue(start.getWorld() == end.getWorld());
+        Validate.isTrue(start.getWorld() == end.getWorld(), "start == end (false)");
 
         return end.toVector().subtract(start.toVector()).normalize();
     }
@@ -128,7 +128,7 @@ public final class LocationUtil {
      * @throws IllegalArgumentException {@code start}와 {@code end}가 서로 다른 월드에 있으면 발생
      */
     public static boolean canPass(@NonNull Location start, @NonNull Location end) {
-        Validate.isTrue(start.getWorld() == end.getWorld());
+        Validate.isTrue(start.getWorld() == end.getWorld(), "start == end (false)");
 
         if (start.distance(end) > CAN_PASS_MAX_DISTANCE)
             return false;
@@ -266,7 +266,7 @@ public final class LocationUtil {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static boolean isInSameBlockXZ(@NonNull Location location, int yCoordinate, @NonNull Material material) {
-        Validate.inclusiveBetween(0, 255, yCoordinate);
+        Validate.inclusiveBetween(0, 255, yCoordinate, "255 >= yCoordinate >= 0 (%d)", yCoordinate);
 
         Location loc = location.clone();
         loc.setY(yCoordinate);
@@ -294,7 +294,7 @@ public final class LocationUtil {
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         private IterableLocation(@NonNull Location location, @NonNull Vector velocity, double maxTravelDistance) {
-            Validate.inclusiveBetween(0, Double.MAX_VALUE, maxTravelDistance);
+            Validate.isTrue(maxTravelDistance >= 0, "maxTravelDistance >= 0 (%f)", maxTravelDistance);
 
             this.location = location.clone();
             this.velocity = velocity.clone();

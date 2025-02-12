@@ -35,7 +35,7 @@ public class ChestGUI extends GUI implements Disposable {
     protected ChestGUI(int rowSize, @NonNull String name, @NonNull Player player) {
         super(Bukkit.createInventory(null, rowSize * 9, name));
 
-        Validate.inclusiveBetween(1, 6, rowSize);
+        Validate.inclusiveBetween(1, 6, rowSize, "6 >= rowSize >= 1 (%d)", rowSize);
 
         this.rowSize = rowSize;
 
@@ -79,8 +79,8 @@ public class ChestGUI extends GUI implements Disposable {
      */
     @Nullable
     public final DefinedItem get(int row, int column) {
-        Validate.inclusiveBetween(0, rowSize - 1L, row);
-        Validate.inclusiveBetween(0, 8, column);
+        validateRow(row);
+        validateColumn(column);
 
         return get(row * 9 + column);
     }
@@ -95,8 +95,8 @@ public class ChestGUI extends GUI implements Disposable {
      * @see GUI#set(int, DefinedItem)
      */
     public final void set(int row, int column, @NonNull DefinedItem definedItem) {
-        Validate.inclusiveBetween(0, rowSize - 1L, row);
-        Validate.inclusiveBetween(0, 8, column);
+        validateRow(row);
+        validateColumn(column);
 
         set(row * 9 + column, definedItem);
     }
@@ -123,7 +123,7 @@ public class ChestGUI extends GUI implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final void fillRow(int row, @NonNull DefinedItem definedItem) {
-        Validate.inclusiveBetween(0, rowSize - 1L, row);
+        validateRow(row);
 
         for (int i = 0; i < 9; i++)
             set(row, i, definedItem);
@@ -137,7 +137,7 @@ public class ChestGUI extends GUI implements Disposable {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public final void fillColumn(int column, @NonNull DefinedItem definedItem) {
-        Validate.inclusiveBetween(0, 8, column);
+        validateColumn(column);
 
         for (int i = 0; i < 6; i++)
             set(i, column, definedItem);
@@ -152,9 +152,17 @@ public class ChestGUI extends GUI implements Disposable {
      * @see GUI#remove(int)
      */
     public final void remove(int row, int column) {
-        Validate.inclusiveBetween(0, rowSize - 1L, row);
-        Validate.inclusiveBetween(0, 8, column);
+        validateRow(row);
+        validateColumn(column);
 
         remove(row * 9 + column);
+    }
+
+    private void validateRow(int row) {
+        Validate.inclusiveBetween(0, rowSize - 1, row, "%d > row >= 0 (%d)", rowSize, row);
+    }
+
+    private void validateColumn(int column) {
+        Validate.inclusiveBetween(0, 8, column, "8 >= column >= 0 (%d)", column);
     }
 }

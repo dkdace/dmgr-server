@@ -28,6 +28,10 @@ public final class ParticleEffect {
         this.particleInfos = particleInfos;
     }
 
+    private static void validateDataIndex(int dataIndex) {
+        Validate.isTrue(dataIndex >= 0, "dataIndex >= 0 (%d)", dataIndex);
+    }
+
     /**
      * 지정한 위치에 특정 플레이어만 볼 수 있는 입자 효과를 생성한다.
      *
@@ -204,7 +208,7 @@ public final class ParticleEffect {
          */
         @NonNull
         public static Builder builder(int dataIndex, @NonNull BlockParticleType blockParticleType) {
-            Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+            validateDataIndex(dataIndex);
             return new Builder(blockParticleType.particle, new FixedValue<>(dataIndex, new MaterialData(Material.AIR)));
         }
 
@@ -245,9 +249,9 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder count(int dataIndex, int minCount, int maxCount) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, minCount);
-                Validate.inclusiveBetween(minCount, Integer.MAX_VALUE, maxCount);
+                validateDataIndex(dataIndex);
+                Validate.isTrue(minCount >= 0, "minCount >= 0 (%d)", minCount);
+                Validate.isTrue(maxCount >= minCount, "maxCount >= %d (%d)", minCount, maxCount);
 
                 count.setValue(dataIndex, minCount, maxCount);
                 return this;
@@ -278,7 +282,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder horizontalSpread(int dataIndex, double minHorizontalSpread, double maxHorizontalSpread) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 horizontalSpread.setValue(dataIndex, minHorizontalSpread, maxHorizontalSpread);
                 return this;
@@ -309,7 +313,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder verticalSpread(int dataIndex, double minVerticalSpread, double maxVerticalSpread) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 verticalSpread.setValue(dataIndex, minVerticalSpread, maxVerticalSpread);
                 return this;
@@ -339,7 +343,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder speed(int dataIndex, double minSpeed, double maxSpeed) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 speed.setValue(dataIndex, minSpeed, maxSpeed);
                 return this;
@@ -415,13 +419,13 @@ public final class ParticleEffect {
         @NonNull
         public static Builder builder(int dataIndex, @NonNull ParticleType particleType, int minRed, int maxRed, int minGreen, int maxGreen,
                                       int minBlue, int maxBlue) {
-            Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
-            Validate.inclusiveBetween(0, 255, minRed);
-            Validate.inclusiveBetween(0, 255, maxRed);
-            Validate.inclusiveBetween(0, 255, minGreen);
-            Validate.inclusiveBetween(0, 255, maxGreen);
-            Validate.inclusiveBetween(0, 255, minBlue);
-            Validate.inclusiveBetween(0, 255, maxBlue);
+            validateDataIndex(dataIndex);
+            Validate.inclusiveBetween(0, 255, minRed, "255 >= minRed >= 0 (%d)", minRed);
+            Validate.inclusiveBetween(0, 255, maxRed, "255 >= maxRed >= 0 (%d)", maxRed);
+            Validate.inclusiveBetween(0, 255, minGreen, "255 >= minGreen >= 0 (%d)", minGreen);
+            Validate.inclusiveBetween(0, 255, maxGreen, "255 >= maxGreen >= 0 (%d)", maxGreen);
+            Validate.inclusiveBetween(0, 255, minBlue, "255 >= minBlue >= 0 (%d)", minBlue);
+            Validate.inclusiveBetween(0, 255, maxBlue, "255 >= maxBlue >= 0 (%d)", maxBlue);
 
             return new Builder(particleType,
                     new VariableValue(dataIndex, Math.max(1, minRed) / 255.0, Math.max(1, maxRed) / 255.0),
@@ -494,7 +498,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder count(int count) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, count);
+                Validate.isTrue(count >= 0, "count >= 0 (%d)", count);
 
                 this.count = count;
                 return this;
@@ -513,7 +517,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder horizontalSpread(int dataIndex, double minHorizontalSpread, double maxHorizontalSpread) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 horizontalSpread.setValue(dataIndex, minHorizontalSpread, maxHorizontalSpread);
                 return this;
@@ -543,7 +547,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder verticalSpread(int dataIndex, double minVerticalSpread, double maxVerticalSpread) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 verticalSpread.setValue(dataIndex, minVerticalSpread, maxVerticalSpread);
                 return this;
@@ -601,7 +605,7 @@ public final class ParticleEffect {
          */
         @NonNull
         public static Builder builder(int dataIndex, @NonNull Particle particle) {
-            Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+            validateDataIndex(dataIndex);
             return new Builder(particle, new FixedValue<>(dataIndex, new Vector()));
         }
 
@@ -647,7 +651,7 @@ public final class ParticleEffect {
              */
             @NonNull
             public Builder speedMultiplier(int dataIndex, double minSpeedMultiplier, double maxSpeedMultiplier) {
-                Validate.inclusiveBetween(0, Integer.MAX_VALUE, dataIndex);
+                validateDataIndex(dataIndex);
 
                 speedMultiplier.setValue(dataIndex, minSpeedMultiplier, maxSpeedMultiplier);
                 return this;
