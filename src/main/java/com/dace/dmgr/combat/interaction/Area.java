@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -53,7 +54,7 @@ public abstract class Area {
      * @param center 판정 중심지
      */
     public final void emit(@NonNull Location center) {
-        CombatEntity[] targets = CombatUtil.getNearCombatEntities(shooter.getGame(), center, radius, condition);
+        Set<CombatEntity> targets = CombatUtil.getNearCombatEntities(shooter.getGame(), center, radius, condition);
         for (CombatEntity target : targets)
             this.penetrationMap.put(target, null);
 

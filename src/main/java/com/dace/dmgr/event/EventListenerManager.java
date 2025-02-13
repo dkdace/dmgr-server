@@ -39,6 +39,7 @@ public final class EventListenerManager {
         Validate.notNull(OnPlayerInteractEntity.getInstance());
         Validate.notNull(OnPlayerItemHeld.getInstance());
         Validate.notNull(OnPlayerJoin.getInstance());
+        Validate.notNull(OnPlayerMove.getInstance());
         Validate.notNull(OnPlayerQuit.getInstance());
         Validate.notNull(OnPlayerResourcePackStatus.getInstance());
         Validate.notNull(OnPlayerSwapHandItems.getInstance());

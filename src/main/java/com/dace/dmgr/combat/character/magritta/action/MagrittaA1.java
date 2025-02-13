@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -13,7 +14,6 @@ import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -65,7 +65,7 @@ public final class MagrittaA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(true);
             new MagrittaA1Projectile().shoot(loc);
 
-            CombatEffectUtil.THROW_HEAVY_SOUND.play(loc);
+            CombatEffectUtil.THROW_SOUND.play(loc, 1, 0.5);
         }, MagrittaA1Info.READY_DURATION));
     }
 

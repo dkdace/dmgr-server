@@ -8,7 +8,6 @@ import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.item.gui.SelectChar;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +32,7 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         if (combatUser != null) {
             GameUser gameUser = combatUser.getGameUser();
 
-            if (gameUser != null && gameUser.isInSpawn() || LocationUtil.isInRegion(player, FreeCombat.FREE_COMBAT_REGION)) {
+            if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)) {
                 new SelectChar(player);
                 return;
             }

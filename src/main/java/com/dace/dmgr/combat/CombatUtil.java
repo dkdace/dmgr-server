@@ -8,17 +8,21 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -32,69 +36,34 @@ public final class CombatUtil {
      * <p>Example:</p>
      *
      * <pre><code>
-     * // 최종 피해량 : 10 (20m) ~ 5 (40m)
-     * double damage = getDistantDamage(10, distance, 20)
+     * // 최종 피해량 : 10 ~ 5 (20m~40m) = 5
+     * double damage = getDistantDamage(10, 40, 20)
      * </code></pre>
      *
-     * @param damage            피해량
+     * @param damage            피해량. 0 이상의 값
      * @param distance          거리 (단위: 블록). 0 이상의 값
      * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록). 0 이상의 값
      * @return 최종 피해량
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static double getDistantDamage(double damage, double distance, double weakeningDistance) {
-        if (distance < 0)
-            throw new IllegalArgumentException("'distance'가 0 이상이어야 함");
-        if (weakeningDistance < 0)
-            throw new IllegalArgumentException("'pitch'가 0 이상이어야 함");
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
+        Validate.isTrue(distance >= 0, "distance >= 0 (%f)", distance);
+        Validate.isTrue(weakeningDistance >= 0, "weakeningDistance >= 0 (%f)", weakeningDistance);
 
         if (distance <= weakeningDistance)
             return damage;
 
+        double halfDamage = damage / 2.0;
         distance = distance - weakeningDistance;
-        double finalDamage = damage / 2.0 * ((weakeningDistance - distance) / weakeningDistance) + damage / 2.0;
 
-        if (finalDamage < damage / 2.0)
-            finalDamage = damage / 2.0;
-        else if (finalDamage < 0)
-            finalDamage = 0;
-
-        return finalDamage;
+        return Math.max(0, Math.min(halfDamage, halfDamage * ((weakeningDistance - distance) / weakeningDistance) + halfDamage));
     }
 
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param condition 조건
-     * @return 범위 내 가장 가까운 엔티티
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntities(Location, double, Predicate)
-     */
-    @Nullable
-    public static CombatEntity getNearCombatEntity(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
-        validateArgs(range);
-
-        return CombatEntity.getAllExcluded().stream()
-                .filter(condition)
-                .filter(combatEntity ->
-                        combatEntity.canBeTargeted()
-                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
-                .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes())
-                                .mapToDouble(hitbox -> hitbox.getDistance(location))
-                                .min()
-                                .orElse(Double.MAX_VALUE) <= range)
-                .findFirst()
-                .orElse(null);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
-     *
-     * @param game      대상 게임. {@code null}로 지정 시
-     *                  {@link CombatUtil#getNearCombatEntity(Location, double, Predicate)} 호출
+     * @param game      대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
      * @param location  위치
      * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
@@ -105,15 +74,12 @@ public final class CombatUtil {
     @Nullable
     public static CombatEntity getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range,
                                                    @NonNull Predicate<@NonNull CombatEntity> condition) {
-        validateArgs(range);
+        Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
-        if (game == null)
-            return getNearCombatEntity(location, range, condition);
-        return game.getCombatEntities().stream()
-                .filter(condition)
-                .filter(combatEntity ->
-                        combatEntity.canBeTargeted()
-                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
+        return (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+                .filter(combatEntity -> condition.test(combatEntity)
+                        && combatEntity.canBeTargeted()
+                        && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
                         Arrays.stream(combatEntity.getHitboxes())
                                 .mapToDouble(hitbox -> hitbox.getDistance(location))
@@ -126,32 +92,7 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param condition 조건
-     * @return 범위 내 모든 엔티티
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntity(Location, double, Predicate)
-     */
-    @NonNull
-    public static CombatEntity @NonNull [] getNearCombatEntities(@NonNull Location location, double range, @NonNull Predicate<@NonNull CombatEntity> condition) {
-        validateArgs(range);
-
-        return CombatEntity.getAllExcluded().stream()
-                .filter(condition)
-                .filter(combatEntity ->
-                        combatEntity.canBeTargeted()
-                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
-                .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
-                .toArray(CombatEntity[]::new);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
-     *
-     * @param game      대상 게임. {@code null}로 지정 시
-     *                  {@link CombatUtil#getNearCombatEntities(Location, double, Predicate)} 호출
+     * @param game      대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
      * @param location  위치
      * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
      * @param condition 조건
@@ -160,30 +101,19 @@ public final class CombatUtil {
      * @see CombatUtil#getNearCombatEntity(Game, Location, double, Predicate)
      */
     @NonNull
-    public static CombatEntity @NonNull [] getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
-                                                                 @NonNull Predicate<@NonNull CombatEntity> condition) {
-        validateArgs(range);
+    @UnmodifiableView
+    public static Set<@NonNull CombatEntity> getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
+                                                                   @NonNull Predicate<@NonNull CombatEntity> condition) {
+        Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
-        if (game == null)
-            return getNearCombatEntities(location, range, condition);
-        return game.getCombatEntities().stream()
-                .filter(condition)
-                .filter(combatEntity ->
-                        combatEntity.canBeTargeted()
+        return Collections.unmodifiableSet(
+                (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+                        .filter(combatEntity -> condition.test(combatEntity)
+                                && combatEntity.canBeTargeted()
                                 && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
-                .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
-                .toArray(CombatEntity[]::new);
-    }
-
-    /**
-     * 인자값이 유효하지 않으면 예외를 발생시킨다.
-     *
-     * @param range 범위 (반지름). (단위: 블록)
-     */
-    private static void validateArgs(double range) {
-        if (range < 0)
-            throw new IllegalArgumentException("'range'가 0 이상이어야 함");
+                        .filter(combatEntity ->
+                                Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
+                        .collect(Collectors.toSet()));
     }
 
     /**
@@ -240,14 +170,12 @@ public final class CombatUtil {
      * @param upSpread        수직 반동 분산도
      * @param sideSpread      수평 반동 분산도
      * @param duration        반동 진행 시간 (tick). 1~5 사이의 값
-     * @param firstMultiplier 초탄 반동 계수. 1로 설정 시 차탄과 동일
+     * @param firstMultiplier 초탄 반동 계수. 1로 설정 시 차탄과 동일. 1 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
-        if (duration < 1 || duration > 5)
-            throw new IllegalArgumentException("'duration'이 1에서 5 사이여야 함");
-        if (firstMultiplier < 0)
-            throw new IllegalArgumentException("'firstMultiplier'가 0 이상이어야 함");
+        Validate.inclusiveBetween(1, 5, duration, "5 >= duration >= 1 (%d)", duration);
+        Validate.isTrue(firstMultiplier >= 1, "firstMultiplier >= 1 (%f)", firstMultiplier);
 
         double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
         double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
@@ -255,15 +183,16 @@ public final class CombatUtil {
         int sum = IntStream.rangeClosed(1, duration).sum();
         combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
 
-        TaskUtil.addTask(combatUser, new IntervalTask(i -> {
+        new IntervalTask(i -> {
             double finalUp = (up + finalUpSpread) / ((double) sum / (duration - i));
             double finalSide = (side + finalSideSpread) / ((double) sum / (duration - i));
             if (first) {
                 finalUp *= firstMultiplier;
                 finalSide *= firstMultiplier;
             }
+
             addYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
-        }, 1, duration));
+        }, 1, duration);
     }
 
     /**

@@ -1,34 +1,38 @@
 package com.dace.dmgr.combat;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GlobalLocation;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 /**
  * 자유 전투 시스템 클래스.
  */
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FreeCombat {
-    /** 자유 전투 지역 이름 */
-    public static final String FREE_COMBAT_REGION = "BattlePVP";
-    /** 자유 전투 월드 객체 */
-    private static final World world = Bukkit.getWorld("FreeCombat");
-    /** 대기실 위치 */
-    private static final Location waitLocation = new Location(world, 18.5, 29, 16, 90, 0);
+    @Getter
+    private static final FreeCombat instance = new FreeCombat();
+
+    /** 자유 전투 대기실 지역 이름 */
+    private static final String WAIT_REGION_NAME = "BattlePVP";
     /** 자유 전투 이동 지역 이름 */
-    private static final String FREE_COMBAT_WARP_REGION = "BattlePVPWarp";
+    private static final String WARP_REGION_NAME = "BattlePVPWarp";
+    /** 자유 전투 월드 인스턴스 */
+    private static final World WORLD = Bukkit.getWorld("FreeCombat");
+    /** 대기실 위치 */
+    private static final Location WAIT_LOCATION = new Location(WORLD, 18.5, 29, 16, 90, 0);
     /** 스폰 위치 목록 */
-    private static final GlobalLocation[] spawnLocations = new GlobalLocation[]{
+    private static final GlobalLocation[] SPAWN_LOCATIONS = {
             new GlobalLocation(89.5, 66, -22.5, -180, 0),
             new GlobalLocation(13.5, 66, -26.5, 90, 0),
             new GlobalLocation(-12.5, 66, -81.5, 0, 0),
@@ -62,33 +66,51 @@ public final class FreeCombat {
      * @return 대기실 위치
      */
     @NonNull
-    public static Location getWaitLocation() {
-        return waitLocation.clone();
+    public Location getWaitLocation() {
+        return WAIT_LOCATION.clone();
     }
 
     /**
-     * 대상 플레이어의 자유 전투를 시작한다.
+     * 지정한 플레이어가 자유 전투 대기실 안에 있는지 확인한다.
+     *
+     * @return 대기실 안에 있으면 {@code true} 반환
+     */
+    public boolean isInFreeCombatWait(@NonNull Player player) {
+        return LocationUtil.isInRegion(player, WAIT_REGION_NAME);
+    }
+
+    /**
+     * 지정한 플레이어가 자유 전투 이동 지역 안에 있는지 확인한다.
+     *
+     * @return 이동 지역 안에 있으면 {@code true} 반환
+     */
+    public boolean isInFreeCombatWarp(@NonNull Player player) {
+        return LocationUtil.isInRegion(player, WARP_REGION_NAME);
+    }
+
+    /**
+     * 플레이어가 자유 전투를 시작했을 때 실행할 작업.
      *
      * @param user 대상 플레이어
+     * @see User#startFreeCombat()
      */
-    public static void start(@NonNull User user) {
+    public void onStart(@NonNull User user) {
         if (CombatUser.fromUser(user) != null)
             return;
 
-        user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofTicks(10), Timespan.ofTicks(40), Timespan.ofTicks(30),
-                Timespan.ofTicks(80));
-        user.teleport(waitLocation);
-        user.setInFreeCombat(true);
+        user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
+                Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
+        user.teleport(WAIT_LOCATION);
 
-        CombatUser combatUser = new CombatUser(user);
+        new CombatUser(user);
+    }
 
-        TaskUtil.addTask(user, new IntervalTask(i -> {
-            if (combatUser.getCharacterType() != null && LocationUtil.isInRegion(user.getPlayer(), FREE_COMBAT_WARP_REGION)) {
-                int index = DMGR.getRandom().nextInt(spawnLocations.length);
-                user.teleport(spawnLocations[index].toLocation(world));
-            }
-
-            return !combatUser.isDisposed();
-        }, 4));
+    /**
+     * 플레이어를 자유 전투 전장의 무작위 위치로 이동시킨다.
+     *
+     * @param user 이동할 플레이어
+     */
+    public void teleportRandom(@NonNull User user) {
+        user.teleport(SPAWN_LOCATIONS[RandomUtils.nextInt(0, SPAWN_LOCATIONS.length)].toLocation(WORLD));
     }
 }

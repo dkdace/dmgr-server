@@ -1,6 +1,5 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
@@ -37,7 +36,7 @@ public final class Warp extends ChestGUI {
     private enum WarpItem {
         TEAM_GAME(Material.IRON_SWORD, "팀전 (일반/랭크)", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.", SelectGame::new),
         FREE_GAME(Material.GOLD_SWORD, "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.",
-                player -> FreeCombat.start(User.fromPlayer(player))),
+                player -> User.fromPlayer(player).startFreeCombat()),
         TRAINING(Material.ARMOR_STAND, "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.",
                 player -> {
                 });

@@ -113,9 +113,7 @@ public final class GameUser implements Disposable {
         this.game = game;
         this.team = team;
 
-        CombatUser defCombatUser = CombatUser.fromUser(user);
-        if (defCombatUser != null)
-            defCombatUser.dispose();
+        user.quitFreeCombat();
         this.combatUser = new CombatUser(this);
 
         GAME_USER_MAP.put(user, this);
@@ -144,7 +142,6 @@ public final class GameUser implements Disposable {
 
         user.teleport(getSpawnLocation());
         user.clearChat();
-        user.setInFreeCombat(false);
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5),
                 game.isPlaying() ? Timespan.ofSeconds(2) : game.getGamePlayMode().getReadyDuration(), Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));

@@ -19,10 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public final class CombatEffectUtil {
     /** 총기 탄피 효과음 */
     public static final SoundEffect SHELL_DROP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(1).pitchVariance(0.1).build());
-    /** 총기 탄피 효과음 (중량) */
-    public static final SoundEffect SHELL_DROP_HEAVY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(0.95).pitchVariance(0.1).build());
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(0.6, 1).pitchVariance(0.1).build());
     /** 산탄총 탄피 효과음 */
     public static final SoundEffect SHOTGUN_SHELL_DROP_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_HORSE_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
@@ -31,10 +28,7 @@ public final class CombatEffectUtil {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.8).pitch(1).build());
     /** 투척 효과음 */
     public static final SoundEffect THROW_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.8).build());
-    /** 투척 효과음 (중량) */
-    public static final SoundEffect THROW_HEAVY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.7).build());
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.6, 0.8).build());
     /** 투척물 튕김 효과음 */
     public static final SoundEffect THROW_BOUNCE_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("random.metalhit").volume(0.1).pitch(1.2).pitchVariance(0.1).build(),

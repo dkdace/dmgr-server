@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
 import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.dace.dmgr.*;
+import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
@@ -165,7 +166,6 @@ public final class User implements Disposable {
     private boolean isAdminChat = false;
     /** 자유 전투 입장 여부 */
     @Getter
-    @Setter
     private boolean isInFreeCombat = false;
 
     /**
@@ -677,7 +677,7 @@ public final class User implements Disposable {
 
         gui.clear();
         teleport(GeneralConfig.getConfig().getLobbyLocation());
-        isInFreeCombat = false;
+        quitFreeCombat();
 
         getAllUsers().forEach(target -> {
             removeGlowing(target.getPlayer());
@@ -1005,6 +1005,35 @@ public final class User implements Disposable {
 
         gameRoom.onQuit(this);
         gameRoom = null;
+    }
+
+    /**
+     * 플레이어를 자유 전투에 입장시킨다.
+     */
+    public void startFreeCombat() {
+        validate();
+
+        if (isInFreeCombat || GameUser.fromUser(this) != null)
+            return;
+
+        isInFreeCombat = true;
+        FreeCombat.getInstance().onStart(this);
+    }
+
+    /**
+     * 플레이어를 자유 전투에서 퇴장시킨다.
+     */
+    public void quitFreeCombat() {
+        validate();
+
+        if (!isInFreeCombat)
+            return;
+
+        isInFreeCombat = false;
+
+        CombatUser combatUser = CombatUser.fromUser(this);
+        if (combatUser != null)
+            combatUser.dispose();
     }
 
     /**
