@@ -1,25 +1,27 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -83,7 +85,7 @@ public final class QuakerUlt extends UltimateSkill {
                     Vector axis = VectorUtil.getYawAxis(loc);
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (index + 1) * 20);
-                    new QuakerUltEffect().shoot(loc, vec);
+                    new QuakerUltEffect().shot(loc, vec);
 
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
                     if (index % 2 == 0)
@@ -130,7 +132,7 @@ public final class QuakerUlt extends UltimateSkill {
                 Vector axis2 = VectorUtil.getRotatedVector(axis, vector, 11 * (j - 2.0));
                 Vector vector2 = VectorUtil.getRotatedVector(vector, vector, 11 * (j - 2.0));
                 Vector vec = VectorUtil.getRotatedVector(vector2, axis2, 90 + 11 * (i - 3.5));
-                new QuakerUltProjectile(targets).shoot(loc, vec);
+                new QuakerUltProjectile(targets).shot(loc, vec);
             }
         }
 
@@ -162,76 +164,88 @@ public final class QuakerUlt extends UltimateSkill {
         }
     }
 
-    private final class QuakerUltEffect extends Hitscan {
+    private final class QuakerUltEffect extends Hitscan<CombatEntity> {
         private QuakerUltEffect() {
-            super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(QuakerWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
-                return;
-
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            return true;
-        }
-
-        @Override
-        protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
+        protected void onDestroy(@NonNull Location location) {
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(6, location -> {
+                if (getTravelDistance() <= 1)
+                    return;
+
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+                QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+            });
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<CombatEntity> getHitEntityHandler() {
+            return (location, target) -> true;
         }
     }
 
-    private final class QuakerUltProjectile extends Projectile {
+    private final class QuakerUltProjectile extends Projectile<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private QuakerUltProjectile(HashSet<Damageable> targets) {
-            super(combatUser, QuakerUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(15).size(QuakerUltInfo.SIZE)
-                    .maxDistance(QuakerUltInfo.DISTANCE).condition(combatUser::isEnemy).build());
+        private QuakerUltProjectile(@NonNull HashSet<Damageable> targets) {
+            super(combatUser, QuakerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(QuakerUltInfo.SIZE).maxDistance(QuakerUltInfo.DISTANCE).build());
             this.targets = targets;
         }
 
         @Override
-        protected void onTrailInterval() {
-            Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
-            QuakerUltInfo.PARTICLE.BULLET_TRAIL.play(getLocation(), vec);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(15, location -> {
+                Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
+                QuakerUltInfo.PARTICLE.BULLET_TRAIL.play(location, vec);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (targets.add(target)) {
-                if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, false)) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
-                            target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
+                        target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
+                                target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
 
-                    if (target instanceof CombatUser) {
-                        combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
-                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerUltInfo.SLOW_DURATION)));
+                        if (target instanceof CombatUser) {
+                            combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
+                            assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerUltInfo.SLOW_DURATION)));
+                        }
                     }
+
+                    QuakerUltInfo.PARTICLE.HIT_ENTITY.play(location);
                 }
 
-                QuakerUltInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-            }
-
-            return !(target instanceof Barrier);
+                return !(target instanceof Barrier);
+            };
         }
     }
 }

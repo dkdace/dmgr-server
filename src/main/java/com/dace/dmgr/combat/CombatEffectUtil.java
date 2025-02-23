@@ -5,6 +5,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +24,9 @@ public final class CombatEffectUtil {
     /** 산탄총 탄피 효과음 */
     public static final SoundEffect SHOTGUN_SHELL_DROP_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_HORSE_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
+    /** 총알 블록 타격 효과음 */
+    public static final SoundEffect BULLET_HIT_BLOCK_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.gun.ricochet").volume(0.8).pitch(0.975).pitchVariance(0.05).build());
     /** 엔티티 소환 효과음 */
     public static final SoundEffect ENTITY_SUMMON_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.8).pitch(1).build());
@@ -107,9 +111,11 @@ public final class CombatEffectUtil {
      *
      * @param location     대상 위치
      * @param combatEntity 대상 엔티티
-     * @param damage       피해량
+     * @param damage       피해량. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static void playBleedingEffect(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+    public static void playBleedingParticle(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
         if (location == null && combatEntity == null)
             return;
 
@@ -125,9 +131,11 @@ public final class CombatEffectUtil {
      *
      * @param location     대상 위치
      * @param combatEntity 대상 엔티티
-     * @param damage       피해량
+     * @param damage       피해량. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static void playBreakEffect(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+    public static void playBreakParticle(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
         if (location == null && combatEntity == null)
             return;
 
@@ -160,6 +168,18 @@ public final class CombatEffectUtil {
      */
     public static void playSmallHitBlockParticle(@NonNull Location location, @NonNull Block block, double scale) {
         HIT_BLOCK_SMALL_PARTICLE.play(location, block.getState().getData(), scale);
+    }
+
+    /**
+     * 지정한 위치에 총알 타격 효과를 재생한다.
+     *
+     * @param location 대상 위치
+     * @param block    블록
+     */
+    public static void playBulletHitBlockEffect(@NonNull Location location, @NonNull Block block) {
+        BULLET_HIT_BLOCK_SOUND.play(location);
+        playSmallHitBlockParticle(location, block, 1);
+        playHitBlockSound(location, block, 1);
     }
 
     /**

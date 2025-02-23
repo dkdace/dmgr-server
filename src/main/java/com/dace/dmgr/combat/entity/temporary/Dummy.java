@@ -1,15 +1,10 @@
 package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
@@ -56,10 +51,10 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
      */
     public Dummy(@NonNull Zombie entity, int maxHealth, @NonNull String teamIdentifier) {
         super(entity, "훈련용 봇", null,
-                new FixedPitchHitbox(entity.getLocation(), 0.5, 0.75, 0.3, 0, 0, 0, 0, 0.375, 0),
-                new FixedPitchHitbox(entity.getLocation(), 0.8, 0.75, 0.45, 0, 0, 0, 0, 1.125, 0),
-                new Hitbox(entity.getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.5, 0),
-                new Hitbox(entity.getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.5, 0)
+                Hitbox.builder(entity.getLocation(), 0.5, 0.75, 0.3).axisOffsetY(0.375).pitchFixed().build(),
+                Hitbox.builder(entity.getLocation(), 0.8, 0.75, 0.45).axisOffsetY(1.125).pitchFixed().build(),
+                Hitbox.builder(entity.getLocation(), 0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.5).build(),
+                Hitbox.builder(entity.getLocation(), 0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.5).build()
         );
         knockbackModule = new KnockbackModule(this);
         statusEffectModule = new StatusEffectModule(this);
@@ -111,7 +106,7 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     @Override
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                          boolean isCrit, boolean isUlt) {
-        CombatEffectUtil.playBleedingEffect(location, this, damage);
+        CombatEffectUtil.playBleedingParticle(location, this, damage);
     }
 
     @Override

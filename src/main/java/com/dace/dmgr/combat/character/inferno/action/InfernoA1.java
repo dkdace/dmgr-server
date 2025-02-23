@@ -1,13 +1,14 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -122,9 +123,9 @@ public final class InfernoA1 extends ActiveSkill {
         }
     }
 
-    private final class InfernoA1Area extends Area {
+    private final class InfernoA1Area extends Area<Damageable> {
         private InfernoA1Area() {
-            super(combatUser, InfernoA1Info.RADIUS, combatUser::isEnemy);
+            super(combatUser, InfernoA1Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -133,9 +134,9 @@ public final class InfernoA1 extends ActiveSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true))
-                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0))
                         .multiply(InfernoA1Info.KNOCKBACK));
 
             InfernoA1Info.PARTICLE.HIT_ENTITY.play(location);
@@ -143,5 +144,4 @@ public final class InfernoA1 extends ActiveSkill {
             return !(target instanceof Barrier);
         }
     }
-
 }

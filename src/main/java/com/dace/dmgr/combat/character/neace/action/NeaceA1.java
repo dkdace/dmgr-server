@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
@@ -38,7 +38,7 @@ public final class NeaceA1 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new NeaceA1Target().shoot();
+        new NeaceA1Target().shot();
     }
 
     @Override
@@ -93,14 +93,14 @@ public final class NeaceA1 extends ActiveSkill {
         }
     }
 
-    private final class NeaceA1Target extends Target {
+    private final class NeaceA1Target extends Target<Healable> {
         private NeaceA1Target() {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA1.this.combatUser, combatEntity)
-                    && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(NeaceA1Mark.instance));
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    .and(combatEntity -> !combatEntity.getStatusEffectModule().hasStatusEffect(NeaceA1Mark.instance)));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             setCooldown();
 
             target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA1Mark.instance, NeaceA1Info.DURATION);
@@ -109,7 +109,7 @@ public final class NeaceA1 extends ActiveSkill {
             playUseEffect(target);
         }
 
-        private void playUseEffect(@NonNull Damageable target) {
+        private void playUseEffect(@NonNull Healable target) {
             Location location = combatUser.getArmLocation(true);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
                 NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);

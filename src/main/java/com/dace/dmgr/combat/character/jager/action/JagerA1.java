@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -10,10 +12,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.interaction.Hitbox;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -195,7 +194,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     owner.getName() + "의 설랑",
                     owner,
                     true, false,
-                    new FixedPitchHitbox(entity.getLocation(), 0.4, 0.8, 1.2, 0, 0.4, 0)
+                    Hitbox.builder(entity.getLocation(), 0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build()
             );
 
             knockbackModule = new KnockbackModule(this);
@@ -251,9 +250,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     damageModule.setMaxHealth(JagerA1Info.HEALTH);
                     damageModule.setHealth(getStateValue());
 
-                    Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                            combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving()
-                                    && combatEntity.isEnemy(this));
+                    Damageable target = CombatUtil.getNearCombatEntity(game, entity.getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
+                            CombatUtil.EntityCondition.enemy(this).and(combatEntity -> combatEntity.getDamageModule().isLiving()));
                     if (target != null) {
                         entity.setTarget(target.getEntity());
 
@@ -309,7 +307,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             setStateValue((int) damageModule.getHealth());
 
             JagerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBleedingEffect(location, this, damage);
+            CombatEffectUtil.playBleedingParticle(location, this, damage);
         }
 
         @Override

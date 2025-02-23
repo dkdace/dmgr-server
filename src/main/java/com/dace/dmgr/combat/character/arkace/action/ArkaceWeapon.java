@@ -9,10 +9,9 @@ import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.GradualSpreadModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.GunHitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -66,7 +65,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 Location loc = combatUser.getEntity().getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
                     Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread());
-                    new ArkaceWeaponHitscan(false).shoot(dir);
+                    new ArkaceWeaponHitscan(false).shot(dir);
                     reloadModule.consume(1);
 
                     CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
@@ -74,7 +73,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     ArkaceWeaponInfo.SOUND.USE.play(loc);
                     TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
-                    new ArkaceWeaponHitscan(true).shoot();
+                    new ArkaceWeaponHitscan(true).shot();
 
                     ArkaceWeaponInfo.SOUND.USE_ULT.play(loc);
                 }
@@ -148,37 +147,45 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         reloadModule.setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
     }
 
-    private final class ArkaceWeaponHitscan extends GunHitscan {
+    private final class ArkaceWeaponHitscan extends Hitscan<Damageable> {
         private final boolean isUlt;
-        private double distance = 0;
 
         private ArkaceWeaponHitscan(boolean isUlt) {
-            super(combatUser, HitscanOption.builder().condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser));
             this.isUlt = isUlt;
         }
 
         @Override
-        protected boolean onInterval() {
-            distance += getVelocity().length();
-            return super.onInterval();
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(14, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                (isUlt ? ArkaceWeaponInfo.PARTICLE.BULLET_TRAIL_ULT : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+            });
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            (isUlt ? ArkaceWeaponInfo.PARTICLE.BULLET_TRAIL_ULT : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (isUlt)
-                target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, false);
-            else {
-                double damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, distance, ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
-            }
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                if (isUlt)
+                    target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, false);
+                else {
+                    double damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
+                    target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+                }
 
-            return false;
+                return false;
+            });
         }
     }
 }

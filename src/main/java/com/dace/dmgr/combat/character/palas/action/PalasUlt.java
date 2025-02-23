@@ -1,14 +1,14 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.character.palas.Palas;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public final class PalasUlt extends UltimateSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new PalasUltTarget().shoot();
+        new PalasUltTarget().shot();
     }
 
     @Override
@@ -82,15 +82,14 @@ public final class PalasUlt extends UltimateSkill {
         }
     }
 
-    private final class PalasUltTarget extends Target {
+    private final class PalasUltTarget extends Target<Healable> {
         private PalasUltTarget() {
-            super(combatUser, PalasUltInfo.MAX_DISTANCE, true, combatEntity ->
-                    Palas.getTargetedActionCondition(PalasUlt.this.combatUser, combatEntity)
-                            && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasUltBuff.instance));
+            super(combatUser, PalasUltInfo.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    .and(combatEntity -> !combatEntity.getStatusEffectModule().hasStatusEffect(PalasUltBuff.instance)));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             PalasUlt.super.onUse(ActionKey.SLOT_4);
 
             setCooldown();

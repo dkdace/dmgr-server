@@ -1,10 +1,9 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
@@ -149,9 +148,9 @@ public final class NeaceUlt extends UltimateSkill {
         }
     }
 
-    private final class NeaceUltArea extends Area {
+    private final class NeaceUltArea extends Area<Healable> {
         private NeaceUltArea() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, combatEntity -> Neace.getTargetedActionCondition(NeaceUlt.this.combatUser, combatEntity));
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser));
         }
 
         @Override
@@ -160,8 +159,8 @@ public final class NeaceUlt extends UltimateSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            ((NeaceWeapon) combatUser.getWeapon()).healTarget((Healable) target);
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Healable target) {
+            ((NeaceWeapon) combatUser.getWeapon()).healTarget(target);
 
             return true;
         }

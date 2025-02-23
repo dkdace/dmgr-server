@@ -1,19 +1,19 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.HasReadyTime;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Area;
+import com.dace.dmgr.combat.interaction.BouncingProjectile;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -70,7 +70,7 @@ public final class JagerUlt extends UltimateSkill {
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             Location loc = combatUser.getArmLocation(true);
-            new JagerUltProjectile().shoot(loc);
+            new JagerUltProjectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
 
@@ -109,32 +109,37 @@ public final class JagerUlt extends UltimateSkill {
             combatUser.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
     }
 
-    private final class JagerUltProjectile extends BouncingProjectile {
+    private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
-            super(combatUser, JagerUltInfo.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).duration(100).hasGravity(true)
-                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
-                    .destroyOnHitFloor(true).build());
+            super(combatUser, JagerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
+                    Option.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            JagerUltInfo.PARTICLE.BULLET_TRAIL.play(getLocation());
-        }
-
-        @Override
-        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
-            // 미사용
-        }
-
-        @Override
-        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            summonEntity = new JagerUltEntity(CombatUtil.spawnEntity(ArmorStand.class, getLocation()), combatUser);
+        protected void onDestroy(@NonNull Location location) {
+            summonEntity = new JagerUltEntity(CombatUtil.spawnEntity(ArmorStand.class, location), combatUser);
             summonEntity.activate();
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(8, JagerUltInfo.PARTICLE.BULLET_TRAIL::play));
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getPreHitBlockHandler() {
+            return createDestroyOnGroundHitBlockHandler((location, hitBlock) -> true);
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getPreHitEntityHandler() {
+            return (location, target) -> true;
         }
     }
 
@@ -165,7 +170,7 @@ public final class JagerUlt extends UltimateSkill {
                     owner.getName() + "의 눈폭풍 발생기",
                     owner,
                     true, true,
-                    new FixedPitchHitbox(entity.getLocation(), 0.7, 0.2, 0.7, 0, 0.1, 0)
+                    Hitbox.builder(entity.getLocation(), 0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build()
             );
 
             knockbackModule = new KnockbackModule(this, 2);
@@ -284,7 +289,7 @@ public final class JagerUlt extends UltimateSkill {
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             JagerUltInfo.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBreakEffect(location, this, damage);
+            CombatEffectUtil.playBreakParticle(location, this, damage);
         }
 
         @Override
@@ -295,11 +300,11 @@ public final class JagerUlt extends UltimateSkill {
             JagerUltInfo.SOUND.DEATH.play(entity.getLocation());
         }
 
-        private final class JagerUltArea extends Area {
+        private final class JagerUltArea extends Area<Damageable> {
             private JagerUltArea(double radius) {
-                super(JagerUltEntity.this, radius, combatEntity -> combatEntity.isEnemy(JagerUltEntity.this)
-                        && combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY()
-                        < JagerUltEntity.this.entity.getLocation().getY());
+                super(JagerUltEntity.this, radius, CombatUtil.EntityCondition.enemy(JagerUltEntity.this)
+                        .and(combatEntity -> combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight(), 0).getY()
+                                < JagerUltEntity.this.getEntity().getLocation().getY()));
             }
 
             @Override

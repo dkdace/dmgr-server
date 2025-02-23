@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
-import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;

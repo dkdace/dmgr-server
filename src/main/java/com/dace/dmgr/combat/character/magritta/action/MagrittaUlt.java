@@ -6,11 +6,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Property;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.GunHitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -19,7 +18,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -93,10 +91,10 @@ public final class MagrittaUlt extends UltimateSkill {
             Location loc = combatUser.getEntity().getLocation();
             HashMap<Damageable, Integer> targets = new HashMap<>();
 
-            new MagrittaUltHitscan(targets).shoot();
+            new MagrittaUltHitscan(targets).shot();
             for (int j = 0; j < MagrittaWeaponInfo.PELLET_AMOUNT - 1; j++) {
                 Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), MagrittaWeaponInfo.SPREAD * 1.25);
-                new MagrittaUltHitscan(targets).shoot(dir);
+                new MagrittaUltHitscan(targets).shot(dir);
             }
             targets.forEach((target, hits) -> {
                 if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
@@ -138,58 +136,60 @@ public final class MagrittaUlt extends UltimateSkill {
         }, MagrittaWeaponInfo.COOLDOWN * 2));
     }
 
-    private final class MagrittaUltHitscan extends GunHitscan {
+    private final class MagrittaUltHitscan extends Hitscan<Damageable> {
         private final HashMap<Damageable, Integer> targets;
-        private double distance = 0;
 
-        private MagrittaUltHitscan(HashMap<Damageable, Integer> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(15).maxDistance(MagrittaWeaponInfo.DISTANCE)
-                    .condition(combatUser::isEnemy).build());
+        private MagrittaUltHitscan(@NonNull HashMap<Damageable, Integer> targets) {
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
             this.targets = targets;
         }
 
         @Override
-        protected boolean onInterval() {
-            distance += getVelocity().length();
-            return super.onInterval();
+        protected void onHit(@NonNull Location location) {
+            MagrittaUltInfo.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            MagrittaUltInfo.PARTICLE.BULLET_TRAIL.play(loc);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(15, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                MagrittaUltInfo.PARTICLE.BULLET_TRAIL.play(loc);
+            });
         }
 
         @Override
-        protected void onHit() {
-            MagrittaUltInfo.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1);
+                MagrittaUltInfo.PARTICLE.HIT_BLOCK.play(location);
+
+                if (blockHitCount++ == 0) {
+                    CombatEffectUtil.BULLET_HIT_BLOCK_SOUND.play(location);
+                    CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                }
+
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, 1);
-            MagrittaUltInfo.PARTICLE.HIT_BLOCK.play(getLocation());
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
+                int shredding = target.getPropertyManager().getValue(Property.SHREDDING);
+                if (shredding > 0)
+                    damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
+                if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, false))
+                    targets.put(target, targets.getOrDefault(target, 0) + 1);
 
-            if (blockHitCount++ == 0) {
-                HIT_BLOCK_SOUND.play(getLocation());
-                CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
-            }
+                MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
 
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, distance, MagrittaWeaponInfo.DISTANCE / 2.0);
-            int shredding = target.getPropertyManager().getValue(Property.SHREDDING);
-            if (shredding > 0)
-                damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
-            if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), false, false))
-                targets.put(target, targets.getOrDefault(target, 0) + 1);
-
-            MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-
-            return false;
+                return false;
+            };
         }
     }
 }

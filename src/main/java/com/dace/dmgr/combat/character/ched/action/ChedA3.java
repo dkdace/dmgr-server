@@ -1,23 +1,22 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -81,7 +80,7 @@ public final class ChedA3 extends ActiveSkill {
                 return;
 
             Location location = combatUser.getArmLocation(true);
-            new ChedA3Projectile().shoot(location);
+            new ChedA3Projectile().shot(location);
 
             ChedA3Info.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
@@ -149,73 +148,76 @@ public final class ChedA3 extends ActiveSkill {
             combatUser.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
     }
 
-    private final class ChedA3Projectile extends Projectile {
+    private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
-            super(combatUser, ChedA3Info.VELOCITY, ProjectileOption.builder().trailInterval(18).size(ChedA3Info.SIZE)
-                    .condition(combatEntity -> ((Damageable) combatEntity).getDamageModule().isLiving()
-                            && combatEntity.isEnemy(ChedA3.this.combatUser)).build());
+            super(combatUser, ChedA3Info.VELOCITY,
+                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity -> combatEntity.getDamageModule().isLiving()),
+                    Option.builder().size(ChedA3Info.SIZE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            playTickEffect();
-            ChedA3Info.SOUND.TICK.play(getLocation());
-        }
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(18, location -> {
+                location.setPitch(0);
 
-        private void playTickEffect() {
-            Location loc = getLocation().clone();
-            loc.setPitch(0);
+                ChedA3Info.SOUND.TICK.play(location);
 
-            ChedA3Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_CORE.play(location);
 
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.5, -0.6),
-                    0.2, 0.12);
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.7, -1.2),
-                    0.16, 0.08);
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.9, -1.8),
-                    0.12, 0.04);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
+                        0.2, 0.12);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
+                        0.16, 0.08);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
+                        0.12, 0.04);
 
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.4, 0.8),
-                    0.1, 0.16);
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.6, 1),
-                    0.1, 0.16);
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.4),
-                    0.18, 0.16);
-            ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.6),
-                    0.24, 0.16);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
+                        0.1, 0.16);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
+                        0.1, 0.16);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
+                        0.18, 0.16);
+                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
+                        0.24, 0.16);
 
-            for (int i = 0; i < 6; i++) {
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
-                        LocationUtil.getLocationFromOffset(loc, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
-                        0.1, 0.1 + i * 0.04);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
-                        LocationUtil.getLocationFromOffset(loc, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
-                        0.1, 0.1 + i * 0.04);
-            }
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return true;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, getLocation(), false, true)) {
-                combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(ChedA3Info.DETECT_DURATION));
-                combatUser.getEntity().getWorld().getPlayers().stream()
-                        .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
-                        .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
-                        .forEach(teamTarget -> teamTarget.getUser().setGlowing(target.getEntity(), ChatColor.RED,
-                                Timespan.ofTicks(ChedA3Info.DETECT_DURATION)));
-
-                if (target instanceof CombatUser) {
-                    combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
-                    killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedA3Info.KILL_SCORE_TIME_LIMIT)));
+                for (int i = 0; i < 6; i++) {
+                    ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                            LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
+                            0.1, 0.1 + i * 0.04);
+                    ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                            LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
+                            0.1, 0.1 + i * 0.04);
                 }
-            }
+            });
+        }
 
-            return true;
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> true;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
+                    combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(ChedA3Info.DETECT_DURATION));
+                    combatUser.getEntity().getWorld().getPlayers().stream()
+                            .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
+                            .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
+                            .forEach(teamTarget -> teamTarget.getUser().setGlowing(target.getEntity(), ChatColor.RED,
+                                    Timespan.ofTicks(ChedA3Info.DETECT_DURATION)));
+
+                    if (target instanceof CombatUser) {
+                        combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
+                        killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedA3Info.KILL_SCORE_TIME_LIMIT)));
+                    }
+                }
+
+                return true;
+            };
         }
     }
 }

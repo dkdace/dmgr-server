@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -7,14 +8,11 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.character.palas.Palas;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.GunHitscan;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -22,7 +20,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 @Getter
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
@@ -76,8 +73,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                 setCooldown();
 
-                new PalasWeaponHitscan(aimModule.isAiming()).shoot();
-                new PalasWeaponHealHitscan(aimModule.isAiming()).shoot();
+                new PalasWeaponHitscan(aimModule.isAiming()).shot();
+                new PalasWeaponHealHitscan(aimModule.isAiming()).shot();
                 reloadModule.cancel();
                 isActionCooldown = false;
 
@@ -199,60 +196,82 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.setRemainingAmmo(PalasWeaponInfo.CAPACITY);
     }
 
-    private final class PalasWeaponHitscan extends GunHitscan {
+    private final class PalasWeaponHitscan extends Hitscan<Damageable> {
         private PalasWeaponHitscan(boolean isAiming) {
-            super(combatUser, (isAiming ? HitscanOption.builder() : HitscanOption.builder().maxDistance(PalasWeaponInfo.DISTANCE)).trailInterval(8)
-                    .condition(combatEntity -> Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity)
-                            || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+                    (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
-            PalasWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(8, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
+                PalasWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+            });
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.isEnemy(combatUser)) {
-                target.getDamageModule().damage(combatUser, PalasWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                return false;
+            };
+        }
 
-                PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-            }
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.isEnemy(combatUser)) {
+                    target.getDamageModule().damage(combatUser, PalasWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
 
-            return false;
+                    PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                }
+
+                return false;
+            };
         }
     }
 
-    private final class PalasWeaponHealHitscan extends Hitscan {
+    private final class PalasWeaponHealHitscan extends Hitscan<Damageable> {
         private PalasWeaponHealHitscan(boolean isAiming) {
-            super(combatUser, (isAiming ? HitscanOption.builder() : HitscanOption.builder().maxDistance(PalasWeaponInfo.DISTANCE))
-                    .size(PalasWeaponInfo.HEAL_SIZE)
-                    .condition(combatEntity -> Palas.getTargetedActionCondition(PalasWeapon.this.combatUser, combatEntity)
-                            || combatEntity.isEnemy(PalasWeapon.this.combatUser)).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+                    (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).size(PalasWeaponInfo.HEAL_SIZE).build());
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return (location, i) -> true;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                if (target.getDamageModule().isLowHealth()) {
-                    PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
-                    skillp1.setHealAmount(PalasWeaponInfo.HEAL);
-                    skillp1.setTarget((Healable) target);
-                    combatUser.useAction(ActionKey.PERIODIC_1);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target instanceof Healable && !target.isEnemy(combatUser)) {
+                    if (target.getDamageModule().isLowHealth()) {
+                        PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
+                        skillp1.setHealAmount(PalasWeaponInfo.HEAL);
+                        skillp1.setTarget((Healable) target);
+                        combatUser.useAction(ActionKey.PERIODIC_1);
+                    }
+
+                    ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
+
+                    PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
                 }
 
-                ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
-
-                PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-            }
-
-            return false;
+                return false;
+            };
         }
     }
 }

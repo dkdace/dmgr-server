@@ -1,21 +1,22 @@
 package com.dace.dmgr.combat.character.silia.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+
+import java.util.function.Consumer;
 
 public final class SiliaA2 extends ActiveSkill {
     public SiliaA2(@NonNull CombatUser combatUser) {
@@ -67,7 +68,7 @@ public final class SiliaA2 extends ActiveSkill {
         }, () -> {
             onCancelled();
 
-            new SiliaA2Projectile().shoot();
+            new SiliaA2Projectile().shot();
 
             SiliaA2Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
@@ -84,69 +85,81 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration(0);
     }
 
-    private final class SiliaA2Projectile extends Projectile {
-        int i = 0;
-
+    private final class SiliaA2Projectile extends Projectile<Damageable> {
         private SiliaA2Projectile() {
-            super(combatUser, SiliaA2Info.VELOCITY, ProjectileOption.builder().trailInterval(4).size(SiliaA2Info.SIZE)
-                    .maxDistance(SiliaA2Info.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, SiliaA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(SiliaA2Info.SIZE).maxDistance(SiliaA2Info.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            i++;
-
-            Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(0.8);
-            Vector axis = VectorUtil.getRollAxis(getLocation());
-
-            int angle = i * 12;
-            for (int j = 0; j < 2; j++) {
-                angle += 180;
-                Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
-                Location loc = getLocation().clone().add(vec);
-
-                SiliaA2Info.PARTICLE.BULLET_TRAIL.play(loc, vec);
-            }
-        }
-
-        @Override
-        protected void onHit() {
-            for (int j = 0; j < 40; j++) {
+        protected void onHit(@NonNull Location location) {
+            for (int i = 0; i < 40; i++) {
                 Vector vec = VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60);
-                SiliaA2Info.PARTICLE.HIT.play(getLocation(), vec, Math.random());
+                SiliaA2Info.PARTICLE.HIT.play(location, vec, Math.random());
             }
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 3);
-            return false;
-        }
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(4, new Consumer<Location>() {
+                private int i = 0;
 
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, getLocation(),
-                    SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
+                @Override
+                public void accept(Location location) {
+                    i++;
 
-                Location loc = target.getEntity().getLocation().add(0, 0.1, 0);
-                loc.setPitch(0);
-                loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
-                for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
-                    SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
-                SiliaA2Info.SOUND.HIT_ENTITY.play(getLocation());
+                    Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
+                    Vector axis = VectorUtil.getRollAxis(location);
 
-                if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
-                        && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
-                    combatUser.getMoveModule().teleport(loc);
-                    combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
+                    int angle = i * 12;
+                    for (int j = 0; j < 2; j++) {
+                        angle += 180;
+                        Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
+                        Location loc = location.clone().add(vec);
 
-                    if (target instanceof CombatUser)
-                        combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
+                        SiliaA2Info.PARTICLE.BULLET_TRAIL.play(loc, vec);
+                    }
                 }
-            }
+            });
+        }
 
-            return false;
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 3);
+                return false;
+            };
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
+                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                    target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
+
+                    Location loc = target.getEntity().getLocation().add(0, 0.1, 0);
+                    loc.setPitch(0);
+                    loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
+                    for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
+                        SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
+                    SiliaA2Info.SOUND.HIT_ENTITY.play(location);
+
+                    if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
+                            && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
+                        combatUser.getMoveModule().teleport(loc);
+                        combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
+
+                        if (target instanceof CombatUser)
+                            combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
+                    }
+                }
+
+                return false;
+            };
         }
     }
 }

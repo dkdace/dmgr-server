@@ -1,8 +1,9 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.palas.Palas;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -11,7 +12,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -43,7 +43,7 @@ public final class PalasA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new PalasA2Target().shoot();
+        new PalasA2Target().shot();
     }
 
     @Override
@@ -85,15 +85,14 @@ public final class PalasA2 extends ActiveSkill {
         }
     }
 
-    private final class PalasA2Target extends Target {
+    private final class PalasA2Target extends Target<Healable> {
         private PalasA2Target() {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, true, combatEntity ->
-                    Palas.getTargetedActionCondition(PalasA2.this.combatUser, combatEntity)
-                            && !((Healable) combatEntity).getStatusEffectModule().hasStatusEffect(PalasA2Immune.instance));
+            super(combatUser, PalasA2Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    .and(combatEntity -> !combatEntity.getStatusEffectModule().hasStatusEffect(PalasA2Immune.instance)));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             setCooldown();
             combatUser.getWeapon().onCancelled();
 

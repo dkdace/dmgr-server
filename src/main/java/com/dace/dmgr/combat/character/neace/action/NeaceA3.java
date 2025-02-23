@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -40,7 +40,7 @@ public final class NeaceA3 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished())
-            new NeaceA3Target().shoot();
+            new NeaceA3Target().shot();
         else
             onCancelled();
     }
@@ -56,13 +56,13 @@ public final class NeaceA3 extends ActiveSkill {
         setDuration(0);
     }
 
-    private final class NeaceA3Target extends Target {
+    private final class NeaceA3Target extends Target<Healable> {
         private NeaceA3Target() {
-            super(combatUser, NeaceA3Info.MAX_DISTANCE, true, combatEntity -> Neace.getTargetedActionCondition(NeaceA3.this.combatUser, combatEntity));
+            super(combatUser, NeaceA3Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             setDuration();
 
             NeaceA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());

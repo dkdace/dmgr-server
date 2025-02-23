@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -101,11 +102,10 @@ public final class InfernoP1 extends AbstractSkill {
         }
     }
 
-    private final class InfernoP1Area extends Area {
+    private final class InfernoP1Area extends Area<Damageable> {
         private InfernoP1Area() {
-            super(combatUser, InfernoP1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof Damageable
-                    && ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)
-                    && combatEntity.isEnemy(InfernoP1.this.combatUser));
+            super(combatUser, InfernoP1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
+                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)));
         }
 
         @Override
@@ -114,7 +114,7 @@ public final class InfernoP1 extends AbstractSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             canActivate = true;
             return true;
         }

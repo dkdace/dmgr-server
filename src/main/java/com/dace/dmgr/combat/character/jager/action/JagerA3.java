@@ -1,19 +1,18 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Area;
+import com.dace.dmgr.combat.interaction.BouncingProjectile;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -104,7 +103,7 @@ public final class JagerA3 extends ActiveSkill {
             combatUser.getWeapon().setCooldown(2);
 
             Location loc = combatUser.getArmLocation(true);
-            new JagerA3Projectile().shoot(loc);
+            new JagerA3Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
         }
@@ -156,43 +155,55 @@ public final class JagerA3 extends ActiveSkill {
         }
     }
 
-    private final class JagerA3Projectile extends BouncingProjectile {
+    private final class JagerA3Projectile extends BouncingProjectile<Damageable> {
         private JagerA3Projectile() {
-            super(combatUser, JagerA3Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8)
-                    .duration(Timestamp.now().until(explodeTimestamp).toTicks()).hasGravity(true)
-                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35).build());
+            super(combatUser, JagerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Projectile.Option.builder().duration(Timestamp.now().until(explodeTimestamp)).build(),
+                    Option.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            JagerA3Info.PARTICLE.BULLET_TRAIL.play(getLocation());
+        protected void onDestroy(@NonNull Location location) {
+            explode(location, this);
         }
 
         @Override
-        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
-            if (getVelocity().length() > 0.01)
-                CombatEffectUtil.THROW_BOUNCE_SOUND.play(getLocation(), 1 + getVelocity().length() * 2);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(8, JagerA3Info.PARTICLE.BULLET_TRAIL::play));
         }
 
         @Override
-        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            if (getVelocity().length() > 0.05)
-                target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
-            return false;
+        @NonNull
+        protected HitBlockHandler getPreHitBlockHandler() {
+            return (location, hitBlock) -> {
+                if (getVelocity().length() > 0.01)
+                    CombatEffectUtil.THROW_BOUNCE_SOUND.play(location, 1 + getVelocity().length() * 2);
+
+                return true;
+            };
         }
 
         @Override
-        protected void onDestroy() {
-            explode(getLocation(), this);
+        @NonNull
+        protected HitEntityHandler<Damageable> getPreHitEntityHandler() {
+            return (location, target) -> {
+                if (getVelocity().length() > 0.05)
+                    target.getDamageModule().damage(this, JagerA3Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+
+                return true;
+            };
         }
     }
 
-    private final class JagerA3Area extends Area {
+    private final class JagerA3Area extends Area<Damageable> {
+        @Nullable
         private final JagerA3Projectile projectile;
 
-        private JagerA3Area(JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, combatEntity -> combatEntity.isEnemy(JagerA3.this.combatUser)
-                    || combatEntity == JagerA3.this.combatUser);
+        private JagerA3Area(@Nullable JagerA3Projectile projectile) {
+            super(combatUser, JagerA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
             this.projectile = projectile;
         }
 
@@ -202,13 +213,13 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
             double damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, JagerA3Info.RADIUS / 2.0);
             int freeze = (int) CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, JagerA3Info.RADIUS / 2.0);
-            boolean isDamaged = projectile == null ?
-                    target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true) :
-                    target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
+            boolean isDamaged = projectile == null
+                    ? target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true)
+                    : target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
             if (isDamaged) {
                 target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))

@@ -8,13 +8,12 @@ import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
@@ -65,7 +64,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 }
 
                 Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
-                new InfernoWeaponRProjectile().shoot(dir);
+                new InfernoWeaponRProjectile().shot(dir);
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
@@ -81,7 +80,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 setCooldown();
 
-                new InfernoWeaponLProjectile().shoot();
+                new InfernoWeaponLProjectile().shot();
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
 
@@ -149,76 +148,91 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
     }
 
-    private final class InfernoWeaponRProjectile extends Projectile {
+    private final class InfernoWeaponRProjectile extends Projectile<Damageable> {
         private InfernoWeaponRProjectile() {
-            super(combatUser, InfernoWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(9)
-                    .size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, InfernoWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            double distance = getLocation().distance(combatUser.getEntity().getEyeLocation());
-            if (distance > 5)
-                return;
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(9, location -> {
+                double distance = getTravelDistance();
+                if (distance > 5)
+                    return;
 
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            InfernoWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                InfernoWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            InfernoWeaponInfo.PARTICLE.HIT_BLOCK.play(getLocation());
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                InfernoWeaponInfo.PARTICLE.HIT_BLOCK.play(location);
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
-                    false, true))
-                target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, InfernoWeaponInfo.FIRE_DURATION);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
+                        false, true))
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, InfernoWeaponInfo.FIRE_DURATION);
 
-            InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
+                InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
 
-            return true;
+                return true;
+            };
         }
     }
 
-    private final class InfernoWeaponLProjectile extends Projectile {
+    private final class InfernoWeaponLProjectile extends Projectile<Damageable> {
         private InfernoWeaponLProjectile() {
-            super(combatUser, InfernoWeaponInfo.FIREBALL.VELOCITY, ProjectileOption.builder().trailInterval(13)
-                    .size(InfernoWeaponInfo.FIREBALL.SIZE).maxDistance(InfernoWeaponInfo.FIREBALL.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, InfernoWeaponInfo.FIREBALL.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(InfernoWeaponInfo.FIREBALL.SIZE).maxDistance(InfernoWeaponInfo.FIREBALL.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            InfernoWeaponInfo.PARTICLE.BULLET_TRAIL_FIREBALL.play(loc);
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            Location loc = getLocation().clone().add(0, 0.1, 0);
+        protected void onDestroy(@NonNull Location location) {
+            Location loc = location.add(0, 0.1, 0);
             new InfernoWeaponLArea().emit(loc);
 
             InfernoWeaponInfo.SOUND.FIREBALL_EXPLODE.play(loc);
             InfernoWeaponInfo.PARTICLE.FIREBALL_EXPLODE.play(loc);
         }
 
-        private final class InfernoWeaponLArea extends Area {
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(13, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                InfernoWeaponInfo.PARTICLE.BULLET_TRAIL_FIREBALL.play(loc);
+            });
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+                return false;
+            };
+        }
+
+        private final class InfernoWeaponLArea extends Area<Damageable> {
             private InfernoWeaponLArea() {
-                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, InfernoWeaponLProjectile.this.condition.or(combatEntity ->
-                        combatEntity == InfernoWeapon.this.combatUser));
+                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, InfernoWeaponLProjectile.this.entityCondition.include(combatUser));
             }
 
             @Override
@@ -227,7 +241,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);

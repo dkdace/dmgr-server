@@ -6,11 +6,11 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -382,7 +382,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile projectile, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
+    public final boolean damage(@NonNull Projectile<?> projectile, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
         if (damage < 0 || critMultiplier < 0)
             throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
 
@@ -409,7 +409,7 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile projectile, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public final boolean damage(@NonNull Projectile<?> projectile, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
         return damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 

@@ -5,8 +5,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -14,7 +16,6 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -56,7 +57,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             setCooldown();
             combatUser.playMeleeAttackAnimation(-4, 10, true);
 
-            new SiliaWeaponProjectile().shoot();
+            new SiliaWeaponProjectile().shot();
 
             SiliaWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
         }
@@ -101,7 +102,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                 axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(loc), isOpposite ? -30 : 30);
 
                 vec = VectorUtil.getRotatedVector(vec, axis, (isOpposite ? 90 - 16 * (index - 3.5) : 90 + 16 * (index - 3.5)));
-                new SiliaWeaponStrikeAttack(combatUser, targets).shoot(loc, vec);
+                new SiliaWeaponStrikeAttack(targets).shot(loc, vec);
 
                 CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
                 if (index < 3)
@@ -125,105 +126,122 @@ public final class SiliaWeapon extends AbstractWeapon {
         combatUser.getWeapon().setDurability(isStrike ? SiliaWeaponInfo.RESOURCE.EXTENDED : SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 
-    private final class SiliaWeaponProjectile extends Projectile {
+    private final class SiliaWeaponProjectile extends Projectile<Damageable> {
         private SiliaWeaponProjectile() {
-            super(combatUser, SiliaWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).size(SiliaWeaponInfo.SIZE)
-                    .maxDistance(SiliaWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, SiliaWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(SiliaWeaponInfo.SIZE).maxDistance(SiliaWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            for (int i = 0; i < 8; i++) {
-                Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(getLocation());
-                Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
-                axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(getLocation()), isOpposite ? 30 : -30);
-
-                vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
-                SiliaWeaponInfo.PARTICLE.BULLET_TRAIL.play(getLocation().clone().add(vec));
-            }
+        protected void onHit(@NonNull Location location) {
+            SiliaWeaponInfo.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            SiliaWeaponInfo.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(10, location -> {
+                for (int j = 0; j < 8; j++) {
+                    Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
+                    Vector axis = VectorUtil.getPitchAxis(location);
+                    Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
+                    axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
+
+                    vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (j - 3.5)).multiply(0.8);
+                    SiliaWeaponInfo.PARTICLE.BULLET_TRAIL.play(location.clone().add(vec));
+                }
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SiliaWeaponInfo.SOUND.HIT_BLOCK.play(getLocation());
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1.5);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                SiliaWeaponInfo.SOUND.HIT_BLOCK.play(location);
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1.5);
 
-            return false;
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(),
-                    SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
+                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
 
-            SiliaWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-            SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
+                SiliaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                SiliaWeaponInfo.SOUND.HIT_ENTITY.play(location);
 
-            return false;
+                return false;
+            };
         }
     }
 
-    private final class SiliaWeaponStrikeAttack extends Hitscan {
+    private final class SiliaWeaponStrikeAttack extends Hitscan<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private SiliaWeaponStrikeAttack(CombatUser combatUser, HashSet<Damageable> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(5).size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE)
-                    .condition(combatUser::isEnemy).build());
+        private SiliaWeaponStrikeAttack(HashSet<Damageable> targets) {
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE).build());
             this.targets = targets;
         }
 
         @Override
-        protected void onTrailInterval() {
-            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
-                return;
-
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            SiliaT2Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+        protected void onHit(@NonNull Location location) {
+            SiliaT2Info.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            SiliaT2Info.PARTICLE.HIT.play(getLocation());
+        protected void onDestroy(@NonNull Location location) {
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+            SiliaT2Info.PARTICLE.BULLET_TRAIL_DECO.play(loc);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1.5);
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(5, location -> {
+                if (getTravelDistance() <= 1)
+                    return;
 
-            return false;
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+                SiliaT2Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+            });
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (targets.add(target)) {
-                if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, getLocation(),
-                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                    target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation())
-                            .multiply(SiliaT2Info.KNOCKBACK));
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1.5);
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
 
-                    if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
-                        combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                return false;
+            };
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
+                            SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                        target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation())
+                                .multiply(SiliaT2Info.KNOCKBACK));
+
+                        if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
+                            combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                    }
+
+                    SiliaT2Info.PARTICLE.HIT_ENTITY.play(location);
+                    SiliaWeaponInfo.SOUND.HIT_ENTITY.play(location);
                 }
 
-                SiliaT2Info.PARTICLE.HIT_ENTITY.play(getLocation());
-                SiliaWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            SiliaT2Info.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+                return true;
+            };
         }
     }
 }

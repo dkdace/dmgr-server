@@ -13,8 +13,8 @@ import com.dace.dmgr.combat.character.Scuffler;
 import com.dace.dmgr.combat.character.magritta.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -147,7 +147,7 @@ public final class Magritta extends Scuffler {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingEffect(location, victim, damage);
+        CombatEffectUtil.playBleedingParticle(location, victim, damage);
     }
 
     @Override

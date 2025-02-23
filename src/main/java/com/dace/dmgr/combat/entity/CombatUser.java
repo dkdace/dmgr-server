@@ -25,8 +25,6 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
@@ -183,10 +181,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private CombatUser(@NonNull User user, @Nullable GameUser gameUser) {
         super(user.getPlayer(), user.getPlayer().getName(), gameUser == null ? null : gameUser.getGame(),
-                new FixedPitchHitbox(user.getPlayer().getLocation(), 0.5, 0.7, 0.3, 0, 0, 0, 0, 0.35, 0),
-                new FixedPitchHitbox(user.getPlayer().getLocation(), 0.8, 0.7, 0.45, 0, 0, 0, 0, 1.05, 0),
-                new Hitbox(user.getPlayer().getLocation(), 0.45, 0.35, 0.45, 0, 0.225, 0, 0, 1.4, 0),
-                new Hitbox(user.getPlayer().getLocation(), 0.45, 0.1, 0.45, 0, 0.4, 0, 0, 1.4, 0)
+                Hitbox.builder(user.getPlayer().getLocation(), 0.5, 0.7, 0.3).axisOffsetY(0.35).pitchFixed().build(),
+                Hitbox.builder(user.getPlayer().getLocation(), 0.8, 0.7, 0.45).axisOffsetY(1.05).pitchFixed().build(),
+                Hitbox.builder(user.getPlayer().getLocation(), 0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.4).build(),
+                Hitbox.builder(user.getPlayer().getLocation(), 0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.4).build()
         );
         this.user = user;
         this.gameUser = gameUser;
@@ -319,7 +317,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (damageModule.isLowHealth())
-            CombatEffectUtil.playBleedingEffect(null, this, 0);
+            CombatEffectUtil.playBleedingParticle(null, this, 0);
 
         if (i % 20 == 0) {
             if (hasCore(Core.REGENERATION))

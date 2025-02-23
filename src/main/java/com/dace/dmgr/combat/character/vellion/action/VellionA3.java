@@ -1,18 +1,19 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -211,9 +212,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             combatUser.addScore("처치 지원", VellionA3Info.ASSIST_SCORE);
     }
 
-    private final class VellionA3Area extends Area {
+    private final class VellionA3Area extends Area<Damageable> {
         private VellionA3Area() {
-            super(combatUser, VellionA3Info.RADIUS, combatUser::isEnemy);
+            super(combatUser, VellionA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -222,7 +223,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, HealBlock.getInstance(), 10);

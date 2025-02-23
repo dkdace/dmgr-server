@@ -1,18 +1,21 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Area;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -81,7 +84,7 @@ public final class ChedUlt extends UltimateSkill {
                 return;
 
             Location location = combatUser.getArmLocation(true);
-            new ChedUltProjectile().shoot(location);
+            new ChedUltProjectile().shot(location);
 
             ChedUltInfo.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
@@ -170,83 +173,85 @@ public final class ChedUlt extends UltimateSkill {
         }
     }
 
-    private final class ChedUltProjectile extends Projectile {
+    private final class ChedUltProjectile extends Projectile<Damageable> {
         private ChedUltProjectile() {
-            super(combatUser, ChedUltInfo.VELOCITY, ProjectileOption.builder().trailInterval(15).size(ChedUltInfo.SIZE)
-                    .condition(combatUser::isEnemy).build());
+            super(combatUser, ChedUltInfo.VELOCITY,
+                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
+                            combatEntity instanceof CombatUser || combatEntity instanceof Dummy),
+                    Option.builder().size(ChedUltInfo.SIZE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            playTickEffect();
-            ChedUltInfo.SOUND.TICK.play(getLocation());
-        }
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(15, location -> {
+                location.setPitch(0);
 
-        private void playTickEffect() {
-            Location loc = getLocation().clone();
-            loc.setPitch(0);
+                ChedUltInfo.SOUND.TICK.play(location);
 
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_CORE.play(location);
 
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.5, -0.6),
-                    0.2, 0.12);
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.7, -1.2),
-                    0.16, 0.08);
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, -0.9, -1.8),
-                    0.12, 0.04);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
+                        0.2, 0.12);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
+                        0.16, 0.08);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
+                        0.12, 0.04);
 
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.4, 0.8),
-                    0.1, 0.16);
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.6, 1),
-                    0.1, 0.16);
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.4),
-                    0.18, 0.16);
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(loc, 0, 0.8, 1.6),
-                    0.24, 0.16);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
+                        0.1, 0.16);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
+                        0.1, 0.16);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
+                        0.18, 0.16);
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
+                        0.24, 0.16);
 
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(loc, -2.8, 1.7, 0));
-            ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(loc, 2.8, 1.7, 0));
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, -2.8, 1.7, 0));
+                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, 2.8, 1.7, 0));
 
-            for (int i = 0; i < 6; i++) {
-                Location loc1 = LocationUtil.getLocationFromOffset(loc, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
-                Location loc2 = LocationUtil.getLocationFromOffset(loc, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
-                Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
+                for (int i = 0; i < 6; i++) {
+                    Location loc1 = LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
+                    Location loc2 = LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
+                    Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
 
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc1, 0.1, 0.1 + i * 0.04);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc2, 0.1, 0.1 + i * 0.04);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc1, vec);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc2, vec);
-            }
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return true;
+                    ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc1, 0.1, 0.1 + i * 0.04);
+                    ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc2, 0.1, 0.1 + i * 0.04);
+                    ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc1, vec);
+                    ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc2, vec);
+                }
+            });
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (!(target instanceof CombatUser || target instanceof Dummy))
-                return true;
-
-            Location loc = target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0).add(0, 0.1, 0);
-            new ChedUltArea().emit(loc);
-
-            summonEntity = new ChedUltFireFloor(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
-            summonEntity.activate();
-
-            for (Location loc2 : LocationUtil.getLine(getLocation(), loc, 0.4))
-                ChedUltInfo.PARTICLE.HIT_ENTITY.play(loc2);
-
-            ChedUltInfo.SOUND.EXPLODE.play(loc);
-            ChedUltInfo.PARTICLE.EXPLODE.play(loc);
-
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> true;
         }
 
-        private final class ChedUltArea extends Area {
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                Location loc = target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0).add(0, 0.1, 0);
+                new ChedUltArea().emit(loc);
+
+                summonEntity = new ChedUltFireFloor(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
+                summonEntity.activate();
+
+                for (Location loc2 : LocationUtil.getLine(location, loc, 0.4))
+                    ChedUltInfo.PARTICLE.HIT_ENTITY.play(loc2);
+
+                ChedUltInfo.SOUND.EXPLODE.play(loc);
+                ChedUltInfo.PARTICLE.EXPLODE.play(loc);
+
+                return false;
+            };
+        }
+
+        private final class ChedUltArea extends Area<Damageable> {
             private ChedUltArea() {
-                super(combatUser, ChedUltInfo.SIZE, ChedUltProjectile.this.condition.or(combatEntity -> combatEntity == ChedUlt.this.combatUser));
+                super(combatUser, ChedUltInfo.SIZE, ChedUltProjectile.this.entityCondition.include(combatUser));
             }
 
             @Override
@@ -255,7 +260,7 @@ public final class ChedUlt extends UltimateSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null,
                         false, false) && target instanceof CombatUser)
                     killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));
@@ -264,7 +269,7 @@ public final class ChedUlt extends UltimateSkill {
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
                 if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null,
                         false, false))
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(getLocation(), location.add(0, 1, 0))
+                    target.getKnockbackModule().knockback(LocationUtil.getDirection(location, location.clone().add(0, 1, 0))
                             .multiply(ChedUltInfo.KNOCKBACK));
 
                 return !(target instanceof Barrier);
@@ -282,7 +287,7 @@ public final class ChedUlt extends UltimateSkill {
                     owner.getName() + "의 화염 지대",
                     owner,
                     false, true,
-                    new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
+                    Hitbox.builder(entity.getLocation(), 1, 1, 1).offsetY(0.5).pitchFixed().build()
             );
 
             onInit();
@@ -317,9 +322,9 @@ public final class ChedUlt extends UltimateSkill {
             summonEntity = null;
         }
 
-        private final class ChedUltFireFloorArea extends Area {
+        private final class ChedUltFireFloorArea extends Area<Damageable> {
             private ChedUltFireFloorArea() {
-                super(combatUser, ChedUltInfo.SIZE, combatUser::isEnemy);
+                super(combatUser, ChedUltInfo.SIZE, CombatUtil.EntityCondition.enemy(combatUser));
             }
 
             @Override
@@ -328,7 +333,7 @@ public final class ChedUlt extends UltimateSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                         false, false)) {
                     target.getStatusEffectModule().applyStatusEffect(combatUser, ChedUltBurning.instance, 10);

@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.character.palas;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -12,10 +14,8 @@ import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.palas.action.*;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.Timespan;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -42,16 +42,6 @@ public final class Palas extends Support {
 
     private Palas() {
         super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", '\u32D9', 4, 1000, 1.0, 1.0);
-    }
-
-    /**
-     * 대상 타겟팅이 가능한 동작의 사용 조건을 반환한다.
-     *
-     * @param combatUser 플레이어
-     * @param target     사용 대상
-     */
-    public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-        return target instanceof Healable && target != combatUser && !target.isEnemy(combatUser);
     }
 
     @Override
@@ -139,12 +129,12 @@ public final class Palas extends Support {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        new PalasTarget(combatUser).shoot();
+        new PalasTarget(combatUser).shot();
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingEffect(location, victim, damage);
+        CombatEffectUtil.playBleedingParticle(location, victim, damage);
     }
 
     @Override
@@ -215,13 +205,13 @@ public final class Palas extends Support {
         return PalasUltInfo.getInstance();
     }
 
-    private static final class PalasTarget extends Target {
-        private PalasTarget(CombatUser combatUser) {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, false, combatEntity -> getTargetedActionCondition(combatUser, combatEntity));
+    private static final class PalasTarget extends Target<Healable> {
+        private PalasTarget(@NonNull CombatUser combatUser) {
+            super(combatUser, PalasA2Info.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, Timespan.ofTicks(3));
         }
     }

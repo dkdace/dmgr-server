@@ -10,15 +10,13 @@ import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
@@ -71,7 +69,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 setCooldown();
 
-                new JagerWeaponLProjectile().shoot();
+                new JagerWeaponLProjectile().shot();
                 reloadModule.consume(1);
 
                 CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
@@ -170,34 +168,41 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
     }
 
-    private final class JagerWeaponLProjectile extends Projectile {
+    private final class JagerWeaponLProjectile extends Projectile<Damageable> {
         private JagerWeaponLProjectile() {
-            super(combatUser, JagerWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10)
-                    .maxDistance(JagerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, JagerWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().maxDistance(JagerWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            JagerWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+        protected void onHit(@NonNull Location location) {
+            JagerWeaponInfo.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            JagerWeaponInfo.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(10, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                JagerWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
-                JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+                    JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
 
-            return false;
+                return false;
+            };
         }
     }
 }

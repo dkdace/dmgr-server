@@ -5,17 +5,15 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -70,7 +68,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                     Vector axis = VectorUtil.getYawAxis(loc);
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
-                    new QuakerWeaponAttack(targets).shoot(loc, vec);
+                    new QuakerWeaponAttack(targets).shot(loc, vec);
 
                     CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 0.8 : -0.8), 0.1);
                     if (index % 2 == 0)
@@ -90,55 +88,64 @@ public final class QuakerWeapon extends AbstractWeapon {
         setVisible(true);
     }
 
-    private final class QuakerWeaponAttack extends Hitscan {
+    private final class QuakerWeaponAttack extends Hitscan<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private QuakerWeaponAttack(HashSet<Damageable> targets) {
-            super(combatUser, HitscanOption.builder().trailInterval(6).size(QuakerWeaponInfo.SIZE).maxDistance(QuakerWeaponInfo.DISTANCE)
-                    .condition(combatUser::isEnemy).build());
+        private QuakerWeaponAttack(@NonNull HashSet<Damageable> targets) {
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(QuakerWeaponInfo.SIZE)
+                    .maxDistance(QuakerWeaponInfo.DISTANCE).build());
             this.targets = targets;
         }
 
         @Override
-        protected void onTrailInterval() {
-            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
-                return;
-
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+        protected void onHit(@NonNull Location location) {
+            QuakerWeaponInfo.SOUND.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            QuakerWeaponInfo.SOUND.HIT.play(getLocation());
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 2);
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
-
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (targets.add(target)) {
-                if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), false, true))
-                    target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation()).multiply(isClockwise ?
-                            -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
-
-                QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(getLocation());
-                QuakerWeaponInfo.SOUND.HIT_ENTITY.play(getLocation());
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
+        protected void onDestroy(@NonNull Location location) {
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(6, location -> {
+                if (getTravelDistance() <= 1)
+                    return;
+
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+                QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+            });
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 2);
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+
+                return false;
+            };
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
+                        target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation())
+                                .multiply(isClockwise ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
+
+                    QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                    QuakerWeaponInfo.SOUND.HIT_ENTITY.play(location);
+                }
+
+                return true;
+            };
         }
     }
 }

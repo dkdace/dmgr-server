@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.character.ched.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 @Getter
 public final class ChedA1 extends StackableSkill {
@@ -106,7 +105,7 @@ public final class ChedA1 extends StackableSkill {
         if (getStack() <= 0)
             setDuration(0);
 
-        new ChedA1Projectile().shoot();
+        new ChedA1Projectile().shot();
 
         ChedA1Info.SOUND.SHOOT.play(combatUser.getEntity().getLocation());
     }
@@ -122,42 +121,52 @@ public final class ChedA1 extends StackableSkill {
         }
     }
 
-    private final class ChedA1Projectile extends Projectile {
+    private final class ChedA1Projectile extends Projectile<Damageable> {
         private ChedA1Projectile() {
-            super(combatUser, ChedA1Info.VELOCITY, ProjectileOption.builder().trailInterval(9).hasGravity(true)
-                    .condition(combatUser::isEnemy).build());
+            super(combatUser, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, 0, 0);
-            ChedA1Info.PARTICLE.BULLET_TRAIL.play(loc);
+        protected void onHit(@NonNull Location location) {
+            ChedWeaponInfo.SOUND.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            ChedWeaponInfo.SOUND.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(9, location -> {
+                        Location loc = LocationUtil.getLocationFromOffset(location, 0.2, 0, 0);
+                        ChedA1Info.PARTICLE.BULLET_TRAIL.play(loc);
+                    }));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, 1.5);
-            ChedA1Info.PARTICLE.HIT_BLOCK.play(getLocation());
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1.5);
+                ChedA1Info.PARTICLE.HIT_BLOCK.play(location);
 
-            return false;
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true)) {
-                target.getStatusEffectModule().applyStatusEffect(shooter, ChedA1Burning.instance, ChedA1Info.FIRE_DURATION);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, location, isCrit, true)) {
+                    target.getStatusEffectModule().applyStatusEffect(shooter, ChedA1Burning.instance, ChedA1Info.FIRE_DURATION);
 
-                if (target instanceof CombatUser)
-                    ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);
-            }
+                    if (target instanceof CombatUser)
+                        ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);
+                }
 
-            return false;
+                return false;
+            });
         }
     }
 }

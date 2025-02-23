@@ -5,6 +5,8 @@ import lombok.NonNull;
 
 /**
  * 치명타 히트박스를 가진 엔티티의 인터페이스.
+ *
+ * @see Bullet#createCritHitEntityHandler(Bullet.CritHitEntityHandler)
  */
 public interface HasCritHitbox extends CombatEntity {
     /**

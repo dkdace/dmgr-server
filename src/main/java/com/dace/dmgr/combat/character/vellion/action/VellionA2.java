@@ -1,19 +1,20 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -69,7 +70,7 @@ public final class VellionA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished())
-            new VellionA2Target().shoot();
+            new VellionA2Target().shot();
         else
             setDuration(0);
     }
@@ -140,11 +141,11 @@ public final class VellionA2 extends ActiveSkill {
         }
     }
 
-    private final class VellionA2Target extends Target {
+    private final class VellionA2Target extends Target<Damageable> {
         private VellionA2Target() {
-            super(combatUser, VellionA2Info.MAX_DISTANCE, true, combatEntity -> ((Damageable) combatEntity).getDamageModule().isLiving()
-                    && combatEntity.isEnemy(VellionA2.this.combatUser)
-                    && !((Damageable) combatEntity).getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance));
+            super(combatUser, VellionA2Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.enemy(combatUser)
+                    .and(combatEntity -> combatEntity.getDamageModule().isLiving()
+                            && !combatEntity.getStatusEffectModule().hasStatusEffect(VellionA2Mark.instance)));
         }
 
         @Override
@@ -242,14 +243,13 @@ public final class VellionA2 extends ActiveSkill {
                     || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > VellionA2Info.MAX_DISTANCE;
         }
 
-        private final class VellionA2Area extends Area {
+        private final class VellionA2Area extends Area<Damageable> {
             private final Location effectLoc;
 
-            private VellionA2Area(Damageable target) {
-                super(combatUser, VellionA2Info.RADIUS, combatEntity -> combatEntity instanceof Damageable && combatEntity != target
-                        && combatEntity.isEnemy(VellionA2.this.combatUser));
+            private VellionA2Area(@NonNull Damageable target) {
+                super(combatUser, VellionA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).exclude(target));
 
-                effectLoc = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
+                this.effectLoc = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
                 VellionA2Info.SOUND.TRIGGER.play(effectLoc);
             }
 
@@ -259,7 +259,7 @@ public final class VellionA2 extends ActiveSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 target.getDamageModule().damage(combatUser, VellionA2Info.DAMAGE_PER_SECOND * 10 / 20.0, DamageType.NORMAL, null,
                         false, true);
 

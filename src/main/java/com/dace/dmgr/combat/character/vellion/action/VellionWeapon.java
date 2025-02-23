@@ -1,16 +1,15 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 public final class VellionWeapon extends AbstractWeapon {
     public VellionWeapon(@NonNull CombatUser combatUser) {
@@ -39,37 +38,44 @@ public final class VellionWeapon extends AbstractWeapon {
         setCooldown();
         combatUser.playMeleeAttackAnimation(-4, 8, true);
 
-        new VellionWeaponProjectile().shoot();
+        new VellionWeaponProjectile().shot();
 
         VellionWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
     }
 
-    private final class VellionWeaponProjectile extends Projectile {
+    private final class VellionWeaponProjectile extends Projectile<Damageable> {
         private VellionWeaponProjectile() {
-            super(combatUser, VellionWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(12).size(VellionWeaponInfo.SIZE)
-                    .maxDistance(VellionWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, VellionWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(VellionWeaponInfo.SIZE).maxDistance(VellionWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            VellionWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+        protected void onHit(@NonNull Location location) {
+            VellionWeaponInfo.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            VellionWeaponInfo.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(12, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                VellionWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true);
-            return false;
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                target.getDamageModule().damage(this, VellionWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+                return false;
+            });
         }
     }
 }

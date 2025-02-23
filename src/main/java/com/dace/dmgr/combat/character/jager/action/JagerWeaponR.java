@@ -7,10 +7,9 @@ import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.GunHitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
+import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -60,7 +59,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
                 setCooldown();
 
-                new JagerWeaponRHitscan().shoot();
+                new JagerWeaponRHitscan().shot();
                 reloadModule.consume(1);
 
                 Location loc = combatUser.getEntity().getLocation();
@@ -121,31 +120,38 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         // 미사용
     }
 
-    private final class JagerWeaponRHitscan extends GunHitscan {
-        private double distance = 0;
-
+    private final class JagerWeaponRHitscan extends Hitscan<Damageable> {
         private JagerWeaponRHitscan() {
-            super(combatUser, HitscanOption.builder().trailInterval(12).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
-        protected boolean onInterval() {
-            distance += getVelocity().length();
-            return super.onInterval();
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(12, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
+                CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+            });
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.2, 0);
-            CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            double damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, distance, JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE);
-            target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, getLocation(), isCrit, true);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                double damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, getTravelDistance(), JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
 
-            return false;
+                return false;
+            });
         }
     }
 }

@@ -1,13 +1,16 @@
 package com.dace.dmgr.combat;
 
 import com.comphenix.packetwrapper.WrapperPlayServerPosition;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.IntervalTask;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.Validate;
@@ -57,34 +60,36 @@ public final class CombatUtil {
         double halfDamage = damage / 2.0;
         distance = distance - weakeningDistance;
 
-        return Math.max(0, Math.min(halfDamage, halfDamage * ((weakeningDistance - distance) / weakeningDistance) + halfDamage));
+        return Math.max(halfDamage, halfDamage * ((weakeningDistance - distance) / weakeningDistance) + halfDamage);
     }
 
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
-     * @param game      대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param condition 조건
+     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
+     * @param location        위치
+     * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
+     * @param entityCondition 엔티티 탐색 조건
+     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 가장 가까운 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntities(Game, Location, double, Predicate)
+     * @see CombatUtil#getNearCombatEntities(Game, Location, double, EntityCondition)
      */
     @Nullable
-    public static CombatEntity getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range,
-                                                   @NonNull Predicate<@NonNull CombatEntity> condition) {
+    public static <T extends CombatEntity> T getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range,
+                                                                 @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
         return (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
-                .filter(combatEntity -> condition.test(combatEntity)
+                .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
+                        ? entityCondition.targetClass.cast(combatEntity)
+                        : null)
+                .filter(combatEntity -> combatEntity != null
+                        && entityCondition.targetCondition.test(combatEntity)
                         && combatEntity.canBeTargeted()
                         && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                 .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes())
-                                .mapToDouble(hitbox -> hitbox.getDistance(location))
-                                .min()
-                                .orElse(Double.MAX_VALUE) <= range)
+                        Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
                 .findFirst()
                 .orElse(null);
     }
@@ -92,23 +97,28 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param game      대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
-     * @param location  위치
-     * @param range     범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param condition 조건
+     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
+     * @param location        위치
+     * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
+     * @param entityCondition 엔티티 탐색 조건
+     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 모든 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntity(Game, Location, double, Predicate)
+     * @see CombatUtil#getNearCombatEntity(Game, Location, double, EntityCondition)
      */
     @NonNull
     @UnmodifiableView
-    public static Set<@NonNull CombatEntity> getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
-                                                                   @NonNull Predicate<@NonNull CombatEntity> condition) {
+    public static <T extends CombatEntity> Set<@NonNull T> getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
+                                                                                 @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
         return Collections.unmodifiableSet(
                 (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
-                        .filter(combatEntity -> condition.test(combatEntity)
+                        .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
+                                ? entityCondition.targetClass.cast(combatEntity)
+                                : null)
+                        .filter(combatEntity -> combatEntity != null
+                                && entityCondition.targetCondition.test(combatEntity)
                                 && combatEntity.canBeTargeted()
                                 && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
                         .filter(combatEntity ->
@@ -177,8 +187,8 @@ public final class CombatUtil {
         Validate.inclusiveBetween(1, 5, duration, "5 >= duration >= 1 (%d)", duration);
         Validate.isTrue(firstMultiplier >= 1, "firstMultiplier >= 1 (%f)", firstMultiplier);
 
-        double finalUpSpread = upSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
-        double finalSideSpread = sideSpread * (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 0.5;
+        double finalUpSpread = upSpread * (Math.random() - Math.random()) * 0.5;
+        double finalSideSpread = sideSpread * (Math.random() - Math.random()) * 0.5;
         boolean first = combatUser.getWeaponFirstRecoilTimestamp().isBefore(Timestamp.now());
         int sum = IntStream.rangeClosed(1, duration).sum();
         combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
@@ -213,5 +223,167 @@ public final class CombatUtil {
         entity.getEquipment().clear();
 
         return entity;
+    }
+
+    /**
+     * 전투 시스템의 엔티티 탐색 조건을 나타내는 클래스.
+     *
+     * @param <T> {@link CombatEntity}를 상속받는 전투 시스템 엔티티
+     */
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class EntityCondition<T extends CombatEntity> {
+        /** 대상 엔티티의 클래스 인스턴스 */
+        private final Class<T> targetClass;
+        /** 대상 엔티티를 찾는 조건 */
+        private final Predicate<T> targetCondition;
+
+        /**
+         * 지정한 클래스와 조건으로 엔티티 탐색 조건을 생성한다.
+         *
+         * @param targetClass     대상 엔티티의 클래스 인스턴스
+         * @param targetCondition 대상 엔티티를 찾는 조건
+         * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public static <T extends CombatEntity> EntityCondition<T> of(@NonNull Class<T> targetClass, @NonNull Predicate<T> targetCondition) {
+            return new EntityCondition<>(targetClass, targetCondition);
+        }
+
+        /**
+         * 지정한 클래스로 엔티티 탐색 조건을 생성한다.
+         *
+         * @param targetClass 대상 엔티티의 클래스 인스턴스
+         * @param <T>         {@link CombatEntity}를 상속받는 전투 시스템 엔티티
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public static <T extends CombatEntity> EntityCondition<T> of(@NonNull Class<T> targetClass) {
+            return of(targetClass, combatEntity -> true);
+        }
+
+        /**
+         * 모든 엔티티를 포함하는, 조건이 지정되지 않은 엔티티 탐색 조건을 생성한다.
+         *
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public static EntityCondition<@NonNull CombatEntity> all() {
+            return of(CombatEntity.class);
+        }
+
+        /**
+         * 지정한 엔티티의 적을 포함하는 엔티티 탐색 조건을 생성한다.
+         *
+         * @param target 대상 엔티티
+         * @return {@link EntityCondition}
+         * @see CombatEntity#isEnemy(CombatEntity)
+         */
+        @NonNull
+        public static EntityCondition<@NonNull Damageable> enemy(@NonNull Damageable target) {
+            return of(Damageable.class, combatEntity -> combatEntity.isEnemy(target));
+        }
+
+        /**
+         * 지정한 엔티티의 아군을 포함하는 엔티티 탐색 조건을 생성한다.
+         *
+         * @param target 대상 엔티티
+         * @return {@link EntityCondition}
+         * @see CombatEntity#isEnemy(CombatEntity)
+         */
+        @NonNull
+        public static EntityCondition<@NonNull Healable> team(@NonNull Healable target) {
+            return of(Healable.class, combatEntity -> !combatEntity.isEnemy(target));
+        }
+
+        /**
+         * 지정한 엔티티가 조건을 만족하는지 확인한다.
+         *
+         * @param target 대상 엔티티
+         * @return 조건을 만족하면 {@code true} 반환
+         */
+        private boolean test(@NonNull CombatEntity target) {
+            return targetClass.isInstance(target) && targetCondition.test(targetClass.cast(target));
+        }
+
+        /**
+         * 현재 조건과 지정한 조건을 모두 만족하는 AND 조건을 생성한다.
+         *
+         * @param targetCondition 대상 엔티티를 찾는 조건
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public EntityCondition<T> and(@NonNull Predicate<T> targetCondition) {
+            return of(targetClass, combatEntity -> this.targetCondition.test(combatEntity) && targetCondition.test(combatEntity));
+        }
+
+        /**
+         * 현재 조건과 지정한 엔티티 탐색 조건을 모두 만족하는 AND 조건을 생성한다.
+         *
+         * @param entityCondition 엔티티 탐색 조건
+         * @param <U>             {@link T} 또는 하위 엔티티 타입
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public <U extends T> EntityCondition<U> and(@NonNull EntityCondition<U> entityCondition) {
+            return entityCondition.and(entityCondition::test);
+        }
+
+        /**
+         * 현재 조건 또는 지정한 조건을 만족하는 OR 조건을 생성한다.
+         *
+         * @param targetCondition 대상 엔티티를 찾는 조건
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public EntityCondition<T> or(@NonNull Predicate<T> targetCondition) {
+            return of(targetClass, combatEntity -> this.targetCondition.test(combatEntity) || targetCondition.test(combatEntity));
+        }
+
+        /**
+         * 현재 조건 또는 지정한 엔티티 탐색 조건을 만족하는 OR 조건을 생성한다.
+         *
+         * @param entityCondition 엔티티 탐색 조건
+         * @param <U>             {@link T} 또는 하위 엔티티 타입
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public <U extends T> EntityCondition<T> or(@NonNull EntityCondition<U> entityCondition) {
+            return or(entityCondition::test);
+        }
+
+        /**
+         * 현재 조건에 대상 엔티티를 포함한다.
+         *
+         * <p>다음과 동일한 결과를 나타냄:</p>
+         *
+         * <pre><code>
+         * EntityCondition.or(combatEntity -> combatEntity == target);
+         * </code></pre>
+         *
+         * @param target 포함할 엔티티
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public EntityCondition<T> include(@NonNull T target) {
+            return or(combatEntity -> combatEntity == target);
+        }
+
+        /**
+         * 현재 조건에서 대상 엔티티를 제외한다.
+         *
+         * <p>다음과 동일한 결과를 나타냄:</p>
+         *
+         * <pre><code>
+         * EntityCondition.and(combatEntity -> combatEntity != target);
+         * </code></pre>
+         *
+         * @param target 제외할 엔티티
+         * @return {@link EntityCondition}
+         */
+        @NonNull
+        public EntityCondition<T> exclude(@NonNull T target) {
+            return and(combatEntity -> combatEntity != target);
+        }
     }
 }

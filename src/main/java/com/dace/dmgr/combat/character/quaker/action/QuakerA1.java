@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
@@ -107,7 +107,7 @@ public final class QuakerA1 extends ChargeableSkill {
                     owner,
                     QuakerA1Info.DEATH_SCORE,
                     QuakerA1Info.HEALTH,
-                    new Hitbox(entity.getLocation(), 6, 3.5, 0.3, 0, -0.3, 0, 0, 1.5, 0)
+                    Hitbox.builder(entity.getLocation(), 6, 3.5, 0.3).offsetY(-0.3).axisOffsetY(1.5).build()
             );
 
             onInit();
@@ -150,7 +150,7 @@ public final class QuakerA1 extends ChargeableSkill {
 
             QuakerA1Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
             if (location != null)
-                CombatEffectUtil.playBreakEffect(location, this, damage);
+                CombatEffectUtil.playBreakParticle(location, this, damage);
         }
 
         @Override

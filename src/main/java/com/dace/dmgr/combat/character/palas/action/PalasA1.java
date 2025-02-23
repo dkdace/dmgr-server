@@ -1,25 +1,23 @@
 package com.dace.dmgr.combat.character.palas.action;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 import java.util.WeakHashMap;
 
@@ -65,7 +63,7 @@ public final class PalasA1 extends ActiveSkill {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);
-            new PalasA1Projectile().shoot(loc);
+            new PalasA1Projectile().shot(loc);
 
             PalasA1Info.SOUND.USE_READY.play(loc);
         }, PalasA1Info.READY_DURATION));
@@ -118,39 +116,44 @@ public final class PalasA1 extends ActiveSkill {
         }
     }
 
-    private final class PalasA1Projectile extends Projectile {
+    private final class PalasA1Projectile extends Projectile<Damageable> {
         private PalasA1Projectile() {
-            super(combatUser, PalasA1Info.VELOCITY, ProjectileOption.builder().trailInterval(8).condition(combatUser::isEnemy).build());
+            super(combatUser, PalasA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
-        protected void onTrailInterval() {
-            PalasA1Info.PARTICLE.BULLET_TRAIL.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(8, PalasA1Info.PARTICLE.BULLET_TRAIL::play);
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, PalasA1Info.DAMAGE, DamageType.NORMAL, getLocation(), false, true)) {
-                if (target.getDamageModule().isLiving()) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA1Stun.instance, PalasA1Info.STUN_DURATION);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(this, PalasA1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                    if (target.getDamageModule().isLiving()) {
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA1Stun.instance, PalasA1Info.STUN_DURATION);
 
-                    PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getEntity().getWidth(), target.getEntity().getHeight());
+                        PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getEntity().getWidth(), target.getEntity().getHeight());
+                    }
+
+                    PalasA1Info.SOUND.HIT_ENTITY.play(location);
+
+                    if (target instanceof CombatUser) {
+                        combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
+                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA1Info.STUN_DURATION)));
+                    }
                 }
 
-                PalasA1Info.SOUND.HIT_ENTITY.play(getLocation());
-
-                if (target instanceof CombatUser) {
-                    combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
-                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA1Info.STUN_DURATION)));
-                }
-            }
-
-            return false;
+                return false;
+            };
         }
     }
 }

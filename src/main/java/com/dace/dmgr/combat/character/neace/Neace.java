@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.character.neace;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -10,11 +12,12 @@ import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.neace.action.*;
-import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.Timespan;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -41,16 +44,6 @@ public final class Neace extends Support {
 
     private Neace() {
         super(null, "니스", "평화주의자", "DVNis", '\u32D5', 1, 1000, 1.0, 1.0);
-    }
-
-    /**
-     * 대상 타겟팅이 가능한 동작의 사용 조건을 반환한다.
-     *
-     * @param combatUser 플레이어
-     * @param target     사용 대상
-     */
-    public static boolean getTargetedActionCondition(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-        return target instanceof Healable && target != combatUser && !target.isEnemy(combatUser);
     }
 
     @Override
@@ -136,7 +129,7 @@ public final class Neace extends Support {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        new NeaceTarget(combatUser).shoot();
+        new NeaceTarget(combatUser).shot();
 
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
@@ -144,7 +137,7 @@ public final class Neace extends Support {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingEffect(location, victim, damage);
+        CombatEffectUtil.playBleedingParticle(location, victim, damage);
 
         NeaceP1 skillp1 = victim.getSkill(NeaceP1Info.getInstance());
         if (skillp1.isCancellable())
@@ -216,13 +209,13 @@ public final class Neace extends Support {
         return NeaceUltInfo.getInstance();
     }
 
-    private static final class NeaceTarget extends Target {
-        private NeaceTarget(CombatUser combatUser) {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, false, combatEntity -> getTargetedActionCondition(combatUser, combatEntity));
+    private static final class NeaceTarget extends Target<Healable> {
+        private NeaceTarget(@NonNull CombatUser combatUser) {
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
+        protected void onFindEntity(@NonNull Healable target) {
             ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, Timespan.ofTicks(3));
         }
     }

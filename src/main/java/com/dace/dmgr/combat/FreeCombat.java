@@ -73,6 +73,7 @@ public final class FreeCombat {
     /**
      * 지정한 플레이어가 자유 전투 대기실 안에 있는지 확인한다.
      *
+     * @param player 확인할 플레이어
      * @return 대기실 안에 있으면 {@code true} 반환
      */
     public boolean isInFreeCombatWait(@NonNull Player player) {
@@ -82,6 +83,7 @@ public final class FreeCombat {
     /**
      * 지정한 플레이어가 자유 전투 이동 지역 안에 있는지 확인한다.
      *
+     * @param player 확인할 플레이어
      * @return 이동 지역 안에 있으면 {@code true} 반환
      */
     public boolean isInFreeCombatWarp(@NonNull Player player) {

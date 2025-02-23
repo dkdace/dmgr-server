@@ -1,19 +1,18 @@
 package com.dace.dmgr.combat.character.ched.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 @Setter
@@ -67,7 +66,7 @@ public final class ChedWeapon extends AbstractWeapon {
                 break;
             }
             case PERIODIC_1: {
-                new ChedWeaponProjectile(power).shoot();
+                new ChedWeaponProjectile(power).shot();
                 setCanShoot(false);
 
                 ChedWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation(), power, power);
@@ -88,40 +87,51 @@ public final class ChedWeapon extends AbstractWeapon {
         combatUser.getEntity().getInventory().setItem(ChedWeaponInfo.ARROW_INVENTORY_SLOT, new ItemStack(canShoot ? Material.ARROW : Material.AIR));
     }
 
-    private final class ChedWeaponProjectile extends Projectile {
+    private final class ChedWeaponProjectile extends Projectile<Damageable> {
         private final double power;
 
         private ChedWeaponProjectile(double power) {
-            super(combatUser, (int) (power * ChedWeaponInfo.MAX_VELOCITY), ProjectileOption.builder().trailInterval(9).hasGravity(true)
-                    .condition(combatUser::isEnemy).build());
+            super(combatUser, (int) (power * ChedWeaponInfo.MAX_VELOCITY), CombatUtil.EntityCondition.enemy(combatUser));
             this.power = power;
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, 0, 0);
-            CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc, combatUser.getEntity());
+        protected void onHit(@NonNull Location location) {
+            ChedWeaponInfo.SOUND.HIT.play(location, power);
         }
 
         @Override
-        protected void onHit() {
-            ChedWeaponInfo.SOUND.HIT.play(getLocation(), power);
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(9, location -> {
+                        Location loc = LocationUtil.getLocationFromOffset(location, 0.2, 0, 0);
+                        CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc, combatUser.getEntity());
+                    }));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, power);
-            CombatEffectUtil.playSmallHitBlockParticle(getLocation(), hitBlock, power * 1.5);
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, power);
+                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, power * 1.5);
 
-            return false;
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, getLocation(),
-                    isCrit, true) && target instanceof CombatUser && isCrit)
-                combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
-            return false;
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location,
+                        isCrit, true) && target instanceof CombatUser && isCrit)
+                    combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
+
+                return false;
+            });
         }
     }
 }

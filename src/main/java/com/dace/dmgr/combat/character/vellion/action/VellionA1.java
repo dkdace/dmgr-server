@@ -10,8 +10,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
+import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -185,7 +184,7 @@ public final class VellionA1 extends ActiveSkill {
                     owner.getName() + "의 마력 응집체",
                     owner,
                     false, true,
-                    new FixedPitchHitbox(entity.getLocation(), 1, 1, 1, 0, 0.5, 0)
+                    Hitbox.builder(entity.getLocation(), 1, 1, 1).offsetY(0.5).build()
             );
 
             onInit();
@@ -230,10 +229,10 @@ public final class VellionA1 extends ActiveSkill {
             summonEntity = null;
         }
 
-        private final class VellionA1Area extends Area {
+        private final class VellionA1Area extends Area<Damageable> {
             private VellionA1Area() {
-                super(combatUser, VellionA1Info.RADIUS, combatEntity -> combatEntity instanceof Damageable && combatEntity != VellionA1.this.combatUser
-                        && ((Damageable) combatEntity).getDamageModule().isLiving());
+                super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class)
+                        .and(combatEntity -> combatEntity.getDamageModule().isLiving()).exclude(combatUser));
             }
 
             @Override
@@ -242,7 +241,7 @@ public final class VellionA1 extends ActiveSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (targets.add(target)) {
                     if (target.isEnemy(combatUser)) {
                         if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,

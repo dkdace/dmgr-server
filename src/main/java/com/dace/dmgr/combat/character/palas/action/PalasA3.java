@@ -1,22 +1,17 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.character.palas.Palas;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
@@ -63,7 +58,7 @@ public final class PalasA3 extends ActiveSkill {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);
-            new PalasA3Projectile().shoot(loc);
+            new PalasA3Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
         }, PalasA3Info.READY_DURATION));
@@ -178,20 +173,15 @@ public final class PalasA3 extends ActiveSkill {
         }
     }
 
-    private final class PalasA3Projectile extends Projectile {
+    private final class PalasA3Projectile extends Projectile<Damageable> {
         private PalasA3Projectile() {
-            super(combatUser, PalasA3Info.VELOCITY, ProjectileOption.builder().trailInterval(8).hasGravity(true).condition(combatEntity ->
-                    Palas.getTargetedActionCondition(PalasA3.this.combatUser, combatEntity) || combatEntity.isEnemy(PalasA3.this.combatUser)).build());
+            super(combatUser, PalasA3Info.VELOCITY,
+                    CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)));
         }
 
         @Override
-        protected void onTrailInterval() {
-            PalasA3Info.PARTICLE.BULLET_TRAIL.play(getLocation());
-        }
-
-        @Override
-        protected void onHit() {
-            Location loc = getLocation().clone().add(0, 0.1, 0);
+        protected void onHit(@NonNull Location location) {
+            Location loc = location.add(0, 0.1, 0);
             new PalasA3Area().emit(loc);
 
             PalasA3Info.SOUND.EXPLODE.play(loc);
@@ -199,18 +189,28 @@ public final class PalasA3 extends ActiveSkill {
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(8, PalasA3Info.PARTICLE.BULLET_TRAIL::play));
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
-        private final class PalasA3Area extends Area {
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> false;
+        }
+
+        private final class PalasA3Area extends Area<Damageable> {
             private PalasA3Area() {
-                super(combatUser, PalasA3Info.RADIUS, Damageable.class::isInstance);
+                super(combatUser, PalasA3Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class));
             }
 
             @Override
@@ -219,7 +219,7 @@ public final class PalasA3 extends ActiveSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().isLiving()) {
                     if (target.isEnemy(combatUser)) {
                         if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
@@ -245,5 +245,4 @@ public final class PalasA3 extends ActiveSkill {
             }
         }
     }
-
 }

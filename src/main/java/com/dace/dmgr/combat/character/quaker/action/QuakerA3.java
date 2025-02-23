@@ -1,13 +1,18 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Area;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -66,12 +71,12 @@ public final class QuakerA3 extends ActiveSkill {
 
             for (int j = 0; j < i; j++) {
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (j - 2.5));
-                new QuakerA3Effect().shoot(loc.clone().add(vec), vec);
+                new QuakerA3Effect().shot(loc.clone().add(vec), vec);
             }
         }, () -> {
             onCancelled();
 
-            new QuakerA3Projectile().shoot();
+            new QuakerA3Projectile().shot();
 
             QuakerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
@@ -91,111 +96,131 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getWeapon().setVisible(true);
     }
 
-    private final class QuakerA3Effect extends Hitscan {
+    private final class QuakerA3Effect extends Hitscan<CombatEntity> {
         private QuakerA3Effect() {
-            super(combatUser, HitscanOption.builder().trailInterval(100).maxDistance(0.4).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(0.6).build());
         }
 
         @Override
-        protected void onTrailInterval() {
+        protected void onDestroy(@NonNull Location location) {
             for (int i = 0; i < 3; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(getLocation(), -0.25 + i * 0.25, 0, 0);
-                QuakerA3Info.PARTICLE.BULLET_TRAIL_EFFECT_CORE.play(loc);
-            }
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            return true;
-        }
-
-        @Override
-        protected void onDestroy() {
-            for (int i = 0; i < 3; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(getLocation(), -0.25 + i * 0.25, 0, 0);
+                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
                 QuakerA3Info.PARTICLE.BULLET_TRAIL_EFFECT_DECO.play(loc);
             }
         }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return (location, i) -> {
+                if (i == 0)
+                    for (int j = 0; j < 3; j++) {
+                        Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + j * 0.25, 0, 0);
+                        QuakerA3Info.PARTICLE.BULLET_TRAIL_EFFECT_CORE.play(loc);
+                    }
+
+                return true;
+            };
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<CombatEntity> getHitEntityHandler() {
+            return (location, target) -> true;
+        }
     }
 
-    private final class QuakerA3Projectile extends Projectile {
+    private final class QuakerA3Projectile extends Projectile<Damageable> {
         private final HashSet<Damageable> targets = new HashSet<>();
 
         private QuakerA3Projectile() {
-            super(combatUser, QuakerA3Info.VELOCITY, ProjectileOption.builder().trailInterval(16).size(QuakerA3Info.SIZE)
-                    .maxDistance(QuakerA3Info.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, QuakerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(QuakerA3Info.SIZE).maxDistance(QuakerA3Info.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Vector vector = VectorUtil.getYawAxis(getLocation()).multiply(-1);
-            Vector axis = VectorUtil.getPitchAxis(getLocation());
-
-            for (int i = 0; i < 8; i++) {
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (i - 3.5)).multiply(0.6);
-                Location loc = getLocation().clone().add(vec);
-                new QuakerA3Effect().shoot(loc, vec);
-
-                Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
-                QuakerA3Info.PARTICLE.BULLET_TRAIL.play(getLocation(), vec2);
-            }
-            QuakerA3Info.SOUND.TICK.play(getLocation());
+        protected void onHit(@NonNull Location location) {
+            QuakerA3Info.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            QuakerA3Info.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(16, location -> {
+                Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
+                Vector axis = VectorUtil.getPitchAxis(location);
+
+                for (int i = 0; i < 8; i++) {
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (i - 3.5)).multiply(0.6);
+                    Location loc = location.clone().add(vec);
+                    new QuakerA3Effect().shot(loc, vec);
+
+                    Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
+                    QuakerA3Info.PARTICLE.BULLET_TRAIL.play(location, vec2);
+                }
+
+                QuakerA3Info.SOUND.TICK.play(location);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            QuakerA3Info.SOUND.HIT.play(getLocation());
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 5);
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                QuakerA3Info.SOUND.HIT.play(location);
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 5);
+
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            onImpact(getLocation().clone().add(0, 0.1, 0), target);
-            return false;
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                onImpact(location.add(0, 0.1, 0), target);
+                return false;
+            };
         }
 
         private void onImpact(@NonNull Location location, @NonNull Damageable target) {
-            if (targets.add(target) && onDamage(location, target)) {
-                Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
-                TaskUtil.addTask(QuakerA3.this, new IntervalTask(i -> {
-                    if (!target.canBeTargeted() || target.isDisposed())
-                        return false;
+            if (!targets.add(target) || !onDamage(location, target))
+                return;
 
-                    if (i < 3)
-                        target.getKnockbackModule().knockback(vec, true);
+            Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
+            TaskUtil.addTask(QuakerA3.this, new IntervalTask(i -> {
+                if (!target.canBeTargeted() || target.isDisposed())
+                    return false;
 
-                    Location loc = target.getCenterLocation().add(0, 0.1, 0);
-                    new QuakerA3Area().emit(loc);
+                if (i < 3)
+                    target.getKnockbackModule().knockback(vec, true);
 
-                    for (int j = 0; j < 5; j++) {
-                        Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);
-                        QuakerA3Info.PARTICLE.HIT_ENTITY_CORE.play(target.getCenterLocation(), vec2);
-                    }
+                Location loc = target.getCenterLocation().add(0, 0.1, 0);
+                new QuakerA3Area().emit(loc);
 
-                    Location hitLoc = loc.clone().add(getVelocity().clone().normalize());
-                    if (!LocationUtil.isNonSolid(hitLoc)) {
-                        onDamage(loc, target);
-                        target.getKnockbackModule().knockback(new Vector(), true);
+                for (int j = 0; j < 5; j++) {
+                    Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);
+                    QuakerA3Info.PARTICLE.HIT_ENTITY_CORE.play(target.getCenterLocation(), vec2);
+                }
 
-                        CombatEffectUtil.playHitBlockParticle(loc, hitLoc.getBlock(), 7);
+                Location hitLoc = loc.clone().add(getVelocity().clone().normalize());
+                if (!LocationUtil.isNonSolid(hitLoc)) {
+                    onDamage(loc, target);
+                    target.getKnockbackModule().knockback(new Vector(), true);
 
-                        return false;
-                    }
+                    CombatEffectUtil.playHitBlockParticle(loc, hitLoc.getBlock(), 7);
 
-                    return true;
-                }, 1, 8));
-            }
+                    return false;
+                }
+
+                return true;
+            }, 1, 8));
         }
 
         private boolean onDamage(@NonNull Location location, @NonNull Damageable target) {
@@ -215,9 +240,9 @@ public final class QuakerA3 extends ActiveSkill {
             return false;
         }
 
-        private final class QuakerA3Area extends Area {
+        private final class QuakerA3Area extends Area<Damageable> {
             private QuakerA3Area() {
-                super(combatUser, QuakerA3Info.RADIUS, QuakerA3Projectile.this.condition);
+                super(combatUser, QuakerA3Info.RADIUS, QuakerA3Projectile.this.entityCondition);
             }
 
             @Override
@@ -226,9 +251,8 @@ public final class QuakerA3 extends ActiveSkill {
             }
 
             @Override
-            public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 onImpact(location, target);
-
                 return !(target instanceof Barrier);
             }
         }

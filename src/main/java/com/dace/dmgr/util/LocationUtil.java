@@ -3,7 +3,6 @@ package com.dace.dmgr.util;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.Validate;
@@ -145,7 +144,7 @@ public final class LocationUtil {
      *
      * @param start    시작 위치
      * @param end      끝 위치
-     * @param interval 위치 간격. 0을 초과하는 값
+     * @param interval 위치 간격. (단위: 블록). 0 이상의 값
      * @return 반복 가능한 위치
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 {@code start}와 {@code end}가 서로 다른 월드에 있으면 발생
      */
@@ -157,17 +156,56 @@ public final class LocationUtil {
     /**
      * 기준 위치에서 지정한 속도로 이동하는 반복 가능한 위치를 반환한다.
      *
+     * @param location    기준 위치
+     * @param velocity    속도
+     * @param maxDistance 최대 이동 거리. (단위: 블록). 0 이상의 값
+     * @return 반복 가능한 위치
+     */
+    @NonNull
+    public static IterableLocation getIterable(@NonNull Location location, @NonNull Vector velocity, double maxDistance) {
+        return new IterableLocation(location, velocity, maxDistance);
+    }
+
+    /**
+     * 기준 위치에서 지정한 속도로 이동하는 반복 가능한 위치를 반환한다.
+     *
      * @param location 기준 위치
      * @param velocity 속도
      * @return 반복 가능한 위치
      */
     @NonNull
-    public static IterableLocation getLine(@NonNull Location location, @NonNull Vector velocity) {
+    public static IterableLocation getIterable(@NonNull Location location, @NonNull Vector velocity) {
         return new IterableLocation(location, velocity);
     }
 
     /**
      * 기준 위치에서 지정한 방향으로 이동했을 때 통과 불가능한 블록의 가장자리와 가장 가까운 위치를 반환한다.
+     *
+     * @param location    기준 위치
+     * @param direction   방향
+     * @param maxDistance 최대 탐지 거리. (단위: 블록). 0 이상의 값
+     * @return 가장자리와 가장 가까운 위치
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    @NonNull
+    public static Location getNearestAgainstEdge(@NonNull Location location, @NonNull Vector direction, double maxDistance) {
+        Location prevLoc = location.clone();
+        boolean isNonSolid = isNonSolid(prevLoc);
+
+        for (Location loc : getIterable(location, direction.clone().normalize().multiply(GET_EDGE_INTERVAL), maxDistance)) {
+            if (isNonSolid != isNonSolid(loc))
+                return isNonSolid ? prevLoc : loc;
+
+            prevLoc = loc;
+        }
+
+        return prevLoc;
+    }
+
+    /**
+     * 기준 위치에서 지정한 방향으로 이동했을 때 통과 불가능한 블록의 가장자리와 가장 가까운 위치를 반환한다.
+     *
+     * <p>최대 탐지 거리는 {@link LocationUtil#CAN_PASS_MAX_DISTANCE}이다.</p>
      *
      * @param location  기준 위치
      * @param direction 방향
@@ -175,15 +213,7 @@ public final class LocationUtil {
      */
     @NonNull
     public static Location getNearestAgainstEdge(@NonNull Location location, @NonNull Vector direction) {
-        Location prevLoc = location.clone();
-        for (Location loc : getLine(location, direction.clone().normalize().multiply(GET_EDGE_INTERVAL))) {
-            if (!isNonSolid(loc))
-                return prevLoc;
-
-            prevLoc = loc;
-        }
-
-        return prevLoc;
+        return getNearestAgainstEdge(location, direction, CAN_PASS_MAX_DISTANCE);
     }
 
     /**
@@ -261,8 +291,7 @@ public final class LocationUtil {
      * @param location    확인할 위치
      * @param yCoordinate Y 좌표. 0~255 사이의 값
      * @param material    블록의 종류
-     * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에
-     * 있으면 {@code true} 반환
+     * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에 있으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public static boolean isInSameBlockXZ(@NonNull Location location, int yCoordinate, @NonNull Material material) {
@@ -277,7 +306,7 @@ public final class LocationUtil {
     /**
      * 반복 가능한 이동하는 위치를 나타내는 클래스.
      */
-    public final class IterableLocation implements Iterable<Location> {
+    public static final class IterableLocation implements Iterable<Location> {
         /** 시작 위치 */
         private final Location location;
         /** 시작 속도 */
@@ -328,25 +357,14 @@ public final class LocationUtil {
      *
      * @see IterableLocation
      */
-    public final class LocationIterator implements Iterator<Location> {
+    public static final class LocationIterator implements Iterator<Location> {
         /** 반복 가능한 위치 인스턴스 */
         private final IterableLocation iterableLocation;
-        /**
-         * 현재 위치.
-         *
-         * <p>값에 대한 변경이 실제 위치에 영향을 줌</p>
-         */
-        @Getter
+        /** 현재 위치 */
         private final Location location;
-        /**
-         * 현재 속도.
-         *
-         * <p>값에 대한 변경이 실제 속도에 영향을 줌</p>
-         */
-        @Getter
+        /** 현재 속도 */
         private final Vector velocity;
         /** 이동한 거리. (단위: 블록) */
-        @Getter
         private double travelDistance = 0;
         /** 반복 시작 여부 */
         private boolean isStarted = false;
@@ -360,15 +378,6 @@ public final class LocationUtil {
             this.iterableLocation = iterableLocation;
             this.location = iterableLocation.location.clone();
             this.velocity = iterableLocation.velocity.clone();
-        }
-
-        /**
-         * 시작 위치부터 현재 위치까지의 거리를 반환한다.
-         *
-         * @return 거리. (단위: 블록)
-         */
-        public double getDistance() {
-            return location.distance(iterableLocation.location);
         }
 
         @Override
@@ -387,7 +396,7 @@ public final class LocationUtil {
             }
 
             travelDistance += velocity.length();
-            return location.add(velocity);
+            return location.add(velocity).clone();
         }
     }
 }

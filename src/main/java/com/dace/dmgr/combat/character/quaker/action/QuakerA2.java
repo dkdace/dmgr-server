@@ -1,19 +1,22 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -85,7 +88,7 @@ public final class QuakerA2 extends ActiveSkill {
                 Vector axis = VectorUtil.getPitchAxis(loc);
 
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, (index < 2 ? -13 : -30 + index * 16));
-                new QuakerA2Effect().shoot(loc, vec);
+                new QuakerA2Effect().shot(loc, vec);
 
                 if (index % 2 == 0)
                     QuakerA2Info.SOUND.USE.play(loc.add(vec));
@@ -130,7 +133,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         for (int i = 0; i < 7; i++) {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 9 * (i - 3));
-            new QuakerA2Projectile(targets).shoot(loc, vec);
+            new QuakerA2Projectile(targets).shot(loc, vec);
         }
 
         TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
@@ -161,75 +164,89 @@ public final class QuakerA2 extends ActiveSkill {
         }
     }
 
-    private final class QuakerA2Effect extends Hitscan {
+    private final class QuakerA2Effect extends Hitscan<CombatEntity> {
         private QuakerA2Effect() {
-            super(combatUser, HitscanOption.builder().trailInterval(6).maxDistance(QuakerWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(QuakerWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            if (getLocation().distance(combatUser.getEntity().getEyeLocation()) <= 1)
-                return;
-
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
-            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            return true;
-        }
-
-        @Override
-        protected void onDestroy() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0, -0.3, 0);
+        protected void onDestroy(@NonNull Location location) {
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(6, location -> {
+                if (getTravelDistance() <= 1)
+                    return;
+
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
+                QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+            });
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<CombatEntity> getHitEntityHandler() {
+            return (location, target) -> true;
         }
     }
 
-    private final class QuakerA2Projectile extends GroundProjectile {
+    private final class QuakerA2Projectile extends Projectile<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private QuakerA2Projectile(HashSet<Damageable> targets) {
-            super(combatUser, QuakerA2Info.VELOCITY, ProjectileOption.builder().trailInterval(10).size(QuakerA2Info.SIZE)
-                    .maxDistance(QuakerA2Info.DISTANCE).condition(combatUser::isEnemy).build());
+        private QuakerA2Projectile(@NonNull HashSet<Damageable> targets) {
+            super(combatUser, QuakerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(QuakerA2Info.SIZE).maxDistance(QuakerA2Info.DISTANCE).build());
             this.targets = targets;
         }
 
         @Override
-        protected void onTrailInterval() {
-            Block floor = getLocation().clone().subtract(0, 0.5, 0).getBlock();
-            CombatEffectUtil.playHitBlockParticle(getLocation(), floor, 3);
-            QuakerA2Info.PARTICLE.BULLET_TRAIL.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGroundIntervalHandler())
+                    .next(createPeriodIntervalHandler(10, location -> {
+                        Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
+                        CombatEffectUtil.playHitBlockParticle(location, floor, 3);
+                        QuakerA2Info.PARTICLE.BULLET_TRAIL.play(location);
+                    }));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (targets.add(target)) {
-                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, getLocation(), false, true)) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
+                        target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
 
-                    if (target instanceof CombatUser) {
-                        combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
-                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerA2Info.SLOW_DURATION)));
+                        if (target instanceof CombatUser) {
+                            combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
+                            assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerA2Info.SLOW_DURATION)));
+                        }
                     }
+
+                    QuakerA2Info.PARTICLE.HIT_ENTITY.play(location);
                 }
 
-                QuakerA2Info.PARTICLE.HIT_ENTITY.play(getLocation());
-            }
-
-            return !(target instanceof Barrier);
+                return !(target instanceof Barrier);
+            };
         }
     }
 }

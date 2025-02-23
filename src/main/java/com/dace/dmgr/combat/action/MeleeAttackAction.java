@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
@@ -15,7 +15,6 @@ import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 
 /**
  * 기본 근접 공격 동작 클래스.
@@ -86,7 +85,7 @@ public final class MeleeAttackAction extends AbstractAction {
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
         TaskUtil.addTask(combatUser, new DelayTask(() -> {
-            new MeleeAttack().shoot();
+            new MeleeAttack().shot();
 
             combatUser.playMeleeAttackAnimation(-7, 18, true);
         }, 2));
@@ -94,29 +93,41 @@ public final class MeleeAttackAction extends AbstractAction {
         TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
     }
 
-    private final class MeleeAttack extends Hitscan {
+    private final class MeleeAttack extends Hitscan<Damageable> {
         private MeleeAttack() {
-            super(combatUser, HitscanOption.builder().size(SIZE).maxDistance(DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SIZE).maxDistance(DISTANCE).build());
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            HIT_BLOCK_SOUND.play(getLocation());
-            CombatEffectUtil.playHitBlockSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playHitBlockParticle(getLocation(), hitBlock, 1);
-
-            return false;
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return (location, i) -> true;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true))
-                target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                HIT_BLOCK_SOUND.play(location);
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1);
 
-            HIT_ENTITY_SOUND.play(getLocation());
-            HIT_ENTITY_PARTICLE.play(getLocation());
+                return false;
+            };
+        }
 
-            return false;
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true))
+                    target.getKnockbackModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
+
+                HIT_ENTITY_SOUND.play(location);
+                HIT_ENTITY_PARTICLE.play(location);
+
+                return false;
+            };
         }
     }
 }

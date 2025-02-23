@@ -1,17 +1,14 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -142,9 +139,9 @@ public final class InfernoA2 extends ActiveSkill {
         }
     }
 
-    private final class InfernoA2Area extends Area {
+    private final class InfernoA2Area extends Area<Damageable> {
         private InfernoA2Area() {
-            super(combatUser, InfernoA2Info.RADIUS, combatUser::isEnemy);
+            super(combatUser, InfernoA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -153,7 +150,7 @@ public final class InfernoA2 extends ActiveSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoA2Burning.instance, 10);

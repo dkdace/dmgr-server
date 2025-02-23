@@ -6,13 +6,12 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -63,7 +62,7 @@ public final class MagrittaA1 extends ActiveSkill {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);
-            new MagrittaA1Projectile().shoot(loc);
+            new MagrittaA1Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc, 1, 0.5);
         }, MagrittaA1Info.READY_DURATION));
@@ -91,29 +90,37 @@ public final class MagrittaA1 extends ActiveSkill {
         }
     }
 
-    private final class MagrittaA1Projectile extends Projectile {
+    private final class MagrittaA1Projectile extends Projectile<Damageable> {
         private MagrittaA1Projectile() {
-            super(combatUser, MagrittaA1Info.VELOCITY, ProjectileOption.builder().trailInterval(7).hasGravity(true)
-                    .condition(combatUser::isEnemy).build());
+            super(combatUser, MagrittaA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
-        protected void onTrailInterval() {
-            MagrittaA1Info.PARTICLE.BULLET_TRAIL.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(7, MagrittaA1Info.PARTICLE.BULLET_TRAIL::play));
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            onStuck(getLocation(), null);
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                onStuck(location, null);
+                return false;
+            };
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, MagrittaA1Info.DAMAGE_DIRECT, DamageType.NORMAL, getLocation(), false, true);
-            onStuck(getLocation(), target);
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                target.getDamageModule().damage(this, MagrittaA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+                onStuck(location, target);
 
-            return false;
+                return false;
+            };
         }
 
         /**
@@ -151,44 +158,40 @@ public final class MagrittaA1 extends ActiveSkill {
             }, isCancelled -> {
                 Location loc = (target == null ? location.clone() : target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0))
                         .add(0, 0.1, 0);
-                new MagrittaA1Area(this).emit(loc);
+                new MagrittaA1Area().emit(loc);
 
                 MagrittaA1Info.SOUND.EXPLODE.play(loc);
                 MagrittaA1Info.PARTICLE.EXPLODE.play(loc);
             }, 1, MagrittaA1Info.EXPLODE_DURATION));
         }
-    }
 
-    private final class MagrittaA1Area extends Area {
-        private final MagrittaA1Projectile projectile;
-
-        private MagrittaA1Area(MagrittaA1Projectile projectile) {
-            super(combatUser, MagrittaA1Info.RADIUS, combatEntity -> combatEntity.isEnemy(MagrittaA1.this.combatUser)
-                    || combatEntity == MagrittaA1.this.combatUser);
-            this.projectile = projectile;
-        }
-
-        @Override
-        protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
-            return false;
-        }
-
-        @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            double distance = center.distance(location);
-            double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
-                    MagrittaA1Info.RADIUS / 2.0);
-            long burning = (long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
-                    MagrittaA1Info.RADIUS / 2.0);
-            if (target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null,
-                    false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, MagrittaA1Burning.instance, burning);
-                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                        .multiply(MagrittaA1Info.KNOCKBACK));
-                MagrittaT1.addShreddingValue(combatUser, target);
+        private final class MagrittaA1Area extends Area<Damageable> {
+            private MagrittaA1Area() {
+                super(combatUser, MagrittaA1Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
             }
 
-            return !(target instanceof Barrier);
+            @Override
+            protected boolean onHitBlock(@NonNull Location center, @NonNull Location location, @NonNull Block hitBlock) {
+                return false;
+            }
+
+            @Override
+            protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+                double distance = center.distance(location);
+                double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
+                        MagrittaA1Info.RADIUS / 2.0);
+                long burning = (long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
+                        MagrittaA1Info.RADIUS / 2.0);
+                if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null,
+                        false, true)) {
+                    target.getStatusEffectModule().applyStatusEffect(combatUser, MagrittaA1Burning.instance, burning);
+                    target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                            .multiply(MagrittaA1Info.KNOCKBACK));
+                    MagrittaT1.addShreddingValue(combatUser, target);
+                }
+
+                return !(target instanceof Barrier);
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.character.inferno.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.interaction.FixedPitchHitbox;
+import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -48,8 +48,8 @@ public final class InfernoUlt extends UltimateSkill {
         combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(0);
         combatUser.getDamageModule().setShield(SHIELD_ID, InfernoUltInfo.SHIELD);
 
-        combatUser.setTemporaryHitboxes(new FixedPitchHitbox[]{
-                new FixedPitchHitbox(combatUser.getEntity().getLocation(), 2, 2, 2, 0, 1, 0)
+        combatUser.setTemporaryHitboxes(new Hitbox[]{
+                Hitbox.builder(combatUser.getEntity().getLocation(), 2, 2, 2).offsetY(1).build()
         });
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {

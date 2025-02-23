@@ -1,27 +1,25 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.character.neace.Neace;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.combat.interaction.ProjectileOption;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
@@ -68,7 +66,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 setCooldown();
                 combatUser.playMeleeAttackAnimation(-3, 6, true);
 
-                new NeaceWeaponProjectile().shoot();
+                new NeaceWeaponProjectile().shot();
 
                 NeaceWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
 
@@ -76,7 +74,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             }
             case RIGHT_CLICK: {
                 if (target == null) {
-                    new NeaceWeaponTarget().shoot();
+                    new NeaceWeaponTarget().shot();
 
                     if (target == null)
                         return;
@@ -123,15 +121,14 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             (isAmplifying ? NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL).play(loc);
     }
 
-    private final class NeaceWeaponTarget extends Target {
+    private final class NeaceWeaponTarget extends Target<Healable> {
         private NeaceWeaponTarget() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, false,
-                    combatEntity -> Neace.getTargetedActionCondition(NeaceWeapon.this.combatUser, combatEntity));
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
-        protected void onFindEntity(@NonNull Damageable target) {
-            NeaceWeapon.this.target = (Healable) target;
+        protected void onFindEntity(@NonNull Healable target) {
+            NeaceWeapon.this.target = target;
             blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
 
             TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed()
@@ -141,32 +138,39 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         }
     }
 
-    private final class NeaceWeaponProjectile extends Projectile {
+    private final class NeaceWeaponProjectile extends Projectile<Damageable> {
         private NeaceWeaponProjectile() {
-            super(combatUser, NeaceWeaponInfo.VELOCITY, ProjectileOption.builder().trailInterval(10).size(NeaceWeaponInfo.SIZE)
-                    .maxDistance(NeaceWeaponInfo.DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, NeaceWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Option.builder().size(NeaceWeaponInfo.SIZE).maxDistance(NeaceWeaponInfo.DISTANCE).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            Location loc = LocationUtil.getLocationFromOffset(getLocation(), 0.2, -0.2, 0);
-            NeaceWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+        protected void onHit(@NonNull Location location) {
+            NeaceWeaponInfo.PARTICLE.HIT.play(location);
         }
 
         @Override
-        protected void onHit() {
-            NeaceWeaponInfo.PARTICLE.HIT.play(getLocation());
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(10, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
+                NeaceWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+            });
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            return false;
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> false;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            target.getDamageModule().damage(this, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, getLocation(), isCrit, true);
-            return false;
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, hitTarget, isCrit) -> {
+                hitTarget.getDamageModule().damage(this, NeaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, true);
+                return false;
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -8,7 +9,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.Timespan;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -45,7 +45,7 @@ public abstract class Controller extends Character {
                     .filter(target -> target != null && target != combatUser && !target.isEnemy(combatUser) && target.getDamageModule().isLowHealth())
                     .forEach(target -> {
                         CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getEntity().getLocation(),
-                                RoleTrait1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof CombatUser && combatEntity.isEnemy(combatUser));
+                                RoleTrait1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(CombatUser.class::isInstance));
 
                         if (targetCombatEntity != null)
                             combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(10));

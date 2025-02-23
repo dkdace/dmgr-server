@@ -114,7 +114,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
             isMoving = oldLoc.getWorld() != entity.getWorld() || oldLoc.distance(entity.getLocation()) > 0;
             for (Hitbox hitbox : getHitboxes()) {
                 hitboxLocation = oldLoc;
-                hitbox.setCenter(hitboxLocation);
+                hitbox.setBaseLocation(hitboxLocation);
             }
         }, 3));
     }

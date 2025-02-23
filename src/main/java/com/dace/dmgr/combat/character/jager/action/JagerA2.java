@@ -1,24 +1,23 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.HasReadyTime;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.interaction.*;
+import com.dace.dmgr.combat.interaction.BouncingProjectile;
+import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +66,7 @@ public final class JagerA2 extends ActiveSkill {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(true);
-            new JagerA2Projectile().shoot(loc);
+            new JagerA2Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
         }, JagerA2Info.READY_DURATION));
@@ -92,32 +91,37 @@ public final class JagerA2 extends ActiveSkill {
             summonEntity.dispose();
     }
 
-    private final class JagerA2Projectile extends BouncingProjectile {
+    private final class JagerA2Projectile extends BouncingProjectile<Damageable> {
         private JagerA2Projectile() {
-            super(combatUser, JagerA2Info.VELOCITY, -1, ProjectileOption.builder().trailInterval(8).duration(100).hasGravity(true)
-                    .condition(combatUser::isEnemy).build(), BouncingProjectileOption.builder().bounceVelocityMultiplier(0.35)
-                    .destroyOnHitFloor(true).build());
+            super(combatUser, JagerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
+                    Option.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
-        protected void onTrailInterval() {
-            JagerA2Info.PARTICLE.BULLET_TRAIL.play(getLocation());
-        }
-
-        @Override
-        protected void onHitBlockBouncing(@NonNull Block hitBlock) {
-            // 미사용
-        }
-
-        @Override
-        protected boolean onHitEntityBouncing(@NonNull Damageable target, boolean isCrit) {
-            return false;
-        }
-
-        @Override
-        protected void onDestroy() {
-            summonEntity = new JagerA2Entity(CombatUtil.spawnEntity(ArmorStand.class, getLocation()), combatUser);
+        protected void onDestroy(@NonNull Location location) {
+            summonEntity = new JagerA2Entity(CombatUtil.spawnEntity(ArmorStand.class, location), combatUser);
             summonEntity.activate();
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return IntervalHandler
+                    .chain(createGravityIntervalHandler())
+                    .next(createPeriodIntervalHandler(8, JagerA2Info.PARTICLE.BULLET_TRAIL::play));
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getPreHitBlockHandler() {
+            return createDestroyOnGroundHitBlockHandler((location, hitBlock) -> true);
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getPreHitEntityHandler() {
+            return (location, target) -> true;
         }
     }
 
@@ -148,7 +152,7 @@ public final class JagerA2 extends ActiveSkill {
                     owner.getName() + "의 곰덫",
                     owner,
                     true, true,
-                    new FixedPitchHitbox(entity.getLocation(), 0.8, 0.1, 0.8, 0, 0.05, 0)
+                    Hitbox.builder(entity.getLocation(), 0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build()
             );
 
             knockbackModule = new KnockbackModule(this, 2);
@@ -197,9 +201,8 @@ public final class JagerA2 extends ActiveSkill {
             if (!readyTimeModule.isReady())
                 return;
 
-            Damageable target = (Damageable) CombatUtil.getNearCombatEntity(game, entity.getLocation().add(0, 0.5, 0), 0.8,
-                    combatEntity -> combatEntity instanceof Damageable && ((Damageable) combatEntity).getDamageModule().isLiving()
-                            && combatEntity.isEnemy(this));
+            Damageable target = CombatUtil.getNearCombatEntity(game, entity.getLocation().add(0, 0.5, 0), 0.8,
+                    CombatUtil.EntityCondition.enemy(this).and(combatEntity -> combatEntity.getDamageModule().isLiving()));
             if (target != null)
                 onCatchEnemy(target);
 
@@ -261,7 +264,7 @@ public final class JagerA2 extends ActiveSkill {
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
                              boolean isCrit, boolean isUlt) {
             JagerA2Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBreakEffect(location, this, damage);
+            CombatEffectUtil.playBreakParticle(location, this, damage);
         }
 
         @Override

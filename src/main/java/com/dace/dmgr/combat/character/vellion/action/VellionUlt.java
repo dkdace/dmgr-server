@@ -1,18 +1,19 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.DamageType;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -219,10 +220,10 @@ public final class VellionUlt extends UltimateSkill {
         }
     }
 
-    private final class VellionUltArea extends Area {
+    private final class VellionUltArea extends Area<Damageable> {
         private VellionUltArea() {
-            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable
-                    && ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
+            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
+                    .and(combatEntity -> combatEntity.getDamageModule().isLiving()));
         }
 
         @Override
@@ -231,7 +232,7 @@ public final class VellionUlt extends UltimateSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, VellionUltSlow.instance, 10);
@@ -245,10 +246,10 @@ public final class VellionUlt extends UltimateSkill {
         }
     }
 
-    private final class VellionUltExplodeArea extends Area {
+    private final class VellionUltExplodeArea extends Area<Damageable> {
         private VellionUltExplodeArea() {
-            super(combatUser, VellionUltInfo.RADIUS, combatEntity -> combatEntity instanceof Damageable
-                    && ((Damageable) combatEntity).getDamageModule().isLiving() && combatEntity.isEnemy(VellionUlt.this.combatUser));
+            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
+                    .and(combatEntity -> combatEntity.getDamageModule().isLiving()));
         }
 
         @Override
@@ -257,7 +258,7 @@ public final class VellionUlt extends UltimateSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO,
                     DamageType.FIXED, null, false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), VellionUltInfo.STUN_DURATION);

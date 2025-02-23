@@ -143,7 +143,7 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public boolean heal(@NonNull Projectile projectile, double amount, boolean isUlt) {
+    public boolean heal(@NonNull Projectile<?> projectile, double amount, boolean isUlt) {
         if (amount < 0)
             throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
 

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -71,11 +72,10 @@ public final class MagrittaP1 extends AbstractSkill {
         return false;
     }
 
-    private final class MagrittaP1Area extends Area {
+    private final class MagrittaP1Area extends Area<Damageable> {
         private MagrittaP1Area() {
-            super(combatUser, MagrittaP1Info.DETECT_RADIUS, combatEntity -> combatEntity instanceof Damageable
-                    && ((Damageable) combatEntity).getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)
-                    && combatEntity.isEnemy(MagrittaP1.this.combatUser));
+            super(combatUser, MagrittaP1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
+                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)));
         }
 
         @Override
@@ -84,7 +84,7 @@ public final class MagrittaP1 extends AbstractSkill {
         }
 
         @Override
-        public boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
+        protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             canActivate = true;
             return true;
         }
