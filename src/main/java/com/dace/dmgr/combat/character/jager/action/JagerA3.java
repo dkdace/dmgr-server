@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -69,22 +70,22 @@ public final class JagerA3 extends ActiveSkill {
 
             setDuration();
             combatUser.getWeapon().onCancelled();
-            combatUser.setGlobalCooldown((int) JagerA3Info.READY_DURATION);
+            combatUser.setGlobalCooldown(Timespan.ofTicks(JagerA3Info.READY_DURATION));
             combatUser.getWeapon().setVisible(false);
 
-            JagerA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            JagerA3Info.SOUND.USE.play(combatUser.getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
                 explodeTimestamp = Timestamp.now().plus(Timespan.ofTicks(JagerA3Info.EXPLODE_DURATION));
 
-                JagerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+                JagerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
 
                 TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                     if (isDurationFinished())
                         return false;
 
-                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
+                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
                     JagerA3Info.PARTICLE.BULLET_TRAIL.play(loc);
 
                     return true;
@@ -94,7 +95,7 @@ public final class JagerA3 extends ActiveSkill {
 
                     onCancelled();
 
-                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.3);
+                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
                     explode(loc, null);
                 }, 1, JagerA3Info.EXPLODE_DURATION));
             }, JagerA3Info.READY_DURATION));
@@ -102,7 +103,7 @@ public final class JagerA3 extends ActiveSkill {
             onCancelled();
             combatUser.getWeapon().setCooldown(2);
 
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerA3Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
@@ -150,8 +151,7 @@ public final class JagerA3 extends ActiveSkill {
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
             if (combatEntity.getDamageModule().isLiving())
-                JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getEntity().getWidth(),
-                        combatEntity.getEntity().getHeight());
+                JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
         }
     }
 

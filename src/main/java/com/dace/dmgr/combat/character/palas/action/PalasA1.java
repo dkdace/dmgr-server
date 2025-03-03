@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.palas.action;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
@@ -18,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 
 import java.util.WeakHashMap;
 
@@ -55,14 +55,14 @@ public final class PalasA1 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasA1Info.GLOBAL_COOLDOWN));
 
-        PalasA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        PalasA1Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA1Projectile().shot(loc);
 
             PalasA1Info.SOUND.USE_READY.play(loc);
@@ -105,13 +105,11 @@ public final class PalasA1 extends ActiveSkill {
             super.onTick(combatEntity, provider, i);
 
             if (combatEntity instanceof CombatUser)
-                CombatUtil.addYawAndPitch(combatEntity.getEntity(),
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20,
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 20);
+                CombatUtil.sendShake((CombatUser) combatEntity, 20, 20);
 
             if (i % 2 == 0) {
                 PalasA1Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
-                PalasA1Info.SOUND.TICK.play(combatEntity.getEntity().getLocation());
+                PalasA1Info.SOUND.TICK.play(combatEntity.getLocation());
             }
         }
     }
@@ -141,7 +139,7 @@ public final class PalasA1 extends ActiveSkill {
                     if (target.getDamageModule().isLiving()) {
                         target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA1Stun.instance, PalasA1Info.STUN_DURATION);
 
-                        PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getEntity().getWidth(), target.getEntity().getHeight());
+                        PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }
 
                     PalasA1Info.SOUND.HIT_ENTITY.play(location);

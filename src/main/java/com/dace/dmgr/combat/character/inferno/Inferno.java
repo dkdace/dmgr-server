@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.character.Vanguard;
 import com.dace.dmgr.combat.character.inferno.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
@@ -152,17 +151,17 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        FOOTSTEP_SOUND.play(combatUser.getEntity().getLocation(), volume);
+        FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
         if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished()) {
-            CombatEffectUtil.playBleedingParticle(location, victim, damage);
+            CombatEffectUtil.playBleedingParticle(victim, location, damage);
             return;
         }
 
-        InfernoUltInfo.SOUND.DAMAGE.play(victim.getEntity().getLocation(), 1 + damage * 0.001);
+        InfernoUltInfo.SOUND.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
         if (location != null)
             InfernoUltInfo.PARTICLE.DAMAGE.play(location, damage * 0.04);
     }

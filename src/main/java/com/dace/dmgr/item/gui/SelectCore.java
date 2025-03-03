@@ -23,7 +23,7 @@ public final class SelectCore extends ChestGUI {
 
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
-        if (combatUser == null || combatUser.getCharacterType() == null)
+        if (combatUser == null)
             return;
 
         Set<Core> cores = user.getUserData().getCharacterRecord(combatUser.getCharacterType()).getCores();

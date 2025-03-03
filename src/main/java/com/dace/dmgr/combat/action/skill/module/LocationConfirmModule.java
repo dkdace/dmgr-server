@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -55,7 +55,7 @@ public final class LocationConfirmModule extends ConfirmModule {
             throw new IllegalArgumentException("'maxDistance'가 0 이상이어야 함");
 
         this.maxDistance = maxDistance;
-        this.currentLocation = skill.getCombatUser().getEntity().getLocation();
+        this.currentLocation = skill.getCombatUser().getLocation();
 
         new IntervalTask(i -> !skill.isDisposed(), () -> {
             if (pointer != null)
@@ -71,7 +71,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     public boolean isValid() {
         if (!isChecking)
             return false;
-        if (currentLocation.equals(skill.getCombatUser().getEntity().getLocation()) || !currentLocation.getBlock().isEmpty()
+        if (currentLocation.equals(skill.getCombatUser().getLocation()) || !currentLocation.getBlock().isEmpty()
                 || currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
             return false;
 
@@ -96,7 +96,7 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
                 false), true);
         pointer.setHelmet(new ItemStack(Material.HOPPER));
-        currentLocation = skill.getCombatUser().getEntity().getLocation();
+        currentLocation = skill.getCombatUser().getLocation();
 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{pointer.getEntityId()});

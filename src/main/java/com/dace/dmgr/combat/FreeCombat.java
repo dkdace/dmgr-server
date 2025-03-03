@@ -103,8 +103,6 @@ public final class FreeCombat {
         user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
                 Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
         user.teleport(WAIT_LOCATION);
-
-        new CombatUser(user);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
@@ -46,10 +47,10 @@ public final class NeaceUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.setGlobalCooldown((int) NeaceUltInfo.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(NeaceUltInfo.READY_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -NeaceUltInfo.READY_SLOW);
 
-        NeaceUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+        NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
@@ -76,7 +77,7 @@ public final class NeaceUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
+        Location loc = combatUser.getLocation().add(0, 0.1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
@@ -110,8 +111,8 @@ public final class NeaceUlt extends UltimateSkill {
         isEnabled = true;
         combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
-        NeaceUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
-        NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getEntity().getLocation());
+        NeaceUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
+        NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
@@ -121,7 +122,7 @@ public final class NeaceUlt extends UltimateSkill {
             new NeaceUltArea().emit(loc);
 
             playTickEffect(i);
-            NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getEntity().getLocation());
+            NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
 
             return true;
         }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION));
@@ -133,7 +134,7 @@ public final class NeaceUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation();
+        Location loc = combatUser.getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(1.5);

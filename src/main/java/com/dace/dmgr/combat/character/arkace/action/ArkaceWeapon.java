@@ -62,13 +62,13 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     return;
                 }
 
-                Location loc = combatUser.getEntity().getLocation();
+                Location loc = combatUser.getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
                     Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread());
                     new ArkaceWeaponHitscan(false).shot(dir);
                     reloadModule.consume(1);
 
-                    CombatUtil.setRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
+                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     ArkaceWeaponInfo.SOUND.USE.play(loc);
                     TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
@@ -132,7 +132,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public void onReloadTick(long i) {
-        ArkaceWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
+        ArkaceWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override

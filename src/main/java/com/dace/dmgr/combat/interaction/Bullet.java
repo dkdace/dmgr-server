@@ -264,7 +264,7 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @param start 발사 위치
      */
     public final void shot(@NonNull Location start) {
-        shot(start, shooter.getEntity().getLocation().getDirection());
+        shot(start, shooter.getLocation().getDirection());
     }
 
     /**
@@ -275,14 +275,14 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
     public final void shot(@NonNull Vector direction) {
         shot((shooter.getEntity() instanceof LivingEntity)
                 ? ((LivingEntity) shooter.getEntity()).getEyeLocation()
-                : shooter.getEntity().getLocation(), direction);
+                : shooter.getLocation(), direction);
     }
 
     /**
      * 엔티티의 눈 위치에서 엔티티가 보는 방향으로 총알을 발사한다.
      */
     public final void shot() {
-        shot(shooter.getEntity().getLocation().getDirection());
+        shot(shooter.getLocation().getDirection());
     }
 
     /**
@@ -400,7 +400,9 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
     @NonNull
     protected final HitEntityHandler<T> createCritHitEntityHandler(@NonNull CritHitEntityHandler<T> handler) {
         return (location, target) -> {
-            boolean isCrit = target instanceof HasCritHitbox && ((HasCritHitbox) target).getCritHitbox().isInHitbox(getLocation(), size);
+            boolean isCrit = target instanceof HasCritHitbox
+                    && ((HasCritHitbox) target).getCritHitbox() != null
+                    && ((HasCritHitbox) target).getCritHitbox().isInHitbox(getLocation(), size);
             return handler.onHitEntity(location, target, isCrit);
         };
     }

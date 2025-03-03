@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -62,8 +63,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 new JagerWeaponRHitscan().shot();
                 reloadModule.consume(1);
 
-                Location loc = combatUser.getEntity().getLocation();
-                CombatUtil.setRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
+                Location loc = combatUser.getLocation();
+                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
                 JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
                 TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
@@ -71,7 +72,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 break;
             }
             case RIGHT_CLICK: {
-                combatUser.setGlobalCooldown(1);
+                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 onCancelled();
 
                 break;

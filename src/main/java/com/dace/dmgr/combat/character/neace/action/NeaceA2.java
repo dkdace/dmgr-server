@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
@@ -44,7 +45,7 @@ public final class NeaceA2 extends ActiveSkill {
             setDuration();
             combatUser.getWeapon().setGlowing(true);
 
-            NeaceA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished() || combatUser.isDead())
@@ -71,7 +72,7 @@ public final class NeaceA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation();
+        Location loc = combatUser.getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(1.3);
@@ -95,7 +96,7 @@ public final class NeaceA2 extends ActiveSkill {
     void amplifyTarget(@NonNull Healable target) {
         target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2Buff.instance, 4);
         if (target instanceof CombatUser)
-            ((CombatUser) target).addKillAssist(combatUser, this, NeaceA2Info.ASSIST_SCORE, 4);
+            ((CombatUser) target).addKillHelper(combatUser, this, NeaceA2Info.ASSIST_SCORE, Timespan.ofTicks(4));
     }
 
     /**

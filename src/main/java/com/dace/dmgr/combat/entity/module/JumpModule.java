@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Jumpable;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -34,7 +33,7 @@ public final class JumpModule extends MoveModule {
         if (!(combatEntity.getEntity() instanceof LivingEntity))
             throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
 
-        TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+        combatEntity.getTaskManager().add(new IntervalTask(i -> {
             if (canJump() && combatEntity.canJump()) {
                 if (((LivingEntity) combatEntity.getEntity()).hasPotionEffect(PotionEffectType.JUMP)
                         && ((LivingEntity) combatEntity.getEntity()).getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)

@@ -1,12 +1,11 @@
 package com.dace.dmgr.combat.character.ched.action;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -80,14 +79,14 @@ public final class ChedP1 extends AbstractSkill {
      * @return 활성화 조건
      */
     private boolean canActivate() {
-        return canActivate(combatUser.getEntity().getLocation().getYaw());
+        return canActivate(combatUser.getLocation().getYaw());
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().setVisible(false);
-        CombatUtil.addYawAndPitch(combatUser.getEntity(), 0, 0);
+        combatUser.addYawAndPitch(0, 0);
 
         float yaw = combatUser.getEntity().getEyeLocation().getYaw();
 
@@ -109,14 +108,14 @@ public final class ChedP1 extends AbstractSkill {
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
-            ChedP1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            ChedP1Info.SOUND.USE.play(combatUser.getLocation());
 
             return true;
         }, () -> {
             onCancelled();
 
             wallRideCount--;
-            Location loc = combatUser.getEntity().getLocation();
+            Location loc = combatUser.getLocation();
             loc.setPitch(-65);
             combatUser.getMoveModule().push(loc.getDirection().multiply(ChedP1Info.PUSH), true);
         }, 3));
@@ -130,8 +129,8 @@ public final class ChedP1 extends AbstractSkill {
             if (!isHanging) {
                 setHanging(true);
 
-                ChedP1Info.SOUND.USE_HANG.play(combatUser.getEntity().getLocation());
-                ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getEntity().getLocation());
+                ChedP1Info.SOUND.USE_HANG.play(combatUser.getLocation());
+                ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
             }
 
             hangTick--;
@@ -162,8 +161,8 @@ public final class ChedP1 extends AbstractSkill {
         if (isHanging) {
             setHanging(false);
 
-            ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getEntity().getLocation());
-            ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getEntity().getLocation());
+            ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getLocation());
+            ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
         } else
             combatUser.getWeapon().setVisible(true);
     }
@@ -172,7 +171,7 @@ public final class ChedP1 extends AbstractSkill {
      * 사용 중 효과를 재생한다.
      */
     private void playTickEffect() {
-        Location loc = combatUser.getEntity().getLocation();
+        Location loc = combatUser.getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(0.65);

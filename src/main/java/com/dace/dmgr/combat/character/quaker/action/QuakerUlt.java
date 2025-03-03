@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
@@ -18,15 +17,14 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.WeakHashMap;
-import java.util.function.LongConsumer;
 
 public final class QuakerUlt extends UltimateSkill {
     /** 수정자 ID */
@@ -65,9 +63,9 @@ public final class QuakerUlt extends UltimateSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerUltInfo.GLOBAL_COOLDOWN));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
-        combatUser.playMeleeAttackAnimation(-10, 16, true);
+        combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(16), MainHand.RIGHT);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             int delay = 0;
@@ -87,11 +85,11 @@ public final class QuakerUlt extends UltimateSkill {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (index + 1) * 20);
                     new QuakerUltEffect().shot(loc, vec);
 
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.8, 0.1);
+                    combatUser.addYawAndPitch(0.8, 0.1);
                     if (index % 2 == 0)
                         QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.addYawAndPitch(combatUser.getEntity(), -1, -0.7);
+                        combatUser.addYawAndPitch(-1, -0.7);
                         onCancelled();
                         onReady();
                     }
@@ -136,10 +134,7 @@ public final class QuakerUlt extends UltimateSkill {
             }
         }
 
-        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
-                CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8), 1, 6));
+        CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(6));
     }
 
     /**
@@ -232,8 +227,8 @@ public final class QuakerUlt extends UltimateSkill {
                     if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
                         target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
                         target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
-                        target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getEntity().getLocation(),
-                                target.getEntity().getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
+                        target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getLocation(),
+                                target.getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);

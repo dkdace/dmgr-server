@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat;
 
-import com.comphenix.packetwrapper.WrapperPlayServerPosition;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatEntity;
@@ -13,17 +12,15 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.function.LongConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -87,9 +84,7 @@ public final class CombatUtil {
                 .filter(combatEntity -> combatEntity != null
                         && entityCondition.targetCondition.test(combatEntity)
                         && combatEntity.canBeTargeted()
-                        && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
-                .filter(combatEntity ->
-                        Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
+                        && combatEntity.isInHitbox(location, range))
                 .findFirst()
                 .orElse(null);
     }
@@ -120,57 +115,12 @@ public final class CombatUtil {
                         .filter(combatEntity -> combatEntity != null
                                 && entityCondition.targetCondition.test(combatEntity)
                                 && combatEntity.canBeTargeted()
-                                && location.distance(combatEntity.getEntity().getLocation()) < combatEntity.getMaxHitboxSize() + range)
-                        .filter(combatEntity ->
-                                Arrays.stream(combatEntity.getHitboxes()).anyMatch(hitbox -> hitbox.isInHitbox(location, range)))
+                                && combatEntity.isInHitbox(location, range))
                         .collect(Collectors.toSet()));
     }
 
     /**
-     * 지정한 플레이어의 시야(yaw/pitch) 값을 설정한다.
-     *
-     * @param player 대상 플레이어
-     * @param yaw    변경할 yaw
-     * @param pitch  변경할 pitch
-     * @see CombatUtil#addYawAndPitch(Player, double, double)
-     */
-    public static void setYawAndPitch(@NonNull Player player, double yaw, double pitch) {
-        WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
-
-        packet.setX(0);
-        packet.setY(0);
-        packet.setZ(0);
-        packet.setYaw((float) yaw);
-        packet.setPitch((float) pitch);
-        packet.setFlags(new HashSet<>(Arrays.asList(WrapperPlayServerPosition.PlayerTeleportFlag.X,
-                WrapperPlayServerPosition.PlayerTeleportFlag.Y, WrapperPlayServerPosition.PlayerTeleportFlag.Z)));
-
-        packet.sendPacket(player);
-    }
-
-    /**
-     * 지정한 플레이어의 시야(yaw/pitch) 값을 추가한다.
-     *
-     * @param player 대상 플레이어
-     * @param yaw    추가할 yaw
-     * @param pitch  추가할 pitch
-     * @see CombatUtil#setYawAndPitch(Player, double, double)
-     */
-    public static void addYawAndPitch(@NonNull Player player, double yaw, double pitch) {
-        WrapperPlayServerPosition packet = new WrapperPlayServerPosition();
-
-        packet.setX(0);
-        packet.setY(0);
-        packet.setZ(0);
-        packet.setYaw((float) yaw);
-        packet.setPitch((float) pitch);
-        packet.setFlags(new HashSet<>(Arrays.asList(WrapperPlayServerPosition.PlayerTeleportFlag.values())));
-
-        packet.sendPacket(player);
-    }
-
-    /**
-     * 지정한 플레이어에게 화면 반동 효과를 적용한다.
+     * 지정한 플레이어에게 화면 반동 효과를 전송한다.
      *
      * <p>주로 총기 반동에 사용된다.</p>
      *
@@ -183,7 +133,7 @@ public final class CombatUtil {
      * @param firstMultiplier 초탄 반동 계수. 1로 설정 시 차탄과 동일. 1 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static void setRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
+    public static void sendRecoil(@NonNull CombatUser combatUser, double up, double side, double upSpread, double sideSpread, int duration, double firstMultiplier) {
         Validate.inclusiveBetween(1, 5, duration, "5 >= duration >= 1 (%d)", duration);
         Validate.isTrue(firstMultiplier >= 1, "firstMultiplier >= 1 (%f)", firstMultiplier);
 
@@ -193,7 +143,7 @@ public final class CombatUtil {
         int sum = IntStream.rangeClosed(1, duration).sum();
         combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
 
-        new IntervalTask(i -> {
+        combatUser.getTaskManager().add(new IntervalTask(i -> {
             double finalUp = (up + finalUpSpread) / ((double) sum / (duration - i));
             double finalSide = (side + finalSideSpread) / ((double) sum / (duration - i));
             if (first) {
@@ -201,28 +151,35 @@ public final class CombatUtil {
                 finalSide *= firstMultiplier;
             }
 
-            addYawAndPitch(combatUser.getEntity(), finalSide, -finalUp);
-        }, 1, duration);
+            combatUser.addYawAndPitch(finalSide, -finalUp);
+        }, 1, duration));
     }
 
     /**
-     * 엔티티를 지정한 위치에 소환한다.
+     * 지정한 플레이어에게 화면 흔들림 효과를 전송한다.
      *
-     * @param entityClass 엔티티 클래스
-     * @param location    소환할 위치
-     * @param <T>         {@link LivingEntity}를 상속받는 엔티티 타입
-     * @return 엔티티
+     * @param combatUser  대상 플레이어
+     * @param yawSpread   Yaw 분산도
+     * @param pitchSpread Pitch 분산도
+     * @param duration    진행 시간
+     * @see CombatUtil#sendShake(CombatUser, double, double)
      */
-    @NonNull
-    public static <T extends LivingEntity> T spawnEntity(@NonNull Class<T> entityClass, @NonNull Location location) {
-        T entity = location.getWorld().spawn(location, entityClass);
-        if (entity.getVehicle() != null) {
-            entity.getVehicle().remove();
-            entity.leaveVehicle();
-        }
-        entity.getEquipment().clear();
+    public static void sendShake(@NonNull CombatUser combatUser, double yawSpread, double pitchSpread, @NonNull Timespan duration) {
+        combatUser.getTaskManager().add(new IntervalTask((LongConsumer) i -> sendShake(combatUser, yawSpread, pitchSpread), 1, duration.toTicks()));
+    }
 
-        return entity;
+    /**
+     * 지정한 플레이어에게 화면 흔들림 효과를 전송한다.
+     *
+     * @param combatUser  대상 플레이어
+     * @param yawSpread   Yaw 분산도
+     * @param pitchSpread Pitch 분산도
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    public static void sendShake(@NonNull CombatUser combatUser, double yawSpread, double pitchSpread) {
+        combatUser.addYawAndPitch(
+                RandomUtils.nextDouble(0, yawSpread) - RandomUtils.nextDouble(0, yawSpread),
+                RandomUtils.nextDouble(0, pitchSpread) - RandomUtils.nextDouble(0, pitchSpread));
     }
 
     /**

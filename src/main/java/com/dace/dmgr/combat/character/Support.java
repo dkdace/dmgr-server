@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -8,7 +10,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +47,7 @@ public abstract class Support extends Character {
                     .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
                     .anyMatch(target -> target != null && !target.isEnemy(combatUser)
                             && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2.0
-                            && target.getEntity().getLocation().distance(combatUser.getEntity().getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
+                            && target.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
                 combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait1Info.SPEED);
@@ -58,10 +59,10 @@ public abstract class Support extends Character {
     @Override
     @MustBeInvokedByOverriders
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        if (provider != target && provider.getTimeAfterLastGiveHeal() > RoleTrait2Info.DURATION) {
-            TaskUtil.addTask(provider, new IntervalTask(i -> {
+        if (provider != target && provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isBefore(Timestamp.now())) {
+            provider.getTaskManager().add(new IntervalTask(i -> {
                 provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
-                return provider.getTimeAfterLastGiveHeal() <= RoleTrait2Info.DURATION;
+                return provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isAfter(Timestamp.now());
             }, 2));
         }
 

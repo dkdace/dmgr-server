@@ -26,7 +26,7 @@ public final class OnPlayerItemHeld extends EventListener<PlayerItemHeldEvent> {
         event.setCancelled(true);
 
         int newSlot = event.getNewSlot();
-        if (combatUser.getCharacterType() == null || newSlot >= 4)
+        if (newSlot >= 4)
             return;
 
         switch (newSlot) {

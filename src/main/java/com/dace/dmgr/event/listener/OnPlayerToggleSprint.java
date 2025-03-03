@@ -21,7 +21,7 @@ public final class OnPlayerToggleSprint extends EventListener<PlayerToggleSprint
     protected void onEvent(@NonNull PlayerToggleSprintEvent event) {
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
 
-        if (combatUser != null && combatUser.getCharacterType() != null)
+        if (combatUser != null)
             combatUser.useAction(ActionKey.SPRINT);
     }
 }

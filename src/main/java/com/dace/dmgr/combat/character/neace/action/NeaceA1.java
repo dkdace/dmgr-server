@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 public final class NeaceA1 extends ActiveSkill {
@@ -71,7 +72,7 @@ public final class NeaceA1 extends ActiveSkill {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            NeaceA1Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
+            NeaceA1Info.PARTICLE.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
             if (!(combatEntity instanceof Healable) || !(provider instanceof Healer))
                 return;
@@ -105,12 +106,12 @@ public final class NeaceA1 extends ActiveSkill {
 
             target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA1Mark.instance, NeaceA1Info.DURATION);
 
-            NeaceA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            NeaceA1Info.SOUND.USE.play(combatUser.getLocation());
             playUseEffect(target);
         }
 
         private void playUseEffect(@NonNull Healable target) {
-            Location location = combatUser.getArmLocation(true);
+            Location location = combatUser.getArmLocation(MainHand.RIGHT);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
                 NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);
 

@@ -160,6 +160,7 @@ public final class LocationUtil {
      * @param velocity    속도
      * @param maxDistance 최대 이동 거리. (단위: 블록). 0 이상의 값
      * @return 반복 가능한 위치
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static IterableLocation getIterable(@NonNull Location location, @NonNull Vector velocity, double maxDistance) {

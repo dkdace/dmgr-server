@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
-import com.dace.dmgr.DMGR;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -18,10 +18,10 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.function.LongConsumer;
 
 public final class MagrittaUlt extends UltimateSkill {
     /** 수정자 ID */
@@ -57,11 +57,11 @@ public final class MagrittaUlt extends UltimateSkill {
 
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) MagrittaUltInfo.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(MagrittaUltInfo.READY_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -MagrittaUltInfo.USE_SLOW);
         ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
 
-        MagrittaUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+        MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(this::onReady, MagrittaUltInfo.READY_DURATION));
     }
@@ -88,7 +88,7 @@ public final class MagrittaUlt extends UltimateSkill {
         isEnabled = true;
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getEntity().getLocation();
+            Location loc = combatUser.getLocation();
             HashMap<Damageable, Integer> targets = new HashMap<>();
 
             new MagrittaUltHitscan(targets).shot();
@@ -102,7 +102,7 @@ public final class MagrittaUlt extends UltimateSkill {
             });
             blockHitCount = 0;
 
-            CombatUtil.setRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP / 2, MagrittaWeaponInfo.RECOIL.SIDE / 2,
+            CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP / 2, MagrittaWeaponInfo.RECOIL.SIDE / 2,
                     MagrittaWeaponInfo.RECOIL.UP_SPREAD / 2, MagrittaWeaponInfo.RECOIL.SIDE_SPREAD / 2, 2, 1);
             MagrittaUltInfo.SOUND.SHOOT.play(loc);
             TaskUtil.addTask(MagrittaUlt.this, new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
@@ -119,20 +119,17 @@ public final class MagrittaUlt extends UltimateSkill {
         combatUser.getWeapon().setCooldown(combatUser.getWeapon().getDefaultCooldown() * 2);
         combatUser.getWeapon().setVisible(false);
 
-        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 0.5);
+        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.5);
 
         MagrittaUltInfo.SOUND.END.play(loc);
         MagrittaUltInfo.PARTICLE.END.play(loc);
 
-        TaskUtil.addTask(this, new IntervalTask((LongConsumer) i ->
-                CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 10,
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 8), 1, 7));
+        CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(7));
 
         TaskUtil.addTask(this, new DelayTask(() -> {
             combatUser.getWeapon().setVisible(true);
 
-            MagrittaUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+            MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
         }, MagrittaWeaponInfo.COOLDOWN * 2));
     }
 

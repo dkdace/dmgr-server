@@ -58,14 +58,14 @@ public final class VellionUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration(-1);
-        combatUser.setGlobalCooldown((int) VellionUltInfo.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionUltInfo.READY_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
 
         VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
         if (skillp1.isCancellable())
             skillp1.onCancelled();
 
-        VellionUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+        VellionUltInfo.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect,
                 () -> new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
@@ -94,7 +94,7 @@ public final class VellionUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
+        Location loc = combatUser.getLocation().add(0, 0.1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
@@ -128,7 +128,7 @@ public final class VellionUlt extends UltimateSkill {
         isEnabled = true;
         combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
-        VellionUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+        VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
@@ -161,7 +161,7 @@ public final class VellionUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
+        Location loc = combatUser.getLocation().add(0, 0.1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);

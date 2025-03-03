@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.arkace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -16,6 +17,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(@NonNull CombatUser combatUser) {
@@ -47,10 +49,10 @@ public final class ArkaceA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(ArkaceA1Info.GLOBAL_COOLDOWN));
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getArmLocation(false);
+            Location loc = combatUser.getArmLocation(MainHand.LEFT);
             new ArkaceA1Projectile().shot(loc);
 
             ArkaceA1Info.SOUND.USE.play(loc);

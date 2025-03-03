@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -48,7 +47,7 @@ public class MoveModule {
         this.combatEntity = combatEntity;
         this.speedStatus = new AbilityStatus(speed);
 
-        TaskUtil.addTask(combatEntity, new IntervalTask(i -> {
+        combatEntity.getTaskManager().add(new IntervalTask(i -> {
             double movementSpeed = speedStatus.getValue();
             if (!canMove() || !combatEntity.canMove())
                 movementSpeed = 0.0001;

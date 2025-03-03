@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -21,6 +22,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -60,17 +62,16 @@ public final class VellionA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA1Info.GLOBAL_COOLDOWN));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA1Info.READY_SLOW);
 
-        VellionA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        VellionA1Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
 
-            Location loc = combatUser.getArmLocation(true);
-            summonEntity = new VellionA1Entity(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
-            summonEntity.activate();
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
+            summonEntity = new VellionA1Entity(loc);
 
             VellionA1Info.SOUND.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION));
@@ -103,7 +104,7 @@ public final class VellionA1 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
+        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
         Vector vector = VectorUtil.getYawAxis(loc);
         Vector axis = VectorUtil.getRollAxis(loc);
 
@@ -178,25 +179,17 @@ public final class VellionA1 extends ActiveSkill {
         /** 회수 시간 */
         private long returnTime = VellionA1Info.RETURN_DURATION;
 
-        private VellionA1Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
+        private VellionA1Entity(@NonNull Location spawnLocation) {
             super(
-                    entity,
-                    owner.getName() + "의 마력 응집체",
-                    owner,
+                    ArmorStand.class,
+                    spawnLocation,
+                    combatUser.getName() + "의 마력 응집체",
+                    combatUser,
                     false, true,
-                    Hitbox.builder(entity.getLocation(), 1, 1, 1).offsetY(0.5).build()
+                    Hitbox.builder(1, 1, 1).offsetY(0.5).build()
             );
 
-            onInit();
-        }
-
-        private void onInit() {
-            entity.setAI(false);
-            entity.setSilent(true);
-            entity.setInvulnerable(true);
             entity.setGravity(false);
-            entity.setMarker(true);
-            entity.setVisible(false);
         }
 
         @Override
@@ -205,11 +198,11 @@ public final class VellionA1 extends ActiveSkill {
                 targets.clear();
 
             Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
-            Vector dir = entity.getLocation().getDirection();
+            Vector dir = getLocation().getDirection();
             if (returnTime < 0)
-                dir = LocationUtil.getDirection(entity.getLocation(), location);
+                dir = LocationUtil.getDirection(getLocation(), location);
 
-            Location loc = entity.getLocation().add(dir.multiply(VellionA1Info.VELOCITY / 20));
+            Location loc = getLocation().add(dir.multiply(VellionA1Info.VELOCITY / 20));
             if (LocationUtil.isNonSolid(loc)) {
                 entity.teleport(loc);
                 if (returnTime < 0 && (loc.distance(location) < 2 || combatUser.isDead()))
@@ -217,15 +210,14 @@ public final class VellionA1 extends ActiveSkill {
             } else if (returnTime < -1)
                 dispose();
 
-            VellionA1Info.PARTICLE.DISPLAY.play(entity.getLocation());
+            VellionA1Info.PARTICLE.DISPLAY.play(getLocation());
 
             new VellionA1Area().emit(loc);
         }
 
         @Override
-        public void dispose() {
-            super.dispose();
-
+        protected void onDispose() {
+            super.onDispose();
             summonEntity = null;
         }
 

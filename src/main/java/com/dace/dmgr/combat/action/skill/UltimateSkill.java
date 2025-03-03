@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.GameUser;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -52,10 +51,8 @@ public abstract class UltimateSkill extends ActiveSkill {
     @Override
     @MustBeInvokedByOverriders
     public void onUse(@NonNull ActionKey actionKey) {
-        Validate.notNull(combatUser.getCharacterType());
-
         combatUser.setUltGaugePercent(0);
-        ULTIMATE_USE_SOUND.play(combatUser.getEntity().getLocation());
+        ULTIMATE_USE_SOUND.play(combatUser.getLocation());
 
         GameUser gameUser = combatUser.getGameUser();
         if (gameUser != null)

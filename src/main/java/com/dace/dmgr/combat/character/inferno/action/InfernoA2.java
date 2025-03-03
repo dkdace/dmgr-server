@@ -54,14 +54,14 @@ public final class InfernoA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        InfernoA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        InfernoA2Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
-            InfernoA2Info.SOUND.TICK.play(combatUser.getEntity().getLocation());
-            InfernoA2Info.PARTICLE.TICK_CORE.play(combatUser.getEntity().getLocation().add(0, 1, 0));
+            InfernoA2Info.SOUND.TICK.play(combatUser.getLocation());
+            InfernoA2Info.PARTICLE.TICK_CORE.play(combatUser.getLocation().add(0, 1, 0));
             playTickEffect(i);
         }, 1, InfernoA2Info.DURATION));
     }
@@ -83,7 +83,7 @@ public final class InfernoA2 extends ActiveSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+        Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);

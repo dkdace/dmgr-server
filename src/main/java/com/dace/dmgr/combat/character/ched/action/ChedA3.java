@@ -17,6 +17,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -57,12 +58,12 @@ public final class ChedA3 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown((int) ChedA3Info.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(ChedA3Info.READY_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedA3Info.READY_SLOW);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
-        ChedA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        ChedA3Info.SOUND.USE.play(combatUser.getLocation());
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
@@ -70,7 +71,7 @@ public final class ChedA3 extends ActiveSkill {
             if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
             playUseTickEffect(loc, i);
 
             return true;
@@ -79,7 +80,7 @@ public final class ChedA3 extends ActiveSkill {
             if (isCancelled)
                 return;
 
-            Location location = combatUser.getArmLocation(true);
+            Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedA3Projectile().shot(location);
 
             ChedA3Info.SOUND.USE_READY.play(location);
@@ -151,7 +152,7 @@ public final class ChedA3 extends ActiveSkill {
     private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
             super(combatUser, ChedA3Info.VELOCITY,
-                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity -> combatEntity.getDamageModule().isLiving()),
+                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity -> combatEntity.getDamageModule().isCreature()),
                     Option.builder().size(ChedA3Info.SIZE).build());
         }
 

@@ -29,10 +29,12 @@ public class SelectCharCommand implements CommandExecutor {
 
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
-        if (combatUser == null)
-            combatUser = new CombatUser(user);
+        CharacterType characterType = CharacterType.valueOf(character);
 
-        combatUser.setCharacterType(CharacterType.valueOf(character));
+        if (combatUser == null)
+            new CombatUser(characterType, user);
+        else
+            combatUser.setCharacterType(characterType);
 
         return true;
     }

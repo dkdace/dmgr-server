@@ -42,13 +42,13 @@ public final class VellionP1 extends AbstractSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, VellionP1Info.SPEED);
-            Location location = combatUser.getEntity().getLocation();
+            Location location = combatUser.getLocation();
 
             VellionP1Info.SOUND.USE.play(location);
             VellionP1Info.PARTICLE.USE.play(location);
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-                Location loc = combatUser.getEntity().getLocation();
+                Location loc = combatUser.getLocation();
 
                 if (i < 2 && location.distance(loc) > 0) {
                     location.setY(loc.getY());
@@ -97,15 +97,15 @@ public final class VellionP1 extends AbstractSkill {
             return !combatUser.getEntity().isOnGround();
         }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
-        VellionP1Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
-        VellionP1Info.PARTICLE.USE.play(combatUser.getEntity().getLocation());
+        VellionP1Info.SOUND.DISABLE.play(combatUser.getLocation());
+        VellionP1Info.PARTICLE.USE.play(combatUser.getLocation());
     }
 
     /**
      * 사용 중 효과를 재생한다.
      */
     private void playTickEffect() {
-        Location loc = combatUser.getEntity().getLocation();
+        Location loc = combatUser.getLocation();
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(0.8);

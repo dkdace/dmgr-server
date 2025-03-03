@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.character.silia.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -129,7 +128,7 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         if (victim instanceof CombatUser && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
 
@@ -137,8 +136,8 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(location, victim, damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
+        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override
@@ -151,7 +150,7 @@ public final class Silia extends Scuffler {
         SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
 
-        if (((CombatUser) victim).getDamageSumRemainingTime(attacker) > GeneralConfig.getCombatConfig().getDamageSumTimeLimit().toTicks() - FAST_KILL_SCORE_TIME_LIMIT)
+        if (((CombatUser) victim).getDamageSumRemainingTime(attacker).toTicks() > GeneralConfig.getCombatConfig().getDamageSumTimeLimit().toTicks() - FAST_KILL_SCORE_TIME_LIMIT)
             attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(2);

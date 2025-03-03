@@ -145,30 +145,28 @@ public abstract class Character {
     /**
      * 전투원으로 다른 엔티티를 공격했을 때 실행할 작업.
      *
-     * @param attacker   공격자
-     * @param victim     피격자
-     * @param damage     피해량
-     * @param damageType 피해 타입
-     * @param isCrit     치명타 여부
+     * @param attacker 공격자
+     * @param victim   피격자
+     * @param damage   피해량
+     * @param isCrit   치명타 여부
      * @return 궁극기 충전 여부
-     * @see Character#onDamage(CombatUser, Attacker, double, DamageType, Location, boolean)
+     * @see Character#onDamage(CombatUser, Attacker, double, Location, boolean)
      */
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         return true;
     }
 
     /**
      * 전투원으로 피해를 입었을 때 실행될 작업.
      *
-     * @param victim     피격자
-     * @param attacker   공격자
-     * @param damage     피해량
-     * @param damageType 피해 타입
-     * @param location   맞은 위치
-     * @param isCrit     치명타 여부
-     * @see Character#onAttack(CombatUser, Damageable, double, DamageType, boolean)
+     * @param victim   피격자
+     * @param attacker 공격자
+     * @param damage   피해량
+     * @param location 맞은 위치
+     * @param isCrit   치명타 여부
+     * @see Character#onAttack(CombatUser, Damageable, double, boolean)
      */
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
         // 미사용
     }
 

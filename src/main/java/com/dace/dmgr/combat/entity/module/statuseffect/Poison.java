@@ -54,7 +54,7 @@ public abstract class Poison implements StatusEffect {
                         4, 0, false, false), true);
 
             if (i % 2 == 0)
-                TICK_PARTICLE.play(combatEntity.getCenterLocation(), combatEntity.getEntity().getWidth(), combatEntity.getEntity().getHeight());
+                TICK_PARTICLE.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
 
             if (i % 10 == 0 && provider instanceof Attacker)
                 combatEntity.getDamageModule().damage((Attacker) provider, damagePerSecond * 10 / 20.0,

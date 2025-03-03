@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -14,6 +15,7 @@ import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -46,8 +48,8 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
         setVisible(false);
-        combatUser.setGlobalCooldown(QuakerWeaponInfo.GLOBAL_COOLDOWN);
-        combatUser.playMeleeAttackAnimation(-10, 15, isClockwise);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerWeaponInfo.GLOBAL_COOLDOWN));
+        combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), isClockwise ? MainHand.RIGHT : MainHand.LEFT);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             isClockwise = !isClockwise;
@@ -70,11 +72,11 @@ public final class QuakerWeapon extends AbstractWeapon {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
                     new QuakerWeaponAttack(targets).shot(loc, vec);
 
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? 0.8 : -0.8), 0.1);
+                    combatUser.addYawAndPitch(isClockwise ? 0.8 : -0.8, 0.1);
                     if (index % 2 == 0)
                         QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
-                        CombatUtil.addYawAndPitch(combatUser.getEntity(), (isClockwise ? -1 : 1), -0.7);
+                        combatUser.addYawAndPitch(isClockwise ? -1 : 1, -0.7);
                         TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
                     }
                 }, delay));
@@ -137,7 +139,7 @@ public final class QuakerWeapon extends AbstractWeapon {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
-                        target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getEntity().getLocation())
+                        target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getLocation())
                                 .multiply(isClockwise ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
                     QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(location);

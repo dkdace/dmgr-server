@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -124,16 +125,16 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             return;
 
         setDuration();
-        combatUser.setGlobalCooldown((int) VellionA3Info.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA3Info.READY_DURATION));
         confirmModule.toggleCheck();
         combatUser.getWeapon().setCooldown(1);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA3Info.READY_SLOW);
         Location location = confirmModule.getCurrentLocation();
 
-        VellionA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        VellionA3Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
                 VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
             VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);

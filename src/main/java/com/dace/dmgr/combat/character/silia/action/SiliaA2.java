@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -48,13 +49,13 @@ public final class SiliaA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaA2Info.GLOBAL_COOLDOWN));
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
         if (skill3.isCancellable())
             skill3.onCancelled();
 
-        SiliaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -70,7 +71,7 @@ public final class SiliaA2 extends ActiveSkill {
 
             new SiliaA2Projectile().shot();
 
-            SiliaA2Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+            SiliaA2Info.SOUND.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaA2Info.READY_DURATION));
     }
 
@@ -141,10 +142,10 @@ public final class SiliaA2 extends ActiveSkill {
                         SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
                     target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
-                    Location loc = target.getEntity().getLocation().add(0, 0.1, 0);
+                    Location loc = target.getLocation().add(0, 0.1, 0);
                     loc.setPitch(0);
                     loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
-                    for (Location loc2 : LocationUtil.getLine(combatUser.getEntity().getLocation(), loc, 0.5))
+                    for (Location loc2 : LocationUtil.getLine(combatUser.getLocation(), loc, 0.5))
                         SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
                     SiliaA2Info.SOUND.HIT_ENTITY.play(location);
 

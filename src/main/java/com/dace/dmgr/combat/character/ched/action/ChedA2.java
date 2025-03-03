@@ -42,14 +42,14 @@ public final class ChedA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
 
-        Location location = combatUser.getEntity().getLocation();
+        Location location = combatUser.getLocation();
         location.setPitch(0);
 
         ChedA2Info.SOUND.USE.play(location);
         ChedA2Info.PARTICLE.USE.play(location.clone().add(0, 0.5, 0));
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            Location loc = combatUser.getEntity().getLocation();
+            Location loc = combatUser.getLocation();
 
             if (location.distance(loc) > 0) {
                 location.setY(loc.getY());
@@ -74,7 +74,7 @@ public final class ChedA2 extends ActiveSkill {
         }, 1, 2));
 
         TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
-                ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getEntity().getLocation()), 1, 10));
+                ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getLocation()), 1, 10));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -49,9 +50,9 @@ public final class InfernoA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(InfernoA1Info.GLOBAL_COOLDOWN));
 
-        Location location = combatUser.getEntity().getLocation();
+        Location location = combatUser.getLocation();
         location.setPitch(Math.max(-40, Math.min(location.getPitch(), 10)));
 
         InfernoA1Info.SOUND.USE.play(location);
@@ -64,7 +65,7 @@ public final class InfernoA1 extends ActiveSkill {
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (i < 15) {
-                Location loc = combatUser.getEntity().getLocation();
+                Location loc = combatUser.getLocation();
                 loc.setPitch(0);
 
                 for (int j = 0; j < 2; j++) {
@@ -98,7 +99,7 @@ public final class InfernoA1 extends ActiveSkill {
      * 점프 후 착지 시 실행할 작업.
      */
     private void onLand() {
-        Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
+        Location loc = combatUser.getLocation().add(0, 0.1, 0);
         new InfernoA1Area().emit(loc);
 
         InfernoA1Info.SOUND.LAND.play(loc);

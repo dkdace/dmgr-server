@@ -25,6 +25,7 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -127,7 +128,7 @@ public final class VellionA2 extends ActiveSkill {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            VellionA2Info.PARTICLE.MARK.play(combatEntity.getEntity().getLocation().add(0, combatEntity.getEntity().getHeight() + 0.5, 0));
+            VellionA2Info.PARTICLE.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
             if (provider instanceof CombatUser)
                 ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(4));
@@ -151,17 +152,17 @@ public final class VellionA2 extends ActiveSkill {
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
-            combatUser.setGlobalCooldown((int) VellionA2Info.READY_DURATION);
+            combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA2Info.READY_DURATION));
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA2Info.READY_SLOW);
             blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(VellionA2Info.BLOCK_RESET_DELAY));
 
-            VellionA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            VellionA2Info.SOUND.USE.play(combatUser.getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (isDurationFinished() || isInvalid(combatUser, target))
                     return false;
 
-                Location loc = combatUser.getArmLocation(true);
+                Location loc = combatUser.getArmLocation(MainHand.RIGHT);
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.7))
                     VellionA2Info.PARTICLE.USE_TICK_1.play(loc2, i / 15.0);
                 Location loc2 = LocationUtil.getLocationFromOffset(loc, LocationUtil.getDirection(loc, target.getCenterLocation()),
@@ -180,9 +181,9 @@ public final class VellionA2 extends ActiveSkill {
 
                 target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA2Mark.instance, 10);
 
-                VellionA2Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+                VellionA2Info.SOUND.USE_READY.play(combatUser.getLocation());
 
-                Location loc = combatUser.getArmLocation(true);
+                Location loc = combatUser.getArmLocation(MainHand.RIGHT);
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
                     VellionA2Info.PARTICLE.USE_TICK_2.play(loc2);
 
@@ -249,7 +250,7 @@ public final class VellionA2 extends ActiveSkill {
             private VellionA2Area(@NonNull Damageable target) {
                 super(combatUser, VellionA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).exclude(target));
 
-                this.effectLoc = target.getEntity().getLocation().add(0, target.getEntity().getHeight() + 0.5, 0);
+                this.effectLoc = target.getLocation().add(0, target.getHeight() + 0.5, 0);
                 VellionA2Info.SOUND.TRIGGER.play(effectLoc);
             }
 

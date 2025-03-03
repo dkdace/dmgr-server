@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -54,14 +55,14 @@ public final class MagrittaA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) MagrittaA1Info.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(MagrittaA1Info.READY_DURATION));
 
-        MagrittaA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        MagrittaA1Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new MagrittaA1Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc, 1, 0.5);
@@ -156,8 +157,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
                 return true;
             }, isCancelled -> {
-                Location loc = (target == null ? location.clone() : target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0))
-                        .add(0, 0.1, 0);
+                Location loc = (target == null ? location.clone() : target.getHitboxCenter()).add(0, 0.1, 0);
                 new MagrittaA1Area().emit(loc);
 
                 MagrittaA1Info.SOUND.EXPLODE.play(loc);

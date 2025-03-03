@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.palas.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -78,16 +79,16 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 reloadModule.cancel();
                 isActionCooldown = false;
 
-                CombatUtil.setRecoil(combatUser, PalasWeaponInfo.RECOIL.UP, PalasWeaponInfo.RECOIL.SIDE, PalasWeaponInfo.RECOIL.UP_SPREAD,
+                CombatUtil.sendRecoil(combatUser, PalasWeaponInfo.RECOIL.UP, PalasWeaponInfo.RECOIL.SIDE, PalasWeaponInfo.RECOIL.UP_SPREAD,
                         PalasWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                PalasWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+                PalasWeaponInfo.SOUND.USE.play(combatUser.getLocation());
 
                 TaskUtil.addTask(taskRunner, new DelayTask(this::action, getDefaultCooldown()));
 
                 break;
             }
             case RIGHT_CLICK: {
-                combatUser.setGlobalCooldown(1);
+                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 if (aimModule.isAiming()) {
                     onCancelled();
                     return;
@@ -125,20 +126,20 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.cancel();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getEntity().getLocation());
+            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getLocation());
 
             switch ((int) i) {
                 case 1:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.25, 0.1);
+                    combatUser.addYawAndPitch(-0.25, 0.1);
                     break;
                 case 2:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), -0.1, 0.2);
+                    combatUser.addYawAndPitch(-0.1, 0.2);
                     break;
                 case 5:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.1, -0.2);
+                    combatUser.addYawAndPitch(0.1, -0.2);
                     break;
                 case 6:
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), 0.25, -0.1);
+                    combatUser.addYawAndPitch(0.25, -0.1);
                     break;
                 default:
                     break;
@@ -165,7 +166,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onReloadTick(long i) {
-        PalasWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
+        PalasWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -175,18 +176,18 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onAimEnable() {
-        combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -PalasWeaponInfo.AIM_SLOW);
 
-        PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getEntity().getLocation());
+        PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
     public void onAimDisable() {
-        combatUser.setGlobalCooldown((int) PalasWeaponInfo.AIM_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
 
-        PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getEntity().getLocation());
+        PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
     }
 
     @Override

@@ -30,7 +30,6 @@ public final class OnPlayerArmorStandManipulate extends EventListener<PlayerArmo
             return;
 
         event.setCancelled(true);
-        if (combatUser.getCharacterType() != null)
-            combatUser.useAction(ActionKey.RIGHT_CLICK);
+        combatUser.useAction(ActionKey.RIGHT_CLICK);
     }
 }

@@ -50,13 +50,13 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION, 2, false, false), true);
 
-        MagrittaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.isDead())
                 return false;
 
-            Location loc = combatUser.getEntity().getLocation().add(0, 0.1, 0);
+            Location loc = combatUser.getLocation().add(0, 0.1, 0);
             MagrittaA2Info.PARTICLE.TICK_CORE.play(loc);
             MagrittaA2Info.PARTICLE.TICK_DECO.play(combatUser.getCenterLocation());
 
@@ -66,7 +66,7 @@ public final class MagrittaA2 extends ActiveSkill {
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
             ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
 
-            MagrittaA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
         }, 1, MagrittaA2Info.DURATION));
     }
 

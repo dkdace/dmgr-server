@@ -20,7 +20,7 @@ public final class SiliaT1 {
             return false;
 
         Vector dir = direction.clone().normalize().setY(0).normalize();
-        Location vloc = victim.getEntity().getLocation();
+        Location vloc = victim.getLocation();
         vloc.setPitch(0);
         Vector vdir = vloc.getDirection();
 

@@ -76,8 +76,6 @@ public final class OnPlayerInteract extends EventListener<PlayerInteractEvent> {
                         break;
                 }
         }
-        if (combatUser.getCharacterType() == null)
-            return;
 
         switch (event.getAction()) {
             case LEFT_CLICK_AIR:

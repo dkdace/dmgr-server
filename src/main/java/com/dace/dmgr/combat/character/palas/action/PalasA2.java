@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 
 public final class PalasA2 extends ActiveSkill {
     /** 수정자 ID */
@@ -104,14 +105,14 @@ public final class PalasA2 extends ActiveSkill {
                 ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
-                ((CombatUser) target).addKillAssist(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
+                ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, Timespan.ofTicks(PalasA2Info.DURATION));
             }
 
-            PalasA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            PalasA2Info.SOUND.USE.play(combatUser.getLocation());
             PalasA2Info.SOUND.HIT_ENTITY.play(target.getCenterLocation());
             PalasA2Info.PARTICLE.HIT_ENTITY_CORE.play(target.getCenterLocation());
 
-            Location location = combatUser.getArmLocation(false);
+            Location location = combatUser.getArmLocation(MainHand.LEFT);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
                 PalasA2Info.PARTICLE.HIT_ENTITY_DECO.play(loc);
         }

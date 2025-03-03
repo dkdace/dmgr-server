@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.character;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -44,7 +45,7 @@ public abstract class Controller extends Character {
                     .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
                     .filter(target -> target != null && target != combatUser && !target.isEnemy(combatUser) && target.getDamageModule().isLowHealth())
                     .forEach(target -> {
-                        CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getEntity().getLocation(),
+                        CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(CombatUser.class::isInstance));
 
                         if (targetCombatEntity != null)
@@ -52,7 +53,7 @@ public abstract class Controller extends Character {
                     });
         }
 
-        if (combatUser.getTimeAfterLastDamage() > RoleTrait2Info.ACTIVATE_DURATION)
+        if (combatUser.getLastDamageTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.ACTIVATE_DURATION)).isBefore(Timestamp.now()))
             combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
     }
 

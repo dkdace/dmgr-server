@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 
 public final class PalasUlt extends UltimateSkill {
     /** 수정자 ID */
@@ -102,15 +103,15 @@ public final class PalasUlt extends UltimateSkill {
                 ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
-                ((CombatUser) target).addKillAssist(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
+                ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, Timespan.ofTicks(PalasUltInfo.DURATION));
             }
 
-            PalasUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+            PalasUltInfo.SOUND.USE.play(combatUser.getLocation());
             PalasUltInfo.SOUND.HIT_ENTITY.play(target.getCenterLocation());
             PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_1.play(target.getCenterLocation());
             PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_2.play(target.getCenterLocation());
 
-            Location location = combatUser.getArmLocation(false);
+            Location location = combatUser.getArmLocation(MainHand.LEFT);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
                 PalasUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc);
         }

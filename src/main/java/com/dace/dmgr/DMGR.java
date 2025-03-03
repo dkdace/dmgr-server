@@ -8,7 +8,6 @@ import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
-import lombok.Getter;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.skinsrestorer.api.SkinsRestorerAPI;
@@ -26,7 +25,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,10 +37,6 @@ public class DMGR extends JavaPlugin {
     /** 임시 복제 월드 이름의 접두사 */
     public static final String TEMPORARY_WORLD_NAME_PREFIX = "_";
 
-    /** 난수 생성 객체 */
-    @NonNull
-    @Getter
-    private static final Random random = new Random();
     /** 탭리스트 관리 인스턴스 */
     @Nullable
     private static Tabbed tabbed;

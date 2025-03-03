@@ -19,10 +19,8 @@ import com.dace.dmgr.item.gui.SelectCharInfo;
 import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
@@ -83,29 +81,23 @@ public enum CharacterType {
                 .build();
         this.selectItem = new DefinedItem(profileItem,
                 (clickType, player) -> {
-                    User user = User.fromPlayer(player);
-                    CombatUser combatUser = CombatUser.fromUser(user);
-                    if (combatUser == null)
-                        return false;
-
                     if (clickType == ClickType.LEFT) {
-                        GameUser gameUser = combatUser.getGameUser();
-                        boolean isDuplicated = gameUser != null && gameUser.getTeam().getTeamUsers().stream()
-                                .anyMatch(targetGameUser -> {
-                                    CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
-                                    Validate.notNull(targetCombatUser);
+                        User user = User.fromPlayer(player);
 
-                                    return targetCombatUser.getCharacterType() == this;
-                                });
-
-                        if (isDuplicated)
+                        GameUser gameUser = GameUser.fromUser(user);
+                        if (gameUser != null && !gameUser.getTeam().checkCharacterDuplication(this))
                             return false;
 
-                        combatUser.setCharacterType(this);
+                        CombatUser combatUser = CombatUser.fromUser(user);
+                        if (combatUser == null)
+                            combatUser = new CombatUser(this, user);
+                        else
+                            combatUser.setCharacterType(this);
+
                         player.closeInventory();
 
                         if (!user.getUserData().getCharacterRecord(this).getCores().isEmpty())
-                            TaskUtil.addTask(combatUser, new DelayTask(() -> new SelectCore(player), 10));
+                            combatUser.getTaskManager().add(new DelayTask(() -> new SelectCore(player), 10));
                     } else if (clickType == ClickType.RIGHT)
                         new SelectCharInfo(player, this);
 

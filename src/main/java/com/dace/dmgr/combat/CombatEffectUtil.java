@@ -109,19 +109,17 @@ public final class CombatEffectUtil {
     /**
      * 지정한 위치 또는 엔티티에 출혈 입자 효과를 재생한다.
      *
-     * @param location     대상 위치
      * @param combatEntity 대상 엔티티
+     * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
      * @param damage       피해량. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 {@code location}과 {@code combatEntity}가 모두 {@code null}이면 발생
      */
-    public static void playBleedingParticle(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+    public static void playBleedingParticle(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-        if (location == null && combatEntity == null)
-            return;
 
         if (location == null)
-            BLEEDING_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.1, combatEntity.getEntity().getWidth(),
-                    combatEntity.getEntity().getHeight(), damage == 0 ? 0 : 1);
+            BLEEDING_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.1, combatEntity.getWidth(), combatEntity.getHeight(),
+                    damage == 0 ? 0 : 1);
         else
             BLEEDING_PARTICLE.play(location, damage * 0.06, 0, 0, 1);
     }
@@ -129,19 +127,17 @@ public final class CombatEffectUtil {
     /**
      * 지정한 위치 또는 엔티티에 파괴 입자 효과를 재생한다.
      *
-     * @param location     대상 위치
      * @param combatEntity 대상 엔티티
+     * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
      * @param damage       피해량. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public static void playBreakParticle(@Nullable Location location, @Nullable CombatEntity combatEntity, double damage) {
+    public static void playBreakParticle(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-        if (location == null && combatEntity == null)
-            return;
 
         if (location == null)
-            BREAK_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.07, combatEntity.getEntity().getWidth(),
-                    combatEntity.getEntity().getHeight(), damage == 0 ? 0 : 1);
+            BREAK_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.07, combatEntity.getWidth(), combatEntity.getHeight(),
+                    damage == 0 ? 0 : 1);
         else
             BREAK_PARTICLE.play(location, damage * 0.04, 0, 0, 1);
     }

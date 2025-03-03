@@ -48,8 +48,7 @@ public abstract class Speed implements StatusEffect {
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity.getDamageModule().isLiving())
-            TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.1, 0), combatEntity.getEntity().getWidth(),
-                    combatEntity.getEntity().getHeight());
+            TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.1, 0), combatEntity.getWidth(), combatEntity.getHeight());
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.*;
+import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.map.GameMap;
@@ -520,6 +522,19 @@ public final class Game implements Initializable<Void>, Disposable {
          */
         public void addScore() {
             this.score += 1;
+        }
+
+        /**
+         * 지정한 전투원을 선택한 팀원이 있는지 중복 여부를 확인한다.
+         *
+         * @param characterType 확인할 전투원
+         * @return 중복 여부
+         */
+        public boolean checkCharacterDuplication(@NonNull CharacterType characterType) {
+            return teamUsers.stream().anyMatch(targetGameUser -> {
+                CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
+                return targetCombatUser != null && targetCombatUser.getCharacterType() == characterType;
+            });
         }
 
         /**

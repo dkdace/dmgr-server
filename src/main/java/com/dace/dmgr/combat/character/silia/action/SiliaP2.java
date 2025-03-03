@@ -1,12 +1,11 @@
 package com.dace.dmgr.combat.character.silia.action;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -68,7 +67,7 @@ public final class SiliaP2 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().setVisible(false);
-        CombatUtil.addYawAndPitch(combatUser.getEntity(), 0, 0);
+        combatUser.addYawAndPitch(0, 0);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.getKnockbackModule().isKnockbacked() || !canActivate())
@@ -80,16 +79,16 @@ public final class SiliaP2 extends AbstractSkill {
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SiliaP2Info.SOUND.USE.play(combatUser.getEntity().getLocation(), 1, 0);
+                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 1, 0);
             else
-                SiliaP2Info.SOUND.USE.play(combatUser.getEntity().getLocation(), 0, 1);
+                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 0, 1);
 
             return true;
         }, isCancelled -> {
             onCancelled();
 
             wallRideCount--;
-            Location loc = combatUser.getEntity().getLocation();
+            Location loc = combatUser.getLocation();
             loc.setPitch(-65);
             combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH), true);
         }, 3, 10));

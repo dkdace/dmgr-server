@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 /**
  * 전투 시스템의 코어 목록.
@@ -32,25 +31,25 @@ public enum Core {
 
     /** 코어 이름 */
     private final String name;
-    /** 수치 값 목록 */
+    /** 수치 값 */
     @Getter
-    private final double @NonNull [] values;
+    private final double value;
     /** 코어 선택 GUI 아이템 */
     @NonNull
     @Getter
     private final DefinedItem selectItem;
 
-    Core(String name, String description, int red, int green, int blue, double... values) {
+    Core(String name, String description, int red, int green, int blue, double value) {
         this.name = name;
-        this.values = values;
+        this.value = value;
 
         this.selectItem = new DefinedItem(new ItemBuilder(Material.FIREWORK_CHARGE)
                 .editItemMeta(itemMeta ->
                         ((FireworkEffectMeta) itemMeta).setEffect(FireworkEffect.builder().withColor(Color.fromRGB(red, green, blue)).build()))
-                .setName(MessageFormat.format("§b{0}의 코어", name))
+                .setName("§b" + getName())
                 .setLore("",
                         "§7장착 시 다음 효과 적용:",
-                        "§9" + MessageFormat.format(description, Arrays.stream(values).boxed().toArray()),
+                        "§9" + MessageFormat.format(description, value),
                         "",
                         "§7§n클릭§f하여 코어를 장착하거나 제거합니다.")
                 .build(),

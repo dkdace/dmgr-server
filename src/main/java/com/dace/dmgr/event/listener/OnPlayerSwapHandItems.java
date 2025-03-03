@@ -27,19 +27,18 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+        User user = User.fromPlayer(player);
+        GameUser gameUser = GameUser.fromUser(user);
 
+        if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)) {
+            new SelectChar(player);
+            return;
+        }
+
+        CombatUser combatUser = CombatUser.fromUser(user);
         if (combatUser != null) {
-            GameUser gameUser = combatUser.getGameUser();
-
-            if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)) {
-                new SelectChar(player);
-                return;
-            }
-            if (combatUser.getCharacterType() != null) {
-                combatUser.useAction(ActionKey.SWAP_HAND);
-                return;
-            }
+            combatUser.useAction(ActionKey.SWAP_HAND);
+            return;
         }
 
         new Menu(player);

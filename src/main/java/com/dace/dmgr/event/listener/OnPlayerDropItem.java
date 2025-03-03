@@ -30,7 +30,6 @@ public final class OnPlayerDropItem extends EventListener<PlayerDropItemEvent> {
             return;
 
         event.setCancelled(true);
-        if (combatUser.getCharacterType() != null)
-            combatUser.useAction(ActionKey.DROP);
+        combatUser.useAction(ActionKey.DROP);
     }
 }

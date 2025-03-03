@@ -108,7 +108,7 @@ public final class HealModule extends DamageModule {
 
         if (provider != null)
             provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
-        ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
+        ((Healable) combatEntity).onTakeHeal(provider, finalAmount);
 
         setHealth(getHealth() + finalAmount);
 

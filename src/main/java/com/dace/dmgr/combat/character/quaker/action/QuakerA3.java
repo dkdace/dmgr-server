@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -20,6 +21,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -58,11 +60,11 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA3Info.GLOBAL_COOLDOWN));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
-        combatUser.playMeleeAttackAnimation(-7, 12, true);
+        combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
 
-        QuakerA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        QuakerA3Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -78,7 +80,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             new QuakerA3Projectile().shot();
 
-            QuakerA3Info.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+            QuakerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
         }, 1, QuakerA3Info.READY_DURATION));
     }
 

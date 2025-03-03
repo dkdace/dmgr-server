@@ -52,7 +52,7 @@ public final class InfernoP1 extends AbstractSkill {
      */
     private boolean canActivate() {
         canActivate = false;
-        new InfernoP1Area().emit(combatUser.getEntity().getLocation().add(0, 0.1, 0));
+        new InfernoP1Area().emit(combatUser.getLocation().add(0, 0.1, 0));
 
         return canActivate;
     }

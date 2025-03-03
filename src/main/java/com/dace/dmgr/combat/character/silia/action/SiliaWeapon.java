@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -16,6 +17,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -55,11 +57,11 @@ public final class SiliaWeapon extends AbstractWeapon {
             strike();
         else {
             setCooldown();
-            combatUser.playMeleeAttackAnimation(-4, 10, true);
+            combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(10), MainHand.RIGHT);
 
             new SiliaWeaponProjectile().shot();
 
-            SiliaWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+            SiliaWeaponInfo.SOUND.USE.play(combatUser.getLocation());
         }
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
@@ -80,9 +82,9 @@ public final class SiliaWeapon extends AbstractWeapon {
         if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
             setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
-        combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaT2Info.GLOBAL_COOLDOWN));
         combatUser.getWeapon().setVisible(false);
-        combatUser.playMeleeAttackAnimation(-2, 6, isOpposite);
+        combatUser.playMeleeAttackAnimation(-2, Timespan.ofTicks(6), isOpposite ? MainHand.RIGHT : MainHand.LEFT);
 
         HashSet<Damageable> targets = new HashSet<>();
 
@@ -104,11 +106,11 @@ public final class SiliaWeapon extends AbstractWeapon {
                 vec = VectorUtil.getRotatedVector(vec, axis, (isOpposite ? 90 - 16 * (index - 3.5) : 90 + 16 * (index - 3.5)));
                 new SiliaWeaponStrikeAttack(targets).shot(loc, vec);
 
-                CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? -0.5 : 0.5), 0.15);
+                combatUser.addYawAndPitch(isOpposite ? -0.5 : 0.5, 0.15);
                 if (index < 3)
                     SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index / 2.0);
                 if (index == 7) {
-                    CombatUtil.addYawAndPitch(combatUser.getEntity(), (isOpposite ? 0.7 : -0.7), -0.85);
+                    combatUser.addYawAndPitch(isOpposite ? 0.7 : -0.7, -0.85);
                     onCancelled();
                 }
             }, delay));
@@ -229,7 +231,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
                             SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                        target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getEntity().getLocation())
+                        target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getLocation())
                                 .multiply(SiliaT2Info.KNOCKBACK));
 
                         if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)

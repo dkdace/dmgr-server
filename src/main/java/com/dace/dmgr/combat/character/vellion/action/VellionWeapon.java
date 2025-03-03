@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -10,6 +11,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 
 public final class VellionWeapon extends AbstractWeapon {
     public VellionWeapon(@NonNull CombatUser combatUser) {
@@ -36,11 +38,11 @@ public final class VellionWeapon extends AbstractWeapon {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
-        combatUser.playMeleeAttackAnimation(-4, 8, true);
+        combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(8), MainHand.RIGHT);
 
         new VellionWeaponProjectile().shot();
 
-        VellionWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+        VellionWeaponInfo.SOUND.USE.play(combatUser.getLocation());
     }
 
     private final class VellionWeaponProjectile extends Projectile<Damageable> {

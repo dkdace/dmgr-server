@@ -1,15 +1,14 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.Timespan;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -35,8 +34,6 @@ public class Silence implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
         if (combatEntity instanceof CombatUser) {
-            Validate.notNull(((CombatUser) combatEntity).getCharacterType());
-
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
             if (provider instanceof CombatUser)

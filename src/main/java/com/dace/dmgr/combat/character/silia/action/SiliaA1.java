@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -17,6 +18,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -52,8 +54,8 @@ public final class SiliaA1 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().setCooldown(0);
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown((int) SiliaA1Info.DURATION);
-        combatUser.playMeleeAttackAnimation(-3, 6, true);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaA1Info.DURATION));
+        combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
         Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
 
@@ -67,7 +69,7 @@ public final class SiliaA1 extends ActiveSkill {
 
             new SiliaA1Attack(targets).shot();
 
-            CombatUtil.setYawAndPitch(combatUser.getEntity(), location.getYaw(), location.getPitch());
+            combatUser.setYawAndPitch(location.getYaw(), location.getPitch());
 
             TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);

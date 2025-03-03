@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -41,14 +42,14 @@ public final class SiliaUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration(-1);
-        combatUser.setGlobalCooldown((int) SiliaUltInfo.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaUltInfo.READY_DURATION));
         combatUser.getWeapon().setVisible(false);
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
         if (skill3.isCancellable())
             skill3.onCancelled();
 
-        float yaw = combatUser.getEntity().getLocation().getYaw();
+        float yaw = combatUser.getLocation().getYaw();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> playUseTickEffect(i, yaw), () -> {
             onCancelled();
@@ -76,7 +77,7 @@ public final class SiliaUlt extends UltimateSkill {
      * @param yaw 원본 Yaw 값
      */
     private void playUseTickEffect(long i, float yaw) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+        Location loc = combatUser.getLocation().add(0, 1, 0);
 
         for (int j = 0; j < 6; j++) {
             long index = i * 6 + j;
@@ -117,7 +118,7 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
 
-        SiliaUltInfo.SOUND.USE_READY.play(combatUser.getEntity().getLocation());
+        SiliaUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
             isEnabled = false;

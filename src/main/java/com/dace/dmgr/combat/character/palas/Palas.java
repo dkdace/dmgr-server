@@ -13,7 +13,10 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.Support;
 import com.dace.dmgr.combat.character.palas.action.*;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -133,8 +136,8 @@ public final class Palas extends Support {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(location, victim, damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
+        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

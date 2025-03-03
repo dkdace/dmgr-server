@@ -49,8 +49,7 @@ public final class JagerT1 {
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             if (combatEntity.getDamageModule().isLiving())
-                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.5, 0),
-                        combatEntity.getEntity().getWidth());
+                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.5, 0), combatEntity.getWidth());
 
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID,

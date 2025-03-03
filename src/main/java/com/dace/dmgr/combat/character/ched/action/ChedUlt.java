@@ -23,6 +23,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.WeakHashMap;
@@ -61,12 +62,12 @@ public final class ChedUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.setGlobalCooldown((int) ChedUltInfo.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(ChedUltInfo.READY_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedUltInfo.READY_SLOW);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
-        ChedUltInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+        ChedUltInfo.SOUND.USE.play(combatUser.getLocation());
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
@@ -74,7 +75,7 @@ public final class ChedUlt extends UltimateSkill {
             if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(true), 0, 0, 1.5);
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
             playUseTickEffect(loc, i);
 
             return true;
@@ -83,7 +84,7 @@ public final class ChedUlt extends UltimateSkill {
             if (isCancelled)
                 return;
 
-            Location location = combatUser.getArmLocation(true);
+            Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedUltProjectile().shot(location);
 
             ChedUltInfo.SOUND.USE_READY.play(location);
@@ -233,11 +234,10 @@ public final class ChedUlt extends UltimateSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                Location loc = target.getHitboxLocation().add(0, target.getEntity().getHeight() / 2, 0).add(0, 0.1, 0);
+                Location loc = target.getHitboxCenter().add(0, 0.1, 0);
                 new ChedUltArea().emit(loc);
 
-                summonEntity = new ChedUltFireFloor(CombatUtil.spawnEntity(ArmorStand.class, loc), combatUser);
-                summonEntity.activate();
+                summonEntity = new ChedUltFireFloor(loc);
 
                 for (Location loc2 : LocationUtil.getLine(location, loc, 0.4))
                     ChedUltInfo.PARTICLE.HIT_ENTITY.play(loc2);
@@ -281,30 +281,20 @@ public final class ChedUlt extends UltimateSkill {
      * 화염 지대 클래스.
      */
     private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
-        private ChedUltFireFloor(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
+        private ChedUltFireFloor(@NonNull Location spawnLocation) {
             super(
-                    entity,
-                    owner.getName() + "의 화염 지대",
-                    owner,
+                    ArmorStand.class,
+                    spawnLocation,
+                    combatUser.getName() + "의 화염 지대",
+                    combatUser,
                     false, true,
-                    Hitbox.builder(entity.getLocation(), 1, 1, 1).offsetY(0.5).pitchFixed().build()
+                    Hitbox.builder(1, 1, 1).offsetY(0.5).pitchFixed().build()
             );
-
-            onInit();
-        }
-
-        private void onInit() {
-            entity.setAI(false);
-            entity.setSilent(true);
-            entity.setInvulnerable(true);
-            entity.setGravity(true);
-            entity.setMarker(true);
-            entity.setVisible(false);
         }
 
         @Override
         protected void onTick(long i) {
-            Location loc = entity.getLocation().add(0, 0.1, 0);
+            Location loc = getLocation().add(0, 0.1, 0);
             new ChedUltFireFloorArea().emit(loc);
 
             if (i % 4 == 0)
@@ -316,9 +306,8 @@ public final class ChedUlt extends UltimateSkill {
         }
 
         @Override
-        public void dispose() {
-            super.dispose();
-
+        protected void onDispose() {
+            super.onDispose();
             summonEntity = null;
         }
 

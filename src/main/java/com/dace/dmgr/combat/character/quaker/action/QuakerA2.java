@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.character.quaker.action;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
@@ -24,11 +23,11 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.WeakHashMap;
-import java.util.function.LongConsumer;
 
 public final class QuakerA2 extends ActiveSkill {
     /** 수정자 ID */
@@ -66,9 +65,9 @@ public final class QuakerA2 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(-1);
+        combatUser.setGlobalCooldown(Timespan.MAX);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
-        combatUser.playMeleeAttackAnimation(-10, 15, true);
+        combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), MainHand.RIGHT);
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
@@ -113,7 +112,7 @@ public final class QuakerA2 extends ActiveSkill {
 
         setDuration(0);
         combatUser.resetGlobalCooldown();
-        combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA2Info.GLOBAL_COOLDOWN));
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
         combatUser.getWeapon().setVisible(true);
     }
@@ -122,7 +121,7 @@ public final class QuakerA2 extends ActiveSkill {
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
-        Location loc = combatUser.getEntity().getLocation();
+        Location loc = combatUser.getLocation();
         loc.setPitch(0);
 
         QuakerA2Info.SOUND.USE_READY.play(loc);
@@ -136,10 +135,7 @@ public final class QuakerA2 extends ActiveSkill {
             new QuakerA2Projectile(targets).shot(loc, vec);
         }
 
-        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
-                CombatUtil.addYawAndPitch(combatUser.getEntity(),
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 7,
-                        (DMGR.getRandom().nextDouble() - DMGR.getRandom().nextDouble()) * 6), 1, 5));
+        CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
     }
 
     /**

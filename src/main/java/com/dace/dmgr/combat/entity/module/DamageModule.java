@@ -13,7 +13,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -108,7 +107,7 @@ public class DamageModule {
         setHealth(getMaxHealth());
 
         if (isShowHealthBar)
-            TaskUtil.addTask(combatEntity, new DelayTask(this::addHealthHologram, 5));
+            combatEntity.getTaskManager().add(new DelayTask(this::addHealthHologram, 5));
     }
 
     /**
@@ -282,8 +281,7 @@ public class DamageModule {
      */
     private boolean handleDamage(@Nullable Attacker attacker, double damage, double damageMultiplier, double defenseMultiplier,
                                  @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || !combatEntity.canTakeDamage()
-                || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
+        if (combatEntity.getEntity().isDead() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
             return false;
         if (damage == 0)
             return true;
@@ -316,9 +314,9 @@ public class DamageModule {
             setHealth(getHealth() - finalDamage);
 
         if (attacker != null)
-            attacker.onAttack(combatEntity, finalDamage, damageType, critMultiplier != 1, isUlt);
+            attacker.onAttack(combatEntity, finalDamage, critMultiplier != 1, isUlt);
         double reducedDamage = Math.max(0, damage * damageMultiplier - finalDamage);
-        combatEntity.onDamage(attacker, finalDamage, reducedDamage, damageType, location, critMultiplier != 1, isUlt);
+        combatEntity.onDamage(attacker, finalDamage, reducedDamage, location, critMultiplier != 1);
         playHitEffect();
         if (isShowHealthBar && attacker instanceof CombatUser)
             showHealthHologramTimestampMap.put((CombatUser) attacker, Timestamp.now().plus(Timespan.ofSeconds(1)));

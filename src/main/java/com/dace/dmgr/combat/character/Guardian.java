@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +47,7 @@ public abstract class Guardian extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
-        TaskUtil.addTask(combatUser, new IntervalTask((LongConsumer) i ->
+        combatUser.getTaskManager().add(new IntervalTask((LongConsumer) i ->
                 combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION, false),
                 1, RoleTrait2Info.DURATION));
     }

@@ -48,18 +48,16 @@ public final class InfernoUlt extends UltimateSkill {
         combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(0);
         combatUser.getDamageModule().setShield(SHIELD_ID, InfernoUltInfo.SHIELD);
 
-        combatUser.setTemporaryHitboxes(new Hitbox[]{
-                Hitbox.builder(combatUser.getEntity().getLocation(), 2, 2, 2).offsetY(1).build()
-        });
+        combatUser.setHitboxes(Hitbox.builder(2, 2, 2).offsetY(1).pitchFixed().build());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
             if (combatUser.getDamageModule().getShield(SHIELD_ID) == 0)
                 return false;
 
-            Location loc = combatUser.getEntity().getLocation();
+            Location loc = combatUser.getLocation();
             if (i < 24) {
                 InfernoUltInfo.SOUND.USE.play(loc, 1, i / 23.0);
-                InfernoUltInfo.PARTICLE.USE_TICK_CORE.play(combatUser.getEntity().getLocation().add(0, 1, 0));
+                InfernoUltInfo.PARTICLE.USE_TICK_CORE.play(combatUser.getLocation().add(0, 1, 0));
                 playUseTickEffect(i);
             }
 
@@ -72,13 +70,13 @@ public final class InfernoUlt extends UltimateSkill {
             if (isCancelled) {
                 setDuration(0);
 
-                Location loc = combatUser.getEntity().getLocation();
+                Location loc = combatUser.getLocation();
                 InfernoUltInfo.SOUND.DEATH.play(loc);
                 InfernoUltInfo.PARTICLE.DEATH.play(loc);
             }
 
             combatUser.getDamageModule().setShield(SHIELD_ID, 0);
-            combatUser.setTemporaryHitboxes(null);
+            combatUser.resetHitboxes();
         }, 1, InfernoUltInfo.DURATION));
     }
 
@@ -93,7 +91,7 @@ public final class InfernoUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playUseTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+        Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc);
@@ -123,7 +121,7 @@ public final class InfernoUlt extends UltimateSkill {
      * @param i 인덱스
      */
     private void playTickEffect(long i) {
-        Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
+        Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
         Vector vector = VectorUtil.getRollAxis(loc).multiply(2);

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
@@ -10,11 +11,10 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.inventory.MainHand;
 
 /**
  * 기본 근접 공격 동작 클래스.
@@ -68,7 +68,6 @@ public final class MeleeAttackAction extends AbstractAction {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        Validate.notNull(combatUser.getCharacterType());
         return super.canUse(actionKey)
                 && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser)
                 && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
@@ -78,19 +77,19 @@ public final class MeleeAttackAction extends AbstractAction {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) COOLDOWN);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(COOLDOWN));
         setCooldown();
 
-        USE_SOUND.play(combatUser.getEntity().getLocation());
+        USE_SOUND.play(combatUser.getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
-        TaskUtil.addTask(combatUser, new DelayTask(() -> {
+        combatUser.getTaskManager().add(new DelayTask(() -> {
             new MeleeAttack().shot();
 
-            combatUser.playMeleeAttackAnimation(-7, 18, true);
+            combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(18), MainHand.RIGHT);
         }, 2));
 
-        TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
+        combatUser.getTaskManager().add(new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
     }
 
     private final class MeleeAttack extends Hitscan<Damageable> {

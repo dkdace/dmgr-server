@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.item.ItemBuilder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,9 +20,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
@@ -37,63 +35,61 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     /** 피해 모듈 */
     @NonNull
     private final HealModule damageModule;
-    /** 치명타 히트박스 객체 */
-    private final Hitbox critHitbox;
-    /** 팀 식별자 */
-    private final String teamIdentifier;
+    /** 적 여부 */
+    private final boolean isEnemy;
 
     /**
      * 더미 인스턴스를 생성한다.
      *
-     * @param entity         대상 엔티티
-     * @param maxHealth      최대 체력
-     * @param teamIdentifier 팀 식별자
+     * @param spawnLocation 생성 위치
+     * @param maxHealth     최대 체력
+     * @param isEnemy       적 여부. {@code true}로 지정 시 적 더미, {@code false}로 지정 시 아군 더미
      */
-    public Dummy(@NonNull Zombie entity, int maxHealth, @NonNull String teamIdentifier) {
-        super(entity, "훈련용 봇", null,
-                Hitbox.builder(entity.getLocation(), 0.5, 0.75, 0.3).axisOffsetY(0.375).pitchFixed().build(),
-                Hitbox.builder(entity.getLocation(), 0.8, 0.75, 0.45).axisOffsetY(1.125).pitchFixed().build(),
-                Hitbox.builder(entity.getLocation(), 0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.5).build(),
-                Hitbox.builder(entity.getLocation(), 0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.5).build()
-        );
-        knockbackModule = new KnockbackModule(this);
-        statusEffectModule = new StatusEffectModule(this);
-        damageModule = new HealModule(this, true, true, true, 0, maxHealth);
-        critHitbox = hitboxes[3];
-        this.teamIdentifier = teamIdentifier;
+    public Dummy(@NonNull Location spawnLocation, int maxHealth, boolean isEnemy) {
+        super(Zombie.class, spawnLocation, "훈련용 봇", null,
+                Hitbox.builder(0.5, 0.75, 0.3).axisOffsetY(0.375).pitchFixed().build(),
+                Hitbox.builder(0.8, 0.75, 0.45).axisOffsetY(1.125).pitchFixed().build(),
+                Hitbox.builder(0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.5).build(),
+                Hitbox.builder(0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.5).build());
+
+        this.knockbackModule = new KnockbackModule(this);
+        this.statusEffectModule = new StatusEffectModule(this);
+        this.damageModule = new HealModule(this, true, true, true, 0, maxHealth);
+        this.isEnemy = isEnemy;
 
         onInit();
     }
 
     /**
-     * 더미 인스턴스를 생성한다.
+     * 적 더미 인스턴스를 생성한다.
      *
-     * @param entity    대상 엔티티
-     * @param maxHealth 최대 체력
+     * @param spawnLocation 생성 위치
+     * @param maxHealth     최대 체력
      */
-    public Dummy(@NonNull Zombie entity, int maxHealth) {
-        this(entity, maxHealth, "Dummy");
+    public Dummy(@NonNull Location spawnLocation, int maxHealth) {
+        this(spawnLocation, maxHealth, true);
     }
 
     private void onInit() {
         entity.setBaby(false);
         entity.setSilent(true);
-        entity.setAI(false);
+        entity.setAI(true);
 
-        List<ItemStack> equipment = new ArrayList<>();
-        equipment.add(new ItemBuilder(Material.LEATHER_CHESTPLATE).build());
-        equipment.add(new ItemBuilder(Material.LEATHER_LEGGINGS).build());
-        equipment.add(new ItemBuilder(Material.LEATHER_BOOTS).build());
-        equipment.forEach(itemStack -> {
-            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+        ItemStack[] equipments = {
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).build(),
+                new ItemBuilder(Material.LEATHER_LEGGINGS).build(),
+                new ItemBuilder(Material.LEATHER_BOOTS).build()
+        };
+        for (ItemStack equipment : equipments) {
+            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) equipment.getItemMeta();
             leatherArmorMeta.setColor(Color.fromRGB(255, 255, 255));
-            itemStack.setItemMeta(leatherArmorMeta);
-        });
+            equipment.setItemMeta(leatherArmorMeta);
+        }
 
-        entity.getEquipment().setHelmet(new ItemBuilder(Material.STAINED_GLASS).setDamage((short) (teamIdentifier.equals("Dummy") ? 14 : 15)).build());
-        entity.getEquipment().setChestplate(equipment.get(0));
-        entity.getEquipment().setLeggings(equipment.get(1));
-        entity.getEquipment().setBoots(equipment.get(2));
+        entity.getEquipment().setHelmet(new ItemBuilder(Material.STAINED_GLASS).setDamage((short) (isEnemy ? 14 : 15)).build());
+        entity.getEquipment().setChestplate(equipments[0]);
+        entity.getEquipment().setLeggings(equipments[1]);
+        entity.getEquipment().setBoots(equipments[2]);
         entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 5, false, false));
     }
@@ -104,13 +100,32 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     }
 
     @Override
-    public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
-                         boolean isCrit, boolean isUlt) {
-        CombatEffectUtil.playBleedingParticle(location, this, damage);
+    @Nullable
+    public Game.Team getTeam() {
+        return null;
     }
 
     @Override
-    public void onTakeHeal(@Nullable Healer provider, double amount, boolean isUlt) {
+    public boolean isEnemy(@NonNull CombatEntity target) {
+        if (target instanceof CombatUser || target instanceof SummonEntity)
+            return isEnemy;
+
+        return !(target instanceof Dummy);
+    }
+
+    @Override
+    @Nullable
+    public Hitbox getCritHitbox() {
+        return hitboxes[3];
+    }
+
+    @Override
+    public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
+        CombatEffectUtil.playBleedingParticle(this, location, damage);
+    }
+
+    @Override
+    public void onTakeHeal(@Nullable Healer provider, double amount) {
         // 미사용
     }
 

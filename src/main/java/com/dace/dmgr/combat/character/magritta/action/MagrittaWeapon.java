@@ -65,7 +65,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
                 setCooldown();
 
-                Location loc = combatUser.getEntity().getLocation();
+                Location loc = combatUser.getLocation();
                 HashMap<Damageable, Integer> targets = new HashMap<>();
 
                 new MagrittaWeaponHitscan(targets).shot();
@@ -80,7 +80,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 blockHitCount = 0;
                 reloadModule.consume(1);
 
-                CombatUtil.setRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
+                CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
                         MagrittaWeaponInfo.RECOIL.SIDE_SPREAD, 3, 1);
                 MagrittaWeaponInfo.SOUND.USE.play(loc);
                 TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
@@ -119,7 +119,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public void onReloadTick(long i) {
-        MagrittaWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
+        MagrittaWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override

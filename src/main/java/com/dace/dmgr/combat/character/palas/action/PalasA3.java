@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.MainHand;
 
 import java.util.WeakHashMap;
 
@@ -50,14 +51,14 @@ public final class PalasA3 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) PalasA3Info.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasA3Info.READY_DURATION));
 
-        PalasA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        PalasA3Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA3Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
@@ -234,7 +235,7 @@ public final class PalasA3 extends ActiveSkill {
 
                         if (target instanceof CombatUser && target != combatUser) {
                             combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
-                            ((CombatUser) target).addKillAssist(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                            ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, Timespan.ofTicks(PalasA3Info.DURATION));
                         }
 
                         return true;

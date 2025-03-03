@@ -2,7 +2,6 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Role;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
@@ -10,7 +9,6 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -40,11 +38,7 @@ public final class SelectChar extends ChestGUI {
             if (isDisposed())
                 return false;
 
-            CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-            if (combatUser == null)
-                return false;
-
-            GameUser gameUser = combatUser.getGameUser();
+            GameUser gameUser = GameUser.fromUser(User.fromPlayer(player));
 
             int[] columnIndexList = {2, 2, 2, 2, 2, 2};
 
@@ -53,18 +47,7 @@ public final class SelectChar extends ChestGUI {
                 int columnIndex = columnIndexList[rowIndex]++;
 
                 set(rowIndex, columnIndex, characterType.getSelectItem(), itemBuilder -> {
-                    if (gameUser == null)
-                        return;
-
-                    boolean isDuplicated = gameUser.getTeam().getTeamUsers().stream()
-                            .anyMatch(targetGameUser -> {
-                                CombatUser targetCombatUser = CombatUser.fromUser(targetGameUser.getUser());
-                                Validate.notNull(targetCombatUser);
-
-                                return targetCombatUser.getCharacterType() == characterType;
-                            });
-
-                    if (isDuplicated)
+                    if (gameUser != null && gameUser.getTeam().checkCharacterDuplication(characterType))
                         itemBuilder.addLore("", "§c§l팀원이 이미 선택했습니다.");
                 });
             }

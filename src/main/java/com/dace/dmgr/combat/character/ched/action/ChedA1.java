@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.ched.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -65,9 +66,9 @@ public final class ChedA1 extends StackableSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.getWeapon().onCancelled();
-            combatUser.setGlobalCooldown((int) ChedA1Info.READY_DURATION);
+            combatUser.setGlobalCooldown(Timespan.ofTicks(ChedA1Info.READY_DURATION));
 
-            ChedA1Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            ChedA1Info.SOUND.USE.play(combatUser.getLocation());
 
             TaskUtil.addTask(taskRunner, new DelayTask(() -> {
                 isEnabled = true;
@@ -107,7 +108,7 @@ public final class ChedA1 extends StackableSkill {
 
         new ChedA1Projectile().shot();
 
-        ChedA1Info.SOUND.SHOOT.play(combatUser.getEntity().getLocation());
+        ChedA1Info.SOUND.SHOOT.play(combatUser.getLocation());
     }
 
     /**

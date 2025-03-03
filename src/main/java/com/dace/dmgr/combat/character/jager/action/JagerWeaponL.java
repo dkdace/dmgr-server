@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.jager.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -72,14 +73,14 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 new JagerWeaponLProjectile().shot();
                 reloadModule.consume(1);
 
-                CombatUtil.setRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
+                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
                         JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                JagerWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+                JagerWeaponInfo.SOUND.USE.play(combatUser.getLocation());
 
                 break;
             }
             case RIGHT_CLICK: {
-                combatUser.setGlobalCooldown(1);
+                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 onCancelled();
 
                 aimModule.toggleAim();
@@ -128,7 +129,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadTick(long i) {
-        JagerWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
+        JagerWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -140,7 +141,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onSwapStart(@NonNull SwapState swapState) {
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
 
-        (swapState == SwapState.PRIMARY ? JagerWeaponInfo.SOUND.SWAP_OFF : JagerWeaponInfo.SOUND.SWAP_ON).play(combatUser.getEntity().getLocation());
+        (swapState == SwapState.PRIMARY ? JagerWeaponInfo.SOUND.SWAP_OFF : JagerWeaponInfo.SOUND.SWAP_ON).play(combatUser.getLocation());
     }
 
     @Override
@@ -150,13 +151,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onAimEnable() {
-        combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -JagerWeaponInfo.AIM_SLOW);
     }
 
     @Override
     public void onAimDisable() {
-        combatUser.setGlobalCooldown((int) JagerWeaponInfo.SWAP_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
     }
 

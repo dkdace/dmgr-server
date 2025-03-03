@@ -8,8 +8,8 @@ import com.dace.dmgr.combat.entity.Property;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.effect.TextHologram;
+import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -34,13 +34,13 @@ public final class MagrittaT1 {
         if (victim.getPropertyManager().getValue(Property.SHREDDING) >= MagrittaT1Info.MAX) {
             victim.getStatusEffectModule().applyStatusEffect(attacker, MagrittaT1Burning.instance, MagrittaT1Info.DURATION);
 
-            MagrittaT1Info.SOUND.MAX.play(victim.getEntity().getLocation());
+            MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
 
             if (victim instanceof CombatUser)
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 
-        MagrittaT1Info.SOUND.USE.play(victim.getEntity().getLocation());
+        MagrittaT1Info.SOUND.USE.play(victim.getLocation());
     }
 
     /**

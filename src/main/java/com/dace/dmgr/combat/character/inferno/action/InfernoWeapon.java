@@ -63,12 +63,12 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     return;
                 }
 
-                Vector dir = VectorUtil.getSpreadedVector(combatUser.getEntity().getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
+                Vector dir = VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD);
                 new InfernoWeaponRProjectile().shot(dir);
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
-                InfernoWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+                InfernoWeaponInfo.SOUND.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -84,9 +84,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
 
-                CombatUtil.setRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
+                CombatUtil.sendRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
                         InfernoWeaponInfo.FIREBALL.RECOIL.UP_SPREAD, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE_SPREAD, 3, 1);
-                InfernoWeaponInfo.SOUND.USE_FIREBALL.play(combatUser.getEntity().getLocation());
+                InfernoWeaponInfo.SOUND.USE_FIREBALL.play(combatUser.getLocation());
 
                 break;
             }
@@ -122,7 +122,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     public void onReloadTick(long i) {
-        InfernoWeaponInfo.SOUND.RELOAD.play(i, combatUser.getEntity().getLocation());
+        InfernoWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override

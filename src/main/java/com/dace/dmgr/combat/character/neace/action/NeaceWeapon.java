@@ -20,6 +20,7 @@ import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
@@ -64,11 +65,11 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         switch (actionKey) {
             case LEFT_CLICK: {
                 setCooldown();
-                combatUser.playMeleeAttackAnimation(-3, 6, true);
+                combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
                 new NeaceWeaponProjectile().shot();
 
-                NeaceWeaponInfo.SOUND.USE.play(combatUser.getEntity().getLocation());
+                NeaceWeaponInfo.SOUND.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -84,12 +85,11 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
                     blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
 
-                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getEntity().getLocation());
+                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
                 combatUser.getUser().sendTitle("", MessageFormat.format("{0} : {1}§e{2}",
                                 (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished() ?
                                         "§a" + TextIcon.HEAL + " §f치유 중" : "§b" + TextIcon.DAMAGE_INCREASE + " §f강화 중"),
-                                (target instanceof CombatUser && ((CombatUser) target).getCharacterType() != null ?
-                                        ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : ""),
+                                target instanceof CombatUser ? ((CombatUser) target).getCharacterType().getCharacter().getIcon() + " " : "",
                                 target.getName()),
                         Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
 
@@ -116,7 +116,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         else if (!target.getStatusEffectModule().hasStatusEffect(NeaceA1.NeaceA1Mark.instance))
             target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20.0, true);
 
-        Location location = combatUser.getArmLocation(true);
+        Location location = combatUser.getArmLocation(MainHand.RIGHT);
         for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.8))
             (isAmplifying ? NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL).play(loc);
     }

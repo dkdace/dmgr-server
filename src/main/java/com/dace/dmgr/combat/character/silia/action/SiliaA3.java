@@ -54,7 +54,7 @@ public final class SiliaA3 extends ChargeableSkill {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaA3Info.SPEED);
 
-            SiliaA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            SiliaA3Info.SOUND.USE.play(combatUser.getLocation());
 
             double health = combatUser.getDamageModule().getHealth();
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
@@ -92,6 +92,6 @@ public final class SiliaA3 extends ChargeableSkill {
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
 
-        SiliaA3Info.SOUND.DISABLE.play(combatUser.getEntity().getLocation());
+        SiliaA3Info.SOUND.DISABLE.play(combatUser.getLocation());
     }
 }

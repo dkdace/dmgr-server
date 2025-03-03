@@ -30,39 +30,16 @@ public interface Damageable extends CombatEntity {
     StatusEffectModule getStatusEffectModule();
 
     /**
-     * 엔티티가 피해를 받을 수 있는지 확인한다.
-     *
-     * @return 피해를 받을 수 있으면 {@code true} 반환
-     * @implSpec {@code true}
-     */
-    default boolean canTakeDamage() {
-        return true;
-    }
-
-    /**
-     * 엔티티가 죽을 수 있는지 확인한다.
-     *
-     * @return 죽을 수 있으면 {@code true} 반환
-     * @implSpec {@code true}
-     */
-    default boolean canDie() {
-        return true;
-    }
-
-    /**
      * 엔티티가 피해를 입었을 때 실행될 작업.
      *
      * @param attacker      공격자
      * @param damage        피해량
      * @param reducedDamage 방어력에 의해 경감된 피해량
-     * @param damageType    타입
      * @param location      맞은 위치
      * @param isCrit        치명타 여부
-     * @param isUlt         궁극기 충전 여부
-     * @see Attacker#onAttack(Damageable, double, DamageType, boolean, boolean)
+     * @see Attacker#onAttack(Damageable, double, boolean, boolean)
      */
-    void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
-                  boolean isCrit, boolean isUlt);
+    void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit);
 
     /**
      * 엔티티가 죽었을 때 실행될 작업.

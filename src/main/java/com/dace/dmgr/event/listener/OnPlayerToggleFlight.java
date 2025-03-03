@@ -21,7 +21,7 @@ public final class OnPlayerToggleFlight extends EventListener<PlayerToggleFlight
     protected void onEvent(@NonNull PlayerToggleFlightEvent event) {
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
 
-        if (combatUser != null && combatUser.getCharacterType() != null)
+        if (combatUser != null)
             combatUser.useAction(ActionKey.SPACE);
     }
 }

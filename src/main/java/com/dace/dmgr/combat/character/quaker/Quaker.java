@@ -11,7 +11,6 @@ import com.dace.dmgr.combat.character.Guardian;
 import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
@@ -138,12 +137,12 @@ public final class Quaker extends Guardian {
         if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
 
-        FOOTSTEP_SOUND.play(combatUser.getEntity().getLocation(), volume);
+        FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(location, victim, damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
+        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

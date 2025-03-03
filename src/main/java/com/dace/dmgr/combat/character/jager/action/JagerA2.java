@@ -19,6 +19,7 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 public final class JagerA2 extends ActiveSkill {
@@ -55,17 +56,17 @@ public final class JagerA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) JagerA2Info.READY_DURATION);
+        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerA2Info.READY_DURATION));
 
         if (summonEntity != null)
             summonEntity.dispose();
 
-        JagerA2Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+        JagerA2Info.SOUND.USE.play(combatUser.getLocation());
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
             onCancelled();
 
-            Location loc = combatUser.getArmLocation(true);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerA2Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
@@ -100,8 +101,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy(@NonNull Location location) {
-            summonEntity = new JagerA2Entity(CombatUtil.spawnEntity(ArmorStand.class, location), combatUser);
-            summonEntity.activate();
+            summonEntity = new JagerA2Entity(location);
         }
 
         @Override
@@ -143,16 +143,16 @@ public final class JagerA2 extends ActiveSkill {
         @NonNull
         private final DamageModule damageModule;
         /** 준비 시간 모듈 */
-        @NonNull
         private final ReadyTimeModule readyTimeModule;
 
-        private JagerA2Entity(@NonNull ArmorStand entity, @NonNull CombatUser owner) {
+        private JagerA2Entity(@NonNull Location spawnLocation) {
             super(
-                    entity,
-                    owner.getName() + "의 곰덫",
-                    owner,
+                    ArmorStand.class,
+                    spawnLocation,
+                    combatUser.getName() + "의 곰덫",
+                    combatUser,
                     true, true,
-                    Hitbox.builder(entity.getLocation(), 0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build()
+                    Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build()
             );
 
             knockbackModule = new KnockbackModule(this, 2);
@@ -165,35 +165,25 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         private void onInit() {
-            entity.setAI(false);
-            entity.setInvulnerable(true);
-            entity.setSilent(true);
-            entity.setMarker(true);
-            entity.setSmall(true);
-            entity.setVisible(false);
-            entity.teleport(entity.getLocation().add(0, 0.05, 0));
+            entity.teleport(getLocation().add(0, 0.05, 0));
             damageModule.setMaxHealth(JagerA2Info.HEALTH);
             damageModule.setHealth(JagerA2Info.HEALTH);
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
-            JagerA2Info.SOUND.SUMMON.play(entity.getLocation());
-        }
+            JagerA2Info.SOUND.SUMMON.play(getLocation());
 
-        @Override
-        public void activate() {
-            super.activate();
             readyTimeModule.ready();
         }
 
         @Override
         public void onTickBeforeReady(long i) {
-            JagerA2Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(entity.getLocation());
+            JagerA2Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(getLocation());
             playTickEffect();
         }
 
         @Override
         public void onReady() {
-            JagerA2Info.SOUND.SUMMON_READY.play(entity.getLocation());
+            JagerA2Info.SOUND.SUMMON_READY.play(getLocation());
         }
 
         @Override
@@ -201,7 +191,7 @@ public final class JagerA2 extends ActiveSkill {
             if (!readyTimeModule.isReady())
                 return;
 
-            Damageable target = CombatUtil.getNearCombatEntity(game, entity.getLocation().add(0, 0.5, 0), 0.8,
+            Damageable target = CombatUtil.getNearCombatEntity(game, getLocation().add(0, 0.5, 0), 0.8,
                     CombatUtil.EntityCondition.enemy(this).and(combatEntity -> combatEntity.getDamageModule().isLiving()));
             if (target != null)
                 onCatchEnemy(target);
@@ -214,11 +204,11 @@ public final class JagerA2 extends ActiveSkill {
          */
         private void playTickEffect() {
             for (int i = 0; i < 7; i++) {
-                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
-                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
+                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
+                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
             }
             for (int i = 0; i < 5; i++)
-                JagerA2Info.PARTICLE.DISPLAY.play(entity.getLocation().add(0, 0, 0.4 - i * 0.2));
+                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(0, 0, 0.4 - i * 0.2));
         }
 
         /**
@@ -227,7 +217,7 @@ public final class JagerA2 extends ActiveSkill {
          * @param target 대상 엔티티
          */
         private void onCatchEnemy(@NonNull Damageable target) {
-            if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getEntity().getLocation().add(0, 0.2, 0),
+            if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getLocation().add(0, 0.2, 0),
                     false, true)) {
                 target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
 
@@ -235,21 +225,30 @@ public final class JagerA2 extends ActiveSkill {
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
             }
 
-            JagerA2Info.SOUND.TRIGGER.play(entity.getLocation());
+            JagerA2Info.SOUND.TRIGGER.play(getLocation());
 
             dispose();
         }
 
         @Override
-        public void dispose() {
-            super.dispose();
-
+        protected void onDispose() {
+            super.onDispose();
             summonEntity = null;
         }
 
         @Override
-        public void onAttack(@NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit, boolean isUlt) {
-            owner.onAttack(victim, damage, damageType, isCrit, isUlt);
+        public double getWidth() {
+            return 0.8;
+        }
+
+        @Override
+        public double getHeight() {
+            return 0.1;
+        }
+
+        @Override
+        public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
+            owner.onAttack(victim, damage, isCrit, isUlt);
 
             combatUser.getSkill(JagerP1Info.getInstance()).setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
@@ -261,18 +260,18 @@ public final class JagerA2 extends ActiveSkill {
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
-                             boolean isCrit, boolean isUlt) {
-            JagerA2Info.SOUND.DAMAGE.play(entity.getLocation(), 1 + damage * 0.001);
-            CombatEffectUtil.playBreakParticle(location, this, damage);
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location,
+                             boolean isCrit) {
+            JagerA2Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            CombatEffectUtil.playBreakParticle(this, location, damage);
         }
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             dispose();
 
-            JagerA2Info.PARTICLE.DEATH.play(entity.getLocation());
-            JagerA2Info.SOUND.DEATH.play(entity.getLocation());
+            JagerA2Info.PARTICLE.DEATH.play(getLocation());
+            JagerA2Info.SOUND.DEATH.play(getLocation());
         }
     }
 }

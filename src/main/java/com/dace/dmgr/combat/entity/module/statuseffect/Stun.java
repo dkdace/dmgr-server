@@ -1,16 +1,14 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestrictions;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.Timespan;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -35,20 +33,15 @@ public class Stun implements StatusEffect {
     @Override
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-        if (combatEntity instanceof CombatUser) {
-            Validate.notNull(((CombatUser) combatEntity).getCharacterType());
-
-            if (provider instanceof CombatUser)
-                ((CombatUser) combatEntity).cancelAction((CombatUser) provider);
-        }
+        if (combatEntity instanceof CombatUser && provider instanceof CombatUser)
+            ((CombatUser) combatEntity).cancelAction((CombatUser) provider);
     }
 
     @Override
     public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
         if (combatEntity instanceof CombatUser) {
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l기절함!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
-
-            CombatUtil.setYawAndPitch(combatEntity.getEntity(), combatEntity.getEntity().getLocation().getYaw(), combatEntity.getEntity().getLocation().getPitch());
+            ((CombatUser) combatEntity).setYawAndPitch(combatEntity.getLocation().getYaw(), combatEntity.getLocation().getPitch());
         }
     }
 

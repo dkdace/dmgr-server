@@ -11,7 +11,10 @@ import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.Controller;
 import com.dace.dmgr.combat.character.Role;
 import com.dace.dmgr.combat.character.vellion.action.*;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -135,7 +138,7 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, @NonNull DamageType damageType, boolean isCrit) {
+    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         if (victim.getDamageModule().isLiving()) {
             attacker.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
             attacker.useAction(ActionKey.PERIODIC_1);
@@ -145,8 +148,8 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(location, victim, damage);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, Location location, boolean isCrit) {
+        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

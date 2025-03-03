@@ -24,7 +24,7 @@ public final class OnPlayerMove extends EventListener<PlayerMoveEvent> {
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
 
-        if (combatUser != null && combatUser.getCharacterType() != null && FreeCombat.getInstance().isInFreeCombatWarp(player))
+        if (combatUser != null && FreeCombat.getInstance().isInFreeCombatWarp(player))
             FreeCombat.getInstance().teleportRandom(user);
     }
 }

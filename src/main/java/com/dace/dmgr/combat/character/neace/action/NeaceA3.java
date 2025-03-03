@@ -65,14 +65,14 @@ public final class NeaceA3 extends ActiveSkill {
         protected void onFindEntity(@NonNull Healable target) {
             setDuration();
 
-            NeaceA3Info.SOUND.USE.play(combatUser.getEntity().getLocation());
+            NeaceA3Info.SOUND.USE.play(combatUser.getLocation());
 
             TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
                 if (!target.canBeTargeted() || target.isDisposed() || combatUser.getKnockbackModule().isKnockbacked())
                     return false;
 
-                Location loc = combatUser.getEntity().getLocation().add(0, 1, 0);
-                Location targetLoc = target.getEntity().getLocation().add(0, 1.5, 0);
+                Location loc = combatUser.getLocation().add(0, 1, 0);
+                Location targetLoc = target.getLocation().add(0, 1.5, 0);
                 Vector vec = LocationUtil.getDirection(loc, targetLoc).multiply(NeaceA3Info.PUSH);
 
                 if (targetLoc.distance(loc) < 1.5)
@@ -87,7 +87,7 @@ public final class NeaceA3 extends ActiveSkill {
                 NeaceA3Info.PARTICLE.TICK_CORE.play(loc);
 
                 TaskUtil.addTask(NeaceA3.this, new DelayTask(() -> {
-                    Location loc2 = combatUser.getEntity().getLocation().add(0, 1, 0);
+                    Location loc2 = combatUser.getLocation().add(0, 1, 0);
                     for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
                         NeaceA3Info.PARTICLE.TICK_DECO.play(loc3);
                 }, 1));
