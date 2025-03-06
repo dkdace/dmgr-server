@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
@@ -24,8 +25,8 @@ import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
 public final class ChedA3 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "ChedA3";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedA3Info.READY_SLOW);
     /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
@@ -59,7 +60,7 @@ public final class ChedA3 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.setGlobalCooldown(Timespan.ofTicks(ChedA3Info.READY_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedA3Info.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
@@ -101,7 +102,7 @@ public final class ChedA3 extends ActiveSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     /**
@@ -151,8 +152,7 @@ public final class ChedA3 extends ActiveSkill {
 
     private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
-            super(combatUser, ChedA3Info.VELOCITY,
-                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity -> combatEntity.getDamageModule().isCreature()),
+            super(combatUser, ChedA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature),
                     Option.builder().size(ChedA3Info.SIZE).build());
         }
 

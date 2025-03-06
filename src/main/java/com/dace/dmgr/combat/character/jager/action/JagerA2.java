@@ -6,7 +6,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.*;
+import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
@@ -130,9 +133,6 @@ public final class JagerA2 extends ActiveSkill {
      */
     @Getter
     private final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
-        /** 넉백 모듈 */
-        @NonNull
-        private final KnockbackModule knockbackModule;
         /** 상태 효과 모듈 */
         @NonNull
         private final StatusEffectModule statusEffectModule;
@@ -155,11 +155,10 @@ public final class JagerA2 extends ActiveSkill {
                     Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build()
             );
 
-            knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this);
-            attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, false, JagerA2Info.DEATH_SCORE, JagerA2Info.HEALTH);
-            readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
+            attackModule = new AttackModule();
+            damageModule = new DamageModule(this, JagerA2Info.HEALTH, true);
+            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerA2Info.SUMMON_DURATION));
 
             onInit();
         }
@@ -171,8 +170,6 @@ public final class JagerA2 extends ActiveSkill {
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             JagerA2Info.SOUND.SUMMON.play(getLocation());
-
-            readyTimeModule.ready();
         }
 
         @Override
@@ -192,7 +189,7 @@ public final class JagerA2 extends ActiveSkill {
                 return;
 
             Damageable target = CombatUtil.getNearCombatEntity(game, getLocation().add(0, 0.5, 0), 0.8,
-                    CombatUtil.EntityCondition.enemy(this).and(combatEntity -> combatEntity.getDamageModule().isLiving()));
+                    CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
             if (target != null)
                 onCatchEnemy(target);
 
@@ -219,7 +216,7 @@ public final class JagerA2 extends ActiveSkill {
         private void onCatchEnemy(@NonNull Damageable target) {
             if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getLocation().add(0, 0.2, 0),
                     false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(this, Snare.getInstance(), JagerA2Info.SNARE_DURATION);
+                target.getStatusEffectModule().apply(Snare.getInstance(), this, Timespan.ofTicks(JagerA2Info.SNARE_DURATION));
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
@@ -244,6 +241,16 @@ public final class JagerA2 extends ActiveSkill {
         @Override
         public double getHeight() {
             return 0.1;
+        }
+
+        @Override
+        public boolean isCreature() {
+            return false;
+        }
+
+        @Override
+        public double getScore() {
+            return JagerA2Info.DEATH_SCORE;
         }
 
         @Override

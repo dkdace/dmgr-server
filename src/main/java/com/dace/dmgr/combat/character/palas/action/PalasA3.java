@@ -8,14 +8,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -90,20 +87,12 @@ public final class PalasA3 extends ActiveSkill {
     /**
      * 체력 증가 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class PalasA3HealthIncrease implements StatusEffect {
+    private static final class PalasA3HealthIncrease extends StatusEffect {
         /** 증가한 최대 체력 */
         private int increasedHealth;
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return true;
+        private PalasA3HealthIncrease() {
+            super(true);
         }
 
         @Override
@@ -134,20 +123,12 @@ public final class PalasA3 extends ActiveSkill {
     /**
      * 체력 감소 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class PalasA3HealthDecrease implements StatusEffect {
+    private static final class PalasA3HealthDecrease extends StatusEffect {
         /** 감소한 최대 체력 */
         private int decreasedHealth;
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return false;
+        private PalasA3HealthDecrease() {
+            super(false);
         }
 
         @Override
@@ -221,17 +202,17 @@ public final class PalasA3 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (target.getDamageModule().isLiving()) {
+                if (target.isCreature()) {
                     if (target.isEnemy(combatUser)) {
                         if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
                                 false, true)) {
-                            target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthDecrease(), PalasA3Info.DURATION);
+                            target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, Timespan.ofTicks(PalasA3Info.DURATION));
 
                             if (target instanceof CombatUser)
                                 assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA3Info.DURATION)));
                         }
                     } else if (target instanceof Healable) {
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, new PalasA3HealthIncrease(), PalasA3Info.DURATION);
+                        target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, Timespan.ofTicks(PalasA3Info.DURATION));
 
                         if (target instanceof CombatUser && target != combatUser) {
                             combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);

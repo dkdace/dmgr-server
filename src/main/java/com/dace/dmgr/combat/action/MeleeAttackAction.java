@@ -3,10 +3,7 @@ package com.dace.dmgr.combat.action;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -70,7 +67,7 @@ public final class MeleeAttackAction extends AbstractAction {
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey)
                 && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser)
-                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
+                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.MELEE_ATTACK)
                 && combatUser.isGlobalCooldownFinished();
     }
 
@@ -83,13 +80,13 @@ public final class MeleeAttackAction extends AbstractAction {
         USE_SOUND.play(combatUser.getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
-        combatUser.getTaskManager().add(new DelayTask(() -> {
+        combatUser.addTask(new DelayTask(() -> {
             new MeleeAttack().shot();
 
             combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(18), MainHand.RIGHT);
         }, 2));
 
-        combatUser.getTaskManager().add(new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
+        combatUser.addTask(new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
     }
 
     private final class MeleeAttack extends Hitscan<Damageable> {
@@ -119,8 +116,8 @@ public final class MeleeAttackAction extends AbstractAction {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true))
-                    target.getKnockbackModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
+                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true) && target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
 
                 HIT_ENTITY_SOUND.play(location);
                 HIT_ENTITY_PARTICLE.play(location);

@@ -3,13 +3,14 @@ package com.dace.dmgr.combat.character.arkace.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 public final class ArkaceP1 extends AbstractSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "ArkaceP1";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(ArkaceP1Info.SPRINT_SPEED);
 
     public ArkaceP1(@NonNull CombatUser combatUser) {
         super(combatUser);
@@ -39,7 +40,7 @@ public final class ArkaceP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, ArkaceP1Info.SPRINT_SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> combatUser.getEntity().isSprinting()
@@ -57,7 +58,7 @@ public final class ArkaceP1 extends AbstractSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
     }
 }

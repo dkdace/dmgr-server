@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -180,13 +181,16 @@ public final class MagrittaA1 extends ActiveSkill {
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
                         MagrittaA1Info.RADIUS / 2.0);
-                long burning = (long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
-                        MagrittaA1Info.RADIUS / 2.0);
+                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
+                        MagrittaA1Info.RADIUS / 2.0));
                 if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null,
                         false, true)) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, MagrittaA1Burning.instance, burning);
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                            .multiply(MagrittaA1Info.KNOCKBACK));
+                    target.getStatusEffectModule().apply(MagrittaA1Burning.instance, combatUser, burning);
+
+                    if (target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                                .multiply(MagrittaA1Info.KNOCKBACK));
+
                     MagrittaT1.addShreddingValue(combatUser, target);
                 }
 

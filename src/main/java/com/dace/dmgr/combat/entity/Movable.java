@@ -22,4 +22,14 @@ public interface Movable extends CombatEntity {
     default boolean canMove() {
         return true;
     }
+
+    /**
+     * 엔티티가 점프할 수 있는지 확인한다.
+     *
+     * @return 점프 가능 여부
+     * @implSpec {@code true}
+     */
+    default boolean canJump() {
+        return true;
+    }
 }

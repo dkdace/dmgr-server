@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.vellion.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -14,8 +15,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public final class VellionP1 extends AbstractSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "VellionP1";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(VellionP1Info.SPEED);
 
     public VellionP1(@NonNull CombatUser combatUser) {
         super(combatUser);
@@ -41,7 +42,7 @@ public final class VellionP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, VellionP1Info.SPEED);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
             Location location = combatUser.getLocation();
 
             VellionP1Info.SOUND.USE.play(location);
@@ -87,7 +88,7 @@ public final class VellionP1 extends AbstractSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,
                 40, -10, false, false), true);
 

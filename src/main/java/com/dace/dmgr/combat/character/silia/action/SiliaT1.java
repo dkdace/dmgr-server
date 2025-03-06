@@ -16,7 +16,7 @@ public final class SiliaT1 {
      * @return 백어택 여부
      */
     static boolean isBackAttack(@NonNull Vector direction, @NonNull Damageable victim) {
-        if (!(victim.getDamageModule().isLiving()))
+        if (!victim.isCreature())
             return false;
 
         Vector dir = direction.clone().normalize().setY(0).normalize();

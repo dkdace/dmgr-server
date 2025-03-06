@@ -5,8 +5,6 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.SoundEffect;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -14,26 +12,27 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 화염 상태 효과를 처리하는 클래스.
  */
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Burning implements StatusEffect {
+public class Burning extends StatusEffect {
     /** 화염 피해 효과음 */
     private static final SoundEffect BURNING_DAMAGE_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build());
 
     /** 초당 피해량 */
-    private final int damagePerSecond;
-    /** 궁극기 충전 여부 */
+    private final double damagePerSecond;
+    /** 궁극기 제공 여부 */
     private final boolean isUlt;
 
-    @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.BURNING;
-    }
+    /**
+     * 화염 상태 효과 인스턴스를 생성한다.
+     *
+     * @param damagePerSecond 초당 피해량
+     * @param isUlt           궁극기 제공 여부
+     */
+    protected Burning(double damagePerSecond, boolean isUlt) {
+        super(StatusEffectType.BURNING, false);
 
-    @Override
-    public final boolean isPositive() {
-        return false;
+        this.damagePerSecond = damagePerSecond;
+        this.isUlt = isUlt;
     }
 
     @Override

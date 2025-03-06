@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.Disposable;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -119,8 +119,7 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return isCooldownFinished()
-                && !combatUser.getStatusEffectModule().hasAllRestrictions(CombatRestrictions.USE_ACTION);
+        return isCooldownFinished() && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
     }
 
     @Override

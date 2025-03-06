@@ -5,7 +5,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
@@ -38,7 +38,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
         if (combatUser == null)
             return false;
 
-        if (combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEAR))
+        if (combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.HEAR))
             return true;
 
         Player target = (Player) location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5).stream()

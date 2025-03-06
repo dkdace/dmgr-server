@@ -1,8 +1,10 @@
 package com.dace.dmgr.combat.character.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -12,8 +14,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public final class MagrittaA2 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "MagrittaA2";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(MagrittaA2Info.SPEED);
 
     public MagrittaA2(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaA2Info.getInstance(), 1);
@@ -45,8 +47,8 @@ public final class MagrittaA2 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, MagrittaA2Info.SPEED);
-        combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), MagrittaA2Info.DURATION);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, Timespan.ofTicks(MagrittaA2Info.DURATION));
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION, 2, false, false), true);
 
@@ -63,7 +65,7 @@ public final class MagrittaA2 extends ActiveSkill {
             return true;
         }, isCancelled -> {
             combatUser.getWeapon().setVisible(true);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
             ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
 
             MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());

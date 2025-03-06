@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
@@ -13,8 +14,8 @@ import org.bukkit.Location;
 
 @Getter
 public final class SiliaUlt extends UltimateSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "SiliaUlt";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaUltInfo.SPEED);
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -115,7 +116,7 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getWeapon().setVisible(true);
         combatUser.getWeapon().setGlowing(true);
         combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaUltInfo.SPEED);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
 
         SiliaUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
@@ -123,7 +124,7 @@ public final class SiliaUlt extends UltimateSkill {
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
             isEnabled = false;
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }, 1));
     }
 }

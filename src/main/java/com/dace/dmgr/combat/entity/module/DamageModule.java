@@ -12,124 +12,88 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.WeakHashMap;
 
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
  *
- * <p>전투 시스템 엔티티가 {@link Damageable}을 상속받는 클래스여야 하며,
- * 엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
+ * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  *
  * @see Damageable
  */
 public class DamageModule {
     /** 방어력 배수 기본값 */
-    public static final double DEFAULT_VALUE = 1;
+    private static final double DEFAULT_VALUE = 1;
     /** 치명타 배수 기본값 */
-    public static final double DEFAULT_CRIT_MULTIPLIER = 2;
+    private static final double DEFAULT_CRIT_MULTIPLIER = 2;
 
-    /** NMS 플레이어 반환 메소드 객체 */
+    /** NMS 플레이어 반환 메소드 인스턴스 */
     private static Method getHandleMethod;
-    /** NMS 플레이어 보호막 설정 메소드 객체 */
+    /** NMS 플레이어 보호막 설정 메소드 인스턴스 */
     private static Method setAbsorptionHeartsMethod;
 
-    /** 엔티티 객체 */
-    @NonNull
-    @Getter
+    /** 엔티티 인스턴스 */
     protected final Damageable combatEntity;
-    /** 엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부 */
-    @Getter
-    protected final boolean isUltProvider;
-    /** 생명력 홀로그램 표시 여부 */
-    @Getter
-    protected final boolean isShowHealthBar;
-    /** 살아있는(Living) 엔티티 여부 */
-    @Getter
-    protected final boolean isLiving;
-    /** 죽었을 때 공격자에게 주는 점수 */
-    @Getter
-    protected final int score;
     /** 방어력 배수 값 */
     @NonNull
     @Getter
     private final AbilityStatus defenseMultiplierStatus;
-    /** 보호막 목록 (보호막 ID : 보호막 양) */
-    private final HashMap<String, Double> shieldMap = new HashMap<>();
-    /** 플레이어별 생명력 홀로그램 타임스탬프 목록 (공격자 : 종료 시점) */
+    /** 생명력 홀로그램 표시 여부 */
+    private final boolean hasHealthBar;
+    /** 보호막 목록 */
+    private final ArrayList<Shield> shields = new ArrayList<>();
+    /** 플레이어별 생명력 홀로그램 표시 타임스탬프 목록 (공격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> showHealthHologramTimestampMap = new WeakHashMap<>();
+
     /** 최대 체력 */
     @Getter
-    protected int maxHealth;
+    private int maxHealth;
     /** 피격 시 애니메이션 타임스탬프 */
     private Timestamp damageAnimationTimestamp = Timestamp.now();
 
     /**
      * 피해 모듈 인스턴스를 생성한다.
      *
-     * @param combatEntity      대상 엔티티
-     * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param isShowHealthBar   생명력 홀로그램 표시 여부
-     * @param isLiving          살아있는(Living) 엔티티 여부
-     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
-     * @param maxHealth         최대 체력. 0 이상의 값
-     * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
-     *                                  상속받지 않으면 발생
+     * @param combatEntity 대상 엔티티
+     * @param maxHealth    최대 체력. 1 이상의 값
+     * @param hasHealthBar 생명력 홀로그램 표시 여부
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
-    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
-                        int score, int maxHealth, double defenseMultiplier) {
-        if (score < 0 || maxHealth < 0 || defenseMultiplier < 0)
-            throw new IllegalArgumentException("'score', 'maxHealth' 및 'defenseMultiplier'가 0 이상이어야 함");
-        if (!(combatEntity.getEntity() instanceof LivingEntity))
-            throw new IllegalArgumentException("'combatEntity'의 엔티티가 LivingEntity를 상속받지 않음");
+    public DamageModule(@NonNull Damageable combatEntity, int maxHealth, boolean hasHealthBar) {
+        Validate.isTrue(maxHealth >= 1, "maxHealth >= 1 (%d)", maxHealth);
+        Validate.isTrue(combatEntity.getEntity() instanceof LivingEntity, "combatEntity.getEntity()가 LivingEntity를 상속받지 않음");
 
         this.combatEntity = combatEntity;
-        this.defenseMultiplierStatus = new AbilityStatus(defenseMultiplier);
-        this.isUltProvider = isUltProvider;
-        this.isShowHealthBar = isShowHealthBar;
-        this.isLiving = isLiving;
-        this.score = score;
+        this.defenseMultiplierStatus = new AbilityStatus(DEFAULT_VALUE);
         this.maxHealth = maxHealth;
+        this.hasHealthBar = hasHealthBar;
 
         setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
 
-        if (isShowHealthBar)
-            combatEntity.getTaskManager().add(new DelayTask(this::addHealthHologram, 5));
-    }
-
-    /**
-     * 피해 모듈 인스턴스를 생성한다.
-     *
-     * @param combatEntity    대상 엔티티
-     * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param isShowHealthBar 생명력 홀로그램 표시 여부
-     * @param score           죽었을 때 공격자에게 주는 점수. 0 이상의 값
-     * @param maxHealth       최대 체력. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
-     *                                  상속받지 않으면 발생
-     */
-    public DamageModule(@NonNull Damageable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
-                        int score, int maxHealth) {
-        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, DEFAULT_VALUE);
+        combatEntity.addOnDispose(this::clearShields);
+        if (hasHealthBar)
+            combatEntity.addTask(new DelayTask(this::createHealthBar, 5));
     }
 
     /**
      * 생명력 홀로그램을 생성한다.
      */
-    private void addHealthHologram() {
+    private void createHealthBar() {
         TextHologram textHologram = new TextHologram(combatEntity.getEntity(), target -> {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
             if (targetCombatUser == null)
@@ -143,26 +107,20 @@ public class DamageModule {
                 return targetCombatUser != combatEntity;
         }, 0);
 
-        new IntervalTask(i -> {
-            if (combatEntity.isDisposed())
-                return false;
-
-            double current = getHealth();
-            int max = getMaxHealth();
+        combatEntity.addOnTick(() -> {
             ChatColor color;
-            if (combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.HEAL_BLOCK))
+            if (combatEntity.getStatusEffectModule().hasType(StatusEffectType.HEAL_BLOCK))
                 color = ChatColor.DARK_PURPLE;
-            else if (current <= max / 4.0)
+            else if (isLowHealth())
                 color = ChatColor.RED;
-            else if (current <= max / 2.0)
+            else if (isHalfHealth())
                 color = ChatColor.YELLOW;
             else
                 color = ChatColor.GREEN;
 
-            textHologram.setContent(StringFormUtil.getProgressBar(current, max, color));
-
-            return true;
-        }, textHologram::dispose, 1);
+            textHologram.setContent(StringFormUtil.getProgressBar(getHealth(), getMaxHealth(), color));
+        });
+        combatEntity.addOnDispose(textHologram::dispose);
     }
 
     /**
@@ -186,84 +144,71 @@ public class DamageModule {
     /**
      * 엔티티의 최대 체력을 설정한다.
      *
-     * @param health 실제 체력×50 (체력 1줄 기준 1000). 0 이상의 값
+     * @param maxHealth 실제 체력×50 (체력 1줄 기준 1000). 1 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final void setMaxHealth(int health) {
-        if (health < 0)
-            throw new IllegalArgumentException("'health'가 0 이상이어야 함");
+    public final void setMaxHealth(int maxHealth) {
+        Validate.isTrue(maxHealth >= 1, "maxHealth >= 1", maxHealth);
 
-        maxHealth = health;
-        if (maxHealth < getHealth())
-            setHealth(health);
-        ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(health / 50.0);
+        this.maxHealth = maxHealth;
+        if (this.maxHealth < getHealth())
+            setHealth(maxHealth);
+
+        ((LivingEntity) combatEntity.getEntity()).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth / 50.0);
+    }
+
+    /**
+     * 엔티티의 체력이 최대치인지 확인한다.
+     *
+     * @return 체력이 최대치이면 {@code true} 반환
+     */
+    public final boolean isFullHealth() {
+        return getHealth() == getMaxHealth();
+    }
+
+    /**
+     * 엔티티의 체력이 절반 이하인지 확인한다.
+     *
+     * @return 체력이 50% 이하면 {@code true} 반환
+     */
+    public final boolean isHalfHealth() {
+        return getHealth() <= getMaxHealth() / 2.0;
     }
 
     /**
      * 엔티티가 치명상인지 확인한다.
      *
-     * @return 체력이 25% 이하이면 {@code true} 반환
+     * @return 체력이 25% 이하면 {@code true} 반환
      */
     public final boolean isLowHealth() {
         return getHealth() <= getMaxHealth() / 4.0;
     }
 
     /**
-     * 엔티티의 보호막을 반환한다.
+     * 엔티티의 보호막을 생성하여 반환한다.
      *
-     * @return 실제 보호막×50 (체력 1줄 기준 1000)
+     * @param health 보호막 체력 (실제 보호막×50 (체력 1줄 기준 1000))
      */
-    public final double getShield() {
-        return shieldMap.values().stream().mapToDouble(Double::doubleValue).sum();
+    @NonNull
+    public final Shield createShield(int health) {
+        return new Shield(health);
     }
 
     /**
-     * 엔티티의 보호막을 반환한다.
+     * 엔티티의 전체 보호막 체력을 반환한다.
      *
-     * @param id 보호막 ID
-     * @return 실제 보호막×50 (체력 1줄 기준 1000)
+     * @return 전체 보호막 체력 (실제 보호막×50 (체력 1줄 기준 1000))
+     * @see Shield#getHealth()
      */
-    public final double getShield(@NonNull String id) {
-        return shieldMap.getOrDefault(id, 0.0);
+    public final double getTotalShield() {
+        return shields.stream().mapToDouble(Shield::getHealth).sum();
     }
 
     /**
-     * 엔티티의 보호막을 설정한다.
-     *
-     * @param id     보호막 ID
-     * @param shield 실제 보호막×50 (체력 1줄 기준 1000)
+     * 엔티티의 전체 보호막을 초기화한다.
      */
-    public final void setShield(@NonNull String id, double shield) {
-        if (shield <= 0)
-            shieldMap.remove(id);
-        else
-            shieldMap.put(id, shield);
-
-        if (!(combatEntity.getEntity() instanceof Player))
-            return;
-
-        try {
-            if (getHandleMethod == null) {
-                getHandleMethod = combatEntity.getEntity().getClass().getMethod("getHandle");
-                getHandleMethod.setAccessible(true);
-            }
-
-            Object nmsPlayer = getHandleMethod.invoke(combatEntity.getEntity());
-            if (setAbsorptionHeartsMethod == null)
-                setAbsorptionHeartsMethod = nmsPlayer.getClass().getMethod("setAbsorptionHearts", Float.TYPE);
-
-            setAbsorptionHeartsMethod.invoke(nmsPlayer, (float) (getShield() / 50.0));
-        } catch (Exception ex) {
-            ConsoleLogger.severe("보호막을 표시할 수 없음", ex);
-        }
-    }
-
-    /**
-     * 엔티티의 보호막을 초기화한다.
-     */
-    public final void clearShield() {
-        shieldMap.clear();
-        setShield("", 0);
+    public final void clearShields() {
+        new ArrayList<>(shields).forEach(shield -> shield.setHealth(0));
     }
 
     /**
@@ -280,8 +225,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      */
     private boolean handleDamage(@Nullable Attacker attacker, double damage, double damageMultiplier, double defenseMultiplier,
-                                 @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.DAMAGED))
+                                 @NonNull DamageType damageType, @Nullable Location location, double critMultiplier, boolean isUlt) {
+        if (combatEntity.getEntity().isDead() || combatEntity.getStatusEffectModule().hasRestriction(CombatRestriction.DAMAGED))
             return false;
         if (damage == 0)
             return true;
@@ -293,32 +238,21 @@ public class DamageModule {
         }
 
         damage *= critMultiplier;
-        double finalDamage = Math.max(0, damage * (1 + damageMultiplier - defenseMultiplier));
-
-        if (getShield() > 0 && damageType != DamageType.IGNORE_DEFENSE)
-            for (String id : shieldMap.keySet()) {
-                if (getShield(id) > finalDamage) {
-                    setShield(id, getShield() - finalDamage);
-                    finalDamage = 0;
-                    break;
-                }
-
-                finalDamage -= getShield(id);
-                setShield(id, 0);
-            }
-
-        finalDamage = Math.min(finalDamage, getHealth());
-
+        double finalDamage = getFinalDamage(damage, damageMultiplier, defenseMultiplier, damageType);
+        double safeFinalDamage = Math.min(finalDamage, getHealth());
         boolean isKilled = getHealth() <= finalDamage;
+
         if (!isKilled)
             setHealth(getHealth() - finalDamage);
 
         if (attacker != null)
-            attacker.onAttack(combatEntity, finalDamage, critMultiplier != 1, isUlt);
+            attacker.onAttack(combatEntity, safeFinalDamage, critMultiplier != 1, isUlt);
+
         double reducedDamage = Math.max(0, damage * damageMultiplier - finalDamage);
-        combatEntity.onDamage(attacker, finalDamage, reducedDamage, location, critMultiplier != 1);
+        combatEntity.onDamage(attacker, safeFinalDamage, reducedDamage, location, critMultiplier != 1);
+
         playHitEffect();
-        if (isShowHealthBar && attacker instanceof CombatUser)
+        if (hasHealthBar && attacker instanceof CombatUser)
             showHealthHologramTimestampMap.put((CombatUser) attacker, Timestamp.now().plus(Timespan.ofSeconds(1)));
 
         if (isKilled) {
@@ -331,20 +265,51 @@ public class DamageModule {
     }
 
     /**
+     * 최종 피해량을 계산하여 반환한다.
+     *
+     * @param damage            피해량
+     * @param damageMultiplier  공격력 배수
+     * @param defenseMultiplier 방어력 배수
+     * @param damageType        피해 타입
+     * @return 최종 피해량
+     */
+    private double getFinalDamage(double damage, double damageMultiplier, double defenseMultiplier, @NotNull DamageType damageType) {
+        double finalDamage = Math.max(0, damage * (1 + damageMultiplier - defenseMultiplier));
+
+        if (getTotalShield() > 0 && damageType != DamageType.IGNORE_DEFENSE) {
+            ListIterator<Shield> iterator = shields.listIterator(shields.size());
+            while (iterator.hasPrevious()) {
+                Shield shield = iterator.previous();
+                if (shield.getHealth() > finalDamage) {
+                    shield.setHealth(shield.getHealth() - finalDamage);
+                    finalDamage = 0;
+                    break;
+                }
+
+                finalDamage -= shield.getHealth();
+                shield.setHealth(0);
+            }
+        }
+
+        return finalDamage;
+    }
+
+    /**
      * 엔티티에게 피해를 입힌다.
      *
      * @param attacker       공격자
      * @param damage         피해량. 0 이상의 값
      * @param damageType     피해 타입
      * @param location       맞은 위치
-     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 0 이상의 값
+     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 1 이상의 값
      * @param isUlt          궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (damage < 0 || critMultiplier < 0)
-            throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
+    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location,
+                                double critMultiplier, boolean isUlt) {
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
+        Validate.isTrue(critMultiplier >= 1, "critMultiplier >= 1 (%f)", critMultiplier);
 
         double damageMultiplier = attacker == null ? 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
         double defenseMultiplier = defenseMultiplierStatus.getValue();
@@ -364,7 +329,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit,
+                                boolean isUlt) {
         return damage(attacker, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 
@@ -375,14 +341,15 @@ public class DamageModule {
      * @param damage         피해량. 0 이상의 값
      * @param damageType     피해 타입
      * @param location       맞은 위치
-     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 0 이상의 값
+     * @param critMultiplier 치명타 배수. 1로 설정 시 치명타 미적용. 1 이상의 값
      * @param isUlt          궁극기 충전 여부
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile<?> projectile, double damage, @NonNull DamageType damageType, Location location, double critMultiplier, boolean isUlt) {
-        if (damage < 0 || critMultiplier < 0)
-            throw new IllegalArgumentException("'damage' 및 'critMultiplier'가 0 이상이어야 함");
+    public final boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
+                                @Nullable Location location, double critMultiplier, boolean isUlt) {
+        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
+        Validate.isTrue(critMultiplier >= 1, "critMultiplier >= 1 (%f)", critMultiplier);
 
         CombatEntity attacker = projectile.getShooter();
         if (attacker instanceof Attacker) {
@@ -407,7 +374,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile<?> projectile, double damage, @NonNull DamageType damageType, Location location, boolean isCrit, boolean isUlt) {
+    public final boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
+                                @Nullable Location location, boolean isCrit, boolean isUlt) {
         return damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 
@@ -415,14 +383,67 @@ public class DamageModule {
      * 엔티티의 피격 효과를 재생한다.
      */
     private void playHitEffect() {
-        if (damageAnimationTimestamp.isBefore(Timestamp.now())) {
-            damageAnimationTimestamp = Timestamp.now().plus(Timespan.ofTicks(6));
-            WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
+        if (damageAnimationTimestamp.isAfter(Timestamp.now()))
+            return;
 
-            packet.setEntityID(combatEntity.getEntity().getEntityId());
-            packet.setEntityStatus((byte) 2);
+        damageAnimationTimestamp = Timestamp.now().plus(Timespan.ofTicks(6));
 
-            packet.broadcastPacket();
+        WrapperPlayServerEntityStatus packet = new WrapperPlayServerEntityStatus();
+
+        packet.setEntityID(combatEntity.getEntity().getEntityId());
+        packet.setEntityStatus((byte) 2);
+
+        packet.broadcastPacket();
+    }
+
+
+    /**
+     * 보호막을 나타내는 클래스.
+     */
+    @Getter
+    public final class Shield {
+        /** 남은 보호막 체력 */
+        private double health;
+
+        private Shield(int health) {
+            setHealth(health);
+        }
+
+        /**
+         * 보호막의 체력을 설정한다.
+         *
+         * @param health 실제 보호막×50 (체력 1줄 기준 1000)
+         */
+        public void setHealth(double health) {
+            this.health = Math.max(0, health);
+
+            if (health == 0)
+                shields.remove(this);
+            else if (!shields.contains(this))
+                shields.add(this);
+
+            if (combatEntity.getEntity() instanceof Player)
+                displayShield();
+        }
+
+        /**
+         * 플레이어에게 보호막 체력을 표시한다.
+         */
+        private void displayShield() {
+            try {
+                if (getHandleMethod == null) {
+                    getHandleMethod = combatEntity.getEntity().getClass().getMethod("getHandle");
+                    getHandleMethod.setAccessible(true);
+                }
+
+                Object nmsPlayer = getHandleMethod.invoke(combatEntity.getEntity());
+                if (setAbsorptionHeartsMethod == null)
+                    setAbsorptionHeartsMethod = nmsPlayer.getClass().getMethod("setAbsorptionHearts", Float.TYPE);
+
+                setAbsorptionHeartsMethod.invoke(nmsPlayer, (float) (getTotalShield() / 50.0));
+            } catch (Exception ex) {
+                ConsoleLogger.severe("보호막을 표시할 수 없음", ex);
+            }
         }
     }
 }

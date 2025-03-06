@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.character.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
@@ -35,7 +36,7 @@ public final class Quaker extends Guardian {
     @Getter
     private static final Quaker instance = new Quaker();
     /** 특성 수정자 */
-    private static final String TRAIT_MODIFIER_ID = "QuakerT1";
+    private static final AbilityStatus.Modifier TRAIT_MODIFIER = new AbilityStatus.Modifier(QuakerT1Info.STATUS_EFFECT_RESISTANCE);
     /** 발소리 */
     private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_COW_STEP).volume(0.3).pitch(0.9).pitchVariance(0.1).build(),
@@ -129,7 +130,7 @@ public final class Quaker extends Guardian {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER_ID, QuakerT1Info.STATUS_EFFECT_RESISTANCE);
+        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER);
     }
 
     @Override

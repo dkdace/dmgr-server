@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -138,8 +139,9 @@ public final class QuakerWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (targets.add(target)) {
-                    if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
-                        target.getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getLocation())
+                    if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true)
+                            && target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(VectorUtil.getPitchAxis(combatUser.getLocation())
                                 .multiply(isClockwise ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
 
                     QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(location);

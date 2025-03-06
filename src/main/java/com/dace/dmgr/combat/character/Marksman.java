@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
  * 역할군이 '사격'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Marksman extends Character {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "RoleTrait2";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(RoleTrait2Info.SPEED);
 
     /**
      * 사격 역할군 전투원 정보 인스턴스를 생성한다.
@@ -39,9 +40,9 @@ public abstract class Marksman extends Character {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (combatUser.getDamageModule().isLowHealth())
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait2Info.SPEED);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         else
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     @Override

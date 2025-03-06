@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.inferno.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -15,9 +16,6 @@ import org.bukkit.util.Vector;
 
 @Getter
 public final class InfernoUlt extends UltimateSkill {
-    /** 보호막 ID */
-    private static final String SHIELD_ID = "InfernoUlt";
-
     public InfernoUlt(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoUltInfo.getInstance());
     }
@@ -46,12 +44,13 @@ public final class InfernoUlt extends UltimateSkill {
         combatUser.getWeapon().onCancelled();
         ((InfernoWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(InfernoWeaponInfo.CAPACITY);
         combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(0);
-        combatUser.getDamageModule().setShield(SHIELD_ID, InfernoUltInfo.SHIELD);
+
+        DamageModule.Shield shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
 
         combatUser.setHitboxes(Hitbox.builder(2, 2, 2).offsetY(1).pitchFixed().build());
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (combatUser.getDamageModule().getShield(SHIELD_ID) == 0)
+            if (shield.getHealth() == 0)
                 return false;
 
             Location loc = combatUser.getLocation();
@@ -75,7 +74,7 @@ public final class InfernoUlt extends UltimateSkill {
                 InfernoUltInfo.PARTICLE.DEATH.play(loc);
             }
 
-            combatUser.getDamageModule().setShield(SHIELD_ID, 0);
+            shield.setHealth(0);
             combatUser.resetHitboxes();
         }, 1, InfernoUltInfo.DURATION));
     }

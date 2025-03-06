@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character.inferno.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
@@ -10,6 +11,7 @@ import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -182,7 +184,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             return (location, target) -> {
                 if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
                         false, true))
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, InfernoWeaponInfo.FIRE_DURATION);
+                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, Timespan.ofTicks(InfernoWeaponInfo.FIRE_DURATION));
 
                 InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
 
@@ -245,13 +247,15 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);
-                long burning = (long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION, distance,
-                        InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);
+                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION, distance,
+                        InfernoWeaponInfo.FIREBALL.RADIUS / 2.0));
                 if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null,
                         false, true)) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoWeaponBurning.instance, burning);
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                            .multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK));
+                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, burning);
+
+                    if (target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                                .multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK));
                 }
 
                 return !(target instanceof Barrier);

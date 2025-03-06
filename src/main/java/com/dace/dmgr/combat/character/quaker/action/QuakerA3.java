@@ -5,10 +5,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -27,8 +25,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 
 public final class QuakerA3 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "QuakerA3";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
 
     public QuakerA3(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA3Info.getInstance(), 2);
@@ -61,7 +59,7 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA3Info.GLOBAL_COOLDOWN));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
 
         QuakerA3Info.SOUND.USE.play(combatUser.getLocation());
@@ -94,7 +92,7 @@ public final class QuakerA3 extends ActiveSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -200,8 +198,8 @@ public final class QuakerA3 extends ActiveSkill {
                 if (!target.canBeTargeted() || target.isDisposed())
                     return false;
 
-                if (i < 3)
-                    target.getKnockbackModule().knockback(vec, true);
+                if (i < 3 && target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(vec, true);
 
                 Location loc = target.getCenterLocation().add(0, 0.1, 0);
                 new QuakerA3Area().emit(loc);
@@ -214,7 +212,8 @@ public final class QuakerA3 extends ActiveSkill {
                 Location hitLoc = loc.clone().add(getVelocity().clone().normalize());
                 if (!LocationUtil.isNonSolid(hitLoc)) {
                     onDamage(loc, target);
-                    target.getKnockbackModule().knockback(new Vector(), true);
+                    if (target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(new Vector(), true);
 
                     CombatEffectUtil.playHitBlockParticle(loc, hitLoc.getBlock(), 7);
 
@@ -230,8 +229,8 @@ public final class QuakerA3 extends ActiveSkill {
             QuakerA3Info.SOUND.HIT.play(location);
 
             if (target.getDamageModule().damage(QuakerA3Projectile.this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location,
-                    false, true) && target.getKnockbackModule().getResistanceStatus().getValue() < 2) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
+                    false, true) && target instanceof Movable) {
+                target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, Timespan.ofTicks(QuakerA3Info.SNARE_DURATION));
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);

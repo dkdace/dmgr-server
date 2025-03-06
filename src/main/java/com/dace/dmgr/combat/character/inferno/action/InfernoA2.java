@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
@@ -20,8 +21,8 @@ import org.bukkit.util.Vector;
 import java.util.WeakHashMap;
 
 public final class InfernoA2 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "InfernoA2";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-InfernoA2Info.HEAL_DECREMENT);
     /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
@@ -129,13 +130,13 @@ public final class InfernoA2 extends ActiveSkill {
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER_ID, -InfernoA2Info.HEAL_DECREMENT);
+                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER);
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER_ID);
+                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER);
         }
     }
 
@@ -153,8 +154,8 @@ public final class InfernoA2 extends ActiveSkill {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, InfernoA2Burning.instance, 10);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+                target.getStatusEffectModule().apply(InfernoA2Burning.instance, combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);

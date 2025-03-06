@@ -67,7 +67,7 @@ import java.util.stream.Stream;
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Jumpable {
+public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Movable {
     /** 궁극기 차단 점수 */
     private static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 결정타 점수 */
@@ -79,14 +79,17 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 코어 장착 인벤토리 슬롯 목록 */
     private static final int[] CORE_INVENTORY_SLOT = {27, 28, 29};
 
-    /** 넉백 모듈 */
-    @NonNull
-    @Getter
-    private final KnockbackModule knockbackModule;
-    /** 상태 효과 모듈 */
-    @NonNull
-    @Getter
-    private final StatusEffectModule statusEffectModule;
+    /** 힘의 코어 수정자 */
+    private static final AbilityStatus.Modifier CORE_STRENGTH_MODIFIER = new AbilityStatus.Modifier(Core.STRENGTH.getValue());
+    /** 저항의 코어 수정자 */
+    private static final AbilityStatus.Modifier CORE_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(Core.RESISTANCE.getValue());
+    /** 신속의 코어 수정자 */
+    private static final AbilityStatus.Modifier CORE_SPEED_MODIFIER = new AbilityStatus.Modifier(Core.SPEED.getValue());
+    /** 치유의 코어 수정자 */
+    private static final AbilityStatus.Modifier CORE_HEALING_MODIFIER = new AbilityStatus.Modifier(Core.HEALING.getValue());
+    /** 강인함의 코어 수정자 */
+    private static final AbilityStatus.Modifier CORE_ENDURANCE_MODIFIER = new AbilityStatus.Modifier(Core.ENDURANCE.getValue());
+
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -99,10 +102,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final HealModule damageModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    @Getter
+    private final StatusEffectModule statusEffectModule;
     /** 이동 모듈 */
     @NonNull
     @Getter
-    private final JumpModule moveModule;
+    private final MoveModule moveModule;
 
     /** 유저 정보 인스턴스 */
     @NonNull
@@ -221,12 +228,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.character = characterType.getCharacter();
         this.weapon = character.getWeaponInfo().createWeapon(this);
 
-        this.knockbackModule = new KnockbackModule(this);
+        this.attackModule = new AttackModule();
+        this.healerModule = new HealerModule();
+        this.damageModule = new HealModule(this, 1000, true);
         this.statusEffectModule = new StatusEffectModule(this);
-        this.attackModule = new AttackModule(this);
-        this.healerModule = new HealerModule(this);
-        this.damageModule = new HealModule(this, true, true, true, 0, 1000);
-        this.moveModule = new JumpModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+        this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
 
         user.getSidebarManager().clear();
 
@@ -304,6 +310,37 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         packet.setWarningDistance(isEnabled ? Integer.MAX_VALUE : 0);
 
         packet.sendPacket(entity);
+    }
+
+    /**
+     * 플레이어의 달리기 가능 여부를 설정한다.
+     */
+    private void setCanSprint() {
+        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
+
+        packet.setHealth((float) entity.getHealth());
+        packet.setFood(canSprint() ? 19 : 2);
+
+        packet.sendPacket(entity);
+
+        if (isDead)
+            entity.setSprinting(false);
+    }
+
+    /**
+     * 플레이어가 달리기를 할 수 있는지 확인한다.
+     *
+     * @return 달리기 가능 여부
+     */
+    private boolean canSprint() {
+        return !isDead && character.canSprint(this) && !statusEffectModule.hasRestriction(CombatRestriction.SPRINT);
+    }
+
+    /**
+     * 플레이어의 비행 가능 여부를 설정한다.
+     */
+    private void setCanFly() {
+        entity.setAllowFlight(!isDead && character.canFly(this) && !statusEffectModule.hasRestriction(CombatRestriction.FLY));
     }
 
     /**
@@ -431,35 +468,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         return currentHitboxes == hitboxes ? hitboxes[3] : null;
     }
 
-    /**
-     * 플레이어의 달리기 가능 여부를 설정한다.
-     */
-    private void setCanSprint() {
-        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth();
-
-        packet.setHealth((float) entity.getHealth());
-        packet.setFood(canSprint() ? 19 : 2);
-
-        packet.sendPacket(entity);
-
-        if (isDead)
-            entity.setSprinting(false);
-    }
-
-    /**
-     * 플레이어가 달리기를 할 수 있는지 확인한다.
-     *
-     * @return 달리기 가능 여부
-     */
-    private boolean canSprint() {
-        return !isDead && character.canSprint(this) && !statusEffectModule.hasAnyRestriction(CombatRestrictions.SPRINT);
-    }
-
-    /**
-     * 플레이어의 비행 가능 여부를 설정한다.
-     */
-    private void setCanFly() {
-        entity.setAllowFlight(!isDead && character.canFly(this) && !statusEffectModule.hasAnyRestriction(CombatRestrictions.FLY));
+    @Override
+    public boolean isCreature() {
+        return true;
     }
 
     @Override
@@ -476,7 +487,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         playAttackEffect(isCrit);
 
-        if (victim.getDamageModule().isUltProvider() && isUlt)
+        if (victim instanceof Healable && isUlt)
             addUltGauge(damage);
 
         if (victim instanceof CombatUser) {
@@ -540,7 +551,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this != target)
             lastGiveHealTimestamp = Timestamp.now();
 
-        if (target.getDamageModule().isUltProvider() && isUlt) {
+        if (isUlt) {
             double ultAmount = amount;
             if (target instanceof CombatUser && ((CombatUser) target).selfHarmDamage > 0)
                 ultAmount = Math.max(0, amount - ((CombatUser) target).selfHarmDamage);
@@ -606,8 +617,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         character.onKill(this, victim, -1, true);
-        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.getDamageModule().isLiving() ? "처치" : "파괴")),
-                victim.getDamageModule().getScore());
+        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), victim.getScore());
     }
 
     /**
@@ -715,13 +725,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
         });
 
+        killContributorManager.clear();
+
         broadcastPlayerKillBossBar();
 
-        statusEffectModule.clearStatusEffect();
+        statusEffectModule.clear();
         damageModule.setHealth(damageModule.getMaxHealth());
-        damageModule.clearShield();
+        damageModule.clearShields();
         selfHarmDamage = 0;
-        killContributorManager.clear();
         cancelAction(null);
 
         if (gameUser != null)
@@ -757,7 +768,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }, () -> {
             isDead = false;
 
-            statusEffectModule.clearStatusEffect();
+            statusEffectModule.clear();
             entity.setGameMode(GameMode.SURVIVAL);
 
             weapon.reset();
@@ -777,7 +788,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 남은 적 처치 기여 제한시간
      */
     @NonNull
-    public Timespan getDamageSumRemainingTime(@NonNull CombatUser attacker) {
+    public Timespan getKillContributorRemainingTime(@NonNull CombatUser attacker) {
         return killContributorManager.getRemainingTime(attacker);
     }
 
@@ -998,17 +1009,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setGameMode(GameMode.SURVIVAL);
 
         fovValue = 0;
-        damageModule.clearShield();
-        statusEffectModule.clearStatusEffect();
+        damageModule.clearShields();
+        statusEffectModule.clear();
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
 
-        knockbackModule.getResistanceStatus().clearModifier();
-        statusEffectModule.getResistanceStatus().clearModifier();
-        attackModule.getDamageMultiplierStatus().clearModifier();
-        healerModule.getHealMultiplierStatus().clearModifier();
-        damageModule.getDefenseMultiplierStatus().clearModifier();
-        moveModule.getSpeedStatus().clearModifier();
+        statusEffectModule.getResistanceStatus().clearModifiers();
+        attackModule.getDamageMultiplierStatus().clearModifiers();
+        healerModule.getHealMultiplierStatus().clearModifiers();
+        damageModule.getDefenseMultiplierStatus().clearModifiers();
+        moveModule.getSpeedStatus().clearModifiers();
         clearCores();
 
         weapon.dispose();
@@ -1062,7 +1072,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     public void useAction(@NonNull ActionKey actionKey) {
         actionMap.get(actionKey).forEach(action -> {
-            if (isDead || action == null || statusEffectModule.hasAllRestrictions(CombatRestrictions.USE_ACTION))
+            if (isDead || action == null || statusEffectModule.hasRestriction(CombatRestriction.USE_ACTION))
                 return;
 
             if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
@@ -1191,15 +1201,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         if (core == Core.STRENGTH)
-            attackModule.getDamageMultiplierStatus().addModifier(Core.STRENGTH.getName(), Core.STRENGTH.getValue());
+            attackModule.getDamageMultiplierStatus().addModifier(CORE_STRENGTH_MODIFIER);
         if (core == Core.RESISTANCE)
-            damageModule.getDefenseMultiplierStatus().addModifier(Core.RESISTANCE.getName(), Core.RESISTANCE.getValue());
+            damageModule.getDefenseMultiplierStatus().addModifier(CORE_RESISTANCE_MODIFIER);
         if (core == Core.SPEED)
-            moveModule.getSpeedStatus().addModifier(Core.SPEED.getName(), Core.SPEED.getValue());
+            moveModule.getSpeedStatus().addModifier(CORE_SPEED_MODIFIER);
         if (core == Core.HEALING)
-            healerModule.getHealMultiplierStatus().addModifier(Core.HEALING.getName(), Core.HEALING.getValue());
+            healerModule.getHealMultiplierStatus().addModifier(CORE_HEALING_MODIFIER);
         if (core == Core.ENDURANCE)
-            statusEffectModule.getResistanceStatus().addModifier(Core.ENDURANCE.getName(), Core.ENDURANCE.getValue());
+            statusEffectModule.getResistanceStatus().addModifier(CORE_ENDURANCE_MODIFIER);
 
         return true;
     }
@@ -1223,15 +1233,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         if (core == Core.STRENGTH)
-            attackModule.getDamageMultiplierStatus().removeModifier(Core.STRENGTH.getName());
+            attackModule.getDamageMultiplierStatus().removeModifier(CORE_STRENGTH_MODIFIER);
         if (core == Core.RESISTANCE)
-            damageModule.getDefenseMultiplierStatus().removeModifier(Core.RESISTANCE.getName());
+            damageModule.getDefenseMultiplierStatus().removeModifier(CORE_RESISTANCE_MODIFIER);
         if (core == Core.SPEED)
-            moveModule.getSpeedStatus().removeModifier(Core.SPEED.getName());
+            moveModule.getSpeedStatus().removeModifier(CORE_SPEED_MODIFIER);
         if (core == Core.HEALING)
-            healerModule.getHealMultiplierStatus().removeModifier(Core.HEALING.getName());
+            healerModule.getHealMultiplierStatus().removeModifier(CORE_HEALING_MODIFIER);
         if (core == Core.ENDURANCE)
-            statusEffectModule.getResistanceStatus().removeModifier(Core.RESISTANCE.getName());
+            statusEffectModule.getResistanceStatus().removeModifier(CORE_ENDURANCE_MODIFIER);
 
         return true;
     }

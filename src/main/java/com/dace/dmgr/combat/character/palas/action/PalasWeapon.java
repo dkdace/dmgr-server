@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -24,8 +25,8 @@ import org.bukkit.Location;
 
 @Getter
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "PalasWeaponL";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-PalasWeaponInfo.AIM_SLOW);
 
     /** 재장전 모듈 */
     @NonNull
@@ -177,7 +178,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     @Override
     public void onAimEnable() {
         combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -PalasWeaponInfo.AIM_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getLocation());
     }
@@ -185,7 +186,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     @Override
     public void onAimDisable() {
         combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
         PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
     }

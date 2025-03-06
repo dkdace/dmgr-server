@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.character.silia.action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
@@ -10,8 +11,8 @@ import lombok.NonNull;
 
 @Getter
 public final class SiliaA3 extends ChargeableSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "SiliaA3";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaA3Info.SPEED);
 
     public SiliaA3(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA3Info.getInstance(), 2);
@@ -52,7 +53,7 @@ public final class SiliaA3 extends ChargeableSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, SiliaA3Info.SPEED);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
             SiliaA3Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -90,7 +91,7 @@ public final class SiliaA3 extends ChargeableSkill {
 
         setCooldown();
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
         SiliaA3Info.SOUND.DISABLE.play(combatUser.getLocation());
     }

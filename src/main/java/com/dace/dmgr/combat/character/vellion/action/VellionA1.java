@@ -5,10 +5,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -16,8 +16,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,8 +26,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 
 public final class VellionA1 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "VellionA1";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA1Info.READY_SLOW);
     /** 소환한 엔티티 */
     private VellionA1Entity summonEntity = null;
 
@@ -63,7 +61,7 @@ public final class VellionA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA1Info.GLOBAL_COOLDOWN));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA1Info.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         VellionA1Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -87,7 +85,7 @@ public final class VellionA1 extends ActiveSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     @Override
@@ -127,19 +125,11 @@ public final class VellionA1 extends ActiveSkill {
     /**
      * 회복 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class VellionA1Heal implements StatusEffect {
+    private static final class VellionA1Heal extends StatusEffect {
         private static final VellionA1Heal instance = new VellionA1Heal();
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return true;
+        private VellionA1Heal() {
+            super(true);
         }
 
         @Override
@@ -166,7 +156,7 @@ public final class VellionA1 extends ActiveSkill {
         private static final VellionA1Poison instance = new VellionA1Poison();
 
         private VellionA1Poison() {
-            super(VellionA1Info.POISON_DAMAGE_PER_SECOND);
+            super(VellionA1Info.POISON_DAMAGE_PER_SECOND, true);
         }
     }
 
@@ -223,8 +213,7 @@ public final class VellionA1 extends ActiveSkill {
 
         private final class VellionA1Area extends Area<Damageable> {
             private VellionA1Area() {
-                super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class)
-                        .and(combatEntity -> combatEntity.getDamageModule().isLiving()).exclude(combatUser));
+                super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
             }
 
             @Override
@@ -238,16 +227,17 @@ public final class VellionA1 extends ActiveSkill {
                     if (target.isEnemy(combatUser)) {
                         if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                                 false, true)) {
-                            target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA1Poison.instance,
-                                    target.getStatusEffectModule().getStatusEffectDuration(VellionA1Poison.instance) + VellionA1Info.EFFECT_DURATION);
-                            target.getStatusEffectModule().applyStatusEffect(combatUser, Snare.getInstance(), VellionA1Info.SNARE_DURATION);
+                            target.getStatusEffectModule().apply(VellionA1Poison.instance, combatUser,
+                                    target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(Timespan.ofTicks(VellionA1Info.EFFECT_DURATION)));
+
+                            target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, Timespan.ofTicks(VellionA1Info.SNARE_DURATION));
                         }
 
                         VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
                         VellionA1Info.SOUND.HIT_ENTITY.play(location);
                     } else if (target instanceof Healable)
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, VellionA1Heal.instance,
-                                target.getStatusEffectModule().getStatusEffectDuration(VellionA1Heal.instance) + VellionA1Info.EFFECT_DURATION);
+                        target.getStatusEffectModule().apply(VellionA1Heal.instance, combatUser,
+                                target.getStatusEffectModule().getDuration(VellionA1Heal.instance).plus(Timespan.ofTicks(VellionA1Info.EFFECT_DURATION)));
 
                     if (target instanceof CombatUser)
                         combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);

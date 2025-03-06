@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.Task;
 import com.dace.dmgr.util.task.TaskManager;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,13 +35,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     @Getter
     protected final T entity;
-    /** 속성 목록 관리 인스턴스 */
-    @NonNull
-    @Getter
-    protected final PropertyManager propertyManager = new PropertyManager();
     /** 태스크 관리 인스턴스 */
-    @NonNull
-    @Getter
     protected final TaskManager taskManager = new TaskManager();
     /** 이름 */
     @NonNull
@@ -49,6 +45,10 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Nullable
     @Getter
     protected final Game game;
+    /** 매 틱마다 실행할 작업 목록 */
+    private final ArrayList<Runnable> onTicks = new ArrayList<>();
+    /** 제거 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onDisposes = new ArrayList<>();
 
     /** 히트박스 목록 */
     protected Hitbox[] hitboxes;
@@ -83,6 +83,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         taskManager.add(new IntervalTask(i -> {
             onTick(i);
+            onTicks.forEach(Runnable::run);
+
             updateHitboxTick();
         }, 1));
     }
@@ -114,6 +116,24 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
      * @param i 인덱스
      */
     protected abstract void onTick(long i);
+
+    @Override
+    public final void addTask(@NonNull Task task) {
+        validate();
+        taskManager.add(task);
+    }
+
+    @Override
+    public final void addOnTick(@NonNull Runnable onTick) {
+        validate();
+        onTicks.add(onTick);
+    }
+
+    @Override
+    public final void addOnDispose(@NonNull Runnable onDispose) {
+        validate();
+        onDisposes.add(onDispose);
+    }
 
     /**
      * 엔티티의 히트박스를 업데이트한다.
@@ -175,6 +195,10 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         validate();
 
         onDispose();
+        onDisposes.forEach(Runnable::run);
+        onTicks.clear();
+        onDisposes.clear();
+
         taskManager.dispose();
 
         if (game == null)

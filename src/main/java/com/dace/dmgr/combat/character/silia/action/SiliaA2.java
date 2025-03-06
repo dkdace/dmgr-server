@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -140,7 +141,9 @@ public final class SiliaA2 extends ActiveSkill {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
                         SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                    target.getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
+
+                    if (target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
                     Location loc = target.getLocation().add(0, 0.1, 0);
                     loc.setPitch(0);
@@ -149,7 +152,7 @@ public final class SiliaA2 extends ActiveSkill {
                         SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
                     SiliaA2Info.SOUND.HIT_ENTITY.play(location);
 
-                    if (target.getDamageModule().isLiving() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
+                    if (target.isCreature() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
                             && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
                         combatUser.getMoveModule().teleport(loc);
                         combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);

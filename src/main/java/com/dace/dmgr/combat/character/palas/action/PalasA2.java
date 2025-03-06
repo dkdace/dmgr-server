@@ -8,19 +8,17 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
 public final class PalasA2 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "PalasA2";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(100);
 
     public PalasA2(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA2Info.getInstance(), 1);
@@ -55,24 +53,16 @@ public final class PalasA2 extends ActiveSkill {
     /**
      * 해로운 효과 면역 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    static final class PalasA2Immune implements StatusEffect {
+    static final class PalasA2Immune extends StatusEffect {
         static final PalasA2Immune instance = new PalasA2Immune();
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return true;
+        private PalasA2Immune() {
+            super(true);
         }
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(MODIFIER_ID, 100);
+            combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(MODIFIER);
         }
 
         @Override
@@ -82,14 +72,14 @@ public final class PalasA2 extends ActiveSkill {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(MODIFIER_ID);
+            combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(MODIFIER);
         }
     }
 
     private final class PalasA2Target extends Target<Healable> {
         private PalasA2Target() {
             super(combatUser, PalasA2Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
-                    .and(combatEntity -> !combatEntity.getStatusEffectModule().hasStatusEffect(PalasA2Immune.instance)));
+                    .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasA2Immune.instance)));
         }
 
         @Override
@@ -97,9 +87,9 @@ public final class PalasA2 extends ActiveSkill {
             setCooldown();
             combatUser.getWeapon().onCancelled();
 
-            target.getStatusEffectModule().removeStatusEffect(PalasUlt.PalasUltBuff.instance);
-            target.getStatusEffectModule().clearStatusEffect(false);
-            target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA2Immune.instance, PalasA2Info.DURATION);
+            target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);
+            target.getStatusEffectModule().clear(false);
+            target.getStatusEffectModule().apply(PalasA2Immune.instance, combatUser, Timespan.ofTicks(PalasA2Info.DURATION));
 
             if (target instanceof CombatUser) {
                 ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));

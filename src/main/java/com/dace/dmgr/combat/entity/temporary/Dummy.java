@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.temporary;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.HealModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
+import com.dace.dmgr.combat.entity.module.MoveModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -17,24 +17,22 @@ import org.bukkit.Material;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 @Getter
-public final class Dummy extends TemporaryEntity<Zombie> implements Healable, HasCritHitbox, CombatEntity {
-    /** 넉백 모듈 */
-    @NonNull
-    private final KnockbackModule knockbackModule;
-    /** 상태 효과 모듈 */
-    @NonNull
-    private final StatusEffectModule statusEffectModule;
+public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Movable, HasCritHitbox, CombatEntity {
     /** 피해 모듈 */
     @NonNull
     private final HealModule damageModule;
+    /** 상태 효과 모듈 */
+    @NonNull
+    private final StatusEffectModule statusEffectModule;
+    /** 이동 모듈 */
+    @NonNull
+    private final MoveModule moveModule;
     /** 적 여부 */
     private final boolean isEnemy;
 
@@ -52,9 +50,9 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
                 Hitbox.builder(0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.5).build(),
                 Hitbox.builder(0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.5).build());
 
-        this.knockbackModule = new KnockbackModule(this);
+        this.damageModule = new HealModule(this, maxHealth, true);
         this.statusEffectModule = new StatusEffectModule(this);
-        this.damageModule = new HealModule(this, true, true, true, 0, maxHealth);
+        this.moveModule = new MoveModule(this, 0);
         this.isEnemy = isEnemy;
 
         onInit();
@@ -90,8 +88,6 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
         entity.getEquipment().setChestplate(equipments[0]);
         entity.getEquipment().setLeggings(equipments[1]);
         entity.getEquipment().setBoots(equipments[2]);
-        entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 5, false, false));
     }
 
     @Override
@@ -103,6 +99,11 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Ha
     @Nullable
     public Game.Team getTeam() {
         return null;
+    }
+
+    @Override
+    public boolean isCreature() {
+        return true;
     }
 
     @Override

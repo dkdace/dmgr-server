@@ -136,8 +136,8 @@ public final class PalasA1 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, PalasA1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                    if (target.getDamageModule().isLiving()) {
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, PalasA1Stun.instance, PalasA1Info.STUN_DURATION);
+                    if (target.isCreature()) {
+                        target.getStatusEffectModule().apply(PalasA1Stun.instance, combatUser, Timespan.ofTicks(PalasA1Info.STUN_DURATION));
 
                         PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }

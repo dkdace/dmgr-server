@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -18,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
  * 역할군이 '지원'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Support extends Character {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "RoleTrait1";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.SPEED);
 
     /**
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
@@ -46,13 +47,13 @@ public abstract class Support extends Character {
             boolean activate = combatUser.getEntity().getWorld().getPlayers().stream()
                     .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
                     .anyMatch(target -> target != null && !target.isEnemy(combatUser)
-                            && target.getDamageModule().getHealth() <= target.getDamageModule().getMaxHealth() / 2.0
+                            && target.getDamageModule().isHalfHealth()
                             && target.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
 
             if (activate)
-                combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, RoleTrait1Info.SPEED);
+                combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
             else
-                combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+                combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }
     }
 
@@ -60,7 +61,7 @@ public abstract class Support extends Character {
     @MustBeInvokedByOverriders
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target && provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isBefore(Timestamp.now())) {
-            provider.getTaskManager().add(new IntervalTask(i -> {
+            provider.addTask(new IntervalTask(i -> {
                 provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
                 return provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isAfter(Timestamp.now());
             }, 2));

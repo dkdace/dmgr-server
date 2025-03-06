@@ -8,7 +8,8 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Property;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -24,8 +25,8 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 
 public final class MagrittaUlt extends UltimateSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "MagrittaUlt";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MagrittaUltInfo.USE_SLOW);
     /** 활성화 완료 여부 */
     @Getter
     private boolean isEnabled = false;
@@ -58,7 +59,7 @@ public final class MagrittaUlt extends UltimateSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.setGlobalCooldown(Timespan.ofTicks(MagrittaUltInfo.READY_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -MagrittaUltInfo.USE_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
 
         MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
@@ -77,7 +78,7 @@ public final class MagrittaUlt extends UltimateSkill {
 
         setDuration(0);
         isEnabled = false;
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     /**
@@ -177,7 +178,7 @@ public final class MagrittaUlt extends UltimateSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
-                int shredding = target.getPropertyManager().getValue(Property.SHREDDING);
+                int shredding = target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.SHREDDING).getValue();
                 if (shredding > 0)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
                 if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, false))

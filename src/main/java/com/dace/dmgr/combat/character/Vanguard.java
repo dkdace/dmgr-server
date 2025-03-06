@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +15,10 @@ import org.jetbrains.annotations.Nullable;
  * 역할군이 '돌격'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Vanguard extends Character {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "RoleTrait1";
+    /** 넉백 저항 수정자 */
+    private static final AbilityStatus.Modifier KNOCKBACK_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
+    /** 상태 효과 저항 수정자 */
+    private static final AbilityStatus.Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
 
     /**
      * 돌격 역할군 전투원 정보 인스턴스를 생성한다.
@@ -38,15 +41,15 @@ public abstract class Vanguard extends Character {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        combatUser.getKnockbackModule().getResistanceStatus().addModifier(MODIFIER_ID, RoleTrait1Info.KNOCKBACK_RESISTANCE);
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(MODIFIER_ID, RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
+        combatUser.getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         if (victim instanceof CombatUser)
-            attacker.getStatusEffectModule().clearStatusEffect(false);
+            attacker.getStatusEffectModule().clear(false);
     }
 
     @Override

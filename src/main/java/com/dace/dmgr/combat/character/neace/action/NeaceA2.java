@@ -4,20 +4,20 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "NeaceA2";
+    /** 공격력 수정자 */
+    private static final AbilityStatus.Modifier DAMAGE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DAMAGE_INCREMENT);
+    /** 방어력 수정자 */
+    private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
     public NeaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA2Info.getInstance(), 1);
@@ -94,7 +94,7 @@ public final class NeaceA2 extends ActiveSkill {
      * @param target 적용 대상
      */
     void amplifyTarget(@NonNull Healable target) {
-        target.getStatusEffectModule().applyStatusEffect(combatUser, NeaceA2Buff.instance, 4);
+        target.getStatusEffectModule().apply(NeaceA2Buff.instance, combatUser, Timespan.ofTicks(4));
         if (target instanceof CombatUser)
             ((CombatUser) target).addKillHelper(combatUser, this, NeaceA2Info.ASSIST_SCORE, Timespan.ofTicks(4));
     }
@@ -102,26 +102,18 @@ public final class NeaceA2 extends ActiveSkill {
     /**
      * 축복 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class NeaceA2Buff implements StatusEffect {
+    private static final class NeaceA2Buff extends StatusEffect {
         private static final NeaceA2Buff instance = new NeaceA2Buff();
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return true;
+        private NeaceA2Buff() {
+            super(true);
         }
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DEFENSE_INCREMENT);
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(MODIFIER_ID, NeaceA2Info.DAMAGE_INCREMENT);
+                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(DAMAGE_MODIFIER);
         }
 
         @Override
@@ -131,9 +123,9 @@ public final class NeaceA2 extends ActiveSkill {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER_ID);
+            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(MODIFIER_ID);
+                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(DAMAGE_MODIFIER);
         }
     }
 }

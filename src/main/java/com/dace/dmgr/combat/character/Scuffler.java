@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.character;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -40,7 +41,7 @@ public abstract class Scuffler extends Character {
             if (isFinalHit)
                 attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-            attacker.getStatusEffectModule().applyStatusEffect(attacker, RoleTrait2Speed.instance, RoleTrait2Info.DURATION);
+            attacker.getStatusEffectModule().apply(RoleTrait2Speed.instance, attacker, Timespan.ofTicks(RoleTrait2Info.DURATION));
         }
     }
 
@@ -102,13 +103,10 @@ public abstract class Scuffler extends Character {
      * 속도 증가 상태 효과 클래스.
      */
     private static final class RoleTrait2Speed extends Speed {
-        /** 수정자 ID */
-        private static final String MODIFIER_ID = "RoleTrait2";
-
         private static final RoleTrait2Speed instance = new RoleTrait2Speed();
 
         private RoleTrait2Speed() {
-            super(MODIFIER_ID, RoleTrait2Info.SPEED);
+            super(RoleTrait2Info.SPEED);
         }
     }
 }

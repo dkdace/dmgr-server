@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -18,8 +19,8 @@ import org.bukkit.util.Vector;
 
 @Getter
 public final class NeaceUlt extends UltimateSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "NeaceUlt";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-NeaceUltInfo.READY_SLOW);
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -48,7 +49,7 @@ public final class NeaceUlt extends UltimateSkill {
 
         setDuration();
         combatUser.setGlobalCooldown(Timespan.ofTicks(NeaceUltInfo.READY_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -NeaceUltInfo.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
 
@@ -68,7 +69,7 @@ public final class NeaceUlt extends UltimateSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     /**

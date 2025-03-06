@@ -188,7 +188,7 @@ public abstract class FunctionalBlock {
 
         @Override
         boolean canUse(@NonNull CombatUser combatUser) {
-            return super.canUse(combatUser) && combatUser.getDamageModule().getHealth() < combatUser.getDamageModule().getMaxHealth();
+            return super.canUse(combatUser) && !combatUser.getDamageModule().isFullHealth();
         }
 
         @Override

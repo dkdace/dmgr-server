@@ -143,7 +143,7 @@ public final class CombatUtil {
         int sum = IntStream.rangeClosed(1, duration).sum();
         combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
 
-        combatUser.getTaskManager().add(new IntervalTask(i -> {
+        combatUser.addTask(new IntervalTask(i -> {
             double finalUp = (up + finalUpSpread) / ((double) sum / (duration - i));
             double finalSide = (side + finalSideSpread) / ((double) sum / (duration - i));
             if (first) {
@@ -165,7 +165,7 @@ public final class CombatUtil {
      * @see CombatUtil#sendShake(CombatUser, double, double)
      */
     public static void sendShake(@NonNull CombatUser combatUser, double yawSpread, double pitchSpread, @NonNull Timespan duration) {
-        combatUser.getTaskManager().add(new IntervalTask((LongConsumer) i -> sendShake(combatUser, yawSpread, pitchSpread), 1, duration.toTicks()));
+        combatUser.addTask(new IntervalTask((LongConsumer) i -> sendShake(combatUser, yawSpread, pitchSpread), 1, duration.toTicks()));
     }
 
     /**

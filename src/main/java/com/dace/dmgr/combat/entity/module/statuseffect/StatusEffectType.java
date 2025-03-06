@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 /**
- * 상태 효과의 종류 목록.
+ * 상태 효과의 유형 목록.
  *
  * @see StatusEffect
  */

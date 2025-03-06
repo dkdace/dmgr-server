@@ -97,7 +97,7 @@ public enum CharacterType {
                         player.closeInventory();
 
                         if (!user.getUserData().getCharacterRecord(this).getCores().isEmpty())
-                            combatUser.getTaskManager().add(new DelayTask(() -> new SelectCore(player), 10));
+                            combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
                     } else if (clickType == ClickType.RIGHT)
                         new SelectCharInfo(player, this);
 

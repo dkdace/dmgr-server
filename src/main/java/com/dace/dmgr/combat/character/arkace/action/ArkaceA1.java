@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -122,8 +123,10 @@ public final class ArkaceA1 extends ActiveSkill {
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, distance, ArkaceA1Info.RADIUS / 2.0);
-                if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true))
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK));
+                if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
+                        && target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                            .multiply(ArkaceA1Info.KNOCKBACK));
 
                 return !(target instanceof Barrier);
             }

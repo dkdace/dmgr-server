@@ -434,7 +434,7 @@ public final class GameUser implements Disposable {
             if (targetCombatUser.getDamageModule().isLowHealth()) {
                 state = "치명상";
                 index = 0;
-            } else if (targetCombatUser.getDamageModule().getHealth() <= targetCombatUser.getDamageModule().getMaxHealth() / 2.0) {
+            } else if (targetCombatUser.getDamageModule().isHalfHealth()) {
                 state = "체력 낮음";
                 index = 1;
             } else {

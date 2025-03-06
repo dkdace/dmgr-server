@@ -5,10 +5,8 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -27,8 +25,8 @@ import java.util.HashSet;
 import java.util.WeakHashMap;
 
 public final class QuakerUlt extends UltimateSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "QuakerUlt";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
     /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
@@ -64,7 +62,7 @@ public final class QuakerUlt extends UltimateSkill {
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerUltInfo.GLOBAL_COOLDOWN));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(16), MainHand.RIGHT);
 
         TaskUtil.addTask(taskRunner, new DelayTask(() -> {
@@ -108,7 +106,7 @@ public final class QuakerUlt extends UltimateSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -155,7 +153,7 @@ public final class QuakerUlt extends UltimateSkill {
         private static final QuakerUltSlow instance = new QuakerUltSlow();
 
         private QuakerUltSlow() {
-            super(MODIFIER_ID, QuakerUltInfo.SLOW);
+            super(QuakerUltInfo.SLOW);
         }
     }
 
@@ -225,10 +223,12 @@ public final class QuakerUlt extends UltimateSkill {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerUltInfo.STUN_DURATION);
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerUltSlow.instance, QuakerUltInfo.SLOW_DURATION);
-                        target.getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getLocation(),
-                                target.getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
+                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(QuakerUltInfo.STUN_DURATION));
+                        target.getStatusEffectModule().apply(QuakerUltSlow.instance, combatUser, Timespan.ofTicks(QuakerUltInfo.SLOW_DURATION));
+
+                        if (target instanceof Movable)
+                            ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(combatUser.getLocation(),
+                                    target.getLocation().add(0, 1, 0)).multiply(QuakerUltInfo.KNOCKBACK));
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);

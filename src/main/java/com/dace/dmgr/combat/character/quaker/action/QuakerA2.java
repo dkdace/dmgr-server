@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -30,8 +31,8 @@ import java.util.HashSet;
 import java.util.WeakHashMap;
 
 public final class QuakerA2 extends ActiveSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "QuakerA2";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
     /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
 
@@ -66,7 +67,7 @@ public final class QuakerA2 extends ActiveSkill {
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(Timespan.MAX);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), MainHand.RIGHT);
 
         int delay = 0;
@@ -113,7 +114,7 @@ public final class QuakerA2 extends ActiveSkill {
         setDuration(0);
         combatUser.resetGlobalCooldown();
         combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA2Info.GLOBAL_COOLDOWN));
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -156,7 +157,7 @@ public final class QuakerA2 extends ActiveSkill {
         private static final QuakerA2Slow instance = new QuakerA2Slow();
 
         private QuakerA2Slow() {
-            super(MODIFIER_ID, QuakerA2Info.SLOW);
+            super(QuakerA2Info.SLOW);
         }
     }
 
@@ -229,8 +230,8 @@ public final class QuakerA2 extends ActiveSkill {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), QuakerA2Info.STUN_DURATION);
-                        target.getStatusEffectModule().applyStatusEffect(combatUser, QuakerA2Slow.instance, QuakerA2Info.SLOW_DURATION);
+                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(QuakerA2Info.STUN_DURATION));
+                        target.getStatusEffectModule().apply(QuakerA2Slow.instance, combatUser, Timespan.ofTicks(QuakerA2Info.SLOW_DURATION));
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);

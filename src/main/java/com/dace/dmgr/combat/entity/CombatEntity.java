@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity;
 import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
-import com.dace.dmgr.util.task.TaskManager;
+import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -48,18 +48,6 @@ public interface CombatEntity extends Disposable {
     <T extends Entity> T getEntity();
 
     /**
-     * @return 속성 목록 관리 인스턴스
-     */
-    @NonNull
-    PropertyManager getPropertyManager();
-
-    /**
-     * @return 태스크 관리 인스턴스
-     */
-    @NonNull
-    TaskManager getTaskManager();
-
-    /**
      * @return 이름
      */
     @NonNull
@@ -76,6 +64,28 @@ public interface CombatEntity extends Disposable {
      */
     @Nullable
     Game.Team getTeam();
+
+    /**
+     * 전투 시스템 엔티티가 실행하는 새로운 태스크를 추가한다.
+     *
+     * @param task 태스크
+     * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
+     */
+    void addTask(@NonNull Task task);
+
+    /**
+     * 엔티티가 매 틱마다 실행할 작업을 추가한다.
+     *
+     * @param onTick 실행할 작업
+     */
+    void addOnTick(@NonNull Runnable onTick);
+
+    /**
+     * 엔티티가 제거되었을 때 ({@link CombatEntity#dispose()} 호출 시) 실행할 작업을 추가한다.
+     *
+     * @param onDispose 실행할 작업
+     */
+    void addOnDispose(@NonNull Runnable onDispose);
 
     /**
      * 엔티티의 너비를 반환한다.

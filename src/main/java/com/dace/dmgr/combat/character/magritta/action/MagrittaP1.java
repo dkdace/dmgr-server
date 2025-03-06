@@ -75,7 +75,7 @@ public final class MagrittaP1 extends AbstractSkill {
     private final class MagrittaP1Area extends Area<Damageable> {
         private MagrittaP1Area() {
             super(combatUser, MagrittaP1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
-                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasStatusEffectType(StatusEffectType.BURNING)));
+                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasType(StatusEffectType.BURNING)));
         }
 
         @Override

@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -231,8 +232,10 @@ public final class SiliaWeapon extends AbstractWeapon {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
                             SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
-                        target.getKnockbackModule().knockback(VectorUtil.getRollAxis(combatUser.getLocation())
-                                .multiply(SiliaT2Info.KNOCKBACK));
+
+                        if (target instanceof Movable)
+                            ((Movable) target).getMoveModule().knockback(VectorUtil.getRollAxis(combatUser.getLocation())
+                                    .multiply(SiliaT2Info.KNOCKBACK));
 
                         if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);

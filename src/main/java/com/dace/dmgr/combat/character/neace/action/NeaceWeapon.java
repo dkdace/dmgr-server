@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
@@ -113,7 +114,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         if (isAmplifying)
             skill2.amplifyTarget(target);
-        else if (!target.getStatusEffectModule().hasStatusEffect(NeaceA1.NeaceA1Mark.instance))
+        else if (!target.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK))
             target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20.0, true);
 
         Location location = combatUser.getArmLocation(MainHand.RIGHT);

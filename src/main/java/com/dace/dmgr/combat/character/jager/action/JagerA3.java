@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
+import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
@@ -150,7 +151,7 @@ public final class JagerA3 extends ActiveSkill {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
-            if (combatEntity.getDamageModule().isLiving())
+            if (combatEntity.isCreature())
                 JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
         }
     }
@@ -222,12 +223,14 @@ public final class JagerA3 extends ActiveSkill {
                     : target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
             if (isDamaged) {
-                target.getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                        .multiply(JagerA3Info.KNOCKBACK));
+                if (target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
+                            .multiply(JagerA3Info.KNOCKBACK));
+
                 JagerT1.addFreezeValue(target, freeze);
 
-                if (target.getPropertyManager().getValue(Property.FREEZE) >= JagerT1Info.MAX) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, Freeze.instance, JagerA3Info.SNARE_DURATION);
+                if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
+                    target.getStatusEffectModule().apply(Freeze.instance, combatUser, Timespan.ofTicks(JagerA3Info.SNARE_DURATION));
                     if (target != combatUser) {
                         combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
                         combatUser.useAction(ActionKey.PERIODIC_1);

@@ -167,10 +167,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
      * 설랑 클래스.
      */
     @Getter
-    private final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Jumpable, CombatEntity {
-        /** 넉백 모듈 */
-        @NonNull
-        private final KnockbackModule knockbackModule;
+    private final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable, CombatEntity {
         /** 상태 효과 모듈 */
         @NonNull
         private final StatusEffectModule statusEffectModule;
@@ -182,7 +179,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         private final DamageModule damageModule;
         /** 이동 모듈 */
         @NonNull
-        private final JumpModule moveModule;
+        private final MoveModule moveModule;
         /** 준비 대기시간 모듈 */
         private final ReadyTimeModule readyTimeModule;
 
@@ -196,12 +193,11 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build()
             );
 
-            knockbackModule = new KnockbackModule(this);
             statusEffectModule = new StatusEffectModule(this);
-            attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, true, JagerA1Info.DEATH_SCORE, JagerA1Info.HEALTH);
-            moveModule = new JumpModule(this, JagerA1Info.SPEED);
-            readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
+            attackModule = new AttackModule();
+            damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
+            moveModule = new MoveModule(this, JagerA1Info.SPEED);
+            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerA1Info.SUMMON_DURATION));
 
             onInit();
         }
@@ -217,8 +213,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             CombatEffectUtil.ENTITY_SUMMON_SOUND.play(getLocation());
-
-            readyTimeModule.ready();
         }
 
         @Override
@@ -246,7 +240,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                     damageModule.setHealth(getStateValue());
 
                     Damageable target = CombatUtil.getNearCombatEntity(game, getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                            CombatUtil.EntityCondition.enemy(this).and(combatEntity -> combatEntity.getDamageModule().isLiving()));
+                            CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
                     if (target != null) {
                         entity.setTarget(target.getEntity());
 
@@ -274,6 +268,16 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         }
 
         @Override
+        public boolean isCreature() {
+            return true;
+        }
+
+        @Override
+        public double getScore() {
+            return JagerA1Info.DEATH_SCORE;
+        }
+
+        @Override
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
@@ -292,7 +296,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @Override
         public void onDefaultAttack(@NonNull Damageable victim) {
             victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, null,
-                    victim.getStatusEffectModule().hasStatusEffectType(StatusEffectType.SNARE), true);
+                    victim.getStatusEffectModule().hasType(StatusEffectType.SNARE), true);
         }
 
         @Override

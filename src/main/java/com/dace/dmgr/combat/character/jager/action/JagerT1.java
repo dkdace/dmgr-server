@@ -1,12 +1,18 @@
 package com.dace.dmgr.combat.character.jager.action;
 
-import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 @UtilityClass
 public final class JagerT1 {
@@ -17,63 +23,53 @@ public final class JagerT1 {
      * @param amount 증가량
      */
     static void addFreezeValue(@NonNull Damageable victim, int amount) {
-        victim.getPropertyManager().addValue(Property.FREEZE, amount);
-        victim.getStatusEffectModule().applyStatusEffect(victim, FreezeValue.instance, JagerT1Info.DURATION);
+        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, victim, Timespan.ofTicks(JagerT1Info.DURATION));
+        freezeValue.setValue(freezeValue.getValue() + amount);
     }
 
     /**
      * 빙결 수치 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class FreezeValue implements StatusEffect {
-        private static final FreezeValue instance = new FreezeValue();
-        /** 수정자 ID */
-        private static final String MODIFIER_ID = "JagerT1";
+    public static final class FreezeValue extends ValueStatusEffect {
+        /** 수정자 */
+        private final AbilityStatus.Modifier modifier = new AbilityStatus.Modifier(0);
 
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.NONE;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return false;
+        public FreezeValue() {
+            super(StatusEffectType.SLOW, false, JagerT1Info.MAX);
         }
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            // 미사용
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifier);
         }
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            if (combatEntity.getDamageModule().isLiving())
-                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getEntity().getLocation().add(0, 0.5, 0), combatEntity.getWidth());
-
+            if (combatEntity.isCreature())
+                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID,
-                        -combatEntity.getPropertyManager().getValue(Property.FREEZE));
+                modifier.setIncrement(-getValue());
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getPropertyManager().setValue(Property.FREEZE, 0);
+            setValue(0);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifier);
         }
 
         @Override
-        public long getCombatRestrictions(@NonNull Damageable combatEntity) {
-            int freezeValue = combatEntity.getPropertyManager().getValue(Property.FREEZE);
-            long restrictions = CombatRestrictions.NONE;
+        @NonNull
+        public Set<@NonNull CombatRestriction> getCombatRestrictions(@NonNull Damageable combatEntity) {
+            EnumSet<CombatRestriction> combatRestrictions = EnumSet.of(CombatRestriction.NONE);
 
-            if (freezeValue >= JagerT1Info.NO_SPRINT)
-                restrictions |= CombatRestrictions.SPRINT;
-            if (freezeValue >= JagerT1Info.NO_JUMP)
-                restrictions |= CombatRestrictions.JUMP;
+            if (getValue() >= JagerT1Info.NO_SPRINT)
+                combatRestrictions.add(CombatRestriction.SPRINT);
+            if (getValue() >= JagerT1Info.NO_JUMP)
+                combatRestrictions.add(CombatRestriction.JUMP);
 
-            return restrictions;
+            return combatRestrictions;
         }
     }
 }

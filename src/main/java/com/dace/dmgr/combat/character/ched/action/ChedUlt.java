@@ -8,6 +8,8 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.Dummy;
@@ -31,7 +33,7 @@ import java.util.function.LongConsumer;
 
 public final class ChedUlt extends UltimateSkill {
     /** 수정자 ID */
-    private static final String MODIFIER_ID = "ChedUlt";
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedUltInfo.READY_SLOW);
     /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 소환한 엔티티 */
@@ -63,7 +65,7 @@ public final class ChedUlt extends UltimateSkill {
 
         setDuration();
         combatUser.setGlobalCooldown(Timespan.ofTicks(ChedUltInfo.READY_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -ChedUltInfo.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
@@ -105,7 +107,7 @@ public final class ChedUlt extends UltimateSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     @Override
@@ -267,9 +269,9 @@ public final class ChedUlt extends UltimateSkill {
 
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
-                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null,
-                        false, false))
-                    target.getKnockbackModule().knockback(LocationUtil.getDirection(location, location.clone().add(0, 1, 0))
+                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false)
+                        && target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(location, location.clone().add(0, 1, 0))
                             .multiply(ChedUltInfo.KNOCKBACK));
 
                 return !(target instanceof Barrier);
@@ -325,7 +327,7 @@ public final class ChedUlt extends UltimateSkill {
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                         false, false)) {
-                    target.getStatusEffectModule().applyStatusEffect(combatUser, ChedUltBurning.instance, 10);
+                    target.getStatusEffectModule().apply(ChedUltBurning.instance, combatUser, Timespan.ofTicks(10));
 
                     if (target instanceof CombatUser)
                         killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));

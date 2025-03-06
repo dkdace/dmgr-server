@@ -7,7 +7,10 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.module.*;
+import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.entity.module.DamageModule;
+import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
+import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
@@ -148,9 +151,6 @@ public final class JagerUlt extends UltimateSkill {
      */
     @Getter
     public final class JagerUltEntity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
-        /** 넉백 모듈 */
-        @NonNull
-        private final KnockbackModule knockbackModule;
         /** 상태 효과 모듈 */
         @NonNull
         private final StatusEffectModule statusEffectModule;
@@ -173,11 +173,10 @@ public final class JagerUlt extends UltimateSkill {
                     Hitbox.builder(0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build()
             );
 
-            knockbackModule = new KnockbackModule(this, 2);
             statusEffectModule = new StatusEffectModule(this);
-            attackModule = new AttackModule(this);
-            damageModule = new DamageModule(this, false, true, false, JagerUltInfo.DEATH_SCORE, JagerUltInfo.HEALTH);
-            readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
+            attackModule = new AttackModule();
+            damageModule = new DamageModule(this, JagerUltInfo.HEALTH, true);
+            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerUltInfo.SUMMON_DURATION));
 
             onInit();
         }
@@ -189,8 +188,6 @@ public final class JagerUlt extends UltimateSkill {
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             JagerUltInfo.SOUND.SUMMON.play(getLocation());
-
-            readyTimeModule.ready();
         }
 
         @Override
@@ -269,6 +266,16 @@ public final class JagerUlt extends UltimateSkill {
         @Override
         public double getHeight() {
             return 0.2;
+        }
+
+        @Override
+        public boolean isCreature() {
+            return false;
+        }
+
+        @Override
+        public double getScore() {
+            return JagerUltInfo.DEATH_SCORE;
         }
 
         @Override

@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
@@ -28,8 +29,8 @@ import java.util.WeakHashMap;
 
 @Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "VellionA3";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA3Info.READY_SLOW);
     /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 위치 확인 모듈 */
@@ -98,7 +99,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         confirmModule.cancel();
         if (!isDurationFinished()) {
             setDuration(0);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }
     }
 
@@ -128,7 +129,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA3Info.READY_DURATION));
         confirmModule.toggleCheck();
         combatUser.getWeapon().setCooldown(1);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -VellionA3Info.READY_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         Location location = confirmModule.getCurrentLocation();
 
         VellionA3Info.SOUND.USE.play(combatUser.getLocation());
@@ -227,8 +228,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, HealBlock.getInstance(), 10);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Silence.getInstance(), 10);
+                target.getStatusEffectModule().apply(HealBlock.getInstance(), combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(Silence.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);

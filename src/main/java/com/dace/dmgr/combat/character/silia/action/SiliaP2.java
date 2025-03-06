@@ -70,7 +70,7 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.addYawAndPitch(0, 0);
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (combatUser.getKnockbackModule().isKnockbacked() || !canActivate())
+            if (combatUser.getMoveModule().isKnockbacked() || !canActivate())
                 return false;
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);

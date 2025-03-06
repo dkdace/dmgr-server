@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.Getter;
@@ -21,8 +22,8 @@ import org.bukkit.Location;
 
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "JagerWeaponL";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-JagerWeaponInfo.AIM_SLOW);
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -152,13 +153,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onAimEnable() {
         combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -JagerWeaponInfo.AIM_SLOW);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
     }
 
     @Override
     public void onAimDisable() {
         combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     @Override

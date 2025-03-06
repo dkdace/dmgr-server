@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
@@ -17,8 +18,8 @@ import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
 public final class QuakerA1 extends ChargeableSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "QuakerA1";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-QuakerA1Info.USE_SLOW);
     /** 소환한 엔티티 */
     private QuakerA1Entity summonEntity = null;
 
@@ -59,7 +60,7 @@ public final class QuakerA1 extends ChargeableSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA1Info.GLOBAL_COOLDOWN));
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -QuakerA1Info.USE_SLOW);
+            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
             QuakerA1Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -78,7 +79,7 @@ public final class QuakerA1 extends ChargeableSkill {
         super.onCancelled();
 
         setDuration(0);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         if (summonEntity != null)
             summonEntity.dispose();
 
@@ -102,8 +103,8 @@ public final class QuakerA1 extends ChargeableSkill {
                     spawnLocation,
                     combatUser.getName() + "의 방패",
                     combatUser,
-                    QuakerA1Info.DEATH_SCORE,
                     QuakerA1Info.HEALTH,
+                    QuakerA1Info.DEATH_SCORE,
                     Hitbox.builder(6, 3.5, 0.3).offsetY(-0.3).axisOffsetY(1.5).build()
             );
 

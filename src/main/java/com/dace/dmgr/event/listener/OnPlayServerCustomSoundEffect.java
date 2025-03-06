@@ -2,7 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.comphenix.packetwrapper.WrapperPlayServerCustomSoundEffect;
 import com.comphenix.protocol.events.PacketEvent;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
@@ -21,7 +21,7 @@ public final class OnPlayServerCustomSoundEffect extends PacketEventListener<Wra
     protected void onEvent(@NonNull PacketEvent event) {
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
 
-        if (combatUser != null && combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEAR))
+        if (combatUser != null && combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.HEAR))
             event.setCancelled(true);
     }
 }

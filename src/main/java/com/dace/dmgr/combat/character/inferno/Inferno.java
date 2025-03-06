@@ -122,9 +122,9 @@ public final class Inferno extends Vanguard {
 
         text.add(weaponDisplay);
         text.add("");
-        if (combatUser.getStatusEffectModule().hasStatusEffect(skillp1buff)) {
+        if (combatUser.getStatusEffectModule().has(skillp1buff)) {
             String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(),
-                    combatUser.getStatusEffectModule().getStatusEffectDuration(skillp1buff) / 20.0, InfernoP1Info.DURATION / 20.0);
+                    combatUser.getStatusEffectModule().getDuration(skillp1buff).toSeconds(), InfernoP1Info.DURATION / 20.0);
             text.add(skillp1Display);
         }
         if (!skill2.isDurationFinished()) {

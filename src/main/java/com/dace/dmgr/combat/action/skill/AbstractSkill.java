@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.action.skill;
 
-import com.dace.dmgr.combat.action.AbstractAction;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.action.AbstractAction;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
@@ -35,8 +35,7 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey)
-                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
+        return super.canUse(actionKey) && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_SKILL);
     }
 
     @Override

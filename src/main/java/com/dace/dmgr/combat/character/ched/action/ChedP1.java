@@ -91,7 +91,7 @@ public final class ChedP1 extends AbstractSkill {
         float yaw = combatUser.getEntity().getEyeLocation().getYaw();
 
         TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (combatUser.getKnockbackModule().isKnockbacked())
+            if (combatUser.getMoveModule().isKnockbacked())
                 return false;
 
             if (combatUser.getEntity().isSneaking() && hangTick > 0)

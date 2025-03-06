@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -27,8 +28,8 @@ import java.util.WeakHashMap;
 
 @Getter
 public final class VellionUlt extends UltimateSkill {
-    /** 수정자 ID */
-    private static final String MODIFIER_ID = "VellionUlt";
+    /** 수정자 */
+    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
     /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
     /** 활성화 완료 여부 */
@@ -59,7 +60,7 @@ public final class VellionUlt extends UltimateSkill {
 
         setDuration(-1);
         combatUser.setGlobalCooldown(Timespan.ofTicks(VellionUltInfo.READY_DURATION));
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER_ID, -100);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
         if (skillp1.isCancellable())
@@ -85,7 +86,7 @@ public final class VellionUlt extends UltimateSkill {
 
         setDuration(0);
         isEnabled = false;
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER_ID);
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
     /**
@@ -126,7 +127,7 @@ public final class VellionUlt extends UltimateSkill {
     private void onReady() {
         setDuration();
         isEnabled = true;
-        combatUser.getStatusEffectModule().applyStatusEffect(combatUser, Invulnerable.getInstance(), VellionUltInfo.DURATION);
+        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, Timespan.ofTicks(VellionUltInfo.DURATION));
 
         VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
@@ -216,14 +217,13 @@ public final class VellionUlt extends UltimateSkill {
         private static final VellionUltSlow instance = new VellionUltSlow();
 
         private VellionUltSlow() {
-            super(MODIFIER_ID, VellionUltInfo.SLOW);
+            super(VellionUltInfo.SLOW);
         }
     }
 
     private final class VellionUltArea extends Area<Damageable> {
         private VellionUltArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
-                    .and(combatEntity -> combatEntity.getDamageModule().isLiving()));
+            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override
@@ -235,8 +235,8 @@ public final class VellionUlt extends UltimateSkill {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                     false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, VellionUltSlow.instance, 10);
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Grounding.getInstance(), 10);
+                target.getStatusEffectModule().apply(VellionUltSlow.instance, combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser)
                     assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
@@ -248,8 +248,7 @@ public final class VellionUlt extends UltimateSkill {
 
     private final class VellionUltExplodeArea extends Area<Damageable> {
         private VellionUltExplodeArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser)
-                    .and(combatEntity -> combatEntity.getDamageModule().isLiving()));
+            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override
@@ -261,7 +260,7 @@ public final class VellionUlt extends UltimateSkill {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO,
                     DamageType.FIXED, null, false, true)) {
-                target.getStatusEffectModule().applyStatusEffect(combatUser, Stun.getInstance(), VellionUltInfo.STUN_DURATION);
+                target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(VellionUltInfo.STUN_DURATION));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);

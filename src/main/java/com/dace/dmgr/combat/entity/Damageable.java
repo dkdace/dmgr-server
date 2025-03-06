@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -18,16 +17,27 @@ public interface Damageable extends CombatEntity {
     DamageModule getDamageModule();
 
     /**
-     * @return 넉백 모듈
-     */
-    @NonNull
-    KnockbackModule getKnockbackModule();
-
-    /**
      * @return 상태 효과 모듈
      */
     @NonNull
     StatusEffectModule getStatusEffectModule();
+
+    /**
+     * 엔티티가 살아있는 생명체인지 확인한다.
+     *
+     * @return 살아있는 생명체이면 {@code true} 반환
+     */
+    boolean isCreature();
+
+    /**
+     * 죽었을 때 공격자(플레이어)에게 주는 점수를 반환한다.
+     *
+     * @return 죽었을 때 공격자에게 주는 점수. 0 이상의 값
+     * @implSpec 0
+     */
+    default double getScore() {
+        return 0;
+    }
 
     /**
      * 엔티티가 피해를 입었을 때 실행될 작업.
