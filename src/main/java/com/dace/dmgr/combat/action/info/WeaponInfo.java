@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
 import org.bukkit.Material;
 
@@ -80,7 +81,7 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
     @NonNull
     public final T createWeapon(@NonNull CombatUser combatUser) {
         try {
-            return weaponClass.getConstructor(CombatUser.class).newInstance(combatUser);
+            return ReflectionUtil.getConstructor(weaponClass, CombatUser.class).newInstance(combatUser);
         } catch (NoSuchMethodException ex) {
             throw new UnsupportedOperationException("해당 무기를 생성할 수 없음");
         } catch (Exception ex) {

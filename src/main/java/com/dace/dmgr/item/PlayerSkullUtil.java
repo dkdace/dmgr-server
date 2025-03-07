@@ -4,6 +4,7 @@ import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.character.CharacterType;
 import com.dace.dmgr.item.gui.GUI;
+import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -14,7 +15,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -25,8 +25,6 @@ import java.util.function.Consumer;
 public final class PlayerSkullUtil {
     /** 머리 스킨을 불러올 때 사용하는 토큰의 접두사 */
     private static final String SKIN_TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
-    /** 아이템 메타의 프로필 필드 인스턴스 */
-    private static Field profileField;
 
     /**
      * 플레이어 머리 아이템을 반환한다.
@@ -69,11 +67,7 @@ public final class PlayerSkullUtil {
             gameProfile.getProperties().put("textures", new Property("textures", propertyName));
 
             try {
-                if (profileField == null) {
-                    profileField = skullMeta.getClass().getDeclaredField("profile");
-                    profileField.setAccessible(true);
-                }
-                profileField.set(skullMeta, gameProfile);
+                ReflectionUtil.getField(skullMeta.getClass(), "profile").set(skullMeta, gameProfile);
             } catch (Exception ex) {
                 ConsoleLogger.severe("아이템 메타 지정 실패", ex);
             }

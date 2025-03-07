@@ -8,9 +8,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
-
-import java.lang.reflect.Constructor;
 
 /**
  * 패킷 이벤트를 처리하는 클래스.
@@ -33,8 +32,6 @@ import java.lang.reflect.Constructor;
 public abstract class PacketEventListener<T extends AbstractPacket> extends PacketAdapter {
     /** 패킷 Wrapper 클래스 인스턴스 */
     private final Class<T> packetWrapperClass;
-    /** 패킷 Wrapper의 생성자 인스턴스 */
-    private Constructor<T> packetWrapperConstructor;
 
     /**
      * 패킷 이벤트 처리 인스턴스를 생성하고 등록한다.
@@ -57,7 +54,7 @@ public abstract class PacketEventListener<T extends AbstractPacket> extends Pack
     @NonNull
     private static PacketType getPacketType(@NonNull Class<? extends AbstractPacket> packetWrapperClass) {
         try {
-            return (PacketType) packetWrapperClass.getDeclaredField("TYPE").get(null);
+            return (PacketType) ReflectionUtil.getField(packetWrapperClass, "TYPE").get(null);
         } catch (Exception ex) {
             ConsoleLogger.severe("PacketEventListener 인스턴스 생성 실패", ex);
         }
@@ -75,10 +72,7 @@ public abstract class PacketEventListener<T extends AbstractPacket> extends Pack
     @NonNull
     protected T createPacketWrapper(@NonNull PacketEvent event) {
         try {
-            if (packetWrapperConstructor == null)
-                packetWrapperConstructor = packetWrapperClass.getDeclaredConstructor(PacketContainer.class);
-
-            return packetWrapperConstructor.newInstance(event.getPacket());
+            return ReflectionUtil.getConstructor(packetWrapperClass, PacketContainer.class).newInstance(event.getPacket());
         } catch (Exception ex) {
             ConsoleLogger.severe("PacketWrapper 인스턴스 생성 실패", ex);
         }

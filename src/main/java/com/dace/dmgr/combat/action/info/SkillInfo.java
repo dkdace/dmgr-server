@@ -4,6 +4,7 @@ import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +55,7 @@ public abstract class SkillInfo<T extends Skill> extends ActionInfo {
     @NonNull
     public final T createSkill(@NonNull CombatUser combatUser) {
         try {
-            return skillClass.getConstructor(CombatUser.class).newInstance(combatUser);
+            return ReflectionUtil.getConstructor(skillClass, CombatUser.class).newInstance(combatUser);
         } catch (NoSuchMethodException ex) {
             throw new UnsupportedOperationException("해당 스킬을 생성할 수 없음");
         } catch (Exception ex) {

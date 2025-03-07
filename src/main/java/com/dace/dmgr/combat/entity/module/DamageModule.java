@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
@@ -40,11 +41,6 @@ public class DamageModule {
     private static final double DEFAULT_VALUE = 1;
     /** 치명타 배수 기본값 */
     private static final double DEFAULT_CRIT_MULTIPLIER = 2;
-
-    /** NMS 플레이어 반환 메소드 인스턴스 */
-    private static Method getHandleMethod;
-    /** NMS 플레이어 보호막 설정 메소드 인스턴스 */
-    private static Method setAbsorptionHeartsMethod;
 
     /** 엔티티 인스턴스 */
     protected final Damageable combatEntity;
@@ -84,6 +80,7 @@ public class DamageModule {
 
         setMaxHealth(getMaxHealth());
         setHealth(getMaxHealth());
+        ((LivingEntity) combatEntity.getEntity()).setRemoveWhenFarAway(false);
 
         combatEntity.addOnDispose(this::clearShields);
         if (hasHealthBar)
@@ -431,14 +428,9 @@ public class DamageModule {
          */
         private void displayShield() {
             try {
-                if (getHandleMethod == null) {
-                    getHandleMethod = combatEntity.getEntity().getClass().getMethod("getHandle");
-                    getHandleMethod.setAccessible(true);
-                }
-
+                Method getHandleMethod = ReflectionUtil.getMethod(combatEntity.getEntity().getClass(), "getHandle");
                 Object nmsPlayer = getHandleMethod.invoke(combatEntity.getEntity());
-                if (setAbsorptionHeartsMethod == null)
-                    setAbsorptionHeartsMethod = nmsPlayer.getClass().getMethod("setAbsorptionHearts", Float.TYPE);
+                Method setAbsorptionHeartsMethod = ReflectionUtil.getMethod(nmsPlayer.getClass(), "setAbsorptionHearts", Float.TYPE);
 
                 setAbsorptionHeartsMethod.invoke(nmsPlayer, (float) (getTotalShield() / 50.0));
             } catch (Exception ex) {

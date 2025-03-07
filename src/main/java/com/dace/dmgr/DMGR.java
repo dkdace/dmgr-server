@@ -5,6 +5,7 @@ import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
@@ -21,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -108,21 +108,11 @@ public class DMGR extends JavaPlugin {
      */
     public static double getTps() {
         try {
-            if (MinecraftServerNMS.minecraftServerClass == null)
-                MinecraftServerNMS.minecraftServerClass = Class.forName("net.minecraft.server.v1_12_R1.MinecraftServer");
+            Class<?> minecraftServerClass = ReflectionUtil.getClass("net.minecraft.server.v1_12_R1.MinecraftServer");
+            Object minecraftServer = ReflectionUtil.getMethod(minecraftServerClass, "getServer").invoke(null);
+            Field recentTpsField = ReflectionUtil.getField(minecraftServerClass, "recentTps");
 
-            if (MinecraftServerNMS.minecraftServer == null) {
-                Method getServerMethod = MinecraftServerNMS.minecraftServerClass.getDeclaredMethod("getServer");
-                getServerMethod.setAccessible(true);
-                MinecraftServerNMS.minecraftServer = getServerMethod.invoke(null);
-            }
-            if (MinecraftServerNMS.recentTpsField == null) {
-                MinecraftServerNMS.recentTpsField = MinecraftServerNMS.minecraftServerClass.getDeclaredField("recentTps");
-                MinecraftServerNMS.recentTpsField.setAccessible(true);
-            }
-
-            double[] recent = (double[]) MinecraftServerNMS.recentTpsField.get(MinecraftServerNMS.minecraftServer);
-
+            double[] recent = (double[]) recentTpsField.get(minecraftServer);
             return recent[0];
         } catch (Exception ex) {
             ConsoleLogger.severe("서버 TPS를 구할 수 없음", ex);
@@ -226,17 +216,5 @@ public class DMGR extends JavaPlugin {
                         ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
                     }
                 });
-    }
-
-    /**
-     * NMS 인스턴스 관리 클래스.
-     */
-    private static class MinecraftServerNMS {
-        /** 서버 NMS 클래스 인스턴스 */
-        private static Class<?> minecraftServerClass;
-        /** TPS 필드 인스턴스 */
-        private static Field recentTpsField;
-        /** 서버 인스턴스 */
-        private static Object minecraftServer;
     }
 }
