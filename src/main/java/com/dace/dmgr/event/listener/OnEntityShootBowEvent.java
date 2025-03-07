@@ -1,8 +1,8 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.character.CharacterType;
-import com.dace.dmgr.combat.character.ched.action.ChedWeapon;
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.combatant.ched.action.ChedWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
@@ -33,7 +33,7 @@ public final class OnEntityShootBowEvent extends EventListener<EntityShootBowEve
 
         event.setCancelled(true);
 
-        if (combatUser.getCharacterType() == CharacterType.CHED) {
+        if (combatUser.getCombatantType() == CombatantType.CHED) {
             ((ChedWeapon) combatUser.getWeapon()).setPower(event.getForce());
             combatUser.useAction(ActionKey.PERIODIC_1);
         }

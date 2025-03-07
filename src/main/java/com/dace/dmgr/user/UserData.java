@@ -2,7 +2,7 @@ package com.dace.dmgr.user;
 
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
@@ -86,7 +86,7 @@ public final class UserData implements Initializable<Void> {
     @Getter
     private final Config config;
     /** 전투원별 전투원 기록 목록 (전투원 : 전투원 기록) */
-    private final EnumMap<CharacterType, CharacterRecord> characterRecordMap;
+    private final EnumMap<CombatantType, CombatantRecord> combatantRecordMap;
 
     /**
      * 유저 데이터 정보 인스턴스를 생성한다.
@@ -115,9 +115,9 @@ public final class UserData implements Initializable<Void> {
         this.quitCountEntry = section.getEntry("quitCount", 0);
 
         this.config = new Config();
-        this.characterRecordMap = new EnumMap<>(CharacterType.class);
-        for (CharacterType characterType : CharacterType.values())
-            characterRecordMap.put(characterType, new CharacterRecord(characterType));
+        this.combatantRecordMap = new EnumMap<>(CombatantType.class);
+        for (CombatantType combatantType : CombatantType.values())
+            combatantRecordMap.put(combatantType, new CombatantRecord(combatantType));
 
         USER_DATA_MAP.put(playerUUID, this);
     }
@@ -205,12 +205,12 @@ public final class UserData implements Initializable<Void> {
     /**
      * 지정한 전투원의 기록 정보를 반환한다.
      *
-     * @param characterType 전투원 종류
+     * @param combatantType 전투원 종류
      * @return 전투원 기록 정보
      */
     @NonNull
-    public CharacterRecord getCharacterRecord(@NonNull CharacterType characterType) {
-        return characterRecordMap.get(characterType);
+    public UserData.CombatantRecord getCombatantRecord(@NonNull CombatantType combatantType) {
+        return combatantRecordMap.get(combatantType);
     }
 
     /**
@@ -545,8 +545,8 @@ public final class UserData implements Initializable<Void> {
      */
     @NonNull
     public Timespan getPlayTime() {
-        return Timespan.ofSeconds(characterRecordMap.values().stream()
-                .mapToInt(characterRecord -> characterRecord.playTimeEntry.get())
+        return Timespan.ofSeconds(combatantRecordMap.values().stream()
+                .mapToInt(combatantRecord -> combatantRecord.playTimeEntry.get())
                 .sum());
     }
 
@@ -675,7 +675,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 전투원 기록 정보.
      */
-    public final class CharacterRecord {
+    public final class CombatantRecord {
         /** 킬 */
         private final YamlFile.Section.Entry<Integer> killEntry;
         /** 데스 */
@@ -685,8 +685,8 @@ public final class UserData implements Initializable<Void> {
         /** 적용된 코어의 이름 목록 */
         private final YamlFile.Section.ListEntry<String> coresEntry;
 
-        private CharacterRecord(@NonNull CharacterType characterType) {
-            YamlFile.Section section = yamlFile.getDefaultSection().getSection("record").getSection(characterType.toString());
+        private CombatantRecord(@NonNull CombatantType combatantType) {
+            YamlFile.Section section = yamlFile.getDefaultSection().getSection("record").getSection(combatantType.toString());
             this.killEntry = section.getEntry("kill", 0);
             this.deathEntry = section.getEntry("death", 0);
             this.playTimeEntry = section.getEntry("playTime", 0);

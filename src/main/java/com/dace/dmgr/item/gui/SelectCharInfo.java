@@ -2,8 +2,8 @@ package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfo;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.Combatant;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.PlayerSkullUtil;
@@ -20,37 +20,37 @@ public final class SelectCharInfo extends ChestGUI {
      * 지정한 전투원의 선택 정보 GUI 인스턴스를 생성한다.
      *
      * @param player        GUI 표시 대상 플레이어
-     * @param characterType 전투원 종류
+     * @param combatantType 전투원 종류
      */
-    public SelectCharInfo(@NonNull Player player, @NonNull CharacterType characterType) {
+    public SelectCharInfo(@NonNull Player player, @NonNull CombatantType combatantType) {
         super(6, "§c§l전투원 정보", player);
 
-        Character character = characterType.getCharacter();
+        Combatant combatant = combatantType.getCombatant();
 
         fillAll(GUIItem.EMPTY);
-        set(0, 3, new DefinedItem(characterType.getProfileItem()), itemBuilder -> itemBuilder
+        set(0, 3, new DefinedItem(combatantType.getProfileItem()), itemBuilder -> itemBuilder
                 .setLore("",
                         "§e✪ 난이도 §7:: §f{0}",
                         "§a{1} 체력 §7:: §f{2}",
                         "§b{3} 이동속도 배수 §7:: §f{4}",
                         "§6⬜ 히트박스 배수 §7:: §f{5}")
                 .formatLore(
-                        StringFormUtil.getProgressBar(character.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
+                        StringFormUtil.getProgressBar(combatant.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
                                 .replace("§0", "§8"),
                         TextIcon.HEAL,
-                        character.getHealth(),
+                        combatant.getHealth(),
                         TextIcon.WALK_SPEED,
-                        character.getSpeedMultiplier(),
-                        character.getHitboxMultiplier()));
+                        combatant.getSpeedMultiplier(),
+                        combatant.getHitboxMultiplier()));
 
-        set(0, 5, character.getWeaponInfo().getDefinedItem());
+        set(0, 5, combatant.getWeaponInfo().getDefinedItem());
 
         set(2, 2, SelectCharInfoItem.TRAIT.definedItem);
-        displayActions(2, SelectCharInfoItem.TRAIT, character);
+        displayActions(2, SelectCharInfoItem.TRAIT, combatant);
         set(3, 2, SelectCharInfoItem.PASSIVE_SKILL.definedItem);
-        displayActions(3, SelectCharInfoItem.PASSIVE_SKILL, character);
+        displayActions(3, SelectCharInfoItem.PASSIVE_SKILL, combatant);
         set(4, 2, SelectCharInfoItem.ACTIVE_SKILL.definedItem);
-        displayActions(4, SelectCharInfoItem.ACTIVE_SKILL, character);
+        displayActions(4, SelectCharInfoItem.ACTIVE_SKILL, combatant);
 
         set(5, 8, new GUIItem.Previous(SelectChar::new));
     }
@@ -60,28 +60,29 @@ public final class SelectCharInfo extends ChestGUI {
      *
      * @param row        행 번호
      * @param actionType 동작 종류
-     * @param character  전투원
+     * @param combatant  전투원
      */
-    private void displayActions(int row, @NonNull SelectCharInfoItem actionType, @NonNull Character character) {
-        for (int i = 1; i <= 4; i++) {
-            ActionInfo actionInfo = null;
-            switch (actionType) {
-                case TRAIT:
-                    actionInfo = character.getTraitInfo(i);
-                    break;
-                case PASSIVE_SKILL:
-                    actionInfo = character.getPassiveSkillInfo(i);
-                    break;
-                case ACTIVE_SKILL:
-                    actionInfo = character.getActiveSkillInfo(i);
-                    break;
-            }
-
-            if (actionInfo == null)
-                remove(row, i + 2);
-            else
-                set(row, i + 2, actionInfo.getDefinedItem());
+    private void displayActions(int row, @NonNull SelectCharInfoItem actionType, @NonNull Combatant combatant) {
+        ActionInfo[] actionInfos;
+        switch (actionType) {
+            case TRAIT:
+                actionInfos = combatant.getTraitInfos();
+                break;
+            case PASSIVE_SKILL:
+                actionInfos = combatant.getPassiveSkillInfos();
+                break;
+            case ACTIVE_SKILL:
+                actionInfos = combatant.getActiveSkillInfos();
+                break;
+            default:
+                return;
         }
+
+        for (int i = 0; i < 4; i++)
+            if (i > actionInfos.length - 1)
+                remove(row, i + 3);
+            else
+                set(row, i + 3, actionInfos[i].getDefinedItem());
     }
 
     /**

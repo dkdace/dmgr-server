@@ -196,7 +196,7 @@ public abstract class FunctionalBlock {
             super.onUse(combatUser);
 
             combatUser.getDamageModule().heal(combatUser, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
-            combatUser.getCharacterType().getCharacter().onUseHealPack(combatUser);
+            combatUser.getCombatantType().getCombatant().onUseHealPack(combatUser);
 
             USE_SOUND.play(combatUser.getLocation());
         }

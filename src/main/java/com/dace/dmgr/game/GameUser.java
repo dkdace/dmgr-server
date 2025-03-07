@@ -5,7 +5,8 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.Combatant;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
@@ -334,9 +335,9 @@ public final class GameUser implements Disposable {
     public void onKill(boolean isFinalHit) {
         validate();
 
-        CharacterType characterType = Validate.notNull(CombatUser.fromUser(user)).getCharacterType();
+        CombatantType combatantType = Validate.notNull(CombatUser.fromUser(user)).getCombatantType();
 
-        user.getUserData().getCharacterRecord(characterType).addKill();
+        user.getUserData().getCombatantRecord(combatantType).addKill();
 
         if (isFinalHit) {
             kill += 1;
@@ -354,9 +355,9 @@ public final class GameUser implements Disposable {
     public void onDeath() {
         validate();
 
-        CharacterType characterType = Validate.notNull(CombatUser.fromUser(user)).getCharacterType();
+        CombatantType combatantType = Validate.notNull(CombatUser.fromUser(user)).getCombatantType();
 
-        user.getUserData().getCharacterRecord(characterType).addDeath();
+        user.getUserData().getCombatantRecord(combatantType).addDeath();
         death += 1;
     }
 
@@ -429,38 +430,40 @@ public final class GameUser implements Disposable {
     private enum CommunicationItem {
         /** 치료 요청 */
         REQ_HEAL("§a치료 요청", 9, targetCombatUser -> {
+            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
             String state;
-            int index;
+            String ment;
+
             if (targetCombatUser.getDamageModule().isLowHealth()) {
                 state = "치명상";
-                index = 0;
+                ment = combatant.getReqHealMentLow();
             } else if (targetCombatUser.getDamageModule().isHalfHealth()) {
                 state = "체력 낮음";
-                index = 1;
+                ment = combatant.getReqHealMentHalf();
             } else {
                 state = "치료 요청";
-                index = 2;
+                ment = combatant.getReqHealMentNormal();
             }
-            String ment = targetCombatUser.getCharacterType().getCharacter().getReqHealMent()[index];
 
             return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
         }),
         /** 궁극기 상태 */
         SHOW_ULT("§a궁극기 상태", 10, targetCombatUser -> {
-            int index;
+            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
+            String ment;
+
             if (targetCombatUser.getUltGaugePercent() < 0.9)
-                index = 0;
+                ment = combatant.getUltStateMentLow();
             else if (targetCombatUser.getUltGaugePercent() < 1)
-                index = 1;
+                ment = combatant.getUltStateMentNearFull();
             else
-                index = 2;
-            String ment = targetCombatUser.getCharacterType().getCharacter().getUltStateMent()[index];
+                ment = combatant.getUltStateMentFull();
 
             return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", 11, targetCombatUser -> {
-            String[] ments = targetCombatUser.getCharacterType().getCharacter().getReqRallyMent();
+            String[] ments = targetCombatUser.getCombatantType().getCombatant().getReqRallyMents();
             String ment = ments[RandomUtils.nextInt(0, ments.length)];
 
             return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);

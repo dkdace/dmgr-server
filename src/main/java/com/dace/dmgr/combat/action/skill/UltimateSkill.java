@@ -56,7 +56,7 @@ public abstract class UltimateSkill extends ActiveSkill {
 
         GameUser gameUser = combatUser.getGameUser();
         if (gameUser != null)
-            gameUser.broadcastChatMessage("§l" + combatUser.getCharacterType().getCharacter().getUltUseMent(), false);
+            gameUser.broadcastChatMessage("§l" + combatUser.getCombatantType().getCombatant().getUltUseMent(), false);
     }
 
     /**

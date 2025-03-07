@@ -1,0 +1,158 @@
+package com.dace.dmgr.combat.combatant.jager.action;
+
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.action.weapon.Reloadable;
+import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
+import lombok.NonNull;
+import org.bukkit.Location;
+
+public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
+    /** 주무기 객체 */
+    private final JagerWeaponL mainWeapon;
+    /** 재장전 모듈 */
+    @Getter
+    @NonNull
+    private final ReloadModule reloadModule;
+
+    JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
+        super(combatUser, JagerWeaponInfo.getInstance());
+
+        this.mainWeapon = mainWeapon;
+        reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
+    }
+
+    @Override
+    @NonNull
+    public ActionKey @NonNull [] getDefaultActionKeys() {
+        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    }
+
+    @Override
+    public long getDefaultCooldown() {
+        return JagerWeaponInfo.COOLDOWN;
+    }
+
+    @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
+    }
+
+    @Override
+    public void onUse(@NonNull ActionKey actionKey) {
+        switch (actionKey) {
+            case LEFT_CLICK: {
+                if (reloadModule.getRemainingAmmo() == 0) {
+                    onAmmoEmpty();
+                    return;
+                }
+
+                setCooldown();
+
+                new JagerWeaponRHitscan().shot();
+                reloadModule.consume(1);
+
+                Location loc = combatUser.getLocation();
+                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
+                        JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
+                JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
+                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
+
+                break;
+            }
+            case RIGHT_CLICK: {
+                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
+                onCancelled();
+
+                break;
+            }
+            case DROP: {
+                onAmmoEmpty();
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onCancelled() {
+        super.onCancelled();
+
+        mainWeapon.getAimModule().cancel();
+        mainWeapon.getReloadModule().cancel();
+        mainWeapon.getSwapModule().cancel();
+        mainWeapon.getSwapModule().swap();
+    }
+
+    @Override
+    public boolean canReload() {
+        return false;
+    }
+
+    @Override
+    public void onAmmoEmpty() {
+        if (reloadModule.isReloading())
+            return;
+
+        onCancelled();
+        TaskUtil.addTask(taskRunner, new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown()));
+    }
+
+    @Override
+    public void onReloadTick(long i) {
+        // 미사용
+    }
+
+    @Override
+    public void onReloadFinished() {
+        // 미사용
+    }
+
+    private final class JagerWeaponRHitscan extends Hitscan<Damageable> {
+        private JagerWeaponRHitscan() {
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser));
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return createPeriodIntervalHandler(12, location -> {
+                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 0);
+                CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+            });
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                return false;
+            };
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return createCritHitEntityHandler((location, target, isCrit) -> {
+                double damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, getTravelDistance(), JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
+
+                return false;
+            });
+        }
+    }
+}

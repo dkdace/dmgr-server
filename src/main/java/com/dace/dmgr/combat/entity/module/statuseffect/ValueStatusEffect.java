@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import com.dace.dmgr.combat.character.jager.action.JagerT1;
-import com.dace.dmgr.combat.character.magritta.action.MagrittaT1;
-import com.dace.dmgr.combat.character.neace.action.NeaceA1;
+import com.dace.dmgr.combat.combatant.jager.action.JagerT1;
+import com.dace.dmgr.combat.combatant.magritta.action.MagrittaT1;
+import com.dace.dmgr.combat.combatant.neace.action.NeaceA1;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import lombok.Getter;
 import lombok.NonNull;

@@ -1,6 +1,6 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
@@ -39,7 +39,7 @@ public final class Stat extends ChestGUI {
                                 DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분"), "")
                         .build())));
 
-        displayCharacterStats(userData);
+        displayCombatantStats(userData);
 
         if (UserData.fromPlayer(player) == userData)
             set(0, 8, new GUIItem.Previous(Menu::new));
@@ -50,20 +50,20 @@ public final class Stat extends ChestGUI {
      *
      * @param userData 대상 플레이어 데이터 정보
      */
-    private void displayCharacterStats(@NonNull UserData userData) {
-        CharacterType[] characterTypes = CharacterType.sortedValues();
-        for (int i = 0; i < characterTypes.length; i++) {
-            UserData.CharacterRecord characterRecord = userData.getCharacterRecord(characterTypes[i]);
+    private void displayCombatantStats(@NonNull UserData userData) {
+        CombatantType[] combatantTypes = CombatantType.sortedValues();
+        for (int i = 0; i < combatantTypes.length; i++) {
+            UserData.CombatantRecord combatantRecord = userData.getCombatantRecord(combatantTypes[i]);
 
-            set(i + 9, new DefinedItem(characterTypes[i].getProfileItem()), itemBuilder -> itemBuilder
+            set(i + 9, new DefinedItem(combatantTypes[i].getProfileItem()), itemBuilder -> itemBuilder
                     .setLore("",
                             "§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
                             "§e플레이 시간 : §f{3}")
                     .formatLore(
-                            characterRecord.getKill(),
-                            characterRecord.getDeath(),
-                            (double) characterRecord.getKill() / (characterRecord.getDeath() == 0 ? 1 : characterRecord.getDeath()),
-                            DurationFormatUtils.formatDuration(characterRecord.getPlayTime().toMilliseconds(), "d일 H시간 m분")));
+                            combatantRecord.getKill(),
+                            combatantRecord.getDeath(),
+                            (double) combatantRecord.getKill() / (combatantRecord.getDeath() == 0 ? 1 : combatantRecord.getDeath()),
+                            DurationFormatUtils.formatDuration(combatantRecord.getPlayTime().toMilliseconds(), "d일 H시간 m분")));
         }
     }
 }

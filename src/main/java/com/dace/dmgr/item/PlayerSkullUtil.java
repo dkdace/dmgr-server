@@ -2,7 +2,7 @@ package com.dace.dmgr.item;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.task.AsyncTask;
@@ -88,11 +88,11 @@ public final class PlayerSkullUtil {
     /**
      * 지정한 전투원의 플레이어 머리 아이템을 반환한다.
      *
-     * @param characterType 전투원 종류
+     * @param combatantType 전투원 종류
      * @return 플레이어 머리 아이템
      */
     @NonNull
-    public static ItemStack fromCharacter(@NonNull CharacterType characterType) {
-        return fromPropertyName(DMGR.getSkinsRestorerAPI().getSkinData(characterType.getCharacter().getSkinName()).getValue());
+    public static ItemStack fromCombatant(@NonNull CombatantType combatantType) {
+        return fromPropertyName(DMGR.getSkinsRestorerAPI().getSkinData(combatantType.getCombatant().getSkinName()).getValue());
     }
 }

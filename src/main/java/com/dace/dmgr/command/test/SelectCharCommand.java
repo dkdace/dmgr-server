@@ -1,6 +1,6 @@
 package com.dace.dmgr.command.test;
 
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 /**
  * 전투원 선택 명령어 클래스.
  *
- * @see CombatUser#setCharacterType(CharacterType)
+ * @see CombatUser#setCombatantType(CombatantType)
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SelectCharCommand implements CommandExecutor {
@@ -29,12 +29,12 @@ public class SelectCharCommand implements CommandExecutor {
 
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
-        CharacterType characterType = CharacterType.valueOf(character);
+        CombatantType combatantType = CombatantType.valueOf(character);
 
         if (combatUser == null)
-            new CombatUser(characterType, user);
+            new CombatUser(combatantType, user);
         else
-            combatUser.setCharacterType(characterType);
+            combatUser.setCombatantType(combatantType);
 
         return true;
     }

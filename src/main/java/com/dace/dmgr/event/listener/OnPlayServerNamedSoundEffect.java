@@ -3,8 +3,8 @@ package com.dace.dmgr.event.listener;
 import com.comphenix.packetwrapper.WrapperPlayServerNamedSoundEffect;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.combat.character.CharacterType;
-import com.dace.dmgr.combat.character.silia.action.SiliaA3Info;
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.combatant.silia.action.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
@@ -47,7 +47,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
                 .orElse(null);
         if (target != null) {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
-            return targetCombatUser != null && targetCombatUser.getCharacterType() == CharacterType.SILIA
+            return targetCombatUser != null && targetCombatUser.getCombatantType() == CombatantType.SILIA
                     && !targetCombatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()
                     && sound.toString().endsWith("_STEP") && soundCategory == EnumWrappers.SoundCategory.PLAYERS;
         }

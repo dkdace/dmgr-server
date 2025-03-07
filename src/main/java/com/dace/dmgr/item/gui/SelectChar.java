@@ -1,7 +1,7 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.combat.character.CharacterType;
-import com.dace.dmgr.combat.character.Role;
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
@@ -42,12 +42,12 @@ public final class SelectChar extends ChestGUI {
 
             int[] columnIndexList = {2, 2, 2, 2, 2, 2};
 
-            for (CharacterType characterType : CharacterType.values()) {
-                int rowIndex = characterType.getCharacter().getRole().ordinal();
+            for (CombatantType combatantType : CombatantType.values()) {
+                int rowIndex = combatantType.getCombatant().getRole().ordinal();
                 int columnIndex = columnIndexList[rowIndex]++;
 
-                set(rowIndex, columnIndex, characterType.getSelectItem(), itemBuilder -> {
-                    if (gameUser != null && gameUser.getTeam().checkCharacterDuplication(characterType))
+                set(rowIndex, columnIndex, combatantType.getSelectItem(), itemBuilder -> {
+                    if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(combatantType))
                         itemBuilder.addLore("", "§c§l팀원이 이미 선택했습니다.");
                 });
             }

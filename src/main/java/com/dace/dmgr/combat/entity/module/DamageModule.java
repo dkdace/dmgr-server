@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -270,7 +269,7 @@ public class DamageModule {
      * @param damageType        피해 타입
      * @return 최종 피해량
      */
-    private double getFinalDamage(double damage, double damageMultiplier, double defenseMultiplier, @NotNull DamageType damageType) {
+    private double getFinalDamage(double damage, double damageMultiplier, double defenseMultiplier, @NonNull DamageType damageType) {
         double finalDamage = Math.max(0, damage * (1 + damageMultiplier - defenseMultiplier));
 
         if (getTotalShield() > 0 && damageType != DamageType.IGNORE_DEFENSE) {

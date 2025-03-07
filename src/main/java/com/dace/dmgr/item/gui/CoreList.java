@@ -1,7 +1,7 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.combat.Core;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.user.UserData;
 import lombok.NonNull;
@@ -23,11 +23,11 @@ public final class CoreList extends ChestGUI {
 
         set(5, 8, new GUIItem.Previous(Menu::new));
 
-        CharacterType[] characterTypes = CharacterType.sortedValues();
-        for (int i = 0; i < characterTypes.length; i++) {
-            Set<Core> cores = UserData.fromPlayer(player).getCharacterRecord(characterTypes[i]).getCores();
+        CombatantType[] combatantTypes = CombatantType.sortedValues();
+        for (int i = 0; i < combatantTypes.length; i++) {
+            Set<Core> cores = UserData.fromPlayer(player).getCombatantRecord(combatantTypes[i]).getCores();
 
-            set(i, new DefinedItem(characterTypes[i].getProfileItem()), itemBuilder -> {
+            set(i, new DefinedItem(combatantTypes[i].getProfileItem()), itemBuilder -> {
                 itemBuilder.setLore("");
 
                 if (cores.isEmpty())
