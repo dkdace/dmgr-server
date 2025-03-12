@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
@@ -22,23 +21,13 @@ import java.util.function.Consumer;
 
 public final class SiliaA2 extends ActiveSkill {
     public SiliaA2(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA2Info.getInstance(), 1);
+        super(combatUser, SiliaA2Info.getInstance(), SiliaA2Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_2, ActionKey.RIGHT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return SiliaA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -50,7 +39,7 @@ public final class SiliaA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaA2Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
         if (skill3.isCancellable())
@@ -58,7 +47,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
             Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
             Vector axis = VectorUtil.getRollAxis(loc);
@@ -73,7 +62,7 @@ public final class SiliaA2 extends ActiveSkill {
             new SiliaA2Projectile().shot();
 
             SiliaA2Info.SOUND.USE_READY.play(combatUser.getLocation());
-        }, 1, SiliaA2Info.READY_DURATION));
+        }, 1, SiliaA2Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -84,7 +73,7 @@ public final class SiliaA2 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
     private final class SiliaA2Projectile extends Projectile<Damageable> {

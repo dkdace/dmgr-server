@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -15,7 +16,6 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -31,7 +31,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     private final GradualSpreadModule fullAutoModule;
 
     public ArkaceWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceWeaponInfo.getInstance());
+        super(combatUser, ArkaceWeaponInfo.getInstance(), Timespan.ZERO);
 
         reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
@@ -45,8 +45,9 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return 0;
+    @NonNull
+    public String getActionBarString() {
+        return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '|');
     }
 
     @Override
@@ -71,7 +72,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     ArkaceWeaponInfo.SOUND.USE.play(loc);
-                    TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
+                    addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shot();
 
@@ -103,7 +104,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
      */
     private boolean cancelP1() {
         ArkaceP1 skillp1 = combatUser.getSkill(ArkaceP1Info.getInstance());
-        long skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION + 2;
+        Timespan skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION.plus(Timespan.ofTicks(2));
 
         if (skillp1.isCancellable()) {
             skillp1.onCancelled();
@@ -118,7 +119,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < ArkaceWeaponInfo.CAPACITY;
+        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity();
     }
 
     @Override
@@ -138,13 +139,6 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @Override
     public void onReloadFinished() {
         // 미사용
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        reloadModule.setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
     }
 
     private final class ArkaceWeaponHitscan extends Hitscan<Damageable> {

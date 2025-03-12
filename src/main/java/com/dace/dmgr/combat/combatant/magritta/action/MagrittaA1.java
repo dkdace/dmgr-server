@@ -16,7 +16,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -27,23 +26,13 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public final class MagrittaA1 extends ActiveSkill {
     public MagrittaA1(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaA1Info.getInstance(), 0);
+        super(combatUser, MagrittaA1Info.getInstance(), MagrittaA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return MagrittaA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -56,18 +45,18 @@ public final class MagrittaA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(MagrittaA1Info.READY_DURATION));
+        combatUser.setGlobalCooldown(MagrittaA1Info.READY_DURATION);
 
         MagrittaA1Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new MagrittaA1Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc, 1, 0.5);
-        }, MagrittaA1Info.READY_DURATION));
+        }, MagrittaA1Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -78,7 +67,7 @@ public final class MagrittaA1 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
     /**
@@ -141,7 +130,7 @@ public final class MagrittaA1 extends ActiveSkill {
                     combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);
             }
 
-            TaskUtil.addTask(MagrittaA1.this, new IntervalTask(i -> {
+            addTask(new IntervalTask(i -> {
                 Location loc = location.clone();
 
                 if (target == null) {
@@ -163,7 +152,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
                 MagrittaA1Info.SOUND.EXPLODE.play(loc);
                 MagrittaA1Info.PARTICLE.EXPLODE.play(loc);
-            }, 1, MagrittaA1Info.EXPLODE_DURATION));
+            }, 1, MagrittaA1Info.EXPLODE_DURATION.toTicks()));
         }
 
         private final class MagrittaA1Area extends Area<Damageable> {
@@ -181,7 +170,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
                         MagrittaA1Info.RADIUS / 2.0);
-                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION, distance,
+                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION.toTicks(), distance,
                         MagrittaA1Info.RADIUS / 2.0));
                 if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null,
                         false, true)) {

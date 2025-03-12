@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -12,23 +13,13 @@ public final class VellionP2 extends AbstractSkill {
     private double damageAmount;
 
     public VellionP2(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, VellionP2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.PERIODIC_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override

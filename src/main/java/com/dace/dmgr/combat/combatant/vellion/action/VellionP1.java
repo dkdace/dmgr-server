@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -7,19 +9,19 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class VellionP1 extends AbstractSkill {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(VellionP1Info.SPEED);
 
     public VellionP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, VellionP1Info.getInstance(), VellionP1Info.COOLDOWN, VellionP1Info.DURATION);
     }
 
     @Override
@@ -29,13 +31,14 @@ public final class VellionP1 extends AbstractSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return VellionP1Info.COOLDOWN;
-    }
+    @Nullable
+    public String getActionBarString() {
+        if (!isCooldownFinished())
+            return ActionBarStringUtil.getCooldownBar(this);
+        else if (!isDurationFinished())
+            return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo(this, "해제");
 
-    @Override
-    public long getDefaultDuration() {
-        return VellionP1Info.DURATION;
+        return null;
     }
 
     @Override
@@ -48,7 +51,7 @@ public final class VellionP1 extends AbstractSkill {
             VellionP1Info.SOUND.USE.play(location);
             VellionP1Info.PARTICLE.USE.play(location);
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 Location loc = combatUser.getLocation();
 
                 if (i < 2 && location.distance(loc) > 0) {
@@ -65,7 +68,7 @@ public final class VellionP1 extends AbstractSkill {
                 return true;
             }, 1, 2));
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 if (isDurationFinished() || !combatUser.getEntity().isFlying())
                     return false;
 
@@ -73,7 +76,7 @@ public final class VellionP1 extends AbstractSkill {
                 playTickEffect();
 
                 return true;
-            }, isCancelled -> onCancelled(), 1, VellionP1Info.DURATION));
+            }, isCancelled -> onCancelled(), 1, VellionP1Info.DURATION.toTicks()));
         } else
             onCancelled();
     }
@@ -87,12 +90,12 @@ public final class VellionP1 extends AbstractSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,
                 40, -10, false, false), true);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             combatUser.getEntity().setFallDistance(0);
 
             return !combatUser.getEntity().isOnGround();

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.palas.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -22,8 +23,8 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     public static final int DAMAGE_INCREMENT = 60;
     /** 이동속도 증가량 */
     public static final int SPEED_INCREMENT = 40;
-    /** 지속시간 (tick) */
-    public static final long DURATION = 7 * 20L;
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(7);
 
     /** 사용 점수 */
     public static final int USE_SCORE = 10;
@@ -38,7 +39,7 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
                         .builder("바라보는 아군에게 나노봇을 투여하여 일정 시간동안 <:DAMAGE_INCREASE:공격력>과 <:WALK_SPEED_INCREASE:이동 속도>를 증폭시킵니다. " +
                                 "<d::생체 나노봇： 알파-X> 효과를 덮어씁니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, Format.PERCENT, DAMAGE_INCREMENT)
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED_INCREMENT)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MAX_DISTANCE)

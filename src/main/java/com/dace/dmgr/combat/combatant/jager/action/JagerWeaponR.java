@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -27,21 +26,26 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     private final ReloadModule reloadModule;
 
     JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
-        super(combatUser, JagerWeaponInfo.getInstance());
+        super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
 
         this.mainWeapon = mainWeapon;
-        reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, 0);
+        reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, Timespan.ZERO);
+    }
+
+    @Override
+    @NonNull
+    public String getActionBarString() {
+        String text = reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '┃');
+        if (mainWeapon.getSwapModule().isSwapped())
+            text = "§a" + text;
+
+        return text;
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return JagerWeaponInfo.COOLDOWN;
     }
 
     @Override
@@ -67,7 +71,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
                 JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
-                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
+                addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
 
                 break;
             }
@@ -108,7 +112,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
             return;
 
         onCancelled();
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown()));
+        addActionTask(new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown().toTicks()));
     }
 
     @Override

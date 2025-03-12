@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.combatant.ched.action;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
@@ -14,19 +15,20 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Nullable;
 
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public final class ChedA1 extends StackableSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
     public ChedA1(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedA1Info.getInstance(), 0);
+        super(combatUser, ChedA1Info.getInstance(), ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK, 0);
     }
 
     @Override
@@ -36,23 +38,12 @@ public final class ChedA1 extends StackableSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return ChedA1Info.COOLDOWN;
-    }
+    @Nullable
+    public String getActionBarString() {
+        if (isDurationFinished() || !isEnabled())
+            return null;
 
-    @Override
-    public long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
-    public long getDefaultStackCooldown() {
-        return ChedA1Info.STACK_COOLDOWN;
-    }
-
-    @Override
-    public int getMaxStack() {
-        return ChedA1Info.MAX_STACK;
+        return ChedA1Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "해제");
     }
 
     @Override
@@ -66,18 +57,18 @@ public final class ChedA1 extends StackableSkill {
         if (isDurationFinished()) {
             setDuration();
             combatUser.getWeapon().onCancelled();
-            combatUser.setGlobalCooldown(Timespan.ofTicks(ChedA1Info.READY_DURATION));
+            combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
 
             ChedA1Info.SOUND.USE.play(combatUser.getLocation());
 
-            TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+            addActionTask(new DelayTask(() -> {
                 isEnabled = true;
                 combatUser.getWeapon().setGlowing(true);
                 combatUser.getWeapon().setMaterial(WeaponInfo.MATERIAL);
                 combatUser.getWeapon().setDurability(ChedWeaponInfo.RESOURCE.FIRE);
 
-                TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished(), this::onCancelled, 1));
-            }, ChedA1Info.READY_DURATION));
+                addActionTask(new IntervalTask(i -> !isDurationFinished(), this::onCancelled, 1));
+            }, ChedA1Info.READY_DURATION.toTicks()));
         } else
             onCancelled();
     }
@@ -91,7 +82,7 @@ public final class ChedA1 extends StackableSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getWeapon().setGlowing(false);
         combatUser.getWeapon().setMaterial(Material.BOW);
@@ -104,7 +95,7 @@ public final class ChedA1 extends StackableSkill {
     void shoot() {
         addStack(-1);
         if (getStack() <= 0)
-            setDuration(0);
+            setDuration(Timespan.ZERO);
 
         new ChedA1Projectile().shot();
 
@@ -160,7 +151,7 @@ public final class ChedA1 extends StackableSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, location, isCrit, true)) {
-                    target.getStatusEffectModule().apply(ChedA1Burning.instance, shooter, Timespan.ofTicks(ChedA1Info.FIRE_DURATION));
+                    target.getStatusEffectModule().apply(ChedA1Burning.instance, shooter, ChedA1Info.FIRE_DURATION);
 
                     if (target instanceof CombatUser)
                         ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);

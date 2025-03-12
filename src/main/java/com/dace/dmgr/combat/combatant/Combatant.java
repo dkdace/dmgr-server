@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.combat.action.info.*;
+import com.dace.dmgr.combat.action.weapon.Swappable;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,7 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 전투원 정보를 관리하는 클래스.
@@ -134,13 +136,38 @@ public abstract class Combatant {
     public abstract String @NonNull [] getDeathMent(@NonNull CombatantType combatantType);
 
     /**
-     * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열 목록을 반환한다.
+     * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
      *
      * @param combatUser 대상 플레이어
-     * @return 액션바 문자열 목록
+     * @return 액션바 문자열
      */
     @NonNull
-    public abstract List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser);
+    public final String getActionBarString(@NonNull CombatUser combatUser) {
+        ArrayList<String> texts = new ArrayList<>();
+
+        Weapon weapon = combatUser.getWeapon();
+        String weaponText = weapon.getActionBarString();
+        if (weaponText != null) {
+            texts.add(weaponText);
+
+            if (weapon instanceof Swappable) {
+                Weapon subweapon = ((Swappable<?>) weapon).getSwapModule().getSubweapon();
+                String subweaponText = subweapon.getActionBarString();
+                if (subweaponText != null)
+                    texts.add(subweaponText);
+            }
+
+            texts.add("");
+        }
+
+        for (SkillInfo<?> skillInfo : getSkillInfos()) {
+            String actionBarString = combatUser.getSkill(skillInfo).getActionBarString();
+            if (actionBarString != null)
+                texts.add(actionBarString);
+        }
+
+        return String.join("    ", texts);
+    }
 
     /**
      * 전투원이 매 틱마다 실행할 작업.
@@ -323,6 +350,16 @@ public abstract class Combatant {
      */
     @NonNull
     protected abstract TraitInfo @NonNull [] getCombatantTraitInfos();
+
+    /**
+     * 전투원의 모든 스킬 목록을 반환한다.
+     *
+     * @return 모든 스킬 목록. 길이가 0~8인 배열
+     */
+    @NonNull
+    public final SkillInfo<?> @NonNull [] getSkillInfos() {
+        return ArrayUtils.addAll(ArrayUtils.addAll(new SkillInfo[0], getPassiveSkillInfos()), getActiveSkillInfos());
+    }
 
     /**
      * 전투원의 패시브 스킬 정보 목록을 반환한다.

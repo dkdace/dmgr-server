@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.inferno.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -19,10 +20,10 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     public static final int COST = 8000;
     /** 보호막 */
     public static final int SHIELD = 2500;
-    /** 액티브 1번 쿨타임 단축 (tick) */
-    public static final long A1_COOLDOWN_DECREMENT = 3 * 20L;
-    /** 지속시간 (tick) */
-    public static final long DURATION = 10 * 20L;
+    /** 액티브 1번 쿨타임 단축 */
+    public static final Timespan A1_COOLDOWN_DECREMENT = Timespan.ofSeconds(3);
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(10);
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
@@ -35,9 +36,9 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
                         .builder("일정 시간동안 몸에 화염 방벽을 둘러 <e:HEAL:보호막>을 얻고 <d::점프 부스터>의 <7:COOLDOWN:쿨타임>을 단축하며, 재장전 없이 사격할 수 있게 됩니다. " +
                                 "보호막이 파괴되면 사용이 종료됩니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.HEAL, ChatColor.YELLOW, SHIELD)
-                        .addValueInfo(TextIcon.COOLDOWN_DECREASE, Format.TIME, -A1_COOLDOWN_DECREMENT / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN_DECREASE, Format.TIME, -A1_COOLDOWN_DECREMENT.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )

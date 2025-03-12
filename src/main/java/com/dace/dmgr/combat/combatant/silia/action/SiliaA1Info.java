@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -12,14 +13,14 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 
 public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 8 * 20L;
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(8);
     /** 이동 거리 (단위: 블록) */
     public static final int MOVE_DISTANCE = 15;
     /** 이동 강도 */
     public static final double PUSH = 2.5;
-    /** 지속시간 (tick) */
-    public static final long DURATION = (long) (0.3 * 20);
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(0.3);
     /** 피해량 */
     public static final int DAMAGE = 250;
     /** 사거리 (단위: 블록) */
@@ -34,7 +35,7 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("앞으로 빠르게 이동하며 <:DAMAGE:광역 피해>를 입힙니다. " +
                                 "적을 처치하면 <7:COOLDOWN:쿨타임>이 초기화됩니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MOVE_DISTANCE)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)

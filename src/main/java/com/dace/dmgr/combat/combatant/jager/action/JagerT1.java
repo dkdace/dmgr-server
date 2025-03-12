@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.jager.action;
 
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -23,7 +22,7 @@ public final class JagerT1 {
      * @param amount 증가량
      */
     static void addFreezeValue(@NonNull Damageable victim, int amount) {
-        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, victim, Timespan.ofTicks(JagerT1Info.DURATION));
+        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, victim, JagerT1Info.DURATION);
         freezeValue.setValue(freezeValue.getValue() + amount);
     }
 

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,10 +14,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 7 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.5 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(7);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.5);
     /** 피해량 (폭발) */
     public static final int DAMAGE_EXPLODE = 120;
     /** 피해량 (직격) */
@@ -37,7 +38,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
         super(ArkaceA1.class, "D.I.A. 코어 미사일",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("소형 미사일을 연속으로 발사하여 <:DAMAGE:광역 피해>를 입힙니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", DAMAGE_EXPLODE, DAMAGE_EXPLODE / 2)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE_DIRECT + " (직격)")
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)

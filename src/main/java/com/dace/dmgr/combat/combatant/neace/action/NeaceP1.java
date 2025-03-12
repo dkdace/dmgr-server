@@ -1,33 +1,23 @@
 package com.dace.dmgr.combat.combatant.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 import java.util.function.LongConsumer;
 
 public final class NeaceP1 extends AbstractSkill {
     public NeaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, NeaceP1Info.getInstance(), NeaceP1Info.ACTIVATE_DURATION, Timespan.MAX);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.PERIODIC_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return NeaceP1Info.ACTIVATE_DURATION;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -39,7 +29,7 @@ public final class NeaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i ->
+        addActionTask(new IntervalTask((LongConsumer) i ->
                 combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20.0, false), 1));
     }
 

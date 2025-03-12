@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -16,18 +17,18 @@ import org.bukkit.Sound;
 public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 9000;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = 20;
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(1);
     /** 효과 범위 (단위: 블록) */
     public static final double RADIUS = 8;
     /** 이동 속도 감소량 */
     public static final int SLOW = 50;
-    /** 지속시간 (tick) */
-    public static final long DURATION = (long) (2.5 * 20);
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(2.5);
     /** 피해량 비율 */
     public static final double DAMAGE_RATIO = 0.5;
-    /** 기절 시간 (tick) */
-    public static final long STUN_DURATION = 20;
+    /** 기절 시간 */
+    public static final Timespan STUN_DURATION = Timespan.ofSeconds(1);
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 15;
@@ -43,10 +44,10 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                                 "일정 시간 후 결계가 폭발하여 탈출하지 못한 적은 <:DAMAGE:광역 피해>를 입고 <:STUN:기절>합니다. " +
                                 "사용 중에는 움직일 수 없습니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.PERCENT, SLOW)
                         .addValueInfo(TextIcon.DAMAGE, "적 최대 체력의 {0}%", (int) (100 * DAMAGE_RATIO))
-                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION / 20.0)
+                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()

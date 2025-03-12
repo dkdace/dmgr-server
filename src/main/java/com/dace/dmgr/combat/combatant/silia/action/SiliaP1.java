@@ -1,34 +1,24 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 public final class SiliaP1 extends AbstractSkill {
     public SiliaP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, SiliaP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SPACE};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -46,7 +36,7 @@ public final class SiliaP1 extends AbstractSkill {
         else
             SiliaP1Info.SOUND.USE.play(location, 0, 1);
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
 
             if (location.distance(loc) > 0) {
@@ -73,7 +63,7 @@ public final class SiliaP1 extends AbstractSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                () -> setDuration(0), 1));
+        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
+                () -> setDuration(Timespan.ZERO), 1));
     }
 }

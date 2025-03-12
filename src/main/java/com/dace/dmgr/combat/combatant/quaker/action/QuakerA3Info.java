@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,12 +14,12 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 8 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.8 * 20);
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.3 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(8);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.8);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.3);
     /** 피해량 */
     public static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */
@@ -29,8 +30,8 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     public static final double SIZE = 1.2;
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 2;
-    /** 속박 시간 (tick) */
-    public static final long SNARE_DURATION = (long) (0.5 * 20);
+    /** 속박 시간 */
+    public static final Timespan SNARE_DURATION = Timespan.ofSeconds(0.5);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 2;
 
@@ -44,9 +45,9 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("검기를 날려 처음 맞은 적을 크게 <:KNOCKBACK:밀쳐내고> <:DAMAGE:피해>와 <:SNARE:속박>을 입힙니다. " +
                                 "적이 벽에 충돌하면 같은 효과를 다시 입히며, 날아가며 부딪힌 적에게도 같은 효과를 입힙니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                        .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION / 20.0)
+                        .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)

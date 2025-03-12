@@ -1,25 +1,19 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.combatant.jager.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 예거 클래스.
@@ -124,57 +118,13 @@ public final class Jager extends Marksman {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        JagerWeaponL weaponL = (JagerWeaponL) combatUser.getWeapon();
-        JagerWeaponR weaponR = weaponL.getSwapModule().getSubweapon();
-        JagerA1 skill1 = combatUser.getSkill(JagerA1Info.getInstance());
-        JagerA3 skill3 = combatUser.getSkill(JagerA3Info.getInstance());
-
-        String weaponLDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponL.getReloadModule().getRemainingAmmo(),
-                JagerWeaponInfo.CAPACITY, JagerWeaponInfo.CAPACITY, '*');
-        String weaponRDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weaponR.getReloadModule().getRemainingAmmo(),
-                JagerWeaponInfo.SCOPE.CAPACITY, JagerWeaponInfo.SCOPE.CAPACITY, '┃');
-        if (weaponL.getSwapModule().getSwapState() == Swappable.SwapState.PRIMARY)
-            weaponLDisplay = "§a" + weaponLDisplay;
-        else if (weaponL.getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
-            weaponRDisplay = "§a" + weaponRDisplay;
-
-        texts.add(weaponLDisplay);
-        texts.add(weaponRDisplay);
-        texts.add("");
-        String skill1Display = StringFormUtil.getActionbarProgressBar(JagerA1Info.getInstance().toString(),
-                skill1.getStateValue(), skill1.getMaxStateValue(), 10, '■');
-        if (!skill1.isDurationFinished())
-            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0] + "] §f회수";
-        texts.add(skill1Display);
-        if (!skill3.isDurationFinished() && skill3.isEnabled())
-            texts.add(JagerA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0] + "][" + skill3.getDefaultActionKeys()[1] + "] §f투척");
-
-        return texts;
-    }
-
-    @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        return attacker.getSkill(JagerUltInfo.getInstance()).getSummonEntity() == null;
+        return attacker.getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!(victim instanceof CombatUser))
-            return;
-
-        attacker.getSkill(JagerA1Info.getInstance()).applyBonusScore((CombatUser) victim, score);
-        attacker.getSkill(JagerUltInfo.getInstance()).applyBonusScore((CombatUser) victim, score);
     }
 
     @Override

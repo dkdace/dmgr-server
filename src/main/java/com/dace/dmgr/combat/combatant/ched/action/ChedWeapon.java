@@ -21,18 +21,13 @@ public final class ChedWeapon extends AbstractWeapon {
     private double power;
 
     public ChedWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedWeaponInfo.getInstance());
+        super(combatUser, ChedWeaponInfo.getInstance(), ChedWeaponInfo.COOLDOWN);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.PERIODIC_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return ChedWeaponInfo.COOLDOWN;
     }
 
     @Override

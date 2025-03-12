@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -31,18 +30,13 @@ public final class SiliaWeapon extends AbstractWeapon {
     private boolean isOpposite = true;
 
     public SiliaWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaWeaponInfo.getInstance());
+        super(combatUser, SiliaWeaponInfo.getInstance(), SiliaWeaponInfo.COOLDOWN);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return SiliaWeaponInfo.COOLDOWN;
     }
 
     @Override
@@ -83,7 +77,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
             setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
-        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaT2Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
         combatUser.getWeapon().setVisible(false);
         combatUser.playMeleeAttackAnimation(-2, Timespan.ofTicks(6), isOpposite ? MainHand.RIGHT : MainHand.LEFT);
 
@@ -96,7 +90,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             if (i == 1 || i == 2 || i == 6 || i == 7)
                 delay += 1;
 
-            TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+            addActionTask(new DelayTask(() -> {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 Vector vector = VectorUtil.getPitchAxis(loc);
                 Vector axis = VectorUtil.getYawAxis(loc);

@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -29,23 +28,13 @@ public final class QuakerA3 extends ActiveSkill {
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
 
     public QuakerA3(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA3Info.getInstance(), 2);
+        super(combatUser, QuakerA3Info.getInstance(), QuakerA3Info.COOLDOWN, Timespan.MAX, 2);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_3};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return QuakerA3Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -58,13 +47,13 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA3Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
 
         QuakerA3Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
             Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
             Vector axis = VectorUtil.getPitchAxis(loc);
@@ -79,7 +68,7 @@ public final class QuakerA3 extends ActiveSkill {
             new QuakerA3Projectile().shot();
 
             QuakerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
-        }, 1, QuakerA3Info.READY_DURATION));
+        }, 1, QuakerA3Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -91,7 +80,7 @@ public final class QuakerA3 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
@@ -194,7 +183,7 @@ public final class QuakerA3 extends ActiveSkill {
                 return;
 
             Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
-            TaskUtil.addTask(QuakerA3.this, new IntervalTask(i -> {
+            addTask(new IntervalTask(i -> {
                 if (!target.canBeTargeted() || target.isDisposed())
                     return false;
 
@@ -230,7 +219,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             if (target.getDamageModule().damage(QuakerA3Projectile.this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location,
                     false, true) && target instanceof Movable) {
-                target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, Timespan.ofTicks(QuakerA3Info.SNARE_DURATION));
+                target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, QuakerA3Info.SNARE_DURATION);
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);

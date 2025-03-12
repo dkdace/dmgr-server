@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.neace.action;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -10,12 +11,12 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class NeaceUlt extends UltimateSkill {
@@ -25,17 +26,13 @@ public final class NeaceUlt extends UltimateSkill {
     private boolean isEnabled = false;
 
     public NeaceUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceUltInfo.getInstance());
+        super(combatUser, NeaceUltInfo.getInstance(), NeaceUltInfo.DURATION, NeaceUltInfo.COST);
     }
 
     @Override
-    public int getCost() {
-        return NeaceUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return NeaceUltInfo.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return (isDurationFinished() || !isEnabled) ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -48,15 +45,15 @@ public final class NeaceUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(NeaceUltInfo.READY_DURATION));
+        combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
+        addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
             onReady();
-        }, 1, NeaceUltInfo.READY_DURATION));
+        }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -68,7 +65,7 @@ public final class NeaceUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
@@ -115,7 +112,7 @@ public final class NeaceUlt extends UltimateSkill {
         NeaceUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
         NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (combatUser.isDead())
                 return false;
 
@@ -126,7 +123,7 @@ public final class NeaceUlt extends UltimateSkill {
             NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
 
             return true;
-        }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION));
+        }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION.toTicks()));
     }
 
     /**

@@ -1,23 +1,21 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class ArkaceUlt extends UltimateSkill {
     public ArkaceUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceUltInfo.getInstance());
+        super(combatUser, ArkaceUltInfo.getInstance(), ArkaceUltInfo.DURATION, ArkaceUltInfo.COST);
     }
 
     @Override
-    public int getCost() {
-        return ArkaceUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return ArkaceUltInfo.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -31,7 +29,7 @@ public final class ArkaceUlt extends UltimateSkill {
 
         setDuration();
         combatUser.getWeapon().onCancelled();
-        ((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(ArkaceWeaponInfo.CAPACITY);
+        ((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
     }
 
     @Override

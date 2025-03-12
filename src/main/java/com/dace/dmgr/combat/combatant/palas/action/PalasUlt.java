@@ -20,17 +20,7 @@ public final class PalasUlt extends UltimateSkill {
     private static final AbilityStatus.Modifier SPEED_MODIFIER = new AbilityStatus.Modifier(PalasUltInfo.SPEED_INCREMENT);
 
     public PalasUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasUltInfo.getInstance());
-    }
-
-    @Override
-    public int getCost() {
-        return PalasUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
+        super(combatUser, PalasUltInfo.getInstance(), Timespan.MAX, PalasUltInfo.COST);
     }
 
     @Override
@@ -89,13 +79,13 @@ public final class PalasUlt extends UltimateSkill {
             combatUser.getWeapon().onCancelled();
 
             target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);
-            target.getStatusEffectModule().apply(PalasUltBuff.instance, combatUser, Timespan.ofTicks(PalasUltInfo.DURATION));
+            target.getStatusEffectModule().apply(PalasUltBuff.instance, combatUser, PalasUltInfo.DURATION);
 
             if (target instanceof CombatUser) {
                 ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
-                ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, Timespan.ofTicks(PalasUltInfo.DURATION));
+                ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
             }
 
             PalasUltInfo.SOUND.USE.play(combatUser.getLocation());

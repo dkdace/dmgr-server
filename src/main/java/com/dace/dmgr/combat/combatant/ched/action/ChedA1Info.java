@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,20 +14,20 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.3 * 20);
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.3 * 20);
-    /** 스택 충전 쿨타임 (tick) */
-    public static final long STACK_COOLDOWN = 6 * 20L;
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.3);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.3);
+    /** 스택 충전 쿨타임 */
+    public static final Timespan STACK_COOLDOWN = Timespan.ofSeconds(6);
     /** 최대 스택 충전량 */
     public static final int MAX_STACK = 3;
     /** 피해량 */
     public static final int DAMAGE = 250;
     /** 초당 화염 피해량 */
     public static final int FIRE_DAMAGE_PER_SECOND = 70;
-    /** 화염 지속 시간 (tick) */
-    public static final long FIRE_DURATION = 3 * 20L;
+    /** 화염 지속 시간 */
+    public static final Timespan FIRE_DURATION = Timespan.ofSeconds(3);
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 95;
 
@@ -39,14 +40,14 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
         super(ChedA1.class, "불화살",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("충전 없이 <3::불화살>을 속사할 수 있습니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME_WITH_MAX_STACK, STACK_COOLDOWN / 20.0, MAX_STACK)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME_WITH_MAX_STACK, STACK_COOLDOWN.toSeconds(), MAX_STACK)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
                         new ActionInfoLore.NamedSection("불화살", ActionInfoLore.Section
                                 .builder("불화살을 발사하여 <:DAMAGE:피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND)
-                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("발사", ActionKey.RIGHT_CLICK)
                                 .build()
                         ),

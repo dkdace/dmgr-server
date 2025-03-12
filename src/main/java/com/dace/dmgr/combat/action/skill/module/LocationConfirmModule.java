@@ -1,12 +1,11 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.LocationUtil;
-import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
@@ -17,14 +16,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 
 /**
  * 스킬의 위치 확인 모듈 클래스.
- *
- * <p>스킬이 {@link Confirmable}을 상속받는 클래스여야 한다.</p>
  *
  * @see Confirmable
  */
@@ -33,10 +31,8 @@ public final class LocationConfirmModule extends ConfirmModule {
     private final int maxDistance;
 
     /** 현재 지정 위치 */
-    @NonNull
-    @Getter
     private Location currentLocation;
-    /** 위치 표시용 갑옷 거치대 객체 */
+    /** 위치 표시용 갑옷 거치대 인스턴스 */
     @Nullable
     private ArmorStand pointer = null;
 
@@ -51,16 +47,15 @@ public final class LocationConfirmModule extends ConfirmModule {
      */
     public LocationConfirmModule(@NonNull Confirmable skill, @NonNull ActionKey acceptKey, @NonNull ActionKey cancelKey, int maxDistance) {
         super(skill, acceptKey, cancelKey);
-        if (maxDistance < 0)
-            throw new IllegalArgumentException("'maxDistance'가 0 이상이어야 함");
+        Validate.isTrue(maxDistance >= 0, "maxDistance >= 0 (%d)", maxDistance);
 
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getLocation();
 
-        new IntervalTask(i -> !skill.isDisposed(), () -> {
+        skill.addOnDispose(() -> {
             if (pointer != null)
                 pointer.remove();
-        }, 1);
+        });
     }
 
     /**
@@ -69,17 +64,26 @@ public final class LocationConfirmModule extends ConfirmModule {
      * @return 위치 지정 가능 여부
      */
     public boolean isValid() {
-        if (!isChecking)
-            return false;
-        if (currentLocation.equals(skill.getCombatUser().getLocation()) || !currentLocation.getBlock().isEmpty()
+        Player player = skill.getCombatUser().getEntity();
+        if (!isChecking || currentLocation.equals(player.getLocation())
+                || !currentLocation.getBlock().isEmpty()
                 || currentLocation.clone().subtract(0, 1, 0).getBlock().isEmpty())
             return false;
 
-        Location loc = skill.getCombatUser().getEntity().getEyeLocation();
+        Location loc = player.getEyeLocation();
         loc.setY(currentLocation.getY());
 
-        return skill.getCombatUser().getEntity().getEyeLocation().getY() > currentLocation.getY() ||
-                LocationUtil.canPass(loc, skill.getCombatUser().getEntity().getEyeLocation());
+        return player.getEyeLocation().getY() > currentLocation.getY() || LocationUtil.canPass(loc, player.getEyeLocation());
+    }
+
+    /**
+     * 현재 지정 위치를 반환한다.
+     *
+     * @return 현재 지정 위치
+     */
+    @NonNull
+    public Location getCurrentLocation() {
+        return currentLocation.clone();
     }
 
     @Override
@@ -87,14 +91,15 @@ public final class LocationConfirmModule extends ConfirmModule {
         Player player = skill.getCombatUser().getEntity();
 
         pointer = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
+        pointer.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
         pointer.setSilent(true);
         pointer.setInvulnerable(true);
         pointer.setGravity(false);
         pointer.setAI(false);
         pointer.setMarker(true);
         pointer.setVisible(false);
-        pointer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false,
-                false), true);
+        pointer.addPotionEffect(
+                new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
         pointer.setHelmet(new ItemStack(Material.HOPPER));
         currentLocation = skill.getCombatUser().getLocation();
 
@@ -111,36 +116,31 @@ public final class LocationConfirmModule extends ConfirmModule {
     protected void onCheckTick(long i) {
         Validate.notNull(pointer);
 
-        Player player = skill.getCombatUser().getEntity();
+        currentLocation = skill.getCombatUser().getEntity().getTargetBlock(null, maxDistance).getLocation().add(0.5, 0.5, 0.5);
+        if (LocationUtil.isNonSolid(currentLocation))
+            currentLocation = LocationUtil.getNearestAgainstEdge(currentLocation, new Vector(0, -1, 0), 8);
+        if (!LocationUtil.isNonSolid(currentLocation))
+            currentLocation = LocationUtil.getNearestAgainstEdge(currentLocation, new Vector(0, 1, 0), 8);
 
-        currentLocation = player.getTargetBlock(null, maxDistance).getLocation().add(0.5, 1, 0.5);
-        Location loc = currentLocation.clone();
-        for (int j = 0; j < 16; j++) {
-            if (!LocationUtil.isNonSolid(loc.subtract(0, 0.5, 0))) {
-                currentLocation = loc;
-                break;
-            }
-        }
-        loc = currentLocation.clone();
-        for (int j = 0; j < 16; j++) {
-            if (LocationUtil.isNonSolid(loc.add(0, 0.5, 0))) {
-                currentLocation = loc;
-                break;
-            }
-        }
+        if (!currentLocation.getBlock().isEmpty())
+            currentLocation.add(0, 0.5, 0);
         currentLocation.setYaw(i * 10F);
         currentLocation.setPitch(0);
+
         pointer.teleport(currentLocation.clone().add(0, -1.75, 0).add(currentLocation.getDirection().multiply(0.25)));
         pointer.setAI(false);
 
+        String message = MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
+                acceptKey,
+                (isValid() ? ChatColor.WHITE : ChatColor.RED),
+                cancelKey);
+
+        skill.getCombatUser().getUser().sendTitle("", message, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
         skill.getCombatUser().getUser().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));
-        skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
-                acceptKey, (isValid() ? ChatColor.WHITE : ChatColor.RED), cancelKey), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
     }
 
     @Override
     protected void onCheckDisable() {
-        Validate.notNull(pointer);
-        pointer.remove();
+        Validate.notNull(pointer).remove();
     }
 }

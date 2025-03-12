@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -15,10 +16,10 @@ import org.bukkit.Sound;
 public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 6500;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.8 * 20);
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.5 * 20);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.8);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.5);
     /** 피해량 */
     public static final int DAMAGE = 250;
     /** 사거리 (단위: 블록) */
@@ -27,12 +28,12 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     public static final int VELOCITY = 35;
     /** 판정 크기 (단위: 블록) */
     public static final double SIZE = 1.5;
-    /** 기절 시간 (tick) */
-    public static final long STUN_DURATION = 20;
+    /** 기절 시간 */
+    public static final Timespan STUN_DURATION = Timespan.ofSeconds(1);
     /** 이동 속도 감소량 */
     public static final int SLOW = 30;
-    /** 이동 속도 감소 시간 (tick) */
-    public static final long SLOW_DURATION = 12 * 20L;
+    /** 이동 속도 감소 시간 */
+    public static final Timespan SLOW_DURATION = Timespan.ofSeconds(12);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 3;
 
@@ -50,8 +51,8 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
                                 "맞은 적은 긴 시간동안 <:WALK_SPEED_DECREASE:이동 속도>가 느려집니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION / 20.0)
-                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION / 20.0, SLOW)
+                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
+                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION.toSeconds(), SLOW)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()

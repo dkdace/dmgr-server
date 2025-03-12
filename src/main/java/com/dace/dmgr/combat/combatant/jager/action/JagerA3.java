@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
@@ -16,9 +17,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -26,7 +25,6 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class JagerA3 extends ActiveSkill {
     /** 폭발 타임스탬프 */
     private Timestamp explodeTimestamp = Timestamp.now();
@@ -34,7 +32,7 @@ public final class JagerA3 extends ActiveSkill {
     private boolean isEnabled = false;
 
     public JagerA3(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA3Info.getInstance(), 2);
+        super(combatUser, JagerA3Info.getInstance(), JagerA3Info.COOLDOWN, Timespan.MAX, 2);
     }
 
     @Override
@@ -49,13 +47,12 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return JagerA3Info.COOLDOWN;
-    }
+    @Nullable
+    public String getActionBarString() {
+        if (isDurationFinished() || !isEnabled)
+            return null;
 
-    @Override
-    public long getDefaultDuration() {
-        return -1;
+        return JagerA3Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "투척");
     }
 
     @Override
@@ -71,18 +68,18 @@ public final class JagerA3 extends ActiveSkill {
 
             setDuration();
             combatUser.getWeapon().onCancelled();
-            combatUser.setGlobalCooldown(Timespan.ofTicks(JagerA3Info.READY_DURATION));
+            combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
             combatUser.getWeapon().setVisible(false);
 
             JagerA3Info.SOUND.USE.play(combatUser.getLocation());
 
-            TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+            addActionTask(new DelayTask(() -> {
                 isEnabled = true;
-                explodeTimestamp = Timestamp.now().plus(Timespan.ofTicks(JagerA3Info.EXPLODE_DURATION));
+                explodeTimestamp = Timestamp.now().plus(JagerA3Info.EXPLODE_DURATION);
 
                 JagerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
 
-                TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+                addActionTask(new IntervalTask(i -> {
                     if (isDurationFinished())
                         return false;
 
@@ -98,11 +95,11 @@ public final class JagerA3 extends ActiveSkill {
 
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
                     explode(loc, null);
-                }, 1, JagerA3Info.EXPLODE_DURATION));
-            }, JagerA3Info.READY_DURATION));
+                }, 1, JagerA3Info.EXPLODE_DURATION.toTicks()));
+            }, JagerA3Info.READY_DURATION.toTicks()));
         } else {
             onCancelled();
-            combatUser.getWeapon().setCooldown(2);
+            combatUser.getWeapon().setCooldown(Timespan.ofTicks(2));
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerA3Projectile().shot(loc);
@@ -120,7 +117,7 @@ public final class JagerA3 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getWeapon().setVisible(true);
     }
@@ -230,7 +227,7 @@ public final class JagerA3 extends ActiveSkill {
                 JagerT1.addFreezeValue(target, freeze);
 
                 if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
-                    target.getStatusEffectModule().apply(Freeze.instance, combatUser, Timespan.ofTicks(JagerA3Info.SNARE_DURATION));
+                    target.getStatusEffectModule().apply(Freeze.instance, combatUser, JagerA3Info.SNARE_DURATION);
                     if (target != combatUser) {
                         combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
                         combatUser.useAction(ActionKey.PERIODIC_1);

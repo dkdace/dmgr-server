@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.inferno.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -18,8 +19,8 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     public static final int DAMAGE_PER_SECOND = 150;
     /** 초당 화염 피해량 */
     public static final int FIRE_DAMAGE_PER_SECOND = 40;
-    /** 화염 지속 시간 (tick) */
-    public static final long FIRE_DURATION = (long) (2.5 * 20);
+    /** 화염 지속 시간 */
+    public static final Timespan FIRE_DURATION = Timespan.ofSeconds(2.5);
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 7;
     /** 투사체 속력 (단위: 블록/s) */
@@ -30,8 +31,8 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     public static final double SPREAD = 30;
     /** 장탄수 */
     public static final int CAPACITY = 200;
-    /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = (long) (2.5 * 20);
+    /** 재장전 시간 */
+    public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(2.5);
     @Getter
     private static final InfernoWeaponInfo instance = new InfernoWeaponInfo();
 
@@ -46,7 +47,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                         new ActionInfoLore.NamedSection("방사", ActionInfoLore.Section
                                 .builder("근거리에 화염을 방사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, DAMAGE_PER_SECOND)
-                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION / 20.0, FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build()
                         ),
@@ -55,8 +56,8 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", FIREBALL.DAMAGE_EXPLODE, FIREBALL.DAMAGE_EXPLODE / 2)
                                 .addValueInfo(TextIcon.DAMAGE, FIREBALL.DAMAGE_DIRECT + " (직격)")
                                 .addValueInfo(TextIcon.FIRE, Format.VARIABLE_TIME_WITH_PER_SECOND,
-                                        FIRE_DURATION / 20.0, FIRE_DURATION / 2 / 20.0, FIRE_DAMAGE_PER_SECOND)
-                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, FIREBALL.COOLDOWN / 20.0)
+                                        FIRE_DURATION.toSeconds(), FIRE_DURATION.toSeconds() / 2, FIRE_DAMAGE_PER_SECOND)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, FIREBALL.COOLDOWN.toSeconds())
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, FIREBALL.DISTANCE)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, FIREBALL.RADIUS)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, -FIREBALL.CAPACITY_CONSUME)
@@ -71,8 +72,8 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      */
     @UtilityClass
     public static class FIREBALL {
-        /** 쿨타임 (tick) */
-        public static final long COOLDOWN = 20;
+        /** 쿨타임 */
+        public static final Timespan COOLDOWN = Timespan.ofSeconds(1);
         /** 피해량 (폭발) */
         public static final int DAMAGE_EXPLODE = 100;
         /** 피해량 (직격) */

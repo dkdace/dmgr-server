@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,18 +14,18 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 17 * 20L;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.6 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(17);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.6);
     /** 시전 중 이동속도 감소량 */
     public static final int READY_SLOW = 70;
     /** 효과 범위 (단위: 블록) */
     public static final double RADIUS = 5;
     /** 최대 거리 (단위: 블록) */
     public static final int MAX_DISTANCE = 30;
-    /** 지속시간 (tick) */
-    public static final long DURATION = 6 * 20L;
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(6);
 
     /** 초당 효과 점수 */
     public static final int EFFECT_SCORE_PER_SECOND = 2;
@@ -37,8 +38,8 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
         super(VellionA3.class, "칠흑의 균열",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("바라보는 곳에 균열을 일으켜 범위의 적을 <:SILENCE:침묵>시키고 <:HEAL_BAN:회복을 차단>합니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MAX_DISTANCE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)

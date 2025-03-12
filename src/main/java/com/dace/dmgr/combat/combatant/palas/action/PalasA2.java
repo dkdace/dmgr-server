@@ -21,23 +21,13 @@ public final class PalasA2 extends ActiveSkill {
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(100);
 
     public PalasA2(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA2Info.getInstance(), 1);
+        super(combatUser, PalasA2Info.getInstance(), PalasA2Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_2};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return PalasA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -89,13 +79,13 @@ public final class PalasA2 extends ActiveSkill {
 
             target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);
             target.getStatusEffectModule().clear(false);
-            target.getStatusEffectModule().apply(PalasA2Immune.instance, combatUser, Timespan.ofTicks(PalasA2Info.DURATION));
+            target.getStatusEffectModule().apply(PalasA2Immune.instance, combatUser, PalasA2Info.DURATION);
 
             if (target instanceof CombatUser) {
                 ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
-                ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, Timespan.ofTicks(PalasA2Info.DURATION));
+                ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
             }
 
             PalasA2Info.SOUND.USE.play(combatUser.getLocation());

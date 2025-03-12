@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.palas;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -13,18 +12,13 @@ import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.combatant.palas.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 팔라스 클래스.
@@ -129,21 +123,6 @@ public final class Palas extends Support {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        PalasWeapon weapon = (PalasWeapon) combatUser.getWeapon();
-
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
-                PalasWeaponInfo.CAPACITY, PalasWeaponInfo.CAPACITY, '┃');
-        weaponDisplay += (weapon.isActionCooldown() ? " §a■" : " §c□");
-        texts.add(weaponDisplay);
-
-        return texts;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -163,15 +142,6 @@ public final class Palas extends Support {
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 
         return true;
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser) || score >= 100)
-            return;
-
-        attacker.getSkill(PalasA1Info.getInstance()).applyAssistScore((CombatUser) victim);
-        attacker.getSkill(PalasA3Info.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override

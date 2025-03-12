@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,14 +14,14 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 3 * 20L;
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(3);
     /** 이동 강도 */
     public static final double PUSH = 0.9;
     /** 최대 거리 (단위: 블록) */
     public static final int MAX_DISTANCE = 30;
-    /** 지속시간 (tick) */
-    public static final long DURATION = 2 * 20L;
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(2);
     @Getter
     private static final NeaceA3Info instance = new NeaceA3Info();
 
@@ -33,7 +34,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
                         .build(),
                         new ActionInfoLore.NamedSection("대상 접근/재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
-                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_3)
                                 .build()
                         )

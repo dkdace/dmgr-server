@@ -15,18 +15,13 @@ import org.bukkit.inventory.MainHand;
 
 public final class VellionWeapon extends AbstractWeapon {
     public VellionWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionWeaponInfo.getInstance());
+        super(combatUser, VellionWeaponInfo.getInstance(), VellionWeaponInfo.COOLDOWN);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return VellionWeaponInfo.COOLDOWN;
     }
 
     @Override

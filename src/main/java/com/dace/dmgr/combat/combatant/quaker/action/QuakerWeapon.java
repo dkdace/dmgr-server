@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
@@ -26,18 +25,13 @@ public final class QuakerWeapon extends AbstractWeapon {
     private boolean isClockwise = true;
 
     public QuakerWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerWeaponInfo.getInstance());
+        super(combatUser, QuakerWeaponInfo.getInstance(), QuakerWeaponInfo.COOLDOWN);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return QuakerWeaponInfo.COOLDOWN;
     }
 
     @Override
@@ -49,10 +43,10 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
         setVisible(false);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerWeaponInfo.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(QuakerWeaponInfo.GLOBAL_COOLDOWN);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), isClockwise ? MainHand.RIGHT : MainHand.LEFT);
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             isClockwise = !isClockwise;
             HashSet<Damageable> targets = new HashSet<>();
 
@@ -65,7 +59,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                 else if (i == 2 || i == 4 || i == 6 || i == 7)
                     delay += 1;
 
-                TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+                addActionTask(new DelayTask(() -> {
                     Location loc = combatUser.getEntity().getEyeLocation();
                     Vector vector = VectorUtil.getPitchAxis(loc);
                     Vector axis = VectorUtil.getYawAxis(loc);
@@ -78,7 +72,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                         QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
                         combatUser.addYawAndPitch(isClockwise ? -1 : 1, -0.7);
-                        TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4));
+                        addActionTask(new DelayTask(this::onCancelled, 4));
                     }
                 }, delay));
             }

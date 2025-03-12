@@ -2,8 +2,11 @@ package com.dace.dmgr.combat.combatant.quaker.action;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
+import com.dace.dmgr.combat.action.skill.Summonable;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
@@ -11,20 +14,24 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.LocationUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
-public final class QuakerA1 extends ChargeableSkill {
+@Getter
+public final class QuakerA1 extends ChargeableSkill implements Summonable<QuakerA1.QuakerA1Entity> {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-QuakerA1Info.USE_SLOW);
-    /** 소환한 엔티티 */
-    private QuakerA1Entity summonEntity = null;
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<QuakerA1Entity> entityModule;
 
     public QuakerA1(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA1Info.getInstance(), 0);
+        super(combatUser, QuakerA1Info.getInstance(), QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH, 0);
+        entityModule = new EntityModule<>(this);
     }
 
     @Override
@@ -34,23 +41,23 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return QuakerA1Info.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        String text = ActionBarStringUtil.getProgressBar(this);
+        if (!isDurationFinished())
+            text += ActionBarStringUtil.getKeyInfo(this, "해제");
+
+        return text;
     }
 
     @Override
-    public int getMaxStateValue() {
-        return QuakerA1Info.HEALTH;
-    }
-
-    @Override
-    public int getStateValueDecrement() {
+    public double getStateValueDecrement() {
         return 0;
     }
 
     @Override
-    public int getStateValueIncrement() {
-        return QuakerA1Info.HEALTH / QuakerA1Info.RECOVER_DURATION;
+    public double getStateValueIncrement() {
+        return QuakerA1Info.HEALTH / QuakerA1Info.RECOVER_DURATION.toSeconds();
     }
 
     @Override
@@ -59,12 +66,12 @@ public final class QuakerA1 extends ChargeableSkill {
 
         if (isDurationFinished()) {
             setDuration();
-            combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA1Info.GLOBAL_COOLDOWN));
+            combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
             QuakerA1Info.SOUND.USE.play(combatUser.getLocation());
 
-            summonEntity = new QuakerA1Entity(combatUser.getLocation());
+            entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
         } else
             onCancelled();
     }
@@ -78,26 +85,18 @@ public final class QuakerA1 extends ChargeableSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        if (summonEntity != null)
-            summonEntity.dispose();
+
+        entityModule.disposeEntity();
 
         QuakerA1Info.SOUND.DISABLE.play(combatUser.getLocation());
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
     }
 
     /**
      * 불굴의 방패 클래스.
      */
-    private final class QuakerA1Entity extends Barrier {
+    public final class QuakerA1Entity extends Barrier {
         private QuakerA1Entity(@NonNull Location spawnLocation) {
             super(
                     spawnLocation,
@@ -123,12 +122,6 @@ public final class QuakerA1 extends ChargeableSkill {
                     0, 0.8, 1.5);
             entity.setRightArmPose(new EulerAngle(Math.toRadians(loc.getPitch() - 90), 0, 0));
             entity.teleport(loc);
-        }
-
-        @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
         }
 
         @Override

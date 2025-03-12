@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -17,36 +19,33 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.WeakHashMap;
-
-@Getter
-public final class VellionUlt extends UltimateSkill {
+public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+
+    /** 보너스 점수 모듈 */
+    @NonNull
+    @Getter
+    private final BonusScoreModule bonusScoreModule;
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
     public VellionUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionUltInfo.getInstance());
+        super(combatUser, VellionUltInfo.getInstance(), VellionUltInfo.DURATION, VellionUltInfo.COST);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionUltInfo.ASSIST_SCORE);
     }
 
     @Override
-    public int getCost() {
-        return VellionUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return VellionUltInfo.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return (isDurationFinished() || !isEnabled) ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -58,8 +57,8 @@ public final class VellionUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration(-1);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionUltInfo.READY_DURATION));
+        setDuration(Timespan.MAX);
+        combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
@@ -68,11 +67,11 @@ public final class VellionUlt extends UltimateSkill {
 
         VellionUltInfo.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect,
+        addActionTask(new IntervalTask(this::playUseTickEffect,
                 () -> new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
-                    setDuration(0);
+                    setDuration(Timespan.ZERO);
                     onReady();
-                }, 1), 1, VellionUltInfo.READY_DURATION));
+                }, 1), 1, VellionUltInfo.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -84,7 +83,7 @@ public final class VellionUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
@@ -127,11 +126,11 @@ public final class VellionUlt extends UltimateSkill {
     private void onReady() {
         setDuration();
         isEnabled = true;
-        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, Timespan.ofTicks(VellionUltInfo.DURATION));
+        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, VellionUltInfo.DURATION);
 
         VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (combatUser.isDead())
                 return false;
 
@@ -153,7 +152,7 @@ public final class VellionUlt extends UltimateSkill {
             Location loc2 = loc.add(0, 1, 0);
             VellionUltInfo.SOUND.EXPLODE.play(loc2);
             VellionUltInfo.PARTICLE.EXPLODE.play(loc2);
-        }, 1, VellionUltInfo.DURATION));
+        }, 1, VellionUltInfo.DURATION.toTicks()));
     }
 
     /**
@@ -199,15 +198,9 @@ public final class VellionUlt extends UltimateSkill {
         }
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", VellionUltInfo.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -239,7 +232,7 @@ public final class VellionUlt extends UltimateSkill {
                 target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser)
-                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
+                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
             }
 
             return true;
@@ -260,11 +253,11 @@ public final class VellionUlt extends UltimateSkill {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO,
                     DamageType.FIXED, null, false, true)) {
-                target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(VellionUltInfo.STUN_DURATION));
+                target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, VellionUltInfo.STUN_DURATION);
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
-                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(VellionUltInfo.STUN_DURATION)));
+                    bonusScoreModule.addTarget((CombatUser) target, VellionUltInfo.STUN_DURATION);
                 }
             }
 

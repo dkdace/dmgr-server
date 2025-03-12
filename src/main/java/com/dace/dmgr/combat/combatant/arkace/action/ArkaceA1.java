@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -22,23 +21,13 @@ import org.bukkit.inventory.MainHand;
 
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceA1Info.getInstance(), 1);
+        super(combatUser, ArkaceA1Info.getInstance(), ArkaceA1Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_2, ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return ArkaceA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -50,14 +39,14 @@ public final class ArkaceA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(ArkaceA1Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(MainHand.LEFT);
             new ArkaceA1Projectile().shot(loc);
 
             ArkaceA1Info.SOUND.USE.play(loc);
-        }, () -> TaskUtil.addTask(taskRunner, new DelayTask(this::onCancelled, 4)), 5, 3));
+        }, () -> addActionTask(new DelayTask(this::onCancelled, 4)), 5, 3));
     }
 
     @Override
@@ -68,7 +57,7 @@ public final class ArkaceA1 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
     private final class ArkaceA1Projectile extends Projectile<Damageable> {

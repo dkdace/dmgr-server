@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.jager.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -12,14 +13,14 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
 
 public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 3 * 20L;
-    /** 사망 시 쿨타임 (tick) */
-    public static final long COOLDOWN_DEATH = 9 * 20L;
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(3);
+    /** 사망 시 쿨타임 */
+    public static final Timespan COOLDOWN_DEATH = Timespan.ofSeconds(9);
     /** 소환 최대 거리 (단위: 블록) */
     public static final int SUMMON_MAX_DISTANCE = 15;
-    /** 소환 시간 (tick) */
-    public static final long SUMMON_DURATION = 2 * 20L;
+    /** 소환 시간 */
+    public static final Timespan SUMMON_DURATION = Timespan.ofSeconds(2);
     /** 체력 */
     public static final int HEALTH = 500;
     /** 피해량 */
@@ -28,13 +29,13 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     public static final double SPEED = 0.45;
     /** 적 감지 범위 (단위: 블록) */
     public static final double ENEMY_DETECT_RADIUS = 20;
-    /** 체력 최대 회복 시간 (tick) */
-    public static final int RECOVER_DURATION = 6 * 20;
+    /** 체력 최대 회복 시간 */
+    public static final Timespan RECOVER_DURATION = Timespan.ofSeconds(6);
 
     /** 처치 점수 */
     public static final int KILL_SCORE = 15;
-    /** 처치 점수 제한시간 (tick) */
-    public static final long KILL_SCORE_TIME_LIMIT = 10 * 20L;
+    /** 처치 점수 제한시간 */
+    public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(10);
     /** 사망 점수 */
     public static final int DEATH_SCORE = 15;
     @Getter
@@ -48,7 +49,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                         .build(),
                         new ActionInfoLore.NamedSection("설랑", ActionInfoLore.Section
                                 .builder("근처의 적을 탐지하면 추적합니다.")
-                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (사망 시)", COOLDOWN_DEATH / 20.0)
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (사망 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEAL, HEALTH)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, ENEMY_DETECT_RADIUS)
                                 .build()
@@ -62,7 +63,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                         ),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
-                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("회수", ActionKey.SLOT_1)
                                 .build()
                         )

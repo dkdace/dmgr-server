@@ -4,6 +4,8 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Summonable;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
@@ -15,7 +17,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -25,30 +27,23 @@ import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 
-public final class VellionA1 extends ActiveSkill {
+@Getter
+public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1.VellionA1Entity> {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA1Info.READY_SLOW);
-    /** 소환한 엔티티 */
-    private VellionA1Entity summonEntity = null;
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<VellionA1Entity> entityModule;
 
     public VellionA1(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA1Info.getInstance(), 0);
+        super(combatUser, VellionA1Info.getInstance(), VellionA1Info.COOLDOWN, Timespan.MAX, 0);
+        entityModule = new EntityModule<>(this);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1, ActionKey.RIGHT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return VellionA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -60,19 +55,19 @@ public final class VellionA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA1Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         VellionA1Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(this::playUseTickEffect, () -> {
+        addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
-            summonEntity = new VellionA1Entity(loc);
+            entityModule.set(new VellionA1Entity(loc));
 
             VellionA1Info.SOUND.USE_READY.play(loc);
-        }, 1, VellionA1Info.READY_DURATION));
+        }, 1, VellionA1Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -84,16 +79,8 @@ public final class VellionA1 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
     }
 
     /**
@@ -163,11 +150,11 @@ public final class VellionA1 extends ActiveSkill {
     /**
      * 마력 응집체 클래스.
      */
-    private final class VellionA1Entity extends SummonEntity<ArmorStand> {
+    public final class VellionA1Entity extends SummonEntity<ArmorStand> {
         /** 피격자 목록 */
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */
-        private long returnTime = VellionA1Info.RETURN_DURATION;
+        private long returnTime = VellionA1Info.RETURN_DURATION.toTicks();
 
         private VellionA1Entity(@NonNull Location spawnLocation) {
             super(
@@ -205,12 +192,6 @@ public final class VellionA1 extends ActiveSkill {
             new VellionA1Area().emit(loc);
         }
 
-        @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
-        }
-
         private final class VellionA1Area extends Area<Damageable> {
             private VellionA1Area() {
                 super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
@@ -228,16 +209,16 @@ public final class VellionA1 extends ActiveSkill {
                         if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
                                 false, true)) {
                             target.getStatusEffectModule().apply(VellionA1Poison.instance, combatUser,
-                                    target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(Timespan.ofTicks(VellionA1Info.EFFECT_DURATION)));
+                                    target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(VellionA1Info.EFFECT_DURATION));
 
-                            target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, Timespan.ofTicks(VellionA1Info.SNARE_DURATION));
+                            target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, VellionA1Info.SNARE_DURATION);
                         }
 
                         VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
                         VellionA1Info.SOUND.HIT_ENTITY.play(location);
                     } else if (target instanceof Healable)
                         target.getStatusEffectModule().apply(VellionA1Heal.instance, combatUser,
-                                target.getStatusEffectModule().getDuration(VellionA1Heal.instance).plus(Timespan.ofTicks(VellionA1Info.EFFECT_DURATION)));
+                                target.getStatusEffectModule().getDuration(VellionA1Heal.instance).plus(VellionA1Info.EFFECT_DURATION));
 
                     if (target instanceof CombatUser)
                         combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);

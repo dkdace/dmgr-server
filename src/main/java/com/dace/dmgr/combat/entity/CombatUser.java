@@ -16,6 +16,7 @@ import com.dace.dmgr.combat.action.MeleeAttackAction;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -61,7 +62,6 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
@@ -168,9 +168,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private Weapon weapon;
-    /** 연사 무기 사용을 처리하는 태스크 */
-    @Nullable
-    private IntervalTask fullAutoTask;
     /** 사망 대사 홀로그램 */
     @Nullable
     private TextHologram deathMentHologram;
@@ -206,8 +203,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private Timestamp actionGlobalCooldownTimestamp = Timestamp.now();
     /** 획득 점수 표시 타임스탬프 */
     private Timestamp scoreDisplayTimestamp = Timestamp.now();
-    /** 연사 무기의 쿨타임 타임스탬프 */
-    private Timestamp weaponFullAutoCooldownTimestamp = Timestamp.now();
 
     /**
      * 전투 시스템의 플레이어 인스턴스를 생성한다.
@@ -348,7 +343,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param i 인덱스
      */
     private void onTickLive(long i) {
-        user.sendActionBar(String.join("    ", combatant.getActionbarStrings(this)));
+        user.sendActionBar(combatant.getActionBarString(this));
 
         if (currentHitboxes == hitboxes) {
             hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
@@ -597,6 +592,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             addScore("§e" + victim.getName() + "§f 처치", score);
             addScore("결정타", FINAL_HIT_SCORE);
 
+            handleBonusScoreSkill(combatUserVictim, score);
+
             if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
                 killStreak = 0;
             killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
@@ -717,6 +714,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
                 target.combatant.onKill(target, this, score, false);
                 target.addScore("§e" + name + "§f 처치 도움", score);
+                target.handleBonusScoreSkill(this, score);
+
                 target.playKillEffect();
 
                 if (target.getGameUser() != null)
@@ -778,6 +777,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 deathMentHologram = null;
             }
         }, 1, durationTicks));
+    }
+
+    /**
+     * 적 처치 시 스킬의 보너스 점수 지급을 처리한다.
+     *
+     * @param victim 피격자
+     * @param score  처치 기여 점수
+     */
+    private void handleBonusScoreSkill(@NonNull CombatUser victim, int score) {
+        for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
+            Skill skill = getSkill(skillInfo);
+            if (skill instanceof HasBonusScore)
+                ((HasBonusScore) skill).getBonusScoreModule().onKill(victim, score);
+        }
     }
 
     /**
@@ -864,7 +877,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         int cooldownTicks = (int) Math.min(Integer.MAX_VALUE, cooldown.toTicks());
         entity.setCooldown(SkillInfo.MATERIAL, cooldownTicks);
-        if (cooldownTicks > weapon.getCooldown())
+        if (cooldown.compareTo(weapon.getCooldown()) > 0)
             entity.setCooldown(WeaponInfo.MATERIAL, cooldownTicks);
     }
 
@@ -938,7 +951,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             value = 0.999;
             UltimateSkill skill = getSkill(combatant.getUltimateSkillInfo());
             if (!skill.isCooldownFinished())
-                skill.setCooldown(0);
+                skill.setCooldown(Timespan.ZERO);
         }
 
         entity.setExp((float) value);
@@ -1039,14 +1052,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         for (ActionKey actionKey : weapon.getDefaultActionKeys())
             actionMap.get(actionKey).add(weapon);
 
-        Stream.concat(Arrays.stream(combatant.getPassiveSkillInfos()), Arrays.stream(combatant.getActiveSkillInfos()))
-                .forEach(skillInfo -> {
-                    Skill skill = skillInfo.createSkill(this);
-                    skillMap.put(skillInfo, skill);
+        for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
+            Skill skill = skillInfo.createSkill(this);
+            skillMap.put(skillInfo, skill);
 
-                    for (ActionKey actionKey : skill.getDefaultActionKeys())
-                        actionMap.get(actionKey).add(skill);
-                });
+            for (ActionKey actionKey : skill.getDefaultActionKeys())
+                actionMap.get(actionKey).add(skill);
+        }
     }
 
     /**
@@ -1078,7 +1090,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             }
 
             Weapon realWeapon = weapon;
-            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().getSwapState() == Swappable.SwapState.SECONDARY)
+            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().isSwapped())
                 realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
 
             if (action instanceof Weapon)
@@ -1096,40 +1108,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
         if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
-            handleUseFullAutoWeapon(actionKey, (FullAuto) weapon);
+            ((FullAuto) weapon).getFullAutoModule().use();
         else if (weapon.canUse(actionKey))
             weapon.onUse(actionKey);
-    }
-
-    /**
-     * 연사 무기의 사용 로직을 처리한다.
-     *
-     * @param actionKey 동작 사용 키
-     * @param weapon    연사 무기
-     */
-    private void handleUseFullAutoWeapon(@NonNull ActionKey actionKey, @NonNull FullAuto weapon) {
-        Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(6));
-
-        if (weaponFullAutoCooldownTimestamp.isAfter(Timestamp.now())) {
-            weaponFullAutoCooldownTimestamp = expiration;
-            return;
-        }
-
-        weaponFullAutoCooldownTimestamp = expiration;
-
-        if (fullAutoTask != null)
-            return;
-
-        fullAutoTask = new IntervalTask(i -> {
-            if (weaponFullAutoCooldownTimestamp.isBefore(Timestamp.now()))
-                return false;
-
-            if (weapon.canUse(actionKey) && !isDead && isGlobalCooldownFinished() && (weapon).getFullAutoModule().isFireTick(i))
-                weapon.onUse(actionKey);
-
-            return true;
-        }, () -> fullAutoTask = null, 1);
-        taskManager.add(fullAutoTask);
     }
 
     /**

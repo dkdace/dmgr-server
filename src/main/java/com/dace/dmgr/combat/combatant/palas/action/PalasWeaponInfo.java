@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.palas.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -16,10 +17,10 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.4 * 20);
-    /** 사용 후 쿨타임 (tick) */
-    public static final long ACTION_COOLDOWN = (long) (0.4 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.4);
+    /** 사용 후 쿨타임 */
+    public static final Timespan ACTION_COOLDOWN = Timespan.ofSeconds(0.4);
     /** 피해량 */
     public static final int DAMAGE = 300;
     /** 치유량 */
@@ -30,10 +31,10 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     public static final int DISTANCE = 30;
     /** 장탄수 */
     public static final int CAPACITY = 10;
-    /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = (long) (2.2 * 20);
-    /** 조준 시간 (tick) */
-    public static final long AIM_DURATION = (long) (0.25 * 20);
+    /** 재장전 시간 */
+    public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(2.2);
+    /** 조준 시간 */
+    public static final Timespan AIM_DURATION = Timespan.ofSeconds(0.25);
     /** 조준 시 이동속도 감소량 */
     public static final int AIM_SLOW = 30;
     /** 확대 레벨 */
@@ -47,7 +48,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                         .builder("생체탄을 발사하는 볼트액션 소총입니다. " +
                                 "사격하여 아군을 <:HEAL:치유>하거나 적에게 <:DAMAGE:피해>를 입힙니다. " +
                                 "정조준 시 사거리 제한이 사라집니다.")
-                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, ChatColor.WHITE, (COOLDOWN + ACTION_COOLDOWN) / 20.0)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, ChatColor.WHITE, COOLDOWN.plus(ACTION_COOLDOWN).toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.HEAL, HEAL)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)

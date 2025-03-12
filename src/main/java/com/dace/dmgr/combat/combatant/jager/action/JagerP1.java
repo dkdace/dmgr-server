@@ -15,7 +15,7 @@ public final class JagerP1 extends AbstractSkill {
     private Damageable target = null;
 
     public JagerP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, JagerP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -25,19 +25,9 @@ public final class JagerP1 extends AbstractSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (target.isCreature())
-            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(JagerP1Info.DURATION));
+            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, JagerP1Info.DURATION);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -15,8 +16,8 @@ import org.bukkit.Sound;
 public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 10000;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (1.5 * 20);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(1.5);
     /** 시전 중 이동속도 감소량 */
     public static final int READY_SLOW = 70;
     /** 피해량 */
@@ -29,15 +30,15 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     public static final double KNOCKBACK = 1;
     /** 초당 화염 피해량 */
     public static final int FIRE_DAMAGE_PER_SECOND = 200;
-    /** 화염 지대 지속 시간 (tick) */
-    public static final long FIRE_FLOOR_DURATION = 8 * 20L;
+    /** 화염 지대 지속 시간 */
+    public static final Timespan FIRE_FLOOR_DURATION = Timespan.ofSeconds(8);
     /** 화염 지대 범위 (단위: 블록) */
     public static final double FIRE_FLOOR_RADIUS = 7;
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
-    /** 궁극기 처치 점수 제한시간 (tick) */
-    public static final long KILL_SCORE_TIME_LIMIT = 2 * 20L;
+    /** 궁극기 처치 점수 제한시간 */
+    public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
     @Getter
     private static final ChedUltInfo instance = new ChedUltInfo();
 
@@ -53,7 +54,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
                         .build(),
                         new ActionInfoLore.NamedSection("화염 지대", ActionInfoLore.Section
                                 .builder("지속적인 <:FIRE:화염 피해>를 입히는 지역입니다.")
-                                .addValueInfo(TextIcon.DURATION, Format.TIME, FIRE_FLOOR_DURATION / 20.0)
+                                .addValueInfo(TextIcon.DURATION, Format.TIME, FIRE_FLOOR_DURATION.toSeconds())
                                 .addValueInfo(TextIcon.FIRE, Format.PER_SECOND, FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, FIRE_FLOOR_RADIUS)
                                 .build()

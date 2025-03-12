@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action.weapon;
 
 import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.action.info.WeaponInfo;
 import lombok.NonNull;
 import org.bukkit.Material;
 
@@ -10,6 +11,12 @@ import org.bukkit.Material;
  * @see AbstractWeapon
  */
 public interface Weapon extends Action {
+    /**
+     * @return 무기 정보 인스턴스
+     */
+    @NonNull
+    WeaponInfo<?> getWeaponInfo();
+
     /**
      * 무기 아이템의 타입을 변경한다.
      *

@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -20,7 +21,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,32 +29,24 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.WeakHashMap;
 
-public final class QuakerA2 extends ActiveSkill {
+@Getter
+public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public QuakerA2(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA2Info.getInstance(), 1);
+        super(combatUser, QuakerA2Info.getInstance(), QuakerA2Info.COOLDOWN, Timespan.MAX, 1);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerA2Info.ASSIST_SCORE);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_2};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return QuakerA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -81,7 +74,7 @@ public final class QuakerA2 extends ActiveSkill {
             else if (i < 10)
                 delay += 1;
 
-            TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+            addActionTask(new DelayTask(() -> {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 loc.setPitch(0);
                 Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
@@ -93,7 +86,7 @@ public final class QuakerA2 extends ActiveSkill {
                 if (index % 2 == 0)
                     QuakerA2Info.SOUND.USE.play(loc.add(vec));
                 if (index == 11) {
-                    TaskUtil.addTask(taskRunner, new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
+                    addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
                         onCancelled();
                         onReady();
                     }, 1));
@@ -111,9 +104,9 @@ public final class QuakerA2 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.resetGlobalCooldown();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerA2Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
@@ -139,15 +132,9 @@ public final class QuakerA2 extends ActiveSkill {
         CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", QuakerA2Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -230,12 +217,12 @@ public final class QuakerA2 extends ActiveSkill {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(QuakerA2Info.STUN_DURATION));
-                        target.getStatusEffectModule().apply(QuakerA2Slow.instance, combatUser, Timespan.ofTicks(QuakerA2Info.SLOW_DURATION));
+                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, QuakerA2Info.STUN_DURATION);
+                        target.getStatusEffectModule().apply(QuakerA2Slow.instance, combatUser, QuakerA2Info.SLOW_DURATION);
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
-                            assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerA2Info.SLOW_DURATION)));
+                            bonusScoreModule.addTarget((CombatUser) target, QuakerA2Info.SLOW_DURATION);
                         }
                     }
 

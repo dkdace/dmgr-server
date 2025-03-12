@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.action;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
@@ -8,10 +7,13 @@ import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import com.dace.dmgr.util.task.Task;
+import com.dace.dmgr.util.task.TaskManager;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+
+import java.util.ArrayList;
 
 /**
  * {@link Action}의 기본 구현체, 모든 동작(무기, 스킬)의 기반 클래스.
@@ -19,76 +21,96 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  * @see AbstractWeapon
  * @see AbstractSkill
  */
-@Getter
 public abstract class AbstractAction implements Action {
-    /** 플레이어 객체 */
+    /** 사용자 플레이어 */
     @NonNull
+    @Getter
     protected final CombatUser combatUser;
-    /** 동작 쿨타임 타임스탬프 */
-    private Timestamp actionCooldownTimestamp = Timestamp.now();
-    /** 비활성화 여부 */
-    private boolean isDisposed = false;
-    /** 동작 태스크 실행 객체 */
+    /** 기본 쿨타임 */
     @NonNull
-    protected final Disposable taskRunner = new Disposable() {
-        @Override
-        public void dispose() {
-            throw new UnsupportedOperationException("TaskRunner는 폐기될 수 없음");
-        }
+    @Getter
+    protected final Timespan defaultCooldown;
+    /** 태스크 관리 인스턴스 */
+    private final TaskManager taskManager = new TaskManager();
+    /** 초기화 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onResets = new ArrayList<>();
+    /** 제거 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onDisposes = new ArrayList<>();
 
-        @Override
-        public boolean isDisposed() {
-            return AbstractAction.this.isDisposed();
-        }
-    };
+    /** 동작 태스크 관리 인스턴스 */
+    private TaskManager actionTaskManager = new TaskManager();
+    /** 쿨타임 타임스탬프 */
+    private Timestamp cooldownTimestamp = Timestamp.now();
+    /** 비활성화 여부 */
+    @Getter
+    private boolean isDisposed = false;
 
     /**
      * 동작 인스턴스를 생성한다.
      *
-     * @param combatUser 대상 플레이어
+     * @param combatUser      사용자 플레이어
+     * @param defaultCooldown 기본 쿨타임
      */
-    protected AbstractAction(@NonNull CombatUser combatUser) {
+    protected AbstractAction(@NonNull CombatUser combatUser, @NonNull Timespan defaultCooldown) {
         this.combatUser = combatUser;
+        this.defaultCooldown = defaultCooldown;
     }
 
     @Override
-    public final long getCooldown() {
-        return Math.max(0, Timestamp.now().until(actionCooldownTimestamp).toTicks());
+    public final void addActionTask(@NonNull Task task) {
+        validate();
+        actionTaskManager.add(task);
     }
 
     @Override
-    public final void setCooldown(long cooldown) {
-        if (cooldown < -1)
-            throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
+    public final void addTask(@NonNull Task task) {
+        validate();
+        taskManager.add(task);
+    }
 
-        Timespan time = cooldown == -1 ? Timespan.MAX : Timespan.ofTicks(cooldown);
+    @Override
+    public final void addOnReset(@NonNull Runnable onReset) {
+        validate();
+        onResets.add(onReset);
+    }
 
+    @Override
+    public final void addOnDispose(@NonNull Runnable onDispose) {
+        validate();
+        onDisposes.add(onDispose);
+    }
+
+    @Override
+    @NonNull
+    public final Timespan getCooldown() {
+        return Timestamp.now().until(cooldownTimestamp);
+    }
+
+    @Override
+    public final void setCooldown(@NonNull Timespan cooldown) {
         if (isCooldownFinished()) {
-            actionCooldownTimestamp = Timestamp.now().plus(time);
+            cooldownTimestamp = Timestamp.now().plus(cooldown);
             runCooldown();
             onCooldownSet();
         } else
-            actionCooldownTimestamp = Timestamp.now().plus(time);
+            cooldownTimestamp = Timestamp.now().plus(cooldown);
     }
 
     @Override
     public final void setCooldown() {
-        setCooldown(getDefaultCooldown());
+        setCooldown(defaultCooldown);
     }
 
     @Override
-    public final void addCooldown(long cooldown) {
-        if (cooldown < 0)
-            throw new IllegalArgumentException("'cooldown'이 0 이상이어야 함");
-
-        setCooldown(getCooldown() + cooldown);
+    public final void addCooldown(@NonNull Timespan cooldown) {
+        setCooldown(getCooldown().plus(cooldown));
     }
 
     /**
-     * 쿨타임 스케쥴러를 실행한다.
+     * 동작의 쿨타임을 실행한다.
      */
     private void runCooldown() {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             if (isCooldownFinished()) {
                 onCooldownFinished();
                 return false;
@@ -114,10 +136,11 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final boolean isCooldownFinished() {
-        return getCooldown() == 0;
+        return cooldownTimestamp.isBefore(Timestamp.now());
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public boolean canUse(@NonNull ActionKey actionKey) {
         return isCooldownFinished() && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
     }
@@ -125,24 +148,30 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void onCancelled() {
-        TaskUtil.clearTask(taskRunner);
+        actionTaskManager.dispose();
+        actionTaskManager = new TaskManager();
     }
 
     @Override
-    @MustBeInvokedByOverriders
-    public void reset() {
+    public final void reset() {
         validate();
-        setCooldown(getDefaultCooldown());
+
+        setCooldown(defaultCooldown);
+        onResets.forEach(Runnable::run);
     }
 
     @Override
-    @MustBeInvokedByOverriders
-    public void dispose() {
+    public final void dispose() {
         validate();
 
         reset();
-        TaskUtil.clearTask(taskRunner);
-        TaskUtil.clearTask(this);
+        onResets.clear();
+        onDisposes.forEach(Runnable::run);
+        onDisposes.clear();
+
+        actionTaskManager.dispose();
+        taskManager.dispose();
+
         isDisposed = true;
     }
 }

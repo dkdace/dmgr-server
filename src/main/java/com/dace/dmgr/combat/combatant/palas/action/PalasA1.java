@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.combatant.palas.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -12,37 +13,28 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
-import java.util.WeakHashMap;
-
-public final class PalasA1 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+@Getter
+public final class PalasA1 extends ActiveSkill implements HasBonusScore {
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public PalasA1(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA1Info.getInstance(), 0);
+        super(combatUser, PalasA1Info.getInstance(), PalasA1Info.COOLDOWN, Timespan.MAX, 0);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA1Info.ASSIST_SCORE);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return PalasA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -55,18 +47,18 @@ public final class PalasA1 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasA1Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
 
         PalasA1Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA1Projectile().shot(loc);
 
             PalasA1Info.SOUND.USE_READY.play(loc);
-        }, PalasA1Info.READY_DURATION));
+        }, PalasA1Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -78,19 +70,13 @@ public final class PalasA1 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", PalasA1Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -137,7 +123,7 @@ public final class PalasA1 extends ActiveSkill {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, PalasA1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
                     if (target.isCreature()) {
-                        target.getStatusEffectModule().apply(PalasA1Stun.instance, combatUser, Timespan.ofTicks(PalasA1Info.STUN_DURATION));
+                        target.getStatusEffectModule().apply(PalasA1Stun.instance, combatUser, PalasA1Info.STUN_DURATION);
 
                         PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }
@@ -146,7 +132,7 @@ public final class PalasA1 extends ActiveSkill {
 
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
-                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA1Info.STUN_DURATION)));
+                        bonusScoreModule.addTarget((CombatUser) target, PalasA1Info.STUN_DURATION);
                     }
                 }
 

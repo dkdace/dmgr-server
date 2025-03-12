@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.jager.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -15,8 +16,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
 public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.25 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.25);
     /** 피해량 */
     public static final int DAMAGE = 70;
     /** 사거리 (단위: 블록) */
@@ -29,10 +30,10 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     public static final int FREEZE = 15;
     /** 장탄수 */
     public static final int CAPACITY = 10;
-    /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = 2 * 20L;
-    /** 무기 교체 시간 (tick) */
-    public static final long SWAP_DURATION = (long) (0.25 * 20);
+    /** 재장전 시간 */
+    public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(2);
+    /** 무기 교체 시간 */
+    public static final Timespan SWAP_DURATION = Timespan.ofSeconds(0.25);
     /** 조준 시 이동속도 감소량 */
     public static final int AIM_SLOW = 30;
     @Getter
@@ -42,7 +43,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
         super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("두 개의 탄창을 가진 특수 소총으로, <3::냉각탄> 및 정조준하여 <3::저격탄>을 사격할 수 있습니다.")
-                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)

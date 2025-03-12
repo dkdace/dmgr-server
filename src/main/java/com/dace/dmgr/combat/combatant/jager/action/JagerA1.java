@@ -1,12 +1,16 @@
 package com.dace.dmgr.combat.combatant.jager.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.Summonable;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
@@ -22,23 +26,24 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.WeakHashMap;
-
-public final class JagerA1 extends ChargeableSkill implements Confirmable {
-    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
-
+@Getter
+public final class JagerA1 extends ChargeableSkill implements Confirmable, Summonable<JagerA1.JagerA1Entity>, HasBonusScore {
     /** 위치 확인 모듈 */
     @NonNull
-    @Getter
     private final LocationConfirmModule confirmModule;
-    /** 소환한 엔티티 */
-    @Nullable
-    private JagerA1Entity summonEntity = null;
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<JagerA1Entity> entityModule;
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public JagerA1(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA1Info.getInstance(), 0);
+        super(combatUser, JagerA1Info.getInstance(), JagerA1Info.COOLDOWN, JagerA1Info.HEALTH, 0);
+
         confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
+        entityModule = new EntityModule<>(this);
+        bonusScoreModule = new BonusScoreModule(this, "설랑 보너스", JagerA1Info.KILL_SCORE);
     }
 
     @Override
@@ -53,23 +58,23 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return JagerA1Info.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        String text = ActionBarStringUtil.getProgressBar(this);
+        if (!isDurationFinished())
+            text += ActionBarStringUtil.getKeyInfo(this, "회수");
+
+        return text;
     }
 
     @Override
-    public int getMaxStateValue() {
-        return JagerA1Info.HEALTH;
-    }
-
-    @Override
-    public int getStateValueDecrement() {
+    public double getStateValueDecrement() {
         return 0;
     }
 
     @Override
-    public int getStateValueIncrement() {
-        return JagerA1Info.HEALTH / JagerA1Info.RECOVER_DURATION;
+    public double getStateValueIncrement() {
+        return JagerA1Info.HEALTH / JagerA1Info.RECOVER_DURATION.toSeconds();
     }
 
     @Override
@@ -86,9 +91,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
                 if (isDurationFinished())
                     confirmModule.toggleCheck();
                 else {
-                    setDuration(0);
-                    if (summonEntity != null)
-                        summonEntity.dispose();
+                    setDuration(Timespan.ZERO);
+                    entityModule.disposeEntity();
                 }
 
                 break;
@@ -140,34 +144,14 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         confirmModule.toggleCheck();
         combatUser.setGlobalCooldown(Timespan.ofTicks(1));
 
-        summonEntity = new JagerA1Entity(confirmModule.getCurrentLocation());
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
-    }
-
-    /**
-     * 플레이어에게 보너스 점수를 지급한다.
-     *
-     * @param victim 피격자
-     * @param score  점수 (처치 기여도)
-     */
-    public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("설랑 보너스", JagerA1Info.KILL_SCORE * score / 100.0);
+        entityModule.set(new JagerA1Entity(confirmModule.getCurrentLocation()));
     }
 
     /**
      * 설랑 클래스.
      */
     @Getter
-    private final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable, CombatEntity {
+    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable, CombatEntity {
         /** 상태 효과 모듈 */
         @NonNull
         private final StatusEffectModule statusEffectModule;
@@ -181,6 +165,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         @NonNull
         private final MoveModule moveModule;
         /** 준비 대기시간 모듈 */
+        @NonNull
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA1Entity(@NonNull Location spawnLocation) {
@@ -197,7 +182,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             attackModule = new AttackModule();
             damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
             moveModule = new MoveModule(this, JagerA1Info.SPEED);
-            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerA1Info.SUMMON_DURATION));
+            readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
 
             onInit();
         }
@@ -262,12 +247,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
         }
 
         @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
-        }
-
-        @Override
         public boolean isCreature() {
             return true;
         }
@@ -285,7 +264,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable {
             combatUser.useAction(ActionKey.PERIODIC_1);
 
             if (victim instanceof CombatUser)
-                killScoreTimeLimitTimestampMap.put((CombatUser) victim, Timestamp.now().plus(Timespan.ofTicks(JagerA1Info.KILL_SCORE_TIME_LIMIT)));
+                bonusScoreModule.addTarget((CombatUser) victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override

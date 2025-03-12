@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.magritta.action;
 
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -25,12 +24,11 @@ public final class MagrittaT1 {
      * @param victim   피격자
      */
     static void addShreddingValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-        ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, attacker,
-                Timespan.ofTicks(MagrittaT1Info.DURATION));
+        ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, attacker, MagrittaT1Info.DURATION);
 
         shreddingValue.addValue();
         if (shreddingValue.getValue() >= MagrittaT1Info.MAX) {
-            victim.getStatusEffectModule().apply(MagrittaT1Burning.instance, attacker, Timespan.ofTicks(MagrittaT1Info.DURATION));
+            victim.getStatusEffectModule().apply(MagrittaT1Burning.instance, attacker, MagrittaT1Info.DURATION);
 
             MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
 

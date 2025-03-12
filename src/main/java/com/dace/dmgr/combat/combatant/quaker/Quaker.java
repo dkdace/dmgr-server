@@ -9,18 +9,13 @@ import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.combatant.quaker.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 퀘이커 클래스.
@@ -127,22 +122,6 @@ public final class Quaker extends Guardian {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        QuakerA1 skill1 = combatUser.getSkill(QuakerA1Info.getInstance());
-
-        String skill1Display = StringFormUtil.getActionbarProgressBar(QuakerA1Info.getInstance().toString(),
-                skill1.getStateValue(), skill1.getMaxStateValue(), 10, '■');
-        if (!skill1.isDurationFinished())
-            skill1Display += "  §7[" + skill1.getDefaultActionKeys()[0] + "][" + skill1.getDefaultActionKeys()[1] + "] §f해제";
-        texts.add(skill1Display);
-
-        return texts;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
         combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER);
@@ -159,15 +138,6 @@ public final class Quaker extends Guardian {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser) || score >= 100)
-            return;
-
-        attacker.getSkill(QuakerA2Info.getInstance()).applyAssistScore((CombatUser) victim);
-        attacker.getSkill(QuakerUltInfo.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override

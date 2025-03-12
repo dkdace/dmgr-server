@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -17,12 +18,12 @@ import org.bukkit.Sound;
 public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
     /** 궁극기 필요 충전량 */
     public static final int COST = 7000;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.8 * 20);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.8);
     /** 시전 중 이동속도 감소량 */
     public static final int READY_SLOW = 70;
-    /** 지속시간 (tick) */
-    public static final long DURATION = 12 * 20L;
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(12);
     @Getter
     private static final NeaceUltInfo instance = new NeaceUltInfo();
 
@@ -32,7 +33,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
                         .builder("체력을 최대치로 즉시 <:HEAL:회복>하고 일정 시간동안 여러 대상을 자동으로 치유합니다. " +
                                 "사용 중에는 공격할 수 없습니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()
                 )

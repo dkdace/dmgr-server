@@ -1,18 +1,17 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class SiliaUlt extends UltimateSkill {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaUltInfo.SPEED);
@@ -20,17 +19,13 @@ public final class SiliaUlt extends UltimateSkill {
     private boolean isEnabled = false;
 
     public SiliaUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaUltInfo.getInstance());
+        super(combatUser, SiliaUltInfo.getInstance(), SiliaUltInfo.DURATION, SiliaUltInfo.COST);
     }
 
     @Override
-    public long getDefaultDuration() {
-        return SiliaUltInfo.DURATION;
-    }
-
-    @Override
-    public int getCost() {
-        return SiliaUltInfo.COST;
+    @Nullable
+    public String getActionBarString() {
+        return (isDurationFinished() || !isEnabled) ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -42,8 +37,8 @@ public final class SiliaUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration(-1);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaUltInfo.READY_DURATION));
+        setDuration(Timespan.MAX);
+        combatUser.setGlobalCooldown(SiliaUltInfo.READY_DURATION);
         combatUser.getWeapon().setVisible(false);
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
@@ -52,10 +47,10 @@ public final class SiliaUlt extends UltimateSkill {
 
         float yaw = combatUser.getLocation().getYaw();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> playUseTickEffect(i, yaw), () -> {
+        addActionTask(new IntervalTask(i -> playUseTickEffect(i, yaw), () -> {
             onCancelled();
             onReady();
-        }, 1, SiliaUltInfo.READY_DURATION));
+        }, 1, SiliaUltInfo.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -67,7 +62,7 @@ public final class SiliaUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
     }
 
@@ -117,11 +112,11 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getWeapon().setGlowing(true);
         combatUser.getWeapon().setDurability(SiliaWeaponInfo.RESOURCE.EXTENDED);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(0);
+        combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
 
         SiliaUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
+        addActionTask(new IntervalTask(i -> !isDurationFinished() && !combatUser.isDead(), () -> {
             isEnabled = false;
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);

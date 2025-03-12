@@ -10,15 +10,10 @@ import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.combatant.ched.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 체드 클래스.
@@ -125,38 +120,8 @@ public final class Ched extends Marksman {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
-        ChedA1 skill1 = combatUser.getSkill(ChedA1Info.getInstance());
-
-        if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(ChedP1Info.getInstance().toString(), skillp1.getHangTick() / 20.0,
-                    ChedP1Info.HANG_DURATION / 20.0);
-            texts.add(skillp1Display);
-        }
-        if (!skill1.isDurationFinished() && skill1.isEnabled())
-            texts.add(ChedA1Info.getInstance() + "  §7[" + skill1.getDefaultActionKeys()[0] + "] §f해제");
-
-        return texts;
-    }
-
-    @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!(victim instanceof CombatUser))
-            return;
-
-        attacker.getSkill(ChedA3Info.getInstance()).applyBonusScore((CombatUser) victim, score);
-        attacker.getSkill(ChedUltInfo.getInstance()).applyBonusScore((CombatUser) victim, score);
     }
 
     @Override

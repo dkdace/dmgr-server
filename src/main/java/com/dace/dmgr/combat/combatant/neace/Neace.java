@@ -14,15 +14,11 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 니스 클래스.
@@ -112,31 +108,6 @@ public final class Neace extends Support {
                 "어떻게 이런 짓을...",
                 "이런 야만적인..."
         };
-    }
-
-    @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        NeaceA2 skill2 = combatUser.getSkill(NeaceA2Info.getInstance());
-        NeaceA3 skill3 = combatUser.getSkill(NeaceA3Info.getInstance());
-        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
-
-        if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(NeaceA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
-                    skill2.getDefaultDuration() / 20.0) + "  §7[" + skill2.getDefaultActionKeys()[0] + "] §f해제";
-            texts.add(skill2Display);
-        }
-        if (!skill3.isDurationFinished())
-            texts.add(NeaceA3Info.getInstance() + "  §7[" + skill3.getDefaultActionKeys()[0] + "] §f해제");
-        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(NeaceUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
-                    skill4.getDefaultDuration() / 20.0);
-            texts.add(skill4Display);
-        }
-
-        return texts;
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Summonable;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
@@ -16,7 +18,6 @@ import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -25,28 +26,21 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-public final class JagerA2 extends ActiveSkill {
-    /** 소환한 엔티티 */
-    private JagerA2Entity summonEntity = null;
+@Getter
+public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.JagerA2Entity> {
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<JagerA2Entity> entityModule;
 
     public JagerA2(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA2Info.getInstance(), 1);
+        super(combatUser, JagerA2Info.getInstance(), JagerA2Info.COOLDOWN, Timespan.MAX, 1);
+        this.entityModule = new EntityModule<>(this);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_2};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return JagerA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -59,21 +53,20 @@ public final class JagerA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerA2Info.READY_DURATION));
+        combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
-        if (summonEntity != null)
-            summonEntity.dispose();
+        entityModule.disposeEntity();
 
         JagerA2Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerA2Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
-        }, JagerA2Info.READY_DURATION));
+        }, JagerA2Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -84,15 +77,7 @@ public final class JagerA2 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
+        setDuration(Timespan.ZERO);
     }
 
     private final class JagerA2Projectile extends BouncingProjectile<Damageable> {
@@ -104,7 +89,7 @@ public final class JagerA2 extends ActiveSkill {
 
         @Override
         protected void onDestroy(@NonNull Location location) {
-            summonEntity = new JagerA2Entity(location);
+            entityModule.set(new JagerA2Entity(location));
         }
 
         @Override
@@ -132,7 +117,7 @@ public final class JagerA2 extends ActiveSkill {
      * 곰덫 클래스.
      */
     @Getter
-    private final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
+    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
         /** 상태 효과 모듈 */
         @NonNull
         private final StatusEffectModule statusEffectModule;
@@ -143,6 +128,7 @@ public final class JagerA2 extends ActiveSkill {
         @NonNull
         private final DamageModule damageModule;
         /** 준비 시간 모듈 */
+        @NonNull
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA2Entity(@NonNull Location spawnLocation) {
@@ -158,7 +144,7 @@ public final class JagerA2 extends ActiveSkill {
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule();
             damageModule = new DamageModule(this, JagerA2Info.HEALTH, true);
-            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerA2Info.SUMMON_DURATION));
+            readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
             onInit();
         }
@@ -216,7 +202,7 @@ public final class JagerA2 extends ActiveSkill {
         private void onCatchEnemy(@NonNull Damageable target) {
             if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getLocation().add(0, 0.2, 0),
                     false, true)) {
-                target.getStatusEffectModule().apply(Snare.getInstance(), this, Timespan.ofTicks(JagerA2Info.SNARE_DURATION));
+                target.getStatusEffectModule().apply(Snare.getInstance(), this, JagerA2Info.SNARE_DURATION);
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
@@ -225,12 +211,6 @@ public final class JagerA2 extends ActiveSkill {
             JagerA2Info.SOUND.TRIGGER.play(getLocation());
 
             dispose();
-        }
-
-        @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
         }
 
         @Override

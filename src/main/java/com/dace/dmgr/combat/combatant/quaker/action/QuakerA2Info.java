@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,12 +14,12 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 14 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = 20;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.6 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(14);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(1);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.6);
     /** 피해량 */
     public static final int DAMAGE = 250;
     /** 사거리 (단위: 블록) */
@@ -27,12 +28,12 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     public static final int VELOCITY = 20;
     /** 판정 크기 (단위: 블록) */
     public static final double SIZE = 1.2;
-    /** 기절 시간 (tick) */
-    public static final long STUN_DURATION = (long) (0.8 * 20);
+    /** 기절 시간 */
+    public static final Timespan STUN_DURATION = Timespan.ofSeconds(0.8);
     /** 이동 속도 감소량 */
     public static final int SLOW = 40;
-    /** 이동 속도 감소 시간 (tick) */
-    public static final long SLOW_DURATION = (long) (2.8 * 20);
+    /** 이동 속도 감소 시간 */
+    public static final Timespan SLOW_DURATION = Timespan.ofSeconds(2.8);
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 8;
@@ -45,10 +46,10 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
         super(QuakerA2.class, "충격파 일격",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("바닥을 내려찍어 충격파를 일으켜 <:DAMAGE:광역 피해>와 <:STUN:기절>을 입히고 <:WALK_SPEED_DECREASE:이동 속도>를 감소시킵니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION / 20.0)
-                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION / 20.0, SLOW)
+                        .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
+                        .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION.toSeconds(), SLOW)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build()
                 )

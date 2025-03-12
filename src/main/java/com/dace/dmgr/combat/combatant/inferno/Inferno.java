@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -13,15 +12,11 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 인페르노 클래스.
@@ -123,40 +118,6 @@ public final class Inferno extends Vanguard {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
-        InfernoP1.InfernoP1Buff skillp1buff = InfernoP1.InfernoP1Buff.getInstance();
-        InfernoA2 skill2 = combatUser.getSkill(InfernoA2Info.getInstance());
-        InfernoUlt skill4 = combatUser.getSkill(InfernoUltInfo.getInstance());
-
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
-                InfernoWeaponInfo.CAPACITY, 10, '■');
-
-        texts.add(weaponDisplay);
-        texts.add("");
-        if (combatUser.getStatusEffectModule().has(skillp1buff)) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(InfernoP1Info.getInstance().toString(),
-                    combatUser.getStatusEffectModule().getDuration(skillp1buff).toSeconds(), InfernoP1Info.DURATION / 20.0);
-            texts.add(skillp1Display);
-        }
-        if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(InfernoA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
-                    skill2.getDefaultDuration() / 20.0);
-            texts.add(skill2Display);
-        }
-        if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(InfernoUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
-                    skill4.getDefaultDuration() / 20.0);
-            texts.add(skill4Display);
-        }
-
-        return texts;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -190,7 +151,6 @@ public final class Inferno extends Vanguard {
 
         InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
 
-        attacker.getSkill(InfernoA2Info.getInstance()).applyAssistScore((CombatUser) victim);
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }

@@ -35,11 +35,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     private final AimModule aimModule;
 
     public JagerWeaponL(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerWeaponInfo.getInstance());
+        super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
 
         reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
         aimModule = new AimModule(this, JagerWeaponInfo.SCOPE.ZOOM_LEVEL);
+
+        addOnReset(() -> swapModule.getSubweapon().getReloadModule().resetRemainingAmmo());
     }
 
     @Override
@@ -49,8 +51,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return JagerWeaponInfo.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        String text = reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '*');
+        if (!swapModule.isSwapped())
+            text = "§a" + text;
+
+        return text;
     }
 
     @Override
@@ -101,7 +108,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onCancelled() {
-        if (swapModule.getSwapState() == SwapState.SECONDARY) {
+        if (swapModule.isSwapped()) {
             swapModule.getSubweapon().onCancelled();
             return;
         }
@@ -115,8 +122,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < JagerWeaponInfo.CAPACITY
-                || swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < JagerWeaponInfo.SCOPE.CAPACITY;
+        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity()
+                || swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < swapModule.getSubweapon().getReloadModule().getCapacity();
     }
 
     @Override
@@ -135,39 +142,31 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadFinished() {
-        swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
+        swapModule.getSubweapon().getReloadModule().resetRemainingAmmo();
     }
 
     @Override
-    public void onSwapStart(@NonNull SwapState swapState) {
+    public void onSwapStart(boolean isSwapped) {
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
 
-        (swapState == SwapState.PRIMARY ? JagerWeaponInfo.SOUND.SWAP_OFF : JagerWeaponInfo.SOUND.SWAP_ON).play(combatUser.getLocation());
+        (isSwapped ? JagerWeaponInfo.SOUND.SWAP_ON : JagerWeaponInfo.SOUND.SWAP_OFF).play(combatUser.getLocation());
     }
 
     @Override
-    public void onSwapFinished(@NonNull SwapState swapState) {
+    public void onSwapFinished(boolean isSwapped) {
         // 미사용
     }
 
     @Override
     public void onAimEnable() {
-        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
+        combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
     }
 
     @Override
     public void onAimDisable() {
-        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerWeaponInfo.SWAP_DURATION));
+        combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        reloadModule.setRemainingAmmo(JagerWeaponInfo.CAPACITY);
-        swapModule.getSubweapon().getReloadModule().setRemainingAmmo(JagerWeaponInfo.SCOPE.CAPACITY);
     }
 
     private final class JagerWeaponLProjectile extends Projectile<Damageable> {

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -15,8 +16,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.5 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.5);
     /** 피해량 */
     public static final int DAMAGE = 40;
     /** 사거리 (단위: 블록) */
@@ -27,8 +28,8 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     public static final double SPREAD = 18;
     /** 장탄수 */
     public static final int CAPACITY = 8;
-    /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = (long) (1.8 * 20);
+    /** 재장전 시간 */
+    public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.8);
     @Getter
     private static final MagrittaWeaponInfo instance = new MagrittaWeaponInfo();
 
@@ -40,7 +41,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
                                 "산탄이 " + PELLET_AMOUNT / 2 + "발 이상 적중하면 적에게 <d::파쇄>를 적용합니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE + " (×{4})",
                                 DAMAGE, DAMAGE / 2, DISTANCE / 2, DISTANCE, PELLET_AMOUNT)
-                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .build()

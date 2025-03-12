@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -14,16 +15,16 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 20;
-    /** 사망 시 쿨타임 (tick) */
-    public static final long COOLDOWN_DEATH = 4 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(1);
+    /** 사망 시 쿨타임 */
+    public static final Timespan COOLDOWN_DEATH = Timespan.ofSeconds(4);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.4);
     /** 체력 */
     public static final int HEALTH = 5000;
-    /** 체력 최대 회복 시간 (tick) */
-    public static final int RECOVER_DURATION = 14 * 20;
+    /** 체력 최대 회복 시간 */
+    public static final Timespan RECOVER_DURATION = Timespan.ofSeconds(14);
     /** 사용 중 이동속도 감소량 */
     public static final int USE_SLOW = 25;
 
@@ -44,13 +45,13 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                         .build(),
                         new ActionInfoLore.NamedSection("방패", ActionInfoLore.Section
                                 .builder("공격을 막는 방벽입니다.")
-                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (파괴 시)", COOLDOWN_DEATH / 20.0)
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (파괴 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEAL, HEALTH)
                                 .build()
                         ),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
-                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)
                                 .build()
                         )

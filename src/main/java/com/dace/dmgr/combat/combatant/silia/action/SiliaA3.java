@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -15,7 +16,7 @@ public final class SiliaA3 extends ChargeableSkill {
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaA3Info.SPEED);
 
     public SiliaA3(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA3Info.getInstance(), 2);
+        super(combatUser, SiliaA3Info.getInstance(), SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
     }
 
     @Override
@@ -25,22 +26,22 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return SiliaA3Info.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        String text = ActionBarStringUtil.getDurationBar(this, Timespan.ofSeconds(getStateValue()), Timespan.ofSeconds(maxStateValue));
+        if (!isDurationFinished())
+            text += ActionBarStringUtil.getKeyInfo(this, "해제");
+
+        return text;
     }
 
     @Override
-    public int getMaxStateValue() {
-        return SiliaA3Info.MAX_DURATION;
-    }
-
-    @Override
-    public int getStateValueDecrement() {
+    public double getStateValueDecrement() {
         return 1;
     }
 
     @Override
-    public int getStateValueIncrement() {
+    public double getStateValueIncrement() {
         return 1;
     }
 
@@ -58,14 +59,14 @@ public final class SiliaA3 extends ChargeableSkill {
             SiliaA3Info.SOUND.USE.play(combatUser.getLocation());
 
             double health = combatUser.getDamageModule().getHealth();
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 if (getStateValue() <= 0 || health - combatUser.getDamageModule().getHealth()
                         >= combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO)
                     return false;
 
                 combatUser.getEntity().setFallDistance(0);
 
-                if (i >= SiliaA3Info.ACTIVATE_DURATION && !((SiliaWeapon) combatUser.getWeapon()).isStrike()) {
+                if (i >= SiliaA3Info.ACTIVATE_DURATION.toTicks() && !((SiliaWeapon) combatUser.getWeapon()).isStrike()) {
                     ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
                     SiliaA3Info.SOUND.ACTIVATE.play(combatUser.getEntity());
                 }

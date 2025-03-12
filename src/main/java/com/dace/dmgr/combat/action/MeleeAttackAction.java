@@ -23,8 +23,7 @@ public final class MeleeAttackAction extends AbstractAction {
     /** 엔티티 타격 효과음 */
     private static final SoundEffect HIT_ENTITY_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build()
-    );
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build());
     /** 블록 타격 효과음 */
     private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
@@ -32,8 +31,8 @@ public final class MeleeAttackAction extends AbstractAction {
     private static final ParticleEffect HIT_ENTITY_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(10).speed(0.4).build());
 
-    /** 쿨타임 (tick) */
-    private static final long COOLDOWN = 20;
+    /** 쿨타임 */
+    private static final Timespan COOLDOWN = Timespan.ofSeconds(1);
     /** 피해량 */
     private static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */
@@ -49,18 +48,13 @@ public final class MeleeAttackAction extends AbstractAction {
      * @param combatUser 대상 플레이어
      */
     public MeleeAttackAction(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, COOLDOWN);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SWAP_HAND};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return COOLDOWN;
     }
 
     @Override
@@ -74,7 +68,7 @@ public final class MeleeAttackAction extends AbstractAction {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(COOLDOWN));
+        combatUser.setGlobalCooldown(COOLDOWN);
         setCooldown();
 
         USE_SOUND.play(combatUser.getLocation());

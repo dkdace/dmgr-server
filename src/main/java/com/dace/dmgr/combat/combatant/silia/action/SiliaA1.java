@@ -14,7 +14,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -25,23 +24,13 @@ import java.util.HashSet;
 
 public final class SiliaA1 extends ActiveSkill {
     public SiliaA1(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA1Info.getInstance(), 0);
+        super(combatUser, SiliaA1Info.getInstance(), SiliaA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return SiliaA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -52,9 +41,9 @@ public final class SiliaA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().setCooldown(0);
+        combatUser.getWeapon().setCooldown(Timespan.ZERO);
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(SiliaA1Info.DURATION));
+        combatUser.setGlobalCooldown(SiliaA1Info.DURATION);
         combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
         Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
@@ -63,7 +52,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         HashSet<Damageable> targets = new HashSet<>();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
             combatUser.getMoveModule().push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
 
@@ -71,7 +60,7 @@ public final class SiliaA1 extends ActiveSkill {
 
             combatUser.setYawAndPitch(location.getYaw(), location.getPitch());
 
-            TaskUtil.addTask(SiliaA1.this, new DelayTask(() -> {
+            addTask(new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
                 for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3))
                     SiliaA1Info.PARTICLE.TICK.play(loc3);
@@ -79,7 +68,7 @@ public final class SiliaA1 extends ActiveSkill {
         }, () -> {
             onCancelled();
             combatUser.getMoveModule().push(new Vector(), true);
-        }, 1, SiliaA1Info.DURATION));
+        }, 1, SiliaA1Info.DURATION.toTicks()));
     }
 
     @Override
@@ -92,7 +81,7 @@ public final class SiliaA1 extends ActiveSkill {
         super.onCancelled();
 
         if (!isDurationFinished())
-            setDuration(0);
+            setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
     }
 

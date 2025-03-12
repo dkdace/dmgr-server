@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -8,6 +9,7 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
 
@@ -16,8 +18,9 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
     public static final double PUSH = 0.45;
     /** 벽타기 최대 횟수 */
     public static final int USE_COUNT = 10;
-    /** 매달리기 최대 시간 (tick) */
-    public static final long HANG_DURATION = 6 * 20L;
+    /** 매달리기 최대 시간 */
+    @NonNull
+    public static final Timespan HANG_DURATION = Timespan.ofSeconds(6);
     @Getter
     private static final ChedP1Info instance = new ChedP1Info();
 
@@ -29,7 +32,7 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
                         .build(),
                         new ActionInfoLore.NamedSection("매달리기", ActionInfoLore.Section
                                 .builder("벽에 매달려 위치를 고정합니다.")
-                                .addValueInfo(TextIcon.DURATION, Format.TIME, HANG_DURATION / 20.0)
+                                .addValueInfo(TextIcon.DURATION, Format.TIME, HANG_DURATION.toSeconds())
                                 .addActionKeyInfo("사용", ActionKey.SNEAK)
                                 .build()
                         ),

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.inferno.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -14,10 +15,10 @@ import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 
 public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 5 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.4 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(5);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.4);
     /** 수직 이동 강도 */
     public static final double PUSH_UP = 0.5;
     /** 수평 이동 강도 */
@@ -35,7 +36,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
         super(InfernoA1.class, "점프 부스터",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("앞으로 높게 도약하여 착지할 때 <:DAMAGE:광역 피해>를 입히고 <:KNOCKBACK:밀쳐냅니다>.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)

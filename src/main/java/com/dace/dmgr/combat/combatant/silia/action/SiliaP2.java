@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,7 +17,7 @@ public final class SiliaP2 extends AbstractSkill {
     private int wallRideCount = SiliaP2Info.USE_COUNT;
 
     public SiliaP2(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, SiliaP2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -30,16 +29,6 @@ public final class SiliaP2 extends AbstractSkill {
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -69,7 +58,7 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.getWeapon().setVisible(false);
         combatUser.addYawAndPitch(0, 0);
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (combatUser.getMoveModule().isKnockbacked() || !canActivate())
                 return false;
 
@@ -103,10 +92,10 @@ public final class SiliaP2 extends AbstractSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
+        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
                 () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }
 }

@@ -1,10 +1,13 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -20,7 +23,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,29 +31,25 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
-public final class ChedUlt extends UltimateSkill {
+@Getter
+public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.ChedUltFireFloor>, HasBonusScore {
     /** 수정자 ID */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedUltInfo.READY_SLOW);
-    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
-    /** 소환한 엔티티 */
-    private ChedUltFireFloor summonEntity = null;
+
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<ChedUltFireFloor> entityModule;
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public ChedUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedUltInfo.getInstance());
-    }
+        super(combatUser, ChedUltInfo.getInstance(), Timespan.MAX, ChedUltInfo.COST);
 
-    @Override
-    public int getCost() {
-        return ChedUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
+        entityModule = new EntityModule<>(this);
+        bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
     }
 
     @Override
@@ -64,7 +63,7 @@ public final class ChedUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(ChedUltInfo.READY_DURATION));
+        combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
@@ -73,7 +72,7 @@ public final class ChedUlt extends UltimateSkill {
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
@@ -92,9 +91,9 @@ public final class ChedUlt extends UltimateSkill {
             ChedUltInfo.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION),
+            addActionTask(new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION.toTicks()),
                     1, 20));
-        }, 1, ChedUltInfo.READY_DURATION));
+        }, 1, ChedUltInfo.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -106,16 +105,8 @@ public final class ChedUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
     }
 
     /**
@@ -151,18 +142,6 @@ public final class ChedUlt extends UltimateSkill {
                     ChedUltInfo.PARTICLE.USE_TICK_2.play(loc2, vec);
             }
         }
-    }
-
-    /**
-     * 플레이어에게 보너스 점수를 지급한다.
-     *
-     * @param victim 피격자
-     * @param score  점수 (처치 기여도)
-     */
-    public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("궁극기 보너스", ChedUltInfo.KILL_SCORE * score / 100.0);
     }
 
     /**
@@ -239,7 +218,7 @@ public final class ChedUlt extends UltimateSkill {
                 Location loc = target.getHitboxCenter().add(0, 0.1, 0);
                 new ChedUltArea().emit(loc);
 
-                summonEntity = new ChedUltFireFloor(loc);
+                entityModule.set(new ChedUltFireFloor(loc));
 
                 for (Location loc2 : LocationUtil.getLine(location, loc, 0.4))
                     ChedUltInfo.PARTICLE.HIT_ENTITY.play(loc2);
@@ -265,7 +244,7 @@ public final class ChedUlt extends UltimateSkill {
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null,
                         false, false) && target instanceof CombatUser)
-                    killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));
+                    bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
@@ -282,7 +261,7 @@ public final class ChedUlt extends UltimateSkill {
     /**
      * 화염 지대 클래스.
      */
-    private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
+    public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
             super(
                     ArmorStand.class,
@@ -303,14 +282,8 @@ public final class ChedUlt extends UltimateSkill {
                 ChedUltInfo.SOUND.FIRE_FLOOR_TICK.play(loc);
             ChedUltInfo.PARTICLE.FIRE_FLOOR_TICK.play(loc);
 
-            if (i >= ChedUltInfo.FIRE_FLOOR_DURATION)
+            if (i >= ChedUltInfo.FIRE_FLOOR_DURATION.toTicks())
                 dispose();
-        }
-
-        @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
         }
 
         private final class ChedUltFireFloorArea extends Area<Damageable> {
@@ -330,7 +303,7 @@ public final class ChedUlt extends UltimateSkill {
                     target.getStatusEffectModule().apply(ChedUltBurning.instance, combatUser, Timespan.ofTicks(10));
 
                     if (target instanceof CombatUser)
-                        killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedUltInfo.KILL_SCORE_TIME_LIMIT)));
+                        bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
                 return !(target instanceof Barrier);

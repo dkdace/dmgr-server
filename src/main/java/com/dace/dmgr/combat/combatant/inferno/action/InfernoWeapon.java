@@ -34,7 +34,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     private final FullAutoModule fullAutoModule;
 
     public InfernoWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoWeaponInfo.getInstance());
+        super(combatUser, InfernoWeaponInfo.getInstance(), InfernoWeaponInfo.FIREBALL.COOLDOWN);
 
         reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
@@ -47,8 +47,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return InfernoWeaponInfo.FIREBALL.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        return reloadModule.getActionBarProgressBar(10, '■');
     }
 
     @Override
@@ -132,13 +133,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         // 미사용
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-
-        reloadModule.setRemainingAmmo(InfernoWeaponInfo.CAPACITY);
-    }
-
     /**
      * 화염 상태 효과 클래스.
      */
@@ -184,7 +178,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             return (location, target) -> {
                 if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
                         false, true))
-                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, Timespan.ofTicks(InfernoWeaponInfo.FIRE_DURATION));
+                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, InfernoWeaponInfo.FIRE_DURATION);
 
                 InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
 
@@ -247,7 +241,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 double distance = center.distance(location);
                 double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0);
-                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION, distance,
+                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION.toTicks(), distance,
                         InfernoWeaponInfo.FIREBALL.RADIUS / 2.0));
                 if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null,
                         false, true)) {

@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -17,7 +18,6 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -25,21 +25,23 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.WeakHashMap;
-
 @Getter
-public final class VellionA3 extends ActiveSkill implements Confirmable {
+public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA3Info.READY_SLOW);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+
     /** 위치 확인 모듈 */
     @NonNull
     private final LocationConfirmModule confirmModule;
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public VellionA3(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA3Info.getInstance(), 2);
-        confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
+        super(combatUser, VellionA3Info.getInstance(), VellionA3Info.COOLDOWN, Timespan.MAX, 2);
+
+        this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);
     }
 
     @Override
@@ -51,16 +53,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_3, ActionKey.LEFT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return VellionA3Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -98,7 +90,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
         confirmModule.cancel();
         if (!isDurationFinished()) {
-            setDuration(0);
+            setDuration(Timespan.ZERO);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }
     }
@@ -126,15 +118,15 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
             return;
 
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA3Info.READY_DURATION));
+        combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
         confirmModule.toggleCheck();
-        combatUser.getWeapon().setCooldown(1);
+        combatUser.getWeapon().setCooldown(Timespan.ofTicks(1));
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         Location location = confirmModule.getCurrentLocation();
 
         VellionA3Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
                 VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
@@ -142,7 +134,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         }, () -> {
             onCancelled();
             onReady(location);
-        }, 1, VellionA3Info.READY_DURATION));
+        }, 1, VellionA3Info.READY_DURATION.toTicks()));
     }
 
     /**
@@ -155,13 +147,13 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
         VellionA3Info.SOUND.USE_READY.play(loc);
 
-        TaskUtil.addTask(VellionA3.this, new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             if (i % 4 == 0)
                 new VellionA3Area().emit(loc);
 
             VellionA3Info.PARTICLE.TICK_CORE.play(loc);
             playTickEffect(i, loc);
-        }, 1, VellionA3Info.DURATION));
+        }, 1, VellionA3Info.DURATION.toTicks()));
     }
 
     /**
@@ -203,15 +195,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
         }
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", VellionA3Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     private final class VellionA3Area extends Area<Damageable> {
@@ -233,7 +219,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
-                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
+                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
                 }
             }
 

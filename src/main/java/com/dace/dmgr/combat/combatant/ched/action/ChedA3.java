@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -14,40 +15,32 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.WeakHashMap;
 import java.util.function.LongConsumer;
 
-public final class ChedA3 extends ActiveSkill {
+@Getter
+public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedA3Info.READY_SLOW);
-    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public ChedA3(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedA3Info.getInstance(), 2);
+        super(combatUser, ChedA3Info.getInstance(), ChedA3Info.COOLDOWN, Timespan.MAX, 2);
+        this.bonusScoreModule = new BonusScoreModule(this, "탐지 보너스", ChedA3Info.KILL_SCORE);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_3};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return ChedA3Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -59,7 +52,7 @@ public final class ChedA3 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(ChedA3Info.READY_DURATION));
+        combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().onCancelled();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
@@ -68,7 +61,7 @@ public final class ChedA3 extends ActiveSkill {
 
         ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (!skillp1.isDurationFinished() && !skillp1.isHanging())
                 return false;
 
@@ -87,9 +80,9 @@ public final class ChedA3 extends ActiveSkill {
             ChedA3Info.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            TaskUtil.addTask(taskRunner, new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedA3Info.READY_DURATION),
-                    1, ChedA3Info.READY_DURATION));
-        }, 1, ChedA3Info.READY_DURATION));
+            addActionTask(new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedA3Info.READY_DURATION.toTicks()),
+                    1, ChedA3Info.READY_DURATION.toTicks()));
+        }, 1, ChedA3Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -101,7 +94,7 @@ public final class ChedA3 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
@@ -136,18 +129,6 @@ public final class ChedA3 extends ActiveSkill {
                 ChedA3Info.PARTICLE.USE_TICK.play(loc2, dir);
             }
         }
-    }
-
-    /**
-     * 플레이어에게 보너스 점수를 지급한다.
-     *
-     * @param victim 피격자
-     * @param score  점수 (처치 기여도)
-     */
-    public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("탐지 보너스", ChedA3Info.KILL_SCORE * score / 100.0);
     }
 
     private final class ChedA3Projectile extends Projectile<Damageable> {
@@ -204,16 +185,16 @@ public final class ChedA3 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
-                    combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(ChedA3Info.DETECT_DURATION));
+                    combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION);
                     combatUser.getEntity().getWorld().getPlayers().stream()
                             .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
                             .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
                             .forEach(teamTarget -> teamTarget.getUser().setGlowing(target.getEntity(), ChatColor.RED,
-                                    Timespan.ofTicks(ChedA3Info.DETECT_DURATION)));
+                                    ChedA3Info.DETECT_DURATION));
 
                     if (target instanceof CombatUser) {
                         combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
-                        killScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(ChedA3Info.KILL_SCORE_TIME_LIMIT)));
+                        bonusScoreModule.addTarget((CombatUser) target, ChedA3Info.KILL_SCORE_TIME_LIMIT);
                     }
                 }
 

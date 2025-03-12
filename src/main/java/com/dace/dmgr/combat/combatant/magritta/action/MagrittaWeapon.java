@@ -14,7 +14,6 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -31,7 +30,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     private int blockHitCount = 0;
 
     public MagrittaWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaWeaponInfo.getInstance());
+        super(combatUser, MagrittaWeaponInfo.getInstance(), MagrittaWeaponInfo.COOLDOWN);
 
         reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
     }
@@ -43,8 +42,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return MagrittaWeaponInfo.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '┃');
     }
 
     @Override
@@ -83,7 +83,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
                         MagrittaWeaponInfo.RECOIL.SIDE_SPREAD, 3, 1);
                 MagrittaWeaponInfo.SOUND.USE.play(loc);
-                TaskUtil.addTask(this, new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
+                addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
 
                 break;
             }
@@ -125,13 +125,6 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @Override
     public void onReloadFinished() {
         // 미사용
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        reloadModule.setRemainingAmmo(MagrittaWeaponInfo.CAPACITY);
     }
 
     private final class MagrittaWeaponHitscan extends Hitscan<Damageable> {

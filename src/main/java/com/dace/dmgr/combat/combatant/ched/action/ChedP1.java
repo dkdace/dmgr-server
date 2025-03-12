@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.ched.action;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -8,25 +9,24 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class ChedP1 extends AbstractSkill {
     /** 벽타기 남은 횟수 */
     private int wallRideCount = ChedP1Info.USE_COUNT;
     /** 매달리기 남은 시간 (tick) */
-    @Getter
-    private long hangTick = ChedP1Info.HANG_DURATION;
+    private long hangTick = ChedP1Info.HANG_DURATION.toTicks();
     /** 매달리기 활성화 여부 */
     @Getter
     private boolean isHanging = false;
 
     public ChedP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, ChedP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -41,13 +41,9 @@ public final class ChedP1 extends AbstractSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this, Timespan.ofTicks(hangTick), ChedP1Info.HANG_DURATION);
     }
 
     @Override
@@ -90,7 +86,7 @@ public final class ChedP1 extends AbstractSkill {
 
         float yaw = combatUser.getEntity().getEyeLocation().getYaw();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (combatUser.getMoveModule().isKnockbacked())
                 return false;
 
@@ -120,7 +116,7 @@ public final class ChedP1 extends AbstractSkill {
             combatUser.getMoveModule().push(loc.getDirection().multiply(ChedP1Info.PUSH), true);
         }, 3));
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (hangTick <= 0)
                 return false;
             if (!combatUser.getEntity().isSneaking())
@@ -151,11 +147,11 @@ public final class ChedP1 extends AbstractSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
+        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
             wallRideCount = ChedP1Info.USE_COUNT;
-            hangTick = ChedP1Info.HANG_DURATION;
+            hangTick = ChedP1Info.HANG_DURATION.toTicks();
         }, 1));
 
         if (isHanging) {

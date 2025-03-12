@@ -17,7 +17,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -40,7 +39,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     private Healable target = null;
 
     public NeaceWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceWeaponInfo.getInstance());
+        super(combatUser, NeaceWeaponInfo.getInstance(), NeaceWeaponInfo.COOLDOWN);
 
         fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
     }
@@ -49,11 +48,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return NeaceWeaponInfo.COOLDOWN;
     }
 
     @Override
@@ -84,7 +78,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 targetResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
-                    blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
+                    blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
                 NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
                 combatUser.getUser().sendTitle("", MessageFormat.format("{0} : {1}§e{2}",
@@ -130,9 +124,9 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         @Override
         protected void onFindEntity(@NonNull Healable target) {
             NeaceWeapon.this.target = target;
-            blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY));
+            blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
-            TaskUtil.addTask(NeaceWeapon.this, new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed()
+            addTask(new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed()
                     && targetResetTimestamp.isAfter(Timestamp.now()) && blockResetTimestamp.isAfter(Timestamp.now())
                     && combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
                     () -> NeaceWeapon.this.target = null, 1));

@@ -1,10 +1,11 @@
 package com.dace.dmgr.combat.combatant.quaker.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -15,33 +16,25 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
-import java.util.WeakHashMap;
 
-public final class QuakerUlt extends UltimateSkill {
+@Getter
+public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public QuakerUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerUltInfo.getInstance());
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
-    public int getCost() {
-        return QuakerUltInfo.COST;
+        super(combatUser, QuakerUltInfo.getInstance(), Timespan.MAX, QuakerUltInfo.COST);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerUltInfo.ASSIST_SCORE);
     }
 
     @Override
@@ -61,11 +54,11 @@ public final class QuakerUlt extends UltimateSkill {
         setDuration();
         combatUser.getWeapon().onCancelled();
         combatUser.getWeapon().setVisible(false);
-        combatUser.setGlobalCooldown(Timespan.ofTicks(QuakerUltInfo.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(16), MainHand.RIGHT);
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             int delay = 0;
             for (int i = 0; i < 8; i++) {
                 int index = i;
@@ -75,7 +68,7 @@ public final class QuakerUlt extends UltimateSkill {
                 else if (i == 2 || i == 4 || i == 6 || i == 7)
                     delay += 1;
 
-                TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+                addActionTask(new DelayTask(() -> {
                     Location loc = combatUser.getEntity().getEyeLocation();
                     Vector vector = VectorUtil.getPitchAxis(loc);
                     Vector axis = VectorUtil.getYawAxis(loc);
@@ -105,7 +98,7 @@ public final class QuakerUlt extends UltimateSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
@@ -135,15 +128,9 @@ public final class QuakerUlt extends UltimateSkill {
         CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(6));
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", QuakerUltInfo.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -223,8 +210,8 @@ public final class QuakerUlt extends UltimateSkill {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
-                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, Timespan.ofTicks(QuakerUltInfo.STUN_DURATION));
-                        target.getStatusEffectModule().apply(QuakerUltSlow.instance, combatUser, Timespan.ofTicks(QuakerUltInfo.SLOW_DURATION));
+                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, QuakerUltInfo.STUN_DURATION);
+                        target.getStatusEffectModule().apply(QuakerUltSlow.instance, combatUser, QuakerUltInfo.SLOW_DURATION);
 
                         if (target instanceof Movable)
                             ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(combatUser.getLocation(),
@@ -232,7 +219,7 @@ public final class QuakerUlt extends UltimateSkill {
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
-                            assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(QuakerUltInfo.SLOW_DURATION)));
+                            bonusScoreModule.addTarget((CombatUser) target, QuakerUltInfo.SLOW_DURATION);
                         }
                     }
 

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,8 +14,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.5 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.5);
     /** 피해량 */
     public static final int DAMAGE = 120;
     /** 사거리 (단위: 블록) */
@@ -31,7 +32,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("마법 구체를 발사하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
                         .build()

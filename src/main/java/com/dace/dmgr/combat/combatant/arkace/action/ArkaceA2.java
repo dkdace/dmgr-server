@@ -1,18 +1,20 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class ArkaceA2 extends ActiveSkill {
     public ArkaceA2(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceA2Info.getInstance(), 2);
+        super(combatUser, ArkaceA2Info.getInstance(), ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION, 2);
     }
 
     @Override
@@ -22,13 +24,9 @@ public final class ArkaceA2 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return ArkaceA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return ArkaceA2Info.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -42,12 +40,12 @@ public final class ArkaceA2 extends ActiveSkill {
 
         ArkaceA2Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
-            if (combatUser.getDamageModule().heal(combatUser, (double) ArkaceA2Info.HEAL / ArkaceA2Info.DURATION, true))
-                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION);
+        addActionTask(new IntervalTask(i -> {
+            if (combatUser.getDamageModule().heal(combatUser, (double) ArkaceA2Info.HEAL / ArkaceA2Info.DURATION.toTicks(), true))
+                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION.toTicks());
 
             playTickEffect(i);
-        }, 1, ArkaceA2Info.DURATION));
+        }, 1, ArkaceA2Info.DURATION.toTicks()));
     }
 
     @Override
@@ -58,7 +56,7 @@ public final class ArkaceA2 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
     /**

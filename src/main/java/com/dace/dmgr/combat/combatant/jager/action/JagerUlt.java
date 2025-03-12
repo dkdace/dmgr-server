@@ -1,11 +1,14 @@
 package com.dace.dmgr.combat.combatant.jager.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
@@ -19,7 +22,6 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -30,28 +32,20 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.WeakHashMap;
-
 @Getter
-public final class JagerUlt extends UltimateSkill {
-    /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> killScoreTimeLimitTimestampMap = new WeakHashMap<>();
-    /** 소환한 엔티티 */
-    @Nullable
-    private JagerUltEntity summonEntity = null;
+public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt.JagerUltEntity>, HasBonusScore {
+    /** 소환 엔티티 모듈 */
+    @NonNull
+    private final EntityModule<JagerUltEntity> entityModule;
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public JagerUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerUltInfo.getInstance());
-    }
+        super(combatUser, JagerUltInfo.getInstance(), Timespan.MAX, JagerUltInfo.COST);
 
-    @Override
-    public long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
-    public int getCost() {
-        return JagerUltInfo.COST;
+        this.entityModule = new EntityModule<>(this);
+        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", JagerUltInfo.KILL_SCORE);
     }
 
     @Override
@@ -66,20 +60,20 @@ public final class JagerUlt extends UltimateSkill {
 
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(JagerUltInfo.READY_DURATION));
-        if (summonEntity != null)
-            summonEntity.dispose();
+        combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
+
+        entityModule.disposeEntity();
 
         JagerUltInfo.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerUltProjectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
 
             onCancelled();
-        }, JagerUltInfo.READY_DURATION));
+        }, JagerUltInfo.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -90,27 +84,7 @@ public final class JagerUlt extends UltimateSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        if (summonEntity != null)
-            summonEntity.dispose();
-    }
-
-    /**
-     * 플레이어에게 보너스 점수를 지급한다.
-     *
-     * @param victim 피격자
-     * @param score  점수 (처치 기여도)
-     */
-    public void applyBonusScore(@NonNull CombatUser victim, int score) {
-        Timestamp expiration = killScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("궁극기 보너스", JagerUltInfo.KILL_SCORE * score / 100.0);
+        setDuration(Timespan.ZERO);
     }
 
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
@@ -122,7 +96,7 @@ public final class JagerUlt extends UltimateSkill {
 
         @Override
         protected void onDestroy(@NonNull Location location) {
-            summonEntity = new JagerUltEntity(location);
+            entityModule.set(new JagerUltEntity(location));
         }
 
         @Override
@@ -161,6 +135,7 @@ public final class JagerUlt extends UltimateSkill {
         @NonNull
         private final DamageModule damageModule;
         /** 준비 시간 모듈 */
+        @NonNull
         private final ReadyTimeModule readyTimeModule;
 
         private JagerUltEntity(@NonNull Location spawnLocation) {
@@ -176,7 +151,7 @@ public final class JagerUlt extends UltimateSkill {
             statusEffectModule = new StatusEffectModule(this);
             attackModule = new AttackModule();
             damageModule = new DamageModule(this, JagerUltInfo.HEALTH, true);
-            readyTimeModule = new ReadyTimeModule(this, Timespan.ofTicks(JagerUltInfo.SUMMON_DURATION));
+            readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
             onInit();
         }
@@ -212,13 +187,13 @@ public final class JagerUlt extends UltimateSkill {
             if (!readyTimeModule.isReady())
                 return;
 
-            double range = Math.min(JagerUltInfo.MIN_RADIUS + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
+            double range = Math.min(JagerUltInfo.MIN_RADIUS + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION.toTicks()) * (JagerUltInfo.MAX_RADIUS - JagerUltInfo.MIN_RADIUS),
                     JagerUltInfo.MAX_RADIUS);
             playTickEffect(i, range);
 
             if (i % 4 == 0)
                 new JagerUltArea(range).emit(getLocation());
-            if (i >= JagerUltInfo.DURATION)
+            if (i >= JagerUltInfo.DURATION.toTicks())
                 dispose();
         }
 
@@ -230,7 +205,7 @@ public final class JagerUlt extends UltimateSkill {
          */
         private void playTickEffect(long i, double range) {
             Location loc = getLocation();
-            if (i <= JagerUltInfo.DURATION - 100 && i % 30 == 0)
+            if (i <= JagerUltInfo.DURATION.toTicks() - 100 && i % 30 == 0)
                 JagerUltInfo.SOUND.TICK.play(loc);
 
             loc.setYaw(0);
@@ -250,12 +225,6 @@ public final class JagerUlt extends UltimateSkill {
                 JagerUltInfo.PARTICLE.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
                 JagerUltInfo.PARTICLE.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
             }
-        }
-
-        @Override
-        protected void onDispose() {
-            super.onDispose();
-            summonEntity = null;
         }
 
         @Override
@@ -283,7 +252,7 @@ public final class JagerUlt extends UltimateSkill {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
             if (victim instanceof CombatUser)
-                killScoreTimeLimitTimestampMap.put((CombatUser) victim, Timestamp.now().plus(Timespan.ofTicks(JagerUltInfo.KILL_SCORE_TIME_LIMIT)));
+                bonusScoreModule.addTarget((CombatUser) victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override

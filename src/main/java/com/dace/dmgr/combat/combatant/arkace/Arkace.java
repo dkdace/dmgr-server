@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -12,14 +11,10 @@ import com.dace.dmgr.combat.combatant.arkace.action.*;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 아케이스 클래스.
@@ -118,34 +113,6 @@ public final class Arkace extends Marksman {
                 "운수 한 번... 안 좋은 날이군...",
                 "여기서... 끝인 건가..."
         };
-    }
-
-    @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
-        ArkaceA2 skill2 = combatUser.getSkill(ArkaceA2Info.getInstance());
-        ArkaceUlt skill4 = combatUser.getSkill(ArkaceUltInfo.getInstance());
-
-        String weaponDisplay = StringFormUtil.getActionbarProgressBar("" + TextIcon.CAPACITY, weapon.getReloadModule().getRemainingAmmo(),
-                ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.CAPACITY, '|');
-
-        texts.add(weaponDisplay);
-        texts.add("");
-        if (!skill2.isDurationFinished()) {
-            String skill2Display = StringFormUtil.getActionbarDurationBar(ArkaceA2Info.getInstance().toString(), skill2.getDuration() / 20.0,
-                    skill2.getDefaultDuration() / 20.0);
-            texts.add(skill2Display);
-        }
-        if (!skill4.isDurationFinished()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(ArkaceUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
-                    skill4.getDefaultDuration() / 20.0);
-            texts.add(skill4Display);
-        }
-
-        return texts;
     }
 
     @Override

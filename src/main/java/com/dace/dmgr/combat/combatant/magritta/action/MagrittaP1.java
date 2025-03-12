@@ -1,6 +1,8 @@
 package com.dace.dmgr.combat.combatant.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -8,17 +10,17 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 public final class MagrittaP1 extends AbstractSkill {
     /** 활성화 가능 여부 */
     private boolean canActivate = false;
 
     public MagrittaP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, MagrittaP1Info.getInstance(), Timespan.ZERO, MagrittaP1Info.DURATION);
     }
 
     @Override
@@ -28,13 +30,9 @@ public final class MagrittaP1 extends AbstractSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return MagrittaP1Info.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -59,7 +57,7 @@ public final class MagrittaP1 extends AbstractSkill {
         if (isDurationFinished()) {
             setDuration();
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 combatUser.getDamageModule().heal(combatUser, MagrittaP1Info.HEAL_PER_SECOND * 2 / 20.0, false);
                 return !isDurationFinished();
             }, 2));

@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 
 public final class ArkaceP1 extends AbstractSkill {
@@ -13,23 +13,13 @@ public final class ArkaceP1 extends AbstractSkill {
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(ArkaceP1Info.SPRINT_SPEED);
 
     public ArkaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, ArkaceP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.PERIODIC_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return 0;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -43,7 +33,7 @@ public final class ArkaceP1 extends AbstractSkill {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> combatUser.getEntity().isSprinting()
+        addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting()
                 && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading(),
                 this::onCancelled, 1));
     }
@@ -57,7 +47,7 @@ public final class ArkaceP1 extends AbstractSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
     }

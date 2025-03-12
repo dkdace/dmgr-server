@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -11,8 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
 public final class MagrittaT1Info extends TraitInfo {
-    /** 지속시간 (tick) */
-    public static final long DURATION = (long) (2.5 * 20);
+    /** 지속시간 */
+    public static final Timespan DURATION = Timespan.ofSeconds(2.5);
     /** 공격력 증가량 */
     public static final int DAMAGE_INCREMENT = 8;
     /** 초당 화염 피해량 */
@@ -30,7 +31,7 @@ public final class MagrittaT1Info extends TraitInfo {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("<5:DAMAGE_INCREASE:수치>에 비례하여 마그리타의 기본 무기로부터 <:DAMAGE_INCREASE:받는 피해>가 증가하는 상태이상입니다. " +
                                 "최대치에 도달하면 불이 붙어 <:FIRE:화염 피해>를 받습니다.")
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "최대 " + MAX, ChatColor.DARK_PURPLE)
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "(파쇄)×{0}%", DAMAGE_INCREMENT)
                         .addValueInfo(TextIcon.FIRE, Format.PER_SECOND, FIRE_DAMAGE_PER_SECOND)

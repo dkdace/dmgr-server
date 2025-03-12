@@ -1,31 +1,33 @@
 package com.dace.dmgr.combat.combatant.palas.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
-import java.util.WeakHashMap;
-
-public final class PalasA3 extends ActiveSkill {
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+@Getter
+public final class PalasA3 extends ActiveSkill implements HasBonusScore {
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public PalasA3(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA3Info.getInstance(), 2);
+        super(combatUser, PalasA3Info.getInstance(), PalasA3Info.COOLDOWN, Timespan.MAX, 2);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA3Info.ASSIST_SCORE);
     }
 
     @Override
@@ -35,31 +37,21 @@ public final class PalasA3 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return PalasA3Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasA3Info.READY_DURATION));
+        combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
         PalasA3Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> {
+        addActionTask(new DelayTask(() -> {
             onCancelled();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA3Projectile().shot(loc);
 
             CombatEffectUtil.THROW_SOUND.play(loc);
-        }, PalasA3Info.READY_DURATION));
+        }, PalasA3Info.READY_DURATION.toTicks()));
     }
 
     @Override
@@ -70,18 +62,12 @@ public final class PalasA3 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", PalasA3Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -206,17 +192,17 @@ public final class PalasA3 extends ActiveSkill {
                     if (target.isEnemy(combatUser)) {
                         if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
                                 false, true)) {
-                            target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, Timespan.ofTicks(PalasA3Info.DURATION));
+                            target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, PalasA3Info.DURATION);
 
                             if (target instanceof CombatUser)
-                                assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(PalasA3Info.DURATION)));
+                                bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
                         }
                     } else if (target instanceof Healable) {
-                        target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, Timespan.ofTicks(PalasA3Info.DURATION));
+                        target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, PalasA3Info.DURATION);
 
                         if (target instanceof CombatUser && target != combatUser) {
                             combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
-                            ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, Timespan.ofTicks(PalasA3Info.DURATION));
+                            ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
                         }
 
                         return true;

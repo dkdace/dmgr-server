@@ -17,23 +17,13 @@ import org.bukkit.util.Vector;
 
 public final class NeaceA1 extends ActiveSkill {
     public NeaceA1(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA1Info.getInstance(), 0);
+        super(combatUser, NeaceA1Info.getInstance(), NeaceA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return NeaceA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -93,7 +83,7 @@ public final class NeaceA1 extends ActiveSkill {
         protected void onFindEntity(@NonNull Healable target) {
             setCooldown();
 
-            target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, combatUser, Timespan.ofTicks(NeaceA1Info.DURATION));
+            target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, combatUser, NeaceA1Info.DURATION);
 
             NeaceA1Info.SOUND.USE.play(combatUser.getLocation());
             playUseEffect(target);

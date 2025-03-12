@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -13,12 +14,12 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = 11 * 20L;
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = 20;
-    /** 시전 시간 (tick) */
-    public static final long READY_DURATION = (long) (0.3 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(11);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(1);
+    /** 시전 시간 */
+    public static final Timespan READY_DURATION = Timespan.ofSeconds(0.3);
     /** 피해량 */
     public static final int DAMAGE = 100;
     /** 이동 강도 */
@@ -40,7 +41,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("회오리바람을 날려 적에게 <:DAMAGE:피해>를 입히고 <:KNOCKBACK:공중에 띄웁니다>. " +
                                 "적중 시 맞은 적의 뒤로 순간이동합니다.")
-                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.RIGHT_CLICK)

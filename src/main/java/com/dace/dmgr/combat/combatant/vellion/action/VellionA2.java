@@ -3,8 +3,11 @@ package com.dace.dmgr.combat.combatant.vellion.action;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -17,7 +20,6 @@ import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -25,25 +27,27 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.WeakHashMap;
-
-@Getter
-public final class VellionA2 extends ActiveSkill {
+public final class VellionA2 extends ActiveSkill implements HasBonusScore {
     /** 이동 속도 수정자 */
     private static final AbilityStatus.Modifier SPEED_MODIFIER = new AbilityStatus.Modifier(-VellionA2Info.READY_SLOW);
     /** 방어력 수정자 */
     private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(-VellionA2Info.DEFENSE_DECREMENT);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+    /** 보너스 점수 모듈 */
+    @NonNull
+    @Getter
+    private final BonusScoreModule bonusScoreModule;
 
     /** 대상 위치 통과 불가 시 초기화 타임스탬프 */
     private Timestamp blockResetTimestamp = Timestamp.now();
     /** 활성화 완료 여부 */
+    @Getter
     private boolean isEnabled = false;
 
     public VellionA2(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA2Info.getInstance(), 1);
+        super(combatUser, VellionA2Info.getInstance(), VellionA2Info.COOLDOWN, Timespan.MAX, 1);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);
     }
 
     @Override
@@ -53,13 +57,12 @@ public final class VellionA2 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return VellionA2Info.COOLDOWN;
-    }
+    @Nullable
+    public String getActionBarString() {
+        if (isDurationFinished() || !isEnabled)
+            return null;
 
-    @Override
-    public long getDefaultDuration() {
-        return -1;
+        return VellionA2Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "해제");
     }
 
     @Override
@@ -73,7 +76,7 @@ public final class VellionA2 extends ActiveSkill {
         if (isDurationFinished())
             new VellionA2Target().shot();
         else
-            setDuration(0);
+            setDuration(Timespan.ZERO);
     }
 
     @Override
@@ -85,20 +88,14 @@ public final class VellionA2 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", VellionA2Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -143,13 +140,13 @@ public final class VellionA2 extends ActiveSkill {
         @Override
         protected void onFindEntity(@NonNull Damageable target) {
             setDuration();
-            combatUser.setGlobalCooldown(Timespan.ofTicks(VellionA2Info.READY_DURATION));
+            combatUser.setGlobalCooldown(VellionA2Info.READY_DURATION);
             combatUser.getMoveModule().getSpeedStatus().addModifier(SPEED_MODIFIER);
-            blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(VellionA2Info.BLOCK_RESET_DELAY));
+            blockResetTimestamp = Timestamp.now().plus(VellionA2Info.BLOCK_RESET_DELAY);
 
             VellionA2Info.SOUND.USE.play(combatUser.getLocation());
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 if (isDurationFinished() || isInvalid(combatUser, target))
                     return false;
 
@@ -178,23 +175,23 @@ public final class VellionA2 extends ActiveSkill {
                 for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
                     VellionA2Info.PARTICLE.USE_TICK_2.play(loc2);
 
-                TaskUtil.addTask(VellionA2.this, new IntervalTask(i -> {
+                addTask(new IntervalTask(i -> {
                     if (isDurationFinished() || isInvalid(combatUser, target) || !target.getStatusEffectModule().has(VellionA2Mark.instance))
                         return false;
 
                     if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
-                        blockResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(VellionA2Info.BLOCK_RESET_DELAY));
+                        blockResetTimestamp = Timestamp.now().plus(VellionA2Info.BLOCK_RESET_DELAY);
 
                     target.getStatusEffectModule().apply(VellionA2Mark.instance, combatUser, Timespan.ofTicks(10));
                     if (i % 10 == 0)
                         new VellionA2Area(target).emit(target.getCenterLocation());
 
                     if (target instanceof CombatUser)
-                        assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
+                        bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
 
                     return true;
                 }, VellionA2.this::onCancelled, 1));
-            }, 1, VellionA2Info.READY_DURATION));
+            }, 1, VellionA2Info.READY_DURATION.toTicks()));
         }
 
         /**

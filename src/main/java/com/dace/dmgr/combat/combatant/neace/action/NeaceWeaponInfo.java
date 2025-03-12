@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.neace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -12,8 +13,8 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Sound;
 
 public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.4 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.4);
     /** 피해량 */
     public static final int DAMAGE = 100;
     /** 사거리 (단위: 블록) */
@@ -35,7 +36,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                         new ActionInfoLore.NamedSection("마법 구체", ActionInfoLore.Section
                                 .builder("마법 구체를 발사하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build()
                         ),
@@ -59,8 +60,8 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
         public static final int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
         public static final int MAX_DISTANCE = 15;
-        /** 대상 위치 통과 불가 시 초기화 제한 시간 (tick) */
-        public static final long BLOCK_RESET_DELAY = 2 * 20L;
+        /** 대상 위치 통과 불가 시 초기화 제한 시간 */
+        public static final Timespan BLOCK_RESET_DELAY = Timespan.ofSeconds(2);
     }
 
     /**

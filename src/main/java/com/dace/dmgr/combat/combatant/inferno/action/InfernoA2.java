@@ -1,10 +1,12 @@
 package com.dace.dmgr.combat.combatant.inferno.action;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -12,22 +14,24 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.WeakHashMap;
-
-public final class InfernoA2 extends ActiveSkill {
+@Getter
+public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-InfernoA2Info.HEAL_DECREMENT);
-    /** 처치 지원 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
-    private final WeakHashMap<CombatUser, Timestamp> assistScoreTimeLimitTimestampMap = new WeakHashMap<>();
+    /** 보너스 점수 모듈 */
+    @NonNull
+    private final BonusScoreModule bonusScoreModule;
 
     public InfernoA2(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoA2Info.getInstance(), 1);
+        super(combatUser, InfernoA2Info.getInstance(), InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION, 1);
+        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", InfernoA2Info.ASSIST_SCORE);
     }
 
     @Override
@@ -37,13 +41,9 @@ public final class InfernoA2 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return InfernoA2Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return InfernoA2Info.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -57,14 +57,14 @@ public final class InfernoA2 extends ActiveSkill {
 
         InfernoA2Info.SOUND.USE.play(combatUser.getLocation());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
             InfernoA2Info.SOUND.TICK.play(combatUser.getLocation());
             InfernoA2Info.PARTICLE.TICK_CORE.play(combatUser.getLocation().add(0, 1, 0));
             playTickEffect(i);
-        }, 1, InfernoA2Info.DURATION));
+        }, 1, InfernoA2Info.DURATION.toTicks()));
     }
 
     @Override
@@ -75,7 +75,7 @@ public final class InfernoA2 extends ActiveSkill {
     @Override
     public void onCancelled() {
         super.onCancelled();
-        setDuration(0);
+        setDuration(Timespan.ZERO);
     }
 
     /**
@@ -106,15 +106,9 @@ public final class InfernoA2 extends ActiveSkill {
         }
     }
 
-    /**
-     * 플레이어에게 처치 지원 점수를 지급한다.
-     *
-     * @param victim 피격자
-     */
-    public void applyAssistScore(@NonNull CombatUser victim) {
-        Timestamp expiration = assistScoreTimeLimitTimestampMap.get(victim);
-        if (expiration != null && expiration.isAfter(Timestamp.now()))
-            combatUser.addScore("처치 지원", InfernoA2Info.ASSIST_SCORE);
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
@@ -159,7 +153,7 @@ public final class InfernoA2 extends ActiveSkill {
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
-                    assistScoreTimeLimitTimestampMap.put((CombatUser) target, Timestamp.now().plus(Timespan.ofTicks(10)));
+                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
                 }
             }
 

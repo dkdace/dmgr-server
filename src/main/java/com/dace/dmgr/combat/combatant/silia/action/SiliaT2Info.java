@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -12,8 +13,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 
 public final class SiliaT2Info extends TraitInfo {
-    /** 전역 쿨타임 (tick) */
-    public static final int GLOBAL_COOLDOWN = (int) (0.3 * 20);
+    /** 전역 쿨타임 */
+    public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.3);
     /** 피해량 */
     public static final int DAMAGE = 350;
     /** 사거리 (단위: 블록) */

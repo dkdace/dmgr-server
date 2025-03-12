@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.neace.action;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.*;
@@ -8,10 +9,10 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class NeaceA2 extends ActiveSkill {
     /** 공격력 수정자 */
@@ -20,7 +21,7 @@ public final class NeaceA2 extends ActiveSkill {
     private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
     public NeaceA2(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA2Info.getInstance(), 1);
+        super(combatUser, NeaceA2Info.getInstance(), NeaceA2Info.COOLDOWN, NeaceA2Info.DURATION, 1);
     }
 
     @Override
@@ -30,13 +31,12 @@ public final class NeaceA2 extends ActiveSkill {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return NeaceA2Info.COOLDOWN;
-    }
+    @Nullable
+    public String getActionBarString() {
+        if (isDurationFinished())
+            return null;
 
-    @Override
-    public long getDefaultDuration() {
-        return NeaceA2Info.DURATION;
+        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo(this, "해제");
     }
 
     @Override
@@ -47,7 +47,7 @@ public final class NeaceA2 extends ActiveSkill {
 
             NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
 
-            TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+            addActionTask(new IntervalTask(i -> {
                 if (isDurationFinished() || combatUser.isDead())
                     return false;
 
@@ -58,7 +58,7 @@ public final class NeaceA2 extends ActiveSkill {
                 return true;
             }, () -> combatUser.getWeapon().setGlowing(false), 1));
         } else
-            setDuration(0);
+            setDuration(Timespan.ZERO);
     }
 
     @Override

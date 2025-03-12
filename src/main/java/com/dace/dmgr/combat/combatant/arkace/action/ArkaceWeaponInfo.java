@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.arkace.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -22,10 +23,10 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     public static final int DAMAGE_WEAKENING_DISTANCE = 25;
     /** 장탄수 */
     public static final int CAPACITY = 30;
-    /** 재장전 시간 (tick) */
-    public static final long RELOAD_DURATION = (long) (1.5 * 20);
-    /** 달리기 중 시전 시간 (tick) */
-    public static final long SPRINT_READY_DURATION = (long) (0.25 * 20);
+    /** 재장전 시간 */
+    public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.5);
+    /** 달리기 중 시전 시간 */
+    public static final Timespan SPRINT_READY_DURATION = Timespan.ofSeconds(0.25);
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 

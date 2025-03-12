@@ -15,7 +15,6 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -23,23 +22,13 @@ import org.bukkit.util.Vector;
 
 public final class InfernoA1 extends ActiveSkill {
     public InfernoA1(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoA1Info.getInstance(), 0);
+        super(combatUser, InfernoA1Info.getInstance(), InfernoA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
     @NonNull
     public ActionKey @NonNull [] getDefaultActionKeys() {
         return new ActionKey[]{ActionKey.SLOT_1};
-    }
-
-    @Override
-    public long getDefaultCooldown() {
-        return InfernoA1Info.COOLDOWN;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return -1;
     }
 
     @Override
@@ -51,7 +40,7 @@ public final class InfernoA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(InfernoA1Info.GLOBAL_COOLDOWN));
+        combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
 
         Location location = combatUser.getLocation();
         location.setPitch(Math.max(-40, Math.min(location.getPitch(), 10)));
@@ -64,7 +53,7 @@ public final class InfernoA1 extends ActiveSkill {
 
         combatUser.getMoveModule().push(vec, true);
 
-        TaskUtil.addTask(taskRunner, new DelayTask(() -> TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new DelayTask(() -> addActionTask(new IntervalTask(i -> {
             if (i < 15) {
                 Location loc = combatUser.getLocation();
                 loc.setPitch(0);
@@ -78,7 +67,7 @@ public final class InfernoA1 extends ActiveSkill {
             return !combatUser.getEntity().isOnGround();
         }, () -> {
             onCancelled();
-            TaskUtil.addTask(this, new DelayTask(this::onLand, 1));
+            addActionTask(new DelayTask(this::onLand, 1));
         }, 1)), 4));
     }
 
@@ -91,9 +80,9 @@ public final class InfernoA1 extends ActiveSkill {
     public void onCancelled() {
         super.onCancelled();
 
-        setDuration(0);
+        setDuration(Timespan.ZERO);
         if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
-            setCooldown(getDefaultCooldown() - InfernoUltInfo.A1_COOLDOWN_DECREMENT);
+            setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));
     }
 
     /**

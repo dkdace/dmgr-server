@@ -13,14 +13,10 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 전투원 - 벨리온 클래스.
@@ -124,35 +120,6 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    @NonNull
-    public List<@NonNull String> getActionbarStrings(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
-
-        VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
-        VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
-        VellionUlt skill4 = combatUser.getSkill(VellionUltInfo.getInstance());
-
-        if (!skillp1.isDurationFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarDurationBar(VellionP1Info.getInstance().toString(), skillp1.getDuration() / 20.0,
-                    skillp1.getDefaultDuration() / 20.0) + "  §7[" + skillp1.getDefaultActionKeys()[0] + "] §f해제";
-            texts.add(skillp1Display);
-        } else if (!skillp1.isCooldownFinished()) {
-            String skillp1Display = StringFormUtil.getActionbarCooldownBar(VellionP1Info.getInstance().toString(), skillp1.getCooldown() / 20.0,
-                    skillp1.getDefaultCooldown() / 20.0);
-            texts.add(skillp1Display);
-        }
-        if (!skill2.isDurationFinished() && skill2.isEnabled())
-            texts.add(VellionA2Info.getInstance() + "  §7[" + skill2.getDefaultActionKeys()[0] + "] §f해제");
-        if (!skill4.isDurationFinished() && skill4.isEnabled()) {
-            String skill4Display = StringFormUtil.getActionbarDurationBar(VellionUltInfo.getInstance().toString(), skill4.getDuration() / 20.0,
-                    skill4.getDefaultDuration() / 20.0);
-            texts.add(skill4Display);
-        }
-
-        return texts;
-    }
-
-    @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         if (victim.isCreature()) {
             attacker.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
@@ -165,16 +132,6 @@ public final class Vellion extends Controller {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser) || score >= 100)
-            return;
-
-        attacker.getSkill(VellionA2Info.getInstance()).applyAssistScore((CombatUser) victim);
-        attacker.getSkill(VellionA3Info.getInstance()).applyAssistScore((CombatUser) victim);
-        attacker.getSkill(VellionUltInfo.getInstance()).applyAssistScore((CombatUser) victim);
     }
 
     @Override

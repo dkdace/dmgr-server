@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -21,8 +22,8 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     public static final int VELOCITY = 35;
     /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 0.4;
-    /** 쿨타임 (tick) */
-    public static final long COOLDOWN = (long) (0.9 * 20);
+    /** 쿨타임 */
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(0.9);
     @Getter
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();
 
@@ -32,7 +33,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
                         .builder("휴대성이 뛰어난 접이식 마체테입니다. " +
                                 "검기를 날려 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
-                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN / 20.0)
+                        .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
                         .build()

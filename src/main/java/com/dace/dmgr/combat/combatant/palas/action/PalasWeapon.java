@@ -18,27 +18,28 @@ import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-@Getter
+
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-PalasWeaponInfo.AIM_SLOW);
 
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
     /** 정조준 모듈 */
     @NonNull
+    @Getter
     private final AimModule aimModule;
     /** 사용 후 쿨타임 진행 여부 */
     private boolean isActionCooldown = true;
 
     public PalasWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasWeaponInfo.getInstance());
+        super(combatUser, PalasWeaponInfo.getInstance(), PalasWeaponInfo.COOLDOWN);
 
         reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
         aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
@@ -51,8 +52,9 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return PalasWeaponInfo.COOLDOWN;
+    @NonNull
+    public String getActionBarString() {
+        return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '┃') + (isActionCooldown ? " §a■" : " §c□");
     }
 
     @Override
@@ -84,7 +86,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                         PalasWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
                 PalasWeaponInfo.SOUND.USE.play(combatUser.getLocation());
 
-                TaskUtil.addTask(taskRunner, new DelayTask(this::action, getDefaultCooldown()));
+                addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));
 
                 break;
             }
@@ -126,7 +128,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
         reloadModule.cancel();
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getLocation());
 
             switch ((int) i) {
@@ -148,12 +150,12 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         }, () -> {
             isActionCooldown = true;
             reloadModule.consume(1);
-        }, 1, PalasWeaponInfo.ACTION_COOLDOWN));
+        }, 1, PalasWeaponInfo.ACTION_COOLDOWN.toTicks()));
     }
 
     @Override
     public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < PalasWeaponInfo.CAPACITY;
+        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity();
     }
 
     @Override
@@ -177,7 +179,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onAimEnable() {
-        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
+        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getLocation());
@@ -185,17 +187,10 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onAimDisable() {
-        combatUser.setGlobalCooldown(Timespan.ofTicks(PalasWeaponInfo.AIM_DURATION));
+        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
         PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-
-        reloadModule.setRemainingAmmo(PalasWeaponInfo.CAPACITY);
     }
 
     private final class PalasWeaponHitscan extends Hitscan<Damageable> {

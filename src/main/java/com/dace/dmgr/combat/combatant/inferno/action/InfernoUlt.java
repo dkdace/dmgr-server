@@ -1,5 +1,7 @@
 package com.dace.dmgr.combat.combatant.inferno.action;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
@@ -8,26 +10,20 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class InfernoUlt extends UltimateSkill {
     public InfernoUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoUltInfo.getInstance());
+        super(combatUser, InfernoUltInfo.getInstance(), InfernoUltInfo.DURATION, InfernoUltInfo.COST);
     }
 
     @Override
-    public int getCost() {
-        return InfernoUltInfo.COST;
-    }
-
-    @Override
-    public long getDefaultDuration() {
-        return InfernoUltInfo.DURATION;
+    @Nullable
+    public String getActionBarString() {
+        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
     }
 
     @Override
@@ -42,14 +38,14 @@ public final class InfernoUlt extends UltimateSkill {
 
         setDuration();
         combatUser.getWeapon().onCancelled();
-        ((InfernoWeapon) combatUser.getWeapon()).getReloadModule().setRemainingAmmo(InfernoWeaponInfo.CAPACITY);
-        combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(0);
+        ((InfernoWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
+        combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
 
         DamageModule.Shield shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
 
         combatUser.setHitboxes(Hitbox.builder(2, 2, 2).offsetY(1).pitchFixed().build());
 
-        TaskUtil.addTask(taskRunner, new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (shield.getHealth() == 0)
                 return false;
 
@@ -67,7 +63,7 @@ public final class InfernoUlt extends UltimateSkill {
             return true;
         }, isCancelled -> {
             if (isCancelled) {
-                setDuration(0);
+                setDuration(Timespan.ZERO);
 
                 Location loc = combatUser.getLocation();
                 InfernoUltInfo.SOUND.DEATH.play(loc);
@@ -76,7 +72,7 @@ public final class InfernoUlt extends UltimateSkill {
 
             shield.setHealth(0);
             combatUser.resetHitboxes();
-        }, 1, InfernoUltInfo.DURATION));
+        }, 1, InfernoUltInfo.DURATION.toTicks()));
     }
 
     @Override
