@@ -122,8 +122,8 @@ public final class Quaker extends Guardian {
     }
 
     @Override
-    public void onTick(@NonNull CombatUser combatUser, long i) {
-        super.onTick(combatUser, i);
+    public void onSet(@NonNull CombatUser combatUser) {
+        super.onSet(combatUser);
         combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER);
     }
 

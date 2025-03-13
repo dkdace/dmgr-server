@@ -163,6 +163,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             JagerUltInfo.SOUND.SUMMON.play(getLocation());
+
+            addOnTick(this::onTick);
         }
 
         @Override
@@ -181,8 +183,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             // 미사용
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             JagerUltInfo.PARTICLE.DISPLAY.play(getLocation());
             if (!readyTimeModule.isReady())
                 return;

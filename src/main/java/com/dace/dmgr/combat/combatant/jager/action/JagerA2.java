@@ -156,6 +156,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             JagerA2Info.SOUND.SUMMON.play(getLocation());
+
+            addOnTick(this::onTick);
         }
 
         @Override
@@ -169,8 +171,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             JagerA2Info.SOUND.SUMMON_READY.play(getLocation());
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             if (!readyTimeModule.isReady())
                 return;
 

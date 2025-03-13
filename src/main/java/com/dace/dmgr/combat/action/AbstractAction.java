@@ -151,7 +151,11 @@ public abstract class AbstractAction implements Action {
     @Override
     public final void reset() {
         setCooldown(defaultCooldown);
-        onResets.forEach(Runnable::run);
+
+        onResets.forEach(onReset -> {
+            if (!isDisposed)
+                onReset.run();
+        });
     }
 
     @Override
@@ -160,9 +164,7 @@ public abstract class AbstractAction implements Action {
             throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         reset();
-        onResets.clear();
         onDisposes.forEach(Runnable::run);
-        onDisposes.clear();
 
         actionTaskManager.dispose();
         taskManager.dispose();

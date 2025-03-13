@@ -103,7 +103,7 @@ public class DamageModule {
                 return targetCombatUser != combatEntity;
         }, 0);
 
-        combatEntity.addOnTick(() -> {
+        combatEntity.addOnTick(i -> {
             ChatColor color;
             if (combatEntity.getStatusEffectModule().hasType(StatusEffectType.HEAL_BLOCK))
                 color = ChatColor.DARK_PURPLE;

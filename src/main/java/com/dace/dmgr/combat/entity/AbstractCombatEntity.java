@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.function.LongConsumer;
 
 /**
  * {@link CombatEntity}의 기본 구현체, 모든 전투 시스템 엔티티의 기반 클래스.
@@ -46,7 +47,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     /** 태스크 관리 인스턴스 */
     private final TaskManager taskManager = new TaskManager();
     /** 매 틱마다 실행할 작업 목록 */
-    private final ArrayList<Runnable> onTicks = new ArrayList<>();
+    private final ArrayList<LongConsumer> onTicks = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
     private final ArrayList<Runnable> onDisposes = new ArrayList<>();
 
@@ -82,8 +83,10 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         COMBAT_ENTITY_MAP.put(entity, this);
 
         addTask(new IntervalTask(i -> {
-            onTick(i);
-            onTicks.forEach(Runnable::run);
+            onTicks.forEach(onTick -> {
+                if (!isDisposed())
+                    onTick.accept(i);
+            });
 
             updateHitboxTick();
         }, 1));
@@ -110,20 +113,13 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         return Collections.unmodifiableCollection(COMBAT_ENTITY_EXCLUDED_MAP.values());
     }
 
-    /**
-     * 엔티티가 매 틱마다 실행할 작업.
-     *
-     * @param i 인덱스
-     */
-    protected abstract void onTick(long i);
-
     @Override
     public final void addTask(@NonNull Task task) {
         taskManager.add(task);
     }
 
     @Override
-    public final void addOnTick(@NonNull Runnable onTick) {
+    public final void addOnTick(@NonNull LongConsumer onTick) {
         onTicks.add(onTick);
     }
 
@@ -192,10 +188,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         if (isDisposed())
             throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
-        onTicks.clear();
         onDisposes.forEach(Runnable::run);
-        onDisposes.clear();
-
         taskManager.dispose();
 
         if (game == null)

@@ -167,10 +167,10 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             );
 
             entity.setGravity(false);
+            addOnTick(this::onTick);
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             if (returnTime-- == 0)
                 targets.clear();
 

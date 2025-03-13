@@ -232,15 +232,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         setCombatantType(combatantType);
 
-        addOnDispose(() -> {
-            if (deathMentHologram != null)
-                deathMentHologram.dispose();
-
-            if (DMGR.getPlugin().isEnabled())
-                user.resetSkin();
-
-            reset();
-        });
+        addOnTick(this::onTick);
+        addOnDispose(this::onDispose);
     }
 
     /**
@@ -269,8 +262,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         return (CombatUser) combatEntity;
     }
 
-    @Override
-    protected void onTick(long i) {
+    /**
+     * 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    private void onTick(long i) {
         combatant.onTick(this, i);
 
         applyFastDiggingPotionEffect();
@@ -281,6 +278,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (!isDead)
             onTickLive(i);
+    }
+
+    /**
+     * 제거되었을 때 실행할 작업.
+     */
+    private void onDispose() {
+        if (deathMentHologram != null)
+            deathMentHologram.dispose();
+
+        if (DMGR.getPlugin().isEnabled())
+            user.resetSkin();
+
+        reset();
     }
 
     /**
@@ -1001,6 +1011,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         resetHitboxes();
         initActions();
+
+        combatant.onSet(this);
 
         addTask(user.applySkin(combatant.getSkinName()));
         addTask(new IntervalTask((LongConsumer) i ->

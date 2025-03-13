@@ -114,10 +114,11 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             entity.setGravity(false);
             entity.setItemInHand(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
             damageModule.setHealth(getStateValue());
+
+            addOnTick(this::onTick);
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             Location loc = LocationUtil.getLocationFromOffset(owner.getLocation(), owner.getLocation().getDirection(),
                     0, 0.8, 1.5);
             entity.setRightArmPose(new EulerAngle(Math.toRadians(loc.getPitch() - 90), 0, 0));

@@ -198,6 +198,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             CombatEffectUtil.ENTITY_SUMMON_SOUND.play(getLocation());
+
+            addOnTick(this::onTick);
         }
 
         @Override
@@ -211,8 +213,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             JagerA1Info.SOUND.SUMMON_READY.play(getLocation());
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             if (!readyTimeModule.isReady())
                 return;
 

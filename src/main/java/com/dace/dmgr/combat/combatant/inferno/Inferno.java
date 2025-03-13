@@ -119,8 +119,6 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        super.onTick(combatUser, i);
-
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
     }

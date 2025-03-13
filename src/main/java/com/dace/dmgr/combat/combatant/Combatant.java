@@ -170,6 +170,15 @@ public abstract class Combatant {
     }
 
     /**
+     * 전투원을 선택했을 때 실행할 작업.
+     *
+     * @param combatUser 대상 플레이어
+     */
+    public void onSet(@NonNull CombatUser combatUser) {
+        // 미사용
+    }
+
+    /**
      * 전투원이 매 틱마다 실행할 작업.
      *
      * @param combatUser 대상 플레이어

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
+import java.util.function.LongConsumer;
 
 /**
  * 전투 시스템의 엔티티 정보를 관리하는 인터페이스.
@@ -76,9 +77,11 @@ public interface CombatEntity extends Disposable {
     /**
      * 엔티티가 매 틱마다 실행할 작업을 추가한다.
      *
-     * @param onTick 실행할 작업
+     * @param onTick 실행할 작업.
+     *
+     *               <p>인덱스 (0부터 시작)를 인자로 받음</p>
      */
-    void addOnTick(@NonNull Runnable onTick);
+    void addOnTick(@NonNull LongConsumer onTick);
 
     /**
      * 엔티티가 제거되었을 때 ({@link CombatEntity#dispose()} 호출 시) 실행할 작업을 추가한다.

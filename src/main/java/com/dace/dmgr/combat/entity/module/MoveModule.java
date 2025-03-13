@@ -54,7 +54,7 @@ public final class MoveModule {
         this.speedStatus = new AbilityStatus(speed);
         this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
 
-        combatEntity.addOnTick(() -> {
+        combatEntity.addOnTick(i -> {
             double movementSpeed = speedStatus.getValue();
             if (!canMove() || !combatEntity.canMove())
                 movementSpeed = 0;

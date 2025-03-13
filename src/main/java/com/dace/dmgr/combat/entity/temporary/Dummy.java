@@ -91,11 +91,6 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Mo
     }
 
     @Override
-    protected void onTick(long i) {
-        // 미사용
-    }
-
-    @Override
     @Nullable
     public Game.Team getTeam() {
         return null;

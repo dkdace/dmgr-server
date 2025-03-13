@@ -271,10 +271,11 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                     false, true,
                     Hitbox.builder(1, 1, 1).offsetY(0.5).pitchFixed().build()
             );
+
+            addOnTick(this::onTick);
         }
 
-        @Override
-        protected void onTick(long i) {
+        private void onTick(long i) {
             Location loc = getLocation().add(0, 0.1, 0);
             new ChedUltFireFloorArea().emit(loc);
 

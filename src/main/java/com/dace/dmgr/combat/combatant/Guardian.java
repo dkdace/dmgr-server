@@ -42,7 +42,7 @@ public abstract class Guardian extends Combatant {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull CombatUser combatUser, long i) {
+    public void onSet(@NonNull CombatUser combatUser) {
         combatUser.getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         combatUser.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
     }
