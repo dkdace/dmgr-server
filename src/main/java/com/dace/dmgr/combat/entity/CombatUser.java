@@ -231,6 +231,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         user.getSidebarManager().clear();
 
         setCombatantType(combatantType);
+
+        addOnDispose(() -> {
+            if (deathMentHologram != null)
+                deathMentHologram.dispose();
+
+            if (DMGR.getPlugin().isEnabled())
+                user.resetSkin();
+
+            reset();
+        });
     }
 
     /**
@@ -391,7 +401,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Location oldLoc = getLocation();
         double fallDistance = entity.getFallDistance();
 
-        taskManager.add(new DelayTask(() -> {
+        addTask(new DelayTask(() -> {
             Location loc = getLocation();
 
             footstepDistance += oldLoc.distance(loc);
@@ -423,17 +433,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             combatant.onFootstep(this, volume);
         }, 1));
-    }
-
-    @Override
-    protected void onDispose() {
-        if (deathMentHologram != null)
-            deathMentHologram.dispose();
-
-        if (DMGR.getPlugin().isEnabled())
-            user.resetSkin();
-
-        reset();
     }
 
     @Override
@@ -514,7 +513,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         user.sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
-        taskManager.add(new DelayTask(() -> sound.play(entity), 2));
+        addTask(new DelayTask(() -> sound.play(entity), 2));
     }
 
     @Override
@@ -621,7 +620,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playKillEffect() {
         user.sendTitle("", "§c" + TextIcon.POISON, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
-        taskManager.add(new DelayTask(() -> SOUND.KILL.play(entity), 2));
+        addTask(new DelayTask(() -> SOUND.KILL.play(entity), 2));
     }
 
     /**
@@ -670,7 +669,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.sendMessage(message);
         victim.getEntity().sendMessage(message);
 
-        taskManager.add(new DelayTask(() ->
+        addTask(new DelayTask(() ->
                 victim.getUser().sendTypewriterTitle(String.valueOf(combatant.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
     }
 
@@ -757,7 +756,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setGameMode(GameMode.SPECTATOR);
         entity.setVelocity(new Vector());
 
-        taskManager.add(new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
                         String.format("%.1f", Timespan.ofTicks(durationTicks - i).toSeconds())), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
@@ -900,7 +899,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (scoreDisplayTimestamp.isBefore(Timestamp.now())) {
             scoreDisplayTimestamp = expiration;
 
-            taskManager.add(new IntervalTask(i -> scoreDisplayTimestamp.isAfter(Timestamp.now()), () -> {
+            addTask(new IntervalTask(i -> scoreDisplayTimestamp.isAfter(Timestamp.now()), () -> {
                 scoreStreakSum = 0;
                 scoreMap.clear();
                 user.getSidebarManager().clear();
@@ -1003,8 +1002,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         resetHitboxes();
         initActions();
 
-        taskManager.add(user.applySkin(combatant.getSkinName()));
-        taskManager.add(new IntervalTask((LongConsumer) i ->
+        addTask(user.applySkin(combatant.getSkinName()));
+        addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
                 1, 10));
     }

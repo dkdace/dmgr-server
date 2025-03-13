@@ -35,8 +35,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     @Getter
     protected final T entity;
-    /** 태스크 관리 인스턴스 */
-    protected final TaskManager taskManager = new TaskManager();
     /** 이름 */
     @NonNull
     @Getter
@@ -45,6 +43,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Nullable
     @Getter
     protected final Game game;
+    /** 태스크 관리 인스턴스 */
+    private final TaskManager taskManager = new TaskManager();
     /** 매 틱마다 실행할 작업 목록 */
     private final ArrayList<Runnable> onTicks = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
@@ -81,7 +81,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         COMBAT_ENTITY_MAP.put(entity, this);
 
-        taskManager.add(new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             onTick(i);
             onTicks.forEach(Runnable::run);
 
@@ -194,9 +194,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     public final void dispose() {
         validate();
 
-        onDispose();
-        onDisposes.forEach(Runnable::run);
         onTicks.clear();
+        onDisposes.forEach(Runnable::run);
         onDisposes.clear();
 
         taskManager.dispose();
@@ -213,9 +212,4 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     public final boolean isDisposed() {
         return COMBAT_ENTITY_MAP.get(entity) == null;
     }
-
-    /**
-     * 엔티티가 제거되었을 때 ({@link CombatEntity#dispose()} 호출 시) 실행할 작업.
-     */
-    protected abstract void onDispose();
 }

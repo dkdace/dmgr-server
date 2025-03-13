@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -46,6 +45,8 @@ public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEn
             if (entity instanceof LivingEntity)
                 ((LivingEntity) entity).getEquipment().clear();
         }), name, game, hitboxes);
+
+        addOnDispose(entity::remove);
     }
 
     /**
@@ -59,12 +60,6 @@ public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEn
         armorStand.setSilent(true);
         armorStand.setMarker(true);
         armorStand.setVisible(false);
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    protected void onDispose() {
-        getEntity().remove();
     }
 
     @Override

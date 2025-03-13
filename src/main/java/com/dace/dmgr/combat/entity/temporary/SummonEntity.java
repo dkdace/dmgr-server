@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,23 +49,19 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         this.owner = owner;
         this.hasNameTag = hasNameTag;
 
-        if (hasNameTag)
-            taskManager.add(new DelayTask(() ->
+        if (hasNameTag) {
+            addTask(new DelayTask(() ->
                     nameTagHologram = new TextHologram(entity, player -> {
                         CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(player));
                         return targetCombatUser == null || !owner.isEnemy(targetCombatUser);
                     }, 1, "§n" + name), 3));
+            addOnDispose(() -> {
+                if (nameTagHologram != null)
+                    nameTagHologram.dispose();
+            });
+        }
         if (isHidden)
             hide();
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    protected void onDispose() {
-        super.onDispose();
-
-        if (hasNameTag && nameTagHologram != null)
-            nameTagHologram.dispose();
     }
 
     @Override
