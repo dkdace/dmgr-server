@@ -119,19 +119,16 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     public final void addTask(@NonNull Task task) {
-        validate();
         taskManager.add(task);
     }
 
     @Override
     public final void addOnTick(@NonNull Runnable onTick) {
-        validate();
         onTicks.add(onTick);
     }
 
     @Override
     public final void addOnDispose(@NonNull Runnable onDispose) {
-        validate();
         onDisposes.add(onDispose);
     }
 
@@ -192,7 +189,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     @Override
     public final void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         onTicks.clear();
         onDisposes.forEach(Runnable::run);

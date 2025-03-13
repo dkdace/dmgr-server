@@ -59,7 +59,9 @@ public class ChestGUI extends GUI implements Disposable {
      */
     @Override
     public final void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+
         GUI_MAP.remove(inventory);
     }
 

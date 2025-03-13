@@ -140,11 +140,7 @@ public class DMGR extends JavaPlugin {
 
                     ConsoleLogger.info("플러그인 활성화 완료");
 
-                    Bukkit.getOnlinePlayers().forEach(player -> {
-                        User user = User.fromPlayer(player);
-                        user.init();
-                        user.sendMessageInfo("시스템 재부팅 완료");
-                    });
+                    Bukkit.getOnlinePlayers().forEach(player -> User.fromPlayer(player).sendMessageInfo("시스템 재부팅 완료"));
                 })
                 .onError(ex -> ConsoleLogger.severe("플러그인 활성화 실패", ex));
     }

@@ -108,7 +108,7 @@ public final class Game implements Initializable<Void>, Disposable {
     @Override
     @NonNull
     public AsyncTask<Void> init() {
-        if (isInitialized())
+        if (isInitialized)
             throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
         gameRoom.getUsers().forEach(user -> user.sendMessageInfo("월드 불러오는 중..."));
@@ -138,6 +138,9 @@ public final class Game implements Initializable<Void>, Disposable {
      */
     @Override
     public void dispose() {
+        if (isDisposed)
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+
         if (isInitialized())
             validate();
 
@@ -154,12 +157,6 @@ public final class Game implements Initializable<Void>, Disposable {
             onSecondTask.dispose();
         if (world != null)
             removeWorld();
-    }
-
-    @Override
-    public void validate() {
-        Initializable.super.validate();
-        Disposable.super.validate();
     }
 
     /**
@@ -179,7 +176,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @param combatEntity 전투 시스템의 엔티티 인스턴스
      */
     public void addCombatEntity(@NonNull CombatEntity combatEntity) {
-        validate();
         combatEntities.add(combatEntity);
     }
 
@@ -189,7 +185,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @param combatEntity 전투 시스템의 엔티티 인스턴스
      */
     public void removeCombatEntity(@NonNull CombatEntity combatEntity) {
-        validate();
         combatEntities.remove(combatEntity);
     }
 
@@ -211,7 +206,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @see GameRoom#addBossBar(BossBarDisplay)
      */
     public void addBossBar(@NonNull BossBarDisplay bossBarDisplay) {
-        validate();
         gameRoom.addBossBar(bossBarDisplay);
     }
 
@@ -222,7 +216,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @see GameRoom#removeBossBar(BossBarDisplay)
      */
     public void removeBossBar(@NonNull BossBarDisplay bossBarDisplay) {
-        validate();
         gameRoom.removeBossBar(bossBarDisplay);
     }
 
@@ -438,8 +431,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @see GameUser#GameUser(User, Game, Team)
      */
     void onAddGameUser(@NonNull GameUser gameUser) {
-        validate();
-
         gameUsers.add(gameUser);
         gameUser.getTeam().teamUsers.add(gameUser);
     }
@@ -451,8 +442,6 @@ public final class Game implements Initializable<Void>, Disposable {
      * @see GameUser#dispose()
      */
     void onRemoveGameUser(@NonNull GameUser gameUser) {
-        validate();
-
         gameUsers.remove(gameUser);
         gameUser.getTeam().teamUsers.remove(gameUser);
     }

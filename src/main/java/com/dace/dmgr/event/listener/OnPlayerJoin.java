@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public final class OnPlayerJoin extends EventListener<PlayerJoinEvent> {
 
         event.setJoinMessage(StringFormUtil.ADD_PREFIX + player.getName());
 
-        User.fromPlayer(player).onJoin();
+        Validate.notNull(User.fromPlayer(player));
 
         new DelayTask(() -> {
             Bukkit.broadcastMessage(MessageFormat.format(BROADCAST_MESSAGE, StringFormUtil.ADD_PREFIX, Bukkit.getOnlinePlayers().size()));

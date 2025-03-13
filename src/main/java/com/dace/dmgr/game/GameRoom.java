@@ -97,7 +97,8 @@ public final class GameRoom implements Disposable {
      */
     @Override
     public void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         if (phase == Phase.FINISHED)
             return;
@@ -151,8 +152,6 @@ public final class GameRoom implements Disposable {
      * @param bossBarDisplay 추가할 보스바
      */
     public void addBossBar(@NonNull BossBarDisplay bossBarDisplay) {
-        validate();
-
         users.forEach(gameUser -> bossBarDisplay.show(gameUser.getPlayer()));
         bossBars.add(bossBarDisplay);
     }
@@ -163,8 +162,6 @@ public final class GameRoom implements Disposable {
      * @param bossBarDisplay 제거할 보스바
      */
     public void removeBossBar(@NonNull BossBarDisplay bossBarDisplay) {
-        validate();
-
         users.forEach(gameUser -> bossBarDisplay.hide(gameUser.getPlayer()));
         bossBars.remove(bossBarDisplay);
     }
@@ -202,8 +199,6 @@ public final class GameRoom implements Disposable {
      * @see User#joinGame(GameRoom)
      */
     public void onJoin(@NonNull User user) {
-        validate();
-
         users.add(user);
         users.forEach(target -> target.sendMessageInfo(StringFormUtil.ADD_PREFIX + user.getPlayer().getName()));
 
@@ -227,8 +222,6 @@ public final class GameRoom implements Disposable {
      * @see User#quitGame()
      */
     public void onQuit(@NonNull User user) {
-        validate();
-
         users.forEach(target -> target.sendMessageInfo(StringFormUtil.REMOVE_PREFIX + user.getPlayer().getName()));
         users.remove(user);
 

@@ -58,25 +58,21 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final void addActionTask(@NonNull Task task) {
-        validate();
         actionTaskManager.add(task);
     }
 
     @Override
     public final void addTask(@NonNull Task task) {
-        validate();
         taskManager.add(task);
     }
 
     @Override
     public final void addOnReset(@NonNull Runnable onReset) {
-        validate();
         onResets.add(onReset);
     }
 
     @Override
     public final void addOnDispose(@NonNull Runnable onDispose) {
-        validate();
         onDisposes.add(onDispose);
     }
 
@@ -154,15 +150,14 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final void reset() {
-        validate();
-
         setCooldown(defaultCooldown);
         onResets.forEach(Runnable::run);
     }
 
     @Override
     public final void dispose() {
-        validate();
+        if (isDisposed)
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         reset();
         onResets.clear();

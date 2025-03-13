@@ -143,7 +143,6 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @throws IllegalStateException 총알이 발사되지 않았으면 발생
      */
     protected final void move(@NonNull Location location) {
-        validate();
         validateIsShot();
         Validate.notNull(this.location);
 
@@ -162,9 +161,7 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @throws IllegalStateException 총알이 발사되지 않았으면 발생
      */
     protected final void move(@NonNull Vector velocity) {
-        validate();
         validateIsShot();
-
         Validate.notNull(this.location).add(velocity);
     }
 
@@ -198,7 +195,6 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @throws IllegalStateException 총알이 발사되지 않았으면 발생
      */
     protected final void setVelocity(@NonNull Vector velocity) {
-        validate();
         validateIsShot();
         Validate.notNull(this.velocity);
 
@@ -214,9 +210,7 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @throws IllegalStateException 총알이 발사되지 않았으면 발생
      */
     protected final void push(@NonNull Vector velocity) {
-        validate();
         validateIsShot();
-
         Validate.notNull(this.velocity).add(velocity);
     }
 
@@ -227,7 +221,9 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      */
     @Override
     public final void dispose() {
-        validate();
+        if (isDisposed)
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+
         validateIsShot();
 
         onDestroy(getLocation());
@@ -241,7 +237,6 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * @param direction 발사 방향
      */
     public final void shot(@NonNull Location start, @NonNull Vector direction) {
-        validate();
         if (isShot)
             return;
 
@@ -294,8 +289,6 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      * 총알을 다음 위치로 이동시키고 등록된 처리기들을 실행시킨다.
      */
     final void next() {
-        validate();
-
         if (!Validate.notNull(intervalHandler).onInterval(getLocation(), index++) || handleBlockCollision() || handleEntityCollision()) {
             dispose();
             return;

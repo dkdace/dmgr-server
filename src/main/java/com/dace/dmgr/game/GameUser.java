@@ -201,7 +201,8 @@ public final class GameUser implements Disposable {
      */
     @Override
     public void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         if (!game.getRemainingTime().isZero())
             user.getUserData().addQuitCount();
@@ -282,8 +283,6 @@ public final class GameUser implements Disposable {
      */
     public void addScore(double score) {
         Validate.isTrue(score >= 0, "score >= 0 (%f)", score);
-        validate();
-
         this.score += score;
     }
 
@@ -295,8 +294,6 @@ public final class GameUser implements Disposable {
      */
     public void addDamage(double damage) {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-        validate();
-
         this.damage += damage;
     }
 
@@ -308,8 +305,6 @@ public final class GameUser implements Disposable {
      */
     public void addDefend(double defend) {
         Validate.isTrue(defend >= 0, "defend >= 0 (%f)", defend);
-        validate();
-
         this.defend += defend;
     }
 
@@ -321,8 +316,6 @@ public final class GameUser implements Disposable {
      */
     public void addHeal(double heal) {
         Validate.isTrue(heal >= 0, "heal >= 0 (%f)", heal);
-        validate();
-
         this.heal += heal;
     }
 
@@ -333,8 +326,6 @@ public final class GameUser implements Disposable {
      * @see CombatUser#onKill(Damageable)
      */
     public void onKill(boolean isFinalHit) {
-        validate();
-
         CombatantType combatantType = Validate.notNull(CombatUser.fromUser(user)).getCombatantType();
 
         user.getUserData().getCombatantRecord(combatantType).addKill();
@@ -353,8 +344,6 @@ public final class GameUser implements Disposable {
      * @see CombatUser#onDeath(Attacker)
      */
     public void onDeath() {
-        validate();
-
         CombatantType combatantType = Validate.notNull(CombatUser.fromUser(user)).getCombatantType();
 
         user.getUserData().getCombatantRecord(combatantType).addDeath();

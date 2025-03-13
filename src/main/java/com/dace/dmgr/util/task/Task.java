@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
 public abstract class Task implements Disposable {
     /** 비활성화 여부 */
     @Getter
-    boolean isDisposed = false;
+    private boolean isDisposed = false;
     /** 스케쥴러 객체 */
     private BukkitTask bukkitTask;
 
@@ -19,7 +19,6 @@ public abstract class Task implements Disposable {
      * 태스크 스케쥴러를 실행한다.
      */
     final void run() {
-        validate();
         bukkitTask = getBukkitTask();
     }
 

@@ -10,7 +10,6 @@ import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
 import com.dace.dmgr.event.listener.OnPlayerCommandPreprocess;
-import com.dace.dmgr.event.listener.OnPlayerJoin;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
@@ -181,6 +180,8 @@ public final class User implements Disposable {
         this.gui = new GUI(player.getInventory());
 
         USER_MAP.put(player, this);
+
+        init();
     }
 
     /**
@@ -212,8 +213,9 @@ public final class User implements Disposable {
     /**
      * 유저 초기화 작업을 수행한다.
      */
-    public void init() {
-        validate();
+    private void init() {
+        reset();
+        taskManager.add(new DelayTask(this::clearChat, 10));
 
         if (userData.isInitialized())
             onInit();
@@ -254,7 +256,8 @@ public final class User implements Disposable {
      * <p>플레이어 퇴장 시 호출해야 한다.</p>
      */
     public void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         reset();
 
@@ -537,18 +540,6 @@ public final class User implements Disposable {
     }
 
     /**
-     * 서버에 접속했을 때 실행할 작업.
-     *
-     * @see OnPlayerJoin
-     */
-    public void onJoin() {
-        init();
-        reset();
-
-        taskManager.add(new DelayTask(this::clearChat, 10));
-    }
-
-    /**
      * 채팅을 입력했을 때 실행할 작업.
      *
      * @param message 입력 메시지
@@ -666,8 +657,6 @@ public final class User implements Disposable {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정하고 스폰으로 이동시킨다.
      */
     public void reset() {
-        validate();
-
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.setExp(0);
@@ -967,8 +956,6 @@ public final class User implements Disposable {
      * @param location 이동할 위치
      */
     public void teleport(@NonNull Location location) {
-        validate();
-
         if (nameTagHider == null)
             player.teleport(location);
         else {
@@ -985,8 +972,6 @@ public final class User implements Disposable {
      * @param gameRoom 대상 게임 방
      */
     public void joinGame(@NonNull GameRoom gameRoom) {
-        validate();
-
         if (this.gameRoom != null || !gameRoom.canJoin())
             return;
 
@@ -998,8 +983,6 @@ public final class User implements Disposable {
      * 플레이어를 현재 입장한 게임 방에서 퇴장시킨다.
      */
     public void quitGame() {
-        validate();
-
         if (gameRoom == null)
             return;
 
@@ -1011,8 +994,6 @@ public final class User implements Disposable {
      * 플레이어를 자유 전투에 입장시킨다.
      */
     public void startFreeCombat() {
-        validate();
-
         if (isInFreeCombat || GameUser.fromUser(this) != null)
             return;
 
@@ -1024,8 +1005,6 @@ public final class User implements Disposable {
      * 플레이어를 자유 전투에서 퇴장시킨다.
      */
     public void quitFreeCombat() {
-        validate();
-
         if (!isInFreeCombat)
             return;
 
@@ -1043,8 +1022,6 @@ public final class User implements Disposable {
      */
     @NonNull
     public AsyncTask<Void> applySkin(@NonNull String skinName) {
-        validate();
-
         return new AsyncTask<>((onFinish, onError) -> {
             try {
                 DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), skinName);
@@ -1061,8 +1038,6 @@ public final class User implements Disposable {
      */
     @NonNull
     public AsyncTask<Void> resetSkin() {
-        validate();
-
         return new AsyncTask<>((onFinish, onError) -> {
             try {
                 DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), player.getName());

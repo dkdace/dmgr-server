@@ -91,7 +91,8 @@ public final class TextHologram implements Disposable {
      * @param content 내용
      */
     public void setContent(@NonNull String content) {
-        validate();
+        if (isDisposed())
+            return;
 
         if (hologram.getLines().size() == 0)
             hologram.getLines().appendText(content);
@@ -116,7 +117,8 @@ public final class TextHologram implements Disposable {
      */
     @Override
     public void dispose() {
-        validate();
+        if (isDisposed())
+            throw new IllegalStateException("인스턴스가 이미 폐기됨");
 
         hologram.delete();
         onTickTask.dispose();
