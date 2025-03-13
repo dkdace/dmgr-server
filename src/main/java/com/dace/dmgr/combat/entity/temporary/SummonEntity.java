@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.entity.temporary;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -24,8 +25,6 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
     @NonNull
     @Getter
     protected final CombatUser owner;
-    /** 아군에게 이름표 표시 여부 */
-    private final boolean hasNameTag;
     /** 이름표 홀로그램 */
     @Nullable
     private TextHologram nameTagHologram;
@@ -45,9 +44,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
     protected SummonEntity(@NonNull Class<T> entityClass, @NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner,
                            boolean hasNameTag, boolean isHidden, @NonNull Hitbox @NonNull ... hitboxes) {
         super(entityClass, spawnLocation, name, owner.getGame(), hitboxes);
-
         this.owner = owner;
-        this.hasNameTag = hasNameTag;
 
         if (hasNameTag) {
             addTask(new DelayTask(() ->
@@ -85,9 +82,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).forEach(target -> {
-            if (target instanceof CombatUser)
-                packet.sendPacket(target.getEntity());
-        });
+        CombatUtil.getCombatEntities(game, CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
+                packet.sendPacket(target.getEntity()));
     }
 }

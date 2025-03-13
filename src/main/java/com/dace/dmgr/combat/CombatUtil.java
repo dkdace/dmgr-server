@@ -120,6 +120,28 @@ public final class CombatUtil {
     }
 
     /**
+     * 특정 조건을 만족하는 모든 엔티티를 반환한다.
+     *
+     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
+     * @param entityCondition 엔티티 탐색 조건
+     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
+     * @return 범위 내 모든 엔티티
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    @NonNull
+    @UnmodifiableView
+    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@Nullable Game game, @NonNull EntityCondition<T> entityCondition) {
+        return Collections.unmodifiableSet(
+                (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+                        .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
+                                ? entityCondition.targetClass.cast(combatEntity)
+                                : null)
+                        .filter(combatEntity -> combatEntity != null
+                                && entityCondition.targetCondition.test(combatEntity))
+                        .collect(Collectors.toSet()));
+    }
+
+    /**
      * 지정한 플레이어에게 화면 반동 효과를 전송한다.
      *
      * <p>주로 총기 반동에 사용된다.</p>

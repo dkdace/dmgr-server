@@ -7,9 +7,8 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.combat.entity.Damageable;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -40,20 +39,18 @@ public abstract class Controller extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        if (i % 5 == 0) {
-            combatUser.getEntity().getWorld().getPlayers().stream()
-                    .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
-                    .filter(target -> target != null && target != combatUser && !target.isEnemy(combatUser) && target.getDamageModule().isLowHealth())
+        if (i % 5 == 0)
+            CombatUtil.getCombatEntities(combatUser.getGame(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                            .and(combatEntity -> combatEntity instanceof CombatUser && combatEntity.getDamageModule().isLowHealth()))
                     .forEach(target -> {
-                        CombatEntity targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getLocation(),
+                        Damageable targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getLocation(),
                                 RoleTrait1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(CombatUser.class::isInstance));
 
                         if (targetCombatEntity != null)
                             combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(10));
                     });
-        }
 
-        if (combatUser.getLastDamageTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.ACTIVATE_DURATION)).isBefore(Timestamp.now()))
+        if (combatUser.getLastDamageTimestamp().plus(RoleTrait2Info.ACTIVATE_DURATION).isBefore(Timestamp.now()))
             combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
     }
 
@@ -63,8 +60,11 @@ public abstract class Controller extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
-        /** 감지 범위 */
+        /** 감지 범위 (단위: 블록) */
         private static final int DETECT_RADIUS = 10;
 
         private static final RoleTrait1Info instance = new RoleTrait1Info();
@@ -74,17 +74,18 @@ public abstract class Controller extends Combatant {
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("치명상인 아군 근처의 적을 탐지합니다.")
                             .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         /** 초당 치유량 */
         private static final int HEAL_PER_SECOND = 40;
-        /** 활성화 시간 (tick) */
-        private static final long ACTIVATE_DURATION = 4 * 20L;
+        /** 활성화 시간 */
+        private static final Timespan ACTIVATE_DURATION = Timespan.ofSeconds(4);
 
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
@@ -92,11 +93,9 @@ public abstract class Controller extends Combatant {
             super("역할: 제어 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("일정 시간동안 피해를 받지 않으면 <:HEAL:회복>합니다.")
-                            .addValueInfo(TextIcon.DURATION, Format.TIME, ACTIVATE_DURATION / 20.0)
+                            .addValueInfo(TextIcon.DURATION, Format.TIME, ACTIVATE_DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 }

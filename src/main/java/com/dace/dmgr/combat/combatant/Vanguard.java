@@ -58,6 +58,9 @@ public abstract class Vanguard extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 상태 효과 저항 */
         private static final int STATUS_EFFECT_RESISTANCE = 15;
@@ -72,12 +75,13 @@ public abstract class Vanguard extends Combatant {
                             .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간과 <:KNOCKBACK:밀쳐내기> 효과가 감소합니다.")
                             .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
                             .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
@@ -85,9 +89,7 @@ public abstract class Vanguard extends Combatant {
             super("역할: 돌격 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("적을 처치하면 모든 <:NEGATIVE_EFFECT:해로운 효과>를 제거합니다.")
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 }

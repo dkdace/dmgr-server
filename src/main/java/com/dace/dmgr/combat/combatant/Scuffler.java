@@ -37,12 +37,13 @@ public abstract class Scuffler extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (victim instanceof CombatUser) {
-            if (isFinalHit)
-                attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
+        if (!(victim instanceof CombatUser))
+            return;
 
-            attacker.getStatusEffectModule().apply(RoleTrait2Speed.instance, attacker, Timespan.ofTicks(RoleTrait2Info.DURATION));
-        }
+        if (isFinalHit)
+            attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
+
+        attacker.getStatusEffectModule().apply(RoleTrait2Speed.instance, attacker, RoleTrait2Info.DURATION);
     }
 
     @Override
@@ -51,6 +52,9 @@ public abstract class Scuffler extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 궁극기 충전량 */
         private static final int ULTIMATE_CHARGE = 500;
@@ -62,17 +66,18 @@ public abstract class Scuffler extends Combatant {
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("마지막 공격으로 적을 처치하면 <7:ULTIMATE:궁극기 충전량>을 추가로 얻습니다.")
                             .addValueInfo(TextIcon.ULTIMATE, ULTIMATE_CHARGE)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         /** 이동속도 증가량 */
         private static final int SPEED = 25;
-        /** 지속시간 (tick) */
-        private static final long DURATION = (long) (2.5 * 20);
+        /** 지속시간 */
+        private static final Timespan DURATION = Timespan.ofSeconds(2.5);
 
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
@@ -80,11 +85,9 @@ public abstract class Scuffler extends Combatant {
             super("역할: 근접 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("적을 처치하면 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
-                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 

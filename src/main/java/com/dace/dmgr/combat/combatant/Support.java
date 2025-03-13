@@ -2,15 +2,13 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -44,30 +42,19 @@ public abstract class Support extends Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
-            boolean activate = combatUser.getEntity().getWorld().getPlayers().stream()
-                    .map(target -> CombatUser.fromUser(User.fromPlayer(target)))
-                    .anyMatch(target -> target != null && !target.isEnemy(combatUser)
-                            && target.getDamageModule().isHalfHealth()
-                            && target.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS);
+            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getGame(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    .and(combatEntity -> combatEntity instanceof CombatUser
+                            && combatEntity.getDamageModule().isHalfHealth()
+                            && combatEntity.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS)).isEmpty();
 
-            if (activate)
+            if (isActive)
                 combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
             else
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }
-    }
 
-    @Override
-    @MustBeInvokedByOverriders
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        if (provider != target && provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isBefore(Timestamp.now())) {
-            provider.addTask(new IntervalTask(i -> {
-                provider.getDamageModule().heal(provider, RoleTrait2Info.HEAL_PER_SECOND * 2 / 20.0, false);
-                return provider.getLastGiveHealTimestamp().plus(Timespan.ofTicks(RoleTrait2Info.DURATION)).isAfter(Timestamp.now());
-            }, 2));
-        }
-
-        return true;
+        if (combatUser.getLastGiveHealTimestamp().plus(RoleTrait2Info.DURATION).isAfter(Timestamp.now()))
+            combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
     }
 
     @Override
@@ -76,10 +63,13 @@ public abstract class Support extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 이동속도 증가량 */
         private static final int SPEED = 20;
-        /** 감지 범위 */
+        /** 감지 범위 (단위: 블록) */
         private static final int DETECT_RADIUS = 20;
 
         private static final RoleTrait1Info instance = new RoleTrait1Info();
@@ -90,17 +80,18 @@ public abstract class Support extends Combatant {
                             .builder("체력이 절반 이하인 아군이 범위 밖에 있을 때 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                             .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         /** 초당 치유량 */
         private static final int HEAL_PER_SECOND = 50;
-        /** 지속시간 (tick) */
-        private static final long DURATION = 3 * 20L;
+        /** 지속시간 */
+        private static final Timespan DURATION = Timespan.ofSeconds(3);
 
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
@@ -108,11 +99,9 @@ public abstract class Support extends Combatant {
             super("역할: 지원 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("아군을 치유하면 일정 시간동안 <:HEAL:회복>합니다.")
-                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 }

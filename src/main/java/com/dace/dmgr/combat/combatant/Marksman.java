@@ -58,6 +58,9 @@ public abstract class Marksman extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 궁극기 충전량 */
         private static final int ULTIMATE_CHARGE = 500;
@@ -69,12 +72,13 @@ public abstract class Marksman extends Combatant {
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("마지막 공격으로 적을 처치하면 <7:ULTIMATE:궁극기 충전량>을 추가로 얻습니다.")
                             .addValueInfo(TextIcon.ULTIMATE, ULTIMATE_CHARGE)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         /** 이동속도 증가량 */
         private static final int SPEED = 10;
@@ -86,9 +90,7 @@ public abstract class Marksman extends Combatant {
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("치명상일 때 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 }

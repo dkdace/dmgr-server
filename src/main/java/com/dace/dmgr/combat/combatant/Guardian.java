@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -51,8 +52,8 @@ public abstract class Guardian extends Combatant {
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
         combatUser.addTask(new IntervalTask((LongConsumer) i ->
-                combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION, false),
-                1, RoleTrait2Info.DURATION));
+                combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION.toTicks(), false),
+                1, RoleTrait2Info.DURATION.toTicks()));
     }
 
     @Override
@@ -61,6 +62,9 @@ public abstract class Guardian extends Combatant {
         return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
     }
 
+    /**
+     * 특성 1번 클래스.
+     */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
         private static final int KNOCKBACK_RESISTANCE = 30;
@@ -75,17 +79,18 @@ public abstract class Guardian extends Combatant {
                             .builder("받는 <:KNOCKBACK:밀쳐내기> 효과가 감소하며, 기본 <:DEFENSE_INCREASE:방어력>을 보유합니다.")
                             .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
                             .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 
+    /**
+     * 특성 2번 클래스.
+     */
     private static final class RoleTrait2Info extends TraitInfo {
         /** 치유량 */
         private static final int HEAL = 300;
-        /** 지속시간 (tick) */
-        private static final long DURATION = 2 * 20L;
+        /** 지속시간 */
+        private static final Timespan DURATION = Timespan.ofSeconds(2);
 
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
@@ -93,11 +98,9 @@ public abstract class Guardian extends Combatant {
             super("역할: 수호 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("힐 팩을 사용하면 일정 시간동안 추가로 <:HEAL:회복>합니다.")
-                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION / 20.0)
+                            .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, HEAL)
-                            .build()
-                    )
-            );
+                            .build()));
         }
     }
 }
