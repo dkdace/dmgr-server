@@ -4,22 +4,21 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
  * 밀리초 단위의 기간을 나타내는 클래스.
  *
- * <p>틱 단위와의 호환을 위해 사용한다.</p>
+ * <p>음수 값을 가질 수 없으며, 틱 단위와의 호환을 위해 사용한다.</p>
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 public final class Timespan implements Comparable<Timespan> {
     /** 0의 값을 가진 기간 */
-    public static final Timespan ZERO = Timespan.ofMilliseconds(0);
-    /** 사용 가능한 최솟값의 기간 */
-    public static final Timespan MIN = Timespan.ofMilliseconds(Long.MIN_VALUE);
+    public static final Timespan ZERO = new Timespan(0);
     /** 사용 가능한 최댓값의 기간 */
-    public static final Timespan MAX = Timespan.ofMilliseconds(Long.MAX_VALUE);
+    public static final Timespan MAX = new Timespan(Long.MAX_VALUE);
 
     /** 밀리초 : 틱 */
     private static final int MILLISECONDS_TO_TICKS = 50;
@@ -38,67 +37,80 @@ public final class Timespan implements Comparable<Timespan> {
     /**
      * 기간을 반환한다.
      *
-     * @param milliseconds 시간 (밀리초)
+     * @param milliseconds 시간 (밀리초). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofMilliseconds(long milliseconds) {
+        Validate.isTrue(milliseconds >= 0, "milliseconds >= 0 (%d)", milliseconds);
+
+        if (milliseconds == 0)
+            return ZERO;
+        if (milliseconds == Long.MAX_VALUE)
+            return MAX;
+
         return new Timespan(milliseconds);
     }
 
     /**
      * 기간을 반환한다.
      *
-     * @param ticks 시간 (틱)
+     * @param ticks 시간 (틱). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofTicks(long ticks) {
-        return new Timespan(ticks * MILLISECONDS_TO_TICKS);
+        return ofMilliseconds(ticks * MILLISECONDS_TO_TICKS);
     }
 
     /**
      * 기간을 반환한다.
      *
-     * @param seconds 시간 (초)
+     * @param seconds 시간 (초). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofSeconds(double seconds) {
-        return new Timespan((long) (seconds * TICKS_TO_SECONDS));
+        return ofMilliseconds((long) (seconds * TICKS_TO_SECONDS));
     }
 
     /**
      * 기간을 반환한다.
      *
-     * @param minutes 시간 (분)
+     * @param minutes 시간 (분). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofMinutes(double minutes) {
-        return new Timespan((long) (minutes * SECONDS_TO_MINUTES));
+        return ofMilliseconds((long) (minutes * SECONDS_TO_MINUTES));
     }
 
     /**
      * 기간을 반환한다.
      *
-     * @param hours 시간 (시간)
+     * @param hours 시간 (시간). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofHours(double hours) {
-        return new Timespan((long) (hours * MINUTES_TO_HOURS));
+        return ofMilliseconds((long) (hours * MINUTES_TO_HOURS));
     }
 
     /**
      * 기간을 반환한다.
      *
-     * @param days 시간 (일)
+     * @param days 시간 (일). 0 이상의 값
      * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofDays(double days) {
-        return new Timespan((long) (days * HOURS_TO_DAYS));
+        return ofMilliseconds((long) (days * HOURS_TO_DAYS));
     }
 
     /**
@@ -119,15 +131,14 @@ public final class Timespan implements Comparable<Timespan> {
      *
      * @param timespan 추가할 기간
      * @return 새로운 {@link Timespan}
+     * @see Timespan#minus(Timespan)
      */
     @NonNull
     public Timespan plus(@NonNull Timespan timespan) {
         if (this.equals(MAX) || timespan.equals(MAX))
             return MAX;
-        if (this.equals(MIN) || timespan.equals(MIN))
-            return MIN;
 
-        return new Timespan(milliseconds + timespan.milliseconds);
+        return ofMilliseconds(milliseconds + timespan.milliseconds);
     }
 
     /**
@@ -139,26 +150,43 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public Timespan minus(@NonNull Timespan timespan) {
-        return plus(timespan.negated());
+        if (this.equals(MAX) || timespan.equals(MAX))
+            return MAX;
+
+        return ofMilliseconds(milliseconds - timespan.milliseconds);
     }
 
     /**
-     * 기간을 음수 값으로 바꿔 반환한다.
+     * 현재 기간에 지정한 값만큼 곱하여 반환한다.
      *
+     * @param value 곱할 값
      * @return 새로운 {@link Timespan}
+     * @see Timespan#divide(double)
      */
     @NonNull
-    public Timespan negated() {
-        return new Timespan(milliseconds * -1);
+    public Timespan multiply(double value) {
+        return this.equals(MAX) ? MAX : ofMilliseconds((long) (milliseconds * value));
     }
 
     /**
-     * 기간이 음수 값인지 확인한다.
+     * 현재 기간에서 지정한 값을 나누어 반환한다.
      *
-     * @return 음수 값 여부
+     * @param value 나눌 값
+     * @return 새로운 {@link Timespan}
+     * @see Timespan#multiply(double)
      */
-    public boolean isNegative() {
-        return milliseconds < 0;
+    @NonNull
+    public Timespan divide(double value) {
+        return this.equals(MAX) ? MAX : ofMilliseconds((long) (milliseconds / value));
+    }
+
+    /**
+     * 값이 0인지 확인한다.
+     *
+     * @return {@link Timespan#ZERO}와 같으면 {@code true} 반환
+     */
+    public boolean isZero() {
+        return equals(ZERO);
     }
 
     /**

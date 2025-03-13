@@ -44,22 +44,10 @@ public final class Timestamp implements Comparable<Timestamp> {
     public Timestamp plus(@NonNull Timespan timespan) {
         if (this.equals(MAX) || timespan.equals(Timespan.MAX))
             return MAX;
-        if (this.equals(MIN) || timespan.equals(Timespan.MIN))
+        if (this.equals(MIN))
             return MIN;
 
         return new Timestamp(timestampMillis + timespan.toMilliseconds());
-    }
-
-    /**
-     * 지정한 기간 이전의 타임스탬프를 반환한다.
-     *
-     * @param timespan 차감할 기간
-     * @return 새로운 {@link Timestamp}
-     * @see Timestamp#plus(Timespan)
-     */
-    @NonNull
-    public Timestamp minus(@NonNull Timespan timespan) {
-        return plus(timespan.negated());
     }
 
     /**
@@ -86,11 +74,13 @@ public final class Timestamp implements Comparable<Timestamp> {
      * 타임스탬프의 시점에서 지정한 타임스탬프의 시점까지의 시간을 반환한다.
      *
      * @param timestamp 타임스탬프
-     * @return 지정한 타임스탬프까지의 시간
+     * @return 지정한 타임스탬프까지의 시간. {@code timestamp}가 현재 시점 이전이면 {@link Timespan#ZERO} 반환
      */
     @NonNull
     public Timespan until(@NonNull Timestamp timestamp) {
-        return Timespan.ofMilliseconds(timestamp.timestampMillis - timestampMillis);
+        return timestampMillis > timestamp.timestampMillis
+                ? Timespan.ZERO
+                : Timespan.ofMilliseconds(timestamp.timestampMillis - timestampMillis);
     }
 
     /**

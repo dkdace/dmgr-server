@@ -158,7 +158,8 @@ public abstract class FunctionalBlock {
             Location hologramLoc = location.clone().add(0.5, 1.7, 0.5);
             TextHologram hologram = new TextHologram(hologramLoc, player -> LocationUtil.canPass(player.getEyeLocation(), hologramLoc));
 
-            long durationTicks = cooldown.toTicks() / 5;
+            long durationTicks = cooldown.divide(5).toTicks();
+
             new IntervalTask(i -> {
                 hologram.setContent(MessageFormat.format("§f§l[ §6{0} {1} §f§l]",
                         TextIcon.COOLDOWN,

@@ -73,7 +73,7 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
             runDuration();
         } else {
             durationTimestamp = Timestamp.now().plus(duration);
-            if (duration.toMilliseconds() <= 0)
+            if (duration.isZero())
                 onDurationFinished();
         }
     }

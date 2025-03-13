@@ -85,8 +85,8 @@ public final class StatusEffectModule {
             return;
 
         if (!statusEffect.isPositive())
-            duration = Timespan.ofMilliseconds((long) (duration.toMilliseconds() * Math.max(0, 2 - resistanceStatus.getValue())));
-        if (duration.toMilliseconds() <= 0)
+            duration = duration.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
+        if (duration.isZero())
             return;
 
         Timestamp expiration = Timestamp.now().plus(duration);

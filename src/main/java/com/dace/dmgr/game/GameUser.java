@@ -203,7 +203,7 @@ public final class GameUser implements Disposable {
     public void dispose() {
         validate();
 
-        if (game.getRemainingTime().toMilliseconds() > 0)
+        if (!game.getRemainingTime().isZero())
             user.getUserData().addQuitCount();
 
         onTickTask.dispose();

@@ -105,14 +105,14 @@ public final class MagrittaUlt extends UltimateSkill {
         }, () -> {
             onCancelled();
             onEnd();
-        }, MagrittaUltInfo.ATTACK_COOLDOWN.toTicks(), MagrittaUltInfo.DURATION.toTicks() / 2));
+        }, MagrittaUltInfo.ATTACK_COOLDOWN.toTicks(), MagrittaUltInfo.DURATION.divide(2).toTicks()));
     }
 
     /**
      * 사용 종료 시 실행할 작업.
      */
     private void onEnd() {
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(combatUser.getWeapon().getDefaultCooldown().toTicks() * 2));
+        combatUser.getWeapon().setCooldown(combatUser.getWeapon().getDefaultCooldown().multiply(2));
         combatUser.getWeapon().setVisible(false);
 
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.5);
@@ -126,7 +126,7 @@ public final class MagrittaUlt extends UltimateSkill {
             combatUser.getWeapon().setVisible(true);
 
             MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
-        }, MagrittaWeaponInfo.COOLDOWN.toTicks() * 2));
+        }, MagrittaWeaponInfo.COOLDOWN.multiply(2).toTicks()));
     }
 
     private final class MagrittaUltHitscan extends Hitscan<Damageable> {

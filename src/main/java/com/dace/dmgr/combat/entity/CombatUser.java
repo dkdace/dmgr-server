@@ -750,7 +750,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser == null)
             duration = Timespan.ofSeconds(1);
         else if (hasCore(Core.RESURRECTION))
-            duration = Timespan.ofMilliseconds((long) (duration.toMilliseconds() * (100 - Core.RESURRECTION.getValue()) / 100.0));
+            duration = duration.multiply((100 - Core.RESURRECTION.getValue()) / 100.0);
 
         long durationTicks = duration.toTicks();
 
