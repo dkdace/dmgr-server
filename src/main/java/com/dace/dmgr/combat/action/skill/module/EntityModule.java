@@ -44,17 +44,17 @@ public final class EntityModule<T extends SummonEntity<?>> {
     public void set(@NonNull T summonEntity) {
         this.summonEntity = summonEntity;
 
-        summonEntity.addOnDispose(() -> {
+        summonEntity.addOnRemove(() -> {
             if (this.summonEntity != null)
                 this.summonEntity = null;
         });
     }
 
     /**
-     * 소환한 엔티티가 지정되어 있으면 {@link SummonEntity#dispose()}를 실행한다.
+     * 소환한 엔티티가 지정되어 있으면 {@link SummonEntity#remove()}를 실행한다.
      */
     public void disposeEntity() {
         if (summonEntity != null)
-            summonEntity.dispose();
+            summonEntity.remove();
     }
 }

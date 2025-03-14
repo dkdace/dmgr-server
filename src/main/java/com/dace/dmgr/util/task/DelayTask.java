@@ -42,7 +42,7 @@ public final class DelayTask extends Task {
             @Override
             public void run() {
                 onFinish.run();
-                dispose();
+                stop();
             }
         }.runTaskLater(DMGR.getPlugin(), delay);
     }

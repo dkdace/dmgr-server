@@ -184,7 +184,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
             addTask(new IntervalTask(i -> {
-                if (!target.canBeTargeted() || target.isDisposed())
+                if (!target.canBeTargeted() || target.isRemoved())
                     return false;
 
                 if (i < 3 && target instanceof Movable)

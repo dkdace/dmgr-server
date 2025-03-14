@@ -64,8 +64,8 @@ public abstract class ConfirmModule {
 
         isChecking = false;
 
-        if (onTickTask != null && !onTickTask.isDisposed())
-            onTickTask.dispose();
+        if (onTickTask != null)
+            onTickTask.stop();
 
         onCheckDisable();
         skill.onCheckDisable();

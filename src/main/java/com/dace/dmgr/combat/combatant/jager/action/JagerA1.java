@@ -240,7 +240,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
                     damageModule.setHealth(getStateValue());
 
                     CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
-                    if (targetCombatEntity == null || targetCombatEntity.isDisposed()
+                    if (targetCombatEntity == null || targetCombatEntity.isRemoved()
                             || (targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()))
                         entity.setTarget(null);
                 }
@@ -290,7 +290,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
-            dispose();
+            remove();
 
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);

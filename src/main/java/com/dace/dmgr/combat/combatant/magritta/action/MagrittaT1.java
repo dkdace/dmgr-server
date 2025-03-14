@@ -78,7 +78,7 @@ public final class MagrittaT1 {
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             setValue(0);
             if (shreddingHologram != null) {
-                shreddingHologram.dispose();
+                shreddingHologram.remove();
                 shreddingHologram = null;
             }
         }

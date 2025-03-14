@@ -85,7 +85,7 @@ public final class SwapModule<T extends Weapon> {
     public void cancel() {
         isSwapping = false;
 
-        if (swapTask != null && !swapTask.isDisposed())
-            swapTask.dispose();
+        if (swapTask != null)
+            swapTask.stop();
     }
 }

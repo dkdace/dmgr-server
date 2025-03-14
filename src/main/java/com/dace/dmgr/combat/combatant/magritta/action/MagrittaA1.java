@@ -136,7 +136,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 if (target == null) {
                     MagrittaA1Info.PARTICLE.TICK.play(loc);
                 } else {
-                    if ((target instanceof CombatUser && ((CombatUser) target).isDead()) || target.isDisposed())
+                    if ((target instanceof CombatUser && ((CombatUser) target).isDead()) || target.isRemoved())
                         return false;
 
                     loc = target.getCenterLocation();

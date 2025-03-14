@@ -37,7 +37,7 @@ public class GameTestCommand implements CommandExecutor {
             }
             case "삭제": {
                 GameRoom gameRoom = GameRoom.fromNumber(false, number);
-                gameRoom.dispose();
+                gameRoom.remove();
                 ConsoleLogger.info("일반 게임 제거됨 : [{0}]", number);
 
                 break;

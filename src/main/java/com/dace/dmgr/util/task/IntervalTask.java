@@ -171,7 +171,7 @@ public final class IntervalTask extends Task {
 
             private void end(boolean isCancelled) {
                 onFinish.accept(isCancelled);
-                dispose();
+                stop();
             }
         }.runTaskTimer(DMGR.getPlugin(), 0, period);
     }

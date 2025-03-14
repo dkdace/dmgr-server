@@ -1,6 +1,5 @@
 package com.dace.dmgr.util.task;
 
-import com.dace.dmgr.Disposable;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.scheduler.BukkitTask;
@@ -8,10 +7,10 @@ import org.bukkit.scheduler.BukkitTask;
 /**
  * 스케쥴러를 실행하는 태스크 클래스.
  */
-public abstract class Task implements Disposable {
-    /** 비활성화 여부 */
+public abstract class Task {
+    /** 종료 여부 */
     @Getter
-    private boolean isDisposed = false;
+    private boolean isStopped = false;
     /** 스케쥴러 객체 */
     private BukkitTask bukkitTask;
 
@@ -25,14 +24,13 @@ public abstract class Task implements Disposable {
     /**
      * 작동 중인 태스크를 강제로 종료한다.
      */
-    @Override
-    public final void dispose() {
-        if (isDisposed)
+    public final void stop() {
+        if (isStopped)
             return;
 
         if (bukkitTask != null)
             bukkitTask.cancel();
-        isDisposed = true;
+        isStopped = true;
     }
 
     /**

@@ -228,7 +228,7 @@ public final class VellionA2 extends ActiveSkill implements HasBonusScore {
          * @return 유지할 수 없으면 {@code true} 반환
          */
         private boolean isInvalid(@NonNull CombatUser combatUser, @NonNull CombatEntity target) {
-            return target.isDisposed() || blockResetTimestamp.isBefore(Timestamp.now())
+            return target.isRemoved() || blockResetTimestamp.isBefore(Timestamp.now())
                     || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > VellionA2Info.MAX_DISTANCE;
         }
 

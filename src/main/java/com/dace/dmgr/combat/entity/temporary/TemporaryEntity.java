@@ -46,7 +46,7 @@ public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEn
                 ((LivingEntity) entity).getEquipment().clear();
         }), name, game, hitboxes);
 
-        addOnDispose(entity::remove);
+        addOnRemove(entity::remove);
     }
 
     /**

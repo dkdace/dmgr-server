@@ -1,6 +1,5 @@
 package com.dace.dmgr.game;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.user.User;
@@ -24,7 +23,7 @@ import java.util.*;
  *
  * @see Game
  */
-public final class GameRoom implements Disposable {
+public final class GameRoom {
     /** 게임 방 목록 ((랭크 여부 : 방 번호) : 게임 방) */
     private static final HashMap<Pair<Boolean, Integer>, GameRoom> GAME_ROOM_MAP = new HashMap<>();
 
@@ -67,7 +66,7 @@ public final class GameRoom implements Disposable {
      */
     public GameRoom(boolean isRanked, int number) {
         Pair<Boolean, Integer> checkPair = Pair.of(isRanked, number);
-        Validate.validState(GAME_ROOM_MAP.get(checkPair) == null, "GameRoom이 이미 존재함");
+        Validate.validState(!GAME_ROOM_MAP.containsKey(checkPair), "GameRoom이 이미 존재함");
 
         this.pair = checkPair;
         this.minPlayerCount = isRanked ? GeneralConfig.getGameConfig().getRankMinPlayerCount() : GeneralConfig.getGameConfig().getNormalMinPlayerCount();
@@ -90,35 +89,6 @@ public final class GameRoom implements Disposable {
     @Nullable
     public static GameRoom fromNumber(boolean isRanked, int number) {
         return GAME_ROOM_MAP.get(Pair.of(isRanked, number));
-    }
-
-    /**
-     * 게임 제거 작업을 수행한다.
-     */
-    @Override
-    public void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
-        if (phase == Phase.FINISHED)
-            return;
-
-        phase = Phase.FINISHED;
-
-        if (onSecondTask != null)
-            onSecondTask.dispose();
-        if (game.isInitialized() && !game.isDisposed())
-            game.dispose();
-
-        if (!users.isEmpty())
-            new ArrayList<>(users).forEach(User::quitGame);
-
-        GAME_ROOM_MAP.remove(pair);
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return GAME_ROOM_MAP.get(pair) == null;
     }
 
     /**
@@ -206,7 +176,7 @@ public final class GameRoom implements Disposable {
 
         onUserCountChange();
 
-        if (game.isInitialized() && !game.isDisposed()) {
+        if (game.isInitialized() && !game.isFinished()) {
             Game.Team team = game.getRedTeam().getTeamUsers().size() < game.getBlueTeam().getTeamUsers().size()
                     ? game.getRedTeam()
                     : game.getBlueTeam();
@@ -229,10 +199,10 @@ public final class GameRoom implements Disposable {
 
         onUserCountChange();
 
-        if (game.isInitialized() && !game.isDisposed())
-            Validate.notNull(GameUser.fromUser(user)).dispose();
+        if (game.isInitialized() && !game.isFinished())
+            Validate.notNull(GameUser.fromUser(user)).remove();
         if (users.isEmpty())
-            dispose();
+            remove();
     }
 
     /**
@@ -262,7 +232,7 @@ public final class GameRoom implements Disposable {
         onSecondWaiting(0);
 
         if (onSecondTask != null) {
-            onSecondTask.dispose();
+            onSecondTask.stop();
             onSecondTask = null;
         }
     }
@@ -282,6 +252,30 @@ public final class GameRoom implements Disposable {
 
         if (remainingSeconds > 0 && (remainingSeconds <= 5 || remainingSeconds == 10))
             users.forEach(user -> user.sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));
+    }
+
+    /**
+     * 게임 방을 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
+     */
+    public void remove() {
+        Validate.validState(GAME_ROOM_MAP.containsKey(pair), "GameRoom이 이미 제거됨");
+
+        if (phase == Phase.FINISHED)
+            return;
+
+        phase = Phase.FINISHED;
+
+        if (onSecondTask != null)
+            onSecondTask.stop();
+        if (game.isInitialized() && !game.isFinished())
+            game.remove();
+
+        if (!users.isEmpty())
+            new ArrayList<>(users).forEach(User::quitGame);
+
+        GAME_ROOM_MAP.remove(pair);
     }
 
     /**

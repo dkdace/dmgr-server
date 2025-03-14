@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
 import com.dace.dmgr.event.listener.OnPlayerCommandPreprocess;
+import com.dace.dmgr.event.listener.OnPlayerQuit;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
@@ -58,7 +59,7 @@ import java.util.function.LongConsumer;
  *
  * @see UserData
  */
-public final class User implements Disposable {
+public final class User {
     /** 유저 목록 (플레이어 : 유저 정보) */
     private static final HashMap<Player, User> USER_MAP = new HashMap<>();
 
@@ -248,46 +249,6 @@ public final class User implements Disposable {
         sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", Timespan.ZERO, Timespan.ofSeconds(5), Timespan.ofSeconds(3));
 
         taskManager.add(new IntervalTask((LongConsumer) i -> onSecond(), 20));
-    }
-
-    /**
-     * 유저 제거 작업을 수행한다.
-     *
-     * <p>플레이어 퇴장 시 호출해야 한다.</p>
-     */
-    public void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
-        reset();
-
-        if (gameRoom != null)
-            quitGame();
-
-        taskManager.dispose();
-        tabListManager.delete();
-        sidebarManager.delete();
-        glowingInfoMap.values().iterator().forEachRemaining(GlowingInfo::removeGlowing);
-
-        if (userData.isInitialized()) {
-            if (nameTagHider != null) {
-                nameTagHider.remove();
-                nameTagHider = null;
-            }
-            if (nameTagHologram != null) {
-                nameTagHologram.dispose();
-                nameTagHologram = null;
-            }
-
-            userData.save();
-        }
-
-        USER_MAP.remove(player);
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return !player.isOnline();
     }
 
     /**
@@ -601,6 +562,38 @@ public final class User implements Disposable {
     }
 
     /**
+     * 서버에서 퇴장했을 때 실행할 작업.
+     *
+     * @see OnPlayerQuit
+     */
+    public void onQuit() {
+        reset();
+
+        if (gameRoom != null)
+            quitGame();
+
+        taskManager.stop();
+        tabListManager.delete();
+        sidebarManager.delete();
+        glowingInfoMap.values().iterator().forEachRemaining(GlowingInfo::removeGlowing);
+
+        if (userData.isInitialized()) {
+            if (nameTagHider != null) {
+                nameTagHider.remove();
+                nameTagHider = null;
+            }
+            if (nameTagHologram != null) {
+                nameTagHologram.remove();
+                nameTagHologram = null;
+            }
+
+            userData.save();
+        }
+
+        USER_MAP.remove(player);
+    }
+
+    /**
      * 명령어를 입력했을 때 실행할 작업.
      *
      * @return 성공 여부. 입력이 유효하면 {@code true} 반환
@@ -680,7 +673,7 @@ public final class User implements Disposable {
 
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
-            combatUser.dispose();
+            combatUser.remove();
     }
 
     /**
@@ -1012,7 +1005,7 @@ public final class User implements Disposable {
 
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
-            combatUser.dispose();
+            combatUser.remove();
     }
 
     /**
@@ -1104,7 +1097,7 @@ public final class User implements Disposable {
             sendRemoveTeamPacket();
             sendGlowingPacket(false);
 
-            onTickTask.dispose();
+            onTickTask.stop();
         }
 
         /**

@@ -1,6 +1,5 @@
 package com.dace.dmgr.game;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
@@ -36,7 +35,7 @@ import java.util.function.Function;
 /**
  * 게임 시스템의 플레이어 정보를 관리하는 클래스.
  */
-public final class GameUser implements Disposable {
+public final class GameUser {
     /** 게임 유저 목록 (유저 정보 : 게임 유저 정보) */
     private static final HashMap<User, GameUser> GAME_USER_MAP = new HashMap<>();
 
@@ -99,7 +98,7 @@ public final class GameUser implements Disposable {
      * @throws IllegalStateException 해당 {@code user}가 지정한 {@code game}의 방에 입장하지 않았거나 GameUser가 이미 존재하면 발생
      */
     GameUser(@NonNull User user, @NonNull Game game, @NonNull Game.Team team) {
-        Validate.validState(GAME_USER_MAP.get(user) == null, "GameUser가 이미 존재함");
+        Validate.validState(!GAME_USER_MAP.containsKey(user), "GameUser가 이미 존재함");
         Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game, "user.getGameRoom().getGame() == game (false)");
 
         this.user = user;
@@ -198,26 +197,21 @@ public final class GameUser implements Disposable {
 
     /**
      * 게임 유저를 제거하고, 소속된 게임에서 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
      */
-    @Override
-    public void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+    void remove() {
+        Validate.validState(GAME_USER_MAP.containsKey(user), "GameUser가 이미 제거됨");
 
         if (!game.getRemainingTime().isZero())
             user.getUserData().addQuitCount();
 
-        onTickTask.dispose();
+        onTickTask.stop();
         game.onRemoveGameUser(this);
 
         user.reset();
 
         GAME_USER_MAP.remove(user);
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return GAME_USER_MAP.get(user) == null;
     }
 
     /**

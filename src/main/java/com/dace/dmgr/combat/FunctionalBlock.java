@@ -165,9 +165,9 @@ public abstract class FunctionalBlock {
                         TextIcon.COOLDOWN,
                         Math.ceil(Timespan.ofTicks((durationTicks - i) * 5).toSeconds())));
 
-                return game == null || !game.isDisposed();
+                return game == null || !game.isFinished();
             }, isCancelled -> {
-                hologram.dispose();
+                hologram.remove();
                 BLOCK_MAP.remove(location);
             }, 5, durationTicks);
         }

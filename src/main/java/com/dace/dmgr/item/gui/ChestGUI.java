@@ -1,6 +1,6 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.Disposable;
+import com.dace.dmgr.event.listener.OnInventoryClose;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  *
  * <p>플레이어가 GUI를 닫기 전까지 일시적으로 사용한다.</p>
  */
-public class ChestGUI extends GUI implements Disposable {
+public class ChestGUI extends GUI {
     /** 인벤토리별 GUI 목록 (인벤토리 : 상자 GUI) */
     private static final HashMap<Inventory, ChestGUI> GUI_MAP = new HashMap<>();
     /** 행 크기 */
@@ -55,19 +55,21 @@ public class ChestGUI extends GUI implements Disposable {
     }
 
     /**
-     * 현재 GUI를 제거한다.
+     * 플레이어가 GUI를 닫아 사용되지 않는 상태인지 확인한다.
+     *
+     * @return 닫힘 여부
      */
-    @Override
-    public final void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
-        GUI_MAP.remove(inventory);
+    public final boolean isClosed() {
+        return !GUI_MAP.containsKey(inventory);
     }
 
-    @Override
-    public final boolean isDisposed() {
-        return GUI_MAP.get(inventory) == null;
+    /**
+     * GUI를 닫았을 때 실행할 작업.
+     *
+     * @see OnInventoryClose
+     */
+    public final void onClose() {
+        GUI_MAP.remove(inventory);
     }
 
     /**

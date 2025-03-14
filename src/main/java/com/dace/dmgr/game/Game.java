@@ -39,7 +39,7 @@ import java.util.function.ToIntFunction;
 /**
  * 게임의 내부 진행 시스템을 관리하는 클래스.
  */
-public final class Game implements Initializable<Void>, Disposable {
+public final class Game implements Initializable<Void> {
     /** 타이머 효과음 */
     private static final SoundEffect TIMER_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1000).pitch(1).build());
@@ -73,9 +73,9 @@ public final class Game implements Initializable<Void>, Disposable {
     /** 초기화 여부 */
     @Getter
     private boolean isInitialized = false;
-    /** 비활성화 여부 */
+    /** 종료 여부 */
     @Getter
-    private boolean isDisposed = false;
+    private boolean isFinished = false;
 
     /** 게임 진행 시점 */
     private Timestamp playTimestamp = Timestamp.now();
@@ -116,7 +116,7 @@ public final class Game implements Initializable<Void>, Disposable {
         return duplicateWorld()
                 .onFinish(() -> {
                     if (!gameRoom.canStart()) {
-                        dispose();
+                        remove();
                         return;
                     }
 
@@ -129,32 +129,31 @@ public final class Game implements Initializable<Void>, Disposable {
                 })
                 .onError(ex -> {
                     gameRoom.getUsers().forEach(user -> user.sendMessageWarn("오류로 인해 월드를 불러올 수 없습니다. 관리자에게 문의하십시오."));
-                    dispose();
+                    remove();
                 });
     }
 
     /**
      * 게임 시스템을 종료하고 게임 방을 제거한다.
+     *
+     * @throws IllegalStateException 이미 종료되었으면 발생
      */
-    @Override
-    public void dispose() {
-        if (isDisposed)
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
+    void remove() {
+        Validate.validState(!isFinished, "Game이 이미 종료됨");
         if (isInitialized())
             validate();
 
         if (!gameUsers.isEmpty()) {
             new ResultManager(this);
-            new ArrayList<>(gameUsers).forEach(GameUser::dispose);
+            new ArrayList<>(gameUsers).forEach(GameUser::remove);
         }
 
         isPlaying = false;
-        isDisposed = true;
-        gameRoom.dispose();
+        isFinished = true;
+        gameRoom.remove();
 
         if (onSecondTask != null)
-            onSecondTask.dispose();
+            onSecondTask.stop();
         if (world != null)
             removeWorld();
     }
@@ -239,7 +238,7 @@ public final class Game implements Initializable<Void>, Disposable {
      */
     @NonNull
     public Timespan getRemainingTime() {
-        if (isDisposed)
+        if (isFinished)
             return Timespan.ZERO;
 
         if (isPlaying())
@@ -381,7 +380,7 @@ public final class Game implements Initializable<Void>, Disposable {
             onSecondPlaying((int) Math.ceil(getRemainingTime().toSeconds()));
 
             return Timestamp.now().isBefore(endTimestamp);
-        }, this::dispose, 20);
+        }, this::remove, 20);
     }
 
     /**
@@ -439,7 +438,7 @@ public final class Game implements Initializable<Void>, Disposable {
      * 게임 플레이어 제거 시 실행할 작업.
      *
      * @param gameUser 대상 플레이어
-     * @see GameUser#dispose()
+     * @see GameUser#remove()
      */
     void onRemoveGameUser(@NonNull GameUser gameUser) {
         gameUsers.remove(gameUser);

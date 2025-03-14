@@ -120,8 +120,8 @@ public final class ReloadModule {
     public void cancel() {
         isReloading = false;
 
-        if (reloadTask != null && !reloadTask.isDisposed())
-            reloadTask.dispose();
+        if (reloadTask != null)
+            reloadTask.stop();
     }
 
     /**

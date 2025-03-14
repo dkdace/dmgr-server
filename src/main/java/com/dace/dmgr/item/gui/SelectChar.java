@@ -35,7 +35,7 @@ public final class SelectChar extends ChestGUI {
         set(5, 0, SelectCharInfoItem.CONTROLLER.definedItem);
 
         new IntervalTask(i -> {
-            if (isDisposed())
+            if (isClosed())
                 return false;
 
             GameUser gameUser = GameUser.fromUser(User.fromPlayer(player));

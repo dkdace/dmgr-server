@@ -11,6 +11,7 @@ import com.dace.dmgr.util.task.Task;
 import com.dace.dmgr.util.task.TaskManager;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.ArrayList;
@@ -32,18 +33,17 @@ public abstract class AbstractAction implements Action {
     protected final Timespan defaultCooldown;
     /** 태스크 관리 인스턴스 */
     private final TaskManager taskManager = new TaskManager();
+    /** 동작 태스크 관리 인스턴스 */
+    private final TaskManager actionTaskManager = new TaskManager();
     /** 초기화 시 실행할 작업 목록 */
     private final ArrayList<Runnable> onResets = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
-    private final ArrayList<Runnable> onDisposes = new ArrayList<>();
+    private final ArrayList<Runnable> onRemoves = new ArrayList<>();
 
-    /** 동작 태스크 관리 인스턴스 */
-    private TaskManager actionTaskManager = new TaskManager();
     /** 쿨타임 타임스탬프 */
     private Timestamp cooldownTimestamp = Timestamp.now();
-    /** 비활성화 여부 */
-    @Getter
-    private boolean isDisposed = false;
+    /** 제거 여부 */
+    private boolean isRemoved = false;
 
     /**
      * 동작 인스턴스를 생성한다.
@@ -58,22 +58,26 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final void addActionTask(@NonNull Task task) {
-        actionTaskManager.add(task);
+        if (!isRemoved)
+            actionTaskManager.add(task);
     }
 
     @Override
     public final void addTask(@NonNull Task task) {
-        taskManager.add(task);
+        if (!isRemoved)
+            taskManager.add(task);
     }
 
     @Override
     public final void addOnReset(@NonNull Runnable onReset) {
-        onResets.add(onReset);
+        if (!isRemoved)
+            onResets.add(onReset);
     }
 
     @Override
-    public final void addOnDispose(@NonNull Runnable onDispose) {
-        onDisposes.add(onDispose);
+    public final void addOnRemove(@NonNull Runnable onRemove) {
+        if (!isRemoved)
+            onRemoves.add(onRemove);
     }
 
     @Override
@@ -144,8 +148,7 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public void onCancelled() {
-        actionTaskManager.dispose();
-        actionTaskManager = new TaskManager();
+        actionTaskManager.stop();
     }
 
     @Override
@@ -153,22 +156,26 @@ public abstract class AbstractAction implements Action {
         setCooldown(defaultCooldown);
 
         onResets.forEach(onReset -> {
-            if (!isDisposed)
-                onReset.run();
+            if (isRemoved) {
+                onResets.clear();
+                return;
+            }
+
+            onReset.run();
         });
     }
 
     @Override
-    public final void dispose() {
-        if (isDisposed)
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+    public final void remove() {
+        Validate.validState(!isRemoved, "Action이 이미 제거됨");
 
         reset();
-        onDisposes.forEach(Runnable::run);
+        onRemoves.forEach(Runnable::run);
+        onRemoves.clear();
 
-        actionTaskManager.dispose();
-        taskManager.dispose();
+        actionTaskManager.stop();
+        taskManager.stop();
 
-        isDisposed = true;
+        isRemoved = true;
     }
 }

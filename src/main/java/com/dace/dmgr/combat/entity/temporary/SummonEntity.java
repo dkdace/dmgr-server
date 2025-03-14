@@ -52,9 +52,9 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
                         CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(player));
                         return targetCombatUser == null || !owner.isEnemy(targetCombatUser);
                     }, 1, "§n" + name), 3));
-            addOnDispose(() -> {
+            addOnRemove(() -> {
                 if (nameTagHologram != null)
-                    nameTagHologram.dispose();
+                    nameTagHologram.remove();
             });
         }
         if (isHidden)

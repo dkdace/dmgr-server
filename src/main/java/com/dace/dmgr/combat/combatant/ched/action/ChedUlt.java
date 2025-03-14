@@ -284,7 +284,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             ChedUltInfo.PARTICLE.FIRE_FLOOR_TICK.play(loc);
 
             if (i >= ChedUltInfo.FIRE_FLOOR_DURATION.toTicks())
-                dispose();
+                remove();
         }
 
         private final class ChedUltFireFloorArea extends Area<Damageable> {

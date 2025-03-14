@@ -127,6 +127,6 @@ public final class Dummy extends TemporaryEntity<Zombie> implements Healable, Mo
 
     @Override
     public void onDeath(@Nullable Attacker attacker) {
-        dispose();
+        remove();
     }
 }

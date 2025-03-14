@@ -126,7 +126,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             NeaceWeapon.this.target = target;
             blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
 
-            addTask(new IntervalTask(i -> target.canBeTargeted() && !target.isDisposed()
+            addTask(new IntervalTask(i -> target.canBeTargeted() && !target.isRemoved()
                     && targetResetTimestamp.isAfter(Timestamp.now()) && blockResetTimestamp.isAfter(Timestamp.now())
                     && combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) <= NeaceWeaponInfo.HEAL.MAX_DISTANCE,
                     () -> NeaceWeapon.this.target = null, 1));

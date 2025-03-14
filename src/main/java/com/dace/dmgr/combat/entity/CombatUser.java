@@ -233,7 +233,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setCombatantType(combatantType);
 
         addOnTick(this::onTick);
-        addOnDispose(this::onDispose);
+        addOnRemove(this::onDispose);
     }
 
     /**
@@ -285,7 +285,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onDispose() {
         if (deathMentHologram != null)
-            deathMentHologram.dispose();
+            deathMentHologram.remove();
 
         if (DMGR.getPlugin().isEnabled())
             user.resetSkin();
@@ -649,7 +649,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         game.addBossBar(killBossBar);
 
         new DelayTask(() -> {
-            if (!game.isDisposed())
+            if (!game.isFinished())
                 game.removeBossBar(killBossBar);
         }, GeneralConfig.getCombatConfig().getKillLogDisplayDuration().toTicks());
     }
@@ -782,7 +782,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             skillMap.values().forEach(Skill::reset);
 
             if (deathMentHologram != null) {
-                deathMentHologram.dispose();
+                deathMentHologram.remove();
                 deathMentHologram = null;
             }
         }, 1, durationTicks));
@@ -1044,8 +1044,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         moveModule.getSpeedStatus().clearModifiers();
         clearCores();
 
-        weapon.dispose();
-        skillMap.values().forEach(Skill::dispose);
+        weapon.remove();
+        skillMap.values().forEach(Skill::remove);
         skillMap.clear();
         actionMap.clear();
     }
@@ -1393,7 +1393,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         @NonNull
         private WeakHashMap<CombatUser, DamageInfo> getDamageMap() {
-            damageMap.entrySet().removeIf(entry -> entry.getKey().isDisposed() || entry.getValue().isExpired());
+            damageMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
             return damageMap;
         }
 
@@ -1476,7 +1476,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         @NonNull
         private WeakHashMap<CombatUser, ScoreInfo> getScoreInfoMap() {
-            scoreInfoMap.entrySet().removeIf(entry -> entry.getKey().isDisposed() || entry.getValue().isExpired());
+            scoreInfoMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
             return scoreInfoMap;
         }
 

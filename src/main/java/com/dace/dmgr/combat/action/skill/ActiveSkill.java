@@ -50,7 +50,7 @@ public abstract class ActiveSkill extends AbstractSkill {
         this.slot = slot;
 
         addTask(new IntervalTask((LongConsumer) i -> onTick(), 1));
-        addOnDispose(() -> combatUser.getEntity().getInventory().clear(slot));
+        addOnRemove(() -> combatUser.getEntity().getInventory().clear(slot));
     }
 
     @Override

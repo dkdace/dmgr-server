@@ -1,12 +1,12 @@
 package com.dace.dmgr.effect;
 
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * 텍스트 홀로그램(가상 텍스트 디스플레이) 기능을 관리하는 클래스.
  */
-public final class TextHologram implements Disposable {
+public final class TextHologram {
     /** 틱 작업을 처리하는 태스크 */
     private final IntervalTask onTickTask;
     /** 홀로그램 인스턴스 */
@@ -91,7 +91,7 @@ public final class TextHologram implements Disposable {
      * @param content 내용
      */
     public void setContent(@NonNull String content) {
-        if (isDisposed())
+        if (hologram.isDeleted())
             return;
 
         if (hologram.getLines().size() == 0)
@@ -114,18 +114,13 @@ public final class TextHologram implements Disposable {
 
     /**
      * 홀로그램을 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
      */
-    @Override
-    public void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
+    public void remove() {
+        Validate.validState(!hologram.isDeleted(), "TextHologram이 이미 제거됨");
 
         hologram.delete();
-        onTickTask.dispose();
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return hologram.isDeleted();
+        onTickTask.stop();
     }
 }

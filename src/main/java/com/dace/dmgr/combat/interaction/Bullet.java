@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.util.LocationUtil;
@@ -25,7 +24,7 @@ import java.util.function.Consumer;
  * @see Hitscan
  * @see Projectile
  */
-public abstract class Bullet<T extends CombatEntity> implements Disposable {
+public abstract class Bullet<T extends CombatEntity> {
     /** 궤적 상 히트박스 판정점 간 거리 기본값. (단위: 블록) */
     protected static final double HITBOX_INTERVAL = 1 / 8.0;
 
@@ -70,9 +69,9 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
 
     /** 발사 여부 */
     private boolean isShot = false;
-    /** 비활성화 여부 */
-    @Getter
-    private boolean isDisposed = false;
+    /** 소멸 여부 */
+    @Getter(AccessLevel.PACKAGE)
+    private boolean isDestroyed = false;
 
     /**
      * 총알 인스턴스를 생성한다.</p>
@@ -217,17 +216,14 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
     /**
      * 총알을 소멸시키고 {@link Bullet#onDestroy(Location)}를 호출한다.
      *
-     * @throws IllegalStateException 총알이 발사되지 않았으면 발생
+     * @throws IllegalStateException 총알이 발사되지 않았거나 이미 제거되었으면 발생
      */
-    @Override
-    public final void dispose() {
-        if (isDisposed)
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
+    final void destroy() {
         validateIsShot();
+        Validate.validState(!isDestroyed, "Bullet이 이미 제거됨");
 
         onDestroy(getLocation());
-        isDisposed = true;
+        isDestroyed = true;
     }
 
     /**
@@ -290,7 +286,7 @@ public abstract class Bullet<T extends CombatEntity> implements Disposable {
      */
     final void next() {
         if (!Validate.notNull(intervalHandler).onInterval(getLocation(), index++) || handleBlockCollision() || handleEntityCollision()) {
-            dispose();
+            destroy();
             return;
         }
 

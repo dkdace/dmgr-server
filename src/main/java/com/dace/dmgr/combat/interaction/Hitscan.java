@@ -42,11 +42,11 @@ public abstract class Hitscan<T extends CombatEntity> extends Bullet<T> {
     final void onShot() {
         while (getDistanceFromStart() < maxDistance) {
             next();
-            if (isDisposed())
+            if (isDestroyed())
                 return;
         }
 
-        dispose();
+        destroy();
     }
 
     /**

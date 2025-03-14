@@ -49,7 +49,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     /** 매 틱마다 실행할 작업 목록 */
     private final ArrayList<LongConsumer> onTicks = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
-    private final ArrayList<Runnable> onDisposes = new ArrayList<>();
+    private final ArrayList<Runnable> onRemoves = new ArrayList<>();
 
     /** 히트박스 목록 */
     protected Hitbox[] hitboxes;
@@ -84,8 +84,12 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         addTask(new IntervalTask(i -> {
             onTicks.forEach(onTick -> {
-                if (!isDisposed())
-                    onTick.accept(i);
+                if (isRemoved()) {
+                    onTicks.clear();
+                    return;
+                }
+
+                onTick.accept(i);
             });
 
             updateHitboxTick();
@@ -114,18 +118,42 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     }
 
     @Override
+    public final void remove() {
+        Validate.validState(!isRemoved(), "CombatEntity가 이미 제거됨");
+
+        onRemoves.forEach(Runnable::run);
+        onRemoves.clear();
+        taskManager.stop();
+
+        if (game == null)
+            COMBAT_ENTITY_EXCLUDED_MAP.remove(entity);
+        else
+            game.removeCombatEntity(this);
+
+        COMBAT_ENTITY_MAP.remove(entity);
+    }
+
+    @Override
+    public final boolean isRemoved() {
+        return !COMBAT_ENTITY_MAP.containsKey(entity);
+    }
+
+    @Override
     public final void addTask(@NonNull Task task) {
-        taskManager.add(task);
+        if (!isRemoved())
+            taskManager.add(task);
     }
 
     @Override
     public final void addOnTick(@NonNull LongConsumer onTick) {
-        onTicks.add(onTick);
+        if (!isRemoved())
+            onTicks.add(onTick);
     }
 
     @Override
-    public final void addOnDispose(@NonNull Runnable onDispose) {
-        onDisposes.add(onDispose);
+    public final void addOnRemove(@NonNull Runnable onRemove) {
+        if (!isRemoved())
+            onRemoves.add(onRemove);
     }
 
     /**
@@ -181,26 +209,5 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     public final Location getCenterLocation() {
         return getLocation().add(0, getHeight() / 2, 0);
-    }
-
-    @Override
-    public final void dispose() {
-        if (isDisposed())
-            throw new IllegalStateException("인스턴스가 이미 폐기됨");
-
-        onDisposes.forEach(Runnable::run);
-        taskManager.dispose();
-
-        if (game == null)
-            COMBAT_ENTITY_EXCLUDED_MAP.remove(entity);
-        else
-            game.removeCombatEntity(this);
-
-        COMBAT_ENTITY_MAP.remove(entity);
-    }
-
-    @Override
-    public final boolean isDisposed() {
-        return COMBAT_ENTITY_MAP.get(entity) == null;
     }
 }

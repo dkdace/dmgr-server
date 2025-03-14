@@ -155,7 +155,7 @@ public class DMGR extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(player -> {
             User user = User.fromPlayer(player);
             user.sendMessageInfo("시스템 재부팅 중...");
-            user.dispose();
+            user.onQuit();
         });
 
         getHolographicDisplaysAPI().deleteHolograms();

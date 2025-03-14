@@ -54,7 +54,7 @@ public final class StatusEffectModule {
         for (ValueStatusEffect.Type<?> type : ValueStatusEffect.Type.values())
             this.valueStatusEffectMap.put(type, type.createStatusEffect());
 
-        combatEntity.addOnDispose(this::clear);
+        combatEntity.addOnRemove(this::clear);
     }
 
     /**
@@ -81,7 +81,7 @@ public final class StatusEffectModule {
      * @param duration     지속시간
      */
     public void apply(@NonNull StatusEffect statusEffect, @NonNull CombatEntity provider, @NonNull Timespan duration) {
-        if (combatEntity.isDisposed())
+        if (combatEntity.isRemoved())
             return;
 
         if (!statusEffect.isPositive())
@@ -272,8 +272,7 @@ public final class StatusEffectModule {
             statusEffectMap.remove(statusEffect);
             statusEffect.onEnd(combatEntity, provider);
 
-            if (!onTickTask.isDisposed())
-                onTickTask.dispose();
+            onTickTask.stop();
         }
     }
 }

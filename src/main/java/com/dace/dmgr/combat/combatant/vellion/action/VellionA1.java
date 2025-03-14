@@ -183,9 +183,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             if (LocationUtil.isNonSolid(loc)) {
                 entity.teleport(loc);
                 if (returnTime < 0 && (loc.distance(location) < 2 || combatUser.isDead()))
-                    dispose();
+                    remove();
             } else if (returnTime < -1)
-                dispose();
+                remove();
 
             VellionA1Info.PARTICLE.DISPLAY.play(getLocation());
 

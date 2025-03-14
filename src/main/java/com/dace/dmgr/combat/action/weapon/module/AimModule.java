@@ -56,8 +56,8 @@ public final class AimModule {
 
         isAiming = false;
 
-        if (onTickTask != null && !onTickTask.isDisposed())
-            onTickTask.dispose();
+        if (onTickTask != null)
+            onTickTask.stop();
 
         weapon.getCombatUser().setFovValue(0);
         weapon.onAimDisable();

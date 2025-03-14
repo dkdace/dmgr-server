@@ -21,6 +21,6 @@ public final class OnEntityDeath extends EventListener<EntityDeathEvent> {
         CombatEntity combatEntity = CombatEntity.fromEntity(event.getEntity());
 
         if (combatEntity instanceof TemporaryEntity)
-            combatEntity.dispose();
+            combatEntity.remove();
     }
 }

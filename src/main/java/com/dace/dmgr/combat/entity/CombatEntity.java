@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.Task;
@@ -18,7 +17,7 @@ import java.util.function.LongConsumer;
  *
  * @see AbstractCombatEntity
  */
-public interface CombatEntity extends Disposable {
+public interface CombatEntity {
     /**
      * 게임에 소속되지 않은 모든 엔티티를 반환한다.
      *
@@ -67,6 +66,20 @@ public interface CombatEntity extends Disposable {
     Game.Team getTeam();
 
     /**
+     * 엔티티를 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
+     */
+    void remove();
+
+    /**
+     * 엔티티가 제거되었는지 확인한다.
+     *
+     * @return 엔티티 제거 여부
+     */
+    boolean isRemoved();
+
+    /**
      * 전투 시스템 엔티티가 실행하는 새로운 태스크를 추가한다.
      *
      * @param task 태스크
@@ -84,11 +97,11 @@ public interface CombatEntity extends Disposable {
     void addOnTick(@NonNull LongConsumer onTick);
 
     /**
-     * 엔티티가 제거되었을 때 ({@link CombatEntity#dispose()} 호출 시) 실행할 작업을 추가한다.
+     * 엔티티가 제거되었을 때 ({@link CombatEntity#remove()} 호출 시) 실행할 작업을 추가한다.
      *
-     * @param onDispose 실행할 작업
+     * @param onRemove 실행할 작업
      */
-    void addOnDispose(@NonNull Runnable onDispose);
+    void addOnRemove(@NonNull Runnable onRemove);
 
     /**
      * 엔티티의 너비를 반환한다.

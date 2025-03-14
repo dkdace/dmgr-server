@@ -195,7 +195,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             if (i % 4 == 0)
                 new JagerUltArea(range).emit(getLocation());
             if (i >= JagerUltInfo.DURATION.toTicks())
-                dispose();
+                remove();
         }
 
         /**
@@ -270,7 +270,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
-            dispose();
+            remove();
 
             JagerUltInfo.PARTICLE.DEATH.play(getLocation());
             JagerUltInfo.SOUND.DEATH.play(getLocation());

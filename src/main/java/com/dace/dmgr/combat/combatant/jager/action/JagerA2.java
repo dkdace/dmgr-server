@@ -211,7 +211,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
             JagerA2Info.SOUND.TRIGGER.play(getLocation());
 
-            dispose();
+            remove();
         }
 
         @Override
@@ -256,7 +256,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
-            dispose();
+            remove();
 
             JagerA2Info.PARTICLE.DEATH.play(getLocation());
             JagerA2Info.SOUND.DEATH.play(getLocation());

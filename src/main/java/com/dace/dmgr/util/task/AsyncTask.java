@@ -174,7 +174,7 @@ public final class AsyncTask<T> extends Task {
             @Override
             public void run() {
                 action.run();
-                dispose();
+                stop();
             }
         }.runTaskAsynchronously(DMGR.getPlugin());
     }

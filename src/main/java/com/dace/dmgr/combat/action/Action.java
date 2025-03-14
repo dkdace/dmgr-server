@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.action;
 
-import com.dace.dmgr.Disposable;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.Task;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see AbstractAction
  */
-public interface Action extends Disposable {
+public interface Action {
     /**
      * 동작의 사용자를 반환한다.
      *
@@ -80,11 +79,11 @@ public interface Action extends Disposable {
     void addOnReset(@NonNull Runnable onReset);
 
     /**
-     * 동작이 제거되었을 때 ({@link Action#dispose()} 호출 시) 실행할 작업을 추가한다.
+     * 동작이 제거되었을 때 ({@link Action#remove()} 호출 시) 실행할 작업을 추가한다.
      *
-     * @param onDispose 실행할 작업
+     * @param onRemove 실행할 작업
      */
-    void addOnDispose(@NonNull Runnable onDispose);
+    void addOnRemove(@NonNull Runnable onRemove);
 
     /**
      * 기본 쿨타임을 반환한다.
@@ -165,4 +164,11 @@ public interface Action extends Disposable {
      * 동작의 상태를 초기화한다.
      */
     void reset();
+
+    /**
+     * 동작을 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
+     */
+    void remove();
 }

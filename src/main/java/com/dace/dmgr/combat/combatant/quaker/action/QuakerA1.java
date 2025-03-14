@@ -151,7 +151,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         @Override
         public void onDeath(@Nullable Attacker attacker) {
-            dispose();
+            remove();
 
             setStateValue(0);
             onCancelled();

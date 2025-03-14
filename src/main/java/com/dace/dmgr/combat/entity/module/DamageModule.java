@@ -81,7 +81,7 @@ public class DamageModule {
         setHealth(getMaxHealth());
         ((LivingEntity) combatEntity.getEntity()).setRemoveWhenFarAway(false);
 
-        combatEntity.addOnDispose(this::clearShields);
+        combatEntity.addOnRemove(this::clearShields);
         if (hasHealthBar)
             combatEntity.addTask(new DelayTask(this::createHealthBar, 5));
     }
@@ -116,7 +116,7 @@ public class DamageModule {
 
             textHologram.setContent(StringFormUtil.getProgressBar(getHealth(), getMaxHealth(), color));
         });
-        combatEntity.addOnDispose(textHologram::dispose);
+        combatEntity.addOnRemove(textHologram::remove);
     }
 
     /**

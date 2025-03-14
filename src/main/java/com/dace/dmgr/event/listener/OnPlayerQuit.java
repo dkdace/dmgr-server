@@ -40,7 +40,7 @@ public final class OnPlayerQuit extends EventListener<PlayerQuitEvent> {
 
         event.setQuitMessage(StringFormUtil.REMOVE_PREFIX + player.getName());
 
-        User.fromPlayer(player).dispose();
+        User.fromPlayer(player).onQuit();
 
         new DelayTask(() -> {
             Bukkit.broadcastMessage(MessageFormat.format(BROADCAST_MESSAGE, StringFormUtil.REMOVE_PREFIX, Bukkit.getOnlinePlayers().size()));

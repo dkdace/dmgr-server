@@ -72,14 +72,14 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
         new IntervalTask(i -> {
             for (int j = 0; j < loopCount; j++) {
                 next();
-                if (isDisposed())
+                if (isDestroyed())
                     return false;
             }
 
             return (duration == Timespan.MAX || i < duration.toTicks()) && getDistanceFromStart() < maxDistance;
         }, () -> {
-            if (!isDisposed())
-                dispose();
+            if (!isDestroyed())
+                destroy();
         }, 1);
     }
 

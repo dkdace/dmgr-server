@@ -53,7 +53,7 @@ public class FullAutoModule {
         if (cooldownTimestamp.isAfter(Timestamp.now())) {
             cooldownTimestamp = expiration;
 
-            if (fullAutoTask != null && !fullAutoTask.isDisposed())
+            if (fullAutoTask != null && !fullAutoTask.isStopped())
                 return;
         }
 

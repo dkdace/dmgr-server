@@ -52,7 +52,7 @@ public final class LocationConfirmModule extends ConfirmModule {
         this.maxDistance = maxDistance;
         this.currentLocation = skill.getCombatUser().getLocation();
 
-        skill.addOnDispose(() -> {
+        skill.addOnRemove(() -> {
             if (pointer != null)
                 pointer.remove();
         });

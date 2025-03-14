@@ -1,7 +1,5 @@
 package com.dace.dmgr.util.task;
 
-import com.dace.dmgr.Disposable;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -16,12 +14,9 @@ import java.util.HashSet;
  * @see Task
  */
 @NoArgsConstructor
-public final class TaskManager implements Disposable {
+public final class TaskManager {
     /** 태스크 목록 */
     private final HashSet<Task> tasks = new HashSet<>();
-    /** 비활성화 여부 */
-    @Getter
-    private boolean isDisposed = false;
 
     /**
      * 새로운 태스크를 추가한다.
@@ -30,23 +25,19 @@ public final class TaskManager implements Disposable {
      * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
      */
     public void add(@NonNull Task task) {
-        if (isDisposed || task.isDisposed())
+        if (task.isStopped())
             return;
 
         Validate.validState(tasks.add(task), "task가 이미 추가됨");
 
-        tasks.removeIf(Task::isDisposed);
+        tasks.removeIf(Task::isStopped);
     }
 
     /**
      * 추가된 작동 중인 모든 태스크를 종료한다.
      */
-    public void dispose() {
-        if (isDisposed)
-            throw new IllegalStateException("인스턴스가 이미 초기화됨");
-
-        tasks.stream().filter(task -> !task.isDisposed()).forEach(Task::dispose);
+    public void stop() {
+        tasks.forEach(Task::stop);
         tasks.clear();
-        isDisposed = true;
     }
 }

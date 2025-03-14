@@ -18,7 +18,7 @@ public final class OnInventoryClose extends EventListener<InventoryCloseEvent> {
     @EventHandler
     protected void onEvent(@NonNull InventoryCloseEvent event) {
         ChestGUI gui = ChestGUI.fromInventory(event.getInventory());
-        if (gui != null && !gui.isDisposed())
-            gui.dispose();
+        if (gui != null)
+            gui.onClose();
     }
 }
