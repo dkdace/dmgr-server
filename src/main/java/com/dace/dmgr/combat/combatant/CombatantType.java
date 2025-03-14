@@ -85,7 +85,7 @@ public enum CombatantType {
                         User user = User.fromPlayer(player);
 
                         GameUser gameUser = GameUser.fromUser(user);
-                        if (gameUser != null && !gameUser.getTeam().checkCombatantDuplication(this))
+                        if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(this))
                             return false;
 
                         CombatUser combatUser = CombatUser.fromUser(user);

@@ -73,10 +73,6 @@ public final class Game implements Initializable<Void> {
     /** 초기화 여부 */
     @Getter
     private boolean isInitialized = false;
-    /** 종료 여부 */
-    @Getter
-    private boolean isFinished = false;
-
     /** 게임 진행 시점 */
     private Timestamp playTimestamp = Timestamp.now();
     /** 게임 종료 시점 */
@@ -90,6 +86,12 @@ public final class Game implements Initializable<Void> {
     /** 게임 진행 중 여부 */
     @Getter
     private boolean isPlaying = false;
+    /** 종료 여부 */
+    @Getter
+    private boolean isFinished = false;
+    /** 궁극기 팩 활성화 여부 */
+    @Getter
+    private boolean isUltPackActivated = false;
 
     /**
      * 게임 진행 시스템 인스턴스를 생성한다.
@@ -248,18 +250,6 @@ public final class Game implements Initializable<Void> {
     }
 
     /**
-     * 궁극기 팩이 활성화 되었는지 확인한다.
-     *
-     * @return 궁극기 팩 활성화 여부
-     */
-    public boolean isUltPackActivated() {
-        if (isPlaying())
-            return Timestamp.now().isAfter(playTimestamp.plus(GeneralConfig.getGameConfig().getUltPackActivationTime()));
-
-        return false;
-    }
-
-    /**
      * 게임 진행을 위한 새로운 복제본 월드를 생성한다.
      */
     @NonNull
@@ -391,29 +381,33 @@ public final class Game implements Initializable<Void> {
     private void onSecondPlaying(int remainingSeconds) {
         gamePlayModeScheduler.onSecond(remainingSeconds);
 
-        int ultPackRemainingSeconds = (int) Math.ceil(GeneralConfig.getGameConfig().getUltPackActivationTime().minus(getElapsedTime()).toSeconds());
+        if (!isUltPackActivated) {
+            int ultPackRemainingSeconds = (int) Math.ceil(GeneralConfig.getGameConfig().getUltPackActivationTime().minus(getElapsedTime()).toSeconds());
 
-        if (ultPackRemainingSeconds >= 0)
-            switch (ultPackRemainingSeconds) {
-                case 20:
-                case 10:
-                case 5:
-                    gameRoom.getUsers().forEach(user -> {
-                        TIMER_SOUND.play(user.getPlayer());
-                        user.sendTitle("", "§9궁극기 팩§f이 §e" + ultPackRemainingSeconds + "초 §f후 활성화됩니다.",
-                                Timespan.ZERO, Timespan.ofSeconds(1), Timespan.ofSeconds(1), Timespan.ofSeconds(2));
-                    });
-                    break;
-                case 0:
-                    gameRoom.getUsers().forEach(user -> {
-                        TIMER_SOUND.play(user.getPlayer());
-                        user.sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", Timespan.ZERO, Timespan.ofSeconds(1),
-                                Timespan.ofSeconds(1), Timespan.ofSeconds(2));
-                    });
-                    break;
-                default:
-                    break;
-            }
+            if (ultPackRemainingSeconds >= 0)
+                switch (ultPackRemainingSeconds) {
+                    case 20:
+                    case 10:
+                    case 5:
+                        gameRoom.getUsers().forEach(user -> {
+                            TIMER_SOUND.play(user.getPlayer());
+                            user.sendTitle("", "§9궁극기 팩§f이 §e" + ultPackRemainingSeconds + "초 §f후 활성화됩니다.",
+                                    Timespan.ZERO, Timespan.ofSeconds(1), Timespan.ofSeconds(1), Timespan.ofSeconds(2));
+                        });
+                        break;
+                    case 0:
+                        isUltPackActivated = true;
+
+                        gameRoom.getUsers().forEach(user -> {
+                            TIMER_SOUND.play(user.getPlayer());
+                            user.sendTitle("", "§9궁극기 팩§f이 활성화되었습니다.", Timespan.ZERO, Timespan.ofSeconds(1),
+                                    Timespan.ofSeconds(1), Timespan.ofSeconds(2));
+                        });
+                        break;
+                    default:
+                        break;
+                }
+        }
 
         if (remainingSeconds > 0 && remainingSeconds <= 10)
             gameRoom.getUsers().forEach(user -> {

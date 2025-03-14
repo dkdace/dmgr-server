@@ -153,7 +153,7 @@ public final class Timespan implements Comparable<Timespan> {
         if (this.equals(MAX) || timespan.equals(MAX))
             return MAX;
 
-        return ofMilliseconds(milliseconds - timespan.milliseconds);
+        return ofMilliseconds(Math.max(0, milliseconds - timespan.milliseconds));
     }
 
     /**
