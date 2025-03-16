@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.action.info;
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
@@ -33,11 +32,10 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
      */
     protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name,
                          @NonNull ActionInfoLore actionInfoLore) {
-        super(name, new DefinedItem(new ItemBuilder(material)
+        super(name, new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)
-                .setLore(actionInfoLore.toString())
-                .build()));
+                .build(), actionInfoLore);
         this.weaponClass = weaponClass;
     }
 
@@ -61,33 +59,30 @@ public abstract class WeaponInfo<T extends Weapon> extends ActionInfo {
     /**
      * 무기 인스턴스를 생성하여 반환한다.
      *
-     * <p>무기 클래스는 다음과 같이 {@link CombatUser} 하나를 인자로 받는
-     * 생성자를 가지는 형태로 구현해야 한다.</p>
+     * <p>무기 클래스는 다음과 같이 {@link CombatUser} 하나를 인자로 받는 생성자를 가지는 형태로 구현해야 한다.</p>
      *
      * <p>Example:</p>
      *
      * <pre><code>
      * public final class TestWeapon extends AbstractWeapon {
      *     public TestWeapon(CombatUser combatUser) {
-     *         super(combatUser, TestWeaponInfo.getInstance());
+     *         super(combatUser, TestWeaponInfo.getInstance(), TestWeaponInfo.COOLDOWN);
      *     }
      * }
      * </code></pre>
      *
-     * @param combatUser 플레이어 객체
-     * @return 무기 객체
+     * @param combatUser 사용자 플레이어
+     * @return 무기 인스턴스
      * @throws UnsupportedOperationException 해당 무기를 생성할 수 없으면 발생
      */
     @NonNull
     public final T createWeapon(@NonNull CombatUser combatUser) {
         try {
             return ReflectionUtil.getConstructor(weaponClass, CombatUser.class).newInstance(combatUser);
-        } catch (NoSuchMethodException ex) {
-            throw new UnsupportedOperationException("해당 무기를 생성할 수 없음");
         } catch (Exception ex) {
             ConsoleLogger.severe("무기 인스턴스 생성 실패", ex);
         }
 
-        throw new UnsupportedOperationException("무기 생성을 사용할 수 없음");
+        throw new UnsupportedOperationException();
     }
 }

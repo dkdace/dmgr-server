@@ -25,15 +25,14 @@ public abstract class ActiveSkillInfo<T extends ActiveSkill> extends SkillInfo<T
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 14)
-                .setLore(actionInfoLore.toString())
-                .build());
+                .build(), actionInfoLore);
     }
 
     /**
-     * @see SkillInfo#SkillInfo(Class, String, ItemStack)
+     * @see SkillInfo#SkillInfo(Class, String, ItemStack, ActionInfoLore)
      */
-    ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ItemStack itemStack) {
-        super(skillClass, name, itemStack);
+    ActiveSkillInfo(@NonNull Class<@NonNull T> skillClass, @NonNull String name, @NonNull ItemStack itemStack, @NonNull ActionInfoLore actionInfoLore) {
+        super(skillClass, name, itemStack, actionInfoLore);
     }
 
     @Override

@@ -24,9 +24,8 @@ public abstract class UltimateSkillInfo<T extends UltimateSkill> extends ActiveS
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 10)
-                .setLore(actionInfoLore.toString())
                 .setGlowing()
-                .build());
+                .build(), actionInfoLore);
     }
 
     @Override
