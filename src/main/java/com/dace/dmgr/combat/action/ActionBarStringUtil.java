@@ -22,8 +22,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[1][우클릭] 사용</pre>
      * <pre><code>
-     * // [1][우클릭] 사용
      * ActionBarStringUtil.getKeyInfo(skill, "사용");
      * </code></pre>
      *
@@ -47,8 +47,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[Test] <font color="yellow">****</font><font color="black">******</font> [40/100]</pre>
      * <pre><code>
-     * // [Test] <노란색>****<검정색>****** [40/100]
      * ActionBarStringUtil.getProgressBar("[Test]", 40, 100, 10, '*');
      * </code></pre>
      *
@@ -92,8 +92,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[스킬명] <font color="yellow">■■■■</font><font color="black">■■■■■■</font> [40/100]</pre>
      * <pre><code>
-     * // [스킬명] <노란색>■■■■<검정색>■■■■■■ [40/100]
      * ActionBarStringUtil.getProgressBar(skill);
      * </code></pre>
      *
@@ -114,8 +114,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[스킬명] <font color="yellow">■■■■</font><font color="black">■■■■■■</font> [(아이콘) 40.5]</pre>
      * <pre><code>
-     * // [스킬명] <노란색>■■■■<검정색>■■■■■■ [<아이콘> 40.5]
      * ActionBarStringUtil.getDurationBar(skill, Timespan.ofSeconds(40.5), Timespan.ofSeconds(100));
      * </code></pre>
      *
@@ -153,8 +153,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[스킬명] <font color="yellow">■■■■</font><font color="black">■■■■■■</font> [(아이콘) 40.5]</pre>
      * <pre><code>
-     * // [스킬명] <노란색>■■■■<검정색>■■■■■■ [<아이콘> 40.5]
      * ActionBarStringUtil.getDurationBar(skill);
      * </code></pre>
      *
@@ -173,9 +173,9 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[스킬명] <font color="red">■■■■■■</font><font color="black">■■■■</font> [(아이콘) 60.5]</pre>
      * <pre><code>
-     * // [스킬명] <노란색>■■■■<검정색>■■■■■■ [<아이콘> 40.5]
-     * ActionBarStringUtil.getCooldownBar(skill, Timespan.ofSeconds(40.5), Timespan.ofSeconds(100));
+     * ActionBarStringUtil.getCooldownBar(skill, Timespan.ofSeconds(60.5), Timespan.ofSeconds(100));
      * </code></pre>
      *
      * @param skill       스킬
@@ -212,8 +212,8 @@ public final class ActionBarStringUtil {
      *
      * <p>Example:</p>
      *
+     * <pre>[스킬명] <font color="red">■■■■■■</font><font color="black">■■■■</font> [(아이콘) 60.5]</pre>
      * <pre><code>
-     * // [스킬명] <노란색>■■■■<검정색>■■■■■■ [<아이콘> 40.5]
      * ActionBarStringUtil.getCooldownBar(skill);
      * </code></pre>
      *

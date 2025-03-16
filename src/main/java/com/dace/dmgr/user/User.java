@@ -691,8 +691,8 @@ public final class User {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font>World!</pre>
      * <pre><code>
-     * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §rWorld!");
      * </code></pre>
      *
@@ -712,8 +712,8 @@ public final class User {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font>World!</pre>
      * <pre><code>
-     * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §r{0}!", "World");
      * </code></pre>
      *
@@ -732,8 +732,8 @@ public final class User {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font><font color="red">World!</font></pre>
      * <pre><code>
-     * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §rWorld!");
      * </code></pre>
      *
@@ -754,8 +754,8 @@ public final class User {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font><font color="red">World!</font></pre>
      * <pre><code>
-     * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §r{0}!", "World");
      * </code></pre>
      *

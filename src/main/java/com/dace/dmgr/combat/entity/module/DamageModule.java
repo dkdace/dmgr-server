@@ -184,6 +184,7 @@ public class DamageModule {
      * 엔티티의 보호막을 생성하여 반환한다.
      *
      * @param health 보호막 체력 (실제 보호막×50 (체력 1줄 기준 1000))
+     * @return 보호막 인스턴스
      */
     @NonNull
     public final Shield createShield(int health) {

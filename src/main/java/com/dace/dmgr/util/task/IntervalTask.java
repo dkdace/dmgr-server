@@ -14,7 +14,7 @@ import java.util.function.LongPredicate;
  * <p>Example:</p>
  *
  * <pre><code>
- * new IntervalTask(i -> {
+ * new IntervalTask(i -&gt; {
  *     // 지정한 횟수만큼 반복하여 호출된다.
  *
  *     // 실행을 멈추고 다음 주기로 넘어가려면 true를 반환해야 한다.
@@ -24,7 +24,7 @@ import java.util.function.LongPredicate;
  *     // 실행을 멈추고 타이머를 끝내려면 false를 반환해야 한다.
  *     // for문으로 치면 break이다.
  *     return false;
- * }, isCancelled -> {
+ * }, isCancelled -&gt; {
  *     // 타이머가 끝났을 때 호출된다.
  * }, 5);
  * </code></pre>

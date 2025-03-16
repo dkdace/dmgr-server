@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
  * <p>Example:</p>
  *
  * <pre><code>
- * new DelayTask(() -> {
+ * new DelayTask(() -&gt; {
  *     // 지정한 딜레이만큼 기다린 후 호출된다.
  * }, 5);
  * </code></pre>

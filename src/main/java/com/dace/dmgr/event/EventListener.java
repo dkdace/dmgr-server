@@ -13,9 +13,9 @@ import org.bukkit.event.Listener;
  * <p>Example:</p>
  *
  * <pre><code>
- * public class OnPlayerJoin extends EventListener<PlayerJoinEvent> {
- *     {@code @Override}
- *     {@code @EventHandler}
+ * public class OnPlayerJoin extends EventListener&lt;PlayerJoinEvent&gt; {
+ *     &#64;Override
+ *     &#64;EventHandler
  *     protected void onEvent(PlayerJoinEvent event) {
  *         Player player = event.getPlayer();
  *     }

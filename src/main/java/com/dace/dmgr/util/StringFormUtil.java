@@ -26,8 +26,8 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="white">*****</font><font color="black">*****</font></pre>
      * <pre><code>
-     * // <흰색>*****<검정색>*****
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10, '*');
      * </code></pre>
      *
@@ -64,8 +64,8 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="white">■■■■■</font><font color="black">■■■■■</font></pre>
      * <pre><code>
-     * // <흰색>■■■■■<검정색>■■■■■
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE, 10);
      * </code></pre>
      *
@@ -86,8 +86,8 @@ public final class StringFormUtil {
      *
      * <p>Example:</p>
      *
+     * <pre><font color="white">■■■■■</font><font color="black">■■■■■</font></pre>
      * <pre><code>
-     * // <흰색>■■■■■<검정색>■■■■■
      * StringFormUtil.getProgressBar(50, 100, ChatColor.WHITE);
      * </code></pre>
      *

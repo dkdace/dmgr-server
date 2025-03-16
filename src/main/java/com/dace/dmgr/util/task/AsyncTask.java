@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * <p>Example:</p>
  *
  * <pre><code>
- * new AsyncTask<Integer>((onFinish, onError) -> {
+ * new AsyncTask&lt;Integer&gt;((onFinish, onError) -&gt; {
  *     // 별도의 스레드에서 비동기 작업을 수행한다.
  *
  *     try {
@@ -30,9 +30,9 @@ import java.util.function.Supplier;
  *         // 작업 실패(예외 발생) 시 호출해야 한다.
  *         onError.accept(ex);
  *     }
- * }).onFinish(result -> {
+ * }).onFinish(result -&gt; {
  *     // 작업 성공 시 호출된다.
- * }).onError(ex -> {
+ * }).onError(ex -&gt; {
  *     // 작업 실패(예외 발생) 시 호출된다.
  * });
  * </code></pre>
@@ -67,6 +67,7 @@ public final class AsyncTask<T> extends Task {
      * 지정한 비동기 작업 목록을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param asyncTasks 비동기 태스크 목록
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull AsyncTask<?> @NonNull ... asyncTasks) {
@@ -80,6 +81,7 @@ public final class AsyncTask<T> extends Task {
      * 지정한 비동기 작업 목록을 수행하는 태스크 인스턴스를 생성한다.
      *
      * @param asyncTasks 비동기 태스크 목록
+     * @return 새로운 {@link AsyncTask}
      */
     @NonNull
     public static AsyncTask<Void> all(@NonNull List<@NonNull AsyncTask<?>> asyncTasks) {

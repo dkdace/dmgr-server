@@ -337,7 +337,7 @@ public final class CombatUtil {
          * <p>다음과 동일한 결과를 나타냄:</p>
          *
          * <pre><code>
-         * EntityCondition.or(combatEntity -> combatEntity == target);
+         * EntityCondition.or(combatEntity -&gt; combatEntity == target);
          * </code></pre>
          *
          * @param target 포함할 엔티티
@@ -354,7 +354,7 @@ public final class CombatUtil {
          * <p>다음과 동일한 결과를 나타냄:</p>
          *
          * <pre><code>
-         * EntityCondition.and(combatEntity -> combatEntity != target);
+         * EntityCondition.and(combatEntity -&gt; combatEntity != target);
          * </code></pre>
          *
          * @param target 제외할 엔티티

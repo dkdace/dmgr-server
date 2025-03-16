@@ -30,10 +30,10 @@ import java.util.List;
  * YamlFile testFile = new YamlFile(Paths.get("foo", "test_file.yml"));
  *
  * testFile.init()
- *     .onFinish(() -> {
+ *     .onFinish(() -&gt; {
  *         // 성공 시 실행할 작업.
  *     })
- *     .onError(Exception ex) -> {
+ *     .onError(Exception ex) -&gt; {
  *         // 실패(예외 발생) 시 실행할 작업.
  *     });
  * </code></pre>
@@ -207,11 +207,11 @@ public final class YamlFile implements Initializable<Void> {
              *
              * <pre><code>
              * // 키 "user"의 값 반환
-             * Entry<Integer> userEntry = section.getEntry("user", 1234);
+             * Entry&lt;Integer&gt; userEntry = section.getEntry("user", 1234);
              * int user = userEntry.get();
              *
              * // 키 "test"의 값 반환
-             * Entry<Boolean> testEntry = section.getEntry("test", false);
+             * Entry&lt;Boolean&gt; testEntry = section.getEntry("test", false);
              * boolean test = testEntry.get();
              * </code></pre>
              *
@@ -253,11 +253,11 @@ public final class YamlFile implements Initializable<Void> {
              *
              * <pre><code>
              * // 키 "user"의 값을 500으로 설정
-             * Entry<Integer> userEntry = section.getEntry("user", 1234);
+             * Entry&lt;Integer&gt; userEntry = section.getEntry("user", 1234);
              * userEntry.set("user", 500);
              *
              * // 키 "test"의 값을 true로 설정
-             * Entry<Boolean> testEntry = section.getEntry("test", false);
+             * Entry&lt;Boolean&gt; testEntry = section.getEntry("test", false);
              * testEntry.set("test", true);
              * </code></pre>
              *
@@ -287,12 +287,12 @@ public final class YamlFile implements Initializable<Void> {
              *
              * <pre><code>
              * // 키 "users"의 값 목록 반환
-             * ListEntry<Integer> usersEntry = section.getListEntry("users");
-             * List<Integer> users = usersEntry.get();
+             * ListEntry&lt;Integer&gt; usersEntry = section.getListEntry("users");
+             * List&lt;Integer&gt; users = usersEntry.get();
              *
              * // 키 "tests"의 값 목록 반환
-             * ListEntry<String> testsEntry = section.getListEntry("tests");
-             * List<String> tests = testsEntry.get();
+             * ListEntry&lt;String&gt; testsEntry = section.getListEntry("tests");
+             * List&lt;String&gt; tests = testsEntry.get();
              * </code></pre>
              *
              * @return 값 목록
@@ -315,7 +315,7 @@ public final class YamlFile implements Initializable<Void> {
              *
              * <pre><code>
              * // 키 "users"의 값 목록에 "player" 추가
-             * ListEntry<String> usersEntry = section.getListEntry("users");
+             * ListEntry&lt;String&gt; usersEntry = section.getListEntry("users");
              * usersEntry.add("player");
              * </code></pre>
              *
@@ -336,7 +336,7 @@ public final class YamlFile implements Initializable<Void> {
              *
              * <pre><code>
              * // 키 "users"의 값 목록에서 "player" 제거
-             * ListEntry<String> usersEntry = section.getListEntry("users");
+             * ListEntry&lt;String&gt; usersEntry = section.getListEntry("users");
              * usersEntry.remove("player");
              * </code></pre>
              *

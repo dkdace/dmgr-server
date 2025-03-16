@@ -75,6 +75,8 @@ public interface Action {
 
     /**
      * 동작의 상태가 초기화되었을 때 ({@link Action#reset()} 호출 시) 실행할 작업을 추가한다.
+     *
+     * @param onReset 실행할 작업
      */
     void addOnReset(@NonNull Runnable onReset);
 

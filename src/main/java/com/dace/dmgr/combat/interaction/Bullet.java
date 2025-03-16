@@ -517,6 +517,7 @@ public abstract class Bullet<T extends CombatEntity> {
          * <p>{@link HitEntityHandler#onHitEntity(Location, CombatEntity)}에서 {@code true}를 반환한 경우 다음 엔티티 판정 처리기를 실행한다.</p>
          *
          * @param handler 엔티티 판정 처리기
+         * @param <T>     {@link CombatEntity}를 상속받는 전투 시스템 엔티티
          * @return {@link Chain}
          */
         @NonNull

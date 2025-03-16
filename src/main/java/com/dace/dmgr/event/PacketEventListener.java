@@ -17,8 +17,8 @@ import lombok.NonNull;
  * <p>Example:</p>
  *
  * <pre><code>
- * public class OnPlayServerUpdateHealth extends PacketEventListener<WrapperPlayServerUpdateHealth> {
- *     {@code @Override}
+ * public class OnPlayServerUpdateHealth extends PacketEventListener&lt;WrapperPlayServerUpdateHealth&gt; {
+ *     &#64;Override
  *     protected void onEvent(PacketEvent event) {
  *         // 패킷 Wrapper를 사용하여 패킷의 내용에 접근할 수 있다.
  *         WrapperPlayServerUpdateHealth packet = createPacketWrapper(event);
