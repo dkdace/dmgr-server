@@ -83,14 +83,14 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         COMBAT_ENTITY_MAP.put(entity, this);
 
         addTask(new IntervalTask(i -> {
-            onTicks.forEach(onTick -> {
+            for (LongConsumer onTick : onTicks) {
+                onTick.accept(i);
+
                 if (isRemoved()) {
                     onTicks.clear();
-                    return;
+                    break;
                 }
-
-                onTick.accept(i);
-            });
+            }
 
             updateHitboxTick();
         }, 1));

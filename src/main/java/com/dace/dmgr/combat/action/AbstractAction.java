@@ -167,14 +167,14 @@ public abstract class AbstractAction implements Action {
     public final void reset() {
         setCooldown(defaultCooldown);
 
-        onResets.forEach(onReset -> {
+        for (Runnable onReset : onResets) {
+            onReset.run();
+
             if (isRemoved) {
                 onResets.clear();
-                return;
+                break;
             }
-
-            onReset.run();
-        });
+        }
     }
 
     @Override
