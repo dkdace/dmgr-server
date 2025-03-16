@@ -67,7 +67,7 @@ public final class MeleeAttackAction extends AbstractAction {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(COOLDOWN);
         setCooldown();
 

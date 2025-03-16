@@ -42,8 +42,7 @@ public final class SiliaA2 extends ActiveSkill {
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
-        if (skill3.isCancellable())
-            skill3.onCancelled();
+        skill3.cancel();
 
         SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -57,7 +56,7 @@ public final class SiliaA2 extends ActiveSkill {
                 SiliaA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec), vec);
             }
         }, () -> {
-            onCancelled();
+            cancel();
 
             new SiliaA2Projectile().shot();
 
@@ -71,8 +70,7 @@ public final class SiliaA2 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

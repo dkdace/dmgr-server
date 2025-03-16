@@ -38,7 +38,7 @@ public final class ArkaceA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
         addActionTask(new IntervalTask(i -> {
@@ -46,7 +46,7 @@ public final class ArkaceA1 extends ActiveSkill {
             new ArkaceA1Projectile().shot(loc);
 
             ArkaceA1Info.SOUND.USE.play(loc);
-        }, () -> addActionTask(new DelayTask(this::onCancelled, 4)), 5, 3));
+        }, () -> addActionTask(new DelayTask(this::cancel, 4)), 5, 3));
     }
 
     @Override
@@ -55,8 +55,7 @@ public final class ArkaceA1 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

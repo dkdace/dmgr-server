@@ -76,7 +76,7 @@ public final class PalasUlt extends UltimateSkill {
             PalasUlt.super.onUse(ActionKey.SLOT_4);
 
             setCooldown();
-            combatUser.getWeapon().onCancelled();
+            combatUser.getWeapon().cancel();
 
             target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);
             target.getStatusEffectModule().apply(PalasUltBuff.instance, combatUser, PalasUltInfo.DURATION);

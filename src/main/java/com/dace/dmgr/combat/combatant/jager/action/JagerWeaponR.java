@@ -77,7 +77,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
             }
             case RIGHT_CLICK: {
                 combatUser.setGlobalCooldown(Timespan.ofTicks(1));
-                onCancelled();
+                cancel();
 
                 break;
             }
@@ -92,9 +92,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         mainWeapon.getAimModule().cancel();
         mainWeapon.getReloadModule().cancel();
         mainWeapon.getSwapModule().cancel();
@@ -111,7 +109,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         addActionTask(new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown().toTicks()));
     }
 

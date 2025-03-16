@@ -66,7 +66,7 @@ public final class SiliaA1 extends ActiveSkill {
                     SiliaA1Info.PARTICLE.TICK.play(loc3);
             }, 1));
         }, () -> {
-            onCancelled();
+            cancel();
             combatUser.getMoveModule().push(new Vector(), true);
         }, 1, SiliaA1Info.DURATION.toTicks()));
     }
@@ -77,9 +77,7 @@ public final class SiliaA1 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         if (!isDurationFinished())
             setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);

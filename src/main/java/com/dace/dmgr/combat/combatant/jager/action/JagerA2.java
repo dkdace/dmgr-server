@@ -52,7 +52,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
         entityModule.disposeEntity();
@@ -60,7 +60,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         JagerA2Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
-            onCancelled();
+            cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new JagerA2Projectile().shot(loc);
@@ -75,8 +75,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

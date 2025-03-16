@@ -125,8 +125,7 @@ public final class Neace extends Support {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
 
         NeaceP1 skillp1 = victim.getSkill(NeaceP1Info.getInstance());
-        if (skillp1.isCancellable())
-            skillp1.onCancelled();
+        skillp1.cancel();
     }
 
     @Override

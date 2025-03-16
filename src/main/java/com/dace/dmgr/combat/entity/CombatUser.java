@@ -1140,8 +1140,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      */
     public void cancelAction(@Nullable CombatUser attacker) {
-        if (weapon.isCancellable())
-            weapon.onCancelled();
+        weapon.cancel();
         cancelSkill(attacker);
     }
 
@@ -1152,10 +1151,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     public void cancelSkill(@Nullable CombatUser attacker) {
         skillMap.values().forEach(skill -> {
-            if (!skill.isCancellable())
+            if (!skill.cancel())
                 return;
 
-            skill.onCancelled();
             if (attacker != null && !isDead && skill instanceof UltimateSkill)
                 attacker.addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
         });

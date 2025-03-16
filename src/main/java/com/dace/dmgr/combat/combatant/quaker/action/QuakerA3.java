@@ -45,7 +45,7 @@ public final class QuakerA3 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
@@ -63,7 +63,7 @@ public final class QuakerA3 extends ActiveSkill {
                 new QuakerA3Effect().shot(loc.clone().add(vec), vec);
             }
         }, () -> {
-            onCancelled();
+            cancel();
 
             new QuakerA3Projectile().shot();
 
@@ -77,9 +77,7 @@ public final class QuakerA3 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);

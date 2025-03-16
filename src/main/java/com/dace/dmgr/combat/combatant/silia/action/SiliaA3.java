@@ -73,12 +73,12 @@ public final class SiliaA3 extends ChargeableSkill {
 
                 return true;
             }, () -> {
-                onCancelled();
+                cancel();
                 if (getStateValue() > 0)
                     setCooldown(SiliaA3Info.COOLDOWN_FORCE);
             }, 1));
         } else
-            onCancelled();
+            cancel();
     }
 
     @Override
@@ -87,9 +87,7 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setCooldown();
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);

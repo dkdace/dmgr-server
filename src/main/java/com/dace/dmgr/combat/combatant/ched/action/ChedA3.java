@@ -54,7 +54,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         setDuration();
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
         ChedA3Info.SOUND.USE.play(combatUser.getLocation());
@@ -70,7 +70,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
             return true;
         }, isCancelled -> {
-            onCancelled();
+            cancel();
             if (isCancelled)
                 return;
 
@@ -91,9 +91,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }

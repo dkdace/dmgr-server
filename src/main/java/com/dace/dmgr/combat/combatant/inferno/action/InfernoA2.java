@@ -73,8 +73,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

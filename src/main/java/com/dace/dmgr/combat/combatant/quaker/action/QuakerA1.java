@@ -62,7 +62,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
 
         if (isDurationFinished()) {
             setDuration();
@@ -73,7 +73,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
             entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
         } else
-            onCancelled();
+            cancel();
     }
 
     @Override
@@ -82,9 +82,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
@@ -154,7 +152,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             remove();
 
             setStateValue(0);
-            onCancelled();
+            cancel();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
             QuakerA1Info.SOUND.DEATH.play(getLocation());

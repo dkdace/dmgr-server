@@ -61,7 +61,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         VellionA1Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
-            onCancelled();
+            cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             entityModule.set(new VellionA1Entity(loc));
@@ -76,9 +76,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }

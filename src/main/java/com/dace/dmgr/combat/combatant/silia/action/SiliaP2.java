@@ -74,7 +74,7 @@ public final class SiliaP2 extends AbstractSkill {
 
             return true;
         }, isCancelled -> {
-            onCancelled();
+            cancel();
 
             wallRideCount--;
             Location loc = combatUser.getLocation();
@@ -89,9 +89,7 @@ public final class SiliaP2 extends AbstractSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
 

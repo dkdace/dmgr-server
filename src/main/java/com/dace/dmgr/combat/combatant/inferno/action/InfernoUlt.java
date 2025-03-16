@@ -37,7 +37,7 @@ public final class InfernoUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         ((InfernoWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
         combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
 

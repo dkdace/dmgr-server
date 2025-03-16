@@ -39,13 +39,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
         PalasA3Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
-            onCancelled();
+            cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA3Projectile().shot(loc);
@@ -60,8 +60,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

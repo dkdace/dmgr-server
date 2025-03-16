@@ -52,7 +52,7 @@ public final class MagrittaUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MagrittaUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
@@ -68,9 +68,7 @@ public final class MagrittaUlt extends UltimateSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
@@ -103,7 +101,7 @@ public final class MagrittaUlt extends UltimateSkill {
             MagrittaUltInfo.SOUND.SHOOT.play(loc);
             addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
         }, () -> {
-            onCancelled();
+            cancel();
             onEnd();
         }, MagrittaUltInfo.ATTACK_COOLDOWN.toTicks(), MagrittaUltInfo.DURATION.divide(2).toTicks()));
     }

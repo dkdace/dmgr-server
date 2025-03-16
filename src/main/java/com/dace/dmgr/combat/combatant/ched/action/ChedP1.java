@@ -108,7 +108,7 @@ public final class ChedP1 extends AbstractSkill {
 
             return true;
         }, () -> {
-            onCancelled();
+            cancel();
 
             wallRideCount--;
             Location loc = combatUser.getLocation();
@@ -144,9 +144,7 @@ public final class ChedP1 extends AbstractSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
         addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {

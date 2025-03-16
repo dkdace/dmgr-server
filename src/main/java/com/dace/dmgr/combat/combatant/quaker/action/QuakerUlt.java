@@ -52,7 +52,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
@@ -81,7 +81,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
                         QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
                         combatUser.addYawAndPitch(-1, -0.7);
-                        onCancelled();
+                        cancel();
                         onReady();
                     }
                 }, delay));
@@ -95,9 +95,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);

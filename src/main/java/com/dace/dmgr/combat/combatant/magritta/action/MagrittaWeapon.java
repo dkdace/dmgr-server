@@ -98,8 +98,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         reloadModule.cancel();
     }
 
@@ -113,7 +112,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         reloadModule.reload();
     }
 

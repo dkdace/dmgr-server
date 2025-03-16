@@ -42,13 +42,12 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.getWeapon().setVisible(false);
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
-        if (skill3.isCancellable())
-            skill3.onCancelled();
+        skill3.cancel();
 
         float yaw = combatUser.getLocation().getYaw();
 
         addActionTask(new IntervalTask(i -> playUseTickEffect(i, yaw), () -> {
-            onCancelled();
+            cancel();
             onReady();
         }, 1, SiliaUltInfo.READY_DURATION.toTicks()));
     }
@@ -59,9 +58,7 @@ public final class SiliaUlt extends UltimateSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
     }

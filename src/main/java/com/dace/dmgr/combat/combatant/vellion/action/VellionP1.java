@@ -76,9 +76,9 @@ public final class VellionP1 extends AbstractSkill {
                 playTickEffect();
 
                 return true;
-            }, isCancelled -> onCancelled(), 1, VellionP1Info.DURATION.toTicks()));
+            }, isCancelled -> cancel(), 1, VellionP1Info.DURATION.toTicks()));
         } else
-            onCancelled();
+            cancel();
     }
 
     @Override
@@ -87,9 +87,7 @@ public final class VellionP1 extends AbstractSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,

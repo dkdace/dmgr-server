@@ -59,7 +59,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
         entityModule.disposeEntity();
@@ -72,7 +72,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
             CombatEffectUtil.THROW_SOUND.play(loc);
 
-            onCancelled();
+            cancel();
         }, JagerUltInfo.READY_DURATION.toTicks()));
     }
 
@@ -82,8 +82,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

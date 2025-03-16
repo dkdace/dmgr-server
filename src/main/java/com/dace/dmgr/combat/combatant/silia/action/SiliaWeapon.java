@@ -60,13 +60,11 @@ public final class SiliaWeapon extends AbstractWeapon {
         }
 
         SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
-        if (skill3.isCancellable())
-            skill3.onCancelled();
+        skill3.cancel();
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setVisible(true);
     }
 
@@ -106,7 +104,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                     SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index / 2.0);
                 if (index == 7) {
                     combatUser.addYawAndPitch(isOpposite ? 0.7 : -0.7, -0.85);
-                    onCancelled();
+                    cancel();
                 }
             }, delay));
         }

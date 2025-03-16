@@ -89,7 +89,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
             }
             case RIGHT_CLICK: {
                 combatUser.setGlobalCooldown(Timespan.ofTicks(1));
-                onCancelled();
+                cancel();
 
                 aimModule.toggleAim();
                 swapModule.swap();
@@ -107,13 +107,11 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     }
 
     @Override
-    public void onCancelled() {
+    protected void onCancelled() {
         if (swapModule.isSwapped()) {
-            swapModule.getSubweapon().onCancelled();
+            swapModule.getSubweapon().cancel();
             return;
         }
-
-        super.onCancelled();
 
         reloadModule.cancel();
         swapModule.cancel();
@@ -131,7 +129,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         reloadModule.reload();
     }
 

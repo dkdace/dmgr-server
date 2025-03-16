@@ -56,7 +56,7 @@ public final class ChedA1 extends StackableSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         if (isDurationFinished()) {
             setDuration();
-            combatUser.getWeapon().onCancelled();
+            combatUser.getWeapon().cancel();
             combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
 
             ChedA1Info.SOUND.USE.play(combatUser.getLocation());
@@ -67,10 +67,10 @@ public final class ChedA1 extends StackableSkill {
                 combatUser.getWeapon().setMaterial(WeaponInfo.MATERIAL);
                 combatUser.getWeapon().setDurability(ChedWeaponInfo.RESOURCE.FIRE);
 
-                addActionTask(new IntervalTask(i -> !isDurationFinished(), this::onCancelled, 1));
+                addActionTask(new IntervalTask(i -> !isDurationFinished(), this::cancel, 1));
             }, ChedA1Info.READY_DURATION.toTicks()));
         } else
-            onCancelled();
+            cancel();
     }
 
     @Override
@@ -79,9 +79,7 @@ public final class ChedA1 extends StackableSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getWeapon().setGlowing(false);

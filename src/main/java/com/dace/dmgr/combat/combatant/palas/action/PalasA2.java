@@ -75,7 +75,7 @@ public final class PalasA2 extends ActiveSkill {
         @Override
         protected void onFindEntity(@NonNull Healable target) {
             setCooldown();
-            combatUser.getWeapon().onCancelled();
+            combatUser.getWeapon().cancel();
 
             target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);
             target.getStatusEffectModule().clear(false);

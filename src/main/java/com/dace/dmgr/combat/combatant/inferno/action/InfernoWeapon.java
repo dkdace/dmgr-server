@@ -104,8 +104,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         reloadModule.cancel();
     }
 
@@ -119,7 +118,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         reloadModule.reload();
     }
 

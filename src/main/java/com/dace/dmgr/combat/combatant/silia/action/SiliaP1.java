@@ -51,7 +51,7 @@ public final class SiliaP1 extends AbstractSkill {
             }
 
             return true;
-        }, isCancelled -> onCancelled(), 1, 2));
+        }, isCancelled -> cancel(), 1, 2));
     }
 
     @Override
@@ -60,9 +60,7 @@ public final class SiliaP1 extends AbstractSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
                 () -> setDuration(Timespan.ZERO), 1));
     }

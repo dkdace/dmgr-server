@@ -92,8 +92,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         reloadModule.cancel();
     }
 
@@ -106,10 +105,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         ArkaceP1 skillp1 = combatUser.getSkill(ArkaceP1Info.getInstance());
         Timespan skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION.plus(Timespan.ofTicks(2));
 
-        if (skillp1.isCancellable()) {
-            skillp1.onCancelled();
+        if (skillp1.cancel()) {
             skillp1.setCooldown(skillp1Cooldown);
-
             return true;
         }
 
@@ -127,7 +124,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         reloadModule.reload();
     }
 

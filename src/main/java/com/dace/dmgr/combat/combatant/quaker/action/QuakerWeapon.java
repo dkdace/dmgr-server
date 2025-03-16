@@ -72,7 +72,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                         QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
                     if (index == 7) {
                         combatUser.addYawAndPitch(isClockwise ? -1 : 1, -0.7);
-                        addActionTask(new DelayTask(this::onCancelled, 4));
+                        addActionTask(new DelayTask(this::cancel, 4));
                     }
                 }, delay));
             }
@@ -80,8 +80,7 @@ public final class QuakerWeapon extends AbstractWeapon {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setVisible(true);
     }
 

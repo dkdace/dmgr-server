@@ -65,7 +65,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         setDuration();
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
 
         ChedUltInfo.SOUND.USE.play(combatUser.getLocation());
@@ -81,7 +81,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
             return true;
         }, isCancelled -> {
-            onCancelled();
+            cancel();
             if (isCancelled)
                 return;
 
@@ -102,9 +102,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }

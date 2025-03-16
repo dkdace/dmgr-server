@@ -54,8 +54,7 @@ public final class ArkaceA2 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

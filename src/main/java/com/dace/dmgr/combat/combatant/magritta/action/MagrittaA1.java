@@ -44,13 +44,13 @@ public final class MagrittaA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MagrittaA1Info.READY_DURATION);
 
         MagrittaA1Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
-            onCancelled();
+            cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new MagrittaA1Projectile().shot(loc);
@@ -65,8 +65,7 @@ public final class MagrittaA1 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 

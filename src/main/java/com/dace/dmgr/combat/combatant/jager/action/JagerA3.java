@@ -67,7 +67,7 @@ public final class JagerA3 extends ActiveSkill {
                 return;
 
             setDuration();
-            combatUser.getWeapon().onCancelled();
+            combatUser.getWeapon().cancel();
             combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
             combatUser.getWeapon().setVisible(false);
 
@@ -91,14 +91,14 @@ public final class JagerA3 extends ActiveSkill {
                     if (isCancelled)
                         return;
 
-                    onCancelled();
+                    cancel();
 
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
                     explode(loc, null);
                 }, 1, JagerA3Info.EXPLODE_DURATION.toTicks()));
             }, JagerA3Info.READY_DURATION.toTicks()));
         } else {
-            onCancelled();
+            cancel();
             combatUser.getWeapon().setCooldown(Timespan.ofTicks(2));
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
@@ -114,9 +114,7 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getWeapon().setVisible(true);

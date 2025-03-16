@@ -57,7 +57,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(Timespan.MAX);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
@@ -87,7 +87,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                     QuakerA2Info.SOUND.USE.play(loc.add(vec));
                 if (index == 11) {
                     addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
-                        onCancelled();
+                        cancel();
                         onReady();
                     }, 1));
                 }
@@ -101,9 +101,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.resetGlobalCooldown();
         combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);

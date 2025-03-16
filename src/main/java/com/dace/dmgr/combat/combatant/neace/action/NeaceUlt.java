@@ -51,7 +51,7 @@ public final class NeaceUlt extends UltimateSkill {
         NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
-            onCancelled();
+            cancel();
             onReady();
         }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
     }
@@ -62,9 +62,7 @@ public final class NeaceUlt extends UltimateSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }

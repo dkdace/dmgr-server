@@ -54,7 +54,7 @@ public interface Action {
     /**
      * 동작에서 실행하는 새로운 태스크를 추가한다.
      *
-     * <p>동작이 끊겼을 때 ({@link Action#onCancelled()} 호출 시) 모든 태스크가 중단된다.</p>
+     * <p>동작이 끊겼을 때 ({@link Action#cancel()} 호출 시) 모든 태스크가 중단된다.</p>
      *
      * @param task 태스크
      * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
@@ -65,7 +65,7 @@ public interface Action {
     /**
      * 동작에서 실행하는 새로운 태스크를 추가한다.
      *
-     * <p>동작 강제 취소({@link Action#onCancelled()} 호출)와 관계 없이 계속 실행한다.</p>
+     * <p>동작 강제 취소({@link Action#cancel()} 호출)와 관계 없이 계속 실행한다.</p>
      *
      * @param task 태스크
      * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
@@ -158,9 +158,12 @@ public interface Action {
     }
 
     /**
-     * 동작 사용이 취소되었을 때 실행할 작업.
+     * 동작 사용을 강제로 취소시킨다.
+     *
+     * @return 취소 여부. {@link Action#isCancellable()}의 값 반환
+     * @see Action#isCancellable()
      */
-    void onCancelled();
+    boolean cancel();
 
     /**
      * 동작의 상태를 초기화한다.

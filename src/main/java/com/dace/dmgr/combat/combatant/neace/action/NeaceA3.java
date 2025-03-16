@@ -43,7 +43,7 @@ public final class NeaceA3 extends ActiveSkill {
         if (isDurationFinished())
             new NeaceA3Target().shot();
         else
-            onCancelled();
+            cancel();
     }
 
     @Override
@@ -52,8 +52,7 @@ public final class NeaceA3 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
     }
 
@@ -95,7 +94,7 @@ public final class NeaceA3 extends ActiveSkill {
 
                 return true;
             }, isCancelled -> {
-                onCancelled();
+                cancel();
 
                 combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,
                         40, -5, false, false), true);

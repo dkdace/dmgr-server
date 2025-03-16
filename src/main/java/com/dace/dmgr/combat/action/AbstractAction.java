@@ -146,9 +146,21 @@ public abstract class AbstractAction implements Action {
     }
 
     @Override
-    @MustBeInvokedByOverriders
-    public void onCancelled() {
+    public final boolean cancel() {
+        if (!isCancellable())
+            return false;
+
         actionTaskManager.stop();
+        onCancelled();
+
+        return true;
+    }
+
+    /**
+     * 동작 사용이 취소되었을 때 실행할 작업.
+     */
+    protected void onCancelled() {
+        // 미사용
     }
 
     @Override

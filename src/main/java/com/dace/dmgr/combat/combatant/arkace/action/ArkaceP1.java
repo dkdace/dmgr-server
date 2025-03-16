@@ -35,7 +35,7 @@ public final class ArkaceP1 extends AbstractSkill {
 
         addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting()
                 && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading(),
-                this::onCancelled, 1));
+                this::cancel, 1));
     }
 
     @Override
@@ -44,9 +44,7 @@ public final class ArkaceP1 extends AbstractSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);

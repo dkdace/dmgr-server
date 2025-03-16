@@ -64,7 +64,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case SLOT_3: {
-                combatUser.getWeapon().onCancelled();
+                combatUser.getWeapon().cancel();
                 confirmModule.toggleCheck();
 
                 break;
@@ -85,9 +85,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         confirmModule.cancel();
         if (!isDurationFinished()) {
             setDuration(Timespan.ZERO);
@@ -132,7 +130,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
             VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);
         }, () -> {
-            onCancelled();
+            cancel();
             onReady(location);
         }, 1, VellionA3Info.READY_DURATION.toTicks()));
     }

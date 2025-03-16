@@ -41,7 +41,7 @@ public final class MagrittaA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.getWeapon().setVisible(false);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, MagrittaA2Info.DURATION);

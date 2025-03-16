@@ -62,8 +62,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
-        if (skillp1.isCancellable())
-            skillp1.onCancelled();
+        skillp1.cancel();
 
         VellionUltInfo.SOUND.USE.play(combatUser.getLocation());
 
@@ -80,9 +79,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
@@ -144,7 +141,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
             return true;
         }, isCancelled -> {
-            onCancelled();
+            cancel();
 
             Location loc = combatUser.getEntity().getEyeLocation();
             new VellionUltExplodeArea().emit(loc);

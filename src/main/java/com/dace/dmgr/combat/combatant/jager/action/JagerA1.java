@@ -86,7 +86,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case SLOT_1: {
-                combatUser.getWeapon().onCancelled();
+                combatUser.getWeapon().cancel();
 
                 if (isDurationFinished())
                     confirmModule.toggleCheck();
@@ -113,8 +113,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled() {
         confirmModule.cancel();
     }
 

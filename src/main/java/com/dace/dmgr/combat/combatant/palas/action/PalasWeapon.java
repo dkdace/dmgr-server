@@ -93,11 +93,11 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             case RIGHT_CLICK: {
                 combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 if (aimModule.isAiming()) {
-                    onCancelled();
+                    cancel();
                     return;
                 }
 
-                onCancelled();
+                cancel();
                 aimModule.toggleAim();
 
                 break;
@@ -113,9 +113,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         reloadModule.cancel();
         aimModule.cancel();
     }
@@ -163,7 +161,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         if (reloadModule.isReloading())
             return;
 
-        onCancelled();
+        cancel();
         reloadModule.reload();
     }
 

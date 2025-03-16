@@ -39,7 +39,7 @@ public final class InfernoA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().onCancelled();
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
 
         Location location = combatUser.getLocation();
@@ -66,7 +66,7 @@ public final class InfernoA1 extends ActiveSkill {
 
             return !combatUser.getEntity().isOnGround();
         }, () -> {
-            onCancelled();
+            cancel();
             addActionTask(new DelayTask(this::onLand, 1));
         }, 1)), 4));
     }
@@ -77,9 +77,7 @@ public final class InfernoA1 extends ActiveSkill {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));

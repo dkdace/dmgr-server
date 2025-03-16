@@ -85,9 +85,7 @@ public final class VellionA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onCancelled() {
-        super.onCancelled();
-
+    protected void onCancelled() {
         setDuration(Timespan.ZERO);
         isEnabled = false;
         combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
@@ -160,7 +158,7 @@ public final class VellionA2 extends ActiveSkill implements HasBonusScore {
                 return target.canBeTargeted();
             }, isCancelled -> {
                 if (isCancelled) {
-                    onCancelled();
+                    cancel();
                     return;
                 }
 
@@ -190,7 +188,7 @@ public final class VellionA2 extends ActiveSkill implements HasBonusScore {
                         bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
 
                     return true;
-                }, VellionA2.this::onCancelled, 1));
+                }, VellionA2.this::cancel, 1));
             }, 1, VellionA2Info.READY_DURATION.toTicks()));
         }
 
