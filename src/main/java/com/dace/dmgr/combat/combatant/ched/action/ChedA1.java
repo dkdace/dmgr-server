@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -14,7 +15,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -54,23 +54,38 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (isDurationFinished()) {
-            setDuration();
-            combatUser.getWeapon().cancel();
-            combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
+        if (!isDurationFinished()) {
+            forceCancel();
+            return;
+        }
 
-            ChedA1Info.SOUND.USE.play(combatUser.getLocation());
+        setDuration();
+        combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
 
-            addActionTask(new DelayTask(() -> {
-                isEnabled = true;
-                combatUser.getWeapon().setGlowing(true);
-                combatUser.getWeapon().setMaterial(WeaponInfo.MATERIAL);
-                combatUser.getWeapon().setDurability(ChedWeaponInfo.RESOURCE.FIRE);
+        Weapon weapon = combatUser.getWeapon();
+        weapon.cancel();
 
-                addActionTask(new IntervalTask(i -> !isDurationFinished(), this::cancel, 1));
-            }, ChedA1Info.READY_DURATION.toTicks()));
-        } else
-            cancel();
+        ChedA1Info.SOUND.USE.play(combatUser.getLocation());
+
+        addActionTask(new DelayTask(() -> {
+            isEnabled = true;
+
+            weapon.setGlowing(true);
+            weapon.setMaterial(WeaponInfo.MATERIAL);
+            weapon.setDurability(ChedWeaponInfo.RESOURCE.FIRE);
+        }, ChedA1Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+
+        isEnabled = false;
+
+        Weapon weapon = combatUser.getWeapon();
+        weapon.setGlowing(false);
+        weapon.setMaterial(Material.BOW);
+        weapon.setDurability(ChedWeaponInfo.RESOURCE.DEFAULT);
     }
 
     @Override
@@ -81,19 +96,15 @@ public final class ChedA1 extends StackableSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        isEnabled = false;
-        combatUser.getWeapon().setGlowing(false);
-        combatUser.getWeapon().setMaterial(Material.BOW);
-        combatUser.getWeapon().setDurability(ChedWeaponInfo.RESOURCE.DEFAULT);
     }
 
     /**
      * 불화살 투사체를 발사한다.
      */
-    void shoot() {
+    void shot() {
         addStack(-1);
         if (getStack() <= 0)
-            setDuration(Timespan.ZERO);
+            forceCancel();
 
         new ChedA1Projectile().shot();
 

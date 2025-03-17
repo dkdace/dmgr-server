@@ -11,11 +11,11 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -52,37 +52,33 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getWeapon().cancel();
-        ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
+
+        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setCanShoot(false);
 
         ChedA3Info.SOUND.USE.play(combatUser.getLocation());
 
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        long durationTicks = ChedA3Info.READY_DURATION.toTicks();
+        EffectManager effectManager = new EffectManager();
 
         addActionTask(new IntervalTask(i -> {
-            if (!skillp1.isDurationFinished() && !skillp1.isHanging())
-                return false;
-
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            playUseTickEffect(loc, i);
-
-            return true;
-        }, isCancelled -> {
+            effectManager.playEffect(loc);
+        }, () -> {
             cancel();
-            if (isCancelled)
-                return;
 
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedA3Projectile().shot(location);
 
             ChedA3Info.SOUND.USE_READY.play(location);
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedA3Info.READY_DURATION.toTicks()),
-                    1, ChedA3Info.READY_DURATION.toTicks()));
-        }, 1, ChedA3Info.READY_DURATION.toTicks()));
+            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(loc), 1, durationTicks));
+        }, 1, durationTicks));
     }
 
     @Override
@@ -97,35 +93,48 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     }
 
     /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param location 사용 위치
-     * @param i        인덱스
+     * 효과를 재생하는 클래스.
      */
-    private void playUseTickEffect(@NonNull Location location, long i) {
-        Vector vector = VectorUtil.getYawAxis(location);
-        Vector axis = VectorUtil.getRollAxis(location);
+    @NoArgsConstructor
+    private static final class EffectManager {
+        private int index = 0;
+        private int angle = 0;
+        private double distance = 0;
+        private double forward = 0;
 
-        for (int j = 0; j < 2; j++) {
-            long index = i * 2 + j;
-            long angle = index * (i > 12 ? 4 : 8);
-            double distance = index * 0.04;
-            double forward = 0;
-            if (i > 12) {
-                forward = (index - 24) * 0.2;
-                distance = 48 * 0.04 - index * 0.03;
+        /**
+         * 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         */
+        private void playEffect(@NonNull Location location) {
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (int i = 0; i < 2; i++) {
+                if (index > 12) {
+                    angle += 4;
+                    distance -= 0.03;
+                    forward += 0.2;
+                } else {
+                    angle += 8;
+                    distance += 0.04;
+                }
+
+                for (int j = 0; j < 10; j++) {
+                    angle += 360 / 5;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
+                    Vector vec3 = vec.clone().multiply(distance + (j < 5 ? 0 : 1.4));
+
+                    Location loc = location.clone().add(vec3).add(location.getDirection().multiply(forward));
+                    Vector dir = LocationUtil.getDirection(location.clone().add(vec), location.clone().add(vec2));
+
+                    ChedA3Info.PARTICLE.USE_TICK.play(loc, dir);
+                }
             }
 
-            for (int k = 0; k < 10; k++) {
-                angle += 72;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
-                Vector vec3 = vec.clone().multiply(distance + (k < 5 ? 0 : 1.4));
-                Vector dir = LocationUtil.getDirection(location.clone().add(vec), location.clone().add(vec2));
-                Location loc2 = location.clone().add(vec3).add(location.getDirection().multiply(forward));
-
-                ChedA3Info.PARTICLE.USE_TICK.play(loc2, dir);
-            }
+            index++;
         }
     }
 
@@ -184,10 +193,10 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
                     combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION);
-                    combatUser.getEntity().getWorld().getPlayers().stream()
-                            .map(teamTarget -> CombatUser.fromUser(User.fromPlayer(teamTarget)))
-                            .filter(teamTarget -> teamTarget != null && teamTarget != combatUser && !teamTarget.isEnemy(combatUser))
-                            .forEach(teamTarget -> teamTarget.getUser().setGlowing(target.getEntity(), ChatColor.RED,
+
+                    CombatUtil.getCombatEntities(combatUser.getGame(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                                    .and(CombatUser.class::isInstance))
+                            .forEach(teamTarget -> ((CombatUser) teamTarget).getUser().setGlowing(target.getEntity(), ChatColor.RED,
                                     ChedA3Info.DETECT_DURATION));
 
                     if (target instanceof CombatUser) {

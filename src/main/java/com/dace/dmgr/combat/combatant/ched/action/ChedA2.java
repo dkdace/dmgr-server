@@ -43,8 +43,9 @@ public final class ChedA2 extends ActiveSkill {
 
             if (location.distance(loc) > 0) {
                 location.setY(loc.getY());
-                Vector vec = ((location.distance(loc) == 0) ? location.getDirection() :
-                        LocationUtil.getDirection(location, loc)).multiply(ChedA2Info.PUSH_SIDE);
+
+                Vector vec = (location.distance(loc) == 0) ? location.getDirection() : LocationUtil.getDirection(location, loc);
+                vec.multiply(ChedA2Info.PUSH_SIDE);
                 vec.setY(ChedA2Info.PUSH_UP);
 
                 combatUser.getMoveModule().push(vec, true);
@@ -63,8 +64,7 @@ public final class ChedA2 extends ActiveSkill {
             combatUser.getMoveModule().push(vec, true);
         }, 1, 2));
 
-        addActionTask(new IntervalTask((LongConsumer) i ->
-                ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getLocation()), 1, 10));
+        addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getLocation()), 1, 10));
     }
 
     @Override

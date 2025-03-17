@@ -20,6 +20,7 @@ public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
     public static final double PUSH_UP = 0.25;
     /** 수평 이동 강도 */
     public static final double PUSH_SIDE = 0.75;
+
     @Getter
     private static final ChedA2Info instance = new ChedA2Info();
 
@@ -29,9 +30,7 @@ public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
                         .builder("이동 방향으로 짧게 도약합니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.SPACE)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -42,8 +41,7 @@ public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(1).pitch(1).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(1).pitch(1).build());
     }
 
     /**

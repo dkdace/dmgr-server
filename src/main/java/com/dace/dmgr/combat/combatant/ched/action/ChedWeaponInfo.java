@@ -23,6 +23,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
 
     /** 치명타 점수 */
     public static final int CRIT_SCORE = 6;
+
     @Getter
     private static final ChedWeaponInfo instance = new ChedWeaponInfo();
 
@@ -33,16 +34,14 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, MAX_DAMAGE / 10, MAX_DAMAGE)
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addActionKeyInfo("충전 및 발사", ActionKey.RIGHT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 1;
         /** 불화살 */
@@ -61,8 +60,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(0.3, 0.8).pitch(1.1, 1.25).build(),
                 SoundEffect.SoundInfo.builder("random.gun.bow").volume(0.3, 0.8).pitch(0.7, 0.85).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(0.4, 0.9).pitch(0.75, 0.9).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(0.4, 0.9).pitch(0.75, 0.9).build());
         /** 타격 */
         public static final SoundEffect HIT = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun.arrowhit").volume(0.3, 0.8).pitch(1).build());

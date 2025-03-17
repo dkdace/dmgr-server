@@ -33,6 +33,7 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 4;
+
     @Getter
     private static final ChedA1Info instance = new ChedA1Info();
 
@@ -49,15 +50,11 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
                                 .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("발사", ActionKey.RIGHT_CLICK)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("불화살: 전탄 사용/재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -68,14 +65,12 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.crossbow.loading_end").volume(0.7).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.7).pitch(2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.7).pitch(2).build());
         /** 사격 */
         public static final SoundEffect SHOOT = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(1.4).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder("random.gun.bow").volume(1.4).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build());
     }
 
     /**
@@ -86,8 +81,7 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).build());
         /** 블록 타격 */
         public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).build());

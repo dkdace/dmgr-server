@@ -33,6 +33,7 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
     public static final int KILL_SCORE = 10;
     /** 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(7);
+
     @Getter
     private static final ChedA3Info instance = new ChedA3Info();
 
@@ -44,9 +45,7 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, SIZE)
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DETECT_DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -58,15 +57,13 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_CHARGE).volume(1.5).pitch(1.3).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.5).build());
         /** 틱 효과음 */
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.3).build());
@@ -82,14 +79,12 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT_MAGIC)
                         .speedMultiplier(-0.25).build(),
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.12).build()
-        );
+                        .speedMultiplier(0.12).build());
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(20).horizontalSpread(0.28).verticalSpread(0.28).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 64, 160, 184)
-                        .count(15).horizontalSpread(2.5).verticalSpread(1.5).build()
-        );
+                        .count(15).horizontalSpread(2.5).verticalSpread(1.5).build());
         /** 총알 궤적 (모양) */
         public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(8)

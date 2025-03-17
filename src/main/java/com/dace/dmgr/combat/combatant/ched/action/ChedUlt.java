@@ -18,12 +18,12 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -48,8 +48,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     public ChedUlt(@NonNull CombatUser combatUser) {
         super(combatUser, ChedUltInfo.getInstance(), Timespan.MAX, ChedUltInfo.COST);
 
-        entityModule = new EntityModule<>(this);
-        bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
+        this.entityModule = new EntityModule<>(this);
+        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
     }
 
     @Override
@@ -63,27 +63,23 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         super.onUse(actionKey);
 
         setDuration();
+
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getWeapon().cancel();
-        ((ChedWeapon) combatUser.getWeapon()).setCanShoot(false);
+
+        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setCanShoot(false);
 
         ChedUltInfo.SOUND.USE.play(combatUser.getLocation());
 
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        EffectManager effectManager = new EffectManager();
 
         addActionTask(new IntervalTask(i -> {
-            if (!skillp1.isDurationFinished() && !skillp1.isHanging())
-                return false;
-
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            playUseTickEffect(loc, i);
-
-            return true;
-        }, isCancelled -> {
+            effectManager.playEffect(loc);
+        }, () -> {
             cancel();
-            if (isCancelled)
-                return;
 
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedUltProjectile().shot(location);
@@ -91,8 +87,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             ChedUltInfo.SOUND.USE_READY.play(location);
             Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> playUseTickEffect(loc, i + ChedUltInfo.READY_DURATION.toTicks()),
-                    1, 20));
+            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(loc), 1, 20));
         }, 1, ChedUltInfo.READY_DURATION.toTicks()));
     }
 
@@ -108,37 +103,48 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     }
 
     /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param location 사용 위치
-     * @param i        인덱스
+     * 효과를 재생하는 클래스.
      */
-    private void playUseTickEffect(@NonNull Location location, long i) {
-        Vector vector = VectorUtil.getYawAxis(location);
-        Vector axis = VectorUtil.getRollAxis(location);
+    @NoArgsConstructor
+    private static final class EffectManager {
+        private int index = 0;
+        private int angle = 0;
+        private double distance = 0.6;
+        private double forward = 0;
 
-        for (int j = 0; j < 2; j++) {
-            long index = i * 2 + j;
-            long angle = index * (i > 10 ? -3 : 3);
-            double distance = index * 0.035;
-            double forward = 0;
-            if (i > 30) {
-                forward = (index - 60) * 0.2;
-                distance = 60 * 0.035 - (index - 60) * 0.01;
+        /**
+         * 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         */
+        private void playEffect(@NonNull Location location) {
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (int i = 0; i < 2; i++) {
+                angle += index > 10 ? -3 : 3;
+
+                if (index > 30) {
+                    forward += 0.2;
+                    distance -= 0.01;
+                } else
+                    distance += 0.035;
+
+                int angles = (index > 15 ? 4 : 6);
+                for (int j = 0; j < angles * 2; j++) {
+                    angle += 360 / angles;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < angles ? angle : -angle);
+                    Vector vec2 = vec.clone().multiply(distance);
+                    Location loc = location.clone().add(vec2).add(location.getDirection().multiply(forward));
+
+                    if (index <= 30)
+                        ChedUltInfo.PARTICLE.USE_TICK_1.play(loc, vec, index / 60.0);
+                    else
+                        ChedUltInfo.PARTICLE.USE_TICK_2.play(loc, vec);
+                }
             }
 
-            int angles = (i > 15 ? 4 : 6);
-            for (int k = 0; k < angles * 2; k++) {
-                angle += 360 / angles;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < angles ? angle : -angle);
-                Vector vec2 = vec.clone().multiply(distance + 0.6);
-                Location loc2 = location.clone().add(vec2).add(location.getDirection().multiply(forward));
-
-                if (i <= 30)
-                    ChedUltInfo.PARTICLE.USE_TICK_1.play(loc2, vec, index / 60.0);
-                else
-                    ChedUltInfo.PARTICLE.USE_TICK_2.play(loc2, vec);
-            }
+            index++;
         }
     }
 
@@ -240,16 +246,17 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null,
-                        false, false) && target instanceof CombatUser)
+                if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null, false, false)
+                        && target instanceof CombatUser)
                     bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
-                double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, distance, ChedUltInfo.SIZE / 2.0);
+                double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, center.distance(location), radius / 2.0);
+
                 if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false)
-                        && target instanceof Movable)
-                    ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(location, location.clone().add(0, 1, 0))
-                            .multiply(ChedUltInfo.KNOCKBACK));
+                        && target instanceof Movable) {
+                    Vector dir = LocationUtil.getDirection(location, location.clone().add(0, 1, 0)).multiply(ChedUltInfo.KNOCKBACK);
+                    ((Movable) target).getMoveModule().knockback(dir);
+                }
 
                 return !(target instanceof Barrier);
             }
@@ -261,15 +268,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
      */
     public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
-            super(
-                    ArmorStand.class,
-                    spawnLocation,
-                    combatUser.getName() + "의 화염 지대",
-                    combatUser,
-                    false, true,
-                    Hitbox.builder(1, 1, 1).offsetY(0.5).pitchFixed().build()
-            );
-
+            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false, true);
             addOnTick(this::onTick);
         }
 
@@ -297,8 +296,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
-                        false, false)) {
+                if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
                     target.getStatusEffectModule().apply(ChedUltBurning.instance, combatUser, Timespan.ofTicks(10));
 
                     if (target instanceof CombatUser)

@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -45,14 +46,15 @@ public final class ChedWeapon extends AbstractWeapon {
                 if (skill1.isEnabled()) {
                     setCooldown(ChedA1Info.COOLDOWN);
 
-                    skill1.shoot();
+                    skill1.shot();
                 } else {
                     setCooldown();
                     setCanShoot(true);
 
                     if (combatUser.getEntity().isHandRaised()) {
-                        combatUser.getWeapon().setVisible(false);
-                        combatUser.getWeapon().setVisible(true);
+                        Weapon weapon = combatUser.getWeapon();
+                        weapon.setVisible(false);
+                        weapon.setVisible(true);
                     }
 
                     ChedWeaponInfo.SOUND.CHARGE.play(combatUser.getLocation());
@@ -121,8 +123,8 @@ public final class ChedWeapon extends AbstractWeapon {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
-                if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location,
-                        isCrit, true) && target instanceof CombatUser && isCrit)
+                if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location, isCrit, true)
+                        && target instanceof CombatUser && isCrit)
                     combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
 
                 return false;
