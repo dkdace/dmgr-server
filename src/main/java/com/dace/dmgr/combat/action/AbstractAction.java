@@ -157,6 +157,14 @@ public abstract class AbstractAction implements Action {
     }
 
     /**
+     * 취소 가능 조건 ({@link Action#isCancellable()})을 무시하고 동작 사용을 강제로 취소시킨다.
+     */
+    protected final void forceCancel() {
+        actionTaskManager.stop();
+        onCancelled();
+    }
+
+    /**
      * 동작 사용이 취소되었을 때 실행할 작업.
      */
     protected void onCancelled() {
