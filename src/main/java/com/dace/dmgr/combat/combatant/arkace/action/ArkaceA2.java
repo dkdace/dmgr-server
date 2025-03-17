@@ -40,12 +40,14 @@ public final class ArkaceA2 extends ActiveSkill {
 
         ArkaceA2Info.SOUND.USE.play(combatUser.getLocation());
 
+        long durationTicks = ArkaceA2Info.DURATION.toTicks();
+
         addActionTask(new IntervalTask(i -> {
-            if (combatUser.getDamageModule().heal(combatUser, (double) ArkaceA2Info.HEAL / ArkaceA2Info.DURATION.toTicks(), true))
-                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / ArkaceA2Info.DURATION.toTicks());
+            if (combatUser.getDamageModule().heal(combatUser, (double) ArkaceA2Info.HEAL / durationTicks, true))
+                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / durationTicks);
 
             playTickEffect(i);
-        }, 1, ArkaceA2Info.DURATION.toTicks()));
+        }, 1, durationTicks));
     }
 
     @Override
@@ -72,7 +74,7 @@ public final class ArkaceA2 extends ActiveSkill {
 
         long angle = i * 10;
         for (int j = 0; j < 3; j++) {
-            angle += 120;
+            angle += 360 / 3;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
             ArkaceA2Info.PARTICLE.TICK.play(loc.clone().add(vec), j / 2.0);

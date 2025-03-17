@@ -17,8 +17,6 @@ public final class ArkaceP1Info extends PassiveSkillInfo<ArkaceP1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("달리기 시 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPRINT_SPEED)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

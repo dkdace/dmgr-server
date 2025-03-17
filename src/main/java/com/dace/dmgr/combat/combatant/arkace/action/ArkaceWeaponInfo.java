@@ -27,6 +27,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.5);
     /** 달리기 중 시전 시간 */
     public static final Timespan SPRINT_READY_DURATION = Timespan.ofSeconds(0.25);
+
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
@@ -41,16 +42,14 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("사격", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 반동 정보.
      */
     @UtilityClass
-    public static class RECOIL {
+    public static final class RECOIL {
         /** 수직 반동 */
         public static final double UP = 0.6;
         /** 수평 반동 */
@@ -65,7 +64,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 탄퍼짐 정보.
      */
     @UtilityClass
-    public static class SPREAD {
+    public static final class SPREAD {
         /** 탄퍼짐 증가량 */
         public static final double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */
@@ -78,7 +77,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 1;
         /** 달리기 */
@@ -93,14 +92,12 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.scarlight_1").volume(3).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
         /** 사용 (궁극기) */
         public static final SoundEffect USE_ULT = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
                 SoundEffect.SoundInfo.builder("random.energy").volume(4).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
         /** 재장전 */
         public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
                 .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.6).build())

@@ -18,6 +18,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.util.Vector;
 
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(@NonNull CombatUser combatUser) {
@@ -38,6 +39,7 @@ public final class ArkaceA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
@@ -109,12 +111,13 @@ public final class ArkaceA1 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, distance, ArkaceA1Info.RADIUS / 2.0);
+                double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
+
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable)
-                    ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                            .multiply(ArkaceA1Info.KNOCKBACK));
+                        && target instanceof Movable) {
+                    Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK);
+                    ((Movable) target).getMoveModule().knockback(dir);
+                }
 
                 return !(target instanceof Barrier);
             }

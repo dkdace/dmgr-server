@@ -136,7 +136,6 @@ public final class Arkace extends Marksman {
             return;
 
         ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());
-
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
     }

@@ -31,6 +31,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
 
     /** 직격 점수 */
     public static final int DIRECT_HIT_SCORE = 3;
+
     @Getter
     private static final ArkaceA1Info instance = new ArkaceA1Info();
 
@@ -43,9 +44,7 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE_DIRECT + " (직격)")
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -56,14 +55,12 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun.grenade").volume(3).pitch(1.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.2).build());
         /** 폭발 */
         public static final SoundEffect EXPLODE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(6).pitch(0.9).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(6).pitch(0.9).build());
     }
 
     /**
@@ -74,13 +71,13 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 32, 250, 225).build()
-        );
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 32, 250, 225)
+                        .build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2).build(),
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2)
+                        .build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 32, 250, 225)
-                        .count(200).horizontalSpread(2.5).verticalSpread(2.5).build()
-        );
+                        .count(200).horizontalSpread(2.5).verticalSpread(2.5).build());
     }
 }

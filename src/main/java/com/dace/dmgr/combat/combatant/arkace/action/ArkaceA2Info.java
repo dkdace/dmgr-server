@@ -22,6 +22,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
 
     /** 치유 점수 */
     public static final int HEAL_SCORE = 8;
+
     @Getter
     private static final ArkaceA2Info instance = new ArkaceA2Info();
 
@@ -33,9 +34,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.HEAL, HEAL)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -47,8 +46,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(0.9).build(),
                 SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.2).build());
     }
 
     /**

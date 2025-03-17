@@ -28,8 +28,10 @@ public final class ArkaceUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getWeapon().cancel();
-        ((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
+
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
+        weapon.cancel();
+        weapon.getReloadModule().resetRemainingAmmo();
     }
 
     @Override

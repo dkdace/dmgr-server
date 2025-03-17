@@ -19,7 +19,6 @@ import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 @Getter
 public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
@@ -33,8 +32,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     public ArkaceWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceWeaponInfo.getInstance(), Timespan.ZERO);
 
-        reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
+        this.reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
+        this.fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
                 ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
     }
 
@@ -65,17 +64,17 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                 Location loc = combatUser.getLocation();
                 if (combatUser.getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
-                    Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread());
-                    new ArkaceWeaponHitscan(false).shot(dir);
+                    new ArkaceWeaponHitscan(false).shot(VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread()));
+
                     reloadModule.consume(1);
 
                     CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
                             ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
                     ArkaceWeaponInfo.SOUND.USE.play(loc);
+
                     addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shot();
-
                     ArkaceWeaponInfo.SOUND.USE_ULT.play(loc);
                 }
 
@@ -83,7 +82,6 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
             }
             case DROP: {
                 onAmmoEmpty();
-
                 break;
             }
             default:
@@ -168,13 +166,11 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
-                if (isUlt)
-                    target.getDamageModule().damage(combatUser, ArkaceWeaponInfo.DAMAGE, DamageType.NORMAL, location, isCrit, false);
-                else {
-                    double damage = CombatUtil.getDistantDamage(ArkaceWeaponInfo.DAMAGE, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
-                    target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
-                }
+                double damage = ArkaceWeaponInfo.DAMAGE;
+                if (!isUlt)
+                    damage = CombatUtil.getDistantDamage(damage, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
 
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, isUlt);
                 return false;
             });
         }

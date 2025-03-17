@@ -31,10 +31,11 @@ public final class ArkaceP1 extends AbstractSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
 
-        addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting()
-                && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading(),
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
+        weapon.setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
+
+        addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting() && !weapon.getReloadModule().isReloading(),
                 this::cancel, 1));
     }
 
@@ -46,6 +47,7 @@ public final class ArkaceP1 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
     }

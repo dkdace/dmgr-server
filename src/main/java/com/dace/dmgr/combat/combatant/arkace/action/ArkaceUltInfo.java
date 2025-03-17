@@ -16,6 +16,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 40;
+
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();
 
@@ -26,8 +27,6 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }
