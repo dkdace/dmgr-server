@@ -33,8 +33,7 @@ public final class Inferno extends Vanguard {
     /** 발소리 */
     private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("new.entity.panda.step").volume(0.4).pitch(0.9).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build()
-    );
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build());
 
     private Inferno() {
         super(null, "인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
@@ -148,7 +147,6 @@ public final class Inferno extends Vanguard {
             return;
 
         InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
-
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }

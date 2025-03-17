@@ -62,7 +62,6 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
             InfernoA2Info.SOUND.TICK.play(combatUser.getLocation());
-            InfernoA2Info.PARTICLE.TICK_CORE.play(combatUser.getLocation().add(0, 1, 0));
             playTickEffect(i);
         }, 1, InfernoA2Info.DURATION.toTicks()));
     }
@@ -77,6 +76,11 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         setDuration(Timespan.ZERO);
     }
 
+    @Override
+    public boolean isAssistMode() {
+        return true;
+    }
+
     /**
      * 사용 중 효과를 재생한다.
      *
@@ -86,6 +90,9 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
+
+        InfernoA2Info.PARTICLE.TICK_CORE.play(loc);
+
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
@@ -103,11 +110,6 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 InfernoA2Info.PARTICLE.TICK_DECO.play(loc2, vec);
             }
         }
-    }
-
-    @Override
-    public boolean isAssistMode() {
-        return true;
     }
 
     /**
@@ -145,8 +147,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
-                    false, true)) {
+            if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
                 target.getStatusEffectModule().apply(InfernoA2Burning.instance, combatUser, Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
 

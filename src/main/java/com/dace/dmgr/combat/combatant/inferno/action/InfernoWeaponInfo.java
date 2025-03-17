@@ -33,6 +33,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     public static final int CAPACITY = 200;
     /** 재장전 시간 */
     public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(2.5);
+
     @Getter
     private static final InfernoWeaponInfo instance = new InfernoWeaponInfo();
 
@@ -49,8 +50,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                                 .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("화염탄", ActionInfoLore.Section
                                 .builder("폭발하는 화염 구체를 발사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", FIREBALL.DAMAGE_EXPLODE, FIREBALL.DAMAGE_EXPLODE / 2)
@@ -61,17 +61,14 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, FIREBALL.DISTANCE)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, FIREBALL.RADIUS)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, -FIREBALL.CAPACITY_CONSUME)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
      * 화염탄의 정보.
      */
     @UtilityClass
-    public static class FIREBALL {
+    public static final class FIREBALL {
         /** 쿨타임 */
         public static final Timespan COOLDOWN = Timespan.ofSeconds(1);
         /** 피해량 (폭발) */
@@ -95,7 +92,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
          * 반동 정보.
          */
         @UtilityClass
-        public static class RECOIL {
+        public static final class RECOIL {
             /** 수직 반동 */
             public static final double UP = 5.0;
             /** 수평 반동 */
@@ -111,7 +108,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 12;
     }
@@ -125,20 +122,17 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_HORSE_BREATHE).volume(1.5).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_HORSE_BREATHE).volume(1.5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder("new.block.soul_sand.fall").volume(1.5).pitch(0.5).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.soul_sand.fall").volume(1.5).pitch(0.5).build());
         /** 사용 (화염탄) */
         public static final SoundEffect USE_FIREBALL = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(2).pitch(1.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(2).pitch(1.1).build(),
-                SoundEffect.SoundInfo.builder("random.gun.grenade").volume(2).pitch(0.9).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun.grenade").volume(2).pitch(0.9).build());
         /** 폭발 (화염탄) */
         public static final SoundEffect FIREBALL_EXPLODE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(3).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(5).pitch(1).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(5).pitch(1).build());
         /** 재장전 */
         public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
                 .add(3, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(0.5).build())
@@ -162,8 +156,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                         .speedMultiplier(1, 1.3, 0.8)
                         .build(),
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(1.45).build()
-        );
+                        .speedMultiplier(1.45).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.2).verticalSpread(0.2).speed(0.05).build());
@@ -173,14 +166,12 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         /** 총알 궤적 (화염탄) */
         public static final ParticleEffect BULLET_TRAIL_FIREBALL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(10).horizontalSpread(0.12).verticalSpread(0.12).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(13).horizontalSpread(0.15).verticalSpread(0.15).speed(0.04).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(13).horizontalSpread(0.15).verticalSpread(0.15).speed(0.04).build());
         /** 폭발 (화염탄) */
         public static final ParticleEffect FIREBALL_EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.1).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(80).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(30).horizontalSpread(0.3).verticalSpread(0.3).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(80).horizontalSpread(0.2).verticalSpread(0.2).speed(0.1).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(80).horizontalSpread(0.2).verticalSpread(0.2).speed(0.1).build());
     }
 }

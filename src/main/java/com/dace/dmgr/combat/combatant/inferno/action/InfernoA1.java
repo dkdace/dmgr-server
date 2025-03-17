@@ -39,6 +39,7 @@ public final class InfernoA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
 
@@ -79,6 +80,7 @@ public final class InfernoA1 extends ActiveSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
         if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));
     }
@@ -91,9 +93,8 @@ public final class InfernoA1 extends ActiveSkill {
         new InfernoA1Area().emit(loc);
 
         InfernoA1Info.SOUND.LAND.play(loc);
-        Block floor = loc.clone().subtract(0, 0.5, 0).getBlock();
-        CombatEffectUtil.playHitBlockParticle(loc, floor, 5);
         InfernoA1Info.PARTICLE.LAND_CORE.play(loc);
+        CombatEffectUtil.playHitBlockParticle(loc, loc.clone().subtract(0, 0.5, 0).getBlock(), 5);
 
         loc.setYaw(0);
         loc.setPitch(0);
@@ -125,12 +126,12 @@ public final class InfernoA1 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true)
-                    && target instanceof Movable)
-                ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0))
-                        .multiply(InfernoA1Info.KNOCKBACK));
+                    && target instanceof Movable) {
+                Vector dir = LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)).multiply(InfernoA1Info.KNOCKBACK);
+                ((Movable) target).getMoveModule().knockback(dir);
+            }
 
             InfernoA1Info.PARTICLE.HIT_ENTITY.play(location);
-
             return !(target instanceof Barrier);
         }
     }

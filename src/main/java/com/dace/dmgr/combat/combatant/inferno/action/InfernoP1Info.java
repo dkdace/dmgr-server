@@ -14,6 +14,7 @@ public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
     public static final double DETECT_RADIUS = 10;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(1.5);
+
     @Getter
     private static final InfernoP1Info instance = new InfernoP1Info();
 
@@ -24,8 +25,6 @@ public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

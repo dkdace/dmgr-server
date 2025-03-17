@@ -27,6 +27,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
+
     @Getter
     private static final InfernoUltInfo instance = new InfernoUltInfo();
 
@@ -40,9 +41,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
                         .addValueInfo(TextIcon.HEAL, ChatColor.YELLOW, SHIELD)
                         .addValueInfo(TextIcon.COOLDOWN_DECREASE, Format.TIME, -A1_COOLDOWN_DECREMENT.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -63,8 +62,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
         public static final SoundEffect DEATH = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.8).build());
     }
 
     /**
@@ -80,8 +78,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
                         .speedMultiplier(0.2).build(),
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.2).build()
-        );
+                        .speedMultiplier(0.2).build());
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
@@ -99,7 +96,6 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
         public static final ParticleEffect DEATH = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(300).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(250).horizontalSpread(0.3).verticalSpread(0.3).speed(0.25).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(150).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(150).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build());
     }
 }

@@ -29,6 +29,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
     public static final double RADIUS = 3.5;
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.6;
+
     @Getter
     private static final InfernoA1Info instance = new InfernoA1Info();
 
@@ -40,9 +41,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -54,15 +53,13 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SHOOT).volume(3).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(3).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.6).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.6).build());
         /** 착지 */
         public static final SoundEffect LAND = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(3).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(3).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(1.3).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(1.3).build());
     }
 
     /**
@@ -76,8 +73,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).verticalSpread(0.15).speed(0.02).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build()
-        );
+                ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build());
         /** 착지 (중심) */
         public static final ParticleEffect LAND_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(200).horizontalSpread(0.8).verticalSpread(0.1).speed(0.05).build());
