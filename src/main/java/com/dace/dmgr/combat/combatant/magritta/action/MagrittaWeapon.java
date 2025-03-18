@@ -31,8 +31,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     public MagrittaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaWeaponInfo.getInstance(), MagrittaWeaponInfo.COOLDOWN);
-
-        reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
+        this.reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
     }
 
     @Override
@@ -64,32 +63,22 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 }
 
                 setCooldown();
+                shot(false);
 
-                Location loc = combatUser.getLocation();
-                HashMap<Damageable, Integer> targets = new HashMap<>();
-
-                new MagrittaWeaponHitscan(targets).shot();
-                for (int i = 0; i < MagrittaWeaponInfo.PELLET_AMOUNT - 1; i++) {
-                    Vector dir = VectorUtil.getSpreadedVector(loc.getDirection(), MagrittaWeaponInfo.SPREAD);
-                    new MagrittaWeaponHitscan(targets).shot(dir);
-                }
-                targets.forEach((target, hits) -> {
-                    if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
-                        MagrittaT1.addShreddingValue(combatUser, target);
-                });
-                blockHitCount = 0;
                 reloadModule.consume(1);
 
                 CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP, MagrittaWeaponInfo.RECOIL.SIDE, MagrittaWeaponInfo.RECOIL.UP_SPREAD,
                         MagrittaWeaponInfo.RECOIL.SIDE_SPREAD, 3, 1);
+
+                Location loc = combatUser.getLocation();
                 MagrittaWeaponInfo.SOUND.USE.play(loc);
+
                 addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
 
                 break;
             }
             case DROP: {
                 onAmmoEmpty();
-
                 break;
             }
             default:
@@ -126,26 +115,53 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         // 미사용
     }
 
+    /**
+     * 기본 무기 총알을 발사한다.
+     *
+     * @param isUlt 궁극기 여부
+     */
+    void shot(boolean isUlt) {
+        HashMap<Damageable, Integer> targets = new HashMap<>();
+        Vector dir = combatUser.getLocation().getDirection();
+        double spread = MagrittaWeaponInfo.SPREAD;
+        if (isUlt)
+            spread *= 1.25;
+
+        new MagrittaWeaponHitscan(targets, isUlt).shot();
+        for (int i = 0; i < MagrittaWeaponInfo.PELLET_AMOUNT - 1; i++)
+            new MagrittaWeaponHitscan(targets, isUlt).shot(VectorUtil.getSpreadedVector(dir, spread));
+
+        targets.forEach((target, hits) -> {
+            if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
+                MagrittaT1.addShreddingValue(combatUser, target);
+        });
+
+        blockHitCount = 0;
+    }
+
     private final class MagrittaWeaponHitscan extends Hitscan<Damageable> {
         private final HashMap<Damageable, Integer> targets;
+        private final boolean isUlt;
 
-        private MagrittaWeaponHitscan(@NonNull HashMap<Damageable, Integer> targets) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser),
-                    Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
+        private MagrittaWeaponHitscan(@NonNull HashMap<Damageable, Integer> targets, boolean isUlt) {
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
+
             this.targets = targets;
+            this.isUlt = isUlt;
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            MagrittaWeaponInfo.PARTICLE.HIT.play(location);
+            (isUlt ? MagrittaUltInfo.PARTICLE.HIT : MagrittaWeaponInfo.PARTICLE.HIT).play(location);
         }
 
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(14, location -> {
+            return createPeriodIntervalHandler((isUlt ? 15 : 14), location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+
+                (isUlt ? MagrittaUltInfo.PARTICLE.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
             });
         }
 
@@ -154,6 +170,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
                 CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1);
+                if (isUlt)
+                    MagrittaUltInfo.PARTICLE.HIT_BLOCK.play(location);
 
                 if (blockHitCount++ == 0) {
                     CombatEffectUtil.BULLET_HIT_BLOCK_SOUND.play(location);
@@ -172,11 +190,11 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 int shredding = target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.SHREDDING).getValue();
                 if (shredding > 0)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
+
                 if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true))
                     targets.put(target, targets.getOrDefault(target, 0) + 1);
 
                 MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
-
                 return false;
             };
         }

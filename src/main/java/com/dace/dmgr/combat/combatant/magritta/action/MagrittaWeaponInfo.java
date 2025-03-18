@@ -30,6 +30,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     public static final int CAPACITY = 8;
     /** 재장전 시간 */
     public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.8);
+
     @Getter
     private static final MagrittaWeaponInfo instance = new MagrittaWeaponInfo();
 
@@ -44,16 +45,14 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 반동 정보.
      */
     @UtilityClass
-    public static class RECOIL {
+    public static final class RECOIL {
         /** 수직 반동 */
         public static final double UP = 9.0;
         /** 수평 반동 */
@@ -68,7 +67,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 13;
     }
@@ -84,8 +83,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
                 SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder("random.gun2.spas_12_1").volume(3).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build());
         /** 재장전 */
         public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
                 .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(0.6).pitch(1.3).build())

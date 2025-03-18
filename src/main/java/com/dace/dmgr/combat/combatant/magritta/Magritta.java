@@ -133,7 +133,6 @@ public final class Magritta extends Scuffler {
             return;
 
         MagrittaUlt skillUlt = attacker.getSkill(MagrittaUltInfo.getInstance());
-
         if (!skillUlt.isDurationFinished())
             attacker.addScore("궁극기 보너스", MagrittaUltInfo.KILL_SCORE * score / 100.0);
     }

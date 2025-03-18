@@ -20,6 +20,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
     public static final int SPEED = 60;
     /** 지속 시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(1);
+
     @Getter
     private static final MagrittaA2Info instance = new MagrittaA2Info();
 
@@ -32,9 +33,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.RIGHT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -45,8 +44,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(1.5).pitch(2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(0.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(0.5).build());
     }
 
     /**
@@ -57,8 +55,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(0.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).horizontalSpread(0.4).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).horizontalSpread(0.4).build());
         /** 틱 입자 효과 (장식) */
         public static final ParticleEffect TICK_DECO = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)

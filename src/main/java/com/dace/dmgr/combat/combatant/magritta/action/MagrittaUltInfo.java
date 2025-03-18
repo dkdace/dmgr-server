@@ -28,6 +28,7 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
+
     @Getter
     private static final MagrittaUltInfo instance = new MagrittaUltInfo();
 
@@ -39,9 +40,7 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME_WITH_RPM, ATTACK_COOLDOWN.toSeconds(), 60 / ATTACK_COOLDOWN.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -53,22 +52,19 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(1).pitch(0.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(1).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(0.6).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(0.6).build());
         /** 사격 */
         public static final SoundEffect SHOOT = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
                 SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.gun2.spas_12_1").volume(3).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build());
         /** 사용 종료 */
         public static final SoundEffect END = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.4).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.4).build());
     }
 
     /**
@@ -83,8 +79,7 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).speed(0.15).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).build());
         /** 블록 타격 */
         public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build());
@@ -94,7 +89,6 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(50).speed(0.05).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(15).build(),
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
-                        .speed(0.1).build()
-        );
+                        .speed(0.1).build());
     }
 }

@@ -25,8 +25,8 @@ public final class MagrittaT1 {
      */
     static void addShreddingValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
         ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, attacker, MagrittaT1Info.DURATION);
-
         shreddingValue.addValue();
+
         if (shreddingValue.getValue() >= MagrittaT1Info.MAX) {
             victim.getStatusEffectModule().apply(MagrittaT1Burning.instance, attacker, MagrittaT1Info.DURATION);
 
@@ -77,6 +77,7 @@ public final class MagrittaT1 {
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             setValue(0);
+
             if (shreddingHologram != null) {
                 shreddingHologram.remove();
                 shreddingHologram = null;

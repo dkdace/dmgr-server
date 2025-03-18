@@ -21,6 +21,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -44,6 +45,7 @@ public final class MagrittaA1 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MagrittaA1Info.READY_DURATION);
 
@@ -132,10 +134,10 @@ public final class MagrittaA1 extends ActiveSkill {
             addTask(new IntervalTask(i -> {
                 Location loc = location.clone();
 
-                if (target == null) {
+                if (target == null)
                     MagrittaA1Info.PARTICLE.TICK.play(loc);
-                } else {
-                    if ((target instanceof CombatUser && ((CombatUser) target).isDead()) || target.isRemoved())
+                else {
+                    if (target.isRemoved() || target instanceof CombatUser && ((CombatUser) target).isDead())
                         return false;
 
                     loc = target.getCenterLocation();
@@ -167,17 +169,17 @@ public final class MagrittaA1 extends ActiveSkill {
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance,
-                        MagrittaA1Info.RADIUS / 2.0);
-                Timespan burning = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION.toTicks(), distance,
-                        MagrittaA1Info.RADIUS / 2.0));
-                if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null,
-                        false, true)) {
-                    target.getStatusEffectModule().apply(MagrittaA1Burning.instance, combatUser, burning);
+                double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance, radius / 2.0);
+                Timespan burningDuration = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION.toTicks(), distance,
+                        radius / 2.0));
 
-                    if (target instanceof Movable)
-                        ((Movable) target).getMoveModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0))
-                                .multiply(MagrittaA1Info.KNOCKBACK));
+                if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null, false, true)) {
+                    target.getStatusEffectModule().apply(MagrittaA1Burning.instance, combatUser, burningDuration);
+
+                    if (target instanceof Movable) {
+                        Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MagrittaA1Info.KNOCKBACK);
+                        ((Movable) target).getMoveModule().knockback(dir);
+                    }
 
                     MagrittaT1.addShreddingValue(combatUser, target);
                 }

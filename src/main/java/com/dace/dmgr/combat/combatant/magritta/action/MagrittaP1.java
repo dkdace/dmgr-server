@@ -59,6 +59,7 @@ public final class MagrittaP1 extends AbstractSkill {
 
             addActionTask(new IntervalTask(i -> {
                 combatUser.getDamageModule().heal(combatUser, MagrittaP1Info.HEAL_PER_SECOND * 2 / 20.0, false);
+
                 return !isDurationFinished();
             }, 2));
         } else
@@ -68,6 +69,11 @@ public final class MagrittaP1 extends AbstractSkill {
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    protected void onCancelled() {
+        setDuration(Timespan.ZERO);
     }
 
     private final class MagrittaP1Area extends Area<Damageable> {

@@ -23,6 +23,7 @@ public final class MagrittaT1Info extends TraitInfo {
 
     /** 최대치 피해 점수 */
     public static final double MAX_DAMAGE_SCORE = 1;
+
     @Getter
     private static final MagrittaT1Info instance = new MagrittaT1Info();
 
@@ -35,9 +36,7 @@ public final class MagrittaT1Info extends TraitInfo {
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "최대 " + MAX, ChatColor.DARK_PURPLE)
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "(파쇄)×{0}%", DAMAGE_INCREMENT)
                         .addValueInfo(TextIcon.FIRE, Format.PER_SECOND, FIRE_DAMAGE_PER_SECOND)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**

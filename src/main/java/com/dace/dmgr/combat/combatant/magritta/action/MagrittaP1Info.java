@@ -14,6 +14,7 @@ public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
     public static final double DETECT_RADIUS = 15;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(2);
+
     @Getter
     private static final MagrittaP1Info instance = new MagrittaP1Info();
 
@@ -24,8 +25,6 @@ public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

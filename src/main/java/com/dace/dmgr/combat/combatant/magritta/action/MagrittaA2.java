@@ -1,8 +1,10 @@
 package com.dace.dmgr.combat.combatant.magritta.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
@@ -41,35 +43,46 @@ public final class MagrittaA2 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().cancel();
-        combatUser.getWeapon().setVisible(false);
+
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, MagrittaA2Info.DURATION);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION.toTicks(), 2, false, false), true);
 
+        Weapon weapon = combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setVisible(false);
+
         MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            if (combatUser.isDead())
-                return false;
-
             Location loc = combatUser.getLocation().add(0, 0.1, 0);
+
             MagrittaA2Info.PARTICLE.TICK_CORE.play(loc);
             MagrittaA2Info.PARTICLE.TICK_DECO.play(combatUser.getCenterLocation());
-
-            return true;
-        }, isCancelled -> {
-            combatUser.getWeapon().setVisible(true);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-            ((MagrittaWeapon) combatUser.getWeapon()).getReloadModule().resetRemainingAmmo();
-
-            MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
         }, 1, MagrittaA2Info.DURATION.toTicks()));
+    }
+
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+
+        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getWeapon();
+        weapon.setVisible(true);
+        weapon.getReloadModule().resetRemainingAmmo();
+
+        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
     }
 
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    protected void onCancelled() {
+        setDuration(Timespan.ZERO);
     }
 }

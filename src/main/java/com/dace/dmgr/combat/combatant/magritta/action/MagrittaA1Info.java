@@ -37,6 +37,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
 
     /** 부착 점수 */
     public static final int STUCK_SCORE = 8;
+
     @Getter
     private static final MagrittaA1Info instance = new MagrittaA1Info();
 
@@ -52,9 +53,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
                                 FIRE_DURATION.toSeconds(), FIRE_DURATION.toSeconds() / 2, FIRE_DAMAGE_PER_SECOND)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -68,8 +67,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
         /** 부착 */
         public static final SoundEffect STUCK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.8).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.8).pitch(1.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.8).pitch(1.5).build());
         /** 틱 효과음 */
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(1.8).build());
@@ -79,8 +77,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(4).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(4).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build());
     }
 
     /**
@@ -96,15 +93,13 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 30, 15)
                         .count(6).horizontalSpread(0.15).verticalSpread(0.15).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(4).horizontalSpread(0.12).verticalSpread(0.12).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(4).horizontalSpread(0.12).verticalSpread(0.12).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(80).horizontalSpread(0.3).verticalSpread(0.3).speed(0.1).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(150).horizontalSpread(0.2).verticalSpread(0.2).speed(0.3).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(100).horizontalSpread(0.8).verticalSpread(0.8).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(250).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(250).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build());
     }
 }
