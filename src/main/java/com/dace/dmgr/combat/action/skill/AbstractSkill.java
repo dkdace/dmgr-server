@@ -70,12 +70,11 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     public final void setDuration(@NonNull Timespan duration) {
         if (isDurationFinished()) {
             durationTimestamp = Timestamp.now().plus(duration);
-            runDuration();
-        } else {
+
+            if (!duration.isZero())
+                runDuration();
+        } else
             durationTimestamp = Timestamp.now().plus(duration);
-            if (duration.isZero())
-                onDurationFinished();
-        }
     }
 
     @Override

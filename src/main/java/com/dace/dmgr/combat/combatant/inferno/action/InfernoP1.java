@@ -71,6 +71,11 @@ public final class InfernoP1 extends AbstractSkill {
         return false;
     }
 
+    @Override
+    protected void onCancelled() {
+        setDuration(Timespan.ZERO);
+    }
+
     private final class InfernoP1Area extends Area<Damageable> {
         private InfernoP1Area() {
             super(combatUser, InfernoP1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser)

@@ -16,6 +16,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class InfernoUlt extends UltimateSkill {
+    /** 보호막 */
+    @Nullable
+    private DamageModule.Shield shield;
+
     public InfernoUlt(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoUltInfo.getInstance(), InfernoUltInfo.DURATION, InfernoUltInfo.COST);
     }
@@ -45,10 +49,10 @@ public final class InfernoUlt extends UltimateSkill {
 
         combatUser.setHitboxes(Hitbox.builder(2, 2, 2).offsetY(1).pitchFixed().build());
 
-        DamageModule.Shield shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
+        shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
 
         addActionTask(new IntervalTask(i -> {
-            if (shield.getHealth() == 0)
+            if (shield != null && shield.getHealth() == 0)
                 return false;
 
             playTickEffect(i);
@@ -60,22 +64,37 @@ public final class InfernoUlt extends UltimateSkill {
 
             return true;
         }, isCancelled -> {
-            if (isCancelled) {
-                setDuration(Timespan.ZERO);
+            if (!isCancelled)
+                return;
 
-                Location loc = combatUser.getLocation();
-                InfernoUltInfo.SOUND.DEATH.play(loc);
-                InfernoUltInfo.PARTICLE.DEATH.play(loc);
-            }
+            setDuration(Timespan.ZERO);
 
-            shield.setHealth(0);
-            combatUser.resetHitboxes();
+            Location loc = combatUser.getLocation();
+            InfernoUltInfo.SOUND.DEATH.play(loc);
+            InfernoUltInfo.PARTICLE.DEATH.play(loc);
         }, 1, InfernoUltInfo.DURATION.toTicks()));
+    }
+
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+
+        combatUser.resetHitboxes();
+
+        if (shield != null) {
+            shield.setHealth(0);
+            shield = null;
+        }
     }
 
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    protected void onCancelled() {
+        setDuration(Timespan.ZERO);
     }
 
     /**

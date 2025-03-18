@@ -90,8 +90,10 @@ public abstract class AbstractAction implements Action {
     public final void setCooldown(@NonNull Timespan cooldown) {
         if (isCooldownFinished()) {
             cooldownTimestamp = Timestamp.now().plus(cooldown);
-            runCooldown();
             onCooldownSet();
+
+            if (!cooldown.isZero())
+                runCooldown();
         } else
             cooldownTimestamp = Timestamp.now().plus(cooldown);
     }
@@ -147,7 +149,7 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final boolean cancel() {
-        if (!isCancellable())
+        if (!isCancellable() && !combatUser.isDead())
             return false;
 
         actionTaskManager.stop();

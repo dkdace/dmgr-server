@@ -92,7 +92,9 @@ public abstract class StackableSkill extends ActiveSkill {
 
         if (isStackCooldownFinished()) {
             stackCooldownTimestamp = Timestamp.now().plus(cooldown);
-            runStackCooldown(cooldown);
+
+            if (!cooldown.isZero())
+                runStackCooldown(cooldown);
         } else
             stackCooldownTimestamp = Timestamp.now().plus(cooldown);
     }

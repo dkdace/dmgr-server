@@ -160,6 +160,8 @@ public interface Action {
     /**
      * 동작 사용을 강제로 취소시킨다.
      *
+     * <p>{@link Action#isCancellable()} 또는 {@link CombatUser#isDead()}가 {@code true}면 강제 취소가 가능하다.</p>
+     *
      * @return 취소 여부. {@link Action#isCancellable()}의 값 반환
      * @see Action#isCancellable()
      */
