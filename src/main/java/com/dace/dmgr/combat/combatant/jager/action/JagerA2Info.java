@@ -34,6 +34,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
     public static final int SNARE_SCORE = 20;
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 10;
+
     @Getter
     private static final JagerA2Info instance = new JagerA2Info();
 
@@ -49,10 +50,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
                                 .addValueInfo(TextIcon.HEAL, HEALTH)
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION.toSeconds())
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -67,8 +65,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
         public static final SoundEffect SUMMON = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_HORSE_ARMOR).volume(0.5).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder("random.craft").volume(0.5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
         /** 소환 준비 */
         public static final SoundEffect SUMMON_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
@@ -76,8 +73,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
         public static final SoundEffect TRIGGER = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_SHEEP_SHEAR).volume(2).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder("new.entity.player.hurt_sweet_berry_bush").volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(1.2).build());
         /** 피격 */
         public static final SoundEffect DAMAGE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(0.4).pitch(1.1).pitchVariance(0.1).build());
@@ -85,8 +81,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
         public static final SoundEffect DEATH = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(1).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(1).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(1).pitch(0.8).build());
     }
 
     /**

@@ -18,8 +18,6 @@ public final class JagerP1Info extends PassiveSkillInfo<JagerP1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("<d::설랑>이 공격한 적, <d::곰덫>에 걸린 적 및 <d::빙결 수류탄>으로 속박당한 적의 위치를 일정 시간동안 탐지합니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

@@ -20,6 +20,7 @@ public final class JagerT1Info extends TraitInfo {
     public static final int NO_JUMP = 80;
     /** 최대치 */
     public static final int MAX = 100;
+
     @Getter
     private static final JagerT1Info instance = new JagerT1Info();
 
@@ -31,9 +32,7 @@ public final class JagerT1Info extends TraitInfo {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, "최대 " + MAX, ChatColor.DARK_PURPLE)
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, "(빙결)%")
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**

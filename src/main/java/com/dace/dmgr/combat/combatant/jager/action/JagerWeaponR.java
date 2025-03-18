@@ -18,7 +18,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 
 public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
-    /** 주무기 객체 */
+    /** 주무기 인스턴스 */
     private final JagerWeaponL mainWeapon;
     /** 재장전 모듈 */
     @Getter
@@ -29,7 +29,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
 
         this.mainWeapon = mainWeapon;
-        reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, Timespan.ZERO);
+        this.reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, Timespan.ZERO);
     }
 
     @Override
@@ -65,25 +65,25 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 setCooldown();
 
                 new JagerWeaponRHitscan().shot();
+
                 reloadModule.consume(1);
 
-                Location loc = combatUser.getLocation();
                 CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
                         JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
+
+                Location loc = combatUser.getLocation();
                 JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
+
                 addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
 
                 break;
             }
             case RIGHT_CLICK: {
-                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 cancel();
-
                 break;
             }
             case DROP: {
                 onAmmoEmpty();
-
                 break;
             }
             default:

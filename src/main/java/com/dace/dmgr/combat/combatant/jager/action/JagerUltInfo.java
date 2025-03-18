@@ -45,6 +45,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 25;
+
     @Getter
     private static final JagerUltInfo instance = new JagerUltInfo();
 
@@ -63,10 +64,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                                 .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.PER_SECOND, ChatColor.DARK_PURPLE, FREEZE_PER_SECOND)
                                 .addValueInfo(TextIcon.RADIUS, "{0}m ~ {1}m (0초~{2}초)",
                                         MIN_RADIUS, MAX_RADIUS, MAX_RADIUS_DURATION.toSeconds())
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -86,8 +84,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
         /** 틱 효과음 */
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ITEM_ELYTRA_FLYING).volume(3).pitch(1.3).pitchVariance(0.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_ELYTRA_FLYING).volume(3).pitch(1.7).pitchVariance(0.2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ITEM_ELYTRA_FLYING).volume(3).pitch(1.7).pitchVariance(0.2).build());
         /** 피격 */
         public static final SoundEffect DAMAGE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(0.4).pitch(1.1).pitchVariance(0.1).build());
@@ -95,8 +92,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
         public static final SoundEffect DEATH = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(1.2).build());
     }
 
     /**
@@ -131,7 +127,6 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(120)
                         .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(80).horizontalSpread(0.1).verticalSpread(0.1).speed(0.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build());
     }
 }

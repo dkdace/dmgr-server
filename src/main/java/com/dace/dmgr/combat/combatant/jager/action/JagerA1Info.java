@@ -38,6 +38,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(10);
     /** 사망 점수 */
     public static final int DEATH_SCORE = 15;
+
     @Getter
     private static final JagerA1Info instance = new JagerA1Info();
 
@@ -52,23 +53,18 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (사망 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEAL, HEALTH)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, ENEMY_DETECT_RADIUS)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("설랑: 공격 시", ActionInfoLore.Section
                                 .builder("적에게 접근하여 <:DAMAGE:피해>를 입힙니다. " +
                                         "<:SNARE:속박>에 걸린 적에게 <:DAMAGE_INCREASE:치명타>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, 1)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("회수", ActionKey.SLOT_1)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**

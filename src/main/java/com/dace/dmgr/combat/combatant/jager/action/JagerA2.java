@@ -52,6 +52,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
@@ -117,41 +118,33 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
      */
     @Getter
     public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
-        /** 상태 효과 모듈 */
-        @NonNull
-        private final StatusEffectModule statusEffectModule;
         /** 공격 모듈 */
         @NonNull
         private final AttackModule attackModule;
         /** 피해 모듈 */
         @NonNull
         private final DamageModule damageModule;
+        /** 상태 효과 모듈 */
+        @NonNull
+        private final StatusEffectModule statusEffectModule;
         /** 준비 시간 모듈 */
         @NonNull
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA2Entity(@NonNull Location spawnLocation) {
-            super(
-                    ArmorStand.class,
-                    spawnLocation,
-                    combatUser.getName() + "의 곰덫",
-                    combatUser,
-                    true, true,
-                    Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build()
-            );
+            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 곰덫", combatUser, true, true,
+                    Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build());
 
-            statusEffectModule = new StatusEffectModule(this);
-            attackModule = new AttackModule();
-            damageModule = new DamageModule(this, JagerA2Info.HEALTH, true);
-            readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
+            this.attackModule = new AttackModule();
+            this.damageModule = new DamageModule(this, JagerA2Info.HEALTH, true);
+            this.statusEffectModule = new StatusEffectModule(this);
+            this.readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
             onInit();
         }
 
         private void onInit() {
             entity.teleport(getLocation().add(0, 0.05, 0));
-            damageModule.setMaxHealth(JagerA2Info.HEALTH);
-            damageModule.setHealth(JagerA2Info.HEALTH);
 
             owner.getUser().setGlowing(entity, ChatColor.WHITE);
             JagerA2Info.SOUND.SUMMON.play(getLocation());
@@ -162,7 +155,6 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         @Override
         public void onTickBeforeReady(long i) {
             JagerA2Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(getLocation());
-            playTickEffect();
         }
 
         @Override
@@ -171,15 +163,15 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         }
 
         private void onTick(long i) {
+            playTickEffect();
             if (!readyTimeModule.isReady())
                 return;
 
             Damageable target = CombatUtil.getNearCombatEntity(game, getLocation().add(0, 0.5, 0), 0.8,
                     CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
+
             if (target != null)
                 onCatchEnemy(target);
-
-            playTickEffect();
         }
 
         /**
@@ -209,7 +201,6 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             }
 
             JagerA2Info.SOUND.TRIGGER.play(getLocation());
-
             remove();
         }
 
@@ -247,8 +238,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location,
-                             boolean isCrit) {
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
             JagerA2Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakParticle(this, location, damage);
         }

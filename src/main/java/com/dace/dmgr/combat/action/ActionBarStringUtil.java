@@ -18,6 +18,29 @@ import java.util.StringJoiner;
 @UtilityClass
 public final class ActionBarStringUtil {
     /**
+     * 동작 사용 키 설명을 반환한다.
+     *
+     * <p>Example:</p>
+     *
+     * <pre>[1][우클릭] 사용</pre>
+     * <pre><code>
+     * ActionBarStringUtil.getKeyInfo("사용", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
+     * </code></pre>
+     *
+     * @param description 설명
+     * @param actionKeys  동작 사용 키 목록
+     * @return 사용 키 설명
+     */
+    @NonNull
+    public static String getKeyInfo(@NonNull String description, @NonNull ActionKey @NonNull ... actionKeys) {
+        StringJoiner keys = new StringJoiner("][");
+        for (ActionKey actionKey : actionKeys)
+            keys.add(actionKey.toString());
+
+        return MessageFormat.format("  §7[{0}] §f{1}", keys, description);
+    }
+
+    /**
      * 지정한 스킬의 사용 키 설명을 반환한다.
      *
      * <p>Example:</p>
@@ -33,11 +56,7 @@ public final class ActionBarStringUtil {
      */
     @NonNull
     public static String getKeyInfo(@NonNull Skill skill, @NonNull String description) {
-        StringJoiner keys = new StringJoiner("][");
-        for (ActionKey actionKey : skill.getDefaultActionKeys())
-            keys.add(actionKey.toString());
-
-        return MessageFormat.format("  §7[{0}] §f{1}", keys, description);
+        return getKeyInfo(description, skill.getDefaultActionKeys());
     }
 
     /**

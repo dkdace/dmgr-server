@@ -41,9 +41,9 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     public JagerA1(@NonNull CombatUser combatUser) {
         super(combatUser, JagerA1Info.getInstance(), JagerA1Info.COOLDOWN, JagerA1Info.HEALTH, 0);
 
-        confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
-        entityModule = new EntityModule<>(this);
-        bonusScoreModule = new BonusScoreModule(this, "설랑 보너스", JagerA1Info.KILL_SCORE);
+        this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
+        this.entityModule = new EntityModule<>(this);
+        this.bonusScoreModule = new BonusScoreModule(this, "설랑 보너스", JagerA1Info.KILL_SCORE);
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     public String getActionBarString() {
         String text = ActionBarStringUtil.getProgressBar(this);
         if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo(this, "회수");
+            text += ActionBarStringUtil.getKeyInfo("회수", getDefaultActionKeys()[0]);
 
         return text;
     }
@@ -99,7 +99,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             }
             case LEFT_CLICK: {
                 onUse();
-
                 break;
             }
             default:
@@ -140,6 +139,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             return;
 
         setDuration();
+
         confirmModule.toggleCheck();
         combatUser.setGlobalCooldown(Timespan.ofTicks(1));
 
@@ -150,16 +150,16 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
      * 설랑 클래스.
      */
     @Getter
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable, CombatEntity {
-        /** 상태 효과 모듈 */
-        @NonNull
-        private final StatusEffectModule statusEffectModule;
+    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable {
         /** 공격 모듈 */
         @NonNull
         private final AttackModule attackModule;
         /** 피해 모듈 */
         @NonNull
         private final DamageModule damageModule;
+        /** 상태 효과 모듈 */
+        @NonNull
+        private final StatusEffectModule statusEffectModule;
         /** 이동 모듈 */
         @NonNull
         private final MoveModule moveModule;
@@ -168,20 +168,14 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA1Entity(@NonNull Location spawnLocation) {
-            super(
-                    Wolf.class,
-                    spawnLocation,
-                    combatUser.getName() + "의 설랑",
-                    combatUser,
-                    true, false,
-                    Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build()
-            );
+            super(Wolf.class, spawnLocation, combatUser.getName() + "의 설랑", combatUser, true, false,
+                    Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
 
-            statusEffectModule = new StatusEffectModule(this);
-            attackModule = new AttackModule();
-            damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
-            moveModule = new MoveModule(this, JagerA1Info.SPEED);
-            readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
+            this.attackModule = new AttackModule();
+            this.damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
+            this.statusEffectModule = new StatusEffectModule(this);
+            this.moveModule = new MoveModule(this, JagerA1Info.SPEED);
+            this.readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
 
             onInit();
         }
@@ -213,37 +207,34 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         }
 
         private void onTick(long i) {
-            if (!readyTimeModule.isReady())
+            if (!readyTimeModule.isReady() || i % 10 != 0)
                 return;
 
-            if (i % 10 == 0) {
-                if (entity.getTarget() == null) {
-                    entity.setAngry(false);
-                    entity.setSitting(true);
-                    entity.setTamed(true);
-                    damageModule.setMaxHealth(JagerA1Info.HEALTH);
-                    damageModule.setHealth(getStateValue());
+            if (entity.getTarget() == null) {
+                entity.setAngry(false);
+                entity.setSitting(true);
+                entity.setTamed(true);
 
-                    Damageable target = CombatUtil.getNearCombatEntity(game, getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                            CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
-                    if (target != null) {
-                        entity.setTarget(target.getEntity());
+                Damageable target = CombatUtil.getNearCombatEntity(game, getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
+                        CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
 
-                        JagerA1Info.SOUND.ENEMY_DETECT.play(getLocation());
-                    }
-                } else {
-                    entity.setAngry(true);
-                    entity.setSitting(false);
-                    entity.setTamed(false);
-                    damageModule.setMaxHealth(JagerA1Info.HEALTH);
-                    damageModule.setHealth(getStateValue());
-
-                    CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
-                    if (targetCombatEntity == null || targetCombatEntity.isRemoved()
-                            || (targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead()))
-                        entity.setTarget(null);
+                if (target != null) {
+                    entity.setTarget(target.getEntity());
+                    JagerA1Info.SOUND.ENEMY_DETECT.play(getLocation());
                 }
+            } else {
+                entity.setAngry(true);
+                entity.setSitting(false);
+                entity.setTamed(false);
+
+                CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
+                if (targetCombatEntity == null || targetCombatEntity.isRemoved()
+                        || targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead())
+                    entity.setTarget(null);
             }
+
+            damageModule.setMaxHealth(JagerA1Info.HEALTH);
+            damageModule.setHealth(getStateValue());
         }
 
         @Override
@@ -268,20 +259,19 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         }
 
         @Override
-        public void onKill(@NonNull Damageable victim) {
-            owner.onKill(victim);
-        }
-
-        @Override
         public void onDefaultAttack(@NonNull Damageable victim) {
             victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, null,
                     victim.getStatusEffectModule().hasType(StatusEffectType.SNARE), true);
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location,
-                             boolean isCrit) {
-            setStateValue((int) damageModule.getHealth());
+        public void onKill(@NonNull Damageable victim) {
+            owner.onKill(victim);
+        }
+
+        @Override
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
+            setStateValue(damageModule.getHealth());
 
             JagerA1Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBleedingParticle(this, location, damage);

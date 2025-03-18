@@ -45,10 +45,11 @@ public final class JagerT1 {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            if (combatEntity.isCreature())
-                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
             if (combatEntity instanceof Movable)
                 modifier.setIncrement(-getValue());
+
+            if (combatEntity.isCreature())
+                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
         }
 
         @Override

@@ -5,11 +5,12 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
-@Setter
+@Setter(AccessLevel.PACKAGE)
 public final class JagerP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Damageable target = null;
@@ -25,9 +26,13 @@ public final class JagerP1 extends AbstractSkill {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && target.isCreature();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (target.isCreature())
-            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, JagerP1Info.DURATION);
+        combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, JagerP1Info.DURATION);
     }
 
     @Override

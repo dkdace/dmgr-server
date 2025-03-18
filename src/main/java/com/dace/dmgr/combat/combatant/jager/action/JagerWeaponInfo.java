@@ -36,6 +36,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     public static final Timespan SWAP_DURATION = Timespan.ofSeconds(0.25);
     /** 조준 시 이동속도 감소량 */
     public static final int AIM_SLOW = 30;
+
     @Getter
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
@@ -54,24 +55,20 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
                                 .addValueInfo(TextIcon.WALK_SPEED_DECREASE, ChatColor.DARK_PURPLE, FREEZE)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("저격탄", ActionInfoLore.Section
                                 .builder("저격탄을 사격하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
                                         SCOPE.DAMAGE, SCOPE.DAMAGE / 2, SCOPE.DAMAGE_WEAKENING_DISTANCE, SCOPE.DAMAGE_WEAKENING_DISTANCE * 2)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, SCOPE.CAPACITY)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
      * 정조준 상태의 정보.
      */
     @UtilityClass
-    public static class SCOPE {
+    public static final class SCOPE {
         /** 피해량 */
         public static final int DAMAGE = 240;
         /** 피해량 감소 시작 거리 (단위: 블록) */
@@ -85,7 +82,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
          * 반동 정보.
          */
         @UtilityClass
-        public static class RECOIL {
+        public static final class RECOIL {
             /** 수직 반동 */
             public static final double UP = 2.8;
             /** 수평 반동 */
@@ -101,7 +98,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 반동 정보.
      */
     @UtilityClass
-    public static class RECOIL {
+    public static final class RECOIL {
         /** 수직 반동 */
         public static final double UP = 0.8;
         /** 수평 반동 */
@@ -116,7 +113,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 2;
     }
@@ -129,20 +126,18 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.m16_1").volume(0.8).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(0.8).pitch(1.7).build()
-        );
-        /** 전환 활성화 */
-        public static final SoundEffect SWAP_ON = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(0.8).pitch(1.7).build());
+        /** 조준 활성화 */
+        public static final SoundEffect AIM_ON = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(1.9).build());
-        /** 전환 비활성화 */
-        public static final SoundEffect SWAP_OFF = new SoundEffect(
+        /** 조준 비활성화 */
+        public static final SoundEffect AIM_OFF = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.9).build());
         /** 사용 (저격탄) */
         public static final SoundEffect USE_SCOPE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.psg_1_1").volume(3.5).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.gun2.m16_1").volume(3.5).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5.5).pitch(0.95).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5.5).pitch(0.95).build());
         /** 재장전 */
         public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
                 .add(3, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(1.7).build())
