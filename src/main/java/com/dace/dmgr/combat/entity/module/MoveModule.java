@@ -22,7 +22,6 @@ import org.bukkit.util.Vector;
  *
  * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  */
-@Getter
 public final class MoveModule {
     /** 넉백 저항 기본값 */
     private static final double DEFAULT_VALUE = 1;
@@ -31,9 +30,11 @@ public final class MoveModule {
     private final Movable combatEntity;
     /** 이동속도 값 */
     @NonNull
+    @Getter
     private final AbilityStatus speedStatus;
     /** 넉백 저항 값 */
     @NonNull
+    @Getter
     private final AbilityStatus resistanceStatus;
 
     /** 넉백 타임스탬프 */
