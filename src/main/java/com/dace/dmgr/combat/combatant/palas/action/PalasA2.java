@@ -68,7 +68,7 @@ public final class PalasA2 extends ActiveSkill {
 
     private final class PalasA2Target extends Target<Healable> {
         private PalasA2Target() {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+            super(combatUser, PalasA2Info.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
                     .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasA2Immune.instance)));
         }
 

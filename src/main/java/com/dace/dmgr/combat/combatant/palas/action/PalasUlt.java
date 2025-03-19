@@ -67,7 +67,7 @@ public final class PalasUlt extends UltimateSkill {
 
     private final class PalasUltTarget extends Target<Healable> {
         private PalasUltTarget() {
-            super(combatUser, PalasUltInfo.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+            super(combatUser, PalasUltInfo.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
                     .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasUltBuff.instance)));
         }
 

@@ -4,20 +4,28 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.Targeted;
+import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
-import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-public final class NeaceA1 extends ActiveSkill {
+@Getter
+public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
+    /** 타겟 모듈 */
+    @NonNull
+    private final TargetModule<Healable> targetModule;
+
     public NeaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA1Info.getInstance(), NeaceA1Info.COOLDOWN, Timespan.MAX, 0);
+        this.targetModule = new TargetModule<>(this, NeaceA1Info.MAX_DISTANCE);
     }
 
     @Override
@@ -27,13 +35,63 @@ public final class NeaceA1 extends ActiveSkill {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && targetModule.findTarget();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new NeaceA1Target().shot();
+        setCooldown();
+
+        Healable target = targetModule.getCurrentTarget();
+        target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, combatUser, NeaceA1Info.DURATION);
+
+        NeaceA1Info.SOUND.USE.play(combatUser.getLocation());
+        playUseEffect(target);
     }
 
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    @NonNull
+    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
+        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK));
+    }
+
+    /**
+     * 사용 시 효과를 재생한다.
+     *
+     * @param target 사용 대상
+     */
+    private void playUseEffect(@NonNull Healable target) {
+        Location location = combatUser.getArmLocation(MainHand.RIGHT);
+        for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
+            NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);
+
+        Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+        Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
+        Vector axis = VectorUtil.getRollAxis(loc);
+
+        for (int i = 0; i < 8; i++) {
+            int angle = i * 10;
+
+            for (int j = 0; j < 10; j++) {
+                angle += 360 / 5;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
+
+                NeaceA1Info.PARTICLE.USE.play(loc.clone().add(vec));
+            }
+        }
+        for (int i = 0; i < 7; i++) {
+            Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
+            Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
+            NeaceA1Info.PARTICLE.USE.play(loc1);
+            NeaceA1Info.PARTICLE.USE.play(loc2);
+        }
     }
 
     /**
@@ -67,55 +125,6 @@ public final class NeaceA1 extends ActiveSkill {
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
             setValue(0);
-        }
-    }
-
-    private final class NeaceA1Target extends Target<Healable> {
-        private NeaceA1Target() {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
-                    .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK)));
-        }
-
-        @Override
-        protected void onFindEntity(@NonNull Healable target) {
-            setCooldown();
-
-            target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, combatUser, NeaceA1Info.DURATION);
-
-            NeaceA1Info.SOUND.USE.play(combatUser.getLocation());
-            playUseEffect(target);
-        }
-
-        /**
-         * 사용 시 효과를 재생한다.
-         *
-         * @param target 사용 대상
-         */
-        private void playUseEffect(@NonNull Healable target) {
-            Location location = combatUser.getArmLocation(MainHand.RIGHT);
-            for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
-                NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);
-
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
-            Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
-            Vector axis = VectorUtil.getRollAxis(loc);
-
-            for (int i = 0; i < 8; i++) {
-                int angle = i * 10;
-
-                for (int j = 0; j < 10; j++) {
-                    angle += 360 / 5;
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
-
-                    NeaceA1Info.PARTICLE.USE.play(loc.clone().add(vec));
-                }
-            }
-            for (int i = 0; i < 7; i++) {
-                Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
-                Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
-                NeaceA1Info.PARTICLE.USE.play(loc1);
-                NeaceA1Info.PARTICLE.USE.play(loc2);
-            }
         }
     }
 }

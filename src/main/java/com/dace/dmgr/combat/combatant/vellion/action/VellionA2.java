@@ -131,7 +131,7 @@ public final class VellionA2 extends ActiveSkill implements HasBonusScore {
 
     private final class VellionA2Target extends Target<Damageable> {
         private VellionA2Target() {
-            super(combatUser, VellionA2Info.MAX_DISTANCE, true, CombatUtil.EntityCondition.enemy(combatUser)
+            super(combatUser, VellionA2Info.MAX_DISTANCE, CombatUtil.EntityCondition.enemy(combatUser)
                     .and(combatEntity -> combatEntity.isCreature() && !combatEntity.getStatusEffectModule().has(VellionA2Mark.instance)));
         }
 

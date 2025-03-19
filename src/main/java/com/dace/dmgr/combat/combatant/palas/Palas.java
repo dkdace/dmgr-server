@@ -181,7 +181,7 @@ public final class Palas extends Support {
 
     private static final class PalasTarget extends Target<Healable> {
         private PalasTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, PalasA2Info.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override

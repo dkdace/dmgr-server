@@ -122,7 +122,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     private final class NeaceWeaponRTarget extends Target<Healable> {
         private NeaceWeaponRTarget() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override

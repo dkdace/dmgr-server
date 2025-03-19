@@ -178,7 +178,7 @@ public final class Neace extends Support {
 
     private static final class NeaceTarget extends Target<Healable> {
         private NeaceTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, false, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
