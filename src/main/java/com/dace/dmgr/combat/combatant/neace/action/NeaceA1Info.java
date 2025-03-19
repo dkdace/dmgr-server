@@ -24,6 +24,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     public static final int MAX_DISTANCE = 30;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(15);
+
     @Getter
     private static final NeaceA1Info instance = new NeaceA1Info();
 
@@ -37,9 +38,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
                         .addValueInfo(TextIcon.HEAL, Format.PER_SECOND + " / 최대 {1}", HEAL_PER_SECOND, MAX_HEAL)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MAX_DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -52,8 +51,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.2).build());
     }
 
     /**
@@ -68,14 +66,12 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
                         .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).build());
         /** 표식 */
         public static final ParticleEffect MARK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
                         .count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
-                        .build()
-        );
+                        .build());
     }
 }

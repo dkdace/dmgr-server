@@ -41,29 +41,37 @@ public final class NeaceA2 extends ActiveSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (isDurationFinished()) {
-            setDuration();
-            combatUser.getWeapon().setGlowing(true);
+        if (!isDurationFinished()) {
+            forceCancel();
+            return;
+        }
 
-            NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
+        setDuration();
+        combatUser.getWeapon().setGlowing(true);
 
-            addActionTask(new IntervalTask(i -> {
-                if (isDurationFinished() || combatUser.isDead())
-                    return false;
+        NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
 
-                NeaceA2Info.PARTICLE.TICK.play(combatUser.getCenterLocation());
-                if (i < 12)
-                    playUseTickEffect(i);
+        addActionTask(new IntervalTask(i -> {
+            NeaceA2Info.PARTICLE.TICK.play(combatUser.getCenterLocation());
+            if (i < 12)
+                playUseTickEffect(i);
+        }, 1, NeaceA2Info.DURATION.toTicks()));
+    }
 
-                return true;
-            }, () -> combatUser.getWeapon().setGlowing(false), 1));
-        } else
-            setDuration(Timespan.ZERO);
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+        combatUser.getWeapon().setGlowing(false);
     }
 
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    protected void onCancelled() {
+        setDuration(Timespan.ZERO);
     }
 
     /**
@@ -80,7 +88,7 @@ public final class NeaceA2 extends ActiveSkill {
 
         long angle = i * 14;
         for (int j = 0; j < 4; j++) {
-            angle += 90;
+            angle += 360 / 4;
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
@@ -95,6 +103,7 @@ public final class NeaceA2 extends ActiveSkill {
      */
     void amplifyTarget(@NonNull Healable target) {
         target.getStatusEffectModule().apply(NeaceA2Buff.instance, combatUser, Timespan.ofTicks(4));
+
         if (target instanceof CombatUser)
             ((CombatUser) target).addKillHelper(combatUser, this, NeaceA2Info.ASSIST_SCORE, Timespan.ofTicks(4));
     }

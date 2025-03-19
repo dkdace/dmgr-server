@@ -24,6 +24,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
     public static final int READY_SLOW = 70;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(12);
+
     @Getter
     private static final NeaceUltInfo instance = new NeaceUltInfo();
 
@@ -35,9 +36,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -49,13 +48,11 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.7).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(1.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(1.1).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(1.1).build());
     }
 
     /**
@@ -68,8 +65,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.GRASS, 0).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
-                        .build()
-        );
+                        .build());
         /** 사용 준비 */
         public static final FireworkEffect USE_READY = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.STAR, 215, 255, 130)
                 .fadeColor(255, 255, 255).trail().build();

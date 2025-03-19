@@ -53,18 +53,15 @@ public final class NeaceA1 extends ActiveSkill {
         public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
             NeaceA1Info.PARTICLE.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
-            if (!(combatEntity instanceof Healable) || !(provider instanceof Healer))
-                return;
-            if (((Healable) combatEntity).getDamageModule().isFullHealth())
+            if (!(combatEntity instanceof Healable) || !(provider instanceof Healer) || ((Healable) combatEntity).getDamageModule().isFullHealth())
                 return;
 
-            if (getValue() >= NeaceA1Info.MAX_HEAL) {
+            double amount = NeaceA1Info.HEAL_PER_SECOND / 20.0;
+            if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, amount, true))
+                setValue(getValue() + amount);
+
+            if (getValue() >= NeaceA1Info.MAX_HEAL)
                 combatEntity.getStatusEffectModule().remove(this);
-                return;
-            }
-
-            if (((Healable) combatEntity).getDamageModule().heal((Healer) provider, NeaceA1Info.HEAL_PER_SECOND / 20.0, true))
-                setValue(getValue() + NeaceA1Info.HEAL_PER_SECOND / 20);
         }
 
         @Override
@@ -89,6 +86,11 @@ public final class NeaceA1 extends ActiveSkill {
             playUseEffect(target);
         }
 
+        /**
+         * 사용 시 효과를 재생한다.
+         *
+         * @param target 사용 대상
+         */
         private void playUseEffect(@NonNull Healable target) {
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
@@ -102,7 +104,7 @@ public final class NeaceA1 extends ActiveSkill {
                 int angle = i * 10;
 
                 for (int j = 0; j < 10; j++) {
-                    angle += 72;
+                    angle += 360 / 5;
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
 
                     NeaceA1Info.PARTICLE.USE.play(loc.clone().add(vec));

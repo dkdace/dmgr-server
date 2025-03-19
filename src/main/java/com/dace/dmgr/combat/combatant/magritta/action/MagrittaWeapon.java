@@ -187,7 +187,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
-                int shredding = target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.SHREDDING).getValue();
+                double shredding = target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.SHREDDING).getValue();
                 if (shredding > 0)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
 

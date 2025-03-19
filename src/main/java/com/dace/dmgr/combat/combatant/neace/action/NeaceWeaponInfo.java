@@ -23,6 +23,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     public static final int VELOCITY = 40;
     /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 0.16;
+
     @Getter
     private static final NeaceWeaponInfo instance = new NeaceWeaponInfo();
 
@@ -38,24 +39,20 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("치유 광선", ActionInfoLore.Section
                                 .builder("바라보는 아군에게 치유 광선을 고정하여 지속적으로 <:HEAL:치유>합니다. " +
                                         "<d::구원의 표식>이 있는 아군은 치유할 수 없습니다.")
                                 .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL.HEAL_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, HEAL.MAX_DISTANCE)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
      * 치유 광선의 정보.
      */
     @UtilityClass
-    public static class HEAL {
+    public static final class HEAL {
         /** 초당 치유량 */
         public static final int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
@@ -68,7 +65,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 5;
     }
@@ -81,8 +78,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(0.8).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1).pitch(1.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1).pitch(1.5).build());
         /** 사용 (치유 광선) */
         public static final SoundEffect USE_HEAL = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(0.2).pitch(2).build());
@@ -98,8 +94,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 235)
                         .horizontalSpread(0.05).verticalSpread(0.05).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 200)
-                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build()
-        );
+                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 200)

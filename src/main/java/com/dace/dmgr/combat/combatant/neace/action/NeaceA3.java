@@ -43,7 +43,7 @@ public final class NeaceA3 extends ActiveSkill {
         if (isDurationFinished())
             new NeaceA3Target().shot();
         else
-            cancel();
+            onEnd();
     }
 
     @Override
@@ -54,6 +54,22 @@ public final class NeaceA3 extends ActiveSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+    }
+
+    /**
+     * 사용 종료 시 실행할 작업.
+     */
+    private void onEnd() {
+        cancel();
+
+        combatUser.getEntity().addPotionEffect(
+                new PotionEffect(PotionEffectType.LEVITATION, 40, -5, false, false), true);
+
+        addTask(new IntervalTask(i -> {
+            combatUser.getEntity().setFallDistance(0);
+
+            return !combatUser.getEntity().isOnGround();
+        }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
     }
 
     private final class NeaceA3Target extends Target<Healable> {
@@ -74,15 +90,12 @@ public final class NeaceA3 extends ActiveSkill {
                 Location loc = combatUser.getLocation().add(0, 1, 0);
                 Location targetLoc = target.getLocation().add(0, 1.5, 0);
                 Vector vec = LocationUtil.getDirection(loc, targetLoc).multiply(NeaceA3Info.PUSH);
+                double distance = targetLoc.distance(loc);
 
-                if (targetLoc.distance(loc) < 1.5)
+                if (distance < 1.5)
                     return false;
-                if (isDurationFinished()) {
-                    combatUser.getMoveModule().push(vec.multiply(0.5), true);
-                    return false;
-                }
 
-                combatUser.getMoveModule().push(targetLoc.distance(loc) < 3.5 ? vec.clone().multiply(0.5) : vec, true);
+                combatUser.getMoveModule().push(distance < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
                 NeaceA3Info.PARTICLE.TICK_CORE.play(loc);
 
@@ -93,18 +106,7 @@ public final class NeaceA3 extends ActiveSkill {
                 }, 1));
 
                 return true;
-            }, isCancelled -> {
-                cancel();
-
-                combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,
-                        40, -5, false, false), true);
-
-                addTask(new IntervalTask(i -> {
-                    combatUser.getEntity().setFallDistance(0);
-
-                    return !combatUser.getEntity().isOnGround();
-                }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
-            }, 1, NeaceA3Info.DURATION.toTicks()));
+            }, isCancelled -> onEnd(), 1, NeaceA3Info.DURATION.toTicks()));
         }
     }
 }

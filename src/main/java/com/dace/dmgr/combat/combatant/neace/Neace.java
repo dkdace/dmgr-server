@@ -124,14 +124,11 @@ public final class Neace extends Support {
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         CombatEffectUtil.playBleedingParticle(victim, location, damage);
 
-        NeaceP1 skillp1 = victim.getSkill(NeaceP1Info.getInstance());
-        skillp1.cancel();
+        victim.getSkill(NeaceP1Info.getInstance()).cancel();
     }
 
     @Override
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        super.onGiveHeal(provider, target, amount);
-
         if (provider != target && target instanceof CombatUser)
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 

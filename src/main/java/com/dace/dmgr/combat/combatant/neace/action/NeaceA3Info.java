@@ -22,6 +22,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
     public static final int MAX_DISTANCE = 30;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(2);
+
     @Getter
     private static final NeaceA3Info instance = new NeaceA3Info();
 
@@ -36,10 +37,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_3)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -51,8 +49,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1.2).pitch(1.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(1.2).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(1.2).pitch(0.7).build());
     }
 
     /**

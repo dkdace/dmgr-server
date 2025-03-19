@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -45,15 +46,39 @@ public final class NeaceUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
+
         combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
         NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
+        EffectManager effectManager = new EffectManager();
+
+        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
             cancel();
-            onReady();
+
+            isEnabled = true;
+
+            setDuration();
+            combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
+
+            NeaceUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
+            NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getLocation());
+
+            addActionTask(new IntervalTask(i -> {
+                Location loc = combatUser.getEntity().getEyeLocation();
+                new NeaceUltArea().emit(loc);
+
+                playTickEffect(i);
+                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
+            }, 1, NeaceUltInfo.DURATION.toTicks()));
         }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+        isEnabled = false;
     }
 
     @Override
@@ -65,63 +90,6 @@ public final class NeaceUlt extends UltimateSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playUseTickEffect(long i) {
-        Location loc = combatUser.getLocation().add(0, 0.1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 3; j++) {
-            long index = i * 3 + j;
-            long angle = index * (i < 10 ? 7 : -31);
-            double distance = 10;
-            double up = 0;
-            if (i < 10)
-                distance = index * 0.35;
-            else
-                up = (index - 30) * 0.2;
-
-            for (int k = 0; k < 8; k++) {
-                angle += 90;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
-                Location loc2 = loc.clone().add(vec).add(0, up, 0);
-
-                NeaceUltInfo.PARTICLE.USE_TICK.play(loc2);
-            }
-        }
-    }
-
-    /**
-     * 시전 완료 시 실행할 작업.
-     */
-    private void onReady() {
-        setDuration();
-        isEnabled = true;
-        combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
-
-        NeaceUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
-        NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getLocation());
-
-        addActionTask(new IntervalTask(i -> {
-            if (combatUser.isDead())
-                return false;
-
-            Location loc = combatUser.getEntity().getEyeLocation();
-            new NeaceUltArea().emit(loc);
-
-            playTickEffect(i);
-            NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
-
-            return true;
-        }, isCancelled -> isEnabled = false, 1, NeaceUltInfo.DURATION.toTicks()));
     }
 
     /**
@@ -138,10 +106,51 @@ public final class NeaceUlt extends UltimateSkill {
 
         long angle = i * 5;
         for (int j = 0; j < 6; j++) {
-            angle += 120;
+            angle += 360 / 3;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
 
             NeaceUltInfo.PARTICLE.TICK.play(loc.clone().add(vec));
+        }
+    }
+
+    /**
+     * 효과를 재생하는 클래스.
+     */
+    @NoArgsConstructor
+    private final class EffectManager {
+        private int index = 0;
+        private int angle = 0;
+        private double distance = 0;
+        private double up = 0;
+
+        /**
+         * 효과를 재생한다.
+         */
+        private void playEffect() {
+            Location loc = combatUser.getLocation().add(0, 0.1, 0);
+            loc.setYaw(0);
+            loc.setPitch(0);
+            Vector vector = VectorUtil.getRollAxis(loc);
+            Vector axis = VectorUtil.getYawAxis(loc);
+
+            for (int j = 0; j < 3; j++) {
+                angle += index > 9 ? -31 : 7;
+
+                if (index > 9)
+                    up += 0.2;
+                else
+                    distance += 0.35;
+
+                for (int k = 0; k < 8; k++) {
+                    angle += 360 / 4;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
+                    Location loc2 = loc.clone().add(vec).add(0, up, 0);
+
+                    NeaceUltInfo.PARTICLE.USE_TICK.play(loc2);
+                }
+            }
+
+            index++;
         }
     }
 
@@ -158,7 +167,6 @@ public final class NeaceUlt extends UltimateSkill {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Healable target) {
             ((NeaceWeapon) combatUser.getWeapon()).healTarget(target);
-
             return true;
         }
     }

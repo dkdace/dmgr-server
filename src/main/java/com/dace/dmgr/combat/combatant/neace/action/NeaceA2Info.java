@@ -24,6 +24,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
 
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 20;
+
     @Getter
     private static final NeaceA2Info instance = new NeaceA2Info();
 
@@ -39,16 +40,12 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                                 .builder("<:DAMAGE_INCREASE:공격력>과 <:DEFENSE_INCREASE:방어력>이 증가합니다.")
                                 .addValueInfo(TextIcon.DAMAGE_INCREASE, Format.PERCENT, DAMAGE_INCREMENT)
                                 .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("지속시간 종료/재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_2)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -61,8 +58,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.4).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.4).build());
     }
 
     /**

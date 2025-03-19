@@ -14,10 +14,10 @@ import java.util.function.Supplier;
  */
 public abstract class ValueStatusEffect extends StatusEffect {
     /** 상태 변수 최댓값 */
-    protected final int maxValue;
+    protected final double maxValue;
     /** 상태 변수 */
     @Getter
-    private int value = 0;
+    private double value = 0;
 
     /**
      * 상태 변수를 가지고 있는 상태 효과 인스턴스를 생성한다.
@@ -26,7 +26,7 @@ public abstract class ValueStatusEffect extends StatusEffect {
      * @param isPositive       이로운 효과 여부
      * @param maxValue         상태 변수 최댓값
      */
-    protected ValueStatusEffect(@NonNull StatusEffectType statusEffectType, boolean isPositive, int maxValue) {
+    protected ValueStatusEffect(@NonNull StatusEffectType statusEffectType, boolean isPositive, double maxValue) {
         super(statusEffectType, isPositive);
         this.maxValue = maxValue;
     }
@@ -36,7 +36,7 @@ public abstract class ValueStatusEffect extends StatusEffect {
      *
      * @param value 값
      */
-    public final void setValue(int value) {
+    public final void setValue(double value) {
         this.value = Math.min(value, maxValue);
     }
 
