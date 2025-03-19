@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.palas.action;
 
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -22,7 +21,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-PalasWeaponInfo.AIM_SLOW);
@@ -41,8 +39,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     public PalasWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, PalasWeaponInfo.getInstance(), PalasWeaponInfo.COOLDOWN);
 
-        reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
-        aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
+        this.reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
+        this.aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
     }
 
     @Override
@@ -79,6 +77,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                 new PalasWeaponHitscan(aimModule.isAiming()).shot();
                 new PalasWeaponHealHitscan(aimModule.isAiming()).shot();
+
                 reloadModule.cancel();
                 isActionCooldown = false;
 
@@ -91,7 +90,6 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 break;
             }
             case RIGHT_CLICK: {
-                combatUser.setGlobalCooldown(Timespan.ofTicks(1));
                 if (aimModule.isAiming()) {
                     cancel();
                     return;
@@ -104,7 +102,6 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             }
             case DROP: {
                 onAmmoEmpty();
-
                 break;
             }
             default:
@@ -116,39 +113,6 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     protected void onCancelled() {
         reloadModule.cancel();
         aimModule.cancel();
-    }
-
-    /**
-     * 사용 후 쿨타임 작업을 수행한다.
-     */
-    private void action() {
-        setCooldown(PalasWeaponInfo.ACTION_COOLDOWN);
-
-        reloadModule.cancel();
-
-        addActionTask(new IntervalTask(i -> {
-            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getLocation());
-
-            switch ((int) i) {
-                case 1:
-                    combatUser.addYawAndPitch(-0.25, 0.1);
-                    break;
-                case 2:
-                    combatUser.addYawAndPitch(-0.1, 0.2);
-                    break;
-                case 5:
-                    combatUser.addYawAndPitch(0.1, -0.2);
-                    break;
-                case 6:
-                    combatUser.addYawAndPitch(0.25, -0.1);
-                    break;
-                default:
-                    break;
-            }
-        }, () -> {
-            isActionCooldown = true;
-            reloadModule.consume(1);
-        }, 1, PalasWeaponInfo.ACTION_COOLDOWN.toTicks()));
     }
 
     @Override
@@ -189,6 +153,39 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
         PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
+    }
+
+    /**
+     * 사용 후 쿨타임 작업을 수행한다.
+     */
+    private void action() {
+        setCooldown(PalasWeaponInfo.ACTION_COOLDOWN);
+
+        reloadModule.cancel();
+
+        addActionTask(new IntervalTask(i -> {
+            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getLocation());
+
+            switch ((int) i) {
+                case 1:
+                    combatUser.addYawAndPitch(-0.25, 0.1);
+                    break;
+                case 2:
+                    combatUser.addYawAndPitch(-0.1, 0.2);
+                    break;
+                case 5:
+                    combatUser.addYawAndPitch(0.1, -0.2);
+                    break;
+                case 6:
+                    combatUser.addYawAndPitch(0.25, -0.1);
+                    break;
+                default:
+                    break;
+            }
+        }, () -> {
+            isActionCooldown = true;
+            reloadModule.consume(1);
+        }, 1, PalasWeaponInfo.ACTION_COOLDOWN.toTicks()));
     }
 
     private final class PalasWeaponHitscan extends Hitscan<Damageable> {
@@ -253,12 +250,11 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                    if (target.getDamageModule().isLowHealth()) {
-                        PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
-                        skillp1.setHealAmount(PalasWeaponInfo.HEAL);
-                        skillp1.setTarget((Healable) target);
-                        combatUser.useAction(ActionKey.PERIODIC_1);
-                    }
+                    PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
+                    skillp1.setHealAmount(PalasWeaponInfo.HEAL);
+                    skillp1.setTarget((Healable) target);
+
+                    combatUser.useAction(ActionKey.PERIODIC_1);
 
                     ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 

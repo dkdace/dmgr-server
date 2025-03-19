@@ -31,6 +31,7 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     public static final int DAMAGE_SCORE = 8;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 20;
+
     @Getter
     private static final PalasA1Info instance = new PalasA1Info();
 
@@ -42,9 +43,7 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -58,19 +57,16 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ARROW_SHOOT).volume(1.5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun.m1911_silencer").volume(1.5).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun.m1911_silencer").volume(1.5).pitch(0.8).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_TWINKLE).volume(2).pitch(1.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.stab").volume(2).pitch(2).build()
-        );
+                SoundEffect.SoundInfo.builder("random.stab").volume(2).pitch(2).build());
         /** 틱 효과음 */
         public static final SoundEffect TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build());
     }
 
     /**
@@ -82,8 +78,7 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 240, 230, 50)
-                        .build()
-        );
+                        .build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 240, 230, 50)

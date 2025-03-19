@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -45,9 +46,11 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().cancel();
-        combatUser.getWeapon().setVisible(false);
         combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
+
+        Weapon weapon = combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setVisible(false);
 
         PalasA1Info.SOUND.USE.play(combatUser.getLocation());
 

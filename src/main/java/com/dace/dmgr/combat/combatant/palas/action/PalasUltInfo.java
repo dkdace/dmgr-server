@@ -30,6 +30,7 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     public static final int USE_SCORE = 10;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 30;
+
     @Getter
     private static final PalasUltInfo instance = new PalasUltInfo();
 
@@ -44,9 +45,7 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED_INCREMENT)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MAX_DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -58,8 +57,7 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_SHOOT).volume(3).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(3).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(3).pitch(1.8).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(3).pitch(1.8).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.trident.thunder").volume(3).pitch(1.5).build());
@@ -72,7 +70,8 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     public static final class PARTICLE {
         /** 엔티티 타격 (중심) - 1 */
         public static final ParticleEffect HIT_ENTITY_CORE_1 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2)
+                        .build());
         /** 엔티티 타격 (중심) - 2 */
         public static final FireworkEffect HIT_ENTITY_CORE_2 = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BURST, 255, 70, 75)
                 .fadeColor(200, 0, 0).build();
@@ -80,14 +79,12 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
         public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 75)
                         .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 75)
                         .count(4).horizontalSpread(1).verticalSpread(1.5).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 50, 24)
-                        .count(2).horizontalSpread(1).verticalSpread(1.5).build()
-        );
+                        .count(2).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

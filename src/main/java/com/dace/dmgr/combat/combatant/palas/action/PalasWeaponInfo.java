@@ -39,6 +39,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     public static final int AIM_SLOW = 30;
     /** 확대 레벨 */
     public static final Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L3;
+
     @Getter
     private static final PalasWeaponInfo instance = new PalasWeaponInfo();
 
@@ -56,16 +57,14 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 반동 정보.
      */
     @UtilityClass
-    public static class RECOIL {
+    public static final class RECOIL {
         /** 수직 반동 */
         public static final double UP = 2.5;
         /** 수평 반동 */
@@ -80,7 +79,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 15;
     }
@@ -94,8 +93,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun.vssvintorez").volume(2.5).pitch(1.3).build(),
                 SoundEffect.SoundInfo.builder("random.gun2.qbz_95_1").volume(2.5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(3.5).pitch(1.1).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(3.5).pitch(1.1).build());
         /** 조준 활성화 */
         public static final SoundEffect AIM_ON = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.4).pitch(2).build());
@@ -130,7 +128,8 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 210, 160, 70).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 210, 160, 70)
+                        .build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(15).build());

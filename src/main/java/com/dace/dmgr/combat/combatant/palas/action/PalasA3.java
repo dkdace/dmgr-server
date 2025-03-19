@@ -37,8 +37,14 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && isDurationFinished();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
@@ -142,8 +148,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
     private final class PalasA3Projectile extends Projectile<Damageable> {
         private PalasA3Projectile() {
-            super(combatUser, PalasA3Info.VELOCITY,
-                    CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)));
+            super(combatUser, PalasA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser)
+                    .exclude(combatUser)));
         }
 
         @Override
@@ -188,27 +194,42 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.isCreature()) {
-                    if (target.isEnemy(combatUser)) {
-                        if (target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null,
-                                false, true)) {
-                            target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, PalasA3Info.DURATION);
-
-                            if (target instanceof CombatUser)
-                                bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
-                        }
-                    } else if (target instanceof Healable) {
-                        target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, PalasA3Info.DURATION);
-
-                        if (target instanceof CombatUser && target != combatUser) {
-                            combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
-                            ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
-                        }
-
-                        return true;
-                    }
+                    if (target.isEnemy(combatUser))
+                        onHitEnemy(target);
+                    else if (target instanceof Healable)
+                        onHitTeamer((Healable) target);
                 }
 
-                return !(target instanceof Barrier);
+                return !target.isEnemy(combatUser) || !(target instanceof Barrier);
+            }
+
+            /**
+             * 적이 맞았을 때 실행할 작업.
+             *
+             * @param target 대상 엔티티
+             */
+            private void onHitEnemy(@NonNull Damageable target) {
+                if (!target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null, false, true))
+                    return;
+
+                target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, PalasA3Info.DURATION);
+
+                if (target instanceof CombatUser)
+                    bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
+            }
+
+            /**
+             * 아군이 맞았을 때 실행할 작업.
+             *
+             * @param target 대상 엔티티
+             */
+            private void onHitTeamer(@NonNull Healable target) {
+                target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, PalasA3Info.DURATION);
+
+                if (target instanceof CombatUser && target != combatUser) {
+                    combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
+                    ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                }
             }
         }
     }

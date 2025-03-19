@@ -26,6 +26,11 @@ public final class PalasP1 extends AbstractSkill {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && target.getDamageModule().isLowHealth();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         target.getDamageModule().heal(combatUser, healAmount, true);
     }

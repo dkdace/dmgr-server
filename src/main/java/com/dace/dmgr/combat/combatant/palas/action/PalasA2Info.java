@@ -25,6 +25,7 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
     public static final int USE_SCORE = 5;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 25;
+
     @Getter
     private static final PalasA2Info instance = new PalasA2Info();
 
@@ -37,9 +38,7 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, MAX_DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -51,8 +50,7 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_SHOOT).volume(2).pitch(1.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(2).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.puffer_fish.blow_out").volume(2).pitch(1.8).build());
@@ -65,13 +63,13 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
     public static final class PARTICLE {
         /** 엔티티 타격 (중심) */
         public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2)
+                        .build());
         /** 엔티티 타격 (장식) */
         public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)
                         .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)

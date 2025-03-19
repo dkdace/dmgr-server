@@ -35,6 +35,7 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     public static final int EFFECT_SCORE = 3;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 10;
+
     @Getter
     private static final PalasA3Info instance = new PalasA3Info();
 
@@ -48,9 +49,7 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
                         .addValueInfo(TextIcon.HEAL_INCREASE, Format.PERCENT, (int) (100 * HEALTH_INCREASE_RATIO))
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -66,8 +65,7 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(2).pitch(1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(2).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(2).pitch(1.2).build());
     }
 
     /**
@@ -85,7 +83,6 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
                         .count(400).horizontalSpread(0.1).verticalSpread(0.1).speed(0.25).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.TOTEM).count(200).horizontalSpread(0.15).verticalSpread(0.15).speed(0.6).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).count(300).horizontalSpread(1.5).verticalSpread(1.5).speed(1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(300).horizontalSpread(0.6).verticalSpread(0.6).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(300).horizontalSpread(0.6).verticalSpread(0.6).build());
     }
 }

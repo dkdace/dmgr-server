@@ -51,7 +51,8 @@ public final class ChedA2Info extends ActiveSkillInfo<ChedA2> {
     public static final class PARTICLE {
         /** 사용 */
         public static final ParticleEffect USE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(20).horizontalSpread(0.4).verticalSpread(0.1).speed(0.15).build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(20).horizontalSpread(0.4).verticalSpread(0.1).speed(0.15)
+                        .build());
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).speed(0.05).build());

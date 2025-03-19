@@ -112,8 +112,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 96, 220, 255)
                         .count(8).horizontalSpread(0.6).verticalSpread(0.02).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 80, 80, 100)
-                        .count(3).horizontalSpread(0.15).verticalSpread(0.02).build()
-        );
+                        .count(3).horizontalSpread(0.15).verticalSpread(0.02).build());
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
