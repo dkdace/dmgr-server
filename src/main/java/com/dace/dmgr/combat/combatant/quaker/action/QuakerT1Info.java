@@ -17,8 +17,6 @@ public final class QuakerT1Info extends TraitInfo {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간이 감소합니다.")
                         .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

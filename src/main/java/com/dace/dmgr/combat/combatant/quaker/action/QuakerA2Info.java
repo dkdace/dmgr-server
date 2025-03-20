@@ -39,6 +39,7 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     public static final int DAMAGE_SCORE = 8;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 20;
+
     @Getter
     private static final QuakerA2Info instance = new QuakerA2Info();
 
@@ -51,9 +52,7 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
                         .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION.toSeconds(), SLOW)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -64,15 +63,13 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.55).pitchVariance(0.1).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.55).pitchVariance(0.1).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(3).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.ITEM_TOTEM_USE).volume(3).pitch(1.6).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.7).build());
     }
 
     /**

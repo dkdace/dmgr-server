@@ -199,7 +199,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 for (int i = 0; i < 6; i++) {
                     Location loc1 = LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
                     Location loc2 = LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
-                    Vector vec = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 20);
+                    Vector vec = VectorUtil.getSpreadedVector(getVelocity().normalize(), 20);
 
                     ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc1, 0.1, 0.1 + i * 0.04);
                     ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc2, 0.1, 0.1 + i * 0.04);

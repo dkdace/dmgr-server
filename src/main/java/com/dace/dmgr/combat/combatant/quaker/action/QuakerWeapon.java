@@ -19,10 +19,11 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.function.IntConsumer;
 
 public final class QuakerWeapon extends AbstractWeapon {
-    /** 휘두르는 방향의 시계 방향 여부 */
-    private boolean isClockwise = true;
+    /** 휘두르는 방향의 반대 방향 여부 */
+    private boolean isOpposite = true;
 
     public QuakerWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerWeaponInfo.getInstance(), QuakerWeaponInfo.COOLDOWN);
@@ -43,40 +44,51 @@ public final class QuakerWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
         setVisible(false);
+
         combatUser.setGlobalCooldown(QuakerWeaponInfo.GLOBAL_COOLDOWN);
-        combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), isClockwise ? MainHand.RIGHT : MainHand.LEFT);
 
-        addActionTask(new DelayTask(() -> {
-            isClockwise = !isClockwise;
-            HashSet<Damageable> targets = new HashSet<>();
+        use(false);
+        addActionTask(new DelayTask(this::cancel, 12));
+    }
 
-            int delay = 0;
-            for (int i = 0; i < 8; i++) {
-                int index = i;
+    /**
+     * 기본 무기를 사용한다.
+     *
+     * @param isUlt 궁극기 여부
+     */
+    void use(boolean isUlt) {
+        isOpposite = isUlt || !isOpposite;
 
-                if (i == 1)
-                    delay += 2;
-                else if (i == 2 || i == 4 || i == 6 || i == 7)
-                    delay += 1;
+        combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), isOpposite ? MainHand.LEFT : MainHand.RIGHT);
 
-                addActionTask(new DelayTask(() -> {
-                    Location loc = combatUser.getEntity().getEyeLocation();
-                    Vector vector = VectorUtil.getPitchAxis(loc);
-                    Vector axis = VectorUtil.getYawAxis(loc);
+        HashSet<Damageable> targets = new HashSet<>();
 
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, (isClockwise ? (index + 1) * 20 : 180 - (index + 1) * 20));
-                    new QuakerWeaponAttack(targets).shot(loc, vec);
+        IntConsumer onIndex = i -> {
+            Location loc = combatUser.getEntity().getEyeLocation();
+            Vector vector = VectorUtil.getPitchAxis(loc);
+            Vector axis = VectorUtil.getYawAxis(loc);
 
-                    combatUser.addYawAndPitch(isClockwise ? 0.8 : -0.8, 0.1);
-                    if (index % 2 == 0)
-                        QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
-                    if (index == 7) {
-                        combatUser.addYawAndPitch(isClockwise ? -1 : 1, -0.7);
-                        addActionTask(new DelayTask(this::cancel, 4));
-                    }
-                }, delay));
-            }
-        }, 2));
+            int angle = (i + 1) * 20;
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, isOpposite ? angle : 180 - angle);
+
+            new QuakerWeaponAttack(targets, isUlt).shot(loc, vec);
+
+            combatUser.addYawAndPitch(isOpposite ? 0.8 : -0.8, 0.1);
+            if (i % 2 == 0)
+                QuakerWeaponInfo.SOUND.USE.play(loc.add(vec));
+            if (i == 7)
+                combatUser.addYawAndPitch(isOpposite ? -1 : 1, -0.7);
+        };
+
+        int delay = 0;
+        int[] delays = {2, 2, 1, 0, 1, 0, 1, 1};
+
+        for (int i = 0; i < delays.length; i++) {
+            int index = i;
+            delay += delays[i];
+
+            addActionTask(new DelayTask(() -> onIndex.accept(index), delay));
+        }
     }
 
     @Override
@@ -86,16 +98,20 @@ public final class QuakerWeapon extends AbstractWeapon {
 
     private final class QuakerWeaponAttack extends Hitscan<Damageable> {
         private final HashSet<Damageable> targets;
+        private final boolean isUlt;
 
-        private QuakerWeaponAttack(@NonNull HashSet<Damageable> targets) {
+        private QuakerWeaponAttack(@NonNull HashSet<Damageable> targets, boolean isUlt) {
             super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(QuakerWeaponInfo.SIZE)
                     .maxDistance(QuakerWeaponInfo.DISTANCE).build());
+
             this.targets = targets;
+            this.isUlt = isUlt;
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            QuakerWeaponInfo.SOUND.HIT.play(location);
+            if (!isUlt)
+                QuakerWeaponInfo.SOUND.HIT.play(location);
         }
 
         @Override
@@ -120,8 +136,10 @@ public final class QuakerWeapon extends AbstractWeapon {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 2);
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                if (!isUlt) {
+                    CombatEffectUtil.playHitBlockParticle(location, hitBlock, 2);
+                    CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                }
 
                 return false;
             };
@@ -131,11 +149,13 @@ public final class QuakerWeapon extends AbstractWeapon {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (targets.add(target)) {
+                if (!isUlt && targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true)
-                            && target instanceof Movable)
-                        ((Movable) target).getMoveModule().knockback(VectorUtil.getPitchAxis(combatUser.getLocation())
-                                .multiply(isClockwise ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK));
+                            && target instanceof Movable) {
+                        Vector dir = VectorUtil.getPitchAxis(combatUser.getLocation())
+                                .multiply(isOpposite ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK);
+                        ((Movable) target).getMoveModule().knockback(dir);
+                    }
 
                     QuakerWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
                     QuakerWeaponInfo.SOUND.HIT_ENTITY.play(location);

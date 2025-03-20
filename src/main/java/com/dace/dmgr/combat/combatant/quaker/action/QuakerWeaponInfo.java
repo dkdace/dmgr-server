@@ -26,6 +26,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     public static final double SIZE = 0.5;
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.3;
+
     @Getter
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 
@@ -37,16 +38,14 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 3;
     }
@@ -59,18 +58,15 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.6).pitchVariance(0.1).build()
-        );
+                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.6).pitchVariance(0.1).build());
         /** 타격 */
         public static final SoundEffect HIT = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(0.8).pitch(0.75).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.6).pitch(0.85).pitchVariance(0.1).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.6).pitch(0.85).pitchVariance(0.1).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(1).pitch(0.9).pitchVariance(0.05).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(1).pitch(1.2).pitchVariance(0.1).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(1).pitch(1.2).pitchVariance(0.1).build());
     }
 
     /**

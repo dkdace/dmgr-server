@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -45,11 +46,14 @@ public final class QuakerA3 extends ActiveSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().cancel();
-        combatUser.getWeapon().setVisible(false);
+
         combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
+
+        Weapon weapon = combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setVisible(false);
 
         QuakerA3Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -79,6 +83,7 @@ public final class QuakerA3 extends ActiveSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         combatUser.getWeapon().setVisible(true);
     }
@@ -148,7 +153,7 @@ public final class QuakerA3 extends ActiveSkill {
                     Location loc = location.clone().add(vec);
                     new QuakerA3Effect().shot(loc, vec);
 
-                    Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().clone().normalize(), 30);
+                    Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().normalize(), 30);
                     QuakerA3Info.PARTICLE.BULLET_TRAIL.play(location, vec2);
                 }
 
@@ -171,36 +176,63 @@ public final class QuakerA3 extends ActiveSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                onImpact(location.add(0, 0.1, 0), target);
+                if (targets.add(target)) {
+                    onHitEnemy(location, target);
+
+                    if (target instanceof Movable)
+                        knockback((Movable) target);
+                }
+
                 return false;
             };
         }
 
-        private void onImpact(@NonNull Location location, @NonNull Damageable target) {
-            if (!targets.add(target) || !onDamage(location, target))
-                return;
+        /**
+         * 적이 맞았을 때 실행할 작업.
+         *
+         * @param location 맞은 위치
+         * @param target   대상 엔티티
+         */
+        private void onHitEnemy(Location location, @NonNull Damageable target) {
+            if (target.getDamageModule().damage(QuakerA3Projectile.this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location,
+                    false, true) && target instanceof Movable) {
+                target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, QuakerA3Info.SNARE_DURATION);
 
-            Vector vec = getVelocity().clone().normalize().multiply(QuakerA3Info.KNOCKBACK);
-            addTask(new IntervalTask(i -> {
-                if (!target.canBeTargeted() || target.isRemoved())
+                if (target instanceof CombatUser)
+                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
+            }
+
+            QuakerA3Info.PARTICLE.HIT_ENTITY_DECO.play(location);
+            QuakerA3Info.SOUND.HIT.play(location);
+        }
+
+        /**
+         * 맞은 적을 밀쳐낸다.
+         *
+         * @param target 대상 엔티티
+         */
+        private void knockback(@NonNull Movable target) {
+            Vector dir = getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK);
+
+            target.addTask(new IntervalTask(i -> {
+                if (!target.canBeTargeted())
                     return false;
 
-                if (i < 3 && target instanceof Movable)
-                    ((Movable) target).getMoveModule().knockback(vec, true);
+                if (i < 3)
+                    target.getMoveModule().knockback(dir, true);
 
                 Location loc = target.getCenterLocation().add(0, 0.1, 0);
                 new QuakerA3Area().emit(loc);
 
                 for (int j = 0; j < 5; j++) {
-                    Vector vec2 = VectorUtil.getSpreadedVector(vec.clone().normalize(), 20);
-                    QuakerA3Info.PARTICLE.HIT_ENTITY_CORE.play(target.getCenterLocation(), vec2);
+                    Vector vec = VectorUtil.getSpreadedVector(dir.clone().normalize(), 20);
+                    QuakerA3Info.PARTICLE.HIT_ENTITY_CORE.play(target.getCenterLocation(), vec);
                 }
 
-                Location hitLoc = loc.clone().add(getVelocity().clone().normalize());
+                Location hitLoc = loc.clone().add(getVelocity().normalize());
                 if (!LocationUtil.isNonSolid(hitLoc)) {
-                    onDamage(loc, target);
-                    if (target instanceof Movable)
-                        ((Movable) target).getMoveModule().knockback(new Vector(), true);
+                    onHitEnemy(hitLoc, (Damageable) target);
+                    target.getMoveModule().knockback(new Vector(), true);
 
                     CombatEffectUtil.playHitBlockParticle(loc, hitLoc.getBlock(), 7);
 
@@ -209,23 +241,6 @@ public final class QuakerA3 extends ActiveSkill {
 
                 return true;
             }, 1, 8));
-        }
-
-        private boolean onDamage(@NonNull Location location, @NonNull Damageable target) {
-            QuakerA3Info.PARTICLE.HIT_ENTITY_DECO.play(location);
-            QuakerA3Info.SOUND.HIT.play(location);
-
-            if (target.getDamageModule().damage(QuakerA3Projectile.this, QuakerA3Info.DAMAGE, DamageType.NORMAL, location,
-                    false, true) && target instanceof Movable) {
-                target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, QuakerA3Info.SNARE_DURATION);
-
-                if (target instanceof CombatUser)
-                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
-
-                return true;
-            }
-
-            return false;
         }
 
         private final class QuakerA3Area extends Area<Damageable> {
@@ -240,7 +255,7 @@ public final class QuakerA3 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                onImpact(location, target);
+                getHitEntityHandler().onHitEntity(location, target);
                 return !(target instanceof Barrier);
             }
         }

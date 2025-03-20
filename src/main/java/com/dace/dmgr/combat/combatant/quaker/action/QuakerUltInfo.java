@@ -41,6 +41,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     public static final int DAMAGE_SCORE = 15;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 30;
+
     @Getter
     private static final QuakerUltInfo instance = new QuakerUltInfo();
 
@@ -55,9 +56,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.TIME_WITH_PERCENT, SLOW_DURATION.toSeconds(), SLOW)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -71,8 +70,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_DEATH).volume(5).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_PLACE).volume(5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(1.4).build()
-        );
+                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(1.4).build());
     }
 
     /**
@@ -86,8 +84,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(4).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(4).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(60).speed(0.4).build());

@@ -31,7 +31,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     public QuakerA1(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA1Info.getInstance(), QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH, 0);
-        entityModule = new EntityModule<>(this);
+        this.entityModule = new EntityModule<>(this);
     }
 
     @Override
@@ -64,16 +64,20 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     public void onUse(@NonNull ActionKey actionKey) {
         combatUser.getWeapon().cancel();
 
-        if (isDurationFinished()) {
-            setDuration();
-            combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-
-            QuakerA1Info.SOUND.USE.play(combatUser.getLocation());
-
-            entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
-        } else
+        if (!isDurationFinished()) {
             cancel();
+            combatUser.setGlobalCooldown(Timespan.ofTicks(1));
+
+            return;
+        }
+
+        setDuration();
+        combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+
+        QuakerA1Info.SOUND.USE.play(combatUser.getLocation());
+
+        entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
     }
 
     @Override
@@ -96,15 +100,8 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
      */
     public final class QuakerA1Entity extends Barrier {
         private QuakerA1Entity(@NonNull Location spawnLocation) {
-            super(
-                    spawnLocation,
-                    combatUser.getName() + "의 방패",
-                    combatUser,
-                    QuakerA1Info.HEALTH,
-                    QuakerA1Info.DEATH_SCORE,
-                    Hitbox.builder(6, 3.5, 0.3).offsetY(-0.3).axisOffsetY(1.5).build()
-            );
-
+            super(spawnLocation, combatUser.getName() + "의 방패", combatUser, QuakerA1Info.HEALTH, QuakerA1Info.DEATH_SCORE,
+                    Hitbox.builder(6, 3.5, 0.3).offsetY(-0.3).axisOffsetY(1.5).build());
             onInit();
         }
 
@@ -117,8 +114,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         }
 
         private void onTick(long i) {
-            Location loc = LocationUtil.getLocationFromOffset(owner.getLocation(), owner.getLocation().getDirection(),
-                    0, 0.8, 1.5);
+            Location loc = LocationUtil.getLocationFromOffset(owner.getLocation(), 0, 0.8, 1.5);
             entity.setRightArmPose(new EulerAngle(Math.toRadians(loc.getPitch() - 90), 0, 0));
             entity.teleport(loc);
         }
@@ -134,11 +130,10 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         }
 
         @Override
-        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location,
-                             boolean isCrit) {
+        public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
             super.onDamage(attacker, damage, reducedDamage, location, isCrit);
 
-            setStateValue((int) damageModule.getHealth());
+            setStateValue(damageModule.getHealth());
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
@@ -150,9 +145,9 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         @Override
         public void onDeath(@Nullable Attacker attacker) {
             remove();
+            cancel();
 
             setStateValue(0);
-            cancel();
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
             QuakerA1Info.SOUND.DEATH.play(getLocation());

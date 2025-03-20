@@ -32,6 +32,7 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     public static final int BLOCK_SCORE = 50;
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 20;
+
     @Getter
     private static final QuakerA1Info instance = new QuakerA1Info();
 
@@ -47,16 +48,12 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                                 .builder("공격을 막는 방벽입니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (파괴 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEAL, HEALTH)
-                                .build()
-                        ),
+                                .build()),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -67,23 +64,20 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1).pitch(0.7).build());
         /** 해제 */
         public static final SoundEffect DISABLE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_CLOSE).volume(1).pitch(1.4).build());
         /** 피격 */
         public static final SoundEffect DAMAGE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25).pitch(1.2).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(0.3).pitch(0.85).pitchVariance(0.1).build()
-        );
+                SoundEffect.SoundInfo.builder("random.metalhit").volume(0.3).pitch(0.85).pitchVariance(0.1).build());
         /** 파괴 */
         public static final SoundEffect DEATH = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build());
     }
 
     /**
@@ -95,7 +89,6 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
         public static final ParticleEffect DEATH = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.2).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
     }
 }

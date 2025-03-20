@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -24,11 +25,11 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.function.IntConsumer;
 
 @Getter
 public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
@@ -57,11 +58,29 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().cancel();
-        combatUser.getWeapon().setVisible(false);
+
         combatUser.setGlobalCooldown(Timespan.MAX);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), MainHand.RIGHT);
+
+        Weapon weapon = combatUser.getWeapon();
+        weapon.cancel();
+        weapon.setVisible(false);
+
+        IntConsumer onIndex = i -> {
+            Location loc = combatUser.getEntity().getEyeLocation();
+            loc.setPitch(0);
+            Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
+            Vector axis = VectorUtil.getPitchAxis(loc);
+
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, (i < 2 ? -13 : -30 + i * 16));
+            new QuakerA2Effect().shot(loc, vec);
+
+            if (i % 2 == 0)
+                QuakerA2Info.SOUND.USE.play(loc.add(vec));
+            if (i == 11)
+                addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), this::onReady, 1));
+        };
 
         int delay = 0;
         for (int i = 0; i < 12; i++) {
@@ -74,24 +93,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             else if (i < 10)
                 delay += 1;
 
-            addActionTask(new DelayTask(() -> {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                loc.setPitch(0);
-                Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(loc);
-
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, (index < 2 ? -13 : -30 + index * 16));
-                new QuakerA2Effect().shot(loc, vec);
-
-                if (index % 2 == 0)
-                    QuakerA2Info.SOUND.USE.play(loc.add(vec));
-                if (index == 11) {
-                    addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), () -> {
-                        cancel();
-                        onReady();
-                    }, 1));
-                }
-            }, delay));
+            addActionTask(new DelayTask(() -> onIndex.accept(index), delay));
         }
     }
 
@@ -103,36 +105,39 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
         combatUser.resetGlobalCooldown();
-        combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+
         combatUser.getWeapon().setVisible(true);
+    }
+
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     /**
      * 시전 완료 시 실행할 작업.
      */
     private void onReady() {
+        cancel();
+        combatUser.setGlobalCooldown(QuakerA2Info.GLOBAL_COOLDOWN);
+
         Location loc = combatUser.getLocation();
         loc.setPitch(0);
-
-        QuakerA2Info.SOUND.USE_READY.play(loc);
-
-        HashSet<Damageable> targets = new HashSet<>();
         Vector vector = VectorUtil.getPitchAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
 
+        HashSet<Damageable> targets = new HashSet<>();
+
         for (int i = 0; i < 7; i++) {
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 9 * (i - 3));
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 9 * (i - 3.0));
             new QuakerA2Projectile(targets).shot(loc, vec);
         }
 
+        QuakerA2Info.SOUND.USE_READY.play(loc);
         CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
-    }
-
-    @Override
-    public boolean isAssistMode() {
-        return true;
     }
 
     /**
@@ -197,8 +202,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             return IntervalHandler
                     .chain(createGroundIntervalHandler())
                     .next(createPeriodIntervalHandler(10, location -> {
-                        Block floor = location.clone().subtract(0, 0.5, 0).getBlock();
-                        CombatEffectUtil.playHitBlockParticle(location, floor, 3);
+                        CombatEffectUtil.playHitBlockParticle(location, location.clone().subtract(0, 0.5, 0).getBlock(), 3);
                         QuakerA2Info.PARTICLE.BULLET_TRAIL.play(location);
                     }));
         }
