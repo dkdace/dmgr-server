@@ -28,6 +28,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 25;
+
     @Getter
     private static final SiliaUltInfo instance = new SiliaUltInfo();
 
@@ -40,9 +41,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME + " (+{1}초)", DURATION.toSeconds(), DURATION_ADD_ON_KILL.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -55,8 +54,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(2).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.2).build());
     }
 
     /**

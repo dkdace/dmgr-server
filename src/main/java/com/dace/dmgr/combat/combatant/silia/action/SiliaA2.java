@@ -41,8 +41,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
-        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
-        skill3.cancel();
+        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
 
         SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
 
@@ -51,8 +50,11 @@ public final class SiliaA2 extends ActiveSkill {
             Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
             Vector axis = VectorUtil.getRollAxis(loc);
 
+            long angle = i * 23;
             for (int j = 0; j < 6; j++) {
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, i * 23 + j * 60).multiply(1.6 - i * 0.2);
+                angle += 360 / 6;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(1.6 - i * 0.2);
+
                 SiliaA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec), vec);
             }
         }, () -> {
@@ -96,19 +98,19 @@ public final class SiliaA2 extends ActiveSkill {
 
                 @Override
                 public void accept(Location location) {
-                    i++;
-
                     Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
                     Vector axis = VectorUtil.getRollAxis(location);
 
                     int angle = i * 12;
                     for (int j = 0; j < 2; j++) {
-                        angle += 180;
+                        angle += 360 / 2;
                         Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
                         Location loc = location.clone().add(vec);
 
                         SiliaA2Info.PARTICLE.BULLET_TRAIL.play(loc, vec);
                     }
+
+                    i++;
                 }
             });
         }
@@ -127,7 +129,7 @@ public final class SiliaA2 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                        SiliaT1.getCritMultiplier(getVelocity(), target), true)) {
 
                     if (target instanceof Movable)
                         ((Movable) target).getMoveModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
@@ -135,22 +137,33 @@ public final class SiliaA2 extends ActiveSkill {
                     Location loc = target.getLocation().add(0, 0.1, 0);
                     loc.setPitch(0);
                     loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
+
+                    SiliaA2Info.SOUND.HIT_ENTITY.play(location);
                     for (Location loc2 : LocationUtil.getLine(combatUser.getLocation(), loc, 0.5))
                         SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
-                    SiliaA2Info.SOUND.HIT_ENTITY.play(location);
 
-                    if (target.isCreature() && LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), loc)
-                            && (!(target instanceof CombatUser) || !((CombatUser) target).isDead())) {
-                        combatUser.getMoveModule().teleport(loc);
-                        combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
-
-                        if (target instanceof CombatUser)
-                            combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
-                    }
+                    knockback(loc, target);
                 }
 
                 return false;
             };
+        }
+
+        /**
+         * 맞은 적을 공중에 띄우고 순간이동한다.
+         *
+         * @param location 이동 위치
+         * @param target   대상 엔티티
+         */
+        private void knockback(@NonNull Location location, @NonNull Damageable target) {
+            if (!target.isCreature() || !target.canBeTargeted() || !LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), location))
+                return;
+
+            combatUser.getMoveModule().teleport(location);
+            combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
+
+            if (target instanceof CombatUser)
+                combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
         }
     }
 }

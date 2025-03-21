@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -14,6 +15,7 @@ import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.DelayTask;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -21,10 +23,11 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
+import java.util.function.IntConsumer;
 
 public final class SiliaWeapon extends AbstractWeapon {
     /** 일격 사용 가능 여부 */
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private boolean isStrike = false;
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
@@ -49,7 +52,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         isOpposite = !isOpposite;
 
         if (isStrike)
-            strike();
+            useStrike();
         else {
             setCooldown();
             combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(10), MainHand.RIGHT);
@@ -59,8 +62,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             SiliaWeaponInfo.SOUND.USE.play(combatUser.getLocation());
         }
 
-        SiliaA3 skill3 = combatUser.getSkill(SiliaA3Info.getInstance());
-        skill3.cancel();
+        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
     }
 
     @Override
@@ -71,42 +73,45 @@ public final class SiliaWeapon extends AbstractWeapon {
     /**
      * 일격을 사용한다.
      */
-    private void strike() {
+    private void useStrike() {
         if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
             setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
         combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
+        combatUser.playMeleeAttackAnimation(-2, Timespan.ofTicks(6), isOpposite ? MainHand.LEFT : MainHand.RIGHT);
+
         combatUser.getWeapon().setVisible(false);
-        combatUser.playMeleeAttackAnimation(-2, Timespan.ofTicks(6), isOpposite ? MainHand.RIGHT : MainHand.LEFT);
 
         HashSet<Damageable> targets = new HashSet<>();
 
+        IntConsumer onIndex = i -> {
+            Location loc = combatUser.getEntity().getEyeLocation();
+            Vector vector = VectorUtil.getPitchAxis(loc);
+            Vector axis = VectorUtil.getYawAxis(loc);
+
+            double angle = 16 * (i - 3.5);
+            Vector vec = VectorUtil.getRotatedVector(vector, axis, (isOpposite ? 90 + angle : 90 - angle));
+            vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(loc), isOpposite ? 30 : -30);
+
+            new SiliaWeaponStrikeAttack(targets).shot(loc, vec);
+
+            combatUser.addYawAndPitch(isOpposite ? 0.5 : -0.5, 0.15);
+            if (i < 3)
+                SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, i / 2.0);
+            if (i == 7) {
+                combatUser.addYawAndPitch(isOpposite ? -0.7 : 0.7, -0.85);
+                cancel();
+            }
+        };
+
         int delay = 0;
-        for (int i = 0; i < 8; i++) {
+        int[] delays = {0, 1, 1, 0, 0, 0, 1, 1};
+
+        for (int i = 0; i < delays.length; i++) {
             int index = i;
+            delay += delays[i];
 
-            if (i == 1 || i == 2 || i == 6 || i == 7)
-                delay += 1;
-
-            addActionTask(new DelayTask(() -> {
-                Location loc = combatUser.getEntity().getEyeLocation();
-                Vector vector = VectorUtil.getPitchAxis(loc);
-                Vector axis = VectorUtil.getYawAxis(loc);
-
-                Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(loc), isOpposite ? -30 : 30);
-                axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(loc), isOpposite ? -30 : 30);
-
-                vec = VectorUtil.getRotatedVector(vec, axis, (isOpposite ? 90 - 16 * (index - 3.5) : 90 + 16 * (index - 3.5)));
-                new SiliaWeaponStrikeAttack(targets).shot(loc, vec);
-
-                combatUser.addYawAndPitch(isOpposite ? -0.5 : 0.5, 0.15);
-                if (index < 3)
-                    SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, index / 2.0);
-                if (index == 7) {
-                    combatUser.addYawAndPitch(isOpposite ? 0.7 : -0.7, -0.85);
-                    cancel();
-                }
-            }, delay));
+            addActionTask(new DelayTask(() -> onIndex.accept(index), delay));
         }
     }
 
@@ -117,8 +122,10 @@ public final class SiliaWeapon extends AbstractWeapon {
      */
     void setStrike(boolean isStrike) {
         this.isStrike = isStrike;
-        combatUser.getWeapon().setGlowing(isStrike);
-        combatUser.getWeapon().setDurability(isStrike ? SiliaWeaponInfo.RESOURCE.EXTENDED : SiliaWeaponInfo.RESOURCE.DEFAULT);
+
+        Weapon weapon = combatUser.getWeapon();
+        weapon.setGlowing(isStrike);
+        weapon.setDurability(isStrike ? SiliaWeaponInfo.RESOURCE.EXTENDED : SiliaWeaponInfo.RESOURCE.DEFAULT);
     }
 
     private final class SiliaWeaponProjectile extends Projectile<Damageable> {
@@ -136,13 +143,12 @@ public final class SiliaWeapon extends AbstractWeapon {
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(10, location -> {
-                for (int j = 0; j < 8; j++) {
+                for (int i = 0; i < 8; i++) {
                     Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
                     Vector axis = VectorUtil.getPitchAxis(location);
-                    Vector vec = VectorUtil.getRotatedVector(vector, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
-                    axis = VectorUtil.getRotatedVector(axis, VectorUtil.getRollAxis(location), isOpposite ? 30 : -30);
 
-                    vec = VectorUtil.getRotatedVector(vec, axis, 90 + 20 * (j - 3.5)).multiply(0.8);
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
+                    vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(location), isOpposite ? -30 : 30);
                     SiliaWeaponInfo.PARTICLE.BULLET_TRAIL.play(location.clone().add(vec));
                 }
             });
@@ -165,7 +171,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true);
+                        SiliaT1.getCritMultiplier(getVelocity(), target), true);
 
                 SiliaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
                 SiliaWeaponInfo.SOUND.HIT_ENTITY.play(location);
@@ -178,7 +184,7 @@ public final class SiliaWeapon extends AbstractWeapon {
     private final class SiliaWeaponStrikeAttack extends Hitscan<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private SiliaWeaponStrikeAttack(HashSet<Damageable> targets) {
+        private SiliaWeaponStrikeAttack(@NonNull HashSet<Damageable> targets) {
             super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE).build());
             this.targets = targets;
         }
@@ -223,11 +229,12 @@ public final class SiliaWeapon extends AbstractWeapon {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                            SiliaT1.isBackAttack(getVelocity(), target) ? SiliaT1Info.CRIT_MULTIPLIER : 1, true)) {
+                            SiliaT1.getCritMultiplier(getVelocity(), target), true)) {
 
-                        if (target instanceof Movable)
-                            ((Movable) target).getMoveModule().knockback(VectorUtil.getRollAxis(combatUser.getLocation())
-                                    .multiply(SiliaT2Info.KNOCKBACK));
+                        if (target instanceof Movable) {
+                            Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
+                            ((Movable) target).getMoveModule().knockback(dir);
+                        }
 
                         if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);

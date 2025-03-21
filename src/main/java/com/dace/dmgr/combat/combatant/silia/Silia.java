@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 public final class Silia extends Scuffler {
     /** 암살 점수 */
     public static final int FAST_KILL_SCORE = 20;
-    /** 암살 점수 제한시간 (tick) */
-    public static final long FAST_KILL_SCORE_TIME_LIMIT = (long) (2.5 * 20);
+    /** 암살 점수 제한시간 */
+    public static final Timespan FAST_KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2.5);
 
     @Getter
     private static final Silia instance = new Silia();
@@ -137,13 +137,15 @@ public final class Silia extends Scuffler {
         if (!(victim instanceof CombatUser))
             return;
 
-        SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
-        SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
-
-        if (((CombatUser) victim).getKillContributorRemainingTime(attacker).toTicks() > GeneralConfig.getCombatConfig().getDamageSumTimeLimit().toTicks() - FAST_KILL_SCORE_TIME_LIMIT)
+        Timespan timeLimit = GeneralConfig.getCombatConfig().getDamageSumTimeLimit().minus(FAST_KILL_SCORE_TIME_LIMIT);
+        if (((CombatUser) victim).getKillContributorRemainingTime(attacker).compareTo(timeLimit) > 0)
             attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
+
+        SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
-            skill1.setCooldown(Timespan.ofTicks(2));
+            skill1.setCooldown(Timespan.ZERO);
+
+        SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
         if (!skillUlt.isDurationFinished()) {
             skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
             attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * score / 100.0);

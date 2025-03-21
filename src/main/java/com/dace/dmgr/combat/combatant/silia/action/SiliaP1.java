@@ -41,8 +41,9 @@ public final class SiliaP1 extends AbstractSkill {
 
             if (location.distance(loc) > 0) {
                 location.setY(loc.getY());
-                Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) :
-                        LocationUtil.getDirection(location, loc).multiply(SiliaP1Info.PUSH_SIDE);
+
+                Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) : LocationUtil.getDirection(location, loc);
+                vec.multiply(SiliaP1Info.PUSH_SIDE);
                 vec.setY(SiliaP1Info.PUSH_UP);
 
                 combatUser.getMoveModule().push(vec, true);
@@ -61,7 +62,6 @@ public final class SiliaP1 extends AbstractSkill {
 
     @Override
     protected void onCancelled() {
-        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                () -> setDuration(Timespan.ZERO), 1));
+        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> setDuration(Timespan.ZERO), 1));
     }
 }

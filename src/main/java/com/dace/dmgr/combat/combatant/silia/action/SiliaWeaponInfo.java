@@ -24,6 +24,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     public static final double SIZE = 0.4;
     /** 쿨타임 */
     public static final Timespan COOLDOWN = Timespan.ofSeconds(0.9);
+
     @Getter
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();
 
@@ -36,16 +37,14 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 4;
         /** 확장 */
@@ -61,8 +60,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.knife_leftclick").volume(0.8).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(0.7).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_1").volume(0.6).pitch(1.3).build()
-        );
+                SoundEffect.SoundInfo.builder("new.item.trident.riptide_1").volume(0.6).pitch(1.3).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.stab").volume(1).pitch(0.8).pitchVariance(0.05).build());
@@ -82,7 +80,8 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
                         .count(2).horizontalSpread(0.05).verticalSpread(0.05).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15)
+                        .build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).speed(0.4).build());

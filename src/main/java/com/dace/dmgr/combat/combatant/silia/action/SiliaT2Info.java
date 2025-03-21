@@ -26,6 +26,7 @@ public final class SiliaT2Info extends TraitInfo {
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 5;
+
     @Getter
     private static final SiliaT2Info instance = new SiliaT2Info();
 
@@ -35,9 +36,7 @@ public final class SiliaT2Info extends TraitInfo {
                         .builder("특수 공격으로, 칼을 휘둘러 근거리에 <:DAMAGE:광역 피해>를 입히고 <:KNOCKBACK:밀쳐냅니다>.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -49,8 +48,7 @@ public final class SiliaT2Info extends TraitInfo {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(1.5).pitch(1, 1.2).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1.5).pitch(0.8, 1).build(),
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.7, 0.9).build()
-        );
+                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.7, 0.9).build());
     }
 
     /**
@@ -67,7 +65,8 @@ public final class SiliaT2Info extends TraitInfo {
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).speed(0.05).build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).speed(0.05)
+                        .build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(40).speed(0.4).build());

@@ -55,8 +55,9 @@ public final class SiliaP2 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getWeapon().setVisible(false);
+
         combatUser.addYawAndPitch(0, 0);
+        combatUser.getWeapon().setVisible(false);
 
         addActionTask(new IntervalTask(i -> {
             if (combatUser.getMoveModule().isKnockbacked() || !canActivate())
@@ -77,6 +78,7 @@ public final class SiliaP2 extends AbstractSkill {
             cancel();
 
             wallRideCount--;
+
             Location loc = combatUser.getLocation();
             loc.setPitch(-65);
             combatUser.getMoveModule().push(loc.getDirection().multiply(SiliaP2Info.PUSH), true);
@@ -93,7 +95,6 @@ public final class SiliaP2 extends AbstractSkill {
         setDuration(Timespan.ZERO);
         combatUser.getWeapon().setVisible(true);
 
-        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(),
-                () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
+        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }
 }

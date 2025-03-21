@@ -33,6 +33,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 8;
+
     @Getter
     private static final SiliaA2Info instance = new SiliaA2Info();
 
@@ -45,9 +46,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2, ActionKey.RIGHT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -61,13 +60,11 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.swing").volume(1.5).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_3").volume(1.5).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("new.item.trident.riptide_3").volume(1.5).pitch(0.8).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.swing").volume(1).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build()
-        );
+                SoundEffect.SoundInfo.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build());
     }
 
     /**
@@ -84,8 +81,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
                         .speedMultiplier(0.25).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
-                        .count(3).horizontalSpread(0.3).verticalSpread(0.3).build()
-        );
+                        .count(3).horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)

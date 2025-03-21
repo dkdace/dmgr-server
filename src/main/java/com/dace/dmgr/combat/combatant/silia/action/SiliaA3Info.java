@@ -25,6 +25,7 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
     public static final Timespan MAX_DURATION = Timespan.ofSeconds(10);
     /** 일격 활성화 시간 */
     public static final Timespan ACTIVATE_DURATION = Timespan.ofSeconds(2);
+
     @Getter
     private static final SiliaA3Info instance = new SiliaA3Info();
 
@@ -43,10 +44,7 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_3)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -57,13 +55,11 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.5).build());
         /** 해제 */
         public static final SoundEffect DISABLE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.7).build());
         /** 일격 활성화 */
         public static final SoundEffect ACTIVATE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.trident.return").volume(1).pitch(1.2).build());

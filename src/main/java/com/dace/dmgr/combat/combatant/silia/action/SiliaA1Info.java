@@ -27,6 +27,7 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
     public static final double DISTANCE = 3;
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 2.5;
+
     @Getter
     private static final SiliaA1Info instance = new SiliaA1Info();
 
@@ -40,9 +41,7 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -54,8 +53,7 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.trident.throw").volume(1.5).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.8).build());
     }
 
     /**
@@ -66,11 +64,11 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(3).horizontalSpread(0.02).verticalSpread(0.02).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build()
-        );
+                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build());
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
+                        .build());
         /** 총알 궤적 (장식) */
         public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)

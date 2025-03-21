@@ -13,6 +13,7 @@ public final class SiliaP2Info extends PassiveSkillInfo<SiliaP2> {
     public static final double PUSH = 0.45;
     /** 벽타기 최대 횟수 */
     public static final int USE_COUNT = 10;
+
     @Getter
     private static final SiliaP2Info instance = new SiliaP2Info();
 
@@ -21,9 +22,7 @@ public final class SiliaP2Info extends PassiveSkillInfo<SiliaP2> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("벽을 클릭하여 벽을 오를 수 있습니다.")
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**

@@ -13,6 +13,7 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
     public static final double PUSH_UP = 0.55;
     /** 수평 이동 강도 */
     public static final double PUSH_SIDE = 0.35;
+
     @Getter
     private static final SiliaP1Info instance = new SiliaP1Info();
 
@@ -21,9 +22,7 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("공중 점프가 가능합니다.")
                         .addActionKeyInfo("사용", ActionKey.SPACE)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -34,7 +33,6 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.1, 0.8).pitch(1.2, 1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_STEP).volume(0.1, 0.8).pitch(1.2, 1.4).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_STEP).volume(0.1, 0.8).pitch(1.2, 1.4).build());
     }
 }

@@ -11,6 +11,7 @@ public final class SiliaT1Info extends TraitInfo {
 
     /** 치명타 점수 */
     public static final int CRIT_SCORE = 3;
+
     @Getter
     private static final SiliaT1Info instance = new SiliaT1Info();
 
@@ -19,8 +20,6 @@ public final class SiliaT1Info extends TraitInfo {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("적의 뒤를 공격하면 <:DAMAGE_INCREASE:치명타>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "×" + CRIT_MULTIPLIER)
-                        .build()
-                )
-        );
+                        .build()));
     }
 }
