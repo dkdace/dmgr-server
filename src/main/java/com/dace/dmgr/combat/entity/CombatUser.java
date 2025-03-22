@@ -1028,6 +1028,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.getActivePotionEffects().forEach((potionEffect -> entity.removePotionEffect(potionEffect.getType())));
         entity.setAllowFlight(false);
         entity.setFlying(false);
+        entity.setGravity(true);
         entity.setGameMode(GameMode.SURVIVAL);
 
         fovValue = 0;
