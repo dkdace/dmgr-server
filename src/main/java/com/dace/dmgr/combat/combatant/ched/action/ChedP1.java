@@ -186,8 +186,8 @@ public final class ChedP1 extends AbstractSkill {
         Vector vector = VectorUtil.getRollAxis(loc).multiply(0.65);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 7; j++) {
-            int angle = 360 / 7 * j;
+        for (int i = 0; i < 7; i++) {
+            int angle = 360 / 7 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
             ChedP1Info.PARTICLE.TICK_HANG.play(loc.clone().add(vec));

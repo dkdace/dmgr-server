@@ -136,8 +136,6 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        super.onGiveHeal(provider, target, amount);
-
         if (provider != target && target instanceof CombatUser)
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 
@@ -164,7 +162,8 @@ public final class Vellion extends Controller {
     public boolean canJump(@NonNull CombatUser combatUser) {
         VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
         return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled())
-                && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+                && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished()
+                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

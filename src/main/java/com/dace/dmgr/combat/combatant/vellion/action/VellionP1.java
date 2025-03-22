@@ -43,42 +43,65 @@ public final class VellionP1 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        if (isDurationFinished()) {
-            setDuration();
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-            Location location = combatUser.getLocation();
-
-            VellionP1Info.SOUND.USE.play(location);
-            VellionP1Info.PARTICLE.USE.play(location);
-
-            addActionTask(new IntervalTask(i -> {
-                Location loc = combatUser.getLocation();
-
-                if (i < 2 && location.distance(loc) > 0) {
-                    location.setY(loc.getY());
-                    Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) :
-                            LocationUtil.getDirection(location, loc).multiply(VellionP1Info.PUSH_SIDE);
-                    vec.setY(VellionP1Info.PUSH_UP);
-
-                    combatUser.getMoveModule().push(vec, true);
-
-                    return false;
-                }
-
-                return true;
-            }, 1, 2));
-
-            addActionTask(new IntervalTask(i -> {
-                if (isDurationFinished() || !combatUser.getEntity().isFlying())
-                    return false;
-
-                combatUser.getEntity().setFallDistance(0);
-                playTickEffect();
-
-                return true;
-            }, isCancelled -> cancel(), 1, VellionP1Info.DURATION.toTicks()));
-        } else
+        if (!isDurationFinished()) {
             cancel();
+            return;
+        }
+
+        setDuration();
+
+        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+
+        Location location = combatUser.getLocation();
+
+        VellionP1Info.SOUND.USE.play(location);
+        VellionP1Info.PARTICLE.USE.play(location);
+
+        addActionTask(new IntervalTask(i -> {
+            Location loc = combatUser.getLocation();
+
+            if (location.distance(loc) > 0) {
+                location.setY(loc.getY());
+
+                Vector vec = (location.distance(loc) == 0) ? new Vector(0, 0, 0) : LocationUtil.getDirection(location, loc);
+                vec.multiply(VellionP1Info.PUSH_SIDE);
+                vec.setY(VellionP1Info.PUSH_UP);
+
+                combatUser.getMoveModule().push(vec, true);
+
+                return false;
+            }
+
+            return true;
+        }, 1, 2));
+
+        addActionTask(new IntervalTask(i -> {
+            if (!combatUser.getEntity().isFlying())
+                return false;
+
+            combatUser.getEntity().setFallDistance(0);
+            playTickEffect();
+
+            return true;
+        }, isCancelled -> cancel(), 1, VellionP1Info.DURATION.toTicks()));
+    }
+
+    @Override
+    protected void onDurationFinished() {
+        super.onDurationFinished();
+
+        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getEntity().addPotionEffect(
+                new PotionEffect(PotionEffectType.LEVITATION, 40, -10, false, false), true);
+
+        addTask(new IntervalTask(i -> {
+            combatUser.getEntity().setFallDistance(0);
+
+            return !combatUser.getEntity().isOnGround();
+        }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
+
+        VellionP1Info.SOUND.DISABLE.play(combatUser.getLocation());
+        VellionP1Info.PARTICLE.USE.play(combatUser.getLocation());
     }
 
     @Override
@@ -89,18 +112,6 @@ public final class VellionP1 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION,
-                40, -10, false, false), true);
-
-        addTask(new IntervalTask(i -> {
-            combatUser.getEntity().setFallDistance(0);
-
-            return !combatUser.getEntity().isOnGround();
-        }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
-
-        VellionP1Info.SOUND.DISABLE.play(combatUser.getLocation());
-        VellionP1Info.PARTICLE.USE.play(combatUser.getLocation());
     }
 
     /**
@@ -113,8 +124,8 @@ public final class VellionP1 extends AbstractSkill {
         Vector vector = VectorUtil.getRollAxis(loc).multiply(0.8);
         Vector axis = VectorUtil.getYawAxis(loc);
 
-        for (int j = 0; j < 8; j++) {
-            int angle = 360 / 8 * j;
+        for (int i = 0; i < 8; i++) {
+            int angle = 360 / 8 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
             VellionP1Info.PARTICLE.TICK.play(loc.clone().add(vec));

@@ -33,6 +33,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
 
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 20;
+
     @Getter
     private static final VellionA2Info instance = new VellionA2Info();
 
@@ -51,10 +52,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_2)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -66,13 +64,11 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("new.entity.squid.squirt").volume(2).pitch(1.2).build()
-        );
+                SoundEffect.SoundInfo.builder("new.entity.squid.squirt").volume(2).pitch(1.2).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_CURSE).volume(2).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.8).build());
         /** 발동 */
         public static final SoundEffect TRIGGER = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(0.6).pitch(0.7).pitchVariance(0.1).build());
@@ -98,8 +94,8 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
         public static final ParticleEffect MARK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 160, 150, 152)
                         .count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 160, 150, 152).build()
-        );
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 160, 150, 152)
+                        .build());
         /** 엔티티 타격 (표식 - 중심) */
         public static final ParticleEffect HIT_ENTITY_MARK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(15).speed(0.3).build());

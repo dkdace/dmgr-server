@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -37,7 +36,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
     public VellionA1(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA1Info.getInstance(), VellionA1Info.COOLDOWN, Timespan.MAX, 0);
-        entityModule = new EntityModule<>(this);
+        this.entityModule = new EntityModule<>(this);
     }
 
     @Override
@@ -55,6 +54,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
+
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
@@ -78,6 +78,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
+        entityModule.disposeEntity();
+
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }
 
@@ -95,14 +98,14 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             int angle = j * 8;
 
             for (int k = 0; k < 12; k++) {
-                angle += 60;
+                angle += 360 / 6;
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(0.8 + j * 0.25);
                 Location loc2 = loc.clone().add(vec);
 
-                if (i != 9)
-                    VellionA1Info.PARTICLE.USE_TICK_1.play(loc2, i / 8.0);
-                else
+                if (i == 9)
                     VellionA1Info.PARTICLE.USE_TICK_2.play(loc2);
+                else
+                    VellionA1Info.PARTICLE.USE_TICK_1.play(loc2, i / 8.0);
             }
         }
     }
@@ -155,14 +158,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         private long returnTime = VellionA1Info.RETURN_DURATION.toTicks();
 
         private VellionA1Entity(@NonNull Location spawnLocation) {
-            super(
-                    ArmorStand.class,
-                    spawnLocation,
-                    combatUser.getName() + "의 마력 응집체",
-                    combatUser,
-                    false, true,
-                    Hitbox.builder(1, 1, 1).offsetY(0.5).build()
-            );
+            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false, true);
 
             entity.setGravity(false);
             addOnTick(this::onTick);
@@ -173,21 +169,22 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                 targets.clear();
 
             Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
-            Vector dir = getLocation().getDirection();
-            if (returnTime < 0)
-                dir = LocationUtil.getDirection(getLocation(), location);
+            Vector dir = returnTime < 0
+                    ? LocationUtil.getDirection(getLocation(), location)
+                    : getLocation().getDirection();
 
             Location loc = getLocation().add(dir.multiply(VellionA1Info.VELOCITY / 20));
             if (LocationUtil.isNonSolid(loc)) {
                 entity.teleport(loc);
-                if (returnTime < 0 && (loc.distance(location) < 2 || combatUser.isDead()))
+
+                if (returnTime < 0 && loc.distance(location) < 2)
                     remove();
             } else if (returnTime < -1)
                 remove();
 
-            VellionA1Info.PARTICLE.DISPLAY.play(getLocation());
-
             new VellionA1Area().emit(loc);
+
+            VellionA1Info.PARTICLE.DISPLAY.play(getLocation());
         }
 
         private final class VellionA1Area extends Area<Damageable> {
@@ -203,18 +200,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (targets.add(target)) {
-                    if (target.isEnemy(combatUser)) {
-                        if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
-                                false, true)) {
-                            target.getStatusEffectModule().apply(VellionA1Poison.instance, combatUser,
-                                    target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(VellionA1Info.EFFECT_DURATION));
-
-                            target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, VellionA1Info.SNARE_DURATION);
-                        }
-
-                        VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
-                        VellionA1Info.SOUND.HIT_ENTITY.play(location);
-                    } else if (target instanceof Healable)
+                    if (target.isEnemy(combatUser))
+                        onHitEnemy(location, target);
+                    else if (target instanceof Healable)
                         target.getStatusEffectModule().apply(VellionA1Heal.instance, combatUser,
                                 target.getStatusEffectModule().getDuration(VellionA1Heal.instance).plus(VellionA1Info.EFFECT_DURATION));
 
@@ -223,6 +211,25 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                 }
 
                 return true;
+            }
+
+            /**
+             * 적이 맞았을 때 실행할 작업.
+             *
+             * @param location 맞은 위치
+             * @param target   대상 엔티티
+             */
+            private void onHitEnemy(@NonNull Location location, @NonNull Damageable target) {
+                if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
+                        false, true)) {
+                    target.getStatusEffectModule().apply(VellionA1Poison.instance, combatUser,
+                            target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(VellionA1Info.EFFECT_DURATION));
+
+                    target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, VellionA1Info.SNARE_DURATION);
+                }
+
+                VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
+                VellionA1Info.SOUND.HIT_ENTITY.play(location);
             }
         }
     }

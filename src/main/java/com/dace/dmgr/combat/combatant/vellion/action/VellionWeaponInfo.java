@@ -24,6 +24,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     public static final int VELOCITY = 35;
     /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 0.3;
+
     @Getter
     private static final VellionWeaponInfo instance = new VellionWeaponInfo();
 
@@ -35,16 +36,14 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static class RESOURCE {
+    public static final class RESOURCE {
         /** 기본 */
         public static final short DEFAULT = 14;
     }
@@ -58,8 +57,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(0.8).pitch(0.5).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build());
     }
 
     /**
@@ -71,8 +69,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(4).horizontalSpread(0.1).verticalSpread(0.1).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 80, 30, 110)
-                        .count(6).horizontalSpread(0.25).verticalSpread(0.25).build()
-        );
+                        .count(6).horizontalSpread(0.25).verticalSpread(0.25).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(30).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1).build());

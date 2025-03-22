@@ -16,8 +16,6 @@ public final class VellionP2Info extends PassiveSkillInfo<VellionP2> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("적에게 피해를 입히면 <:HEAL:회복>합니다.")
                         .addValueInfo(TextIcon.HEAL, "피해량의 {0}%", (int) (100 * HEAL_DAMAGE_RATIO))
-                        .build()
-                )
-        );
+                        .build()));
     }
 }

@@ -23,6 +23,7 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
     public static final double PUSH_SIDE = 0.6;
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(10);
+
     @Getter
     private static final VellionP1Info instance = new VellionP1Info();
 
@@ -39,10 +40,7 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SPACE)
-                                .build()
-                        )
-                )
-        );
+                                .build())));
     }
 
     /**
@@ -54,13 +52,11 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.7).build());
         /** 해제 */
         public static final SoundEffect DISABLE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.5).build(),
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build()
-        );
+                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build());
     }
 
     /**

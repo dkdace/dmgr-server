@@ -48,7 +48,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && targetModule.findTarget();
+        return super.canUse(actionKey) && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override

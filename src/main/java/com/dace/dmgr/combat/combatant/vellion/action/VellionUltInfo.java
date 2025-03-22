@@ -34,6 +34,7 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
     public static final int DAMAGE_SCORE = 15;
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 25;
+
     @Getter
     private static final VellionUltInfo instance = new VellionUltInfo();
 
@@ -50,9 +51,7 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                         .addValueInfo(TextIcon.STUN, Format.TIME, STUN_DURATION.toSeconds())
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -64,21 +63,18 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_HURT).volume(2).pitch(1.8).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_HURT).volume(2).pitch(1.8).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.8).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK).volume(3).pitch(0.85).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(0.7).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(0.7).build());
         /** 폭발 */
         public static final SoundEffect EXPLODE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.6).build(),
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.8).build()
-        );
+                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.8).build());
     }
 
     /**
@@ -89,8 +85,7 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 70, 0, 45).build()
-        );
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 70, 0, 45).build());
         /** 틱 입자 효과 (중심) - 1 */
         public static final ParticleEffect TICK_CORE_1 = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 90, 0, 55)
@@ -121,8 +116,7 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 2).count(300)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build(),
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 14).count(200)
-                        .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build()
-        );
+                        .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
         /** 엔티티 타격 (중심) */
         public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(50).speed(0.4).build());

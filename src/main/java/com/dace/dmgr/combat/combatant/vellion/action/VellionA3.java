@@ -71,7 +71,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
             }
             case LEFT_CLICK: {
                 onUse();
-
                 break;
             }
             default:
@@ -87,6 +86,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     @Override
     protected void onCancelled() {
         confirmModule.cancel();
+
         if (!isDurationFinished()) {
             setDuration(Timespan.ZERO);
             combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
@@ -108,6 +108,11 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         // 미사용
     }
 
+    @Override
+    public boolean isAssistMode() {
+        return true;
+    }
+
     /**
      * 사용 시 실행할 작업.
      */
@@ -116,55 +121,52 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
             return;
 
         setDuration();
-        combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
+
         confirmModule.toggleCheck();
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(1));
+        combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+
+        combatUser.getWeapon().setCooldown(Timespan.ofTicks(1));
+
         Location location = confirmModule.getCurrentLocation();
 
         VellionA3Info.SOUND.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
-            for (Location loc2 : LocationUtil.getLine(loc, location, 0.7))
-                VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
             VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);
+            for (Location loc2 : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), location, 0.7))
+                VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
         }, () -> {
             cancel();
-            onReady(location);
+
+            Location loc = location.clone().add(0, 0.1, 0);
+
+            VellionA3Info.SOUND.USE_READY.play(loc);
+
+            addTask(new IntervalTask(i -> {
+                if (i % 4 == 0)
+                    new VellionA3Area().emit(loc);
+
+                playTickEffect(loc, i);
+            }, 1, VellionA3Info.DURATION.toTicks()));
         }, 1, VellionA3Info.READY_DURATION.toTicks()));
-    }
-
-    /**
-     * 시전 완료 시 실행할 작업.
-     *
-     * @param location 대상 위치
-     */
-    private void onReady(@NonNull Location location) {
-        Location loc = location.clone().add(0, 0.1, 0);
-
-        VellionA3Info.SOUND.USE_READY.play(loc);
-
-        addTask(new IntervalTask(i -> {
-            if (i % 4 == 0)
-                new VellionA3Area().emit(loc);
-
-            VellionA3Info.PARTICLE.TICK_CORE.play(loc);
-            playTickEffect(i, loc);
-        }, 1, VellionA3Info.DURATION.toTicks()));
     }
 
     /**
      * 범위 표시 효과를 재생한다.
      *
-     * @param i        인덱스
      * @param location 사용 위치
+     * @param i        인덱스
      */
-    private void playTickEffect(long i, @NonNull Location location) {
-        location.setYaw(0);
-        location.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(location);
-        Vector axis = VectorUtil.getYawAxis(location);
+    private void playTickEffect(@NonNull Location location, long i) {
+        Location loc = location.clone();
+        loc.setYaw(0);
+        loc.setPitch(0);
+
+        VellionA3Info.PARTICLE.TICK_CORE.play(loc);
+
+        Vector vector = VectorUtil.getRollAxis(loc);
+        Vector axis = VectorUtil.getYawAxis(loc);
 
         for (int j = 0; j < 2; j++) {
             long index = i * 2 + j;
@@ -172,30 +174,26 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
             double distance = index * 0.2 % 5;
 
             for (int k = 0; k < 12; k++) {
-                angle += distance > 3 ? 90 : 60;
+                angle += distance > 3 ? 360 / 4 : 360 / 6;
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
-                Location loc = location.clone().add(vec.clone().multiply(distance));
+                Location loc2 = loc.clone().add(vec.clone().multiply(distance));
 
-                VellionA3Info.PARTICLE.TICK_DECO_1.play(loc, vec.setY(0.4));
+                VellionA3Info.PARTICLE.TICK_DECO_1.play(loc2, vec.setY(0.4));
             }
-            double distance2 = index * 0.1 % 2.5;
-            long angle2 = index * 44;
-            for (int k = 0; k < 3; k++) {
-                angle2 += 120;
 
+            long angle2 = index * 44;
+            double distance2 = index * 0.1 % 2.5;
+
+            for (int k = 0; k < 3; k++) {
+                angle2 += 360 / 3;
                 Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle2);
                 Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
-                Vector dir = LocationUtil.getDirection(location.clone().add(vec1), location.clone().add(vec2));
+                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
 
-                VellionA3Info.PARTICLE.TICK_DECO_2.play(location.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
+                VellionA3Info.PARTICLE.TICK_DECO_2.play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
                         dir.setY(distance2 * 0.1));
             }
         }
-    }
-
-    @Override
-    public boolean isAssistMode() {
-        return true;
     }
 
     private final class VellionA3Area extends Area<Damageable> {
@@ -210,13 +208,12 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
-                    false, true)) {
+            if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
                 target.getStatusEffectModule().apply(HealBlock.getInstance(), combatUser, Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(Silence.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
-                    combatUser.addScore("적 침묵", (double) (VellionA3Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
+                    combatUser.addScore("적 침묵", VellionA3Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
                     bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
                 }
             }

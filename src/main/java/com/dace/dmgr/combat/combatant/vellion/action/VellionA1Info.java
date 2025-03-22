@@ -40,6 +40,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
 
     /** 효과 점수 */
     public static final int EFFECT_SCORE = 1;
+
     @Getter
     private static final VellionA1Info instance = new VellionA1Info();
 
@@ -55,9 +56,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, VELOCITY * RETURN_DURATION.toSeconds())
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)
-                        .build()
-                )
-        );
+                        .build()));
     }
 
     /**
@@ -69,14 +68,12 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(2).pitch(1.5).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(2).pitch(1.5).build());
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(2).pitch(0.7).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_DEATH).volume(2).pitch(1.8).build()
-        );
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_DEATH).volume(2).pitch(1.8).build());
         /** 엔티티 타격 */
         public static final SoundEffect HIT_ENTITY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build());
@@ -101,8 +98,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 140, 120, 180)
                         .count(10).horizontalSpread(1.5).verticalSpread(1.5).build(),
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 10).count(8)
-                        .horizontalSpread(0.5).verticalSpread(0.5).speed(0.05).build()
-        );
+                        .horizontalSpread(0.5).verticalSpread(0.5).speed(0.05).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(30).speed(0.4).build());
