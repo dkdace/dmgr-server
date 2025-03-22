@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -77,12 +78,12 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 240, 230, 50)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(240, 230, 50)).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 240, 230, 50)
-                        .count(20)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                                Color.fromRGB(240, 230, 50)).count(20)
                         .horizontalSpread(0, 0, 0.5)
                         .verticalSpread(1, 0, 0.5)
                         .build());

@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -83,8 +84,8 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(20).horizontalSpread(0.28).verticalSpread(0.28).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 64, 160, 184)
-                        .count(15).horizontalSpread(2.5).verticalSpread(1.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(64, 160, 184)).count(15).horizontalSpread(2.5).verticalSpread(1.5).build());
         /** 총알 궤적 (모양) */
         public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(8)

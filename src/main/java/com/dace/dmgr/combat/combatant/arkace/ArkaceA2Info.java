@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
@@ -57,7 +58,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                                220, 160, 255, 255, 36, 36)
+                                Color.fromRGB(220, 255, 36), Color.fromRGB(160, 255, 36))
                         .count(3).verticalSpread(0.4).build());
     }
 }

@@ -149,7 +149,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(14, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                (isUlt ? ArkaceWeaponInfo.PARTICLE.BULLET_TRAIL_ULT : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+                (isUlt ? ArkaceUltInfo.PARTICLE.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
             });
         }
 

@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -58,7 +59,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(4).horizontalSpread(0.4).build());
         /** 틱 입자 효과 (장식) */
         public static final ParticleEffect TICK_DECO = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
-                        .count(6).horizontalSpread(1).verticalSpread(1.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 70, 0)).count(6).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

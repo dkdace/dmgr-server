@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -87,12 +88,12 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 95, 35)
-                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(200, 95, 35)).count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 30, 15)
-                        .count(6).horizontalSpread(0.15).verticalSpread(0.15).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(200, 30, 15)).count(6).horizontalSpread(0.15).verticalSpread(0.15).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(4).horizontalSpread(0.12).verticalSpread(0.12).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(

@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 
 public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
@@ -64,8 +65,8 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
     public static final class PARTICLE {
         /** 사용 시 입자 효과 (중심) */
         public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
-                        .count(2).horizontalSpread(0.15).verticalSpread(0.15).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 255, 255)).count(2).horizontalSpread(0.15).verticalSpread(0.15).build());
         /** 사용 시 입자 효과 (장식) */
         public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(2).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());

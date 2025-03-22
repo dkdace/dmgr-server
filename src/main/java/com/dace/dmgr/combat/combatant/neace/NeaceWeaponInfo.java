@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
@@ -91,21 +92,21 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 235)
-                        .horizontalSpread(0.05).verticalSpread(0.05).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 200)
-                        .count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(255, 255, 235)).horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 255, 200)).count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 200)
-                        .count(15).horizontalSpread(0.2).verticalSpread(0.2).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(255, 255, 200)).count(15).horizontalSpread(0.2).verticalSpread(0.2).build());
         /** 엔티티 타격 (치유 광선) */
         public static final ParticleEffect HIT_ENTITY_HEAL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 140)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 255, 140)).build());
         /** 엔티티 타격 (치유 광선 - 축복) */
         public static final ParticleEffect HIT_ENTITY_HEAL_AMPLIFY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 140, 255, 245)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(140, 255, 245)).build());
     }
 }

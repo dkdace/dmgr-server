@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -64,14 +65,14 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(2).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
-                        .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(215, 255, 130)).count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).build());
         /** 표식 */
         public static final ParticleEffect MARK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 215, 255, 130)
-                        .count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(215, 255, 130)).count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(215, 255, 130)).build());
     }
 }

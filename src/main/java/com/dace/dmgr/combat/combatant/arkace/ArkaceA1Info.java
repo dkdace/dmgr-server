@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -71,13 +72,13 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 32, 250, 225)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(32, 250, 225)).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2)
                         .build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 32, 250, 225)
-                        .count(200).horizontalSpread(2.5).verticalSpread(2.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(32, 250, 225)).count(200).horizontalSpread(2.5).verticalSpread(2.5).build());
     }
 }

@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
@@ -69,11 +70,11 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                                200, 140, 255, 255, 160, 245)
+                                Color.fromRGB(200, 255, 160), Color.fromRGB(140, 255, 245))
                         .count(6).horizontalSpread(0.2).verticalSpread(0.2).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 140, 255, 245)
-                        .count(3).horizontalSpread(1).verticalSpread(1.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(140, 255, 245)).count(3).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

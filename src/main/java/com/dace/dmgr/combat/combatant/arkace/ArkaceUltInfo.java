@@ -6,7 +6,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.effect.ParticleEffect;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 
 public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
     /** 궁극기 필요 충전량 */
@@ -28,5 +31,16 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()));
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(0, 230, 255)).build());
     }
 }

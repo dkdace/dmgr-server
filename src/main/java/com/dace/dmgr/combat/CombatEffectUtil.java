@@ -36,8 +36,7 @@ public final class CombatEffectUtil {
     /** 투척물 튕김 효과음 */
     public static final SoundEffect THROW_BOUNCE_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("random.metalhit").volume(0.1).pitch(1.2).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.1).pitch(2).build()
-    );
+            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.1).pitch(2).build());
     /** 총알 궤적 효과 */
     public static final ParticleEffect BULLET_TRAIL_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build());
@@ -54,13 +53,11 @@ public final class CombatEffectUtil {
     /** 블록 타격 효과음 (금속) */
     private static final SoundEffect HIT_BLOCK_METAL_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.5).pitch(1.95).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.8).pitch(1.95).pitchVariance(0.1).build()
-    );
+            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.8).pitch(1.95).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (목재) */
     private static final SoundEffect HIT_BLOCK_WOOD_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.BLOCK_WOOD_BREAK).volume(0.8).pitch(0.8).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder("random.stab").volume(0.8).pitch(1.95).pitchVariance(0.1).build()
-    );
+            SoundEffect.SoundInfo.builder("random.stab").volume(0.8).pitch(1.95).pitchVariance(0.1).build());
     /** 블록 타격 효과음 (유리) */
     private static final SoundEffect HIT_BLOCK_GLASS_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
@@ -94,8 +91,7 @@ public final class CombatEffectUtil {
                     .count(1, 0, 25)
                     .horizontalSpread(1, 0, 0.05)
                     .verticalSpread(1, 0, 0.05)
-                    .build()
-    );
+                    .build());
     /** 블록 타격 효과 (소형) */
     private static final ParticleEffect HIT_BLOCK_SMALL_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(0, ParticleEffect.BlockParticleType.BLOCK_DUST)
@@ -103,8 +99,7 @@ public final class CombatEffectUtil {
                     .speed(0.1).build(),
             ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA)
                     .count(1, 0, 10)
-                    .build()
-    );
+                    .build());
 
     /**
      * 지정한 위치 또는 엔티티에 출혈 입자 효과를 재생한다.

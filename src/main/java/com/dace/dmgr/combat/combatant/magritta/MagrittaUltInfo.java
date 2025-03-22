@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -74,8 +75,8 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 70, 0)).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).speed(0.15).build(),

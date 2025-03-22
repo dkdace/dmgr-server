@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -76,8 +77,8 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     public static final class PARTICLE {
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 200, 200, 200)
-                        .count(12).horizontalSpread(0.3).verticalSpread(0.3).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(200, 200, 200)).count(12).horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 총알 궤적 (장식) */
         public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(30).horizontalSpread(0.15).verticalSpread(0.15).speed(0.05).build());

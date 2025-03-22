@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.effect.ParticleEffect;
 import lombok.NonNull;
+import org.bukkit.Color;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -14,8 +15,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 public class Speed extends StatusEffect {
     /** 틱 입자 효과 */
     private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
-            ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB_AMBIENT, 200, 255, 255)
-                    .count(3)
+            ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB_AMBIENT,
+                            Color.fromRGB(200, 255, 255)).count(3)
                     .horizontalSpread(0, 0, 0.25)
                     .verticalSpread(1, 0, 0.25)
                     .build());

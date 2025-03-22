@@ -9,10 +9,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.util.Vector;
 
 public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
@@ -102,17 +99,17 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 96, 220, 255)
-                        .count(15).horizontalSpread(0.6).verticalSpread(0.02).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(96, 220, 255)).count(15).horizontalSpread(0.6).verticalSpread(0.02).build());
         /** 소환 준비 대기 틱 입자 효과 */
         public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build());
         /** 표시 */
         public static final ParticleEffect DISPLAY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 96, 220, 255)
-                        .count(8).horizontalSpread(0.6).verticalSpread(0.02).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 80, 80, 100)
-                        .count(3).horizontalSpread(0.15).verticalSpread(0.02).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(96, 220, 255)).count(8).horizontalSpread(0.6).verticalSpread(0.02).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(80, 80, 100)).count(3).horizontalSpread(0.15).verticalSpread(0.02).build());
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)

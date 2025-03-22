@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerWorldParticles;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -407,45 +408,32 @@ public final class ParticleEffect {
          *
          * @param dataIndex    가변 데이터 인덱스. {@link ParticleEffect#play(Location, Object...)}에서 사용됨. 0 이상의 값
          * @param particleType 색이 있는 입자 종류
-         * @param minRed       최소 빨강 값. 0~255 사이의 값
-         * @param maxRed       최대 빨강 값. 0~255 사이의 값
-         * @param minGreen     최소 초록 값. 0~255 사이의 값
-         * @param maxGreen     최대 초록 값. 0~255 사이의 값
-         * @param minBlue      최소 파랑 값. 0~255 사이의 값
-         * @param maxBlue      최대 파랑 값. 0~255 사이의 값
+         * @param minColor     최소 색상 값
+         * @param maxColor     최대 색상 값
          * @return {@link Builder}
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         @NonNull
-        public static Builder builder(int dataIndex, @NonNull ParticleType particleType, int minRed, int maxRed, int minGreen, int maxGreen,
-                                      int minBlue, int maxBlue) {
+        public static Builder builder(int dataIndex, @NonNull ParticleType particleType, @NonNull Color minColor, @NonNull Color maxColor) {
             validateDataIndex(dataIndex);
-            Validate.inclusiveBetween(0, 255, minRed, "255 >= minRed >= 0 (%d)", minRed);
-            Validate.inclusiveBetween(0, 255, maxRed, "255 >= maxRed >= 0 (%d)", maxRed);
-            Validate.inclusiveBetween(0, 255, minGreen, "255 >= minGreen >= 0 (%d)", minGreen);
-            Validate.inclusiveBetween(0, 255, maxGreen, "255 >= maxGreen >= 0 (%d)", maxGreen);
-            Validate.inclusiveBetween(0, 255, minBlue, "255 >= minBlue >= 0 (%d)", minBlue);
-            Validate.inclusiveBetween(0, 255, maxBlue, "255 >= maxBlue >= 0 (%d)", maxBlue);
 
             return new Builder(particleType,
-                    new VariableValue(dataIndex, Math.max(1, minRed) / 255.0, Math.max(1, maxRed) / 255.0),
-                    new VariableValue(dataIndex, Math.max(1, minGreen) / 255.0, Math.max(1, maxGreen) / 255.0),
-                    new VariableValue(dataIndex, Math.max(1, minBlue) / 255.0, Math.max(1, maxBlue) / 255.0));
+                    new VariableValue(dataIndex, Math.max(1, minColor.getRed()) / 255.0, Math.max(1, maxColor.getRed()) / 255.0),
+                    new VariableValue(dataIndex, Math.max(1, minColor.getGreen()) / 255.0, Math.max(1, maxColor.getGreen()) / 255.0),
+                    new VariableValue(dataIndex, Math.max(1, minColor.getBlue()) / 255.0, Math.max(1, maxColor.getBlue()) / 255.0));
         }
 
         /**
          * 빌더 인스턴스를 생성하여 반환한다.
          *
          * @param particle 입자 종류
-         * @param red      빨강. 0~255 사이의 값
-         * @param green    초록. 0~255 사이의 값
-         * @param blue     파랑. 0~255 사이의 값
+         * @param color    색상
          * @return {@link Builder}
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         @NonNull
-        public static Builder builder(@NonNull ParticleType particle, int red, int green, int blue) {
-            return builder(Integer.MAX_VALUE, particle, red, red, green, green, blue, blue);
+        public static Builder builder(@NonNull ParticleType particle, @NonNull Color color) {
+            return builder(Integer.MAX_VALUE, particle, color, color);
         }
 
         @Override

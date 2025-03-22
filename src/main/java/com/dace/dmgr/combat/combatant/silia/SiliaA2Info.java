@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -80,8 +81,8 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
                         .speedMultiplier(0.25).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 255, 255)
-                        .count(3).horizontalSpread(0.3).verticalSpread(0.3).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 255, 255)).count(3).horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)

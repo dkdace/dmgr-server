@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
@@ -93,7 +94,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     public static final class PARTICLE {
         /** 소환 준비 대기 틱 입자 효과 */
         public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 255, 255, 255)
-                        .count(5).horizontalSpread(0.2).verticalSpread(0.2).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(255, 255, 255)).count(5).horizontalSpread(0.2).verticalSpread(0.2).build());
     }
 }

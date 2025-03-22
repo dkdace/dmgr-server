@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -67,12 +68,12 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
                         .build());
         /** 엔티티 타격 (장식) */
         public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)
-                        .count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 230, 90)).count(2).horizontalSpread(0.1).verticalSpread(0.1).build(),
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 230, 90)
-                        .count(4).horizontalSpread(1).verticalSpread(1.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 230, 90)).count(4).horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

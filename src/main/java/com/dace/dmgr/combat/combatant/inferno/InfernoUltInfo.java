@@ -10,10 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 
 public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     /** 궁극기 필요 충전량 */
@@ -81,8 +78,8 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
                         .speedMultiplier(0.2).build());
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 255, 70, 0)
-                        .count(3).verticalSpread(1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(255, 70, 0)).count(3).verticalSpread(1).build());
         /** 틱 입자 효과 (장식) */
         public static final ParticleEffect TICK_DECO = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)

@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
@@ -108,16 +107,5 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
                 .add(26, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(1.7).build())
                 .add(27, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.8).build())
                 .build();
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class PARTICLE {
-        /** 총알 궤적 (궁극기) */
-        public static final ParticleEffect BULLET_TRAIL_ULT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 0, 230, 255)
-                        .build());
     }
 }

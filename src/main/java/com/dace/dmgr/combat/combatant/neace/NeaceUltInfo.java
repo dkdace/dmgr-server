@@ -11,6 +11,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -64,14 +65,14 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.GRASS, 0).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(215, 255, 130)).build());
         /** 사용 준비 */
-        public static final FireworkEffect USE_READY = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.STAR, 215, 255, 130)
-                .fadeColor(255, 255, 255).trail().build();
+        public static final FireworkEffect USE_READY = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.STAR,
+                Color.fromRGB(215, 255, 130)).fadeColor(Color.fromRGB(255, 255, 255)).trail().build();
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 215, 255, 130)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(215, 255, 130)).horizontalSpread(0.1).verticalSpread(0.1).build());
     }
 }

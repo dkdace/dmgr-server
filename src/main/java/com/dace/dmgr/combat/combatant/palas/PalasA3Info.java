@@ -10,10 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 
 public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     /** 쿨타임 */
@@ -75,8 +72,8 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 220, 161, 43)
-                        .count(5).horizontalSpread(0.15).verticalSpread(0.15).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(220, 161, 43)).count(5).horizontalSpread(0.15).verticalSpread(0.15).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 4)

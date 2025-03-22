@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -75,14 +76,16 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(70).horizontalSpread(1).verticalSpread(0.5).speed(0.2).build());
         /** 사용 시 틱 입자 효과 (장식) */
         public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 156, 60, 130).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(156, 60, 130)).build());
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 156, 60, 130)
-                        .count(3).horizontalSpread(0.4).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(156, 60, 130)).count(3).horizontalSpread(0.4).build());
         /** 틱 입자 효과 (장식) - 1 */
         public static final ParticleEffect TICK_DECO_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 156, 60, 130).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(156, 60, 130)).build(),
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
                         .speedMultiplier(0.1).build());
         /** 틱 입자 효과 (장식) - 2 */

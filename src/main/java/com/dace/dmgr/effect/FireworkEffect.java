@@ -4,7 +4,6 @@ import com.dace.dmgr.util.task.DelayTask;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Firework;
@@ -25,22 +24,12 @@ public final class FireworkEffect {
      * 빌더 인스턴스를 생성하여 반환한다.
      *
      * @param type  폭죽 효과 타입
-     * @param red   빨강. 0~255 사이의 값
-     * @param green 초록. 0~255 사이의 값
-     * @param blue  파랑. 0~255 사이의 값
+     * @param color 기본 색상
      * @return {@link Builder}
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
-    public static Builder builder(@NonNull org.bukkit.FireworkEffect.Type type, int red, int green, int blue) {
-        validateRGB(red, green, blue);
-        return new Builder(org.bukkit.FireworkEffect.builder().with(type).withColor(Color.fromRGB(red, green, blue)));
-    }
-
-    private static void validateRGB(int red, int green, int blue) {
-        Validate.inclusiveBetween(0, 255, red, "255 >= red >= 0 (%d)", red);
-        Validate.inclusiveBetween(0, 255, green, "255 >= green >= 0 (%d)", green);
-        Validate.inclusiveBetween(0, 255, blue, "255 >= blue >= 0 (%d)", blue);
+    public static Builder builder(@NonNull org.bukkit.FireworkEffect.Type type, @NonNull Color color) {
+        return new Builder(org.bukkit.FireworkEffect.builder().with(type).withColor(color));
     }
 
     /**
@@ -69,17 +58,12 @@ public final class FireworkEffect {
         /**
          * 폭죽의 사라지는 색을 설정한다.
          *
-         * @param red   빨강. 0~255 사이의 값
-         * @param green 초록. 0~255 사이의 값
-         * @param blue  파랑. 0~255 사이의 값
+         * @param color 사라지는 색
          * @return {@link Builder}
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
         @NonNull
-        public Builder fadeColor(int red, int green, int blue) {
-            validateRGB(red, green, blue);
-
-            mcBuilder.withFade(Color.fromRGB(red, green, blue));
+        public Builder fadeColor(@NonNull Color color) {
+            mcBuilder.withFade(color);
             return this;
         }
 

@@ -13,6 +13,7 @@ import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
@@ -157,11 +158,11 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 137, 185, 240)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(137, 185, 240)).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 137, 185, 240)
-                        .count(10).horizontalSpread(0.25).verticalSpread(0.25).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(137, 185, 240)).count(10).horizontalSpread(0.25).verticalSpread(0.25).build());
     }
 }

@@ -19,15 +19,15 @@ import java.text.MessageFormat;
  * 전투 시스템의 코어 목록.
  */
 public enum Core {
-    STRENGTH("힘", "공격력 +{0}%", 227, 14, 14, 10),
-    RESISTANCE("저항", "방어력 +{0}%", 212, 96, 13, 10),
-    SPEED("신속", "이동 속도 +{0}%", 84, 235, 230, 7),
-    ULTIMATE("궁극", "궁극기 필요 충전량 -{0}%", 37, 92, 232, 10),
-    REGENERATION("재생", "초당 {0}% 체력 회복", 14, 179, 20, 0.7),
-    HEALTH_DRAIN("흡혈", "입힌 피해의 {0}% 회복", 138, 12, 12, 10),
-    HEALING("치유", "치유량 +{0}%", 157, 232, 65, 15),
-    RESURRECTION("부활", "부활 시간 -{0}%", 232, 237, 128, 30),
-    ENDURANCE("강인함", "받는 해로운 효과 시간 -{0}%", 135, 135, 135, 20);
+    STRENGTH("힘", "공격력 +{0}%", Color.fromRGB(227, 14, 14), 10),
+    RESISTANCE("저항", "방어력 +{0}%", Color.fromRGB(212, 96, 13), 10),
+    SPEED("신속", "이동 속도 +{0}%", Color.fromRGB(84, 235, 230), 7),
+    ULTIMATE("궁극", "궁극기 필요 충전량 -{0}%", Color.fromRGB(37, 92, 232), 10),
+    REGENERATION("재생", "초당 {0}% 체력 회복", Color.fromRGB(14, 179, 20), 0.7),
+    HEALTH_DRAIN("흡혈", "입힌 피해의 {0}% 회복", Color.fromRGB(138, 12, 12), 10),
+    HEALING("치유", "치유량 +{0}%", Color.fromRGB(157, 232, 65), 15),
+    RESURRECTION("부활", "부활 시간 -{0}%", Color.fromRGB(232, 237, 128), 30),
+    ENDURANCE("강인함", "받는 해로운 효과 시간 -{0}%", Color.fromRGB(135, 135, 135), 20);
 
     /** 코어 이름 */
     private final String name;
@@ -39,13 +39,13 @@ public enum Core {
     @Getter
     private final DefinedItem selectItem;
 
-    Core(String name, String description, int red, int green, int blue, double value) {
+    Core(String name, String description, Color color, double value) {
         this.name = name;
         this.value = value;
 
         this.selectItem = new DefinedItem(new ItemBuilder(Material.FIREWORK_CHARGE)
                 .editItemMeta(itemMeta ->
-                        ((FireworkEffectMeta) itemMeta).setEffect(FireworkEffect.builder().withColor(Color.fromRGB(red, green, blue)).build()))
+                        ((FireworkEffectMeta) itemMeta).setEffect(FireworkEffect.builder().withColor(color).build()))
                 .setName("§b" + getName())
                 .setLore("",
                         "§7장착 시 다음 효과 적용:",

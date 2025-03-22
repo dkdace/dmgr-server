@@ -10,6 +10,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Color;
 import org.bukkit.Sound;
 
 public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
@@ -66,11 +67,11 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
     public static final class PARTICLE {
         /** 사용 */
         public static final ParticleEffect USE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, 150, 110, 170)
-                        .count(50).horizontalSpread(0.8).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
+                        Color.fromRGB(150, 110, 170)).count(50).horizontalSpread(0.8).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 150, 110, 170)
-                        .count(2).horizontalSpread(0.3).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(150, 110, 170)).count(2).horizontalSpread(0.3).build());
     }
 }

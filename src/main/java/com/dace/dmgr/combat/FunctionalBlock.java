@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -210,8 +211,8 @@ public abstract class FunctionalBlock {
         /** 블록 타입 */
         private static final Material MATERIAL = GeneralConfig.getCombatConfig().getUltPackBlock();
         /** 사용 입자 효과 */
-        private static final FireworkEffect USE_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL, 48, 85, 251)
-                .fadeColor(255, 255, 255).build();
+        private static final FireworkEffect USE_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
+                Color.fromRGB(48, 85, 251)).fadeColor(Color.fromRGB(255, 255, 255)).build();
         /** 사용 효과음 */
         private static final SoundEffect USE_SOUND = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(1).pitch(2).build(),

@@ -13,6 +13,7 @@ import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -128,8 +129,8 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     public static final class PARTICLE {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, 210, 160, 70)
-                        .build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(210, 160, 70)).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(15).build());
