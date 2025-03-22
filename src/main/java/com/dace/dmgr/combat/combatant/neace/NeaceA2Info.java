@@ -67,14 +67,17 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(140, 255, 245);
+
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                                Color.fromRGB(200, 255, 160), Color.fromRGB(140, 255, 245))
+                                Color.fromRGB(200, 255, 160), COLOR)
                         .count(6).horizontalSpread(0.2).verticalSpread(0.2).build());
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(140, 255, 245)).count(3).horizontalSpread(1).verticalSpread(1.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(3)
+                        .horizontalSpread(1).verticalSpread(1.5).build());
     }
 }

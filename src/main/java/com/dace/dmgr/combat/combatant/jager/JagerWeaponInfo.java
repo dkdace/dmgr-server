@@ -156,13 +156,15 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(137, 185, 240);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(137, 185, 240)).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(137, 185, 240)).count(10).horizontalSpread(0.25).verticalSpread(0.25).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(10)
+                        .horizontalSpread(0.25).verticalSpread(0.25).build());
     }
 }

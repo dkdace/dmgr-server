@@ -10,7 +10,6 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -88,8 +87,8 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
     public static final class PARTICLE {
         /** 총알 궤적 (이펙트 - 중심) */
         public static final ParticleEffect BULLET_TRAIL_EFFECT_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 200, 200)).count(2).horizontalSpread(0.12).verticalSpread(0.12).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.PARTICLE.COLOR)
+                        .count(2).horizontalSpread(0.12).verticalSpread(0.12).build());
         /** 총알 궤적 (이펙트 - 장식) */
         public static final ParticleEffect BULLET_TRAIL_EFFECT_DECO = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(3).horizontalSpread(0.07).verticalSpread(0.07).build());

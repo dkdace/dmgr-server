@@ -83,6 +83,9 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(90, 0, 55);
+
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
@@ -90,8 +93,8 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                         Color.fromRGB(70, 0, 45)).build());
         /** 틱 입자 효과 (중심) - 1 */
         public static final ParticleEffect TICK_CORE_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(90, 0, 55)).count(4).horizontalSpread(0.3).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(4)
+                        .horizontalSpread(0.3).build());
         /** 틱 입자 효과 (중심) - 2 */
         public static final ParticleEffect TICK_CORE_2 = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.PORTAL).count(40).speed(1.5).build());
@@ -107,8 +110,8 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 14).build());
         /** 틱 입자 효과 (장식) - 4 */
         public static final ParticleEffect TICK_DECO_4 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(90, 0, 55)).count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(3)
+                        .horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 틱 입자 효과 (장식) - 5 */
         public static final ParticleEffect TICK_DECO_5 = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.MYCEL, 0).count(4)

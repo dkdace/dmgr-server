@@ -90,16 +90,19 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(255, 255, 200);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
                         Color.fromRGB(255, 255, 235)).horizontalSpread(0.05).verticalSpread(0.05).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 255, 200)).count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(3)
+                        .horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(255, 255, 200)).count(15).horizontalSpread(0.2).verticalSpread(0.2).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(15)
+                        .horizontalSpread(0.2).verticalSpread(0.2).build());
         /** 엔티티 타격 (치유 광선) */
         public static final ParticleEffect HIT_ENTITY_HEAL = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

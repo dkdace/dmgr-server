@@ -69,16 +69,18 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(32, 250, 225);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(32, 250, 225)).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2)
                         .build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(32, 250, 225)).count(200).horizontalSpread(2.5).verticalSpread(2.5).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(200)
+                        .horizontalSpread(2.5).verticalSpread(2.5).build());
     }
 }

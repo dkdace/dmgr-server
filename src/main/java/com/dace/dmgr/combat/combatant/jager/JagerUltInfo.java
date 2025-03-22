@@ -97,17 +97,20 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(96, 220, 255);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(96, 220, 255)).count(15).horizontalSpread(0.6).verticalSpread(0.02).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(15)
+                        .horizontalSpread(0.6).verticalSpread(0.02).build());
         /** 소환 준비 대기 틱 입자 효과 */
         public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(Particle.EXPLOSION_NORMAL, new Vector(0, -0.3, 0)).build());
         /** 표시 */
         public static final ParticleEffect DISPLAY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(96, 220, 255)).count(8).horizontalSpread(0.6).verticalSpread(0.02).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(8)
+                        .horizontalSpread(0.6).verticalSpread(0.02).build(),
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
                         Color.fromRGB(80, 80, 100)).count(3).horizontalSpread(0.15).verticalSpread(0.02).build());
         /** 틱 입자 효과 (중심) */

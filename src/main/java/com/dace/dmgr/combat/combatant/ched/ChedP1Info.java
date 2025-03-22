@@ -64,13 +64,16 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(186, 55, 30);
+
         /** 사용 (매달리기) */
         public static final ParticleEffect USE_HANG = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(186, 55, 30)).count(40).horizontalSpread(0.65).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(40)
+                        .horizontalSpread(0.65).build());
         /** 틱 입자 효과 (매달리기) */
         public static final ParticleEffect TICK_HANG = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(186, 55, 30)).horizontalSpread(0.24).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).horizontalSpread(0.24)
+                        .build());
     }
 }

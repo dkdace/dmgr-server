@@ -90,14 +90,17 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(120, 120, 135);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(120, 120, 135)).count(17).horizontalSpread(0.7).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(17)
+                        .horizontalSpread(0.7).build());
         /** 소환 준비 대기 틱 입자 효과 */
         public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(120, 120, 135)).count(5).horizontalSpread(0.2).verticalSpread(0.2).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(5)
+                        .horizontalSpread(0.2).verticalSpread(0.2).build());
         /** 표시 */
         public static final ParticleEffect DISPLAY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA).build());

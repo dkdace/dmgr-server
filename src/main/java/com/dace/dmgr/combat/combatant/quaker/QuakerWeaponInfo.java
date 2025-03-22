@@ -75,10 +75,13 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(200, 200, 200);
+
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 200, 200)).count(12).horizontalSpread(0.3).verticalSpread(0.3).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(12)
+                        .horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 총알 궤적 (장식) */
         public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(30).horizontalSpread(0.15).verticalSpread(0.15).speed(0.05).build());

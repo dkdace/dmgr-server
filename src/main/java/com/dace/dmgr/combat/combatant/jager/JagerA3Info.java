@@ -84,10 +84,13 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(120, 220, 240);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(120, 220, 240)).count(3).horizontalSpread(0.1).verticalSpread(0.1).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(3)
+                        .horizontalSpread(0.1).verticalSpread(0.1).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.ICE, 0).count(300)
@@ -98,8 +101,7 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build());
         /** 틱 입자 효과 (빙결) */
         public static final ParticleEffect FREEZE_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                                Color.fromRGB(120, 220, 240)).count(5)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(5)
                         .horizontalSpread(0, 0, 0.5)
                         .verticalSpread(1, 0, 0.5)
                         .build());

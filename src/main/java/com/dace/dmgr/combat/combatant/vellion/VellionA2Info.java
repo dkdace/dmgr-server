@@ -80,23 +80,27 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 사용 시 틱 입자 효과 색상 */
+        public static final Color USE_TICK_COLOR = Color.fromRGB(200, 130, 230);
+        /** 표식 색상 */
+        public static final Color MARK_COLOR = Color.fromRGB(160, 150, 152);
+
         /** 사용 시 틱 입자 효과 - 1 */
         public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 130, 230), Color.fromRGB(140, 130, 155)).build());
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, USE_TICK_COLOR,
+                        Color.fromRGB(140, 130, 155)).build());
         /** 사용 시 틱 입자 효과 - 2 */
         public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).build());
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 130, 230), Color.fromRGB(140, 130, 155)).build());
+                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, USE_TICK_COLOR,
+                        Color.fromRGB(140, 130, 155)).build());
         /** 표식 */
         public static final ParticleEffect MARK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(160, 150, 152)).count(4).horizontalSpread(0.2).verticalSpread(0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(160, 150, 152)).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, MARK_COLOR).count(4)
+                        .horizontalSpread(0.2).verticalSpread(0.2).build(),
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, MARK_COLOR).build());
         /** 엔티티 타격 (표식 - 중심) */
         public static final ParticleEffect HIT_ENTITY_MARK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(15).speed(0.3).build());

@@ -5,11 +5,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.quaker.QuakerWeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -59,8 +59,8 @@ public final class SiliaT2Info extends TraitInfo {
     public static final class PARTICLE {
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 255, 255)).count(8).horizontalSpread(0.15).verticalSpread(0.15).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.PARTICLE.COLOR)
+                        .count(8).horizontalSpread(0.15).verticalSpread(0.15).build());
         /** 총알 궤적 (장식) */
         public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());

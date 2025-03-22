@@ -75,10 +75,13 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
      */
     @UtilityClass
     public static final class PARTICLE {
+        /** 색상 */
+        public static final Color COLOR = Color.fromRGB(255, 255, 255);
+
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 255, 255)).count(2).horizontalSpread(0.05).verticalSpread(0.05).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(2)
+                        .horizontalSpread(0.05).verticalSpread(0.05).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15)
