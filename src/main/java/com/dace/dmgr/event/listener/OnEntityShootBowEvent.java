@@ -2,7 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.combatant.ched.action.ChedWeapon;
+import com.dace.dmgr.combat.combatant.ched.ChedWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;

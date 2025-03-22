@@ -4,7 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerNamedSoundEffect;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.combatant.silia.action.SiliaA3Info;
+import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;

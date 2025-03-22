@@ -24,7 +24,7 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.combatant.silia.action.SiliaA3Info;
+import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
