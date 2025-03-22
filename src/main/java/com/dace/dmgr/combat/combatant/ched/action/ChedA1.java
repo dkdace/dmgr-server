@@ -78,7 +78,7 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
+        return (!isEnabled || combatUser.isDead()) && !isDurationFinished();
     }
 
     @Override

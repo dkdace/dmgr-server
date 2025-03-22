@@ -68,7 +68,7 @@ public final class InfernoP1 extends AbstractSkill {
 
     @Override
     public boolean isCancellable() {
-        return false;
+        return combatUser.isDead();
     }
 
     @Override

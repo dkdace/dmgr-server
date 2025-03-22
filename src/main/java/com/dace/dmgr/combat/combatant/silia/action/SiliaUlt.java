@@ -78,7 +78,7 @@ public final class SiliaUlt extends UltimateSkill {
 
     @Override
     public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
+        return (!isEnabled || combatUser.isDead()) && !isDurationFinished();
     }
 
     @Override

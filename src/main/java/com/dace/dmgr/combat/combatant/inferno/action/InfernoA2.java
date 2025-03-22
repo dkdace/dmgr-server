@@ -152,7 +152,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
-                    combatUser.addScore("적 고정", (double) (InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4) / 20);
+                    combatUser.addScore("적 고정", InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
                     bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
                 }
             }

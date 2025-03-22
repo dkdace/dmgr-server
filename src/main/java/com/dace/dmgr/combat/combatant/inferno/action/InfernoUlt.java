@@ -89,7 +89,7 @@ public final class InfernoUlt extends UltimateSkill {
 
     @Override
     public boolean isCancellable() {
-        return false;
+        return combatUser.isDead();
     }
 
     @Override

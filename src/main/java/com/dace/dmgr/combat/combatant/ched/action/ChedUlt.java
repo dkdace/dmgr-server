@@ -75,19 +75,15 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
         EffectManager effectManager = new EffectManager();
 
-        addActionTask(new IntervalTask(i -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            effectManager.playEffect(loc);
-        }, () -> {
+        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
             cancel();
 
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedUltProjectile().shot(location);
 
             ChedUltInfo.SOUND.USE_READY.play(location);
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(loc), 1, 20));
+            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, 20));
         }, 1, ChedUltInfo.READY_DURATION.toTicks()));
     }
 
@@ -103,10 +99,21 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     }
 
     /**
+     * 화염 상태 효과 클래스.
+     */
+    private static final class ChedUltBurning extends Burning {
+        private static final ChedUltBurning instance = new ChedUltBurning();
+
+        private ChedUltBurning() {
+            super(ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
+        }
+    }
+
+    /**
      * 효과를 재생하는 클래스.
      */
     @NoArgsConstructor
-    private static final class EffectManager {
+    private final class EffectManager {
         private int index = 0;
         private int angle = 0;
         private double distance = 0.6;
@@ -114,12 +121,11 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
         /**
          * 효과를 재생한다.
-         *
-         * @param location 사용 위치
          */
-        private void playEffect(@NonNull Location location) {
-            Vector vector = VectorUtil.getYawAxis(location);
-            Vector axis = VectorUtil.getRollAxis(location);
+        private void playEffect() {
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
+            Vector vector = VectorUtil.getYawAxis(loc);
+            Vector axis = VectorUtil.getRollAxis(loc);
 
             for (int i = 0; i < 2; i++) {
                 angle += index > 10 ? -3 : 3;
@@ -135,27 +141,16 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                     angle += 360 / angles;
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, j < angles ? angle : -angle);
                     Vector vec2 = vec.clone().multiply(distance);
-                    Location loc = location.clone().add(vec2).add(location.getDirection().multiply(forward));
+                    Location loc2 = loc.clone().add(vec2).add(loc.getDirection().multiply(forward));
 
                     if (index <= 30)
-                        ChedUltInfo.PARTICLE.USE_TICK_1.play(loc, vec, index / 60.0);
+                        ChedUltInfo.PARTICLE.USE_TICK_1.play(loc2, vec, index / 60.0);
                     else
-                        ChedUltInfo.PARTICLE.USE_TICK_2.play(loc, vec);
+                        ChedUltInfo.PARTICLE.USE_TICK_2.play(loc2, vec);
                 }
             }
 
             index++;
-        }
-    }
-
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class ChedUltBurning extends Burning {
-        private static final ChedUltBurning instance = new ChedUltBurning();
-
-        private ChedUltBurning() {
-            super(ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
         }
     }
 

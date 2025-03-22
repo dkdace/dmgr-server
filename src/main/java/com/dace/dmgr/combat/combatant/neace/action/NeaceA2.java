@@ -66,7 +66,7 @@ public final class NeaceA2 extends ActiveSkill {
 
     @Override
     public boolean isCancellable() {
-        return false;
+        return combatUser.isDead();
     }
 
     @Override

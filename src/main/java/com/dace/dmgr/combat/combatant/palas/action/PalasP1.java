@@ -5,10 +5,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Setter;
 
-@Setter
+@Setter(AccessLevel.PACKAGE)
 public final class PalasP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Healable target = null;

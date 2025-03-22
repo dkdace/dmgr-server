@@ -54,7 +54,9 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (!isDurationFinished()) {
+            combatUser.getMoveModule().push(combatUser.getLocation().getDirection().multiply(0.5), true);
             onEnd();
+
             return;
         }
 

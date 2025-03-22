@@ -128,7 +128,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.4))
             VellionA2Info.PARTICLE.USE_TICK_2.play(loc);
 
-        addTask(new IntervalTask(i -> {
+        addActionTask(new IntervalTask(i -> {
             if (isInvalid(target) || !target.getStatusEffectModule().has(VellionA2Mark.instance))
                 return false;
 
@@ -149,7 +149,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
+        return (!isEnabled || combatUser.isDead()) && !isDurationFinished();
     }
 
     @Override

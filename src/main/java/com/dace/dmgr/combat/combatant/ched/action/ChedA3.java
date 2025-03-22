@@ -65,10 +65,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         long durationTicks = ChedA3Info.READY_DURATION.toTicks();
         EffectManager effectManager = new EffectManager();
 
-        addActionTask(new IntervalTask(i -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            effectManager.playEffect(loc);
-        }, () -> {
+        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
             cancel();
 
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
@@ -76,8 +73,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
             ChedA3Info.SOUND.USE_READY.play(location);
 
-            Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
-            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(loc), 1, durationTicks));
+            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, durationTicks));
         }, 1, durationTicks));
     }
 
@@ -96,7 +92,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
      * 효과를 재생하는 클래스.
      */
     @NoArgsConstructor
-    private static final class EffectManager {
+    private final class EffectManager {
         private int index = 0;
         private int angle = 0;
         private double distance = 0;
@@ -104,12 +100,11 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
         /**
          * 효과를 재생한다.
-         *
-         * @param location 사용 위치
          */
-        private void playEffect(@NonNull Location location) {
-            Vector vector = VectorUtil.getYawAxis(location);
-            Vector axis = VectorUtil.getRollAxis(location);
+        private void playEffect() {
+            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
+            Vector vector = VectorUtil.getYawAxis(loc);
+            Vector axis = VectorUtil.getRollAxis(loc);
 
             for (int i = 0; i < 2; i++) {
                 if (index > 12) {
@@ -127,10 +122,10 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
                     Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
                     Vector vec3 = vec.clone().multiply(distance + (j < 5 ? 0 : 1.4));
 
-                    Location loc = location.clone().add(vec3).add(location.getDirection().multiply(forward));
-                    Vector dir = LocationUtil.getDirection(location.clone().add(vec), location.clone().add(vec2));
+                    Location loc2 = loc.clone().add(vec3).add(loc.getDirection().multiply(forward));
+                    Vector dir = LocationUtil.getDirection(loc.clone().add(vec), loc.clone().add(vec2));
 
-                    ChedA3Info.PARTICLE.USE_TICK.play(loc, dir);
+                    ChedA3Info.PARTICLE.USE_TICK.play(loc2, dir);
                 }
             }
 

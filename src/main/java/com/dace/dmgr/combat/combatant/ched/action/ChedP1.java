@@ -9,6 +9,7 @@ import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -22,7 +23,7 @@ public final class ChedP1 extends AbstractSkill {
     /** 매달리기 남은 시간 (tick) */
     private long hangTick = ChedP1Info.HANG_DURATION.toTicks();
     /** 매달리기 활성화 여부 */
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private boolean isHanging = false;
 
     public ChedP1(@NonNull CombatUser combatUser) {

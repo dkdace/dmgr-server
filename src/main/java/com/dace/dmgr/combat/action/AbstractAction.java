@@ -149,7 +149,7 @@ public abstract class AbstractAction implements Action {
 
     @Override
     public final boolean cancel() {
-        if (!isCancellable() && !combatUser.isDead())
+        if (!isCancellable())
             return false;
 
         actionTaskManager.stop();

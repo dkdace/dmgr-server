@@ -85,7 +85,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
+        return (!isEnabled || combatUser.isDead()) && !isDurationFinished();
     }
 
     @Override

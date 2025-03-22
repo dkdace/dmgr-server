@@ -87,17 +87,9 @@ public final class JagerA3 extends ActiveSkill {
             JagerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
-                if (isDurationFinished())
-                    return false;
-
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
                 JagerA3Info.PARTICLE.BULLET_TRAIL.play(loc);
-
-                return true;
-            }, isCancelled -> {
-                if (isCancelled)
-                    return;
-
+            }, () -> {
                 forceCancel();
 
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
@@ -108,7 +100,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean isCancellable() {
-        return !isEnabled && !isDurationFinished();
+        return (!isEnabled || combatUser.isDead()) && !isDurationFinished();
     }
 
     @Override

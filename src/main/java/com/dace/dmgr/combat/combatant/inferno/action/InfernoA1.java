@@ -79,9 +79,9 @@ public final class InfernoA1 extends ActiveSkill {
 
     @Override
     protected void onCancelled() {
-        setDuration(Timespan.ZERO);
-
-        if (!combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+            setDuration(Timespan.ZERO);
+        else
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));
     }
 
