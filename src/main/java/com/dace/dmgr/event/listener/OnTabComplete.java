@@ -1,21 +1,30 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.server.TabCompleteEvent;
 
-public final class OnTabComplete implements Listener {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnTabComplete extends EventListener<TabCompleteEvent> {
+    @Getter
+    private static final OnTabComplete instance = new OnTabComplete();
+
+    @Override
     @EventHandler
-    public static void event(TabCompleteEvent event) {
+    protected void onEvent(@NonNull TabCompleteEvent event) {
         if (!(event.getSender() instanceof Player))
             return;
 
-        Player player = (Player) event.getSender();
+        Player sender = (Player) event.getSender();
 
-        if (!player.isOp() && !event.getBuffer().contains(" ")) {
-            User.fromPlayer(player).sendMessageWarn("금지된 행동입니다.");
+        if (!sender.isOp() && !event.getBuffer().contains(" ")) {
+            User.fromPlayer(sender).sendMessageWarn("금지된 행동입니다.");
             event.setCancelled(true);
         }
     }

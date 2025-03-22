@@ -2,46 +2,52 @@ package com.dace.dmgr;
 
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Yaml 파일을 관리하는 클래스.
  *
- * <p>하나의 Yaml 파일에 여러 key-value 쌍을 저장할 수 있다.</p>
- *
- * <p>해당 클래스를 상속받아 Yaml 파일 시스템을 구현할 수 있다.</p>
+ * <p>하나의 Yaml 파일에 여러 항목 (key-value 쌍)을 저장할 수 있다.</p>
  *
  * <p>Example:</p>
  *
  * <pre><code>
- * public class TestFile extends YamlFile {
- *     // ...
- * }
+ * // foo/test_file.yml 생성
+ * YamlFile testFile = new YamlFile(Paths.get("foo", "test_file.yml"));
  *
- * // foo/testFile.yml 생성
- * TestFile testFile = new TestFile("foo/testFile");
- *
- * testFile.init().onFinish(() -> {
- *     // 성공 시 실행할 작업.
- * }).onError(Exception ex) -> {
- *     // 실패(예외 발생) 시 실행할 작업.
- * });
+ * testFile.init()
+ *     .onFinish(() -&gt; {
+ *         // 성공 시 실행할 작업.
+ *     })
+ *     .onError(Exception ex) -&gt; {
+ *         // 실패(예외 발생) 시 실행할 작업.
+ *     });
  * </code></pre>
  */
-public abstract class YamlFile implements Initializable<Void> {
-    /** Yaml 설정 객체 */
+public final class YamlFile implements Initializable<Void> {
+    /** Yaml 설정 인스턴스 */
     private final YamlConfiguration config;
-    /** 읽기 전용 여부 */
-    private final boolean isReadOnly;
-    /** 파일 저장을 위한 객체 */
+    /** 파일 저장 인스턴스 */
     private final File file;
+    /** 기본 섹션 인스턴스 */
+    @NonNull
+    @Getter
+    private final Section defaultSection;
+
     /** 초기화 여부 */
     @Getter
     private boolean isInitialized = false;
@@ -49,22 +55,12 @@ public abstract class YamlFile implements Initializable<Void> {
     /**
      * Yaml 파일 관리 인스턴스를 생성한다.
      *
-     * @param path       파일 경로
-     * @param isReadOnly 읽기 전용 여부
+     * @param path 파일 상대 경로 (플러그인 폴더로부터의 경로)
      */
-    protected YamlFile(@NonNull String path, boolean isReadOnly) {
-        this.file = new File(DMGR.getPlugin().getDataFolder(), path + ".yml");
+    public YamlFile(@NonNull Path path) {
+        this.file = DMGR.getPlugin().getDataFolder().toPath().resolve(path).toFile();
         this.config = YamlConfiguration.loadConfiguration(file);
-        this.isReadOnly = isReadOnly;
-    }
-
-    /**
-     * Yaml 파일 관리 인스턴스를 생성한다.
-     *
-     * @param path 파일 경로
-     */
-    protected YamlFile(@NonNull String path) {
-        this(path, false);
+        this.defaultSection = new Section(config);
     }
 
     /**
@@ -74,7 +70,7 @@ public abstract class YamlFile implements Initializable<Void> {
      */
     @Override
     @NonNull
-    public final AsyncTask<Void> init() {
+    public AsyncTask<Void> init() {
         if (isInitialized)
             throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
@@ -88,38 +84,6 @@ public abstract class YamlFile implements Initializable<Void> {
                 config.load(file);
                 isInitialized = true;
 
-                onFinish.andThen(v -> onInitFinish()).accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-
-                onInitError(ex);
-                onError.andThen(this::onInitError).accept(ex);
-            }
-        });
-    }
-
-    /**
-     * 초기화 성공 시 호출할 작업.
-     */
-    protected abstract void onInitFinish();
-
-    /**
-     * 초기화 실패(예외 발생) 시 호출할 작업.
-     *
-     * @param ex 발생한 예외
-     */
-    protected abstract void onInitError(@NonNull Exception ex);
-
-    /**
-     * 파일을 다시 불러온다.
-     */
-    @NonNull
-    public final AsyncTask<Void> reload() {
-        validate();
-
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                config.load(file);
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
@@ -129,16 +93,11 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
-     * 파일을 저장한다.
-     *
-     * <p>읽기 전용으로 지정된 경우 사용할 수 없다.</p>
-     *
-     * @throws IllegalStateException 읽기 전용으로 호출 시 발생
+     * Yaml 파일을 저장한다.
      */
     @NonNull
-    public final AsyncTask<Void> save() {
+    public AsyncTask<Void> save() {
         validate();
-        validateReadOnly();
 
         return new AsyncTask<>((onFinish, onError) -> {
             try {
@@ -152,15 +111,10 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
-     * 파일을 저장한다. (동기 실행).
-     *
-     * <p>읽기 전용으로 지정된 경우 사용할 수 없다.</p>
-     *
-     * @throws IllegalStateException 읽기 전용으로 호출 시 발생
+     * Yaml 파일을 저장한다. (동기 실행).
      */
-    public final void saveSync() {
+    public void saveSync() {
         validate();
-        validateReadOnly();
 
         try {
             config.save(file);
@@ -170,391 +124,233 @@ public abstract class YamlFile implements Initializable<Void> {
     }
 
     /**
-     * 섹션에서 실제 키 값을 반환한다.
-     *
-     * @param key 섹션이 포함된 키
-     * @return 실제 키
+     * Yaml 파일의 섹션을 나타내는 클래스.
      */
-    private String getLastKey(@NonNull String key) {
-        String[] sections = key.split("\\.");
-        return sections[sections.length - 1];
-    }
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public final class Section {
+        /** 설정 섹션 인스턴스 */
+        private final ConfigurationSection configurationSection;
+        /** 항목 목록 (키 : 항목 인스턴스) */
+        private final HashMap<String, Entry<?>> entries = new HashMap<>();
+        /** 하위 섹션 목록 (이름 : 섹션 인스턴스) */
+        private final HashMap<String, Section> subSections = new HashMap<>();
 
-    /**
-     * 섹션이 포함된 키에서 가장 깊은 섹션을 반환한다.
-     *
-     * @param key 섹션이 포함된 키
-     * @return 가장 깊은 섹션
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    private ConfigurationSection getDeepestSection(@NonNull String key) {
-        if (key.startsWith(".") || key.endsWith(".") || key.contains(".."))
-            throw new IllegalArgumentException("'key'가 유효하지 않음");
-
-        ConfigurationSection configurationSection = config;
-        String[] sections = key.split("\\.");
-        for (int i = 0; i < sections.length - 1; i++) {
-            if (configurationSection.getConfigurationSection(sections[i]) == null)
-                configurationSection = configurationSection.createSection(sections[i]);
-            else
-                configurationSection = configurationSection.getConfigurationSection(sections[i]);
+        private Section(@NonNull ConfigurationSection configurationSection, @NonNull String name) {
+            this.configurationSection = configurationSection.getConfigurationSection(name) == null
+                    ? configurationSection.createSection(name)
+                    : configurationSection.getConfigurationSection(name);
         }
 
-        return configurationSection;
-    }
 
-    /**
-     * 파일에 값을 저장한다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>읽기 전용으로 지정된 경우 사용할 수 없다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'에 값 1234 저장
-     * yamlFile.set("test", 1234);
-     * // 섹션 'user'의 키 'test'에 값 true 저장
-     * yamlFile.set("user.test", true);
-     * </code></pre>
-     *
-     * @param key   키
-     * @param value 값
-     * @throws IllegalStateException    읽기 전용으로 호출 시 발생
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final void set(@NonNull String key, @Nullable Object value) {
-        validate();
-        validateReadOnly();
+        /**
+         * 지정한 이름의 섹션을 반환한다.
+         *
+         * @param name 섹션 이름
+         * @return 섹션 인스턴스
+         */
+        @NonNull
+        public Section getSection(@NonNull String name) {
+            subSections.computeIfAbsent(name, k -> new Section(this.configurationSection, k));
+            return subSections.get(name);
+        }
 
-        if (key.contains("."))
-            getDeepestSection(key).set(getLastKey(key), value);
-        else
-            config.set(key, value);
-    }
+        /**
+         * 지정한 키에 해당하는 항목을 반환한다.
+         *
+         * @param key          키
+         * @param defaultValue 기본값. 항목이 존재하지 않으면 이 값으로 설정됨
+         * @param <T>          항목의 값 타입
+         * @return 항목 인스턴스
+         */
+        @NonNull
+        @SuppressWarnings("unchecked")
+        public <T> Entry<T> getEntry(@NonNull String key, @NonNull T defaultValue) {
+            entries.computeIfAbsent(key, k -> new Entry<>(k, defaultValue));
+            return (Entry<T>) entries.get(key);
+        }
 
-    /**
-     * 파일에서 정수 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * long value = yamlFile.getLong("test", 0);
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * long value = yamlFile.getLong("user.test", 0);
-     * </code></pre>
-     *
-     * @param key          키
-     * @param defaultValue 기본값
-     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final long getLong(@NonNull String key, long defaultValue) {
-        validate();
+        /**
+         * 지정한 키에 해당하는 목록 항목을 반환한다.
+         *
+         * @param key 키
+         * @param <T> 항목의 값 타입
+         * @return 목록 항목 인스턴스
+         */
+        @NonNull
+        @SuppressWarnings("unchecked")
+        public <T> ListEntry<T> getListEntry(@NonNull String key) {
+            entries.computeIfAbsent(key, ListEntry::new);
+            return (ListEntry<T>) entries.get(key);
+        }
 
-        if (key.contains("."))
-            return getDeepestSection(key).getLong(getLastKey(key), defaultValue);
+        /**
+         * 섹션의 항목 (key-value 쌍)을 나타내는 클래스.
+         *
+         * @param <T> 항목의 값 타입
+         * @see Section#getEntry(String, Object)
+         */
+        @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+        public class Entry<T> {
+            /** 키 */
+            @NonNull
+            private final String key;
+            /** 기본값 */
+            @NonNull
+            private final T defaultValue;
 
-        return config.getLong(key, defaultValue);
-    }
+            /** 값 */
+            @Nullable
+            private T value;
 
-    /**
-     * 파일에서 정수 값 목록을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * List<Long> values = yamlFile.getLong("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * List<Long> values = yamlFile.getLong("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값 목록
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final List<@NonNull Long> getLongList(@NonNull String key) {
-        validate();
+            /**
+             * 값을 반환한다.
+             *
+             * <pre><code>
+             * // 키 "user"의 값 반환
+             * Entry&lt;Integer&gt; userEntry = section.getEntry("user", 1234);
+             * int user = userEntry.get();
+             *
+             * // 키 "test"의 값 반환
+             * Entry&lt;Boolean&gt; testEntry = section.getEntry("test", false);
+             * boolean test = testEntry.get();
+             * </code></pre>
+             *
+             * @return 값. 데이터가 존재하지 않으면 기본값 반환
+             */
+            @NonNull
+            @SuppressWarnings("unchecked")
+            public T get() {
+                validate();
 
-        if (key.contains("."))
-            return getDeepestSection(key).getLongList(getLastKey(key));
+                if (value == null) {
+                    Object getValue = configurationSection.get(key, defaultValue);
 
-        return config.getLongList(key);
-    }
+                    if (getValue.getClass().isInstance(defaultValue))
+                        value = (T) getValue;
+                    else if (defaultValue instanceof Byte)
+                        value = (T) Byte.valueOf(((Number) getValue).byteValue());
+                    else if (defaultValue instanceof Short)
+                        value = (T) Short.valueOf(((Number) getValue).shortValue());
+                    else if (defaultValue instanceof Integer)
+                        value = (T) Integer.valueOf(((Number) getValue).intValue());
+                    else if (defaultValue instanceof Long)
+                        value = (T) Long.valueOf(((Number) getValue).longValue());
+                    else if (defaultValue instanceof Float)
+                        value = (T) Float.valueOf(((Number) getValue).floatValue());
+                    else if (defaultValue instanceof Double)
+                        value = (T) Double.valueOf(((Number) getValue).doubleValue());
+                    else
+                        value = defaultValue;
+                }
 
-    /**
-     * 파일에서 정수 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * long value = yamlFile.getLong("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * long value = yamlFile.getLong("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 0 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final long getLong(@NonNull String key) {
-        validate();
-        return getLong(key, 0);
-    }
+                return value;
+            }
 
-    /**
-     * 파일에서 실수 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * double value = yamlFile.getDouble("test", 2.5);
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * double value = yamlFile.getDouble("user.test", 2.5);
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final double getDouble(@NonNull String key, double defaultValue) {
-        validate();
+            /**
+             * 값을 설정한다.
+             *
+             * <p>Example:</p>
+             *
+             * <pre><code>
+             * // 키 "user"의 값을 500으로 설정
+             * Entry&lt;Integer&gt; userEntry = section.getEntry("user", 1234);
+             * userEntry.set("user", 500);
+             *
+             * // 키 "test"의 값을 true로 설정
+             * Entry&lt;Boolean&gt; testEntry = section.getEntry("test", false);
+             * testEntry.set("test", true);
+             * </code></pre>
+             *
+             * @param value 값. {@code null}로 지정 시 삭제
+             */
+            public void set(@Nullable T value) {
+                validate();
 
-        if (key.contains("."))
-            return getDeepestSection(key).getDouble(getLastKey(key), defaultValue);
+                this.value = value;
+                configurationSection.set(key, value == defaultValue ? null : value);
+            }
+        }
 
-        return config.getDouble(key, defaultValue);
-    }
+        /**
+         * 섹션의 목록 항목 (여러 key-value 쌍)을 나타내는 클래스.
+         *
+         * @param <T> 항목의 값 타입
+         * @see Section#getListEntry(String)
+         */
+        public final class ListEntry<T> extends Entry<List<T>> {
+            private ListEntry(@NonNull String key) {
+                super(key, Collections.emptyList());
+            }
 
-    /**
-     * 파일에서 실수 값 목록을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * List<Double> values = yamlFile.getDouble("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * List<Double> values = yamlFile.getDouble("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값 목록
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final List<@NonNull Double> getDoubleList(@NonNull String key) {
-        validate();
+            /**
+             * 값 목록을 반환한다.
+             *
+             * <pre><code>
+             * // 키 "users"의 값 목록 반환
+             * ListEntry&lt;Integer&gt; usersEntry = section.getListEntry("users");
+             * List&lt;Integer&gt; users = usersEntry.get();
+             *
+             * // 키 "tests"의 값 목록 반환
+             * ListEntry&lt;String&gt; testsEntry = section.getListEntry("tests");
+             * List&lt;String&gt; tests = testsEntry.get();
+             * </code></pre>
+             *
+             * @return 값 목록
+             */
+            @Override
+            @NonNull
+            @UnmodifiableView
+            @SuppressWarnings("unchecked")
+            public List<@NonNull T> get() {
+                validate();
 
-        if (key.contains("."))
-            return getDeepestSection(key).getDoubleList(getLastKey(key));
+                if (super.value == null)
+                    super.value = (List<T>) configurationSection.getList(super.key, new ArrayList<>());
 
-        return config.getDoubleList(key);
-    }
+                return Collections.unmodifiableList(super.value);
+            }
 
-    /**
-     * 파일에서 실수 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * double value = yamlFile.getDouble("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * double value = yamlFile.getDouble("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 0 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final double getDouble(@NonNull String key) {
-        validate();
-        return getDouble(key, 0);
-    }
+            /**
+             * 목록에 값을 추가한다.
+             *
+             * <pre><code>
+             * // 키 "users"의 값 목록에 "player" 추가
+             * ListEntry&lt;String&gt; usersEntry = section.getListEntry("users");
+             * usersEntry.add("player");
+             * </code></pre>
+             *
+             * @param value 추가할 값
+             */
+            public void add(@NonNull T value) {
+                validate();
 
-    /**
-     * 파일에서 문자열 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * String value = yamlFile.getString("test", "Default");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * String value = yamlFile.getString("user.test", "Default");
-     * </code></pre>
-     *
-     * @param key          키
-     * @param defaultValue 기본값
-     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final String getString(@NonNull String key, @NonNull String defaultValue) {
-        validate();
+                if (super.value == null)
+                    super.value = new ArrayList<>();
 
-        if (key.contains("."))
-            return getDeepestSection(key).getString(getLastKey(key), defaultValue);
+                super.value.add(value);
+                set(super.value);
+            }
 
-        return config.getString(key, defaultValue);
-    }
+            /**
+             * 목록에서 값을 제거한다.
+             *
+             * <pre><code>
+             * // 키 "users"의 값 목록에서 "player" 제거
+             * ListEntry&lt;String&gt; usersEntry = section.getListEntry("users");
+             * usersEntry.remove("player");
+             * </code></pre>
+             *
+             * @param value 제거할 값
+             */
+            public void remove(@NonNull T value) {
+                validate();
 
-    /**
-     * 파일에서 문자열 값 목록을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * List<String> values = yamlFile.getStringList("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * List<String> values = yamlFile.getStringList("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값 목록
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final List<@NonNull String> getStringList(@NonNull String key) {
-        validate();
+                if (super.value == null)
+                    return;
 
-        if (key.contains("."))
-            return getDeepestSection(key).getStringList(getLastKey(key));
-
-        return config.getStringList(key);
-    }
-
-    /**
-     * 파일에서 문자열 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * String value = yamlFile.getString("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * String value = yamlFile.getString("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 빈 문자열 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final String getString(@NonNull String key) {
-        validate();
-        return getString(key, "");
-    }
-
-    /**
-     * 파일에서 부울 값을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * boolean value = yamlFile.getBoolean("test", false);
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * boolean value = yamlFile.getBoolean("user.test", true);
-     * </code></pre>
-     *
-     * @param key          키
-     * @param defaultValue 기본값
-     * @return 값. 데이터가 존재하지 않으면 {@code defaultValue} 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final boolean getBoolean(@NonNull String key, boolean defaultValue) {
-        validate();
-
-        if (key.contains("."))
-            return getDeepestSection(key).getBoolean(getLastKey(key), defaultValue);
-
-        return config.getBoolean(key, defaultValue);
-    }
-
-    /**
-     * 파일에서 부울 값 목록을 불러온다.
-     *
-     * <p>키 값에 섹션을 포함할 수 있으며, '.'으로 구분한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * List<Boolean> values = yamlFile.getBooleanList("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * List<Boolean> values = yamlFile.getBooleanList("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값 목록
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    @NonNull
-    protected final List<@NonNull Boolean> getBooleanList(@NonNull String key) {
-        validate();
-
-        if (key.contains("."))
-            return getDeepestSection(key).getBooleanList(getLastKey(key));
-
-        return config.getBooleanList(key);
-    }
-
-    /**
-     * 파일에서 부울 값을 불러온다.
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 키 'test'의 값 불러오기
-     * boolean value = yamlFile.getBoolean("test");
-     * // 섹션 'user'의 키 'test'의 값 불러오기
-     * boolean value = yamlFile.getBoolean("user.test");
-     * </code></pre>
-     *
-     * @param key 키
-     * @return 값. 데이터가 존재하지 않으면 {@code false} 반환
-     * @throws IllegalArgumentException {@code key}가 유효하지 않으면 발생
-     */
-    protected final boolean getBoolean(@NonNull String key) {
-        validate();
-        return getBoolean(key, false);
-    }
-
-    /**
-     * 인스턴스가 읽기 전용으로 생성되었으면 예외를 발생시킨다.
-     */
-    private void validateReadOnly() {
-        if (isReadOnly)
-            throw new IllegalStateException("인스턴스가 읽기 전용으로 생성됨");
+                super.value.remove(value);
+                set(super.value);
+            }
+        }
     }
 }

@@ -3,59 +3,43 @@ package com.dace.dmgr.command;
 import com.dace.dmgr.item.gui.Stat;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 전적 명령어 클래스.
  *
- * <p>Usage: /전적 [플레이어]</p>
- *
  * @see Stat
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StatCommand extends BaseCommandExecutor {
+public final class StatCommand extends CommandHandler {
     @Getter
     private static final StatCommand instance = new StatCommand();
 
-    @Override
-    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
-        User user = User.fromPlayer(player);
-
-        UserData targetUserData = user.getUserData();
-        if (args.length == 1) {
-            targetUserData = UserData.getAllUserDatas().stream()
-                    .filter(target -> target.getPlayerName().equalsIgnoreCase(args[0]))
-                    .findFirst()
-                    .orElse(null);
-
-            if (targetUserData == null) {
-                user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
-                return;
-            }
-        } else if (args.length > 1) {
-            user.sendMessageWarn(WARN_WRONG_USAGE, "/(전적|stat) [플레이어]");
-            return;
-        }
-
-        new Stat(targetUserData).open(player);
+    private StatCommand() {
+        super("전적", new ParameterList(ParameterType.PLAYER_NAME));
     }
 
     @Override
-    @Nullable
-    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
-        if (args.length != 1)
-            return null;
+    protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
+        User user = User.fromPlayer(sender);
 
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+        if (args.length > 1) {
+            sendWarnWrongUsage(sender);
+            return;
+        }
+
+        UserData targetUserData = user.getUserData();
+
+        if (args.length == 1) {
+            targetUserData = UserData.fromPlayerName(args[0]);
+            if (targetUserData == null) {
+                sendWarnPlayerNotFound(sender);
+                return;
+            }
+        }
+
+        new Stat(sender, targetUserData);
     }
 }
 

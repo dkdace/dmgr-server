@@ -5,7 +5,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 다른 엔티티로부터 치유를 받을 수 있는 엔티티의 인터페이스.
+ * 다른 엔티티로부터 피해 및 치유를 받을 수 있는 엔티티의 인터페이스.
  */
 public interface Healable extends Damageable {
     /**
@@ -19,8 +19,7 @@ public interface Healable extends Damageable {
      *
      * @param provider 제공자
      * @param amount   치유량
-     * @param isUlt    궁극기 충전 여부
      * @see Healer#onGiveHeal(Healable, double, boolean)
      */
-    void onTakeHeal(@Nullable Healer provider, double amount, boolean isUlt);
+    void onTakeHeal(@Nullable Healer provider, double amount);
 }

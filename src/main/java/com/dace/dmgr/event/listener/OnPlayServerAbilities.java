@@ -1,25 +1,25 @@
 package com.dace.dmgr.event.listener;
 
 import com.comphenix.packetwrapper.WrapperPlayServerAbilities;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
-import org.bukkit.entity.Player;
+import lombok.Getter;
+import lombok.NonNull;
 
-public final class OnPlayServerAbilities extends PacketAdapter {
-    public OnPlayServerAbilities() {
-        super(DMGR.getPlugin(), PacketType.Play.Server.ABILITIES);
+public final class OnPlayServerAbilities extends PacketEventListener<WrapperPlayServerAbilities> {
+    @Getter
+    private static final OnPlayServerAbilities instance = new OnPlayServerAbilities();
+
+    private OnPlayServerAbilities() {
+        super(WrapperPlayServerAbilities.class);
     }
 
     @Override
-    public void onPacketSending(PacketEvent event) {
-        WrapperPlayServerAbilities packet = new WrapperPlayServerAbilities(event.getPacket());
-        Player player = event.getPlayer();
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-
+    protected void onEvent(@NonNull PacketEvent event) {
+        WrapperPlayServerAbilities packet = createPacketWrapper(event);
+        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
         if (combatUser == null)
             return;
 

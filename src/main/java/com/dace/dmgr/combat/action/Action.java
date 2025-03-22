@@ -1,32 +1,24 @@
 package com.dace.dmgr.combat.action;
 
-import com.dace.dmgr.Disposable;
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
  *
  * @see AbstractAction
  */
-public interface Action extends Disposable {
+public interface Action {
     /**
      * 동작의 사용자를 반환한다.
      *
-     * @return 플레이어 객체
+     * @return 사용자 플레이어
      */
     @NonNull
     CombatUser getCombatUser();
-
-    /**
-     * 동작 태스크 실행 객체를 반환한다.
-     *
-     * <p>쿨타임, 지속시간 등의 스케쥴러 처리를 위해 사용한다.</p>
-     *
-     * @return 동작 태스크 실행 객체
-     */
-    @NonNull
-    Disposable getTaskRunner();
 
     /**
      * 동작 사용 우선순위를 반환한다.
@@ -49,26 +41,74 @@ public interface Action extends Disposable {
     ActionKey @NonNull [] getDefaultActionKeys();
 
     /**
+     * 액션바에 동작 상태를 표시하기 위한 문자열을 반환한다.
+     *
+     * @return 동작 상태 표시 문자열. {@code null} 반환 시 표시 대상에서 제외
+     * @implSpec {@code null}
+     */
+    @Nullable
+    default String getActionBarString() {
+        return null;
+    }
+
+    /**
+     * 동작에서 실행하는 새로운 태스크를 추가한다.
+     *
+     * <p>동작이 끊겼을 때 ({@link Action#cancel()} 호출 시) 모든 태스크가 중단된다.</p>
+     *
+     * @param task 태스크
+     * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
+     * @see Action#addTask(Task)
+     */
+    void addActionTask(@NonNull Task task);
+
+    /**
+     * 동작에서 실행하는 새로운 태스크를 추가한다.
+     *
+     * <p>동작 강제 취소({@link Action#cancel()} 호출)와 관계 없이 계속 실행한다.</p>
+     *
+     * @param task 태스크
+     * @throws IllegalStateException 해당 {@code task}가 이미 추가되었으면 발생
+     * @see Action#addActionTask(Task)
+     */
+    void addTask(@NonNull Task task);
+
+    /**
+     * 동작의 상태가 초기화되었을 때 ({@link Action#reset()} 호출 시) 실행할 작업을 추가한다.
+     *
+     * @param onReset 실행할 작업
+     */
+    void addOnReset(@NonNull Runnable onReset);
+
+    /**
+     * 동작이 제거되었을 때 ({@link Action#remove()} 호출 시) 실행할 작업을 추가한다.
+     *
+     * @param onRemove 실행할 작업
+     */
+    void addOnRemove(@NonNull Runnable onRemove);
+
+    /**
      * 기본 쿨타임을 반환한다.
      *
-     * @return 기본 쿨타임 (tick)
+     * @return 기본 쿨타임
      */
-    long getDefaultCooldown();
+    @NonNull
+    Timespan getDefaultCooldown();
 
     /**
      * 쿨타임의 남은 시간을 반환한다.
      *
-     * @return 쿨타임 (tick)
+     * @return 남은 쿨타임
      */
-    long getCooldown();
+    @NonNull
+    Timespan getCooldown();
 
     /**
      * 쿨타임을 설정한다.
      *
-     * @param cooldown 쿨타임 (tick). -1로 설정 시 무한 지속
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param cooldown 쿨타임
      */
-    void setCooldown(long cooldown);
+    void setCooldown(@NonNull Timespan cooldown);
 
     /**
      * 쿨타임을 기본 쿨타임으로 설정한다.
@@ -80,10 +120,9 @@ public interface Action extends Disposable {
     /**
      * 쿨타임을 증가시킨다.
      *
-     * @param cooldown 추가할 쿨타임 (tick). 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param cooldown 추가할 쿨타임
      */
-    void addCooldown(long cooldown);
+    void addCooldown(@NonNull Timespan cooldown);
 
     /**
      * 쿨타임이 끝났는지 확인한다.
@@ -119,12 +158,24 @@ public interface Action extends Disposable {
     }
 
     /**
-     * 동작 사용이 취소되었을 때 실행할 작업.
+     * 동작 사용을 강제로 취소시킨다.
+     *
+     * <p>{@link Action#isCancellable()}이 {@code true}면 강제 취소가 가능하다.</p>
+     *
+     * @return 취소 여부. {@link Action#isCancellable()}의 값 반환
+     * @see Action#isCancellable()
      */
-    void onCancelled();
+    boolean cancel();
 
     /**
      * 동작의 상태를 초기화한다.
      */
     void reset();
+
+    /**
+     * 동작을 제거한다.
+     *
+     * @throws IllegalStateException 이미 제거되었으면 발생
+     */
+    void remove();
 }

@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.ChatColor;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -54,23 +53,25 @@ public final class ActionInfoLore {
      *
      * <p>Example:</p>
      *
-     * <pre><code>
-     * //
-     * // ▍ 동작 개요에 대한 내용
-     * //
-     * // \u4DC4 100
-     * // \u4DC0 100 ~ 50
-     * //
-     * // [1] [좌클릭] 사용 [우클릭] 해제
-     * //
-     * // [재사용 시]
-     * //
-     * // ▍ 아군을 \u4DC4 치유한다.
-     * //
-     * // \u4DC4 100
-     * //
-     * // [1] 사용
+     * <pre>
      *
+     * ▍ 동작 개요에 대한 내용
+     *
+     * <font color="lime">(아이콘)</font> 100
+     * <font color="red">(아이콘)</font> 100 ~ 50
+     *
+     * [1] [좌클릭] 사용 [우클릭] 해제
+     *
+     * [재사용 시]
+     *
+     * ▍ 아군을 <font color="lime">(아이콘) 치유</font>한다.
+     *
+     * <font color="lime">(아이콘)</font> 100
+     *
+     * [1] 사용
+     * </pre>
+     *
+     * <pre><code>
      * ActionInfoLore lore = new ActionInfoLore(Section
      *     .builder("동작 개요에 대한 내용")
      *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
@@ -79,12 +80,10 @@ public final class ActionInfoLore {
      *     .addActionKeyInfo("해제", ActionKey.RIGHT_CLICK);
      *     .build(),
      *     new NamedSection("재사용 시", Section
-     *         .builder("아군을 <a:HEAL:치유>한다.")
-     *         .addValueInfo(ChatColor.GREEN, TextIcon.HEAL, 100)
+     *         .builder("아군을 &lt;a:HEAL:치유&gt;한다.")
+     *         .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
      *         .addActionKeyInfo("사용", ActionKey.SLOT_1)
-     *         .build()
-     *     )
-     * );
+     *         .build()));
      * lore.toString();
      * </code></pre>
      *
@@ -103,21 +102,19 @@ public final class ActionInfoLore {
         private static final int SUMMARY_WRAP_LENGTH = 24;
         /**
          * 개요에 사용할 수 있는 자리 표시자의 패턴 정규식.
-         * <code><색상 코드:TextIcon 이름:설명></code> 형식을 나타냄
+         *
+         * <p><code>&lt;색상 코드:TextIcon 이름:설명&gt;</code> 형식을 나타냄</p>
          */
         private static final Pattern SUMMARY_PLACEHOLDER_PATTERN = Pattern.compile("<[0-9a-f]?:[A-Z_]*:[^\n]*?>");
         /** 개요 문자열 접두사 */
         private static final String SUMMARY_PREFIX = "§f▍ ";
 
         /** 개요 문자열 목록 */
-        @NonNull
         private final String[] summaries;
         /** 수치 상세 설명 문자열 목록 */
-        @NonNull
-        private final String @Nullable [] valueInfos;
+        private final ArrayList<String> valueInfos;
         /** 동작 사용 키 설명 문자열 목록 */
-        @NonNull
-        private final String @Nullable [] actionKeyInfos;
+        private final ArrayList<String> actionKeyInfos;
 
         /**
          * 동작 설명 섹션 인스턴스를 생성한다.
@@ -125,33 +122,42 @@ public final class ActionInfoLore {
          * @param sectionBuilder 설명 섹션 빌더
          */
         private Section(@NonNull SectionBuilder sectionBuilder) {
-            this.summaries = parseSummary(sectionBuilder.summary);
-            ArrayList<ValueInfo> valueInfoList = sectionBuilder.valueInfos;
-            ArrayList<ActionKeyInfo> actionKeyInfoList = sectionBuilder.actionKeyInfos;
+            this.summaries = sectionBuilder.summaries;
+            this.valueInfos = sectionBuilder.valueInfos;
+            this.actionKeyInfos = sectionBuilder.actionKeyInfos;
+        }
 
-            if (valueInfoList == null)
-                this.valueInfos = null;
-            else {
-                this.valueInfos = new String[valueInfoList.size()];
-                for (int i = 0; i < valueInfoList.size(); i++) {
-                    ValueInfo valueInfo = valueInfoList.get(i);
-                    this.valueInfos[i] = MessageFormat.format(
-                            MessageFormat.format("{0}{1} §f{2}", valueInfo.color, valueInfo.textIcon, valueInfo.pattern),
-                            valueInfo.arguments);
-                }
-            }
-
-            if (actionKeyInfoList == null)
-                this.actionKeyInfos = null;
-            else {
-                this.actionKeyInfos = new String[actionKeyInfoList.size()];
-                for (int i = 0; i < actionKeyInfoList.size(); i++) {
-                    ActionKeyInfo actionKeyInfo = actionKeyInfoList.get(i);
-                    this.actionKeyInfos[i] = MessageFormat.format("§7§l[{0}] §f{1}",
-                            Arrays.stream(actionKeyInfo.actionKeys).map(ActionKey::toString).collect(Collectors.joining("] [")),
-                            actionKeyInfo.description);
-                }
-            }
+        /**
+         * 빌더 인스턴스를 생성하여 반환한다.
+         *
+         * <p>Example:</p>
+         *
+         * <pre>▍ 아군을 <font color="lime">(아이콘) 치유</font>한다.</pre>
+         * <pre><code>
+         * Section.builder("아군을 &lt;:HEAL:치유&gt;한다.").build();
+         * </code></pre>
+         *
+         * <pre>▍ 적에게 <font color="purple">(아이콘) 피해</font>를 입힌다.</pre>
+         * <pre><code>
+         * Section.builder("적에게 &lt;5:DAMAGE:피해&gt;를 입힌다.").build();
+         * </code></pre>
+         *
+         * <pre>▍ <font color="fuchsia">특성</font>을 적용한다.</pre>
+         * <pre><code>
+         * Section.builder("&lt;d::특성&gt;을 적용한다.").build();
+         * </code></pre>
+         *
+         * <pre>▍ <font color="red">(아이콘)</font> 테스트</pre>
+         * <pre><code>
+         * Section.builder("&lt;:DAMAGE:&gt; 테스트").build();
+         * </code></pre>
+         *
+         * @param summary 개요. 자리 표시자 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을 포함할 수 있는 문자열
+         * @return {@link SectionBuilder}
+         */
+        @NonNull
+        public static SectionBuilder builder(@NonNull String summary) {
+            return new SectionBuilder(parseSummary(summary));
         }
 
         /**
@@ -212,44 +218,21 @@ public final class ActionInfoLore {
         }
 
         /**
-         * 빌더 인스턴스를 생성하여 반환한다.
-         *
-         * <p>Example:</p>
-         *
-         * <pre><code>
-         * // ▍ 아군을 <초록색>\u4DC4 치유<흰색>한다.
-         * Section.builder("아군을 <:HEAL:치유>한다.").build();
-         * // ▍ 적에게 <보라색>\u4DC0 피해<흰색>를 입힌다.
-         * Section.builder("적에게 <5:DAMAGE:피해>를 입힌다.").build();
-         * // ▍ <분홍색>특성<흰색>을 적용한다.
-         * Section.builder("<d::특성>을 적용한다.").build();
-         * // ▍ <빨간색>\u4DC0 <흰색>테스트
-         * Section.builder("<:DAMAGE:> 테스트").build();
-         * </code></pre>
-         *
-         * @param summary 개요. 자리 표시자 정규식 {@link Section#SUMMARY_PLACEHOLDER_PATTERN}을
-         *                포함할 수 있는 문자열
-         * @return {@link SectionBuilder}
-         */
-        @NonNull
-        public static SectionBuilder builder(@NonNull String summary) {
-            return new SectionBuilder(summary);
-        }
-
-        /**
          * 설명 섹션의 전체 문자열을 반환한다.
          *
          * <p>Example:</p>
          *
-         * <pre><code>
-         * //
-         * // ▍ 동작 개요에 대한 내용
-         * //
-         * // \u4DC4 100
-         * // \u4DC0 100 ~ 50
-         * //
-         * // [1] [좌클릭] 사용 [우클릭] 해제
+         * <pre>
          *
+         * ▍ 동작 개요에 대한 내용
+         *
+         * <font color="lime">(아이콘)</font> 100
+         * <font color="red">(아이콘)</font> 100 ~ 50
+         *
+         * [1] [좌클릭] 사용 [우클릭] 해제
+         * </pre>
+         *
+         * <pre><code>
          * Section useSection = Section
          *     .builder("동작 개요에 대한 내용")
          *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
@@ -270,17 +253,15 @@ public final class ActionInfoLore {
             for (String summary : summaries)
                 lore.add(summary);
 
-            if (valueInfos != null) {
+            if (!valueInfos.isEmpty()) {
                 lore.add("");
-                for (String valueInfo : valueInfos)
-                    lore.add(valueInfo);
+                valueInfos.forEach(lore::add);
             }
 
-            if (actionKeyInfos != null) {
+            if (!actionKeyInfos.isEmpty()) {
                 lore.add("");
                 StringJoiner actionKeyInfoText = new StringJoiner(" ");
-                for (String actionKeyInfo : actionKeyInfos)
-                    actionKeyInfoText.add(actionKeyInfo);
+                actionKeyInfos.forEach(actionKeyInfoText::add);
                 lore.add(actionKeyInfoText.toString());
             }
 
@@ -335,20 +316,17 @@ public final class ActionInfoLore {
          */
         @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class SectionBuilder {
-            @NonNull
-            private final String summary;
-            @Nullable
-            private ArrayList<ValueInfo> valueInfos;
-            @Nullable
-            private ArrayList<ActionKeyInfo> actionKeyInfos;
+            private final String[] summaries;
+            private final ArrayList<String> valueInfos = new ArrayList<>();
+            private final ArrayList<String> actionKeyInfos = new ArrayList<>();
 
             /**
              * 수치 상세 설명을 추가한다.
              *
              * <p>Example:</p>
              *
+             * <pre><font color="red">(아이콘)</font> 10 + 20</pre>
              * <pre><code>
-             * // <빨간색>\u4DDE <흰색>10 + 20
              * builder.addValueInfo(TextIcon.DAMAGE, "{0} + {1}", ChatColor.RED, 10, 20);
              * </code></pre>
              *
@@ -361,10 +339,7 @@ public final class ActionInfoLore {
             @NonNull
             public SectionBuilder addValueInfo(@NonNull TextIcon textIcon, @NonNull String pattern, @NonNull ChatColor color,
                                                @NonNull Object @NonNull ... arguments) {
-                if (valueInfos == null)
-                    valueInfos = new ArrayList<>();
-
-                valueInfos.add(new ValueInfo(textIcon, pattern, color, arguments));
+                valueInfos.add(new ValueInfo(textIcon, pattern, color, arguments).toString());
                 return this;
             }
 
@@ -373,8 +348,8 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre><font color="red">(아이콘)</font> 10 + 20</pre>
              * <pre><code>
-             * // <빨간색>\u4DDE <흰색>10 + 20
              * builder.addValueInfo(TextIcon.DAMAGE, "{0} + {1}", 10, 20);
              * </code></pre>
              *
@@ -393,10 +368,13 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre><font color="red">(아이콘)</font> 10m</pre>
              * <pre><code>
-             * // <빨간색>\u4DDE <흰색>10m
              * builder.addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, ChatColor.RED, 10);
-             * // <빨간색>\u4DC0 <흰색>100 ~ 50
+             * </code></pre>
+             *
+             * <pre><font color="red">(아이콘)</font> 100 ~ 50</pre>
+             * <pre><code>
              * builder.addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, ChatColor.RED, 100, 50);
              * </code></pre>
              *
@@ -417,10 +395,13 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre><font color="white">(아이콘)</font> 10m</pre>
              * <pre><code>
-             * // <흰색>\u4DDE <흰색>10m
              * builder.addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, 10);
-             * // <빨간색>\u4DC0 <흰색>100 ~ 50
+             * </code></pre>
+             *
+             * <pre><font color="red">(아이콘)</font> 100 ~ 50</pre>
+             * <pre><code>
              * builder.addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, 100, 50);
              * </code></pre>
              *
@@ -439,8 +420,8 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre><font color="red">(아이콘)</font> 100</pre>
              * <pre><code>
-             * // <빨간색>\u4DC0 <흰색>100
              * builder.addValueInfo(TextIcon.DAMAGE, ChatColor.RED, 100);
              * </code></pre>
              *
@@ -459,8 +440,8 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre><font color="red">(아이콘)</font> 100</pre>
              * <pre><code>
-             * // <빨간색>\u4DC0 <흰색>100
              * builder.addValueInfo(TextIcon.DAMAGE, 100);
              * </code></pre>
              *
@@ -478,8 +459,8 @@ public final class ActionInfoLore {
              *
              * <p>Example:</p>
              *
+             * <pre>[1] [좌클릭] 사용 [우클릭] 해제</pre>
              * <pre><code>
-             * // [1] [좌클릭] 사용 [우클릭] 해제
              * builder
              *     .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.LEFT_CLICK)
              *     .addActionKeyInfo("해제", ActionKey.RIGHT_CLICK);
@@ -491,10 +472,7 @@ public final class ActionInfoLore {
              */
             @NonNull
             public SectionBuilder addActionKeyInfo(@NonNull String description, @NonNull ActionKey @NonNull ... actionKeys) {
-                if (actionKeyInfos == null)
-                    actionKeyInfos = new ArrayList<>();
-
-                actionKeyInfos.add(new ActionKeyInfo(description, actionKeys));
+                actionKeyInfos.add(new ActionKeyInfo(description, actionKeys).toString());
                 return this;
             }
 
@@ -515,17 +493,18 @@ public final class ActionInfoLore {
         @AllArgsConstructor(access = AccessLevel.PRIVATE)
         private static final class ValueInfo {
             /** 텍스트 아이콘 */
-            @NonNull
             private final TextIcon textIcon;
             /** 문자열 패턴 */
-            @NonNull
             private final String pattern;
             /** 텍스트 아이콘 색상 */
-            @NonNull
             private final ChatColor color;
             /** 포맷에 사용할 인자 목록 */
-            @NonNull
             private final Object[] arguments;
+
+            @Override
+            public String toString() {
+                return MessageFormat.format(MessageFormat.format("{0}{1} §f{2}", color, textIcon, pattern), arguments);
+            }
         }
 
         /**
@@ -534,16 +513,23 @@ public final class ActionInfoLore {
         @AllArgsConstructor(access = AccessLevel.PRIVATE)
         private static final class ActionKeyInfo {
             /** 동작 설명 */
-            @NonNull
             private final String description;
             /** 동작 사용 키 목록 */
-            @NonNull
-            private final ActionKey @NonNull [] actionKeys;
+            private final ActionKey[] actionKeys;
+
+            @Override
+            public String toString() {
+                return MessageFormat.format("§7§l[{0}] §f{1}",
+                        Arrays.stream(actionKeys).map(ActionKey::toString).collect(Collectors.joining("] [")),
+                        description);
+            }
         }
     }
 
     /**
      * 이름이 지정된 설명 섹션을 나타내는 클래스.
+     *
+     * @see Section
      */
     @AllArgsConstructor
     public static final class NamedSection {
@@ -559,17 +545,19 @@ public final class ActionInfoLore {
          *
          * <p>Example:</p>
          *
-         * <pre><code>
-         * // [재사용 시]
-         * //
-         * // ▍ 아군을 \u4DC4 치유한다.
-         * //
-         * // \u4DC4 100
-         * //
-         * // [1] 사용
+         * <pre>
+         * [재사용 시]
          *
+         * ▍ 아군을 <font color="lime">(아이콘) 치유</font>한다.
+         *
+         * <font color="lime">(아이콘)</font> 100
+         *
+         * [1] 사용
+         * </pre>
+         *
+         * <pre><code>
          * NamedSection useSection = new NamedSection("재사용 시", Section
-         *     .builder("아군을 <a:HEAL:치유>한다.")
+         *     .builder("아군을 &lt;a:HEAL:치유&gt;한다.")
          *     .addValueInfo(TextIcon.HEAL, ChatColor.GREEN, 100)
          *     .addActionKeyInfo("사용", ActionKey.SLOT_1)
          *     .build());

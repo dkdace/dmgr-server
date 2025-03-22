@@ -1,51 +1,46 @@
 package com.dace.dmgr.item.gui;
 
+import com.dace.dmgr.command.BlockCommand;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
-import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * 차단 목록 GUI 클래스.
+ *
+ * @see BlockCommand
  */
-public final class BlockList extends Gui {
-    /** 차단된 플레이어 GUI 아이템 객체 */
-    private static final GuiItem playerInto = new GuiItem("BlockListPlayer", new ItemBuilder(Material.SKULL_ITEM)
-            .setDamage((short) 3)
-            .setLore("§f클릭 시 차단을 해제합니다.")
-            .build()) {
-        @Override
-        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            player.performCommand("차단 " + ((SkullMeta) clickItem.getItemMeta()).getOwningPlayer().getName());
-            player.closeInventory();
-            return true;
-        }
-    };
-    @Getter
-    private static final BlockList instance = new BlockList();
+public final class BlockList extends ChestGUI {
+    /**
+     * 차단 목록 GUI 인스턴스를 생성한다.
+     *
+     * @param player GUI 표시 대상 플레이어
+     */
+    public BlockList(@NonNull Player player) {
+        super(3, "§8차단 목록", player);
 
-    private BlockList() {
-        super(3, "§8차단 목록");
-    }
+        Set<UserData> blockedPlayers = UserData.fromPlayer(player).getBlockedPlayers();
 
-    @Override
-    public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
-        UserData userData = UserData.fromPlayer(player);
+        new AsyncTask<>((onFinish, onError) -> {
+            int i = 0;
+            for (Iterator<UserData> iterator = blockedPlayers.iterator(); iterator.hasNext(); i++) {
+                UserData blockedPlayer = iterator.next();
 
-        UserData[] blockedPlayers = userData.getBlockedPlayers();
-        new AsyncTask<Void>((onFinish, onError) -> {
-            for (int i = 0; i < Math.min(blockedPlayers.length, 27); i++) {
-                UserData blockedPlayer = blockedPlayers[i];
+                set(i, new DefinedItem(new ItemBuilder(blockedPlayer.getProfileItem())
+                        .setLore("§f클릭 시 차단을 해제합니다.")
+                        .build(),
+                        (clickType, target) -> {
+                            target.performCommand("차단 " + blockedPlayer.getPlayerName());
+                            target.closeInventory();
 
-                guiController.set(i, playerInto, itemBuilder -> itemBuilder.setName(blockedPlayer.getDisplayName())
-                        .setSkullOwner(Bukkit.getOfflinePlayer(blockedPlayer.getPlayerUUID())));
+                            return true;
+                        }));
             }
         });
     }

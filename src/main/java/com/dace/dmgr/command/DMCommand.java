@@ -1,63 +1,49 @@
 package com.dace.dmgr.command;
 
 import com.dace.dmgr.user.User;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 귓속말 명령어 클래스.
  *
- * <p>Usage: /귓속말 [플레이어]</p>
+ * @see User#setMessageTarget(User)
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DMCommand extends BaseCommandExecutor {
+public final class DMCommand extends CommandHandler {
     @Getter
     private static final DMCommand instance = new DMCommand();
 
+    private DMCommand() {
+        super("귓속말", new ParameterList(ParameterType.PLAYER_NAME));
+    }
+
     @Override
-    protected void onCommandInput(@NonNull Player player, @NonNull String @NonNull [] args) {
-        User user = User.fromPlayer(player);
+    protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
+        User user = User.fromPlayer(sender);
 
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                user.sendMessageWarn(WARN_PLAYER_NOT_FOUND);
+                sendWarnPlayerNotFound(sender);
                 return;
             }
 
             user.setMessageTarget(User.fromPlayer(target));
-            user.sendMessageInfo("");
-            user.sendMessageInfo("§e§n{0}§r님과의 대화가 시작되었습니다.", target.getName());
-            user.sendMessageInfo("종료하려면 §n'/(귓[속말]|dm)'§r을 다시 입력하십시오.");
-            user.sendMessageInfo("");
+            user.sendMessageInfo("\n" +
+                            "§e§n{0}§r님과의 대화가 시작되었습니다.\n" +
+                            "종료하려면 §n''{1}''§r을 다시 입력하십시오.\n",
+                    target.getName(), getUsage().split(" ")[0]);
         } else {
             if (user.getMessageTarget() == null) {
-                user.sendMessageWarn(WARN_WRONG_USAGE, "/(귓[속말]|dm) <플레이어>");
+                sendWarnWrongUsage(sender);
                 return;
             }
 
             user.setMessageTarget(null);
-            user.sendMessageInfo("");
-            user.sendMessageInfo("개인 대화가 종료되었습니다.");
-            user.sendMessageInfo("");
+            user.sendMessageInfo("\n개인 대화가 종료되었습니다.\n");
         }
-    }
-
-    @Override
-    @Nullable
-    protected List<@NonNull String> getCompletions(@NonNull String alias, @NonNull String @NonNull [] args) {
-        if (args.length != 1)
-            return null;
-
-        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
     }
 }
 

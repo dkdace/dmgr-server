@@ -1,90 +1,93 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.character.Character;
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.action.info.ActionInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.util.SkinUtil;
+import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * 전투원 선택 정보 GUI 클래스.
  */
-public final class SelectCharInfo extends Gui {
-    /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.Left("SelectCharInfoLeft") {
-        @Override
-        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            SelectChar.getInstance().open(player);
-            return true;
-        }
-    };
-    /** 대상 전투원 종류 */
-    private final CharacterType characterType;
-
+public final class SelectCharInfo extends ChestGUI {
     /**
      * 지정한 전투원의 선택 정보 GUI 인스턴스를 생성한다.
      *
-     * @param characterType 전투원 종류
+     * @param player        GUI 표시 대상 플레이어
+     * @param combatantType 전투원 종류
      */
-    public SelectCharInfo(@NonNull CharacterType characterType) {
-        super(6, "§c§l전투원 정보");
-        this.characterType = characterType;
+    public SelectCharInfo(@NonNull Player player, @NonNull CombatantType combatantType) {
+        super(6, "§c§l전투원 정보", player);
+
+        Combatant combatant = combatantType.getCombatant();
+
+        fillAll(GUIItem.EMPTY);
+        set(0, 3, new DefinedItem(combatantType.getProfileItem()), itemBuilder -> itemBuilder
+                .setLore("",
+                        "§e✪ 난이도 §7:: §f{0}",
+                        "§a{1} 체력 §7:: §f{2}",
+                        "§b{3} 이동속도 배수 §7:: §f{4}",
+                        "§6⬜ 히트박스 배수 §7:: §f{5}")
+                .formatLore(
+                        StringFormUtil.getProgressBar(combatant.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
+                                .replace("§0", "§8"),
+                        TextIcon.HEAL,
+                        combatant.getHealth(),
+                        TextIcon.WALK_SPEED,
+                        combatant.getSpeedMultiplier(),
+                        combatant.getHitboxMultiplier()));
+
+        set(0, 5, combatant.getWeaponInfo().getDefinedItem());
+
+        set(2, 2, SelectCharInfoItem.TRAIT.definedItem);
+        displayActions(2, SelectCharInfoItem.TRAIT, combatant);
+        set(3, 2, SelectCharInfoItem.PASSIVE_SKILL.definedItem);
+        displayActions(3, SelectCharInfoItem.PASSIVE_SKILL, combatant);
+        set(4, 2, SelectCharInfoItem.ACTIVE_SKILL.definedItem);
+        displayActions(4, SelectCharInfoItem.ACTIVE_SKILL, combatant);
+
+        set(5, 8, new GUIItem.Previous(SelectChar::new));
     }
 
-    @Override
-    public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
-        Character character = characterType.getCharacter();
-
-        guiController.fillAll(DisplayItem.EMPTY.getStaticItem());
-        guiController.set(3, characterType.getGuiItem(), itemBuilder -> itemBuilder.setLore("",
-                "§e✪ 난이도 §7:: §f" + StringFormUtil.getProgressBar(character.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
-                        .replace("§0", "§8"),
-                "§a" + TextIcon.HEAL + " 체력 §7:: §f" + character.getHealth(),
-                "§b" + TextIcon.WALK_SPEED + " 이동속도 배수 §7:: §f" + character.getSpeedMultiplier(),
-                "§6⬜ 히트박스 배수 §7:: §f" + character.getHitboxMultiplier()));
-        guiController.set(5, character.getWeaponInfo().getStaticItem());
-
-        guiController.set(20, SelectCharInfoItem.TRAIT.staticItem);
-        for (int i = 21; i <= 24; i++) {
-            TraitInfo traitInfo = character.getTraitInfo(i - 20);
-            if (traitInfo == null)
-                guiController.remove(i);
-            else
-                guiController.set(i, traitInfo.getStaticItem());
+    /**
+     * 지정한 동작 종류에 해당하는 모든 동작 정보를 표시한다.
+     *
+     * @param row        행 번호
+     * @param actionType 동작 종류
+     * @param combatant  전투원
+     */
+    private void displayActions(int row, @NonNull SelectCharInfoItem actionType, @NonNull Combatant combatant) {
+        ActionInfo[] actionInfos;
+        switch (actionType) {
+            case TRAIT:
+                actionInfos = combatant.getTraitInfos();
+                break;
+            case PASSIVE_SKILL:
+                actionInfos = combatant.getPassiveSkillInfos();
+                break;
+            case ACTIVE_SKILL:
+                actionInfos = combatant.getActiveSkillInfos();
+                break;
+            default:
+                return;
         }
 
-        guiController.set(29, SelectCharInfoItem.PASSIVE_SKILL.staticItem);
-        for (int i = 30; i <= 33; i++) {
-            PassiveSkillInfo<?> passiveSkillInfo = character.getPassiveSkillInfo(i - 29);
-            if (passiveSkillInfo == null)
-                guiController.remove(i);
+        for (int i = 0; i < 4; i++)
+            if (i > actionInfos.length - 1)
+                remove(row, i + 3);
             else
-                guiController.set(i, passiveSkillInfo.getStaticItem());
-        }
-
-        guiController.set(38, SelectCharInfoItem.ACTIVE_SKILL.staticItem);
-        for (int i = 39; i <= 42; i++) {
-            ActiveSkillInfo<?> activeSkillInfo = character.getActiveSkillInfo(i - 38);
-            if (activeSkillInfo == null)
-                guiController.remove(i);
-            else
-                guiController.set(i, activeSkillInfo.getStaticItem());
-        }
-
-        guiController.set(53, buttonLeft);
+                set(row, i + 3, actionInfos[i].getDefinedItem());
     }
 
+    /**
+     * 전투원 선택 정보의 아이템 목록.
+     */
     private enum SelectCharInfoItem {
         TRAIT("OWZjMzJjOTE0Mjc2ZjY4NjE0MTc5NmE1YTAyM2MzOWVmZGZlZDE0ZDNkN2M5YzQyNzkyNTEzODQ2ZjdmYTRiMyJ9fX0=",
                 "§b§l특성 §7§oTrait"),
@@ -93,15 +96,11 @@ public final class SelectCharInfo extends Gui {
         ACTIVE_SKILL("NTFkMzgzNDAxZjc3YmVmZmNiOTk4YzJjZjc5YjdhZmVlMjNmMThjNDFkOGE1NmFmZmVkNzliYjU2ZTIyNjdhMyJ9fX0=",
                 "§c§l액티브 스킬 §7§oActive Skill");
 
-        /** 정적 아이템 객체 */
-        private final StaticItem staticItem;
+        /** GUI 아이템 */
+        private final DefinedItem definedItem;
 
         SelectCharInfoItem(String skinUrl, String name) {
-            this.staticItem = new StaticItem("PlayerOption" + this, new ItemBuilder(Material.SKULL_ITEM)
-                    .setDamage((short) 3)
-                    .setSkullOwner(SkinUtil.TOKEN_PREFIX + skinUrl)
-                    .setName(name)
-                    .build());
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl)).setName(name).build());
         }
     }
 }

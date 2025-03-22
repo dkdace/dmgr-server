@@ -1,37 +1,61 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * 여러 번 사용할 수 있는 스택형 스킬의 상태를 관리하는 클래스.
  */
-@Getter
 public abstract class StackableSkill extends ActiveSkill {
-    /** 스킬 스택 충전 쿨타임 ID */
-    private static final String SKILL_STACK_COOLDOWN_ID = "SkillStackCooldown";
+    /** 기본 스택 충전 쿨타임 */
+    @Getter
+    protected final Timespan defaultStackCooldown;
+    /** 최대 스택 충전량 */
+    private final int maxStack;
+
+    /** 스택 충전 쿨타임 타임스탬프 */
+    private Timestamp stackCooldownTimestamp = Timestamp.now();
     /** 스킬 스택 수 */
+    @Getter
     private int stack = 0;
 
     /**
-     * @see ActiveSkill#ActiveSkill(CombatUser, ActiveSkillInfo, int)
+     * 스택형 액티브 스킬 인스턴스를 생성한다.
+     *
+     * @param combatUser           사용자 플레이어
+     * @param activeSkillInfo      액티브 스킬 정보 인스턴스
+     * @param defaultCooldown      기본 쿨타임
+     * @param defaultStackCooldown 기본 스택 충전 쿨타임
+     * @param defaultDuration      기본 지속시간
+     * @param maxStack             최대 스택 충전량. 1 이상의 값
+     * @param slot                 슬롯 번호. 0~4 사이의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
-        super(combatUser, activeSkillInfo, slot);
-        setStackCooldown(getDefaultStackCooldown());
+    protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
+                             @NonNull Timespan defaultStackCooldown, @NonNull Timespan defaultDuration, int maxStack, int slot) {
+        super(combatUser, activeSkillInfo, defaultCooldown, defaultDuration, slot);
+        Validate.isTrue(maxStack >= 1, "maxStack >= 1 (%d)", maxStack);
+
+        this.defaultStackCooldown = defaultStackCooldown;
+        this.maxStack = maxStack;
+        setStackCooldown(defaultStackCooldown);
+
+        addOnReset(() -> {
+            setStackCooldown(Timespan.ZERO);
+            addStack(maxStack);
+        });
     }
 
     @Override
-    protected void onTick() {
+    final void onTick() {
         if (stack > 0) {
             if (isDurationFinished())
                 displayReady(stack);
@@ -42,66 +66,51 @@ public abstract class StackableSkill extends ActiveSkill {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && stack > 0;
     }
 
-    @Override
-    @MustBeInvokedByOverriders
-    public void reset() {
-        super.reset();
-
-        setStackCooldown(0);
-        addStack(getMaxStack());
-    }
-
-    /**
-     * 기본 스택 충전 쿨타임을 반환한다.
-     *
-     * @return 스택 충전 쿨타임 (tick)
-     */
-    public abstract long getDefaultStackCooldown();
-
     /**
      * 스킬의 남은 스택 충전 쿨타임을 반환한다.
      *
-     * @return 스택 충전 쿨타임 (tick)
+     * @return 남은 스택 충전 쿨타임
      */
-    public final long getStackCooldown() {
-        return CooldownUtil.getCooldown(this, SKILL_STACK_COOLDOWN_ID);
+    @NonNull
+    public final Timespan getStackCooldown() {
+        return Timestamp.now().until(stackCooldownTimestamp);
     }
 
     /**
      * 스킬의 스택 충전 쿨타임을 설정한다.
      *
-     * @param cooldown 스택 충전 쿨타임 (tick). -1로 설정 시 무한 지속
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param cooldown 스택 충전 쿨타임
      */
-    public final void setStackCooldown(long cooldown) {
-        if (cooldown < -1)
-            throw new IllegalArgumentException("'cooldown'이 -1 이상이어야 함");
-        if (stack >= getMaxStack())
+    public final void setStackCooldown(@NonNull Timespan cooldown) {
+        if (stack >= maxStack)
             return;
 
         if (isStackCooldownFinished()) {
-            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
-            runStackCooldown(cooldown);
+            stackCooldownTimestamp = Timestamp.now().plus(cooldown);
+
+            if (!cooldown.isZero())
+                runStackCooldown(cooldown);
         } else
-            CooldownUtil.setCooldown(this, SKILL_STACK_COOLDOWN_ID, cooldown);
+            stackCooldownTimestamp = Timestamp.now().plus(cooldown);
     }
 
     /**
-     * 스킬의 스택 충전 쿨타임 스케쥴러를 실행한다.
+     * 스킬의 스택 충전 쿨타임을 실행한다.
      *
-     * @param cooldown 스택 충전 쿨타임 (tick). -1로 설정 시 무한 지속
+     * @param cooldown 스택 충전 쿨타임
      */
-    private void runStackCooldown(long cooldown) {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+    private void runStackCooldown(@NonNull Timespan cooldown) {
+        addTask(new IntervalTask(i -> {
             if (isStackCooldownFinished()) {
                 onStackCooldownFinished();
 
                 addStack(1);
-                if (stack < getMaxStack())
+                if (stack < maxStack)
                     setStackCooldown(cooldown);
 
                 return false;
@@ -116,15 +125,8 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        READY_SOUND.play(combatUser.getEntity());
     }
-
-    /**
-     * 최대 스택 충전량을 반환한다.
-     *
-     * @return 최대 스택 충전량
-     */
-    public abstract int getMaxStack();
 
     /**
      * 지정한 양만큼 스킬의 스택 수를 증가시킨다.
@@ -132,10 +134,10 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param amount 스택 증가량
      */
     public final void addStack(int amount) {
-        stack = Math.min(Math.max(0, stack + amount), getMaxStack());
+        stack = Math.min(Math.max(0, stack + amount), maxStack);
 
         if (stack > 0 && isStackCooldownFinished())
-            setStackCooldown(getDefaultStackCooldown());
+            setStackCooldown(defaultStackCooldown);
     }
 
     /**
@@ -144,6 +146,6 @@ public abstract class StackableSkill extends ActiveSkill {
      * @return 스택 충전 쿨타임 종료 여부
      */
     public final boolean isStackCooldownFinished() {
-        return getStackCooldown() == 0;
+        return stackCooldownTimestamp.isBefore(Timestamp.now());
     }
 }

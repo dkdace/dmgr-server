@@ -1,28 +1,38 @@
 package com.dace.dmgr.combat.action;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.interaction.DamageType;
+import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.HitscanOption;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.ParticleUtil;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
+import org.bukkit.Sound;
+import org.bukkit.inventory.MainHand;
 
 /**
  * 기본 근접 공격 동작 클래스.
  */
 public final class MeleeAttackAction extends AbstractAction {
-    /** 쿨타임 (tick) */
-    private static final long COOLDOWN = 20;
+    /** 사용 효과음 */
+    private static final SoundEffect USE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(0.6).pitch(1.1).pitchVariance(0.1).build());
+    /** 엔티티 타격 효과음 */
+    private static final SoundEffect HIT_ENTITY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build());
+    /** 블록 타격 효과음 */
+    private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
+    /** 엔티티 타격 효과 */
+    private static final ParticleEffect HIT_ENTITY_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(10).speed(0.4).build());
+
+    /** 쿨타임 */
+    private static final Timespan COOLDOWN = Timespan.ofSeconds(1);
     /** 피해량 */
     private static final int DAMAGE = 150;
     /** 사거리 (단위: 블록) */
@@ -38,7 +48,7 @@ public final class MeleeAttackAction extends AbstractAction {
      * @param combatUser 대상 플레이어
      */
     public MeleeAttackAction(@NonNull CombatUser combatUser) {
-        super(combatUser);
+        super(combatUser, COOLDOWN);
     }
 
     @Override
@@ -48,60 +58,66 @@ public final class MeleeAttackAction extends AbstractAction {
     }
 
     @Override
-    public long getDefaultCooldown() {
-        return COOLDOWN;
-    }
-
-    @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        Validate.notNull(combatUser.getCharacterType());
         return super.canUse(actionKey)
-                && combatUser.getCharacterType().getCharacter().canUseMeleeAttack(combatUser)
-                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.MELEE_ATTACK)
+                && combatUser.getCombatantType().getCombatant().canUseMeleeAttack(combatUser)
+                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.MELEE_ATTACK)
                 && combatUser.isGlobalCooldownFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().onCancelled();
-        combatUser.setGlobalCooldown((int) COOLDOWN);
+        combatUser.getWeapon().cancel();
+        combatUser.setGlobalCooldown(COOLDOWN);
         setCooldown();
 
-        SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_USE, combatUser.getEntity().getLocation());
+        USE_SOUND.play(combatUser.getLocation());
         combatUser.getEntity().getInventory().setHeldItemSlot(8);
 
-        TaskUtil.addTask(combatUser, new DelayTask(() -> {
-            new MeleeAttack().shoot();
+        combatUser.addTask(new DelayTask(() -> {
+            new MeleeAttack().shot();
 
-            combatUser.playMeleeAttackAnimation(-7, 18, true);
+            combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(18), MainHand.RIGHT);
         }, 2));
 
-        TaskUtil.addTask(combatUser, new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
+        combatUser.addTask(new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
     }
 
-    private final class MeleeAttack extends Hitscan {
+    private final class MeleeAttack extends Hitscan<Damageable> {
         private MeleeAttack() {
-            super(combatUser, HitscanOption.builder().size(SIZE).maxDistance(DISTANCE).condition(combatUser::isEnemy).build());
+            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SIZE).maxDistance(DISTANCE).build());
         }
 
         @Override
-        protected boolean onHitBlock(@NonNull Block hitBlock) {
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_BLOCK, getLocation());
-            CombatEffectUtil.playBlockHitSound(getLocation(), hitBlock, 1);
-            CombatEffectUtil.playBlockHitEffect(getLocation(), hitBlock, 1);
-
-            return false;
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return (location, i) -> true;
         }
 
         @Override
-        protected boolean onHitEntity(@NonNull Damageable target, boolean isCrit) {
-            if (target.getDamageModule().damage((CombatUser) shooter, DAMAGE, DamageType.NORMAL, getLocation(), false, true))
-                target.getKnockbackModule().knockback(getVelocity().clone().normalize().multiply(KNOCKBACK));
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> {
+                HIT_BLOCK_SOUND.play(location);
+                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
+                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1);
 
-            SoundUtil.playNamedSound(NamedSound.COMBAT_MELEE_ATTACK_HIT_ENTITY, getLocation());
-            ParticleUtil.play(Particle.CRIT, getLocation(), 10, 0, 0, 0, 0.4);
+                return false;
+            };
+        }
 
-            return false;
+        @Override
+        @NonNull
+        protected HitEntityHandler<Damageable> getHitEntityHandler() {
+            return (location, target) -> {
+                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true) && target instanceof Movable)
+                    ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
+
+                HIT_ENTITY_SOUND.play(location);
+                HIT_ENTITY_PARTICLE.play(location);
+
+                return false;
+            };
         }
     }
 }
