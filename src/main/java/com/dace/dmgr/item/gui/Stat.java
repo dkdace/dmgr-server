@@ -1,87 +1,69 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.combat.character.CharacterType;
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.StaticItem;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
 import lombok.NonNull;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * 전적 GUI 클래스.
  */
-public final class Stat extends Gui {
-    /** 플레이어 전적 GUI 아이템 객체 */
-    private static final StaticItem playerInto = new StaticItem("StatPlayer", new ItemBuilder(Material.SKULL_ITEM)
-            .setDamage((short) 3)
-            .setLore("",
-                    "§e승률 : §b{0}승 §f/ §c{1}패 §f({2}%)",
-                    "§e탈주 : §c{3}회 §f({4}%)",
-                    "§e플레이 시간 : §f{5}")
-            .build());
-    /** 이전 버튼 GUI 아이템 객체 */
-    private static final GuiItem buttonLeft = new ButtonItem.Left("StatLeft") {
-        @Override
-        public boolean onClick(@NonNull ClickType clickType, @NonNull ItemStack clickItem, @NonNull Player player) {
-            player.performCommand("메뉴");
-            return true;
-        }
-    };
+public final class Stat extends ChestGUI {
+    /**
+     * 지정한 플레이어 데이터에 해당하는 전적 GUI 인스턴스를 생성한다.
+     *
+     * @param player   GUI 표시 대상 플레이어
+     * @param userData 대상 플레이어 데이터 정보
+     */
+    public Stat(@NonNull Player player, @NonNull UserData userData) {
+        super(6, "§8전적", player);
 
-    /** 대상 플레이어 데이터 정보 */
-    private final UserData userData;
+        fillRow(0, GUIItem.EMPTY);
+
+        new AsyncTask<>((onFinish, onError) ->
+                set(0, 4, new DefinedItem(new ItemBuilder(userData.getProfileItem())
+                        .setLore("",
+                                "§e승률 : §b{0}승 §f/ §c{1}패 §f({2}%)",
+                                "§e탈주 : §c{3}회 §f({4}%)",
+                                "§e플레이 시간 : §f{5}")
+                        .formatLore(
+                                userData.getWinCount(),
+                                userData.getLoseCount(),
+                                (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
+                                userData.getQuitCount(),
+                                (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
+                                DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분"), "")
+                        .build())));
+
+        displayCombatantStats(userData);
+
+        if (UserData.fromPlayer(player) == userData)
+            set(0, 8, new GUIItem.Previous(Menu::new));
+    }
 
     /**
-     * 지정한 플레이어의 전적 GUI 인스턴스를 생성한다.
+     * 모든 전투원별 전적 정보를 표시한다.
      *
      * @param userData 대상 플레이어 데이터 정보
      */
-    public Stat(@NonNull UserData userData) {
-        super(6, "§8전적");
-        this.userData = userData;
-    }
+    private void displayCombatantStats(@NonNull UserData userData) {
+        CombatantType[] combatantTypes = CombatantType.sortedValues();
+        for (int i = 0; i < combatantTypes.length; i++) {
+            UserData.CombatantRecord combatantRecord = userData.getCombatantRecord(combatantTypes[i]);
 
-    @Override
-    public void onOpen(@NonNull Player player, @NonNull GuiController guiController) {
-        guiController.fillRow(1, DisplayItem.EMPTY.getStaticItem());
-
-        new AsyncTask<Void>((onFinish, onError) ->
-                guiController.set(4, playerInto, itemBuilder -> {
-                    itemBuilder.setName(userData.getDisplayName()).setSkullOwner(Bukkit.getOfflinePlayer(userData.getPlayerUUID()));
-                    itemBuilder.formatLore(userData.getWinCount(), userData.getLoseCount(),
-                            (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
-                            userData.getQuitCount(),
-                            (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
-                            DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분"), "");
-                })
-        );
-
-        if (player.getName().equals(userData.getPlayerName()))
-            guiController.set(8, buttonLeft);
-
-        CharacterType[] characterTypes = Arrays.stream(CharacterType.values())
-                .sorted(Comparator.comparing(characterType -> characterType.getCharacter().getName()))
-                .toArray(CharacterType[]::new);
-        for (int i = 0; i < characterTypes.length; i++) {
-            UserData.CharacterRecord characterRecord = userData.getCharacterRecord(characterTypes[i]);
-
-            guiController.set(i + 9, CharacterType.valueOf(characterTypes[i].toString()).getGuiItem(), itemBuilder ->
-                    itemBuilder.setLore("",
-                            MessageFormat.format("§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
-                                    characterRecord.getKill(), characterRecord.getDeath(),
-                                    (double) characterRecord.getKill() / (characterRecord.getDeath() == 0 ? 1 : characterRecord.getDeath())),
-                            MessageFormat.format("§e플레이 시간 : §f{0}",
-                                    DurationFormatUtils.formatDuration(characterRecord.getPlayTime() * 1000L, "d일 H시간 m분"))));
+            set(i + 9, new DefinedItem(combatantTypes[i].getProfileItem()), itemBuilder -> itemBuilder
+                    .setLore("",
+                            "§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
+                            "§e플레이 시간 : §f{3}")
+                    .formatLore(
+                            combatantRecord.getKill(),
+                            combatantRecord.getDeath(),
+                            (double) combatantRecord.getKill() / (combatantRecord.getDeath() == 0 ? 1 : combatantRecord.getDeath()),
+                            DurationFormatUtils.formatDuration(combatantRecord.getPlayTime().toMilliseconds(), "d일 H시간 m분")));
         }
     }
 }

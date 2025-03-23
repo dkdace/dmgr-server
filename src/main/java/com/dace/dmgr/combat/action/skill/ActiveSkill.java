@@ -1,88 +1,87 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.function.LongConsumer;
+
 /**
- * 직접 사용하는 액티브 스킬의 상태를 관리하는 클래스.
+ * 인벤토리 슬롯에서 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
 public abstract class ActiveSkill extends AbstractSkill {
-    /** 스킬 슬롯 */
+    /** 스킬 준비 효과음 */
+    static final SoundEffect READY_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(0.2).pitch(2).build());
+
+    /** 스킬 인벤토리 슬롯 */
     private final int slot;
-    /** 원본 스킬 아이템 객체 */
+    /** 원본 스킬 아이템 인스턴스 */
     private final ItemStack originalItemStack;
-    /** 스킬 아이템 객체 */
+    /** 스킬 아이템 인스턴스 */
     private ItemStack itemStack;
 
     /**
      * 액티브 스킬 인스턴스를 생성한다.
      *
-     * @param combatUser      대상 플레이어
-     * @param activeSkillInfo 액티브 스킬 정보 객체
-     * @param slot            슬롯 번호. 0~8 사이의 값
+     * @param combatUser      사용자 플레이어
+     * @param activeSkillInfo 액티브 스킬 정보 인스턴스
+     * @param defaultCooldown 기본 쿨타임
+     * @param defaultDuration 기본 지속시간
+     * @param slot            슬롯 번호. 0~4 사이의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
-        super(combatUser);
-        if (slot < 0 || slot > 8)
-            throw new IllegalArgumentException("'slot'이 0에서 8 사이여야 함");
+    protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
+                          @NonNull Timespan defaultDuration, int slot) {
+        super(combatUser, activeSkillInfo, defaultCooldown, defaultDuration);
+        Validate.inclusiveBetween(0, 4, slot, "4 >= slot >= 0 (%d)", slot);
 
-        this.originalItemStack = activeSkillInfo.getStaticItem().getItemStack();
+        this.originalItemStack = activeSkillInfo.getDefinedItem().getItemStack();
         this.itemStack = originalItemStack.clone();
         this.slot = slot;
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick();
-            return true;
-        }, 1));
+        addTask(new IntervalTask((LongConsumer) i -> onTick(), 1));
+        addOnRemove(() -> combatUser.getEntity().getInventory().clear(slot));
+    }
+
+    @Override
+    @NonNull
+    public ActiveSkillInfo<?> getSkillInfo() {
+        return (ActiveSkillInfo<?>) super.getSkillInfo();
     }
 
     /**
      * 매 틱마다 실행할 작업.
      */
-    protected void onTick() {
+    void onTick() {
         if (isDurationFinished()) {
             if (isCooldownFinished())
                 displayReady(1);
             else
-                displayCooldown((int) Math.ceil(getCooldown() / 20.0));
+                displayCooldown((int) Math.ceil(getCooldown().toSeconds()));
         } else
-            displayUsing((int) Math.ceil(getDuration() / 20.0));
+            displayUsing((int) Math.ceil(getDuration().toSeconds()));
     }
 
     @Override
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
-        SoundUtil.playNamedSound(NamedSound.COMBAT_ACTIVE_SKILL_READY, combatUser.getEntity());
+        READY_SOUND.play(combatUser.getEntity());
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && combatUser.isGlobalCooldownFinished();
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void reset() {
-        super.reset();
-        setDuration(0);
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void dispose() {
-        super.dispose();
-
-        combatUser.getEntity().getInventory().clear(slot);
     }
 
     /**

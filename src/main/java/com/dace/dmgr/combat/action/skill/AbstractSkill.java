@@ -1,81 +1,97 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
+import com.dace.dmgr.combat.action.info.SkillInfo;
+import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.CooldownUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
  */
 public abstract class AbstractSkill extends AbstractAction implements Skill {
-    /** 스킬 지속시간 쿨타임 ID */
-    private static final String SKILL_DURATION_COOLDOWN_ID = "SkillDuration";
+    /** 스킬 정보 인스턴스 */
+    @NonNull
+    @Getter
+    protected final SkillInfo<?> skillInfo;
+    /** 기본 지속시간 */
+    @NonNull
+    @Getter
+    protected final Timespan defaultDuration;
+
+    /** 지속시간 타임스탬프 */
+    private Timestamp durationTimestamp = Timestamp.now();
 
     /**
      * 스킬 인스턴스를 생성한다.
      *
-     * @param combatUser 대상 플레이어
+     * @param combatUser      사용자 플레이어
+     * @param skillInfo       스킬 정보 인스턴스
+     * @param defaultCooldown 기본 쿨타임
+     * @param defaultDuration 기본 지속시간
      */
-    protected AbstractSkill(@NonNull CombatUser combatUser) {
-        super(combatUser);
-        setCooldown(getDefaultCooldown());
+    protected AbstractSkill(@NonNull CombatUser combatUser, @NonNull SkillInfo<?> skillInfo, @NonNull Timespan defaultCooldown,
+                            @NonNull Timespan defaultDuration) {
+        super(combatUser, defaultCooldown);
+
+        this.skillInfo = skillInfo;
+        this.defaultDuration = defaultDuration;
+        setCooldown(defaultCooldown);
+
+        addOnReset(() -> setDuration(Timespan.ZERO));
     }
 
     @Override
+    @MustBeInvokedByOverriders
     protected void onCooldownSet() {
         if (!isDurationFinished())
-            setDuration(0);
+            setDuration(Timespan.ZERO);
     }
 
     @Override
+    @MustBeInvokedByOverriders
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey)
-                && !combatUser.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.USE_SKILL);
+        return super.canUse(actionKey) && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_SKILL);
     }
 
     @Override
-    public final long getDuration() {
-        return CooldownUtil.getCooldown(this, SKILL_DURATION_COOLDOWN_ID);
+    @NonNull
+    public final Timespan getDuration() {
+        return Timestamp.now().until(durationTimestamp);
     }
 
     @Override
-    public final void setDuration(long duration) {
-        if (duration < -1)
-            throw new IllegalArgumentException("'duration'이 -1 이상이어야 함");
-
+    public final void setDuration(@NonNull Timespan duration) {
         if (isDurationFinished()) {
-            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
-            runDuration();
-        } else {
-            CooldownUtil.setCooldown(this, SKILL_DURATION_COOLDOWN_ID, duration);
-            if (duration == 0)
-                onDurationFinished();
-        }
+            durationTimestamp = Timestamp.now().plus(duration);
+
+            if (!duration.isZero())
+                runDuration();
+        } else
+            durationTimestamp = Timestamp.now().plus(duration);
     }
 
     @Override
     public final void setDuration() {
-        setDuration(getDefaultDuration());
+        setDuration(defaultDuration);
     }
 
     @Override
-    public final void addDuration(long duration) {
-        if (duration < 0)
-            throw new IllegalArgumentException("'duration'이 0 이상이어야 함");
-
-        setDuration(getDuration() + duration);
+    public final void addDuration(@NonNull Timespan duration) {
+        setDuration(getDuration().plus(duration));
     }
 
     /**
-     * 스킬의 지속시간 스케쥴러를 실행한다.
+     * 스킬의 지속시간을 실행한다.
      */
     private void runDuration() {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+        addTask(new IntervalTask(i -> {
             if (isDurationFinished()) {
                 onDurationFinished();
                 return false;
@@ -88,6 +104,7 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     /**
      * 지속시간이 끝났을 때 실행할 작업.
      */
+    @MustBeInvokedByOverriders
     protected void onDurationFinished() {
         if (isCooldownFinished())
             setCooldown();
@@ -95,6 +112,6 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
     @Override
     public final boolean isDurationFinished() {
-        return getDuration() == 0;
+        return durationTimestamp.isBefore(Timestamp.now());
     }
 }

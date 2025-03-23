@@ -1,38 +1,61 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.item.StaticItem;
-import com.dace.dmgr.item.gui.GuiItem;
+import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.event.EventListener;
+import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.gui.ChestGUI;
+import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.user.User;
-import com.dace.dmgr.util.NamedSound;
-import com.dace.dmgr.util.SoundUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public final class OnInventoryClick implements Listener {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnInventoryClick extends EventListener<InventoryClickEvent> {
+    @Getter
+    private static final OnInventoryClick instance = new OnInventoryClick();
+    /** GUI 클릭 효과음 */
+    private static final SoundEffect GUI_CLICK_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder(Sound.UI_BUTTON_CLICK).build());
+
+    @Override
     @EventHandler
-    public static void event(InventoryClickEvent event) {
+    protected void onEvent(@NonNull InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player))
+            return;
+
         Player player = (Player) event.getWhoClicked();
-        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
-        ItemStack itemStack = event.getCurrentItem();
+        User user = User.fromPlayer(player);
+        CombatUser combatUser = CombatUser.fromUser(user);
 
         if (combatUser != null)
             event.setCancelled(true);
-        if (itemStack == null || itemStack.getType() == Material.AIR)
+
+        Inventory inventory = event.getClickedInventory();
+        ItemStack itemStack = event.getCurrentItem();
+        if (inventory == null || itemStack == null || itemStack.getType() == Material.AIR)
             return;
 
-        StaticItem staticItem = StaticItem.fromItemStack(itemStack);
-        if (staticItem != null) {
-            event.setCancelled(true);
+        GUI gui = inventory == player.getInventory() ? user.getGui() : ChestGUI.fromInventory(inventory);
+        if (gui == null)
+            return;
 
-            if (staticItem instanceof GuiItem && event.getClick() != ClickType.DOUBLE_CLICK &&
-                    ((GuiItem) staticItem).onClick(event.getClick(), itemStack, player))
-                SoundUtil.playNamedSound(NamedSound.GENERAL_GUI_CLICK, player);
-        }
+        DefinedItem definedItem = gui.get(event.getSlot());
+        if (definedItem == null)
+            return;
+
+        event.setCancelled(true);
+
+        if (event.getClick() != ClickType.DOUBLE_CLICK && definedItem.getOnClick().apply(event.getClick(), player))
+            GUI_CLICK_SOUND.play(player);
     }
 }

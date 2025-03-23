@@ -1,9 +1,7 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
-import com.dace.dmgr.combat.interaction.DamageType;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
@@ -19,35 +17,26 @@ public interface Damageable extends CombatEntity {
     DamageModule getDamageModule();
 
     /**
-     * @return 넉백 모듈
-     */
-    @NonNull
-    KnockbackModule getKnockbackModule();
-
-    /**
      * @return 상태 효과 모듈
      */
     @NonNull
     StatusEffectModule getStatusEffectModule();
 
     /**
-     * 엔티티가 피해를 받을 수 있는지 확인한다.
+     * 엔티티가 살아있는 생명체인지 확인한다.
      *
-     * @return 피해를 받을 수 있으면 {@code true} 반환
-     * @implSpec {@code true}
+     * @return 살아있는 생명체이면 {@code true} 반환
      */
-    default boolean canTakeDamage() {
-        return true;
-    }
+    boolean isCreature();
 
     /**
-     * 엔티티가 죽을 수 있는지 확인한다.
+     * 죽었을 때 공격자(플레이어)에게 주는 점수를 반환한다.
      *
-     * @return 죽을 수 있으면 {@code true} 반환
-     * @implSpec {@code true}
+     * @return 죽었을 때 공격자에게 주는 점수. 0 이상의 값
+     * @implSpec 0
      */
-    default boolean canDie() {
-        return true;
+    default double getScore() {
+        return 0;
     }
 
     /**
@@ -56,14 +45,11 @@ public interface Damageable extends CombatEntity {
      * @param attacker      공격자
      * @param damage        피해량
      * @param reducedDamage 방어력에 의해 경감된 피해량
-     * @param damageType    타입
      * @param location      맞은 위치
      * @param isCrit        치명타 여부
-     * @param isUlt         궁극기 충전 여부
-     * @see Attacker#onAttack(Damageable, int, DamageType, boolean, boolean)
+     * @see Attacker#onAttack(Damageable, double, boolean, boolean)
      */
-    void onDamage(@Nullable Attacker attacker, int damage, int reducedDamage, @NonNull DamageType damageType, @Nullable Location location,
-                  boolean isCrit, boolean isUlt);
+    void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit);
 
     /**
      * 엔티티가 죽었을 때 실행될 작업.

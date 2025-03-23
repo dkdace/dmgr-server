@@ -1,88 +1,72 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatRestrictions;
+import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.interaction.Projectile;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 치유를 받을 수 있는 엔티티의 모듈 클래스.
  *
- * <p>전투 시스템 엔티티가 {@link Healable}을 상속받는 클래스여야 하며,
- * 엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
+ * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  *
  * @see Healable
  */
 @Getter
 public final class HealModule extends DamageModule {
     /** 회복량 배수 기본값 */
-    public static final double DEFAULT_VALUE = 1;
-
+    private static final double DEFAULT_VALUE = 1;
     /** 회복량 배수 값 */
     @NonNull
     private final AbilityStatus healMultiplierStatus;
 
     /**
-     * 치유 모듈 인스턴스를 생성한다.
+     * 회복 모듈 인스턴스를 생성한다.
      *
-     * @param combatEntity      대상 엔티티
-     * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param isShowHealthBar   생명력 홀로그램 표시 여부
-     * @param isLiving          살아있는(Living) 엔티티 여부
-     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
-     * @param maxHealth         최대 체력. 0 이상의 값
-     * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
-     * @param healMultiplier    회복량 배수 기본값. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
-     *                                  상속받지 않으면 발생
+     * @param combatEntity 대상 엔티티
+     * @param maxHealth    최대 체력. 1 이상의 값
+     * @param hasHealthBar 생명력 홀로그램 표시 여부
+     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
-                      int score, int maxHealth, double defenseMultiplier, double healMultiplier) {
-        super(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, defenseMultiplier);
-        if (healMultiplier < 0)
-            throw new IllegalArgumentException("'healMultiplier'가 0 이상이어야 함");
-
-        this.healMultiplierStatus = new AbilityStatus(healMultiplier);
+    public HealModule(@NonNull Healable combatEntity, int maxHealth, boolean hasHealthBar) {
+        super(combatEntity, maxHealth, hasHealthBar);
+        this.healMultiplierStatus = new AbilityStatus(DEFAULT_VALUE);
     }
 
     /**
-     * 치유 모듈 인스턴스를 생성한다.
+     * 엔티티의 치유 로직을 처리한다.
      *
-     * @param combatEntity      대상 엔티티
-     * @param isUltProvider     엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param isShowHealthBar   생명력 홀로그램 표시 여부
-     * @param isLiving          살아있는(Living) 엔티티 여부
-     * @param score             죽었을 때 공격자에게 주는 점수. 0 이상의 값
-     * @param maxHealth         최대 체력. 0 이상의 값
-     * @param defenseMultiplier 방어력 배수 기본값. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
-     *                                  상속받지 않으면 발생
+     * @param provider           제공자
+     * @param amount             치유량
+     * @param giveHealMultiplier 주는 치유량 배수
+     * @param takeHealMultiplier 받는 치유량 배수
+     * @param isUlt              궁극기 충전 여부
+     * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
-                      int score, int maxHealth, double defenseMultiplier) {
-        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, defenseMultiplier, DEFAULT_VALUE);
-    }
+    private boolean handleHeal(@Nullable Healer provider, double amount, double giveHealMultiplier, double takeHealMultiplier, boolean isUlt) {
+        if (combatEntity.getEntity().isDead() || isFullHealth() || combatEntity.getStatusEffectModule().hasRestriction(CombatRestriction.HEALED))
+            return false;
+        if (amount == 0)
+            return true;
 
-    /**
-     * 치유 모듈 인스턴스를 생성한다.
-     *
-     * @param combatEntity    대상 엔티티
-     * @param isUltProvider   엔티티가 공격당했을 때 공격자에게 궁극기 게이지 제공 여부
-     * @param isShowHealthBar 생명력 홀로그램 표시 여부
-     * @param isLiving        살아있는(Living) 엔티티 여부
-     * @param score           죽었을 때 공격자에게 주는 점수. 0 이상의 값
-     * @param maxHealth       최대 체력. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를
-     *                                  상속받지 않으면 발생
-     */
-    public HealModule(@NonNull Healable combatEntity, boolean isUltProvider, boolean isShowHealthBar, boolean isLiving,
-                      int score, int maxHealth) {
-        this(combatEntity, isUltProvider, isShowHealthBar, isLiving, score, maxHealth, DamageModule.DEFAULT_VALUE);
+        double finalAmount = Math.max(0, amount * (giveHealMultiplier + takeHealMultiplier - 1));
+        if (getHealth() + finalAmount > getMaxHealth())
+            finalAmount = getMaxHealth() - getHealth();
+
+        if (provider != null)
+            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
+
+        ((Healable) combatEntity).onTakeHeal(provider, finalAmount);
+
+        setHealth(getHealth() + finalAmount);
+
+        return true;
     }
 
     /**
@@ -94,25 +78,13 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public boolean heal(@Nullable Healer provider, int amount, boolean isUlt) {
-        if (amount < 0)
-            throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
+    public boolean heal(@Nullable Healer provider, double amount, boolean isUlt) {
+        Validate.isTrue(amount >= 0, "amount >= 0 (%f)", amount);
 
-        if (getHealth() == getMaxHealth() || combatEntity.getStatusEffectModule().hasAnyRestriction(CombatRestrictions.HEALED))
-            return false;
+        double giveHealMultiplier = provider == null ? 1 : provider.getHealerModule().getHealMultiplierStatus().getValue();
+        double takeHealMultiplier = healMultiplierStatus.getValue();
 
-        double healMultiplier = healMultiplierStatus.getValue();
-        int finalAmount = Math.max(0, (int) (amount * healMultiplier));
-        if (getHealth() + finalAmount > getMaxHealth())
-            finalAmount = getMaxHealth() - getHealth();
-
-        if (provider != null)
-            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
-        ((Healable) combatEntity).onTakeHeal(provider, finalAmount, isUlt);
-
-        setHealth(getHealth() + finalAmount);
-
-        return true;
+        return handleHeal(provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
     }
 
     /**
@@ -124,13 +96,16 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public boolean heal(@NonNull Projectile projectile, int amount, boolean isUlt) {
-        if (amount < 0)
-            throw new IllegalArgumentException("'amount'가 0 이상이어야 함");
+    public boolean heal(@NonNull Projectile<? extends Healable> projectile, double amount, boolean isUlt) {
+        Validate.isTrue(amount >= 0, "amount >= 0 (%f)", amount);
 
         CombatEntity provider = projectile.getShooter();
-        if (provider instanceof Healer)
-            return heal((Healer) provider, amount, isUlt);
+        if (provider instanceof Healer) {
+            double giveHealMultiplier = projectile.getHealIncrement();
+            double takeHealMultiplier = healMultiplierStatus.getValue();
+
+            return handleHeal((Healer) provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
+        }
 
         return false;
     }

@@ -24,8 +24,7 @@ public abstract class PassiveSkillInfo<T extends Skill> extends SkillInfo<T> {
         super(skillClass, name, new ItemBuilder(MATERIAL)
                 .setName(PREFIX + name)
                 .setDamage((short) 4)
-                .setLore(actionInfoLore.toString())
-                .build());
+                .build(), actionInfoLore);
     }
 
     @Override

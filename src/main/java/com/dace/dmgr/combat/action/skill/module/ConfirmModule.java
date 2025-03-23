@@ -3,23 +3,20 @@ package com.dace.dmgr.combat.action.skill.module;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.text.MessageFormat;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 스킬의 확인 모듈 클래스.
  *
- * <p>스킬이 {@link Confirmable}을 상속받는 클래스여야 한다.</p>
- *
  * @see Confirmable
  */
-@RequiredArgsConstructor
-public class ConfirmModule {
-    /** 스킬 객체 */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class ConfirmModule {
+    /** 스킬 인스턴스 */
     @NonNull
     protected final Confirmable skill;
     /** 수락 키 */
@@ -32,61 +29,62 @@ public class ConfirmModule {
     /** 확인 중 상태 */
     @Getter
     protected boolean isChecking = false;
+    /** 틱 작업을 처리하는 태스크 */
+    @Nullable
+    private IntervalTask onTickTask;
 
     /**
      * 스킬 확인 모드를 활성화 또는 비활성화한다.
      */
     public final void toggleCheck() {
-        isChecking = !isChecking;
-
         if (isChecking) {
-            skill.onCheckEnable();
-            onCheckEnable();
-
-            TaskUtil.addTask(skill, new IntervalTask(i -> {
-                if (!isChecking)
-                    return false;
-
-                skill.onCheckTick(i);
-                onCheckTick(i);
-
-                return true;
-            }, isCancelled -> {
-                isChecking = false;
-                onCheckDisable();
-                skill.onCheckDisable();
-            }, 1));
+            cancel();
+            return;
         }
+
+        isChecking = true;
+
+        skill.onCheckEnable();
+        onCheckEnable();
+
+        onTickTask = new IntervalTask(i -> {
+            skill.onCheckTick(i);
+            onCheckTick(i);
+        }, 1);
+
+        skill.addTask(onTickTask);
     }
 
     /**
      * 스킬의 확인 모드를 취소한다.
      */
     public final void cancel() {
+        if (!isChecking)
+            return;
+
         isChecking = false;
+
+        if (onTickTask != null)
+            onTickTask.stop();
+
+        onCheckDisable();
+        skill.onCheckDisable();
     }
 
     /**
      * 모듈에서 확인 모드 활성화 시 실행할 작업.
      */
-    protected void onCheckEnable() {
-        // 미사용
-    }
+    protected abstract void onCheckEnable();
 
     /**
      * 모듈에서 확인 중에 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */
-    protected void onCheckTick(long i) {
-        skill.getCombatUser().getUser().sendTitle("", MessageFormat.format("§7§l[{0}] §f사용     §7§l[{1}] §f취소",
-                acceptKey, cancelKey), 0, 5, 5);
-    }
+    protected abstract void onCheckTick(long i);
 
     /**
      * 모듈에서 확인 모드 비활성화 시 실행할 작업.
      */
-    protected void onCheckDisable() {
-        // 미사용
-    }
+    protected abstract void onCheckDisable();
 }

@@ -4,16 +4,22 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import com.dace.dmgr.util.task.Task;
+import com.dace.dmgr.util.task.TaskManager;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.function.LongConsumer;
 
 /**
  * {@link CombatEntity}의 기본 구현체, 모든 전투 시스템 엔티티의 기반 클래스.
@@ -21,38 +27,34 @@ import java.text.MessageFormat;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 public abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
-    /** 엔티티 객체 */
+    /** 전투 시스템 엔티티 목록 (엔티티 : 전투 시스템 엔티티) */
+    private static final HashMap<Entity, CombatEntity> COMBAT_ENTITY_MAP = new HashMap<>();
+    /** 게임에 소속되지 않은 전투 시스템 엔티티 목록 (엔티티 : 전투 시스템 엔티티) */
+    private static final HashMap<Entity, CombatEntity> COMBAT_ENTITY_EXCLUDED_MAP = new HashMap<>();
+
+    /** 엔티티 인스턴스 */
     @NonNull
     @Getter
     protected final T entity;
-    /** 속성 목록 관리 객체 */
-    @NonNull
-    @Getter
-    protected final PropertyManager propertyManager = new PropertyManager();
     /** 이름 */
     @NonNull
     @Getter
     protected final String name;
-    /** 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    /** 소속된 게임 */
     @Nullable
     @Getter
     protected final Game game;
-    /** 히트박스 객체 목록 */
-    @NonNull
-    @Getter
-    protected final Hitbox @NonNull [] hitboxes;
-    /** 활성화 여부 */
-    @Getter
-    protected boolean isActivated = false;
-    /** 움직임 상태 */
-    @Getter
-    protected boolean isMoving = false;
-    /** 히트박스의 중앙 위치 */
-    @NonNull
-    private Location hitboxLocation;
-    /** 히트박스의 가능한 최대 크기. (단위: 블록) */
-    @Getter
-    private double maxHitboxSize = 0;
+    /** 태스크 관리 인스턴스 */
+    private final TaskManager taskManager = new TaskManager();
+    /** 매 틱마다 실행할 작업 목록 */
+    private final ArrayList<LongConsumer> onTicks = new ArrayList<>();
+    /** 제거 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onRemoves = new ArrayList<>();
+
+    /** 히트박스 목록 */
+    protected Hitbox[] hitboxes;
+    /** 히트박스 기준 위치 */
+    private Location hitboxBaseLocation;
 
     /**
      * 전투 시스템의 엔티티 인스턴스를 생성한다.
@@ -64,47 +66,95 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
-        CombatEntity combatEntity = CombatEntityRegistry.getInstance().get(entity);
-        if (combatEntity != null)
-            throw new IllegalStateException(MessageFormat.format("엔티티 {0}의 CombatEntity가 이미 생성됨", name));
+        Validate.validState(COMBAT_ENTITY_MAP.get(entity) == null, "CombatEntity가 이미 존재함");
 
         this.entity = entity;
         this.name = name;
         this.game = game;
         this.hitboxes = hitboxes;
-        hitboxLocation = entity.getLocation();
+        this.hitboxBaseLocation = entity.getLocation();
 
-        for (Hitbox hitbox : hitboxes) {
-            double hitboxMaxSize = Math.max(hitbox.getSizeX(), Math.max(hitbox.getSizeY(), hitbox.getSizeZ()));
-            maxHitboxSize = Math.max(maxHitboxSize, hitboxMaxSize + Math.max(hitbox.getOffsetX() + hitbox.getAxisOffsetX(),
-                    Math.max(hitbox.getOffsetY() + hitbox.getAxisOffsetY(), hitbox.getOffsetZ() + hitbox.getAxisOffsetZ())));
-        }
         entity.setCustomName(ChatColor.WHITE + name);
-        if (game != null)
+        if (game == null)
+            COMBAT_ENTITY_EXCLUDED_MAP.put(entity, this);
+        else
             game.addCombatEntity(this);
 
-        CombatEntityRegistry.getInstance().add(entity, this);
-    }
+        COMBAT_ENTITY_MAP.put(entity, this);
 
-    @Override
-    @MustBeInvokedByOverriders
-    public void activate() {
-        isActivated = true;
+        addTask(new IntervalTask(i -> {
+            for (LongConsumer onTick : onTicks) {
+                onTick.accept(i);
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onTick(i);
+                if (isRemoved()) {
+                    onTicks.clear();
+                    break;
+                }
+            }
+
             updateHitboxTick();
-
-            return true;
         }, 1));
     }
 
     /**
-     * 엔티티가 매 틱마다 실행할 작업.
+     * 지정한 엔티티의 전투 시스템 엔티티 인스턴스를 반환한다.
      *
-     * @param i 인덱스
+     * @param entity 대상 엔티티
+     * @return 전투 시스템의 엔티티 인스턴스. 존재하지 않으면 {@code null} 반환
      */
-    protected abstract void onTick(long i);
+    static CombatEntity fromEntity(@NonNull Entity entity) {
+        return COMBAT_ENTITY_MAP.get(entity);
+    }
+
+    /**
+     * 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     *
+     * @return 게임에 소속되지 않은 모든 엔티티
+     */
+    @NonNull
+    @UnmodifiableView
+    static Collection<@NonNull CombatEntity> getAllExcluded() {
+        return Collections.unmodifiableCollection(COMBAT_ENTITY_EXCLUDED_MAP.values());
+    }
+
+    @Override
+    public final void remove() {
+        Validate.validState(!isRemoved(), "CombatEntity가 이미 제거됨");
+
+        onRemoves.forEach(Runnable::run);
+        onRemoves.clear();
+        taskManager.stop();
+
+        if (game == null)
+            COMBAT_ENTITY_EXCLUDED_MAP.remove(entity);
+        else
+            game.removeCombatEntity(this);
+
+        COMBAT_ENTITY_MAP.remove(entity);
+    }
+
+    @Override
+    public final boolean isRemoved() {
+        return !COMBAT_ENTITY_MAP.containsKey(entity);
+    }
+
+    @Override
+    public final void addTask(@NonNull Task task) {
+        if (!isRemoved())
+            taskManager.add(task);
+    }
+
+    @Override
+    public final void addOnTick(@NonNull LongConsumer onTick) {
+        if (!isRemoved())
+            onTicks.add(onTick);
+    }
+
+    @Override
+    public final void addOnRemove(@NonNull Runnable onRemove) {
+        if (!isRemoved())
+            onRemoves.add(onRemove);
+    }
 
     /**
      * 엔티티의 히트박스를 업데이트한다.
@@ -112,46 +162,52 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     private void updateHitboxTick() {
         Location oldLoc = entity.getLocation();
 
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            isMoving = oldLoc.getWorld() != entity.getWorld() || oldLoc.distance(entity.getLocation()) > 0;
-            for (Hitbox hitbox : getHitboxes()) {
-                hitboxLocation = oldLoc;
-                hitbox.setCenter(hitboxLocation);
-            }
-        }, 3));
+        new DelayTask(() -> {
+            hitboxBaseLocation = oldLoc;
+            for (Hitbox hitbox : hitboxes)
+                hitbox.setBaseLocation(hitboxBaseLocation);
+        }, 3);
+    }
+
+    @Override
+    public double getWidth() {
+        return entity.getWidth();
+    }
+
+    @Override
+    public double getHeight() {
+        return entity.getHeight();
     }
 
     @Override
     @NonNull
-    public final Location getHitboxLocation() {
-        return hitboxLocation.clone();
+    public final Location getHitboxCenter() {
+        return hitboxBaseLocation.clone().add(0, getHeight() / 2, 0);
+    }
+
+    @Override
+    public final void setHitboxes(@NonNull Hitbox @NonNull ... hitboxes) {
+        this.hitboxes = hitboxes;
+    }
+
+    @Override
+    public final boolean isInHitbox(@NonNull Location location, double radius) {
+        for (Hitbox hitbox : hitboxes)
+            if (hitbox.isInHitbox(location, radius))
+                return true;
+
+        return false;
+    }
+
+    @Override
+    @NonNull
+    public final Location getLocation() {
+        return entity.getLocation();
     }
 
     @Override
     @NonNull
     public final Location getCenterLocation() {
-        return entity.getLocation().add(0, entity.getHeight() / 2, 0);
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void dispose() {
-        validate();
-
-        CombatEntityRegistry.getInstance().remove(entity);
-        if (game != null)
-            game.removeCombatEntity(this);
-
-        TaskUtil.clearTask(this);
-    }
-
-    @Override
-    public final boolean isDisposed() {
-        return CombatEntityRegistry.getInstance().get(entity) == null;
-    }
-
-    @Override
-    public final boolean isEnemy(@NonNull CombatEntity combatEntity) {
-        return !getTeamIdentifier().equals(combatEntity.getTeamIdentifier());
+        return getLocation().add(0, getHeight() / 2, 0);
     }
 }

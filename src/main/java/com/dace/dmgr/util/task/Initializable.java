@@ -7,6 +7,7 @@ import lombok.NonNull;
  *
  * <p>초기화 시 비동기 작업이 필요한 클래스를 위해 사용한다.</p>
  *
+ * @param <T> {@link Initializable#init()}에서 반환할 값의 타입
  * @see AsyncTask
  */
 public interface Initializable<T> {

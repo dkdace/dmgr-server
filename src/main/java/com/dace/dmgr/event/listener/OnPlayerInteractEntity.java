@@ -1,17 +1,23 @@
 package com.dace.dmgr.event.listener;
 
-import org.bukkit.entity.Entity;
+import com.dace.dmgr.event.EventListener;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.entity.Sittable;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
-public final class OnPlayerInteractEntity implements Listener {
-    @EventHandler
-    public static void event(PlayerInteractEntityEvent event) {
-        Entity entity = event.getRightClicked();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnPlayerInteractEntity extends EventListener<PlayerInteractEntityEvent> {
+    @Getter
+    private static final OnPlayerInteractEntity instance = new OnPlayerInteractEntity();
 
-        if (entity instanceof Sittable)
+    @Override
+    @EventHandler
+    protected void onEvent(@NonNull PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof Sittable)
             event.setCancelled(true);
     }
 }

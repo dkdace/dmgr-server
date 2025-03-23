@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 @UtilityClass
 public final class ConsoleLogger {
-    /** 플러그인 로거 객체 */
+    /** 플러그인 로거 인스턴스 */
     private static final Logger logger = DMGR.getPlugin().getLogger();
 
     /**
@@ -24,7 +24,7 @@ public final class ConsoleLogger {
      *
      * <pre><code>
      * // Hello, World!
-     * ConsoleLogger.info("Hello, {0}!", "World!");
+     * ConsoleLogger.info("Hello, {0}!", "World");
      * </code></pre>
      *
      * @param message   메시지
@@ -52,7 +52,7 @@ public final class ConsoleLogger {
      *
      * <pre><code>
      * // Hello, World!
-     * ConsoleLogger.warn("Hello, {0}!", "World!");
+     * ConsoleLogger.warn("Hello, {0}!", "World");
      * </code></pre>
      *
      * @param message   메시지
@@ -80,7 +80,7 @@ public final class ConsoleLogger {
      *
      * <pre><code>
      * // Hello, World!
-     * ConsoleLogger.severe("Hello, {0}!", "World!");
+     * ConsoleLogger.severe("Hello, {0}!", "World");
      * </code></pre>
      *
      * @param message   메시지
@@ -99,11 +99,11 @@ public final class ConsoleLogger {
      *
      * <pre><code>
      * // "Hello, World!" 및 예외 정보 출력
-     * ConsoleLogger.severe("Hello, {0}!", ex, "World!");
+     * ConsoleLogger.severe("Hello, {0}!", ex, "World");
      * </code></pre>
      *
      * @param message   메시지
-     * @param exception 예외 객체
+     * @param exception 예외
      * @param arguments 포맷에 사용할 인자 목록
      */
     public static void severe(@NonNull String message, @NonNull Exception exception, @NonNull Object @NonNull ... arguments) {
@@ -123,7 +123,7 @@ public final class ConsoleLogger {
      * 심각 레벨의 로그를 출력한다.
      *
      * @param message   메시지
-     * @param exception 예외 객체
+     * @param exception 예외
      */
     public static void severe(@NonNull String message, @NonNull Exception exception) {
         logger.log(Level.SEVERE, message, exception);

@@ -1,23 +1,24 @@
 package com.dace.dmgr.event.listener;
 
 import com.comphenix.packetwrapper.WrapperPlayServerUpdateHealth;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.dace.dmgr.DMGR;
-import org.bukkit.entity.Player;
+import com.dace.dmgr.event.PacketEventListener;
+import lombok.Getter;
+import lombok.NonNull;
 
-public final class OnPlayServerUpdateHealth extends PacketAdapter {
-    public OnPlayServerUpdateHealth() {
-        super(DMGR.getPlugin(), PacketType.Play.Server.UPDATE_HEALTH);
+public final class OnPlayServerUpdateHealth extends PacketEventListener<WrapperPlayServerUpdateHealth> {
+    @Getter
+    private static final OnPlayServerUpdateHealth instance = new OnPlayServerUpdateHealth();
+
+    private OnPlayServerUpdateHealth() {
+        super(WrapperPlayServerUpdateHealth.class);
     }
 
     @Override
-    public void onPacketSending(PacketEvent event) {
-        WrapperPlayServerUpdateHealth packet = new WrapperPlayServerUpdateHealth(event.getPacket());
-        Player player = event.getPlayer();
+    protected void onEvent(@NonNull PacketEvent event) {
+        WrapperPlayServerUpdateHealth packet = createPacketWrapper(event);
 
-        if (player.getFoodLevel() == packet.getFood())
+        if (event.getPlayer().getFoodLevel() == packet.getFood())
             event.setCancelled(true);
     }
 }

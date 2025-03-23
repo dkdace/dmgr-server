@@ -18,24 +18,14 @@ public interface Swappable<T extends Weapon> extends Weapon {
     /**
      * 무기 전환을 시작할 때 실행할 작업.
      *
-     * @param swapState 변경할 상태
+     * @param isSwapped 보조무기 전환 상태
      */
-    void onSwapStart(@NonNull SwapState swapState);
+    void onSwapStart(boolean isSwapped);
 
     /**
      * 무기 전환이 끝났을 때 실행할 작업.
      *
-     * @param swapState 변경할 상태
+     * @param isSwapped 보조무기 전환 상태
      */
-    void onSwapFinished(@NonNull SwapState swapState);
-
-    /**
-     * 무기 전환 상태 목록.
-     */
-    enum SwapState {
-        /** 주무기 사용 중 */
-        PRIMARY,
-        /** 보조무기 사용 중 */
-        SECONDARY
-    }
+    void onSwapFinished(boolean isSwapped);
 }

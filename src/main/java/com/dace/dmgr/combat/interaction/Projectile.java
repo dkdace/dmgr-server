@@ -1,115 +1,152 @@
 package com.dace.dmgr.combat.interaction;
 
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 /**
- * 투사체. 유한한 탄속을 가지는 총알을 관리하는 클래스.
+ * 투사체. 유한한 탄속을 가져 매 틱마다 판정이 발생하는 총알을 관리하는 클래스.
+ *
+ * @param <T> {@link CombatEntity}를 상속받는 전투 시스템 엔티티
  */
-public abstract class Projectile extends Bullet {
-    /** 투사체의 속력. (단위: 블록/s) */
-    protected final int speed;
-    /** 투사체가 유지되는 시간 (tick). -1로 설정 시 무한 지속 */
-    protected final long duration;
-    /** 중력 작용 여부 */
-    protected final boolean hasGravity;
+public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
+    /** 반복 횟수 */
+    private final int loopCount;
+    /** 투사체가 유지되는 시간 */
+    private final Timespan duration;
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;
-
-    /** 반복 횟수 */
-    private int loopCount = 0;
-    /** 0부터 {@link Projectile#loopCount}까지의 합계 */
-    private int sum = 0;
+    /** 치유 증가량 */
+    @Getter
+    private final double healIncrement;
 
     /**
      * 투사체 인스턴스를 생성한다.
      *
-     * <p>투사체의 선택적 옵션은 {@link ProjectileOption} 객체를 통해 전달받는다.</p>
+     * <p>투사체의 선택적 옵션은 {@link Option}을 통해 전달받는다.</p>
      *
-     * @param shooter 발사자
-     * @param speed   투사체의 속력. (단위: 블록/s). 0 이상의 값
-     * @param option  선택적 옵션
+     * @param shooter         발사자
+     * @param speed           투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param entityCondition 대상 엔티티를 찾는 조건
+     * @param option          투사체의 선택적 옵션
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see ProjectileOption
+     * @see Option
      */
-    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull ProjectileOption option) {
-        super(shooter, option.trailInterval, option.startDistance, option.maxDistance, option.size, option.condition);
-        if (speed < 0)
-            throw new IllegalArgumentException("'speed'가 0 이상이어야 함");
-        if (option.duration < -1)
-            throw new IllegalArgumentException("ProjectileOption의 'duration'이 -1 이상이어야 함");
+    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
+        super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
+        Validate.isTrue(speed >= 0, "speed >= 0 (%d)", speed);
 
         this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
-        this.speed = speed;
+        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
         this.duration = option.duration;
-        this.hasGravity = option.hasGravity;
+        this.loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
     }
 
     /**
      * 투사체 인스턴스를 생성한다.
      *
-     * @param shooter 발사자
-     * @param speed   투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param shooter         발사자
+     * @param speed           투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Projectile(@NonNull CombatEntity shooter, int speed) {
-        super(shooter, ProjectileOption.TRAIL_INTERVAL_DEFAULT, ProjectileOption.START_DISTANCE_DEFAULT, ProjectileOption.MAX_DISTANCE_DEFAULT,
-                ProjectileOption.SIZE_DEFAULT, ProjectileOption.CONDITION_DEFAULT);
-        if (speed < 0)
-            throw new IllegalArgumentException("'speed'가 0 이상이어야 함");
-
-        this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
-        this.speed = speed;
-        this.duration = ProjectileOption.DURATION_DEFAULT;
-        this.hasGravity = ProjectileOption.HAS_GRAVITY_DEFAULT;
+    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+        this(shooter, speed, entityCondition, Option.builder().build());
     }
 
     @Override
-    protected final void onShoot(@NonNull Location origin, @NonNull Vector direction) {
-        loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
-        sum = IntStream.rangeClosed(0, loopCount).sum();
+    final void onShot() {
+        new IntervalTask(i -> {
+            for (int j = 0; j < loopCount; j++) {
+                next();
+                if (isDestroyed())
+                    return false;
+            }
 
-        TaskUtil.addTask(shooter, new IntervalTask(new Function<Long, Boolean>() {
-            int count = 0;
+            return (duration == Timespan.MAX || i < duration.toTicks()) && getDistanceFromStart() < maxDistance;
+        }, () -> {
+            if (!isDestroyed())
+                destroy();
+        }, 1);
+    }
 
-            @Override
-            public Boolean apply(Long i) {
-                for (int j = 0; j < loopCount; j++) {
-                    if (!onInterval())
-                        return false;
+    /**
+     * 중력 효과를 적용하는 판정점 처리기를 생성한다.
+     *
+     * @return 판정점 처리기
+     */
+    @NonNull
+    protected final IntervalHandler createGravityIntervalHandler() {
+        int sum = IntStream.rangeClosed(0, loopCount).sum();
 
-                    if (getVelocity().length() > 0.01)
-                        getLocation().add(getVelocity());
-                    if (count++ % trailInterval == 0)
-                        onTrailInterval();
+        return (location, i) -> {
+            if (LocationUtil.isNonSolid(getLocation().subtract(0, HITBOX_INTERVAL, 0)))
+                push(new Vector(0, -(0.045 * ((double) loopCount / sum) / loopCount), 0));
+
+            return true;
+        };
+    }
+
+    /**
+     * 지면 고정 효과를 적용하는 판정점 처리기를 생성한다.
+     *
+     * @return 판정점 처리기
+     */
+    @NonNull
+    protected final IntervalHandler createGroundIntervalHandler() {
+        return (location, i) -> {
+            if (!LocationUtil.isNonSolid(location)) {
+                Location up = LocationUtil.getNearestAgainstEdge(location, new Vector(0, 1, 0), 2.5);
+                if (LocationUtil.isNonSolid(up)) {
+                    move(up);
+                    return true;
                 }
 
-                return (duration == -1 || i < duration) && getLocation().distance(origin) < maxDistance;
+                return false;
+            } else if (LocationUtil.isNonSolid(location.clone().subtract(0, HITBOX_INTERVAL, 0))) {
+                Location down = LocationUtil.getNearestAgainstEdge(location, new Vector(0, -1, 0), 2.5);
+                if (LocationUtil.isNonSolid(down) && !LocationUtil.isNonSolid(down.clone().subtract(0, HITBOX_INTERVAL, 0))) {
+                    move(down);
+                    return true;
+                }
+
+                return false;
             }
-        }, isCancelled -> onDestroy(), 1));
+
+            return true;
+        };
     }
 
-    @Override
-    @MustBeInvokedByOverriders
-    protected boolean onInterval() {
-        if (!super.onInterval())
-            return false;
-
-        if (hasGravity && LocationUtil.isNonSolid(getLocation().clone().subtract(0, 0.1, 0)))
-            getVelocity().subtract(new Vector(0, 0.045 * ((double) loopCount / sum) / loopCount, 0));
-
-        return true;
+    /**
+     * 투사체의 선택적 옵션을 관리하는 클래스.
+     */
+    @Builder
+    public static final class Option {
+        /** 발사 위치로부터 총알이 생성되는 거리. (단위: 블록). 0 이상의 값 */
+        @Builder.Default
+        private final double startDistance = 0.5;
+        /** 총알의 최대 사거리. (단위: 블록). {@code startDistance} 이상의 값 */
+        @Builder.Default
+        private final double maxDistance = 70;
+        /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록). 0 이상의 값 */
+        @Builder.Default
+        private final double size = 0.13;
+        /** 투사체가 유지되는 시간 */
+        @Builder.Default
+        @NonNull
+        private final Timespan duration = Timespan.MAX;
     }
 }

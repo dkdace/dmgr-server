@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.action.skill;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
@@ -13,26 +14,41 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 @Getter
 public abstract class ChargeableSkill extends ActiveSkill {
+    /** 상태 변수의 최댓값 */
+    protected final double maxStateValue;
     /** 상태 변수 */
-    private int stateValue = 0;
+    private double stateValue = 0;
 
     /**
-     * @see ActiveSkill#ActiveSkill(CombatUser, ActiveSkillInfo, int)
+     * 충전형 액티브 스킬 인스턴스를 생성한다.
+     *
+     * @param combatUser      사용자 플레이어
+     * @param activeSkillInfo 액티브 스킬 정보 인스턴스
+     * @param defaultCooldown 기본 쿨타임
+     * @param maxStateValue   상태 변수의 최댓값. 0을 초과하는 값
+     * @param slot            슬롯 번호. 0~4 사이의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<? extends ActiveSkill> activeSkillInfo, int slot) {
-        super(combatUser, activeSkillInfo, slot);
+    protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
+                              double maxStateValue, int slot) {
+        super(combatUser, activeSkillInfo, defaultCooldown, Timespan.MAX, slot);
+
+        Validate.isTrue(maxStateValue > 0, "maxStateValue > 0 (%f)", maxStateValue);
+        this.maxStateValue = maxStateValue;
+
+        addOnReset(() -> setStateValue(maxStateValue));
     }
 
     @Override
-    protected void onTick() {
+    final void onTick() {
         if (isDurationFinished()) {
             if (isCooldownFinished())
                 displayReady(1);
             else
-                displayCooldown((int) Math.ceil(getCooldown() / 20.0));
+                displayCooldown((int) Math.ceil(getCooldown().toSeconds()));
         } else {
             displayUsing(1);
-            addStateValue(-getStateValueDecrement());
+            addStateValue(-getStateValueDecrement() / 20.0);
         }
     }
 
@@ -43,44 +59,24 @@ public abstract class ChargeableSkill extends ActiveSkill {
         runStateValueCharge();
     }
 
-    @Override
-    public final long getDefaultDuration() {
-        return -1;
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public void reset() {
-        super.reset();
-
-        setStateValue(getMaxStateValue());
-    }
-
     /**
      * 스킬의 상태 변수 충전을 실행한다.
      */
     private void runStateValueCharge() {
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            addStateValue(getStateValueIncrement());
+        addTask(new IntervalTask(i -> {
+            addStateValue(getStateValueIncrement() / 20.0);
 
-            return (stateValue < getMaxStateValue()) && isDurationFinished() && isCooldownFinished();
+            return (stateValue < maxStateValue) && isDurationFinished() && isCooldownFinished();
         }, 1));
     }
-
-    /**
-     * 상태 변수의 최댓값을 반환한다.
-     *
-     * @return 상태 변수의 최댓값
-     */
-    public abstract int getMaxStateValue();
 
     /**
      * 스킬의 상태 변수를 설정한다.
      *
      * @param stateValue 상태 변수
      */
-    public final void setStateValue(int stateValue) {
-        this.stateValue = Math.min(Math.max(0, stateValue), getMaxStateValue());
+    public final void setStateValue(double stateValue) {
+        this.stateValue = Math.min(Math.max(0, stateValue), maxStateValue);
     }
 
     /**
@@ -88,21 +84,21 @@ public abstract class ChargeableSkill extends ActiveSkill {
      *
      * @param increment 증가량
      */
-    public final void addStateValue(int increment) {
+    public final void addStateValue(double increment) {
         setStateValue(stateValue + increment);
     }
 
     /**
-     * 상태 변수의 틱당 충전량을 반환한다.
+     * 상태 변수의 초당 충전량을 반환한다.
      *
-     * @return 상태 변수의 틱당 충전량
+     * @return 상태 변수의 초당 충전량
      */
-    protected abstract int getStateValueIncrement();
+    protected abstract double getStateValueIncrement();
 
     /**
-     * 상태 변수의 틱당 소모량을 반환한다.
+     * 상태 변수의 초당 소모량을 반환한다.
      *
-     * @return 상태 변수의 틱당 소모량
+     * @return 상태 변수의 초당 소모량
      */
-    protected abstract int getStateValueDecrement();
+    protected abstract double getStateValueDecrement();
 }

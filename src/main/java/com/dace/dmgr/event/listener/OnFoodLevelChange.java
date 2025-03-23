@@ -1,12 +1,21 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.event.EventListener;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
-public final class OnFoodLevelChange implements Listener {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnFoodLevelChange extends EventListener<FoodLevelChangeEvent> {
+    @Getter
+    private static final OnFoodLevelChange instance = new OnFoodLevelChange();
+
+    @Override
     @EventHandler
-    public static void event(FoodLevelChangeEvent event) {
+    protected void onEvent(@NonNull FoodLevelChangeEvent event) {
         event.setCancelled(true);
     }
 }

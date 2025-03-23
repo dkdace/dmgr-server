@@ -1,18 +1,27 @@
 package com.dace.dmgr.user;
 
-import com.comphenix.packetwrapper.WrapperPlayServerBoss;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.dace.dmgr.DMGR;
-import com.dace.dmgr.Disposable;
-import com.dace.dmgr.GeneralConfig;
+import com.comphenix.packetwrapper.WrapperPlayServerEntityMetadata;
+import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.dace.dmgr.*;
+import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.game.Game;
+import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.effect.TextHologram;
+import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
+import com.dace.dmgr.event.listener.OnPlayerCommandPreprocess;
+import com.dace.dmgr.event.listener.OnPlayerQuit;
+import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
+import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.util.*;
+import com.dace.dmgr.item.gui.GUI;
+import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.dace.dmgr.util.task.TaskUtil;
+import com.dace.dmgr.util.task.TaskManager;
 import com.keenant.tabbed.item.TextTabItem;
+import com.keenant.tabbed.tablist.TabList;
 import com.keenant.tabbed.tablist.TableTabList;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
@@ -22,93 +31,141 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.skinsrestorer.api.PlayerWrapper;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.ServerOperator;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.LongConsumer;
 
 /**
  * 유저 정보 및 상태를 관리하는 클래스.
  *
  * @see UserData
  */
-public final class User implements Disposable {
-    /** 타자기 효과 타이틀 쿨타임 ID */
-    private static final String TYPEWRITER_TITLE_COOLDOWN_ID = "TypewriterTitle";
-    /** 타이틀 쿨타임 ID */
-    private static final String TITLE_COOLDOWN_ID = "Title";
-    /** 액션바 쿨타임 ID */
-    private static final String ACTION_BAR_COOLDOWN_ID = "ActionBar";
-    /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
-    private static final String MESSAGE_KICK_ERR = "§c유저 데이터를 불러오는 중 오류가 발생했습니다." +
-            "\n" +
-            "\n§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오." +
-            "\n" +
-            "\n§7오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
-    /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
-    private static final String MESSAGE_KICK_DENY = "§c리소스팩 적용을 활성화 하십시오." +
-            "\n" +
-            "\n§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용" +
-            "\n" +
-            "\n§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오." +
-            "\n" +
-            "\n§7다운로드 오류 문의 : " + GeneralConfig.getConfig().getAdminContact();
+public final class User {
+    /** 유저 목록 (플레이어 : 유저 정보) */
+    private static final HashMap<Player, User> USER_MAP = new HashMap<>();
 
-    /** 플레이어 객체 */
+    /** 오류 발생으로 강제퇴장 시 표시되는 메시지 */
+    private static final String MESSAGE_KICK_ERR = String.join("\n",
+            "{0}§c유저 데이터를 불러오는 중 오류가 발생했습니다.",
+            "",
+            "§f잠시 후 다시 시도하거나, 관리자에게 문의하십시오.",
+            "",
+            "§7오류 문의 : {1}");
+    /** 리소스팩 미적용으로 강제퇴장 시 표시되는 메시지 */
+    private static final String MESSAGE_KICK_DENY = String.join("\n",
+            "{0}§c리소스팩 적용을 활성화 하십시오.",
+            "",
+            "§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용",
+            "",
+            "§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오.",
+            "",
+            "§7다운로드 오류 문의 : {1}");
+    /** 리소스팩 적용 중 오류로 강제퇴장 시 표시되는 메시지 */
+    private static final String MESSAGE_KICK_RESOURCE_ERR = String.join("\n",
+            "{0}§c리소스팩 적용 중 오류가 발생했습니다.",
+            "",
+            "§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오.",
+            "",
+            "§7다운로드 오류 문의 : {1}");
+    /** 채팅의 메시지 포맷 패턴 */
+    private static final String CHAT_FORMAT_PATTERN = "<{0}> {1}";
+    /** 레벨 업 효과음 */
+    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
+    /** 티어 승급 효과음 */
+    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
+    /** 티어 강등 효과음 */
+    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
+    /** 경고 액션바 효과음 */
+    private static final SoundEffect ALERT_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build());
+    /** 타자기 효과 타이틀 효과음 */
+    private static final SoundEffect TYPEWRITER_TITLE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("new.block.note_block.bass").volume(1).pitch(1.5).build());
+
+    /** 플레이어 인스턴스 */
     @NonNull
     @Getter
     private final Player player;
-    /** 유저 데이터 정보 객체 */
+    /** 유저 데이터 정보 인스턴스 */
     @NonNull
     @Getter
     private final UserData userData;
-    /** 생성된 보스바 UUID 목록 (보스바 ID : UUID) */
-    private final HashMap<String, UUID> bossBarMap = new HashMap<>();
-    /** 이름표 숨기기용 갑옷 거치대 객체 */
+    /** 태스크 관리 인스턴스 */
+    private final TaskManager taskManager = new TaskManager();
+    /** 플레이어 탭리스트 관리 인스턴스 */
+    @NonNull
+    @Getter
+    private final TabListManager tabListManager;
+    /** 플레이어 사이드바 관리 인스턴스 */
+    @NonNull
+    @Getter
+    private final SidebarManager sidebarManager;
+    /** 발광 효과 정보 목록 (발광 엔티티 : 발광 효과 정보) */
+    private final WeakHashMap<Entity, GlowingInfo> glowingInfoMap = new WeakHashMap<>();
+    /** 플레이어 인벤토리 GUI */
+    @NonNull
+    @Getter
+    private final GUI gui;
+
+    /** 채팅 쿨타임 타임스탬프 */
+    private Timestamp chatCooldownTimestamp = Timestamp.now();
+    /** 명령어 쿨타임 타임스탬프 */
+    private Timestamp commandCooldownTimestamp = Timestamp.now();
+    /** 타자기 효과 타이틀 타임스탬프 */
+    private Timestamp typewriterTitleTimestamp = Timestamp.now();
+    /** 타이틀 덮어쓰기 타임스탬프 */
+    private Timestamp titleOverrideTimestamp = Timestamp.now();
+    /** 액션바 덮어쓰기 타임스탬프 */
+    private Timestamp actionBarOverrideTimestamp = Timestamp.now();
+
+    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
     @Nullable
     private ArmorStand nameTagHider;
-    /** 플레이어 사이드바 */
+    /** 이름표 홀로그램 */
     @Nullable
-    private BPlayerBoard sidebar;
-    /** 플레이어 탭리스트 */
-    @Nullable
-    private TableTabList tabList;
+    private TextHologram nameTagHologram;
     /** 현재 핑 (ms) */
-    @Getter
     @Setter
     private int ping = 0;
     /** 리소스팩 적용 수락 여부 */
-    @Setter
     private boolean isResourcePackAccepted = false;
     /** 현재 귓속말 대상 */
     @Nullable
     @Getter
     @Setter
     private User messageTarget;
+    /** 현재 입장한 게임 방 */
+    @Nullable
+    @Getter
+    private GameRoom gameRoom;
     /** 관리자 채팅 여부 */
     @Getter
     @Setter
     private boolean isAdminChat = false;
     /** 자유 전투 입장 여부 */
     @Getter
-    @Setter
     private boolean isInFreeCombat = false;
 
     /**
@@ -119,8 +176,13 @@ public final class User implements Disposable {
     private User(@NonNull Player player) {
         this.player = player;
         this.userData = UserData.fromPlayer(player);
+        this.tabListManager = new TabListManager(player);
+        this.sidebarManager = new SidebarManager(player);
+        this.gui = new GUI(player.getInventory());
 
-        UserRegistry.getInstance().add(player, this);
+        USER_MAP.put(player, this);
+
+        init();
     }
 
     /**
@@ -131,7 +193,7 @@ public final class User implements Disposable {
      */
     @NonNull
     public static User fromPlayer(@NonNull Player player) {
-        User user = UserRegistry.getInstance().get(player);
+        User user = USER_MAP.get(player);
         if (user == null)
             user = new User(player);
 
@@ -139,18 +201,34 @@ public final class User implements Disposable {
     }
 
     /**
+     * 모든 유저 정보를 반환한다.
+     *
+     * @return 유저 정보 인스턴스 목록
+     */
+    @NonNull
+    @UnmodifiableView
+    public static Collection<@NonNull User> getAllUsers() {
+        return Collections.unmodifiableCollection(USER_MAP.values());
+    }
+
+    /**
      * 유저 초기화 작업을 수행한다.
      */
-    public void init() {
-        validate();
+    private void init() {
+        reset();
+        taskManager.add(new DelayTask(this::clearChat, 10));
 
         if (userData.isInitialized())
             onInit();
         else
-            TaskUtil.addTask(this, userData.init()
+            taskManager.add(userData.init()
                     .onFinish(this::onInit)
-                    .onError(ex -> TaskUtil.addTask(User.this, new DelayTask(() ->
-                            player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_ERR), 60))));
+                    .onError(ex -> taskManager.add(new DelayTask(() -> {
+                        String message = MessageFormat.format(MESSAGE_KICK_ERR,
+                                GeneralConfig.getConfig().getMessagePrefix(),
+                                GeneralConfig.getConfig().getAdminContact());
+                        player.kickPlayer(message);
+                    }, 60))));
     }
 
     /**
@@ -158,71 +236,19 @@ public final class User implements Disposable {
      */
     private void onInit() {
         disableCollision();
-        TaskUtil.addTask(this, new DelayTask(this::updateNameTagHider, 1));
-        TaskUtil.addTask(this, new DelayTask(this::sendResourcePack, 10));
-        TaskUtil.addTask(this, SkinUtil.resetSkin(player));
+        taskManager.add(new DelayTask(this::createNameTagHider, 1));
+        taskManager.add(new DelayTask(this::sendResourcePack, 10));
+        taskManager.add(resetSkin());
 
-        sidebar = new BPlayerBoard(player, "lobby");
-        clearSidebar();
-        tabList = (TableTabList) DMGR.getTabbed().getTabList(player);
-        if (tabList == null)
-            tabList = DMGR.getTabbed().newTableTabList(player);
-        tabList.setBatchEnabled(true);
-        clearTabListItems();
-
-        HologramUtil.addHologram(player.getName(), player, 0, 2.25, 0, userData.getDisplayName());
-        HologramUtil.setHologramVisibility(player.getName(), false, player);
+        nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
+                0, userData.getDisplayName());
 
         if (!userData.getConfig().isKoreanChat())
             player.performCommand("kakc chmod 0");
 
-        TaskUtil.addTask(this, new IntervalTask(i -> {
-            onSecond();
-            return true;
-        }, 20));
-    }
+        sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", Timespan.ZERO, Timespan.ofSeconds(5), Timespan.ofSeconds(3));
 
-    /**
-     * 유저를 제거하고 등록 해제한다.
-     *
-     * <p>플레이어 퇴장 시 호출해야 한다.</p>
-     */
-    public void dispose() {
-        validate();
-
-        reset();
-        TaskUtil.clearTask(this);
-        HologramUtil.removeHologram(player.getName());
-
-        GameUser gameUser = GameUser.fromUser(this);
-        if (gameUser != null)
-            gameUser.dispose();
-        UserRegistry.getInstance().remove(player);
-
-        if (userData.isInitialized()) {
-            if (sidebar != null) {
-                sidebar.delete();
-                sidebar = null;
-            }
-            if (tabList != null) {
-                tabList.disable();
-                tabList = null;
-            }
-            if (nameTagHider != null) {
-                nameTagHider.remove();
-                nameTagHider = null;
-            }
-
-            if (DMGR.getPlugin().isEnabled())
-                userData.save();
-            else
-                userData.saveSync();
-        }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return !player.isOnline();
+        taskManager.add(new IntervalTask((LongConsumer) i -> onSecond(), 20));
     }
 
     /**
@@ -239,9 +265,9 @@ public final class User implements Disposable {
     }
 
     /**
-     * 이름표 숨기기 객체를 업데이트한다.
+     * 이름표 숨기기 갑옷 거치대 인스턴스를 생성한다.
      */
-    private void updateNameTagHider() {
+    private void createNameTagHider() {
         if (nameTagHider != null)
             return;
 
@@ -264,10 +290,30 @@ public final class User implements Disposable {
     private void sendResourcePack() {
         player.setResourcePack(GeneralConfig.getConfig().getResourcePackUrl());
 
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            if (!isResourcePackAccepted)
-                player.kickPlayer(GeneralConfig.getConfig().getMessagePrefix() + MESSAGE_KICK_DENY);
-        }, GeneralConfig.getConfig().getResourcePackTimeout() * 20L));
+        taskManager.add(new DelayTask(() -> {
+            if (!isResourcePackAccepted) {
+                String message = MessageFormat.format(MESSAGE_KICK_DENY,
+                        GeneralConfig.getConfig().getMessagePrefix(),
+                        GeneralConfig.getConfig().getAdminContact());
+                player.kickPlayer(message);
+            }
+        }, GeneralConfig.getConfig().getResourcePackTimeout().toTicks()));
+    }
+
+    /**
+     * 리소스팩 적용 상태가 변경되었을 때 실행할 작업.
+     *
+     * @param status 리소스팩 적용 상태
+     * @see OnPlayerResourcePackStatus
+     */
+    public void onResourcePackStatus(@NonNull PlayerResourcePackStatusEvent.Status status) {
+        isResourcePackAccepted = status == PlayerResourcePackStatusEvent.Status.ACCEPTED
+                || status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED;
+
+        if (status == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
+            player.kickPlayer(MessageFormat.format(MESSAGE_KICK_RESOURCE_ERR,
+                    GeneralConfig.getConfig().getMessagePrefix(),
+                    GeneralConfig.getConfig().getAdminContact()));
     }
 
     /**
@@ -279,24 +325,22 @@ public final class User implements Disposable {
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
-        CombatUser combatUser = CombatUser.fromUser(this);
-        if (combatUser == null) {
+        if (CombatUser.fromUser(this) == null) {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
-            updateSidebar();
+            updateLobbySidebar();
         }
 
-        HologramUtil.setHologramVisibility(player.getName(), combatUser == null, player.getWorld().getPlayers().toArray(new Player[0]));
-        HologramUtil.setHologramVisibility(player.getName(), false, player);
-
         GameUser gameUser = GameUser.fromUser(this);
-        if (gameUser == null || gameUser.getGame().getPhase() == Game.Phase.WAITING)
-            updateTablist();
+        if (gameUser == null)
+            updateLobbyTabList();
+
+        tabListManager.update();
     }
 
     /**
      * 로비 사이드바를 업데이트한다.
      */
-    private void updateSidebar() {
+    private void updateLobbySidebar() {
         int reqXp = userData.getNextLevelXp();
         int rank = userData.isRanked() ? userData.getRankRate() : 0;
         int reqRank = userData.getTier().getMaxScore();
@@ -318,26 +362,30 @@ public final class User implements Disposable {
                 break;
         }
 
-        setSidebarName("§b§n" + player.getName());
-        editSidebar(
-                "§f",
+        String levelText = MessageFormat.format("{0} §2[{1}/{2}]",
+                StringFormUtil.getProgressBar(userData.getXp(), reqXp, ChatColor.DARK_GREEN),
+                userData.getXp(),
+                reqXp);
+        String rankText = MessageFormat.format("{0} §3[{1}/{2}]",
+                StringFormUtil.getProgressBar((rank - curRank), (reqRank - curRank), ChatColor.DARK_AQUA),
+                rank,
+                reqRank);
+
+        sidebarManager.setName("§b§n" + player.getName());
+        sidebarManager.setAll(
+                "",
                 "§e보유 중인 돈",
                 "§6" + String.format("%,d", userData.getMoney()),
-                "§f§f",
-                "§f레벨 : " + userData.getLevelPrefix(),
-                MessageFormat.format("{0} §2[{1}/{2}]",
-                        StringFormUtil.getProgressBar(userData.getXp(), reqXp, ChatColor.DARK_GREEN), userData.getXp(), reqXp),
-                "§f§f§f",
-                "§f랭크 : " + userData.getTier().getPrefix(),
-                MessageFormat.format("{0} §3[{1}/{2}]",
-                        StringFormUtil.getProgressBar(rank - curRank, reqRank - curRank, ChatColor.DARK_AQUA), rank, reqRank)
-        );
+                "",
+                "§f레벨 : " + userData.getLevelPrefix(), levelText,
+                "",
+                "§f랭크 : " + userData.getTier().getPrefix(), rankText);
     }
 
     /**
      * 로비 탭리스트를 업데이트한다.
      */
-    private void updateTablist() {
+    private void updateLobbyTabList() {
         long freeMemory = Runtime.getRuntime().freeMemory() / 1024 / 1024;
         long totalMemory = Runtime.getRuntime().totalMemory() / 1024 / 1024;
         long memory = totalMemory - freeMemory;
@@ -368,59 +416,71 @@ public final class User implements Disposable {
         else if (tps < 19.7)
             tpsColor = ChatColor.YELLOW;
 
-        setTabListHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
-        setTabListFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
+        tabListManager.setHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
+        tabListManager.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
 
-        setTabListItem(0, 0, "§f§l§n 서버 상태 ", Skins.getPlayer("TimmyTimothy"));
-        setTabListItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
+        tabListManager.setItem(0, 0, "§f§l§n 서버 상태 ", Skins.getPlayer("TimmyTimothy"));
+        tabListManager.setItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
                 Skins.getPlayer("FranciRoma"));
-        setTabListItem(0, 3, MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
+        tabListManager.setItem(0, 3, MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
                 Skins.getPlayer("AddelBurgh"));
-        setTabListItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
+        tabListManager.setItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
                 Skins.getPlayer("CommandBlock"));
-        setTabListItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
+        tabListManager.setItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
                 Skins.getPlayer("MHF_Steve"));
-        setTabListItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
+        tabListManager.setItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
                 Skins.getPlayer(player));
-        setTabListItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)", userData.getWinCount(), userData.getLoseCount(),
+        tabListManager.setItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
+                        userData.getWinCount(),
+                        userData.getLoseCount(),
                         (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("goldblock"));
-        setTabListItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회 §f({1}%)", userData.getQuitCount(),
+        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회 §f({1}%)",
+                        userData.getQuitCount(),
                         (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("MHF_TNT2"));
-        setTabListItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
-                        DurationFormatUtils.formatDuration(userData.getPlayTime() * 1000L, "d일 H시간 m분")),
+        tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
+                        DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")),
                 Skins.getPlayer("Olaf_C"));
 
-        User[] lobbyUsers = Bukkit.getOnlinePlayers().stream()
-                .filter(target -> !target.isOp())
-                .sorted(Comparator.comparing(HumanEntity::getName))
-                .map(User::fromPlayer)
-                .toArray(User[]::new);
-        User[] adminUsers = Bukkit.getOnlinePlayers().stream()
-                .filter(ServerOperator::isOp)
-                .sorted(Comparator.comparing(HumanEntity::getName))
-                .map(User::fromPlayer)
-                .toArray(User[]::new);
+        updateLobbyTabListUsers();
+    }
 
+    /**
+     * 로비 탭리스트의 접속자 목록을 업데이트한다.
+     */
+    private void updateLobbyTabListUsers() {
+        List<User> lobbyUsers = new ArrayList<>();
+        List<User> adminUsers = new ArrayList<>();
+        getAllUsers().stream()
+                .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
+                .forEach(target -> (target.getPlayer().isOp() ? adminUsers : lobbyUsers).add(target));
+
+        tabListManager.setItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.size()), Skins.getDot(ChatColor.GREEN));
         for (int i = 0; i < 38; i++) {
-            if (i > lobbyUsers.length - 1)
-                removeTabListItem(i % 2 == 0 ? 1 : 2, i / 2 + 1);
-            else
-                setTabListItem(i % 2 == 0 ? 1 : 2, i / 2 + 1, lobbyUsers[i].getTablistPlayerName(), lobbyUsers[i]);
-        }
-        setTabListItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.length), Skins.getDot(ChatColor.GREEN));
+            int column = 1 + i % 2;
+            int row = i / 2 + 1;
 
+            if (i > lobbyUsers.size() - 1)
+                tabListManager.removeItem(column, row);
+            else {
+                User lobbyUser = lobbyUsers.get(i);
+                tabListManager.setItem(column, row, lobbyUser.getTabListPlayerName(), lobbyUser);
+            }
+        }
+
+        tabListManager.setItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.size()), Skins.getDot(ChatColor.AQUA));
         for (int i = 0; i < 19; i++) {
-            if (i > adminUsers.length - 1)
-                removeTabListItem(3, i + 1);
-            else
-                setTabListItem(3, i + 1, adminUsers[i].getTablistPlayerName(), adminUsers[i]);
+            int column = 3;
+            int row = i + 1;
 
-            setTabListItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.length), Skins.getDot(ChatColor.AQUA));
+            if (i > adminUsers.size() - 1)
+                tabListManager.removeItem(column, row);
+            else {
+                User adminUser = adminUsers.get(i);
+                tabListManager.setItem(column, row, adminUser.getTabListPlayerName(), adminUser);
+            }
         }
-
-        applyTabList();
     }
 
     /**
@@ -429,51 +489,160 @@ public final class User implements Disposable {
      * @return 이름
      */
     @NonNull
-    public String getTablistPlayerName() {
+    private String getTabListPlayerName() {
         String prefix = "§7[로비]";
 
-        GameUser gameUser = GameUser.fromUser(this);
         if (isInFreeCombat())
             prefix = "§7[자유 전투]";
-        else if (gameUser != null) {
-            Game game = gameUser.getGame();
-
-            if (game.getGamePlayMode().isRanked())
-                prefix = MessageFormat.format("§6[랭크 게임 {0}]", game.getNumber());
-            else
-                prefix = MessageFormat.format("§a[일반 게임 {0}]", game.getNumber());
-        }
+        else if (gameRoom != null)
+            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 게임 {0}]" : "§a[일반 게임 {0}]", gameRoom.getNumber());
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
 
     /**
+     * 채팅을 입력했을 때 실행할 작업.
+     *
+     * @param message 입력 메시지
+     * @see OnAsyncPlayerChat
+     */
+    public void onChat(@NonNull String message) {
+        if (!player.isOp()) {
+            if (chatCooldownTimestamp.isAfter(Timestamp.now())) {
+                sendMessageWarn("채팅을 천천히 하십시오.");
+                return;
+            }
+
+            chatCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getChatCooldown());
+        }
+
+        if (messageTarget == null) {
+            if (isAdminChat()) {
+                getAllUsers().stream()
+                        .filter(target -> target.getPlayer().isOp())
+                        .forEach(target -> sendChatMessage(target, ChatColor.DARK_AQUA + message));
+            } else {
+                GameUser gameUser = GameUser.fromUser(this);
+
+                if (gameUser == null)
+                    getAllUsers().forEach(target -> sendChatMessage(target, message));
+                else
+                    gameUser.broadcastChatMessage(message, gameUser.isTeamChat());
+            }
+        } else {
+            sendChatMessage(this, ChatColor.GRAY + message);
+            sendChatMessage(messageTarget, ChatColor.GRAY + message);
+        }
+    }
+
+    /**
+     * 수신 플레이어에게 채팅 메시지를 전송하고 효과음을 재생한다.
+     *
+     * @param receiver 수신 플레이어
+     * @param message  메시지
+     */
+    private void sendChatMessage(@NonNull User receiver, @NonNull String message) {
+        UserData receiverUserData = receiver.getUserData();
+        if (receiverUserData.isBlockedPlayer(userData))
+            return;
+
+        String pattern = CHAT_FORMAT_PATTERN;
+        String name = userData.getDisplayName();
+
+        if (messageTarget != null) {
+            if (this != receiver)
+                name += "§7님의 개인 메시지§f";
+        } else if (isAdminChat)
+            pattern = "§7§l[관리자] §f" + pattern;
+
+        message = MessageFormat.format(pattern, name, message);
+
+        receiver.getPlayer().sendMessage(message);
+        receiverUserData.getConfig().getChatSound().getSound().play(receiver.getPlayer());
+    }
+
+    /**
+     * 서버에서 퇴장했을 때 실행할 작업.
+     *
+     * @see OnPlayerQuit
+     */
+    public void onQuit() {
+        reset();
+
+        if (gameRoom != null)
+            quitGame();
+
+        taskManager.stop();
+        tabListManager.delete();
+        sidebarManager.delete();
+        glowingInfoMap.values().iterator().forEachRemaining(GlowingInfo::removeGlowing);
+
+        if (userData.isInitialized()) {
+            if (nameTagHider != null) {
+                nameTagHider.remove();
+                nameTagHider = null;
+            }
+            if (nameTagHologram != null) {
+                nameTagHologram.remove();
+                nameTagHologram = null;
+            }
+
+            userData.save();
+        }
+
+        USER_MAP.remove(player);
+    }
+
+    /**
+     * 명령어를 입력했을 때 실행할 작업.
+     *
+     * @return 성공 여부. 입력이 유효하면 {@code true} 반환
+     * @see OnPlayerCommandPreprocess
+     */
+    public boolean onCommand() {
+        if (player.isOp())
+            return true;
+
+        if (commandCooldownTimestamp.isAfter(Timestamp.now())) {
+            sendMessageWarn("동작이 너무 빠릅니다.");
+            return false;
+        }
+
+        commandCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getCommandCooldown());
+
+        return true;
+    }
+
+    /**
      * 레벨 상승 시 효과를 재생한다.
      */
-    public void playLevelUpEffect() {
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GENERAL_SUCCESS, player);
-            sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", 8, 40, 30, 40);
+    void playLevelUpEffect() {
+        taskManager.add(new DelayTask(() -> {
+            sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
+            LEVEL_UP_SOUND.play(player);
         }, 100));
     }
 
     /**
-     * 티어 승급 시 효과를 재생한다.
+     * 티어 상승 시 효과를 재생한다.
      */
-    public void playTierUpEffect() {
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GAME_WIN, player);
-            sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), 8, 40, 30, 40);
+    void playTierUpEffect() {
+        taskManager.add(new DelayTask(() -> {
+            sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
+            TIER_UP_SOUND.play(player);
         }, 80));
     }
 
     /**
-     * 티어 강등 시 효과를 재생한다.
+     * 티어 하락 시 효과를 재생한다.
      */
-    public void playTierDownEffect() {
-        TaskUtil.addTask(this, new DelayTask(() -> {
-            SoundUtil.playNamedSound(NamedSound.GAME_LOSE, player);
-            sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), 8, 40, 30, 40);
+    void playTierDownEffect() {
+        taskManager.add(new DelayTask(() -> {
+            sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                    Timespan.ofSeconds(2));
+            TIER_DOWN_SOUND.play(player);
         }, 80));
     }
 
@@ -481,30 +650,30 @@ public final class User implements Disposable {
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정하고 스폰으로 이동시킨다.
      */
     public void reset() {
-        validate();
-
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
-        player.getInventory().clear();
         player.setExp(0);
         player.setLevel(0);
         player.setWalkSpeed(0.2F);
-        player.getActivePotionEffects().forEach((potionEffect ->
-                player.removePotionEffect(potionEffect.getType())));
-        Bukkit.getOnlinePlayers().forEach(target -> GlowUtil.removeGlowing(this.player, target));
+        player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
 
-        clearBossBar();
-        teleport(LocationUtil.getLobbyLocation());
-        isInFreeCombat = false;
+        gui.clear();
+        teleport(GeneralConfig.getConfig().getLobbyLocation());
+        quitFreeCombat();
+
+        getAllUsers().forEach(target -> {
+            removeGlowing(target.getPlayer());
+            target.removeGlowing(this.player);
+        });
 
         if (userData.isInitialized()) {
-            clearSidebar();
-            clearTabListItems();
+            sidebarManager.clear();
+            tabListManager.clearItems();
         }
 
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
-            combatUser.dispose();
+            combatUser.remove();
     }
 
     /**
@@ -518,12 +687,12 @@ public final class User implements Disposable {
     /**
      * 플레이어의 채팅창에 일반 메시지를 전송한다.
      *
-     * <p>'§r'을 사용하여 기본 색상으로 초기화할 수 있다.</p>
+     * <p>기본 색상은 흰색('§f')이며, '§r'을 사용하여 기본 색상으로 초기화할 수 있다.</p>
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font>World!</pre>
      * <pre><code>
-     * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §rWorld!");
      * </code></pre>
      *
@@ -537,14 +706,14 @@ public final class User implements Disposable {
     /**
      * 플레이어의 채팅창에 일반 메시지를 전송한다.
      *
-     * <p>'§r'을 사용하여 기본 색상으로 초기화할 수 있다.</p>
+     * <p>기본 색상은 흰색('§f')이며, '§r'을 사용하여 기본 색상으로 초기화할 수 있다.</p>
      *
      * <p>지정한 arguments의 n번째 인덱스가 메시지에 포함된 '{n}'을 치환한다.</p>
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font>World!</pre>
      * <pre><code>
-     * // <연두색>Hello, <흰색>World!
      * user.sendMessageInfo("§aHello, §r{0}!", "World");
      * </code></pre>
      *
@@ -559,12 +728,12 @@ public final class User implements Disposable {
     /**
      * 플레이어의 채팅창에 경고 메시지를 전송한다.
      *
-     * <p>'§r'을 사용하여 적용된 색상을 초기화할 수 있다.</p>
+     * <p>기본 색상은 빨간색('§c')이며, '§r'을 사용하여 적용된 색상을 초기화할 수 있다.</p>
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font><font color="red">World!</font></pre>
      * <pre><code>
-     * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §rWorld!");
      * </code></pre>
      *
@@ -579,14 +748,14 @@ public final class User implements Disposable {
     /**
      * 플레이어의 채팅창에 경고 메시지를 전송한다.
      *
-     * <p>'§r'을 사용하여 적용된 색상을 초기화할 수 있다.</p>
+     * <p>기본 색상은 빨간색('§c')이며, '§r'을 사용하여 적용된 색상을 초기화할 수 있다.</p>
      *
      * <p>지정한 arguments의 n번째 인덱스가 메시지에 포함된 '{n}'을 치환한다.</p>
      *
      * <p>Example:</p>
      *
+     * <pre><font color="lime">Hello, </font><font color="red">World!</font></pre>
      * <pre><code>
-     * // <연두색>Hello, <빨간색>World!
      * user.sendMessageWarn("§aHello, §r{0}!", "World");
      * </code></pre>
      *
@@ -603,18 +772,14 @@ public final class User implements Disposable {
     /**
      * 플레이어에게 액션바를 전송한다.
      *
-     * @param message       메시지
-     * @param overrideTicks 덮어쓰기 지속시간 (tick). 0 이상으로 지정하면 지속시간 동안 기존 액션바 출력을 무시함
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * <p>덮어쓰기 지속시간 동안 기본 액션바 출력을 무시한다.</p>
+     *
+     * @param message          메시지
+     * @param overrideDuration 덮어쓰기 지속시간
+     * @see User#sendActionBar(String)
      */
-    public void sendActionBar(@NonNull String message, long overrideTicks) {
-        if (overrideTicks < 0)
-            throw new IllegalArgumentException("'overrideTicks'가 0 이상이어야 함");
-
-        if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, ACTION_BAR_COOLDOWN_ID, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, ACTION_BAR_COOLDOWN_ID) > 0)
-            return;
+    public void sendActionBar(@NonNull String message, @NonNull Timespan overrideDuration) {
+        actionBarOverrideTimestamp = Timestamp.now().plus(overrideDuration);
 
         TextComponent actionBar = new TextComponent(message);
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, actionBar);
@@ -626,64 +791,69 @@ public final class User implements Disposable {
      * @param message 메시지
      */
     public void sendActionBar(@NonNull String message) {
-        sendActionBar(message, 0);
+        if (actionBarOverrideTimestamp.isAfter(Timestamp.now()))
+            return;
+
+        sendActionBar(message, Timespan.ZERO);
     }
 
     /**
      * 플레이어에게 경고 액션바를 전송한다.
      *
+     * <p>주로 특정 동작의 사용 금지 상태를 알리기 위해 사용한다.</p>
+     *
      * @param message 경고 메시지
      */
-    public void sendAlert(@NonNull String message) {
-        SoundUtil.playNamedSound(NamedSound.GENERAL_ALERT, player);
-        TaskUtil.addTask(this, new IntervalTask(i -> {
+    public void sendAlertActionBar(@NonNull String message) {
+        ALERT_SOUND.play(player);
+
+        taskManager.add(new IntervalTask(i -> {
             ChatColor color = ChatColor.YELLOW;
             if (i == 1)
                 color = ChatColor.GOLD;
             else if (i == 2)
                 color = ChatColor.RED;
 
-            sendActionBar(color + ChatColor.stripColor(message), 16);
-
-            return true;
+            sendActionBar(color + ChatColor.stripColor(message), Timespan.ofSeconds(0.8));
         }, 1, 3));
     }
 
     /**
      * 플레이어에게 타이틀을 전송한다.
      *
-     * @param title         제목
-     * @param subtitle      부제목
-     * @param fadeIn        나타나는 시간 (tick). 0 이상의 값
-     * @param stay          유지 시간 (tick). 0 이상의 값
-     * @param fadeOut       사라지는 시간 (tick). 0 이상의 값
-     * @param overrideTicks 덮어쓰기 지속시간 (tick). 0 이상으로 지정하면 지속시간 동안 기존 타이틀 출력을 무시함
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * <p>덮어쓰기 지속시간 동안 기본 타이틀 출력을 무시한다.</p>
+     *
+     * @param title            제목
+     * @param subtitle         부제목
+     * @param fadeInDuration   나타나는 시간
+     * @param stayDuration     유지 시간
+     * @param fadeOutDuration  사라지는 시간
+     * @param overrideDuration 덮어쓰기 지속시간
+     * @see User#sendTitle(String, String, Timespan, Timespan, Timespan)
      */
-    public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut, long overrideTicks) {
-        if (overrideTicks < 0 || fadeIn < 0 || stay < 0 || fadeOut < 0)
-            throw new IllegalArgumentException("'fadeIn', 'stay', 'fadeOut' 및 'overrideTicks'가 0 이상이어야 함");
+    public void sendTitle(@NonNull String title, @NonNull String subtitle, @NonNull Timespan fadeInDuration, @NonNull Timespan stayDuration,
+                          @NonNull Timespan fadeOutDuration, @NonNull Timespan overrideDuration) {
+        titleOverrideTimestamp = Timestamp.now().plus(overrideDuration);
 
-        if (overrideTicks > 0)
-            CooldownUtil.setCooldown(this, TITLE_COOLDOWN_ID, overrideTicks);
-        else if (CooldownUtil.getCooldown(this, TITLE_COOLDOWN_ID) > 0)
-            return;
-
-        player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+        player.sendTitle(title, subtitle, (int) Math.min(Integer.MAX_VALUE, fadeInDuration.toTicks()),
+                (int) Math.min(Integer.MAX_VALUE, stayDuration.toTicks()), (int) Math.min(Integer.MAX_VALUE, fadeOutDuration.toTicks()));
     }
 
     /**
      * 플레이어에게 타이틀을 전송한다.
      *
-     * @param title    제목
-     * @param subtitle 부제목
-     * @param fadeIn   나타나는 시간 (tick). 0 이상의 값
-     * @param stay     유지 시간 (tick). 0 이상의 값
-     * @param fadeOut  사라지는 시간 (tick). 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param title           제목
+     * @param subtitle        부제목
+     * @param fadeInDuration  나타나는 시간
+     * @param stayDuration    유지 시간
+     * @param fadeOutDuration 사라지는 시간
      */
-    public void sendTitle(@NonNull String title, @NonNull String subtitle, int fadeIn, int stay, int fadeOut) {
-        sendTitle(title, subtitle, fadeIn, stay, fadeOut, 0);
+    public void sendTitle(@NonNull String title, @NonNull String subtitle, @NonNull Timespan fadeInDuration, @NonNull Timespan stayDuration,
+                          @NonNull Timespan fadeOutDuration) {
+        if (titleOverrideTimestamp.isAfter(Timestamp.now()))
+            return;
+
+        sendTitle(title, subtitle, fadeInDuration, stayDuration, fadeOutDuration, Timespan.ZERO);
     }
 
     /**
@@ -696,17 +866,17 @@ public final class User implements Disposable {
      */
     public void sendTypewriterTitle(@NonNull String prefix, @NonNull String message) {
         int delay = 0;
-        StringBuilder text = new StringBuilder();
+        StringBuilder text = new StringBuilder(prefix + " §f");
 
         for (int i = 0; i < message.length(); i++) {
             char nextChar = message.charAt(i);
 
-            TaskUtil.addTask(this, new DelayTask(() -> {
+            taskManager.add(new DelayTask(() -> {
                 text.append(nextChar);
-                CooldownUtil.setCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID, 50);
+                typewriterTitleTimestamp = Timestamp.now().plus(Timespan.ofSeconds(2.5));
 
-                sendTitle("", prefix + " §f" + text, 0, 40, 10);
-                SoundUtil.playNamedSound(NamedSound.TYPEWRITER_TITLE, player);
+                sendTitle("", text.toString(), Timespan.ZERO, Timespan.ofSeconds(2), Timespan.ofSeconds(0.5));
+                TYPEWRITER_TITLE_SOUND.play(player);
             }, delay));
 
             if (nextChar == '.' || nextChar == ',')
@@ -722,244 +892,53 @@ public final class User implements Disposable {
      * 플레이어의 타자기 효과 타이틀이 출력 중인지 확인한다.
      *
      * @return 출력 중이면 {@code true} 반환
+     * @see User#sendTypewriterTitle(String, String)
      */
     public boolean isTypewriterTitlePrinting() {
-        return CooldownUtil.getCooldown(this, TYPEWRITER_TITLE_COOLDOWN_ID) > 0;
+        return typewriterTitleTimestamp.isAfter(Timestamp.now());
     }
 
     /**
-     * 플레이어의 사이드바 이름을 지정한다.
+     * 플레이어에게 지정한 엔티티를 지속시간동안 발광 상태로 표시한다.
      *
-     * @param name 사이드바 이름
+     * @param target   발광 효과를 적용할 엔티티
+     * @param color    색상
+     * @param duration 지속시간
      */
-    public void setSidebarName(@NonNull String name) {
-        Validate.notNull(sidebar).setName(name);
+    public void setGlowing(@NonNull Entity target, @NonNull ChatColor color, @NonNull Timespan duration) {
+        glowingInfoMap.computeIfAbsent(target, k -> new GlowingInfo(this, target)).setGlowing(color, duration);
     }
 
     /**
-     * 플레이어의 사이드바 내용을 업데이트한다.
+     * 플레이어에게 지정한 엔티티를 발광 상태로 표시한다.
      *
-     * @param line    줄 번호. 0~14 사이의 값
-     * @param content 내용
-     * @throws IndexOutOfBoundsException {@code line}이 유효 범위를 초과하면 발생
+     * @param target 발광 효과를 적용할 엔티티
+     * @param color  색상
      */
-    public void editSidebar(int line, @NonNull String content) {
-        Validate.notNull(sidebar);
-        if (line < 0 || line > 14)
-            throw new IndexOutOfBoundsException("'line'이 0에서 14 사이여야 함");
-
-        ChatColor[] chatColors = ChatColor.values();
-        sidebar.set(content.isEmpty() ? String.valueOf(chatColors[line]) : content, 14 - line);
+    public void setGlowing(@NonNull Entity target, @NonNull ChatColor color) {
+        setGlowing(target, color, Timespan.MAX);
     }
 
     /**
-     * 플레이어의 사이드바 내용을 업데이트한다.
+     * 지정한 엔티티가 발광 상태인지 확인한다.
      *
-     * @param contents 내용 목록
-     * @throws IndexOutOfBoundsException {@code contents}의 길이가 15를 초과하면 발생
+     * @param target 확인할 엔티티
+     * @return 플레이어에게 발광 상태면 {@code true} 반환
      */
-    public void editSidebar(@NonNull String @NonNull ... contents) {
-        Validate.notNull(sidebar);
-        if (contents.length > 15)
-            throw new IndexOutOfBoundsException("'contents'의 길이가 16 미만이어야 함");
-
-        sidebar.setAll(contents);
+    public boolean isGlowing(@NonNull Entity target) {
+        GlowingInfo glowingInfo = glowingInfoMap.get(target);
+        return glowingInfo != null && glowingInfo.expiration.isAfter(Timestamp.now());
     }
 
     /**
-     * 플레이어의 사이드바 내용을 초기화한다.
-     */
-    public void clearSidebar() {
-        Validate.notNull(sidebar).clear();
-    }
-
-    /**
-     * 플레이어의 탭리스트 헤더(상단부)의 내용을 지정한다.
+     * 지정한 엔티티의 발광 효과를 제거한다.
      *
-     * @param content 내용
+     * @param target 발광 효과가 적용된 엔티티
      */
-    public void setTabListHeader(@NonNull String content) {
-        Validate.notNull(tabList).setHeader(content);
-    }
-
-    /**
-     * 플레이어의 탭리스트 푸터(하단부)의 내용을 지정한다.
-     *
-     * @param content 내용
-     */
-    public void setTabListFooter(@NonNull String content) {
-        Validate.notNull(tabList).setFooter(content);
-    }
-
-    /**
-     * 플레이어의 탭리스트에서 지정한 항목을 설정한다.
-     *
-     * @param column  열 번호. 0~3 사이의 값
-     * @param row     행 번호. 0~19 사이의 값
-     * @param content 내용
-     * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
-     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
-     */
-    public void setTabListItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
-        Validate.notNull(tabList);
-        validateColumnRow(column, row);
-
-        tabList.set(column, row, skin == null ? new TextTabItem(content, -1) : new TextTabItem(content, -1, skin));
-    }
-
-    /**
-     * 플레이어의 탭리스트에서 지정한 항목을 설정한다.
-     *
-     * @param column  열 번호. 0~3 사이의 값
-     * @param row     행 번호. 0~19 사이의 값
-     * @param content 내용
-     * @param user    표시할 플레이어
-     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
-     */
-    public void setTabListItem(int column, int row, @NonNull String content, @NonNull User user) {
-        Validate.notNull(tabList);
-        validateColumnRow(column, row);
-
-        int realPing;
-        if (user.getPing() < 40)
-            realPing = 0;
-        else if (user.getPing() < 70)
-            realPing = 150;
-        else if (user.getPing() < 100)
-            realPing = 300;
-        else if (user.getPing() < 130)
-            realPing = 600;
-        else
-            realPing = 1000;
-
-        tabList.set(column, row, new TextTabItem(content, realPing, Skins.getPlayer(user.getPlayer())));
-    }
-
-    /**
-     * 플레이어의 탭리스트에서 지정한 항목을 제거한다.
-     *
-     * @param column 열 번호. 0~3 사이의 값
-     * @param row    행 번호. 0~19 사이의 값
-     * @throws IndexOutOfBoundsException {@code column} 또는 {@code row}가 유효 범위를 초과하면 발생
-     */
-    public void removeTabListItem(int column, int row) {
-        Validate.notNull(tabList);
-        validateColumnRow(column, row);
-
-        tabList.set(column, row, new TextTabItem("", -1));
-    }
-
-    /**
-     * 플레이어의 탭리스트에서 모든 항목을 제거한다.
-     */
-    public void clearTabListItems() {
-        Validate.notNull(tabList);
-
-        for (int i = 0; i < 80; i++)
-            tabList.set(i, new TextTabItem("", -1));
-    }
-
-    /**
-     * 플레이어의 탭리스트 변경 사항을 적용한다.
-     *
-     * <p>탭리스트 내용 변경 후 호출해야 한다.</p>
-     */
-    public void applyTabList() {
-        Validate.notNull(tabList);
-
-        tabList.batchUpdate();
-    }
-
-    /**
-     * 플레이어에게 보스바를 표시한다.
-     *
-     * <p>이미 해당 ID의 보스바가 존재할 경우 덮어쓴다.</p>
-     *
-     * @param id       보스바 ID
-     * @param message  내용
-     * @param color    막대 색
-     * @param style    막대 스타일
-     * @param progress 진행률. 0~1 사이의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public void addBossBar(@NonNull String id, @NonNull String message, @NonNull BarColor color, @NonNull WrapperPlayServerBoss.BarStyle style,
-                           double progress) {
-        if (progress < 0 || progress > 1)
-            throw new IllegalArgumentException("'progress'가 0에서 1 사이여야 함");
-
-        UUID uuid = bossBarMap.getOrDefault(id, UUID.randomUUID());
-
-        if (bossBarMap.get(id) == null) {
-            WrapperPlayServerBoss packet = new WrapperPlayServerBoss();
-
-            packet.setUniqueId(uuid);
-            packet.setAction(WrapperPlayServerBoss.Action.ADD);
-            packet.setTitle(WrappedChatComponent.fromText(message));
-            packet.setColor(color);
-            packet.setStyle(style);
-            packet.setHealth((float) progress);
-
-            packet.sendPacket(player);
-
-            bossBarMap.put(id, uuid);
-        } else {
-            WrapperPlayServerBoss packet1 = new WrapperPlayServerBoss();
-            WrapperPlayServerBoss packet2 = new WrapperPlayServerBoss();
-            WrapperPlayServerBoss packet3 = new WrapperPlayServerBoss();
-            packet1.setUniqueId(uuid);
-            packet2.setUniqueId(uuid);
-            packet3.setUniqueId(uuid);
-
-            packet1.setAction(WrapperPlayServerBoss.Action.UPDATE_NAME);
-            packet1.setTitle(WrappedChatComponent.fromText(message));
-
-            packet2.setAction(WrapperPlayServerBoss.Action.UPDATE_STYLE);
-            packet2.setColor(color);
-            packet2.setStyle(style);
-
-            packet3.setAction(WrapperPlayServerBoss.Action.UPDATE_PCT);
-            packet3.setHealth((float) progress);
-
-            packet1.sendPacket(player);
-            packet2.sendPacket(player);
-            packet3.sendPacket(player);
-        }
-    }
-
-    /**
-     * 플레이어의 보스바를 제거한다.
-     *
-     * @param id 보스바 ID
-     */
-    public void removeBossBar(@NonNull String id) {
-        UUID uuid = bossBarMap.get(id);
-        if (uuid == null)
-            return;
-
-        WrapperPlayServerBoss packet = new WrapperPlayServerBoss();
-
-        packet.setAction(WrapperPlayServerBoss.Action.REMOVE);
-        packet.setUniqueId(uuid);
-
-        packet.sendPacket(player);
-
-        bossBarMap.remove(id, uuid);
-    }
-
-    /**
-     * 플레이어의 모든 보스바를 제거한다.
-     */
-    public void clearBossBar() {
-        bossBarMap.forEach((id, uuid) -> {
-            WrapperPlayServerBoss packet = new WrapperPlayServerBoss();
-
-            packet.setAction(WrapperPlayServerBoss.Action.REMOVE);
-            packet.setUniqueId(uuid);
-
-            packet.sendPacket(player);
-        });
-
-        bossBarMap.clear();
+    public void removeGlowing(@NonNull Entity target) {
+        GlowingInfo glowingInfo = glowingInfoMap.remove(target);
+        if (glowingInfo != null)
+            glowingInfo.removeGlowing();
     }
 
     /**
@@ -970,8 +949,6 @@ public final class User implements Disposable {
      * @param location 이동할 위치
      */
     public void teleport(@NonNull Location location) {
-        validate();
-
         if (nameTagHider == null)
             player.teleport(location);
         else {
@@ -983,15 +960,385 @@ public final class User implements Disposable {
     }
 
     /**
-     * 열 및 행 인자값이 유효하지 않으면 예외를 발생시킨다.
+     * 플레이어를 지정한 게임 방에 입장시킨다.
      *
-     * @param column 열 번호
-     * @param row    행 번호
+     * @param gameRoom 대상 게임 방
      */
-    private void validateColumnRow(int column, int row) {
-        if (column < 0 || column > 3)
-            throw new IndexOutOfBoundsException("'column'이 0에서 3 사이여야 함");
-        if (row < 0 || row > 19)
-            throw new IndexOutOfBoundsException("'row'가 0에서 19 사이여야 함");
+    public void joinGame(@NonNull GameRoom gameRoom) {
+        if (this.gameRoom != null || !gameRoom.canJoin())
+            return;
+
+        this.gameRoom = gameRoom;
+        gameRoom.onJoin(this);
+    }
+
+    /**
+     * 플레이어를 현재 입장한 게임 방에서 퇴장시킨다.
+     */
+    public void quitGame() {
+        if (gameRoom == null)
+            return;
+
+        gameRoom.onQuit(this);
+        gameRoom = null;
+    }
+
+    /**
+     * 플레이어를 자유 전투에 입장시킨다.
+     */
+    public void startFreeCombat() {
+        if (isInFreeCombat || GameUser.fromUser(this) != null)
+            return;
+
+        isInFreeCombat = true;
+        FreeCombat.getInstance().onStart(this);
+    }
+
+    /**
+     * 플레이어를 자유 전투에서 퇴장시킨다.
+     */
+    public void quitFreeCombat() {
+        if (!isInFreeCombat)
+            return;
+
+        isInFreeCombat = false;
+
+        CombatUser combatUser = CombatUser.fromUser(this);
+        if (combatUser != null)
+            combatUser.remove();
+    }
+
+    /**
+     * 플레이어의 스킨을 변경한다.
+     *
+     * @param skinName 적용할 스킨 이름
+     */
+    @NonNull
+    public AsyncTask<Void> applySkin(@NonNull String skinName) {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), skinName);
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
+                onError.accept(ex);
+            }
+        });
+    }
+
+    /**
+     * 플레이어의 스킨을 초기화한다.
+     */
+    @NonNull
+    public AsyncTask<Void> resetSkin() {
+        return new AsyncTask<>((onFinish, onError) -> {
+            try {
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), player.getName());
+                onFinish.accept(null);
+            } catch (Exception ex) {
+                ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
+                onError.accept(ex);
+            }
+        });
+    }
+
+    /**
+     * 발광 효과 정보 클래스.
+     */
+    private static final class GlowingInfo {
+        /** 발광 효과의 팀 패킷 이름 */
+        private static final String GLOWING_TEAM_PACKET_NAME = "Glowing";
+
+        /** 플레이어 */
+        private final Player player;
+        /** 발광 효과 적용 엔티티 */
+        private final Entity target;
+        /** 틱 작업을 처리하는 태스크 */
+        private final IntervalTask onTickTask;
+        /** 색상 */
+        private ChatColor color;
+        /** 종료 시점 */
+        private Timestamp expiration = Timestamp.now();
+
+        private GlowingInfo(@NonNull User user, @NonNull Entity target) {
+            this.player = user.getPlayer();
+            this.target = target;
+            this.onTickTask = new IntervalTask(i -> {
+                if (!target.isValid() || expiration.isBefore(Timestamp.now()))
+                    return false;
+
+                if (i % 4 == 0)
+                    sendGlowingPacket(true);
+
+                return true;
+            }, () -> user.removeGlowing(target), 1);
+        }
+
+        /**
+         * 플레이어에게 엔티티를 지속시간동안 발광 상태로 표시한다.
+         *
+         * @param color    색상
+         * @param duration 지속시간
+         */
+        private void setGlowing(@NonNull ChatColor color, @NonNull Timespan duration) {
+            this.color = color;
+
+            sendRemoveTeamPacket();
+            sendAddTeamPacket();
+
+            if (expiration.isBefore(Timestamp.now()) || duration.compareTo(Timestamp.now().until(expiration)) > 0)
+                expiration = Timestamp.now().plus(duration);
+        }
+
+        /**
+         * 엔티티의 발광 효과를 제거한다.
+         */
+        public void removeGlowing() {
+            sendRemoveTeamPacket();
+            sendGlowingPacket(false);
+
+            onTickTask.stop();
+        }
+
+        /**
+         * 플레이어에게 발광 효과 패킷을 전송한다.
+         *
+         * @param isEnabled 활성화 여부
+         */
+        private void sendGlowingPacket(boolean isEnabled) {
+            WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata();
+
+            packet.setEntityID(target.getEntityId());
+            WrappedDataWatcher dw = WrappedDataWatcher.getEntityWatcher(target).deepClone();
+            dw.setObject(0, (byte) (isEnabled ? dw.getByte(0) | 1 << 6 : dw.getByte(0) & ~(1 << 6)));
+            packet.setMetadata(dw.getWatchableObjects());
+
+            packet.sendPacket(player);
+        }
+
+        /**
+         * 플레이어에게 팀 추가 패킷을 전송한다.
+         */
+        private void sendAddTeamPacket() {
+            WrapperPlayServerScoreboardTeam packet1 = new WrapperPlayServerScoreboardTeam();
+            WrapperPlayServerScoreboardTeam packet2 = new WrapperPlayServerScoreboardTeam();
+            WrapperPlayServerScoreboardTeam packet3 = new WrapperPlayServerScoreboardTeam();
+
+            packet1.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+            packet2.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+            packet3.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+
+            packet1.setMode(0);
+
+            packet2.setMode(2);
+            packet2.setNameTagVisibility("never");
+            packet2.setCollisionRule("never");
+            packet2.setPrefix(color + "");
+            packet2.setColor(color.ordinal());
+
+            packet3.setMode(3);
+            packet3.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
+
+            packet1.sendPacket(player);
+            packet2.sendPacket(player);
+            packet3.sendPacket(player);
+        }
+
+        /**
+         * 플레이어에게 팀 제거 패킷을 전송한다.
+         */
+        private void sendRemoveTeamPacket() {
+            WrapperPlayServerScoreboardTeam packet = new WrapperPlayServerScoreboardTeam();
+
+            packet.setMode(4);
+            packet.setName(GLOWING_TEAM_PACKET_NAME + color.ordinal());
+            packet.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
+
+            packet.sendPacket(player);
+        }
+    }
+
+    /**
+     * 플레이어의 탭리스트 상태를 관리하는 클래스.
+     */
+    public static final class TabListManager {
+        /** 탭리스트의 공백 항목 */
+        private static final TextTabItem BLANK_TAB_ITEM = new TextTabItem("", -1);
+        /** 탭리스트 인스턴스 */
+        private final TableTabList tabList;
+
+        private TabListManager(Player player) {
+            TabList tableTabList = DMGR.getTabbed().getTabList(player);
+            this.tabList = tableTabList == null ? DMGR.getTabbed().newTableTabList(player) : (TableTabList) tableTabList;
+
+            this.tabList.setBatchEnabled(true);
+            clearItems();
+        }
+
+        private static void validateColumnRow(int column, int row) {
+            Validate.inclusiveBetween(0, 3, column, "3 >= column >= 0 (%d)", column);
+            Validate.inclusiveBetween(0, 19, row, "19 >= row >= 0 (%d)", row);
+        }
+
+        /**
+         * 탭리스트 헤더(상단부)의 내용을 지정한다.
+         *
+         * @param content 내용
+         */
+        public void setHeader(@NonNull String content) {
+            tabList.setHeader(content);
+        }
+
+        /**
+         * 탭리스트 푸터(하단부)의 내용을 지정한다.
+         *
+         * @param content 내용
+         */
+        public void setFooter(@NonNull String content) {
+            tabList.setFooter(content);
+        }
+
+        /**
+         * 지정한 번호의 항목을 설정한다.
+         *
+         * @param column  열 번호. 0~3 사이의 값
+         * @param row     행 번호. 0~19 사이의 값
+         * @param content 내용
+         * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+         */
+        public void setItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
+            validateColumnRow(column, row);
+
+            tabList.set(column, row, skin == null
+                    ? new TextTabItem(content, -1)
+                    : new TextTabItem(content, -1, skin));
+        }
+
+        /**
+         * 지정한 번호의 항목을 설정한다.
+         *
+         * @param column  열 번호. 0~3 사이의 값
+         * @param row     행 번호. 0~19 사이의 값
+         * @param content 내용
+         * @param user    표시할 플레이어
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+         */
+        public void setItem(int column, int row, @NonNull String content, @NonNull User user) {
+            validateColumnRow(column, row);
+
+            int realPing;
+            if (user.ping < 50)
+                realPing = 0;
+            else if (user.ping < 70)
+                realPing = 150;
+            else if (user.ping < 100)
+                realPing = 300;
+            else if (user.ping < 130)
+                realPing = 600;
+            else
+                realPing = 1000;
+
+            tabList.set(column, row, new TextTabItem(content, realPing, Skins.getPlayer(user.getPlayer())));
+        }
+
+        /**
+         * 지정한 번호의 항목을 제거한다.
+         *
+         * @param column 열 번호. 0~3 사이의 값
+         * @param row    행 번호. 0~19 사이의 값
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+         */
+        public void removeItem(int column, int row) {
+            validateColumnRow(column, row);
+            tabList.set(column, row, BLANK_TAB_ITEM);
+        }
+
+        /**
+         * 탭리스트의 모든 항목을 제거한다.
+         */
+        public void clearItems() {
+            for (int i = 0; i < 80; i++)
+                tabList.set(i, BLANK_TAB_ITEM);
+        }
+
+        /**
+         * 탭리스트 변경 사항을 업데이트한다.
+         *
+         * <p>탭리스트 내용 변경 후 호출해야 한다.</p>
+         */
+        private void update() {
+            tabList.batchUpdate();
+        }
+
+        /**
+         * 탭리스트를 제거한다.
+         */
+        private void delete() {
+            tabList.disable();
+        }
+    }
+
+    /**
+     * 플레이어의 사이드바 상태를 관리하는 클래스.
+     */
+    public static final class SidebarManager {
+        /** 사이드바 인스턴스 */
+        private final BPlayerBoard sidebar;
+
+        private SidebarManager(Player player) {
+            this.sidebar = new BPlayerBoard(player, "");
+            clear();
+        }
+
+        /**
+         * 사이드바의 이름을 지정한다.
+         *
+         * @param name 사이드바 이름
+         */
+        public void setName(@NonNull String name) {
+            sidebar.setName(name);
+        }
+
+        /**
+         * 사이드바의 내용을 설정한다.
+         *
+         * @param line    줄 번호. 0~14 사이의 값
+         * @param content 내용
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+         */
+        public void set(int line, @NonNull String content) {
+            Validate.inclusiveBetween(0, 14, line, "14 >= line >= 0 (%d)", line);
+
+            ChatColor[] chatColors = ChatColor.values();
+            sidebar.set(chatColors[line] + content, 14 - line);
+        }
+
+        /**
+         * 사이드바의 전체 내용을 설정한다.
+         *
+         * @param contents 내용 목록
+         * @throws IllegalArgumentException {@code contents}의 길이가 15를 초과하면 발생
+         */
+        public void setAll(@NonNull String @NonNull ... contents) {
+            Validate.inclusiveBetween(0, 15, contents.length, "contents.length <= 15 (%d)", contents.length);
+
+            for (int i = 0; i < contents.length; i++)
+                set(i, contents[i]);
+        }
+
+        /**
+         * 사이드바의 내용을 초기화한다.
+         */
+        public void clear() {
+            sidebar.clear();
+        }
+
+        /**
+         * 사이드바를 제거한다.
+         */
+        private void delete() {
+            sidebar.delete();
+        }
     }
 }

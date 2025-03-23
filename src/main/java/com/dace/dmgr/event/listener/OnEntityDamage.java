@@ -1,18 +1,26 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.event.EventListener;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public final class OnEntityDamage implements Listener {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OnEntityDamage extends EventListener<EntityDamageEvent> {
+    @Getter
+    private static final OnEntityDamage instance = new OnEntityDamage();
+
+    @Override
     @EventHandler
-    public static void event(EntityDamageEvent event) {
+    protected void onEvent(@NonNull EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        CombatEntity combatEntity = CombatEntity.fromEntity(entity);
-        if (combatEntity == null)
+        if (CombatEntity.fromEntity(entity) == null)
             return;
 
         switch (event.getCause()) {
