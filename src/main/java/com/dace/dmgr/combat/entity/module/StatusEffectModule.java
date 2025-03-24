@@ -258,7 +258,7 @@ public final class StatusEffectModule {
             statusEffect.onStart(combatEntity, provider);
 
             this.onTickTask = new IntervalTask(i -> {
-                if (this.expiration.isBefore(Timestamp.now()))
+                if (this.expiration.isBefore(Timestamp.now()) || provider.isRemoved())
                     return false;
 
                 statusEffect.onTick(combatEntity, provider, i);
