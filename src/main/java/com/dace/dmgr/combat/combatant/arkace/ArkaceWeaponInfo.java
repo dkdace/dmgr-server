@@ -92,11 +92,6 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.scarlight_1").volume(3).pitch(1).build(),
                 SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
-        /** 사용 (궁극기) */
-        public static final SoundEffect USE_ULT = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
-                SoundEffect.SoundInfo.builder("random.energy").volume(4).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
         /** 재장전 */
         public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
                 .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.6).build())

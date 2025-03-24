@@ -75,7 +75,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shot();
-                    ArkaceWeaponInfo.SOUND.USE_ULT.play(loc);
+                    ArkaceUltInfo.SOUND.SHOOT.play(loc);
                 }
 
                 break;
@@ -170,7 +170,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 if (!isUlt)
                     damage = CombatUtil.getDistantDamage(damage, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
 
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, isUlt);
+                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, !isUlt);
                 return false;
             });
         }
