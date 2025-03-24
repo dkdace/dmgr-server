@@ -156,7 +156,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     private final class ChedUltProjectile extends Projectile<Damageable> {
         private ChedUltProjectile() {
-            super(combatUser, ChedUltInfo.VELOCITY,
+            super(ChedUlt.this, ChedUltInfo.VELOCITY,
                     CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
                             combatEntity instanceof CombatUser || combatEntity instanceof Dummy),
                     Option.builder().size(ChedUltInfo.SIZE).build());

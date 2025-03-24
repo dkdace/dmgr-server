@@ -145,7 +145,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     private final class InfernoWeaponRProjectile extends Projectile<Damageable> {
         private InfernoWeaponRProjectile() {
-            super(combatUser, InfernoWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(InfernoWeapon.this, InfernoWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).build());
         }
 
@@ -187,7 +187,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     private final class InfernoWeaponLProjectile extends Projectile<Damageable> {
         private InfernoWeaponLProjectile() {
-            super(combatUser, InfernoWeaponInfo.FIREBALL.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(InfernoWeapon.this, InfernoWeaponInfo.FIREBALL.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(InfernoWeaponInfo.FIREBALL.SIZE).maxDistance(InfernoWeaponInfo.FIREBALL.DISTANCE).build());
         }
 

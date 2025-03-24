@@ -135,7 +135,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
-            super(combatUser, ChedA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature),
+            super(ChedA3.this, ChedA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature),
                     Option.builder().size(ChedA3Info.SIZE).build());
         }
 

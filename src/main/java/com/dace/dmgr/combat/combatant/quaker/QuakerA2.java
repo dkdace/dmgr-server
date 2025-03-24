@@ -191,7 +191,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerA2Projectile(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, QuakerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerA2.this, QuakerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerA2Info.SIZE).maxDistance(QuakerA2Info.DISTANCE).build());
             this.targets = targets;
         }

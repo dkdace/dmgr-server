@@ -82,7 +82,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
     private final class MagrittaA1Projectile extends Projectile<Damageable> {
         private MagrittaA1Projectile() {
-            super(combatUser, MagrittaA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(MagrittaA1.this, MagrittaA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override

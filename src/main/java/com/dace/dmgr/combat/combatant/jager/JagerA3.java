@@ -158,7 +158,7 @@ public final class JagerA3 extends ActiveSkill {
 
     private final class JagerA3Projectile extends BouncingProjectile<Damageable> {
         private JagerA3Projectile() {
-            super(combatUser, JagerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerA3.this, JagerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timestamp.now().until(explodeTimestamp)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }

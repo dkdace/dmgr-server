@@ -42,7 +42,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
     private final class VellionWeaponProjectile extends Projectile<Damageable> {
         private VellionWeaponProjectile() {
-            super(combatUser, VellionWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(VellionWeapon.this, VellionWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(VellionWeaponInfo.SIZE).maxDistance(VellionWeaponInfo.DISTANCE).build());
         }
 

@@ -119,7 +119,7 @@ public final class ChedA1 extends StackableSkill {
 
     private final class ChedA1Projectile extends Projectile<Damageable> {
         private ChedA1Projectile() {
-            super(combatUser, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedA1.this, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override

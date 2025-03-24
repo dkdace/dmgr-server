@@ -88,7 +88,7 @@ public final class ChedWeapon extends AbstractWeapon {
         private final double power;
 
         private ChedWeaponProjectile(double power) {
-            super(combatUser, (int) (power * ChedWeaponInfo.MAX_VELOCITY), CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedWeapon.this, (int) (power * ChedWeaponInfo.MAX_VELOCITY), CombatUtil.EntityCondition.enemy(combatUser));
             this.power = power;
         }
 
