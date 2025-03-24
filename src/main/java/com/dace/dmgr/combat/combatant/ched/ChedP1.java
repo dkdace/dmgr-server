@@ -87,7 +87,12 @@ public final class ChedP1 extends AbstractSkill {
         ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
         weapon.setVisible(false);
 
-        float yaw = combatUser.getEntity().getEyeLocation().getYaw();
+        Location location = combatUser.getEntity().getEyeLocation();
+        double distance = location.distance(combatUser.getEntity().getTargetBlock(null, 1).getLocation());
+        if (distance < 1)
+            combatUser.getMoveModule().teleport(LocationUtil.getLocationFromOffset(combatUser.getLocation(), 0, 0, -1 + distance));
+
+        float yaw = location.getYaw();
 
         addActionTask(new IntervalTask(i -> {
             if (combatUser.getMoveModule().isKnockbacked())
