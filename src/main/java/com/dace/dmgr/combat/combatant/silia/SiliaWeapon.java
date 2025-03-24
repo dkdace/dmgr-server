@@ -127,7 +127,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     private final class SiliaWeaponProjectile extends Projectile<Damageable> {
         private SiliaWeaponProjectile() {
-            super(combatUser, SiliaWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(SiliaWeapon.this, SiliaWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(SiliaWeaponInfo.SIZE).maxDistance(SiliaWeaponInfo.DISTANCE).build());
         }
 

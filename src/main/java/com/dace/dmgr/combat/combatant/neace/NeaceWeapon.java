@@ -133,7 +133,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     private final class NeaceWeaponLProjectile extends Projectile<Damageable> {
         private NeaceWeaponLProjectile() {
-            super(combatUser, NeaceWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(NeaceWeapon.this, NeaceWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(NeaceWeaponInfo.SIZE).maxDistance(NeaceWeaponInfo.DISTANCE).build());
         }
 

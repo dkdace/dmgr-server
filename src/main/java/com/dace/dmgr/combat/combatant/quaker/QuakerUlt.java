@@ -124,7 +124,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerUltProjectile(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, QuakerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerUltInfo.SIZE).maxDistance(QuakerUltInfo.DISTANCE).build());
             this.targets = targets;
         }

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
+import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Healer;
@@ -13,6 +14,7 @@ import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.IntStream;
 
@@ -26,12 +28,40 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
     private final int loopCount;
     /** 투사체가 유지되는 시간 */
     private final Timespan duration;
+    /** 발사자가 사용한 동작 */
+    @Nullable
+    private final Action action;
     /** 피해 증가량 */
     @Getter
     private final double damageIncrement;
     /** 치유 증가량 */
     @Getter
     private final double healIncrement;
+
+    /**
+     * 투사체 인스턴스를 생성한다.
+     *
+     * <p>투사체의 선택적 옵션은 {@link Option}을 통해 전달받는다.</p>
+     *
+     * @param shooter         발사자
+     * @param action          발사자가 사용한 동작
+     * @param speed           투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param entityCondition 대상 엔티티를 찾는 조건
+     * @param option          투사체의 선택적 옵션
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see Option
+     */
+    Projectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+               @NonNull Option option) {
+        super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
+        Validate.isTrue(speed >= 0, "speed >= 0 (%d)", speed);
+
+        this.duration = option.duration;
+        this.loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
+        this.action = action;
+        this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
+        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
+    }
 
     /**
      * 투사체 인스턴스를 생성한다.
@@ -46,13 +76,23 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @see Option
      */
     protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
-        super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
-        Validate.isTrue(speed >= 0, "speed >= 0 (%d)", speed);
+        this(shooter, null, speed, entityCondition, option);
+    }
 
-        this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
-        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
-        this.duration = option.duration;
-        this.loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
+    /**
+     * 투사체 인스턴스를 생성한다.
+     *
+     * <p>투사체의 선택적 옵션은 {@link Option}을 통해 전달받는다.</p>
+     *
+     * @param action          발사자가 사용한 동작
+     * @param speed           투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param entityCondition 대상 엔티티를 찾는 조건
+     * @param option          투사체의 선택적 옵션
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @see Option
+     */
+    protected Projectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
+        this(action.getCombatUser(), action, speed, entityCondition, option);
     }
 
     /**
@@ -64,12 +104,24 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
-        this(shooter, speed, entityCondition, Option.builder().build());
+        this(shooter, null, speed, entityCondition, Option.builder().build());
+    }
+
+    /**
+     * 투사체 인스턴스를 생성한다.
+     *
+     * @param action          발사자가 사용한 동작
+     * @param speed           투사체의 속력. (단위: 블록/s). 0 이상의 값
+     * @param entityCondition 대상 엔티티를 찾는 조건
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    protected Projectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+        this(action.getCombatUser(), action, speed, entityCondition, Option.builder().build());
     }
 
     @Override
     final void onShot() {
-        new IntervalTask(i -> {
+        IntervalTask onTickTask = new IntervalTask(i -> {
             for (int j = 0; j < loopCount; j++) {
                 next();
                 if (isDestroyed())
@@ -81,6 +133,9 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
             if (!isDestroyed())
                 destroy();
         }, 1);
+
+        if (action != null)
+            action.addTask(onTickTask);
     }
 
     /**

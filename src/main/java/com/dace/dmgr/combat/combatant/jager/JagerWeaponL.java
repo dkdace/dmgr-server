@@ -170,7 +170,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     private final class JagerWeaponLProjectile extends Projectile<Damageable> {
         private JagerWeaponLProjectile() {
-            super(combatUser, JagerWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerWeaponL.this, JagerWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().maxDistance(JagerWeaponInfo.DISTANCE).build());
         }
 

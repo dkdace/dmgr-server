@@ -63,7 +63,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
     private final class ArkaceA1Projectile extends Projectile<Damageable> {
         private ArkaceA1Projectile() {
-            super(combatUser, ArkaceA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ArkaceA1.this, ArkaceA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override

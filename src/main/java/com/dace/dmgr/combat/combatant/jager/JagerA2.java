@@ -82,7 +82,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
     private final class JagerA2Projectile extends BouncingProjectile<Damageable> {
         private JagerA2Projectile() {
-            super(combatUser, JagerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerA2.this, JagerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }

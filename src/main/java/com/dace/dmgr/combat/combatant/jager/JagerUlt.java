@@ -89,7 +89,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
-            super(combatUser, JagerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerUlt.this, JagerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }

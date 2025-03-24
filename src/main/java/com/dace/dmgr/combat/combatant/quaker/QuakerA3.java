@@ -132,7 +132,7 @@ public final class QuakerA3 extends ActiveSkill {
         private final HashSet<Damageable> targets = new HashSet<>();
 
         private QuakerA3Projectile() {
-            super(combatUser, QuakerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerA3.this, QuakerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerA3Info.SIZE).maxDistance(QuakerA3Info.DISTANCE).build());
         }
 

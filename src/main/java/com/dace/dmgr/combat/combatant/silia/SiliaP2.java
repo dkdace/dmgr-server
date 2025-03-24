@@ -59,6 +59,10 @@ public final class SiliaP2 extends AbstractSkill {
         combatUser.addYawAndPitch(0, 0);
         combatUser.getWeapon().setVisible(false);
 
+        double distance = combatUser.getEntity().getEyeLocation().distance(combatUser.getEntity().getTargetBlock(null, 1).getLocation());
+        if (distance < 1)
+            combatUser.getMoveModule().teleport(LocationUtil.getLocationFromOffset(combatUser.getLocation(), 0, 0, -1 + distance));
+
         addActionTask(new IntervalTask(i -> {
             if (combatUser.getMoveModule().isKnockbacked() || !canActivate())
                 return false;

@@ -6,10 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.LocationUtil;
@@ -20,8 +17,11 @@ import org.bukkit.inventory.MainHand;
 
 @Getter
 public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
-    /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(100);
+    /** 상태 효과 저항 수정자 */
+    private static final AbilityStatus.Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(100);
+    /** 넉백 저항 수정자 */
+    private static final AbilityStatus.Modifier KNOCKBACK_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(100);
+
     /** 타겟 모듈 */
     @NonNull
     private final TargetModule<Healable> targetModule;
@@ -93,7 +93,9 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(MODIFIER);
+            combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
 
         @Override
@@ -103,7 +105,9 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(MODIFIER);
+            combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+            if (combatEntity instanceof Movable)
+                ((Movable) combatEntity).getMoveModule().getResistanceStatus().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
     }
 }

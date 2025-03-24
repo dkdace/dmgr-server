@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
@@ -31,6 +32,18 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build()));
+    }
+
+    /**
+     * 효과음 정보.
+     */
+    @UtilityClass
+    public static final class SOUND {
+        /** 사격 */
+        public static final SoundEffect SHOOT = new SoundEffect(
+                SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
+                SoundEffect.SoundInfo.builder("random.energy").volume(4).pitch(1.6).build(),
+                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
     }
 
     /**

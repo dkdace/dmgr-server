@@ -78,7 +78,7 @@ public final class SiliaA2 extends ActiveSkill {
 
     private final class SiliaA2Projectile extends Projectile<Damageable> {
         private SiliaA2Projectile() {
-            super(combatUser, SiliaA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(SiliaA2.this, SiliaA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
                     Option.builder().size(SiliaA2Info.SIZE).maxDistance(SiliaA2Info.DISTANCE).build());
         }
 

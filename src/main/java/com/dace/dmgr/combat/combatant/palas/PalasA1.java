@@ -103,7 +103,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
 
     private final class PalasA1Projectile extends Projectile<Damageable> {
         private PalasA1Projectile() {
-            super(combatUser, PalasA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(PalasA1.this, PalasA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override

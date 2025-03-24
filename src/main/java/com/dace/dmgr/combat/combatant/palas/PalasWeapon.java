@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.palas;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
@@ -159,6 +160,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
      * 사용 후 쿨타임 작업을 수행한다.
      */
     private void action() {
+        setCooldown(Timespan.ZERO);
         setCooldown(PalasWeaponInfo.ACTION_COOLDOWN);
 
         reloadModule.cancel();
