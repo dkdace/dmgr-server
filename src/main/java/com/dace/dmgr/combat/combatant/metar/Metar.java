@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
  * 전투원 - METAR 클래스.
  *
  * @see MetarWeapon
+ * @see MetarP1
  * @see MetarA1
  */
 public final class Metar extends Guardian {
@@ -101,6 +103,12 @@ public final class Metar extends Guardian {
     }
 
     @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        if (combatUser.getEntity().isSneaking())
+            combatUser.useAction(ActionKey.PERIODIC_1);
+    }
+
+    @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
     }
@@ -135,7 +143,7 @@ public final class Metar extends Guardian {
     @Override
     @NonNull
     public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[0];
+        return new PassiveSkillInfo[]{MetarP1Info.getInstance()};
     }
 
     @Override
