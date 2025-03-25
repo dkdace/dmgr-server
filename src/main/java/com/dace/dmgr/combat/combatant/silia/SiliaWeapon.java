@@ -226,7 +226,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                            SiliaT1.getCritMultiplier(getVelocity(), target), true)) {
+                            SiliaT1.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
 
                         if (target instanceof Movable) {
                             Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
