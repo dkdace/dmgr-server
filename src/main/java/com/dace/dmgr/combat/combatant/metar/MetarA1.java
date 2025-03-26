@@ -97,7 +97,7 @@ public final class MetarA1 extends ActiveSkill {
         private Damageable target;
 
         private MetarA1Projectile() {
-            super(MetarA1.this, MetarA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
+            super(MetarA1.this, MetarA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -155,7 +155,7 @@ public final class MetarA1 extends ActiveSkill {
 
         private final class MetarA1Area extends Area<Damageable> {
             private MetarA1Area() {
-                super(combatUser, MetarA1Info.ENEMY_DETECT_RADIUS, MetarA1Projectile.this.entityCondition);
+                super(combatUser, MetarA1Info.ENEMY_DETECT_RADIUS, MetarA1Projectile.this.entityCondition.and(Damageable::isCreature));
             }
 
             @Override

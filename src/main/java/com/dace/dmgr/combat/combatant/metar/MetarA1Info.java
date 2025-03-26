@@ -26,7 +26,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 35;
     /** 적 감지 범위 (단위: 블록) */
-    public static final double ENEMY_DETECT_RADIUS = 6;
+    public static final double ENEMY_DETECT_RADIUS = 7;
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3;
     /** 넉백 강도 */
@@ -86,7 +86,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
         /** 사용 시 틱 입자 효과 (모양) */
         public static final ParticleEffect USE_TICK_SHAPE = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 10, 10)).count(1).horizontalSpread(0).verticalSpread(0).build());
+                        Color.fromRGB(200, 10, 10)).horizontalSpread(0).verticalSpread(0).build());
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
@@ -94,7 +94,6 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
         /** 폭발 */
         public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(25).horizontalSpread(0).verticalSpread(0).speed(0.25)
-                        .build());
+                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(25).speed(0.25).build());
     }
 }
