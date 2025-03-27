@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * @see MetarWeapon
  * @see MetarP1
  * @see MetarA1
+ * @see MetarA2
  */
 public final class Metar extends Guardian {
     @Getter
@@ -149,7 +150,7 @@ public final class Metar extends Guardian {
     @Override
     @NonNull
     public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{MetarA1Info.getInstance(), getUltimateSkillInfo()};
+        return new ActiveSkillInfo[]{MetarA1Info.getInstance(), MetarA2Info.getInstance(), getUltimateSkillInfo()};
     }
 
     @Override
