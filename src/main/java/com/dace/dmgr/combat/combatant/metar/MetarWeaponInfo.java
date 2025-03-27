@@ -24,11 +24,11 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     /** 피해량 감소 시작 거리 (단위: 블록) */
     public static final int DAMAGE_WEAKENING_DISTANCE = 12;
     /** 사거리 (단위: 블록) */
-    public static final int DISTANCE = 30;
+    public static final int DISTANCE = 24;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
     /** 탄퍼짐 */
-    public static final double SPREAD = 4;
+    public static final double SPREAD = 5;
     /** 장탄수 */
     public static final int CAPACITY = 200;
     /** 재장전 시간 */
@@ -66,20 +66,6 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     }
 
     /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class PARTICLE {
-        /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(30, 255, 180)).build());
-        /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(6).horizontalSpread(0).verticalSpread(0).speed(0.1).build());
-    }
-
-    /**
      * 효과음 정보.
      */
     @UtilityClass
@@ -105,5 +91,19 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
                 .add(50, SoundEffect.SoundInfo.builder("new.block.beacon.activate").volume(0.6).pitch(1.7).build())
                 .add(57, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(0.65).build())
                 .build();
+    }
+
+    /**
+     * 입자 효과 정보.
+     */
+    @UtilityClass
+    public static final class PARTICLE {
+        /** 총알 궤적 */
+        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
+                        Color.fromRGB(30, 255, 180)).build());
+        /** 타격 */
+        public static final ParticleEffect HIT = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(6).speed(0.1).build());
     }
 }
