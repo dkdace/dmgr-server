@@ -1,21 +1,18 @@
 package com.dace.dmgr.combat.combatant.metar;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.combatant.quaker.QuakerUltInfo;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - METAR 클래스.
@@ -104,6 +101,12 @@ public final class Metar extends Guardian {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.ROBOT;
+    }
+
+    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (combatUser.getEntity().isSneaking())
             combatUser.useAction(ActionKey.PERIODIC_1);
@@ -112,11 +115,6 @@ public final class Metar extends Guardian {
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

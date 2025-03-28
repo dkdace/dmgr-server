@@ -1,23 +1,20 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 팔라스 클래스.
@@ -122,15 +119,16 @@ public final class Palas extends Support {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
+    }
+
+    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
         new PalasTarget(combatUser).shot();
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override
