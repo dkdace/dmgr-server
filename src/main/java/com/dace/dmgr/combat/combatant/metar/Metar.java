@@ -21,6 +21,7 @@ import org.bukkit.Sound;
  * @see MetarP1
  * @see MetarA1
  * @see MetarA2
+ * @see MetarA3
  */
 public final class Metar extends Guardian {
     @Getter
@@ -148,7 +149,7 @@ public final class Metar extends Guardian {
     @Override
     @NonNull
     public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{MetarA1Info.getInstance(), MetarA2Info.getInstance(), getUltimateSkillInfo()};
+        return new ActiveSkillInfo[]{MetarA1Info.getInstance(), MetarA2Info.getInstance(), MetarA3Info.getInstance(), getUltimateSkillInfo()};
     }
 
     @Override
