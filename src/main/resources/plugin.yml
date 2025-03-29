@@ -20,6 +20,11 @@ commands:
     description: 메뉴 창을 엽니다. F키를 눌러 사용할 수도 있습니다.
     aliases:
       - menu
+  상점:
+    usage: /(상점|shop)
+    description: 상점 창을 엽니다.
+    aliases:
+      - shop
   퇴장:
     usage: /(퇴장|quit)
     description: 현재 입장한 게임에서 나갑니다.

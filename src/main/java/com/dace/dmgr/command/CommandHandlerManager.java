@@ -21,6 +21,7 @@ public final class CommandHandlerManager {
     public static void register() {
         Validate.notNull(LobbyCommand.getInstance());
         Validate.notNull(MenuCommand.getInstance());
+        Validate.notNull(ShopCommand.getInstance());
         Validate.notNull(QuitCommand.getInstance());
         Validate.notNull(HelpCommand.getInstance());
         Validate.notNull(StatCommand.getInstance());

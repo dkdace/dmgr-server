@@ -14,6 +14,7 @@ public final class HelpCommand extends CommandHandler {
     private static final String MESSAGE_HELP = String.join("\n",
             StringFormUtil.BAR,
             MenuCommand.getInstance().getHelp(),
+            ShopCommand.getInstance().getHelp(),
             LobbyCommand.getInstance().getHelp(),
             QuitCommand.getInstance().getHelp(),
             StatCommand.getInstance().getHelp(),
