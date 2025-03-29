@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.combatant.quaker.QuakerUltInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -22,6 +21,7 @@ import org.bukkit.Sound;
  * @see MetarA1
  * @see MetarA2
  * @see MetarA3
+ * @see MetarUlt
  */
 public final class Metar extends Guardian {
     @Getter
@@ -120,7 +120,7 @@ public final class Metar extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return ((MetarWeapon) combatUser.getWeapon()).canSprint();
+        return ((MetarWeapon) combatUser.getWeapon()).canSprint() && combatUser.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -154,7 +154,7 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    public QuakerUltInfo getUltimateSkillInfo() {
-        return QuakerUltInfo.getInstance();
+    public MetarUltInfo getUltimateSkillInfo() {
+        return MetarUltInfo.getInstance();
     }
 }
