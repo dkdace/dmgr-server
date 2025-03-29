@@ -1,19 +1,16 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 아케이스 클래스.
@@ -115,16 +112,17 @@ public final class Arkace extends Marksman {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
+    }
+
+    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
         if (combatUser.getEntity().isSprinting())
             combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

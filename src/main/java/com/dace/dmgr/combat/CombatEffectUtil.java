@@ -70,16 +70,14 @@ public final class CombatEffectUtil {
                     .count(0, 0, 1)
                     .horizontalSpread(1, 0, 0.25)
                     .verticalSpread(2, 0, 0.25)
-                    .speed(3, 0.03, 0.1)
-                    .build());
+                    .speed(0.1).build());
     /** 파괴 효과 */
     private static final ParticleEffect BREAK_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0)
                     .count(0, 0, 1)
                     .horizontalSpread(1, 0, 0.25)
                     .verticalSpread(2, 0, 0.25)
-                    .speed(3, 0.03, 0.1)
-                    .build());
+                    .speed(0.1).build());
     /** 블록 타격 효과 */
     private static final ParticleEffect HIT_BLOCK_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(0, ParticleEffect.BlockParticleType.BLOCK_DUST)
@@ -113,14 +111,13 @@ public final class CombatEffectUtil {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
 
         if (location == null)
-            BLEEDING_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.1, combatEntity.getWidth(), combatEntity.getHeight(),
-                    damage == 0 ? 0 : 1);
+            BLEEDING_PARTICLE.play(combatEntity.getCenterLocation(), damage * 0.1, combatEntity.getWidth(), combatEntity.getHeight());
         else
-            BLEEDING_PARTICLE.play(location, damage * 0.06, 0, 0, 1);
+            BLEEDING_PARTICLE.play(location, damage * 0.06, 0, 0);
     }
 
     /**
-     * 지정한 위치 또는 엔티티에 파괴 입자 효과를 재생한다.
+     * 지정한 위치 또는 엔티티에 파편 입자 효과를 재생한다.
      *
      * @param combatEntity 대상 엔티티
      * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
@@ -131,10 +128,9 @@ public final class CombatEffectUtil {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
 
         if (location == null)
-            BREAK_PARTICLE.play(combatEntity.getCenterLocation(), damage == 0 ? 1 : damage * 0.07, combatEntity.getWidth(), combatEntity.getHeight(),
-                    damage == 0 ? 0 : 1);
+            BREAK_PARTICLE.play(combatEntity.getCenterLocation(), damage * 0.07, combatEntity.getWidth(), combatEntity.getHeight());
         else
-            BREAK_PARTICLE.play(location, damage * 0.04, 0, 0, 1);
+            BREAK_PARTICLE.play(location, damage * 0.04, 0, 0);
     }
 
     /**

@@ -1,15 +1,21 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -168,6 +174,14 @@ public abstract class Combatant {
 
         return String.join("    ", texts);
     }
+
+    /**
+     * 전투원의 종족 유형을 반환한다.
+     *
+     * @return 종족 유형
+     */
+    @NonNull
+    public abstract Combatant.Species getSpecies();
 
     /**
      * 전투원을 선택했을 때 실행할 작업.
@@ -393,4 +407,109 @@ public abstract class Combatant {
      */
     @NonNull
     public abstract UltimateSkillInfo<?> getUltimateSkillInfo();
+
+    /**
+     * 전투원의 종족 유형.
+     */
+    @AllArgsConstructor
+    @Getter
+    public enum Species {
+        /** 인간 */
+        HUMAN(new HumanReaction()),
+        /** 로봇 */
+        ROBOT(new RobotReaction());
+
+        /** 이벤트 반응 */
+        @NonNull
+        private final Reaction reaction;
+
+        /**
+         * 종족별 공통된 이벤트 반응을 처리하는 인터페이스.
+         */
+        public interface Reaction {
+            /**
+             * 치명상일 때 매 틱마다 실행할 작업.
+             *
+             * @param combatUser 대상 플레이어
+             */
+            void onTickLowHealth(@NonNull CombatUser combatUser);
+
+            /**
+             * 피해를 입었을 때 실행할 작업.
+             *
+             * @param combatUser 대상 플레이어
+             * @param damage     피해량
+             * @param location   맞은 위치
+             */
+            void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location);
+
+            /**
+             * 죽었을 때 실행할 작업.
+             *
+             * @param combatUser 대상 플레이어
+             */
+            void onDeath(@NonNull CombatUser combatUser);
+        }
+
+        private static class HumanReaction implements Reaction {
+            /** 치명상 효과 */
+            private static final ParticleEffect LOW_HEALTH_PARTICLE = new ParticleEffect(
+                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.REDSTONE_BLOCK, 0)
+                            .horizontalSpread(0.15).verticalSpread(0.45).speed(0.03).build());
+
+            @Override
+            public void onTickLowHealth(@NonNull CombatUser combatUser) {
+                LOW_HEALTH_PARTICLE.play(combatUser.getCenterLocation());
+            }
+
+            @Override
+            public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
+                CombatEffectUtil.playBleedingParticle(combatUser, location, damage);
+            }
+
+            @Override
+            public void onDeath(@NonNull CombatUser combatUser) {
+                // 미사용
+            }
+        }
+
+        private static class RobotReaction implements Reaction {
+            /** 치명상 효과 */
+            private static final ParticleEffect LOW_HEALTH_PARTICLE = new ParticleEffect(
+                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.COAL_BLOCK, 0)
+                            .horizontalSpread(0.15).verticalSpread(0.45).speed(0.03).build(),
+                    ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).horizontalSpread(0.15).verticalSpread(0.45).speed(0.2).build());
+            /** 피격 효과음 */
+            private static final SoundEffect DAMAGE_SOUND = new SoundEffect(
+                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.15).pitch(1.3).pitchVariance(0.2).build());
+            /** 사망 효과 */
+            private static final ParticleEffect DEATH_PARTICLE = new ParticleEffect(
+                    ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
+                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(300)
+                            .horizontalSpread(0.2).verticalSpread(0.2).speed(0.3).build());
+            /** 사망 효과음 */
+            private static final SoundEffect DEATH_SOUND = new SoundEffect(
+                    SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(0.5).build(),
+                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.5).build(),
+                    SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.5).build(),
+                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.5).build());
+
+            @Override
+            public void onTickLowHealth(@NonNull CombatUser combatUser) {
+                LOW_HEALTH_PARTICLE.play(combatUser.getCenterLocation());
+            }
+
+            @Override
+            public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
+                CombatEffectUtil.playBreakParticle(combatUser, location, damage);
+                DAMAGE_SOUND.play(combatUser.getLocation(), 1 + damage * 0.001);
+            }
+
+            @Override
+            public void onDeath(@NonNull CombatUser combatUser) {
+                DEATH_PARTICLE.play(combatUser.getCenterLocation());
+                DEATH_SOUND.play(combatUser.getLocation());
+            }
+        }
+    }
 }

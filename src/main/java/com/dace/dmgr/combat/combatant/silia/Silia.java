@@ -2,20 +2,17 @@ package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 실리아 클래스.
@@ -117,16 +114,17 @@ public final class Silia extends Scuffler {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
+    }
+
+    @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         if (victim instanceof CombatUser && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
 
         return true;
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

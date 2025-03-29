@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -110,6 +110,12 @@ public final class Neace extends Support {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
+    }
+
+    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -121,8 +127,6 @@ public final class Neace extends Support {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
-
         victim.getSkill(NeaceP1Info.getInstance()).cancel();
     }
 

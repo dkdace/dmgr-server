@@ -1,17 +1,14 @@
 package com.dace.dmgr.combat.combatant.ched;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 체드 클래스.
@@ -97,7 +94,6 @@ public final class Ched extends Marksman {
                         "궁술은 기사의 기본 소양이지."
                 };
         }
-
     }
 
     @Override
@@ -118,8 +114,9 @@ public final class Ched extends Marksman {
     }
 
     @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
     }
 
     @Override

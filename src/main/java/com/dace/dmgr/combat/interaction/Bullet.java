@@ -70,7 +70,7 @@ public abstract class Bullet<T extends CombatEntity> {
     /** 발사 여부 */
     private boolean isShot = false;
     /** 소멸 여부 */
-    @Getter(AccessLevel.PACKAGE)
+    @Getter
     private boolean isDestroyed = false;
 
     /**
@@ -218,7 +218,7 @@ public abstract class Bullet<T extends CombatEntity> {
      *
      * @throws IllegalStateException 총알이 발사되지 않았거나 이미 제거되었으면 발생
      */
-    final void destroy() {
+    public final void destroy() {
         validateIsShot();
         Validate.validState(!isDestroyed, "Bullet이 이미 제거됨");
 
