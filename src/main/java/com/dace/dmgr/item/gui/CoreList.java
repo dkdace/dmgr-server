@@ -95,6 +95,8 @@ public final class CoreList extends ChestGUI {
                             return false;
 
                         onPurchaseCore(player, combatantType, core, price);
+
+                        player.closeInventory();
                         return true;
                     }));
         }
@@ -112,17 +114,17 @@ public final class CoreList extends ChestGUI {
         User user = User.fromPlayer(player);
         UserData userData = user.getUserData();
 
-        if (userData.getMoney() < price)
+        int currentMoney = userData.getMoney();
+        if (currentMoney < price) {
             user.sendMessageWarn("잔액이 부족합니다.");
-        else {
-            user.getUserData().setMoney(userData.getMoney() - price);
-            userData.getCombatantRecord(combatantType).addCore(selectCore);
-
-            user.sendMessageInfo("§e§n{0}§r의 코어 목록에 §b§n{1}§r를 추가했습니다.", combatantType.getCombatant().getName(), selectCore.getName());
-
-            CORE_PURCHASE_SOUND.play(player);
+            return;
         }
 
-        player.closeInventory();
+        user.getUserData().setMoney(currentMoney - price);
+        userData.getCombatantRecord(combatantType).addCore(selectCore);
+
+        user.sendMessageInfo("§e§n{0}§r의 코어 목록에 §b§n{1}§r를 추가했습니다.", combatantType.getCombatant().getName(), selectCore.getName());
+
+        CORE_PURCHASE_SOUND.play(player);
     }
 }
