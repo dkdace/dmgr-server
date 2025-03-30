@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
@@ -81,9 +82,6 @@ public final class StatusEffectModule {
      * @param duration     지속시간
      */
     public void apply(@NonNull StatusEffect statusEffect, @NonNull CombatEntity provider, @NonNull Timespan duration) {
-        if (combatEntity.isRemoved())
-            return;
-
         if (!statusEffect.isPositive())
             duration = duration.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
         if (duration.isZero())
@@ -258,7 +256,8 @@ public final class StatusEffectModule {
             statusEffect.onStart(combatEntity, provider);
 
             this.onTickTask = new IntervalTask(i -> {
-                if (this.expiration.isBefore(Timestamp.now()) || provider.isRemoved())
+                if (this.expiration.isBefore(Timestamp.now()) || provider.isRemoved() || combatEntity instanceof CombatUser
+                        && ((CombatUser) combatEntity).isDead())
                     return false;
 
                 statusEffect.onTick(combatEntity, provider, i);
