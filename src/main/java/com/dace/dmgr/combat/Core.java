@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
 import java.text.MessageFormat;
@@ -34,6 +35,8 @@ public enum Core {
     /** 수치 값 */
     @Getter
     private final double value;
+    /** 코어 아이템 */
+    private final ItemStack coreItem;
     /** 코어 선택 GUI 아이템 */
     @NonNull
     @Getter
@@ -43,16 +46,15 @@ public enum Core {
         this.name = name;
         this.value = value;
 
-        this.selectItem = new DefinedItem(new ItemBuilder(Material.FIREWORK_CHARGE)
+        this.coreItem = new ItemBuilder(Material.FIREWORK_CHARGE)
                 .editItemMeta(itemMeta ->
                         ((FireworkEffectMeta) itemMeta).setEffect(FireworkEffect.builder().withColor(color).build()))
                 .setName("§b" + getName())
                 .setLore("",
                         "§7장착 시 다음 효과 적용:",
-                        "§9" + MessageFormat.format(description, value),
-                        "",
-                        "§7§n클릭§f하여 코어를 장착하거나 제거합니다.")
-                .build(),
+                        "§9" + MessageFormat.format(description, value))
+                .build();
+        this.selectItem = new DefinedItem(new ItemBuilder(coreItem).addLore("", "§7§n클릭§f하여 코어를 장착하거나 제거합니다.").build(),
                 (clickType, player) -> {
                     ChestGUI gui = ChestGUI.fromInventory(player.getOpenInventory().getTopInventory());
                     if (!(gui instanceof SelectCore))
@@ -80,5 +82,15 @@ public enum Core {
     @NonNull
     public String getName() {
         return name + "의 코어";
+    }
+
+    /**
+     * 코어 아이템을 반환한다.
+     *
+     * @return 코어 아이템
+     */
+    @NonNull
+    public ItemStack getCoreItem() {
+        return coreItem.clone();
     }
 }
