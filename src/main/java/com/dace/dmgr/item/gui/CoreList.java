@@ -57,7 +57,7 @@ public final class CoreList extends ChestGUI {
                     for (Core core : cores)
                         itemBuilder.addLore("§b" + core.getName());
 
-                itemBuilder.addLore("", "§7§l클릭§f하여 코어를 추가합니다.");
+                itemBuilder.addLore("", "§7§n클릭§f하여 코어를 추가합니다.");
             });
         }
     }

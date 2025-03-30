@@ -60,7 +60,7 @@ public final class YamlFile implements Initializable<Void> {
     public YamlFile(@NonNull Path path) {
         this.file = DMGR.getPlugin().getDataFolder().toPath().resolve(path).toFile();
         this.config = YamlConfiguration.loadConfiguration(file);
-        this.defaultSection = new Section(config);
+        this.defaultSection = new Section();
     }
 
     /**
@@ -126,21 +126,34 @@ public final class YamlFile implements Initializable<Void> {
     /**
      * Yaml 파일의 섹션을 나타내는 클래스.
      */
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public final class Section {
-        /** 설정 섹션 인스턴스 */
-        private final ConfigurationSection configurationSection;
+        /** 섹션 경로 */
+        private final String path;
         /** 항목 목록 (키 : 항목 인스턴스) */
         private final HashMap<String, Entry<?>> entries = new HashMap<>();
         /** 하위 섹션 목록 (이름 : 섹션 인스턴스) */
         private final HashMap<String, Section> subSections = new HashMap<>();
 
-        private Section(@NonNull ConfigurationSection configurationSection, @NonNull String name) {
-            this.configurationSection = configurationSection.getConfigurationSection(name) == null
-                    ? configurationSection.createSection(name)
-                    : configurationSection.getConfigurationSection(name);
+        private Section() {
+            this.path = "";
         }
 
+        private Section(@NonNull Section section, @NonNull String name) {
+            this.path = section.path + "." + name;
+        }
+
+        /**
+         * 현재 섹션의 {@link ConfigurationSection} 인스턴스를 반환한다.
+         *
+         * @return {@link ConfigurationSection}
+         */
+        @NonNull
+        private ConfigurationSection getConfigurationSection() {
+            if (path.isEmpty())
+                return config;
+
+            return config.getConfigurationSection(path) == null ? config.createSection(path) : config.getConfigurationSection(path);
+        }
 
         /**
          * 지정한 이름의 섹션을 반환한다.
@@ -150,8 +163,7 @@ public final class YamlFile implements Initializable<Void> {
          */
         @NonNull
         public Section getSection(@NonNull String name) {
-            subSections.computeIfAbsent(name, k -> new Section(this.configurationSection, k));
-            return subSections.get(name);
+            return subSections.computeIfAbsent(name, k -> new Section(this, k));
         }
 
         /**
@@ -165,8 +177,7 @@ public final class YamlFile implements Initializable<Void> {
         @NonNull
         @SuppressWarnings("unchecked")
         public <T> Entry<T> getEntry(@NonNull String key, @NonNull T defaultValue) {
-            entries.computeIfAbsent(key, k -> new Entry<>(k, defaultValue));
-            return (Entry<T>) entries.get(key);
+            return (Entry<T>) entries.computeIfAbsent(key, k -> new Entry<>(k, defaultValue));
         }
 
         /**
@@ -179,8 +190,7 @@ public final class YamlFile implements Initializable<Void> {
         @NonNull
         @SuppressWarnings("unchecked")
         public <T> ListEntry<T> getListEntry(@NonNull String key) {
-            entries.computeIfAbsent(key, ListEntry::new);
-            return (ListEntry<T>) entries.get(key);
+            return (ListEntry<T>) entries.computeIfAbsent(key, ListEntry::new);
         }
 
         /**
@@ -223,7 +233,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (value == null) {
-                    Object getValue = configurationSection.get(key, defaultValue);
+                    Object getValue = getConfigurationSection().get(key, defaultValue);
 
                     if (getValue.getClass().isInstance(defaultValue))
                         value = (T) getValue;
@@ -267,7 +277,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 this.value = value;
-                configurationSection.set(key, value == defaultValue ? null : value);
+                getConfigurationSection().set(key, value == defaultValue ? null : value);
             }
         }
 
@@ -305,7 +315,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (super.value == null)
-                    super.value = (List<T>) configurationSection.getList(super.key, new ArrayList<>());
+                    super.value = (List<T>) getConfigurationSection().getList(super.key, new ArrayList<>());
 
                 return Collections.unmodifiableList(super.value);
             }
