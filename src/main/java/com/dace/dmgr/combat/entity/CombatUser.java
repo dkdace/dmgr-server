@@ -6,7 +6,6 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.FunctionalBlock;
@@ -374,7 +373,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         handleFootstep();
 
         if (damageModule.isLowHealth())
-            CombatEffectUtil.playBleedingParticle(this, null, 0);
+            combatant.getSpecies().getReaction().onTickLowHealth(this);
 
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
@@ -535,7 +534,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker == null)
             selfHarmDamage += damage;
 
+        if (damageModule.getTotalShield() > 0)
+            combatant.getSpecies().getReaction().onDamage(this, damage, location);
         combatant.onDamage(this, attacker, damage, location, isCrit);
+
         lastDamageTimestamp = Timestamp.now();
 
         if (attacker instanceof SummonEntity)
@@ -707,6 +709,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return;
 
         isDead = true;
+
+        combatant.getSpecies().getReaction().onDeath(this);
         combatant.onDeath(this, attacker);
 
         killContributorManager.getDamageMap().keySet().forEach(target -> {

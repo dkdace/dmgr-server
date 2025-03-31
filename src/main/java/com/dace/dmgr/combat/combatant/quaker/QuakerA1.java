@@ -101,21 +101,21 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     public final class QuakerA1Entity extends Barrier {
         private QuakerA1Entity(@NonNull Location spawnLocation) {
             super(spawnLocation, combatUser.getName() + "의 방패", combatUser, QuakerA1Info.HEALTH, QuakerA1Info.DEATH_SCORE,
-                    Hitbox.builder(6, 3.5, 0.3).offsetY(-0.3).axisOffsetY(1.5).build());
+                    Hitbox.builder(6, 3.5, 0.3).axisOffsetY(1.4).build());
             onInit();
         }
 
         private void onInit() {
             entity.setGravity(false);
-            entity.setItemInHand(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
+            entity.setHelmet(new ItemBuilder(Material.IRON_HOE).setDamage((short) 1).build());
             damageModule.setHealth(getStateValue());
 
             addOnTick(this::onTick);
         }
 
         private void onTick(long i) {
-            Location loc = LocationUtil.getLocationFromOffset(owner.getLocation(), 0, 0.8, 1.5);
-            entity.setRightArmPose(new EulerAngle(Math.toRadians(loc.getPitch() - 90), 0, 0));
+            Location loc = LocationUtil.getLocationFromOffset(owner.getLocation().add(0, 0.5, 0), 0, 0, 1.5);
+            entity.setHeadPose(new EulerAngle(Math.toRadians(loc.getPitch()), 0, 0));
             entity.teleport(loc);
         }
 
@@ -126,7 +126,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         @Override
         public double getHeight() {
-            return 3.5;
+            return 2.8;
         }
 
         @Override
@@ -137,7 +137,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
-            QuakerA1Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            QuakerA1Info.SOUND.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
             if (location != null)
                 CombatEffectUtil.playBreakParticle(this, location, damage);
         }
@@ -150,7 +150,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             setStateValue(0);
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
-            QuakerA1Info.SOUND.DEATH.play(getLocation());
+            QuakerA1Info.SOUND.DEATH.play(getCenterLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);

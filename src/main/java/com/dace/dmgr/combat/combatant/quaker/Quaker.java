@@ -1,20 +1,17 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 퀘이커 클래스.
@@ -96,6 +93,8 @@ public final class Quaker extends Guardian {
         switch (combatantType) {
             case ARKACE:
                 return new String[]{"조국의 방패는 납덩어리에 굴복하지 않는다!"};
+            case METAR:
+                return new String[]{"찌그러져 있어라, 깡통!"};
             default:
                 return new String[]{
                         "적을 제거했다!",
@@ -120,6 +119,12 @@ public final class Quaker extends Guardian {
     }
 
     @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
+    }
+
+    @Override
     public void onSet(@NonNull CombatUser combatUser) {
         super.onSet(combatUser);
         combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER);
@@ -131,11 +136,6 @@ public final class Quaker extends Guardian {
             volume = 1.4;
 
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
-    }
-
-    @Override
-    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        CombatEffectUtil.playBleedingParticle(victim, location, damage);
     }
 
     @Override

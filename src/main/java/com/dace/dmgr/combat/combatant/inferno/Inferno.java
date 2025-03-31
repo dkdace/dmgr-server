@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -102,7 +102,6 @@ public final class Inferno extends Vanguard {
                         "열정이 부족해! 열정이!"
                 };
         }
-
     }
 
     @Override
@@ -113,6 +112,12 @@ public final class Inferno extends Vanguard {
                 "바닥은... 조금 차갑네.",
                 "...뻔한 결말이려나."
         };
+    }
+
+    @Override
+    @NonNull
+    public Combatant.Species getSpecies() {
+        return Species.HUMAN;
     }
 
     @Override
@@ -128,10 +133,8 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished()) {
-            CombatEffectUtil.playBleedingParticle(victim, location, damage);
+        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
-        }
 
         InfernoUltInfo.SOUND.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
         if (location != null)
