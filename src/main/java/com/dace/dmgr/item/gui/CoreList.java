@@ -78,8 +78,7 @@ public final class CoreList extends ChestGUI {
                 .filter(core -> !currentCores.contains(core))
                 .iterator();
 
-        int i = 0;
-        for (; iterator.hasNext(); i++) {
+        for (int i = 0; iterator.hasNext(); i++) {
             Core core = iterator.next();
             int price = GeneralConfig.getConfig().getCorePrice();
 
