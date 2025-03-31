@@ -48,6 +48,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("바라보는 곳에 공격을 돕는 늑대인 <3::설랑>을 소환합니다.")
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, SUMMON_MAX_DISTANCE)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
                         new ActionInfoLore.NamedSection("설랑", ActionInfoLore.Section
                                 .builder("근처의 적을 탐지하면 추적합니다.")
