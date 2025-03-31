@@ -76,14 +76,16 @@ public final class User {
             "",
             "§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용",
             "",
-            "§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오.",
+            "§f다운로드가 되지 않으면, §n.minecraft → server-resource-packs§f 폴더를 생성하십시오.",
             "",
             "§7다운로드 오류 문의 : {1}");
     /** 리소스팩 적용 중 오류로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_RESOURCE_ERR = String.join("\n",
             "{0}§c리소스팩 적용 중 오류가 발생했습니다.",
             "",
-            "§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오.",
+            "§f§n.minecraft → server-resource-packs§f 폴더의 내용물을 전부 삭제한 뒤 재접속 하시기 바랍니다.",
+            "",
+            "§e문제가 해결되지 않으면 문의 바랍니다.",
             "",
             "§7다운로드 오류 문의 : {1}");
     /** 채팅의 메시지 포맷 패턴 */
