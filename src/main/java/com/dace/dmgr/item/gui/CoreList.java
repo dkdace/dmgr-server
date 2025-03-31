@@ -37,16 +37,18 @@ public final class CoreList extends ChestGUI {
         set(5, 8, new GUIItem.Previous(Menu::new));
 
         CombatantType[] combatantTypes = CombatantType.sortedValues();
+
         for (int i = 0; i < combatantTypes.length; i++) {
             CombatantType combatantType = combatantTypes[i];
 
             Set<Core> cores = UserData.fromPlayer(player).getCombatantRecord(combatantType).getCores();
+            boolean hasAllCores = cores.size() == Core.values().length;
 
             set(i, new DefinedItem(combatantType.getProfileItem(), (clickType, target) -> {
-                if (clickType != ClickType.LEFT)
+                if (clickType != ClickType.LEFT || hasAllCores)
                     return false;
 
-                onSelectCombatant(player, combatantType);
+                onSelectCombatant(combatantType, cores);
                 return true;
             }), itemBuilder -> {
                 itemBuilder.setLore("");
@@ -57,7 +59,7 @@ public final class CoreList extends ChestGUI {
                     for (Core core : cores)
                         itemBuilder.addLore("§b" + core.getName());
 
-                itemBuilder.addLore("", "§7§n클릭§f하여 코어를 추가합니다.");
+                itemBuilder.addLore("", hasAllCores ? "§f모든 코어가 추가되어 있습니다." : "§7§n클릭§f하여 코어를 추가합니다.");
             });
         }
     }
@@ -65,17 +67,15 @@ public final class CoreList extends ChestGUI {
     /**
      * 코어를 추가할 전투원을 선택했을 때 실행할 작업.
      *
-     * @param player        플레이어
      * @param combatantType 대상 전투원
+     * @param currentCores  적용된 코어 목록
      */
-    private void onSelectCombatant(@NonNull Player player, @NonNull CombatantType combatantType) {
+    private void onSelectCombatant(@NonNull CombatantType combatantType, @NonNull Set<Core> currentCores) {
         clear();
         set(5, 8, new GUIItem.Previous(CoreList::new));
 
-        UserData userData = UserData.fromPlayer(player);
-
         Iterator<Core> iterator = Arrays.stream(Core.values())
-                .filter(core -> !userData.getCombatantRecord(combatantType).getCores().contains(core))
+                .filter(core -> !currentCores.contains(core))
                 .iterator();
 
         int i = 0;
@@ -94,9 +94,9 @@ public final class CoreList extends ChestGUI {
                         if (clickType != ClickType.LEFT)
                             return false;
 
-                        onPurchaseCore(player, combatantType, core, price);
+                        onPurchaseCore(target, combatantType, core, price);
 
-                        player.closeInventory();
+                        target.closeInventory();
                         return true;
                     }));
         }
