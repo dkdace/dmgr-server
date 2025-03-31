@@ -437,9 +437,7 @@ public final class User {
                         userData.getLoseCount(),
                         (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("goldblock"));
-        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회 §f({1}%)",
-                        userData.getQuitCount(),
-                        (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
+        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()),
                 Skins.getPlayer("MHF_TNT2"));
         tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
                         DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")),
