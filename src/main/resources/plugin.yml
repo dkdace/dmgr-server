@@ -20,6 +20,18 @@ commands:
     description: 메뉴 창을 엽니다. F키를 눌러 사용할 수도 있습니다.
     aliases:
       - menu
+  디스코드:
+    usage: /(디스코드|디코|discord)
+    description: 공식 디스코드 서버 주소를 확인합니다.
+    aliases:
+      - discord
+      - 디코
+  마인리스트:
+    usage: /(마인리스트|마리|minelist)
+    description: 마인리스트 주소를 확인합니다.
+    aliases:
+      - minelist
+      - 마리
   퇴장:
     usage: /(퇴장|quit)
     description: 현재 입장한 게임에서 나갑니다.

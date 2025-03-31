@@ -21,6 +21,8 @@ public final class CommandHandlerManager {
     public static void register() {
         Validate.notNull(LobbyCommand.getInstance());
         Validate.notNull(MenuCommand.getInstance());
+        Validate.notNull(DiscordCommand.getInstance());
+        Validate.notNull(MinelistCommand.getInstance());
         Validate.notNull(QuitCommand.getInstance());
         Validate.notNull(HelpCommand.getInstance());
         Validate.notNull(StatCommand.getInstance());
