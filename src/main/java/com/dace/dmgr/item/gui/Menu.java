@@ -50,7 +50,7 @@ public final class Menu extends ChestGUI {
         RECORD(Material.NAME_TAG, 0, "전적", "개인 전적을 확인합니다.", player -> new Stat(player, UserData.fromPlayer(player))),
         ACHIEVEMENT(Material.BOOK, 0, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
         OPTION(Material.REDSTONE_COMPARATOR, 0, "설정", "설정 관련 메뉴를 확인합니다.", PlayerOption::new),
-        CORE(Material.FIREWORK_CHARGE, 0, "코어 확인", "전투원에 할당된 코어를 확인합니다.", CoreList::new),
+        CORE(Material.FIREWORK_CHARGE, 0, "코어 확인", "전투원에 할당된 코어를 확인하거나 구매합니다.", CoreList::new),
         COMMAND(Material.COMMAND, 0, "명령어 목록", "서버 명령어 목록을 확인합니다.",
                 player -> {
                     player.performCommand("명령어");

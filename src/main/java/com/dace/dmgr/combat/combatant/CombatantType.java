@@ -33,7 +33,6 @@ import java.util.Comparator;
  *
  * @see Combatant
  */
-@Getter
 public enum CombatantType {
     MAGRITTA(Magritta.getInstance()),
     SILIA(Silia.getInstance()),
@@ -53,12 +52,13 @@ public enum CombatantType {
 
     /** 전투원 정보 */
     @NonNull
+    @Getter
     private final Combatant combatant;
     /** 전투원 프로필 정보 아이템 */
-    @NonNull
     private final ItemStack profileItem;
     /** 전투원 선택 GUI 아이템 */
     @NonNull
+    @Getter
     private final DefinedItem selectItem;
 
     CombatantType(Combatant combatant) {
@@ -116,5 +116,15 @@ public enum CombatantType {
         Arrays.sort(combatantTypes, Comparator.comparing(combatantType -> combatantType.getCombatant().getName()));
 
         return combatantTypes;
+    }
+
+    /**
+     * 전투원의 프로필 정보 아이템을 반환한다.
+     *
+     * @return 프로필 정보 아이템
+     */
+    @NonNull
+    public ItemStack getProfileItem() {
+        return profileItem.clone();
     }
 }
