@@ -64,13 +64,15 @@ public final class SelectGame extends ChestGUI {
                 if (isRanked) {
                     user.sendMessageWarn("랭크 게임 준비 중입니다.");
                     player.closeInventory();
+
+                    return false;
                 }
 
                 if (clickType == ClickType.LEFT) {
                     if (user.getGameRoom() != null)
                         return false;
 
-                    GameRoom gameRoom = GameRoom.getAvailableGameRoom(isRanked);
+                    GameRoom gameRoom = GameRoom.getAvailableGameRoom(false);
                     if (gameRoom == null)
                         return false;
 
@@ -78,7 +80,7 @@ public final class SelectGame extends ChestGUI {
 
                     player.closeInventory();
                 } else if (clickType == ClickType.RIGHT)
-                    new SelectGameRoom(player, isRanked);
+                    new SelectGameRoom(player, false);
 
                 return true;
             });

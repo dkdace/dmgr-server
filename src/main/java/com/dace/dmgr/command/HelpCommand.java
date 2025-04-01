@@ -17,7 +17,6 @@ public final class HelpCommand extends CommandHandler {
             DiscordCommand.getInstance().getHelp(),
             MinelistCommand.getInstance().getHelp(),
             LobbyCommand.getInstance().getHelp(),
-            QuitCommand.getInstance().getHelp(),
             StatCommand.getInstance().getHelp(),
             DMCommand.getInstance().getHelp(),
             BlockCommand.getInstance().getHelp(),

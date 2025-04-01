@@ -29,7 +29,7 @@ public final class GameRoom {
 
     /** 게임 시작 대기 보스바 목록 */
     private final BossBarDisplay[] gameWaitBossBars = new BossBarDisplay[]{
-            new BossBarDisplay("§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오."),
+            new BossBarDisplay("§f대기열에서 나가려면 인벤토리에서 §c§l나가기 §f버튼을 누르십시오."),
             new BossBarDisplay(""),
             new BossBarDisplay("", BarColor.GREEN, BarStyle.SOLID)
     };

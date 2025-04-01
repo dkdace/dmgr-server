@@ -32,12 +32,6 @@ commands:
     aliases:
       - minelist
       - 마리
-  퇴장:
-    usage: /(퇴장|quit)
-    description: 현재 입장한 게임에서 나갑니다.
-    aliases:
-      - quit
-      - q
   명령어:
     usage: /(명령어|command)
     aliases:

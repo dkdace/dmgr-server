@@ -1072,7 +1072,7 @@ public final class User {
         TEAM_GAME_EXIT("YWZkMjQwMDAwMmFkOWZiYmJkMDA2Njk0MWViNWIxYTM4NGFiOWIwZTQ4YTE3OGVlOTZlNGQxMjlhNTIwODY1NCJ9fX0=",
                 "§c§l나가기", "현재 입장한 게임에서 나갑니다." +
                 "\n" +
-                "\n§c경고: 게임에서 나가면 탈주 처리되며, 랭크 게임의 경우 패널티가 적용됩니다.", 13,
+                "\n§c경고: 게임 진행 중 나가면 탈주 처리되며, 랭크 게임은 패널티가 적용됩니다.", 13,
                 target -> {
                     User.fromPlayer(target).quitGame();
                     target.closeInventory();
