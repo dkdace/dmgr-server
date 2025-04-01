@@ -663,7 +663,9 @@ public final class User {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
 
+        gui.clear();
         updateGUI();
+
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         quitFreeCombat();
 
@@ -686,8 +688,6 @@ public final class User {
      * 인벤토리 GUI를 업데이트한다.
      */
     private void updateGUI() {
-        gui.clear();
-
         for (MenuItem menuItem : MenuItem.values())
             if (menuItem != MenuItem.TEAM_GAME && gameRoom != null || menuItem != MenuItem.TEAM_GAME_EXIT && gameRoom == null)
                 gui.set(menuItem.slotIndex, menuItem.definedItem);
