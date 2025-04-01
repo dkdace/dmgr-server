@@ -59,8 +59,14 @@ public final class SelectGame extends ChestGUI {
             itemBuilder.addLore("", "§7§n좌클릭§f하여 참여 가능한 게임에 입장합니다.", "§7§n우클릭§f하여 게임 방을 선택합니다.");
 
             this.definedItem = new DefinedItem(itemBuilder.build(), (clickType, player) -> {
+                User user = User.fromPlayer(player);
+
+                if (isRanked) {
+                    user.sendMessageWarn("랭크 게임 준비 중입니다.");
+                    player.closeInventory();
+                }
+
                 if (clickType == ClickType.LEFT) {
-                    User user = User.fromPlayer(player);
                     if (user.getGameRoom() != null)
                         return false;
 
