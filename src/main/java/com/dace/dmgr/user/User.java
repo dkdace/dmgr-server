@@ -492,10 +492,10 @@ public final class User {
     private String getTabListPlayerName() {
         String prefix = "§7[로비]";
 
-        if (isInFreeCombat())
+        if (gameRoom != null)
+            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 {0}]" : "§a[일반 {0}]", gameRoom.getNumber());
+        else if (isInFreeCombat())
             prefix = "§7[자유 전투]";
-        else if (gameRoom != null)
-            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 게임 {0}]" : "§a[일반 게임 {0}]", gameRoom.getNumber());
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
