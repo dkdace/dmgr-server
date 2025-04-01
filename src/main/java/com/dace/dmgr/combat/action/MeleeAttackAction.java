@@ -72,7 +72,7 @@ public final class MeleeAttackAction extends AbstractAction {
         setCooldown();
 
         USE_SOUND.play(combatUser.getLocation());
-        combatUser.getEntity().getInventory().setHeldItemSlot(8);
+        combatUser.getEntity().getInventory().setHeldItemSlot(7);
 
         combatUser.addTask(new DelayTask(() -> {
             new MeleeAttack().shot();

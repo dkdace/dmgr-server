@@ -92,6 +92,35 @@ public final class GameRoom {
     }
 
     /**
+     * 현재 입장 가능한 게임을 반환한다.
+     *
+     * <p>입장 가능한 게임이 없으면 새 {@link GameRoom}을 생성한다.</p>
+     *
+     * <p>생성할 수 없는 경우 {@code null}을 반환한다.</p>
+     *
+     * @param isRanked 랭크 여부
+     * @return 입장 가능한 게임
+     */
+    @Nullable
+    public static GameRoom getAvailableGameRoom(boolean isRanked) {
+        int nullRoomNumber = -1;
+        for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
+            GameRoom gameRoom = fromNumber(isRanked, i);
+
+            if (gameRoom == null) {
+                if (nullRoomNumber == -1)
+                    nullRoomNumber = i;
+            } else if (gameRoom.canJoin())
+                return gameRoom;
+        }
+
+        if (nullRoomNumber != -1)
+            return new GameRoom(isRanked, nullRoomNumber);
+
+        return null;
+    }
+
+    /**
      * @return 랭크 여부
      */
     public boolean isRanked() {

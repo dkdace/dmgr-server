@@ -14,7 +14,11 @@ import com.dace.dmgr.event.listener.OnPlayerQuit;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.GUI;
+import com.dace.dmgr.item.gui.SelectGame;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
@@ -42,6 +46,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -52,6 +57,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
 /**
@@ -657,7 +663,7 @@ public final class User {
         player.setWalkSpeed(0.2F);
         player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
 
-        gui.clear();
+        updateGUI();
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         quitFreeCombat();
 
@@ -674,6 +680,17 @@ public final class User {
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
             combatUser.remove();
+    }
+
+    /**
+     * 인벤토리 GUI를 업데이트한다.
+     */
+    private void updateGUI() {
+        gui.clear();
+
+        for (MenuItem menuItem : MenuItem.values())
+            if (menuItem != MenuItem.TEAM_GAME && gameRoom != null || menuItem != MenuItem.TEAM_GAME_EXIT && gameRoom == null)
+                gui.set(menuItem.slotIndex, menuItem.definedItem);
     }
 
     /**
@@ -970,6 +987,8 @@ public final class User {
 
         this.gameRoom = gameRoom;
         gameRoom.onJoin(this);
+
+        updateGUI();
     }
 
     /**
@@ -981,6 +1000,8 @@ public final class User {
 
         gameRoom.onQuit(this);
         gameRoom = null;
+
+        updateGUI();
     }
 
     /**
@@ -1040,6 +1061,54 @@ public final class User {
                 onError.accept(ex);
             }
         });
+    }
+
+    /**
+     * 메뉴 아이템 목록.
+     */
+    private enum MenuItem {
+        TEAM_GAME("NzYxODQ2MTBjNTBjMmVmYjcyODViYzJkMjBmMzk0MzY0ZTgzNjdiYjMxNDg0MWMyMzhhNmE1MjFhMWVlMTJiZiJ9fX0=",
+                "팀전 (일반/랭크)", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.", 13, SelectGame::new),
+        TEAM_GAME_EXIT("YWZkMjQwMDAwMmFkOWZiYmJkMDA2Njk0MWViNWIxYTM4NGFiOWIwZTQ4YTE3OGVlOTZlNGQxMjlhNTIwODY1NCJ9fX0=",
+                "§c§l나가기", "현재 입장한 게임에서 나갑니다." +
+                "\n" +
+                "\n§c경고: 게임에서 나가면 탈주 처리되며, 랭크 게임의 경우 패널티가 적용됩니다.", 13,
+                target -> {
+                    User.fromPlayer(target).quitGame();
+                    target.closeInventory();
+                }),
+        FREE_GAME("NTBkZmM4YTM1NjNiZjk5NmY1YzFiNzRiMGIwMTViMmNjZWIyZDA0Zjk0YmJjZGFmYjIyOTlkOGE1OTc5ZmFjMSJ9fX0=",
+                "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.", 14,
+                target -> User.fromPlayer(target).startFreeCombat()),
+        TRAINING("ZTg3MDhkNGI0YWIxMGI5YmE4NWVkMWE5MjQyYmY4MTEwNWM1NTk2ZDc0M2YyY2EyMGEzMzg3ZTI5ZDA2MzM0NSJ9fX0=",
+                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15, target -> {
+        }),
+        LOBBY("OTNiZjJmYzY5M2IxNmNiOTFiOGM4N2E0YjA4OWZkOWUxODI1ZmNhMDFjZWZiMTY1YzYxODdmYzUzOWIxNTJjOSJ9fX0=",
+                "로비", "로비로 이동합니다.", 17,
+                target -> {
+                    target.performCommand("exit");
+                    target.closeInventory();
+                });
+
+        /** 인벤토리 칸 번호 */
+        private final int slotIndex;
+        /** GUI 아이템 */
+        private final DefinedItem definedItem;
+
+        MenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
+            this.slotIndex = slotIndex;
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl))
+                    .setName("§e§l" + name)
+                    .setLore("§f" + lore)
+                    .build(),
+                    (clickType, target) -> {
+                        if (clickType != ClickType.LEFT)
+                            return false;
+
+                        action.accept(target);
+                        return true;
+                    });
+        }
     }
 
     /**
