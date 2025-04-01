@@ -691,6 +691,8 @@ public final class User {
         for (MenuItem menuItem : MenuItem.values())
             if (menuItem != MenuItem.TEAM_GAME && gameRoom != null || menuItem != MenuItem.TEAM_GAME_EXIT && gameRoom == null)
                 gui.set(menuItem.slotIndex, menuItem.definedItem);
+
+        player.updateInventory();
     }
 
     /**
@@ -1069,7 +1071,7 @@ public final class User {
     private enum MenuItem {
         TEAM_GAME("NzYxODQ2MTBjNTBjMmVmYjcyODViYzJkMjBmMzk0MzY0ZTgzNjdiYjMxNDg0MWMyMzhhNmE1MjFhMWVlMTJiZiJ9fX0=",
                 "팀전 (일반/랭크)", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.", 13, SelectGame::new),
-        TEAM_GAME_EXIT("YWZkMjQwMDAwMmFkOWZiYmJkMDA2Njk0MWViNWIxYTM4NGFiOWIwZTQ4YTE3OGVlOTZlNGQxMjlhNTIwODY1NCJ9fX0=",
+        TEAM_GAME_EXIT("YzEwNTkxZTY5MDllNmEyODFiMzcxODM2ZTQ2MmQ2N2EyYzc4ZmEwOTUyZTkxMGYzMmI0MWEyNmM0OGMxNzU3YyJ9fX0=",
                 "§c§l나가기", "현재 입장한 게임에서 나갑니다." +
                 "\n" +
                 "\n§c경고: 게임 진행 중 나가면 탈주 처리되며, 랭크 게임은 패널티가 적용됩니다.", 13,
@@ -1080,7 +1082,7 @@ public final class User {
         FREE_GAME("NTBkZmM4YTM1NjNiZjk5NmY1YzFiNzRiMGIwMTViMmNjZWIyZDA0Zjk0YmJjZGFmYjIyOTlkOGE1OTc5ZmFjMSJ9fX0=",
                 "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.", 14,
                 target -> User.fromPlayer(target).startFreeCombat()),
-        TRAINING("ZTg3MDhkNGI0YWIxMGI5YmE4NWVkMWE5MjQyYmY4MTEwNWM1NTk2ZDc0M2YyY2EyMGEzMzg3ZTI5ZDA2MzM0NSJ9fX0=",
+        TRAINING("NzNjM2E5YmRjOGM0MGM0MmQ4NDFkYWViNzFlYTllN2QxYzU0YWIzMWEyM2EyZDkyNjU5MWQ1NTUxNDExN2U1ZCJ9fX0=",
                 "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15, target -> {
         }),
         LOBBY("OTNiZjJmYzY5M2IxNmNiOTFiOGM4N2E0YjA4OWZkOWUxODI1ZmNhMDFjZWZiMTY1YzYxODdmYzUzOWIxNTJjOSJ9fX0=",

@@ -5,9 +5,9 @@ import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -35,11 +35,11 @@ public final class SelectGame extends ChestGUI {
      * 게임 정보 아이템.
      */
     private enum SelectGameInfoItem {
-        NORMAL(false, Material.IRON_SWORD, "§a§l일반",
+        NORMAL(false, "YzQ2NWMxMjE5NThjMDUyMmUzZGNjYjNkMTRkNjg2MTJkNjMxN2NkMzgwYjBlNjQ2YjYxYjc0MjBiOTA0YWYwMiJ9fX0=", "§a§l일반",
                 "§f랭크 점수에 반영되지 않는 일반 게임입니다.",
                 "",
                 "§f다음 게임 모드 중에서 무작위로 선택됨 :"),
-        RANK(true, Material.DIAMOND_SWORD, "§6§l랭크",
+        RANK(true, "YzM0NTJiOThhYjlhODhkMTc1N2YwMzJjMDcyYWY4MWNmYTM1ZGRiNDc5NDU4NTkxNDc4MTFiY2RjZmQ5ODcxZSJ9fX0=", "§6§l랭크",
                 "§f랭크 점수에 반영되는 랭크 게임입니다.",
                 "§f랭크 게임 §e{0}판§f을 플레이하면 첫 티어 및 랭크 점수가 결정됩니다.",
                 "§f중간 난입이 불가능한 게임입니다.",
@@ -49,8 +49,8 @@ public final class SelectGame extends ChestGUI {
         /** GUI 아이템 */
         private final DefinedItem definedItem;
 
-        SelectGameInfoItem(boolean isRanked, Material material, String name, String... lores) {
-            ItemBuilder itemBuilder = new ItemBuilder(material).setName(name).setLore(lores);
+        SelectGameInfoItem(boolean isRanked, String skinUrl, String name, String... lores) {
+            ItemBuilder itemBuilder = new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl)).setName(name).setLore(lores);
 
             String[] gamePlayModeNames = Arrays.stream(GamePlayMode.values())
                     .filter(gamePlayMode -> gamePlayMode.isRanked() == isRanked)
