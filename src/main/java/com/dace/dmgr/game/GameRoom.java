@@ -249,6 +249,8 @@ public final class GameRoom {
                     for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
                         removeBossBar(gameWaitBossBar);
 
+                    broadcastGameMessage("게임이 시작했습니다.");
+
                     phase = Phase.PLAYING;
                     game.init();
 
@@ -280,7 +282,19 @@ public final class GameRoom {
         gameWaitBossBars[2].setProgress(canStart() ? remainingSeconds / GeneralConfig.getGameConfig().getWaitingTime().toSeconds() : 1);
 
         if (remainingSeconds > 0 && (remainingSeconds <= 5 || remainingSeconds == 10))
-            users.forEach(user -> user.sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));
+            broadcastGameMessage(MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));
+    }
+
+    /**
+     * 모든 플레이어에게 게임 전체 메시지를 전송한다.
+     *
+     * @param message 메시지
+     */
+    private void broadcastGameMessage(@NonNull String message) {
+        User.getAllUsers().forEach(user -> user.sendMessageInfo("{0}§l[일반 {1}] §r{2}",
+                isRanked() ? "§6" : "§a",
+                getNumber(),
+                message));
     }
 
     /**
