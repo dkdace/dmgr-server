@@ -150,7 +150,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<String, Double>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 5;
+            return size() > 10;
         }
     };
     /** 장착한 코어 목록 */
@@ -947,7 +947,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void sendScoreSidebar() {
         user.getSidebarManager().clear();
-        user.getSidebarManager().setName("§a+" + (int) scoreStreakSum);
+        user.getSidebarManager().setName("§a✪ " + (int) scoreStreakSum);
         user.getSidebarManager().set(0, "");
 
         int i = 0;
