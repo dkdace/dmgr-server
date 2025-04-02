@@ -128,7 +128,7 @@ public abstract class CommandHandler implements TabExecutor {
      */
     @NonNull
     protected final String getHelp() {
-        return MessageFormat.format("§a§l{0} - §a{1}", getUsage(), getDescription());
+        return MessageFormat.format("§a{0} - §f{1}", getUsage(), getDescription());
     }
 
     /**
@@ -340,7 +340,7 @@ public abstract class CommandHandler implements TabExecutor {
          */
         @NonNull
         protected final String getHelp() {
-            return MessageFormat.format("§a§l{0} - §a{1}", usage, description);
+            return MessageFormat.format("§a{0} - §f{1}", usage, description);
         }
 
         /**

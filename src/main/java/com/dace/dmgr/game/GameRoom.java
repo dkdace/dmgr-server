@@ -29,7 +29,7 @@ public final class GameRoom {
 
     /** 게임 시작 대기 보스바 목록 */
     private final BossBarDisplay[] gameWaitBossBars = new BossBarDisplay[]{
-            new BossBarDisplay("§f대기열에서 나가려면 §n'/quit'§f 또는 §n'/q'§f를 입력하십시오."),
+            new BossBarDisplay("§f대기열에서 나가려면 인벤토리에서 §c§l나가기 §f버튼을 누르십시오."),
             new BossBarDisplay(""),
             new BossBarDisplay("", BarColor.GREEN, BarStyle.SOLID)
     };
@@ -89,6 +89,35 @@ public final class GameRoom {
     @Nullable
     public static GameRoom fromNumber(boolean isRanked, int number) {
         return GAME_ROOM_MAP.get(Pair.of(isRanked, number));
+    }
+
+    /**
+     * 현재 입장 가능한 게임을 반환한다.
+     *
+     * <p>입장 가능한 게임이 없으면 새 {@link GameRoom}을 생성한다.</p>
+     *
+     * <p>생성할 수 없는 경우 {@code null}을 반환한다.</p>
+     *
+     * @param isRanked 랭크 여부
+     * @return 입장 가능한 게임
+     */
+    @Nullable
+    public static GameRoom getAvailableGameRoom(boolean isRanked) {
+        int nullRoomNumber = -1;
+        for (int i = 0; i < GeneralConfig.getGameConfig().getMaxRoomCount(); i++) {
+            GameRoom gameRoom = fromNumber(isRanked, i);
+
+            if (gameRoom == null) {
+                if (nullRoomNumber == -1)
+                    nullRoomNumber = i;
+            } else if (gameRoom.canJoin())
+                return gameRoom;
+        }
+
+        if (nullRoomNumber != -1)
+            return new GameRoom(isRanked, nullRoomNumber);
+
+        return null;
     }
 
     /**
@@ -220,6 +249,8 @@ public final class GameRoom {
                     for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
                         removeBossBar(gameWaitBossBar);
 
+                    broadcastGameMessage("게임이 시작했습니다.");
+
                     phase = Phase.PLAYING;
                     game.init();
 
@@ -251,7 +282,19 @@ public final class GameRoom {
         gameWaitBossBars[2].setProgress(canStart() ? remainingSeconds / GeneralConfig.getGameConfig().getWaitingTime().toSeconds() : 1);
 
         if (remainingSeconds > 0 && (remainingSeconds <= 5 || remainingSeconds == 10))
-            users.forEach(user -> user.sendMessageInfo("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));
+            broadcastGameMessage(MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));
+    }
+
+    /**
+     * 모든 플레이어에게 게임 전체 메시지를 전송한다.
+     *
+     * @param message 메시지
+     */
+    private void broadcastGameMessage(@NonNull String message) {
+        User.getAllUsers().forEach(user -> user.sendMessageInfo("{0}§l[일반 {1}] §r{2}",
+                isRanked() ? "§6" : "§a",
+                getNumber(),
+                message));
     }
 
     /**

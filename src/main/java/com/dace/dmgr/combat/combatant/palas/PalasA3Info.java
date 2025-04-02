@@ -10,7 +10,10 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 
 public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     /** 쿨타임 */
@@ -39,11 +42,11 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     private PalasA3Info() {
         super(PalasA3.class, "R.S.K. 생체 제어 수류탄",
                 new ActionInfoLore(ActionInfoLore.Section
-                        .builder("특수 수류탄을 던져 범위의 적에게는 <c:HEAL_DECREASE:최대 체력>을 감소시키고, 아군에게는 <:HEAL_INCREASE:최대 체력>을 증가시킵니다.")
+                        .builder("특수 수류탄을 던져 범위의 적에게는 <:HEALTH_DECREASE:최대 체력>을 감소시키고, 아군에게는 <:HEALTH_INCREASE:최대 체력>을 증가시킵니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
-                        .addValueInfo(TextIcon.HEAL_DECREASE, Format.PERCENT, ChatColor.RED, (int) (100 * HEALTH_DECREASE_RATIO))
-                        .addValueInfo(TextIcon.HEAL_INCREASE, Format.PERCENT, (int) (100 * HEALTH_INCREASE_RATIO))
+                        .addValueInfo(TextIcon.HEALTH_DECREASE, Format.PERCENT, (int) (100 * HEALTH_DECREASE_RATIO))
+                        .addValueInfo(TextIcon.HEALTH_INCREASE, Format.PERCENT, (int) (100 * HEALTH_INCREASE_RATIO))
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
                         .build()));

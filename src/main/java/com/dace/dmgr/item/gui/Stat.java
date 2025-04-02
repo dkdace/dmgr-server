@@ -28,14 +28,13 @@ public final class Stat extends ChestGUI {
                 set(0, 4, new DefinedItem(new ItemBuilder(userData.getProfileItem())
                         .setLore("",
                                 "§e승률 : §b{0}승 §f/ §c{1}패 §f({2}%)",
-                                "§e탈주 : §c{3}회 §f({4}%)",
-                                "§e플레이 시간 : §f{5}")
+                                "§e탈주 : §c{3}회",
+                                "§e플레이 시간 : §f{4}")
                         .formatLore(
                                 userData.getWinCount(),
                                 userData.getLoseCount(),
                                 (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
                                 userData.getQuitCount(),
-                                (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100,
                                 DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분"), "")
                         .build())));
 

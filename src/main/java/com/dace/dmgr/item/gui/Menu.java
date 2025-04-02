@@ -24,29 +24,26 @@ public final class Menu extends ChestGUI {
      * @param player GUI 표시 대상 플레이어
      */
     public Menu(@NonNull Player player) {
-        super(6, "§8메뉴", player);
+        super(5, "§8메뉴", player);
 
         fillAll(GUIItem.EMPTY);
 
         new AsyncTask<>((onFinish, onError) ->
                 set(0, 4, new DefinedItem(UserData.fromPlayer(player).getProfileItem())));
 
-        set(2, 1, MenuItem.GAME_START.definedItem);
-        set(2, 3, MenuItem.RECORD.definedItem);
-        set(2, 5, MenuItem.CORE.definedItem);
-        set(2, 7, MenuItem.ACHIEVEMENT.definedItem);
-        set(4, 1, MenuItem.OPTION.definedItem);
-        set(4, 3, MenuItem.COMMAND.definedItem);
-        set(4, 5, MenuItem.RANKING.definedItem);
-        set(4, 7, MenuItem.LOBBY.definedItem);
-        set(5, 8, GUIItem.EXIT);
+        set(2, 2, MenuItem.RECORD.definedItem);
+        set(2, 4, MenuItem.CORE.definedItem);
+        set(2, 6, MenuItem.OPTION.definedItem);
+        set(4, 2, MenuItem.ACHIEVEMENT.definedItem);
+        set(4, 4, MenuItem.COMMAND.definedItem);
+        set(4, 6, MenuItem.RANKING.definedItem);
+        set(4, 8, GUIItem.EXIT);
     }
 
     /**
      * 메뉴의 아이템 목록.
      */
     private enum MenuItem {
-        GAME_START(Material.IRON_SWORD, 0, "게임 시작", "게임에 참가합니다.", Warp::new),
         RECORD(Material.NAME_TAG, 0, "전적", "개인 전적을 확인합니다.", player -> new Stat(player, UserData.fromPlayer(player))),
         ACHIEVEMENT(Material.BOOK, 0, "업적", "업적 목록을 확인합니다.", player -> player.performCommand("업적")),
         OPTION(Material.REDSTONE_COMPARATOR, 0, "설정", "설정 관련 메뉴를 확인합니다.", PlayerOption::new),
@@ -56,8 +53,7 @@ public final class Menu extends ChestGUI {
                     player.performCommand("명령어");
                     player.closeInventory();
                 }),
-        RANKING(Material.DIAMOND, 0, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.", Ranking::new),
-        LOBBY(Material.BED, 14, "로비", "로비로 이동합니다.", player -> player.performCommand("exit"));
+        RANKING(Material.DIAMOND, 0, "랭킹", "1위부터 10위까지의 항목별 랭킹을 확인합니다.", Ranking::new);
 
         /** GUI 아이템 */
         private final DefinedItem definedItem;
