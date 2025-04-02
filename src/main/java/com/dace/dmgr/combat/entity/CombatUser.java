@@ -550,7 +550,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker == null)
             selfHarmDamage += damage;
 
-        if (damageModule.getTotalShield() > 0)
+        if (damageModule.getTotalShield() == 0)
             combatant.getSpecies().getReaction().onDamage(this, damage, location);
         combatant.onDamage(this, attacker, damage, location, isCrit);
 
