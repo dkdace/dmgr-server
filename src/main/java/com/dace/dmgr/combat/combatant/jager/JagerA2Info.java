@@ -48,7 +48,7 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
                         .build(),
                         new ActionInfoLore.NamedSection("곰덫", ActionInfoLore.Section
                                 .builder("밟은 적은 <:DAMAGE:피해>를 입고 <:SNARE:속박>됩니다.")
-                                .addValueInfo(TextIcon.HEAL, HEALTH)
+                                .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION.toSeconds())
                                 .build())));

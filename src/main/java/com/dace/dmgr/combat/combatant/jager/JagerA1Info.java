@@ -53,7 +53,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
                         new ActionInfoLore.NamedSection("설랑", ActionInfoLore.Section
                                 .builder("근처의 적을 탐지하면 추적합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (사망 시)", COOLDOWN_DEATH.toSeconds())
-                                .addValueInfo(TextIcon.HEAL, HEALTH)
+                                .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, ENEMY_DETECT_RADIUS)
                                 .build()),
                         new ActionInfoLore.NamedSection("설랑: 공격 시", ActionInfoLore.Section

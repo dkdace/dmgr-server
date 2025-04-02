@@ -73,7 +73,13 @@ public enum TextIcon {
     /** 거리 */
     DISTANCE('\u4DDE', ChatColor.WHITE),
     /** 범위 */
-    RADIUS('\u4DDF', ChatColor.WHITE);
+    RADIUS('\u4DDF', ChatColor.WHITE),
+    /** 생명력 */
+    HEALTH('\u4DE0', ChatColor.GREEN),
+    /** 생명력 증가 */
+    HEALTH_INCREASE('\u4DE1', ChatColor.GREEN),
+    /** 생명력 감소 */
+    HEALTH_DECREASE('\u4DE2', ChatColor.RED);
 
     /** 아이콘 문자 */
     private final char icon;
