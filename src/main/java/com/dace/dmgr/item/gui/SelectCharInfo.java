@@ -1,15 +1,12 @@
 package com.dace.dmgr.item.gui;
 
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.PlayerSkullUtil;
-import com.dace.dmgr.util.StringFormUtil;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -28,20 +25,7 @@ public final class SelectCharInfo extends ChestGUI {
         Combatant combatant = combatantType.getCombatant();
 
         fillAll(GUIItem.EMPTY);
-        set(0, 3, new DefinedItem(combatantType.getProfileItem()), itemBuilder -> itemBuilder
-                .setLore("",
-                        "§e✪ 난이도 §7:: §f{0}",
-                        "§a{1} 체력 §7:: §f{2}",
-                        "§b{3} 이동속도 배수 §7:: §f{4}",
-                        "§6⬜ 히트박스 배수 §7:: §f{5}")
-                .formatLore(
-                        StringFormUtil.getProgressBar(combatant.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
-                                .replace("§0", "§8"),
-                        TextIcon.HEAL,
-                        combatant.getHealth(),
-                        TextIcon.WALK_SPEED,
-                        combatant.getSpeedMultiplier(),
-                        combatant.getHitboxMultiplier()));
+        set(0, 3, combatantType.getInfoItem());
 
         set(0, 5, combatant.getWeaponInfo().getDefinedItem());
 

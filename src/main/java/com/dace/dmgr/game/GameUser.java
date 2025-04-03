@@ -251,9 +251,9 @@ public final class GameUser {
                     User targetUser = target.getUser();
 
                     if (team == targetTeam || isHeadReveal)
-                        tabListManager.setItem(column, row, targetUser.getUserData().getDisplayName(), targetUser);
+                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), targetUser);
                     else
-                        tabListManager.setItem(column, row, targetUser.getUserData().getDisplayName(), Skins.getPlayer("crashdummie99"));
+                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), Skins.getPlayer("crashdummie99"));
 
                     tabListManager.setItem(column, row + 1, MessageFormat.format("§7{0} §f{1}   §7{2} §f{3}   §7{4} §f{5}   §7{6} §f{7}",
                             "✪",

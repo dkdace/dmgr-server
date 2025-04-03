@@ -25,7 +25,7 @@ public final class LobbyCommand extends CommandHandler {
         GameUser gameUser = GameUser.fromUser(user);
 
         if (gameUser != null) {
-            user.sendMessageWarn("게임 진행 중에 나가려면 §n'/quit'§r 또는 §n'/q'§r를 입력하십시오.");
+            user.sendMessageWarn("게임 진행 중에 나가려면 §l나가기 §r버튼을 사용하십시오.");
             return;
         }
 

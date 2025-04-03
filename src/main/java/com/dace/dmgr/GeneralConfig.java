@@ -107,6 +107,14 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 관리자 연락처 */
         @NonNull
         private final String adminContact = section.getEntry("admin_contact", "").get();
+        /** 디스코드 주소 */
+        @NonNull
+        private final String discord = section.getEntry("discord", "").get();
+        /** 마인리스트 주소 */
+        @NonNull
+        private final String minelist = section.getEntry("minelist", "").get();
+        /** 코어 가격 */
+        private final int corePrice = section.getEntry("core_price", 0).get();
         /** 로비 위치 */
         private final Location lobbyLocation = new Location(
                 DMGR.getDefaultWorld(),

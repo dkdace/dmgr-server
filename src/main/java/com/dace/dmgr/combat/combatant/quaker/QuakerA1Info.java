@@ -47,7 +47,7 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                         new ActionInfoLore.NamedSection("방패", ActionInfoLore.Section
                                 .builder("공격을 막는 방벽입니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (파괴 시)", COOLDOWN_DEATH.toSeconds())
-                                .addValueInfo(TextIcon.HEAL, HEALTH)
+                                .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .build()),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")

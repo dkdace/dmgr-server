@@ -6,7 +6,6 @@ import com.dace.dmgr.DMGR;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.FunctionalBlock;
@@ -36,6 +35,9 @@ import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.PlayerSkullUtil;
+import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -52,6 +54,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -89,6 +92,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 강인함의 코어 수정자 */
     private static final AbilityStatus.Modifier CORE_ENDURANCE_MODIFIER = new AbilityStatus.Modifier(Core.ENDURANCE.getValue());
 
+    /** 메뉴 아이템 */
+    private static final DefinedItem MENU_ITEM = new DefinedItem(new ItemBuilder(
+            PlayerSkullUtil.fromURL("ZDliMjk4M2MwMWI4ZGE3ZGMxYzBmMTJkMDJjNGFiMjBjZDhlNjg3NWU4ZGY2OWVhZTJhODY3YmFlZTYyMzZkNCJ9fX0="))
+            .setName("§e§l메뉴")
+            .setLore("§f메뉴 창을 엽니다.")
+            .build(),
+            (clickType, player) -> {
+                if (clickType != ClickType.LEFT)
+                    return false;
+
+                new Menu(player);
+                return true;
+            });
+
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -109,7 +126,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final MoveModule moveModule;
-
     /** 유저 정보 인스턴스 */
     @NonNull
     @Getter
@@ -122,7 +138,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final Game.Team team;
-
     /** 처치 기여자별 누적 피해량 관리 인스턴스 */
     private final KillContributorManager killContributorManager = new KillContributorManager();
     /** 처치 지원자 관리 인스턴스 */
@@ -135,12 +150,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<String, Double>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 5;
+            return size() > 10;
         }
     };
     /** 장착한 코어 목록 */
     private final EnumSet<Core> cores = EnumSet.noneOf(Core.class);
-
     /** 현재 히트박스 목록 */
     private Hitbox[] currentHitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용 */
@@ -229,6 +243,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
 
         user.getSidebarManager().clear();
+        user.getGui().set(8, MENU_ITEM);
 
         setCombatantType(combatantType);
 
@@ -374,7 +389,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         handleFootstep();
 
         if (damageModule.isLowHealth())
-            CombatEffectUtil.playBleedingParticle(this, null, 0);
+            combatant.getSpecies().getReaction().onTickLowHealth(this);
 
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
@@ -535,7 +550,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker == null)
             selfHarmDamage += damage;
 
+        if (damageModule.getTotalShield() == 0)
+            combatant.getSpecies().getReaction().onDamage(this, damage, location);
         combatant.onDamage(this, attacker, damage, location, isCrit);
+
         lastDamageTimestamp = Timestamp.now();
 
         if (attacker instanceof SummonEntity)
@@ -707,6 +725,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return;
 
         isDead = true;
+
+        combatant.getSpecies().getReaction().onDeath(this);
         combatant.onDeath(this, attacker);
 
         killContributorManager.getDamageMap().keySet().forEach(target -> {
@@ -927,7 +947,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void sendScoreSidebar() {
         user.getSidebarManager().clear();
-        user.getSidebarManager().setName("§a+" + (int) scoreStreakSum);
+        user.getSidebarManager().setName("§a✪ " + (int) scoreStreakSum);
         user.getSidebarManager().set(0, "");
 
         int i = 0;

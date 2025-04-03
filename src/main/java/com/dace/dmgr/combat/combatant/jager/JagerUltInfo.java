@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -51,11 +52,12 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("<3::눈폭풍 발생기>를 던져 긴 시간동안 눈폭풍을 일으킵니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build(),
                         new ActionInfoLore.NamedSection("눈폭풍 발생기", ActionInfoLore.Section
                                 .builder("일정 시간동안 <:DAMAGE:광역 피해>와 <5:WALK_SPEED_DECREASE:> <d::빙결>을 입히는 눈폭풍을 일으킵니다. " +
                                         "눈폭풍의 범위는 시간에 따라 점차 넓어집니다.")
-                                .addValueInfo(TextIcon.HEAL, HEALTH)
+                                .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                                 .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.PER_SECOND, ChatColor.DARK_PURPLE, FREEZE_PER_SECOND)

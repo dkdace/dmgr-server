@@ -14,7 +14,11 @@ import com.dace.dmgr.event.listener.OnPlayerQuit;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.GUI;
+import com.dace.dmgr.item.gui.SelectGame;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
@@ -42,6 +46,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -52,6 +57,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
 /**
@@ -76,14 +82,16 @@ public final class User {
             "",
             "§e멀티플레이 → 편집 → 서버 리소스 팩 : 사용",
             "",
-            "§f다운로드가 되지 않으면, .minecraft → server-resource-packs 폴더를 생성하십시오.",
+            "§f다운로드가 되지 않으면, §n.minecraft → server-resource-packs§f 폴더를 생성하십시오.",
             "",
             "§7다운로드 오류 문의 : {1}");
     /** 리소스팩 적용 중 오류로 강제퇴장 시 표시되는 메시지 */
     private static final String MESSAGE_KICK_RESOURCE_ERR = String.join("\n",
             "{0}§c리소스팩 적용 중 오류가 발생했습니다.",
             "",
-            "§f잠시 후 다시 시도하거나, 게임을 재부팅 하십시오.",
+            "§f§n.minecraft → server-resource-packs§f 폴더의 내용물을 전부 삭제한 뒤 재접속 하시기 바랍니다.",
+            "",
+            "§e문제가 해결되지 않으면 문의 바랍니다.",
             "",
             "§7다운로드 오류 문의 : {1}");
     /** 채팅의 메시지 포맷 패턴 */
@@ -435,9 +443,7 @@ public final class User {
                         userData.getLoseCount(),
                         (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
                 Skins.getPlayer("goldblock"));
-        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회 §f({1}%)",
-                        userData.getQuitCount(),
-                        (double) userData.getQuitCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
+        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()),
                 Skins.getPlayer("MHF_TNT2"));
         tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
                         DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")),
@@ -492,10 +498,10 @@ public final class User {
     private String getTabListPlayerName() {
         String prefix = "§7[로비]";
 
-        if (isInFreeCombat())
+        if (gameRoom != null)
+            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 {0}]" : "§a[일반 {0}]", gameRoom.getNumber());
+        else if (isInFreeCombat())
             prefix = "§7[자유 전투]";
-        else if (gameRoom != null)
-            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 게임 {0}]" : "§a[일반 게임 {0}]", gameRoom.getNumber());
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
@@ -658,6 +664,8 @@ public final class User {
         player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
 
         gui.clear();
+        updateGUI();
+
         teleport(GeneralConfig.getConfig().getLobbyLocation());
         quitFreeCombat();
 
@@ -674,6 +682,17 @@ public final class User {
         CombatUser combatUser = CombatUser.fromUser(this);
         if (combatUser != null)
             combatUser.remove();
+    }
+
+    /**
+     * 인벤토리 GUI를 업데이트한다.
+     */
+    private void updateGUI() {
+        for (MenuItem menuItem : MenuItem.values())
+            if (menuItem != MenuItem.TEAM_GAME && gameRoom != null || menuItem != MenuItem.TEAM_GAME_EXIT && gameRoom == null)
+                gui.set(menuItem.slotIndex, menuItem.definedItem);
+
+        player.updateInventory();
     }
 
     /**
@@ -970,6 +989,8 @@ public final class User {
 
         this.gameRoom = gameRoom;
         gameRoom.onJoin(this);
+
+        updateGUI();
     }
 
     /**
@@ -981,6 +1002,8 @@ public final class User {
 
         gameRoom.onQuit(this);
         gameRoom = null;
+
+        updateGUI();
     }
 
     /**
@@ -1040,6 +1063,54 @@ public final class User {
                 onError.accept(ex);
             }
         });
+    }
+
+    /**
+     * 메뉴 아이템 목록.
+     */
+    private enum MenuItem {
+        TEAM_GAME("NzYxODQ2MTBjNTBjMmVmYjcyODViYzJkMjBmMzk0MzY0ZTgzNjdiYjMxNDg0MWMyMzhhNmE1MjFhMWVlMTJiZiJ9fX0=",
+                "팀전 (일반/랭크)", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.", 13, SelectGame::new),
+        TEAM_GAME_EXIT("YzEwNTkxZTY5MDllNmEyODFiMzcxODM2ZTQ2MmQ2N2EyYzc4ZmEwOTUyZTkxMGYzMmI0MWEyNmM0OGMxNzU3YyJ9fX0=",
+                "§c§l나가기", "현재 입장한 게임에서 나갑니다." +
+                "\n" +
+                "\n§c경고: 게임 진행 중 나가면 탈주 처리되며, 랭크 게임은 패널티가 적용됩니다.", 13,
+                target -> {
+                    User.fromPlayer(target).quitGame();
+                    target.closeInventory();
+                }),
+        FREE_GAME("NTBkZmM4YTM1NjNiZjk5NmY1YzFiNzRiMGIwMTViMmNjZWIyZDA0Zjk0YmJjZGFmYjIyOTlkOGE1OTc5ZmFjMSJ9fX0=",
+                "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.", 14,
+                target -> User.fromPlayer(target).startFreeCombat()),
+        TRAINING("NzNjM2E5YmRjOGM0MGM0MmQ4NDFkYWViNzFlYTllN2QxYzU0YWIzMWEyM2EyZDkyNjU5MWQ1NTUxNDExN2U1ZCJ9fX0=",
+                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15, target -> {
+        }),
+        LOBBY("OTNiZjJmYzY5M2IxNmNiOTFiOGM4N2E0YjA4OWZkOWUxODI1ZmNhMDFjZWZiMTY1YzYxODdmYzUzOWIxNTJjOSJ9fX0=",
+                "로비", "로비로 이동합니다.", 17,
+                target -> {
+                    target.performCommand("exit");
+                    target.closeInventory();
+                });
+
+        /** 인벤토리 칸 번호 */
+        private final int slotIndex;
+        /** GUI 아이템 */
+        private final DefinedItem definedItem;
+
+        MenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
+            this.slotIndex = slotIndex;
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl))
+                    .setName("§e§l" + name)
+                    .setLore("§f" + lore)
+                    .build(),
+                    (clickType, target) -> {
+                        if (clickType != ClickType.LEFT)
+                            return false;
+
+                        action.accept(target);
+                        return true;
+                    });
+        }
     }
 
     /**

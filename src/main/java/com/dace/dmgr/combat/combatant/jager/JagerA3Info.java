@@ -51,6 +51,7 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.VARIABLE, ChatColor.DARK_PURPLE, FREEZE, FREEZE / 2)
                         .addValueInfo(TextIcon.SNARE, Format.TIME, SNARE_DURATION.toSeconds())
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
+                        .addActionKeyInfo("사용", ActionKey.SLOT_3)
                         .build(),
                         new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("수류탄을 던집니다.")
