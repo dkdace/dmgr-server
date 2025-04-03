@@ -98,13 +98,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             .setName("§e§l메뉴")
             .setLore("§f메뉴 창을 엽니다.")
             .build(),
-            (clickType, player) -> {
-                if (clickType != ClickType.LEFT)
-                    return false;
-
+            new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                 new Menu(player);
                 return true;
-            });
+            }));
 
     /** 공격 모듈 */
     @NonNull

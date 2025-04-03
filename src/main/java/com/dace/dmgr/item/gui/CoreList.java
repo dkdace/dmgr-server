@@ -44,13 +44,13 @@ public final class CoreList extends ChestGUI {
             Set<Core> cores = UserData.fromPlayer(player).getCombatantRecord(combatantType).getCores();
             boolean hasAllCores = cores.size() == Core.values().length;
 
-            set(i, new DefinedItem(combatantType.getProfileItem(), (clickType, target) -> {
-                if (clickType != ClickType.LEFT || hasAllCores)
+            set(i, new DefinedItem(combatantType.getProfileItem(), new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
+                if (hasAllCores)
                     return false;
 
                 onSelectCombatant(combatantType, cores);
                 return true;
-            }), itemBuilder -> {
+            })), itemBuilder -> {
                 itemBuilder.setLore("");
 
                 if (cores.isEmpty())
@@ -89,15 +89,12 @@ public final class CoreList extends ChestGUI {
                             "§7§n클릭§f하여 코어를 구매합니다.")
                     .formatLore(price)
                     .build(),
-                    (clickType, target) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
                         onPurchaseCore(target, combatantType, core, price);
 
                         target.closeInventory();
                         return true;
-                    }));
+                    })));
         }
     }
 

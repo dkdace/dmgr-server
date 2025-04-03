@@ -7,6 +7,7 @@ import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -35,12 +36,12 @@ public final class BlockList extends ChestGUI {
                 set(i, new DefinedItem(new ItemBuilder(blockedPlayer.getProfileItem())
                         .setLore("§f클릭 시 차단을 해제합니다.")
                         .build(),
-                        (clickType, target) -> {
+                        new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
                             target.performCommand("차단 " + blockedPlayer.getPlayerName());
                             target.closeInventory();
 
                             return true;
-                        }));
+                        })));
             }
         });
     }

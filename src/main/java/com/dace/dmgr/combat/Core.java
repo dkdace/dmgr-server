@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 
@@ -55,7 +56,7 @@ public enum Core {
                         "§9" + MessageFormat.format(description, value))
                 .build();
         this.selectItem = new DefinedItem(new ItemBuilder(coreItem).addLore("", "§7§n클릭§f하여 코어를 장착하거나 제거합니다.").build(),
-                (clickType, player) -> {
+                new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                     ChestGUI gui = ChestGUI.fromInventory(player.getOpenInventory().getTopInventory());
                     if (!(gui instanceof SelectCore))
                         return false;
@@ -73,7 +74,7 @@ public enum Core {
                         new SelectCore(player);
 
                     return pass;
-                });
+                }));
     }
 
     /**

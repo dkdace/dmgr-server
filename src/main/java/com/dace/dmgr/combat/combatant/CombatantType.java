@@ -106,29 +106,30 @@ public enum CombatantType {
                         "§7§n좌클릭§f하여 전투원을 선택합니다.",
                         "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
                 .build(),
-                (clickType, player) -> {
-                    if (clickType == ClickType.LEFT) {
-                        User user = User.fromPlayer(player);
+                new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
+                    User user = User.fromPlayer(player);
 
-                        GameUser gameUser = GameUser.fromUser(user);
-                        if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(this))
-                            return false;
+                    GameUser gameUser = GameUser.fromUser(user);
+                    if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(this))
+                        return false;
 
-                        CombatUser combatUser = CombatUser.fromUser(user);
-                        if (combatUser == null)
-                            combatUser = new CombatUser(this, user);
-                        else
-                            combatUser.setCombatantType(this);
+                    CombatUser combatUser = CombatUser.fromUser(user);
+                    if (combatUser == null)
+                        combatUser = new CombatUser(this, user);
+                    else
+                        combatUser.setCombatantType(this);
 
-                        player.closeInventory();
+                    player.closeInventory();
 
-                        if (!user.getUserData().getCombatantRecord(this).getCores().isEmpty())
-                            combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
-                    } else if (clickType == ClickType.RIGHT)
-                        new SelectCharInfo(player, this);
+                    if (!user.getUserData().getCombatantRecord(this).getCores().isEmpty())
+                        combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
 
                     return true;
-                });
+                }),
+                new DefinedItem.ClickHandler(ClickType.RIGHT, player -> {
+                    new SelectCharInfo(player, this);
+                    return true;
+                }));
     }
 
     /**

@@ -83,10 +83,7 @@ public final class ChatSoundOption extends ChestGUI {
             this.sound = new SoundEffect(SoundEffect.SoundInfo.builder(sound).volume(1000).pitch(Math.sqrt(2)).build());
 
             this.definedItem = new DefinedItem(new ItemBuilder(material).setName("§e§l" + name).build(),
-                    (clickType, player) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                         UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
                         userConfig.setChatSound(this);
 
@@ -95,7 +92,7 @@ public final class ChatSoundOption extends ChestGUI {
                         new ChatSoundOption(player);
 
                         return true;
-                    });
+                    }));
         }
     }
 }

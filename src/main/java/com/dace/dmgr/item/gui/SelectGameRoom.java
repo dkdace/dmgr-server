@@ -127,10 +127,7 @@ public final class SelectGameRoom extends ChestGUI {
 
             itemBuilder.formatLore(gameUserCount, maxPlayerCount, phase, playMode, displayTime);
 
-            return new DefinedItem(itemBuilder.build(), (clickType, player) -> {
-                if (clickType != ClickType.LEFT)
-                    return false;
-
+            return new DefinedItem(itemBuilder.build(), new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                 User user = User.fromPlayer(player);
                 if (user.getGameRoom() == null) {
                     GameRoom selectGameRoom = GameRoom.fromNumber(isRanked, number);
@@ -143,7 +140,7 @@ public final class SelectGameRoom extends ChestGUI {
                 }
 
                 return true;
-            });
+            }));
         }
     }
 }

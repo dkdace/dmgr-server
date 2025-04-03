@@ -75,13 +75,10 @@ public final class PlayerOption extends ChestGUI {
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),
-                    (clickType, player) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                         action.accept(player);
                         return true;
-                    });
+                    }));
         }
     }
 }

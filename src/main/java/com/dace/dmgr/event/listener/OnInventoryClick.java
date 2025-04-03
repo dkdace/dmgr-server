@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,8 +23,10 @@ import org.bukkit.inventory.ItemStack;
 public final class OnInventoryClick extends EventListener<InventoryClickEvent> {
     @Getter
     private static final OnInventoryClick instance = new OnInventoryClick();
-    /** GUI 클릭 효과음 */
-    private static final SoundEffect GUI_CLICK_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder(Sound.UI_BUTTON_CLICK).build());
+    /** GUI 클릭 성공 효과음 */
+    private static final SoundEffect GUI_CLICK_PASS_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder(Sound.UI_BUTTON_CLICK).build());
+    /** GUI 클릭 실패 효과음 */
+    private static final SoundEffect GUI_CLICK_FAIL_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder("new.block.note_block.bit").pitch(0.7).build());
 
     @Override
     @EventHandler
@@ -55,7 +56,8 @@ public final class OnInventoryClick extends EventListener<InventoryClickEvent> {
 
         event.setCancelled(true);
 
-        if (event.getClick() != ClickType.DOUBLE_CLICK && definedItem.getOnClick().apply(event.getClick(), player))
-            GUI_CLICK_SOUND.play(player);
+        DefinedItem.ClickHandler clickHandler = definedItem.getClickHandler(event.getClick());
+        if (clickHandler != null)
+            (clickHandler.onClick.test(player) ? GUI_CLICK_PASS_SOUND : GUI_CLICK_FAIL_SOUND).play(player);
     }
 }

@@ -59,18 +59,15 @@ public final class Menu extends ChestGUI {
         private final DefinedItem definedItem;
 
         MenuItem(Material material, int damage, String name, String lore, Consumer<Player> action) {
-            definedItem = new DefinedItem(new ItemBuilder(material)
+            this.definedItem = new DefinedItem(new ItemBuilder(material)
                     .setDamage((short) damage)
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),
-                    (clickType, player) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                         action.accept(player);
                         return true;
-                    });
+                    }));
         }
     }
 }

@@ -464,10 +464,7 @@ public final class GameUser {
                             .setDamage((short) 5)
                             .setName(name)
                             .build(),
-                    (clickType, player) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
                         if (combatUser == null)
                             return false;
@@ -487,7 +484,7 @@ public final class GameUser {
                         player.closeInventory();
 
                         return true;
-                    });
+                    }));
         }
     }
 }

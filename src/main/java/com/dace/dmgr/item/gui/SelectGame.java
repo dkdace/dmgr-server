@@ -58,32 +58,35 @@ public final class SelectGame extends ChestGUI {
             itemBuilder.addLore(gamePlayModeNames);
             itemBuilder.addLore("", "§7§n좌클릭§f하여 참여 가능한 게임에 입장합니다.", "§7§n우클릭§f하여 게임 방을 선택합니다.");
 
-            this.definedItem = new DefinedItem(itemBuilder.build(), (clickType, player) -> {
-                User user = User.fromPlayer(player);
-
-                if (isRanked) {
-                    user.sendMessageWarn("랭크 게임 준비 중입니다.");
+            if (isRanked)
+                this.definedItem = new DefinedItem(itemBuilder.build(), new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
+                    User.fromPlayer(player).sendMessageWarn("랭크 게임 준비 중입니다.");
                     player.closeInventory();
 
                     return false;
-                }
+                }));
+            else
+                this.definedItem = new DefinedItem(itemBuilder.build(),
+                        new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
+                            User user = User.fromPlayer(player);
 
-                if (clickType == ClickType.LEFT) {
-                    if (user.getGameRoom() != null)
-                        return false;
+                            if (user.getGameRoom() != null)
+                                return false;
 
-                    GameRoom gameRoom = GameRoom.getAvailableGameRoom(false);
-                    if (gameRoom == null)
-                        return false;
+                            GameRoom gameRoom = GameRoom.getAvailableGameRoom(false);
+                            if (gameRoom == null)
+                                return false;
 
-                    user.joinGame(gameRoom);
+                            user.joinGame(gameRoom);
 
-                    player.closeInventory();
-                } else if (clickType == ClickType.RIGHT)
-                    new SelectGameRoom(player, false);
+                            player.closeInventory();
 
-                return true;
-            });
+                            return true;
+                        }),
+                        new DefinedItem.ClickHandler(ClickType.RIGHT, player -> {
+                            new SelectGameRoom(player, false);
+                            return true;
+                        }));
         }
     }
 }

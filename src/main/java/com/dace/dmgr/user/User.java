@@ -1103,13 +1103,10 @@ public final class User {
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),
-                    (clickType, target) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
+                    new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
                         action.accept(target);
                         return true;
-                    });
+                    }));
         }
     }
 

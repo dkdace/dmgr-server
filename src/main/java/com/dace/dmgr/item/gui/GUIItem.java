@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.function.Function;
 
@@ -31,10 +32,10 @@ public final class GUIItem {
 
     /** 나가기 버튼 */
     public static final ButtonItem EXIT = new ButtonItem(8, "§c§l나가기",
-            (clickType, player) -> {
+            new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
                 player.closeInventory();
                 return true;
-            });
+            }));
 
     /**
      * 표시용 GUI 아이템.
@@ -52,11 +53,11 @@ public final class GUIItem {
      * 버튼 GUI 아이템.
      */
     public static class ButtonItem extends DefinedItem {
-        private ButtonItem(int damage, @NonNull String name, @NonNull OnClick onClick) {
+        private ButtonItem(int damage, @NonNull String name, @NonNull DefinedItem.ClickHandler clickHandler) {
             super(new ItemBuilder(Material.CARROT_STICK)
                     .setDamage((short) damage)
                     .setName(name)
-                    .build(), onClick);
+                    .build(), clickHandler);
         }
     }
 
@@ -70,10 +71,10 @@ public final class GUIItem {
          * @param onClick 클릭했을 때 이동할 GUI 반환에 실행할 작업.
          */
         public Previous(@NonNull Function<@NonNull Player, @NonNull GUI> onClick) {
-            super(9, "§6§l이전", (clickType, player) -> {
+            super(9, "§6§l이전", new ClickHandler(ClickType.LEFT, player -> {
                 onClick.apply(player);
                 return true;
-            });
+            }));
         }
     }
 
@@ -81,8 +82,8 @@ public final class GUIItem {
      * 다음 버튼.
      */
     public static final class Next extends ButtonItem {
-        public Next(@NonNull OnClick onClick) {
-            super(10, "§6§l다음", onClick);
+        public Next(@NonNull DefinedItem.ClickHandler clickHandler) {
+            super(10, "§6§l다음", clickHandler);
         }
     }
 
@@ -90,8 +91,8 @@ public final class GUIItem {
      * 위 버튼.
      */
     public static final class Up extends ButtonItem {
-        public Up(@NonNull OnClick onClick) {
-            super(11, "§6§l위로", onClick);
+        public Up(@NonNull DefinedItem.ClickHandler clickHandler) {
+            super(11, "§6§l위로", clickHandler);
         }
     }
 
@@ -99,8 +100,8 @@ public final class GUIItem {
      * 아래 버튼.
      */
     public static final class Down extends ButtonItem {
-        public Down(@NonNull OnClick onClick) {
-            super(12, "§6§l아래로", onClick);
+        public Down(@NonNull DefinedItem.ClickHandler clickHandler) {
+            super(12, "§6§l아래로", clickHandler);
         }
     }
 }
