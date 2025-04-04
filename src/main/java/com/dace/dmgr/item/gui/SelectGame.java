@@ -1,11 +1,11 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -50,7 +50,7 @@ public final class SelectGame extends ChestGUI {
         private final DefinedItem definedItem;
 
         SelectGameInfoItem(boolean isRanked, String skinUrl, String name, String... lores) {
-            ItemBuilder itemBuilder = new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl)).setName(name).setLore(lores);
+            ItemBuilder itemBuilder = new ItemBuilder(PlayerSkin.fromURL(skinUrl)).setName(name).setLore(lores);
 
             String[] gamePlayModeNames = Arrays.stream(GamePlayMode.values())
                     .filter(gamePlayMode -> gamePlayMode.isRanked() == isRanked)

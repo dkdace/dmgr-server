@@ -2,10 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.DMGR;
-import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.FunctionalBlock;
@@ -36,7 +33,6 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
@@ -94,7 +90,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /** 메뉴 아이템 */
     private static final DefinedItem MENU_ITEM = new DefinedItem(new ItemBuilder(
-            PlayerSkullUtil.fromURL("ZDliMjk4M2MwMWI4ZGE3ZGMxYzBmMTJkMDJjNGFiMjBjZDhlNjg3NWU4ZGY2OWVhZTJhODY3YmFlZTYyMzZkNCJ9fX0="))
+            PlayerSkin.fromURL("ZDliMjk4M2MwMWI4ZGE3ZGMxYzBmMTJkMDJjNGFiMjBjZDhlNjg3NWU4ZGY2OWVhZTJhODY3YmFlZTYyMzZkNCJ9fX0="))
             .setName("§e§l메뉴")
             .setLore("§f메뉴 창을 엽니다.")
             .build(),
@@ -1030,7 +1026,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         combatant.onSet(this);
 
-        addTask(user.applySkin(combatant.getSkinName()));
+        addTask(user.applySkin(PlayerSkin.fromName(combatant.getSkinName())));
         addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
                 1, 10));

@@ -16,7 +16,6 @@ import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.item.gui.SelectGame;
 import com.dace.dmgr.util.StringFormUtil;
@@ -1034,13 +1033,13 @@ public final class User {
     /**
      * 플레이어의 스킨을 변경한다.
      *
-     * @param skinName 적용할 스킨 이름
+     * @param playerSkin 적용할 스킨
      */
     @NonNull
-    public AsyncTask<Void> applySkin(@NonNull String skinName) {
+    public AsyncTask<Void> applySkin(@NonNull PlayerSkin playerSkin) {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), skinName);
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), playerSkin.getProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
@@ -1056,7 +1055,7 @@ public final class User {
     public AsyncTask<Void> resetSkin() {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), player.getName());
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), PlayerSkin.fromPlayerName(player.getName()).getProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
@@ -1099,7 +1098,7 @@ public final class User {
 
         MenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
             this.slotIndex = slotIndex;
-            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl))
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkin.fromURL(skinUrl))
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),

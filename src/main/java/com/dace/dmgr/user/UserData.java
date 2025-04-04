@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
@@ -603,11 +602,10 @@ public final class UserData implements Initializable<Void> {
      * 플레이어의 프로필 정보 아이템을 반환한다.
      *
      * @return 프로필 정보 아이템
-     * @see PlayerSkullUtil#fromPlayer(OfflinePlayer)
      */
     @NonNull
     public ItemStack getProfileItem() {
-        return new ItemBuilder(PlayerSkullUtil.fromPlayer(Bukkit.getOfflinePlayer(playerUUID))).setName(getDisplayName()).build();
+        return new ItemBuilder(PlayerSkin.fromUUID(playerUUID)).setName(getDisplayName()).build();
     }
 
     /**
