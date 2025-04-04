@@ -2,7 +2,6 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
@@ -94,12 +93,8 @@ public final class FreeCombat {
      * 플레이어가 자유 전투를 시작했을 때 실행할 작업.
      *
      * @param user 대상 플레이어
-     * @see User#startFreeCombat()
      */
     public void onStart(@NonNull User user) {
-        if (CombatUser.fromUser(user) != null)
-            return;
-
         user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
                 Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
         user.teleport(WAIT_LOCATION);

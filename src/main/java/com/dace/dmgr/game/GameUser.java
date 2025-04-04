@@ -106,7 +106,7 @@ public final class GameUser {
         this.game = game;
         this.team = team;
 
-        user.quitFreeCombat();
+        user.reset();
 
         GAME_USER_MAP.put(user, this);
 
@@ -209,9 +209,9 @@ public final class GameUser {
         onTickTask.stop();
         game.onRemoveGameUser(this);
 
-        user.reset();
-
         GAME_USER_MAP.remove(user);
+
+        user.setCurrentPlace(User.Place.LOBBY);
     }
 
     /**

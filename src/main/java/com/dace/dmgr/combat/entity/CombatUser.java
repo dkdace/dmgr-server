@@ -48,7 +48,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.MainHand;
@@ -1036,8 +1035,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 모든 상태를 재설정한다.
      */
     private void reset() {
-        entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        entity.getInventory().setHeldItemSlot(4);
         entity.getActivePotionEffects().forEach((potionEffect -> entity.removePotionEffect(potionEffect.getType())));
         entity.setAllowFlight(false);
         entity.setFlying(false);

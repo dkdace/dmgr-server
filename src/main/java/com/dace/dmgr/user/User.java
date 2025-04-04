@@ -5,6 +5,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.FreeCombat;
+import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
@@ -30,6 +31,7 @@ import com.keenant.tabbed.tablist.TableTabList;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -168,13 +170,12 @@ public final class User {
     @Nullable
     @Getter
     private GameRoom gameRoom;
+    /** 현재 장소 */
+    private Place currentPlace = Place.LOBBY;
     /** 관리자 채팅 여부 */
     @Getter
     @Setter
     private boolean isAdminChat = false;
-    /** 자유 전투 입장 여부 */
-    @Getter
-    private boolean isInFreeCombat = false;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -226,7 +227,7 @@ public final class User {
      * 유저 초기화 작업을 수행한다.
      */
     private void init() {
-        reset();
+        setCurrentPlace(Place.LOBBY);
         taskManager.add(new DelayTask(this::clearChat, 10));
 
         if (userData.isInitialized())
@@ -503,8 +504,8 @@ public final class User {
 
         if (gameRoom != null)
             prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 {0}]" : "§a[일반 {0}]", gameRoom.getNumber());
-        else if (isInFreeCombat())
-            prefix = "§7[자유 전투]";
+        else if (currentPlace != Place.LOBBY)
+            prefix = MessageFormat.format("§7[{0}]", currentPlace.name);
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
@@ -576,7 +577,7 @@ public final class User {
      * @see OnPlayerQuit
      */
     public void onQuit() {
-        reset();
+        setCurrentPlace(Place.LOBBY);
 
         if (gameRoom != null)
             quitGame();
@@ -656,7 +657,7 @@ public final class User {
     }
 
     /**
-     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정하고 스폰으로 이동시킨다.
+     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
     public void reset() {
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
@@ -668,9 +669,6 @@ public final class User {
 
         gui.clear();
         updateGUI();
-
-        teleport(GeneralConfig.getConfig().getLobbyLocation());
-        quitFreeCombat();
 
         getAllUsers().forEach(target -> {
             removeGlowing(target.getPlayer());
@@ -1010,28 +1008,18 @@ public final class User {
     }
 
     /**
-     * 플레이어를 자유 전투에 입장시킨다.
+     * 플레이어를 지정한 장소로 이동시킨다.
+     *
+     * @param place 이동할 장소
      */
-    public void startFreeCombat() {
-        if (isInFreeCombat || GameUser.fromUser(this) != null)
+    public void setCurrentPlace(@NonNull Place place) {
+        if (currentPlace == place && place != Place.LOBBY || GameUser.fromUser(this) != null)
             return;
 
-        isInFreeCombat = true;
-        FreeCombat.getInstance().onStart(this);
-    }
+        currentPlace = place;
+        place.onWarp.accept(this);
 
-    /**
-     * 플레이어를 자유 전투에서 퇴장시킨다.
-     */
-    public void quitFreeCombat() {
-        if (!isInFreeCombat)
-            return;
-
-        isInFreeCombat = false;
-
-        CombatUser combatUser = CombatUser.fromUser(this);
-        if (combatUser != null)
-            combatUser.remove();
+        reset();
     }
 
     /**
@@ -1069,6 +1057,24 @@ public final class User {
     }
 
     /**
+     * 이용 가능한 장소 목록.
+     */
+    @AllArgsConstructor
+    public enum Place {
+        /** 로비 */
+        LOBBY("로비", user -> user.teleport(GeneralConfig.getConfig().getLobbyLocation())),
+        /** 자유 전투 */
+        FREE_COMBAT("자유 전투", FreeCombat.getInstance()::onStart),
+        /** 훈련장 */
+        TRAINING_CENTER("훈련장", TrainingCenter.getInstance()::onStart);
+
+        /** 이름 */
+        private final String name;
+        /** 이동 시 실행할 작업 */
+        private final Consumer<User> onWarp;
+    }
+
+    /**
      * 메뉴 아이템 목록.
      */
     private enum MenuItem {
@@ -1084,10 +1090,10 @@ public final class User {
                 }),
         FREE_GAME("NTBkZmM4YTM1NjNiZjk5NmY1YzFiNzRiMGIwMTViMmNjZWIyZDA0Zjk0YmJjZGFmYjIyOTlkOGE1OTc5ZmFjMSJ9fX0=",
                 "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.", 14,
-                target -> User.fromPlayer(target).startFreeCombat()),
+                target -> User.fromPlayer(target).setCurrentPlace(Place.FREE_COMBAT)),
         TRAINING("NzNjM2E5YmRjOGM0MGM0MmQ4NDFkYWViNzFlYTllN2QxYzU0YWIzMWEyM2EyZDkyNjU5MWQ1NTUxNDExN2U1ZCJ9fX0=",
-                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15, target -> {
-        }),
+                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15,
+                target -> User.fromPlayer(target).setCurrentPlace(Place.TRAINING_CENTER)),
         LOBBY("OTNiZjJmYzY5M2IxNmNiOTFiOGM4N2E0YjA4OWZkOWUxODI1ZmNhMDFjZWZiMTY1YzYxODdmYzUzOWIxNTJjOSJ9fX0=",
                 "로비", "로비로 이동합니다.", 17,
                 target -> {

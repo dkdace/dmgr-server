@@ -1,5 +1,6 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
@@ -27,7 +28,7 @@ public final class OnEntityDamage extends EventListener<EntityDamageEvent> {
         if (CombatEntity.fromEntity(entity) == null) {
             if (entity instanceof Player && !EntityUtil.isCitizensNPC(entity)) {
                 User user = User.fromPlayer((Player) entity);
-                if (user.isInFreeCombat() || user.getGameRoom() != null)
+                if (entity.getWorld() != DMGR.getDefaultWorld() || user.getGameRoom() != null)
                     event.setCancelled(true);
             }
 
