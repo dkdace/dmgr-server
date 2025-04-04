@@ -7,6 +7,7 @@ import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.ChatSoundOption;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
@@ -126,9 +127,13 @@ public final class UserData implements Initializable<Void> {
      *
      * @param player 대상 플레이어
      * @return 유저 데이터 인스턴스
+     * @throws IllegalStateException 해당 {@code player}가 Citizens NPC이면 발생
      */
     @NonNull
     public static UserData fromPlayer(@NonNull OfflinePlayer player) {
+        if (player instanceof Player)
+            Validate.validState(!EntityUtil.isCitizensNPC((Player) player), "Citizens NPC는 UserData 인스턴스를 생성할 수 없음");
+
         UserData userData = USER_DATA_MAP.get(player.getUniqueId());
         if (userData == null)
             userData = new UserData(player.getUniqueId(), player.getName());

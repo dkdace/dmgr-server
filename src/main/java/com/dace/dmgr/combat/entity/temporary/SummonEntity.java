@@ -39,7 +39,6 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
      * @param hasNameTag    아군에게 이름표 표시 여부
      * @param isHidden      엔티티 숨김 여부
      * @param hitboxes      히트박스 목록
-     * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected SummonEntity(@NonNull Class<T> entityClass, @NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner,
                            boolean hasNameTag, boolean isHidden, @NonNull Hitbox @NonNull ... hitboxes) {

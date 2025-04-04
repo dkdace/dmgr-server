@@ -18,6 +18,7 @@ import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.item.gui.SelectGame;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
@@ -197,9 +198,12 @@ public final class User {
      *
      * @param player 대상 플레이어
      * @return 유저 인스턴스
+     * @throws IllegalStateException 해당 {@code player}가 Citizens NPC이면 발생
      */
     @NonNull
     public static User fromPlayer(@NonNull Player player) {
+        Validate.validState(!EntityUtil.isCitizensNPC(player), "Citizens NPC는 User 인스턴스를 생성할 수 없음");
+
         User user = USER_MAP.get(player);
         if (user == null)
             user = new User(player);
