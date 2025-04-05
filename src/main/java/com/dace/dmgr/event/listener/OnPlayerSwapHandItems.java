@@ -1,6 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.FreeCombat;
+import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.EventListener;
@@ -30,7 +31,8 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
 
-        if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)) {
+        if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)
+                || TrainingCenter.getInstance().isInSelectCharZone(player)) {
             new SelectChar(player);
             return;
         }

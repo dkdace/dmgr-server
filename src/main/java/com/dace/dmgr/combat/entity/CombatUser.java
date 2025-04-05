@@ -763,7 +763,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Location deadLocation = (gameUser == null ? FreeCombat.getInstance().getWaitLocation() : gameUser.getSpawnLocation()).add(0, 2, 0);
+        Location deadLocation = (gameUser == null ? user.getCurrentPlace().getStartLocation() : gameUser.getSpawnLocation().add(0, 2, 0));
         user.teleport(deadLocation);
 
         Timespan duration = GeneralConfig.getCombatConfig().getRespawnTime();

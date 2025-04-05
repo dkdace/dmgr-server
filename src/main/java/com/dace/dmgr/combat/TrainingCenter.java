@@ -1,7 +1,9 @@
 package com.dace.dmgr.combat;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 /**
  * 훈련장 클래스.
@@ -31,6 +34,17 @@ public final class TrainingCenter {
     @NonNull
     public Location getSpawnLocation() {
         return SPAWN_LOCATION.clone();
+    }
+
+    /**
+     * 지정한 플레이어가 전투원 선택 지역에 있는지 확인한다.
+     *
+     * @param player 확인할 플레이어
+     * @return 전투원 선택 지역 안에 있으면 {@code true} 반환
+     */
+    public boolean isInSelectCharZone(@NonNull Player player) {
+        return LocationUtil.isInSameBlockXZ(player.getLocation(), GeneralConfig.getTrainingConfig().getSpawnRegionCheckYCoordinate(),
+                GeneralConfig.getTrainingConfig().getSelectCharZoneBlock());
     }
 
     /**

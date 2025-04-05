@@ -171,6 +171,8 @@ public final class User {
     @Getter
     private GameRoom gameRoom;
     /** 현재 장소 */
+    @NonNull
+    @Getter
     private Place currentPlace = Place.LOBBY;
     /** 관리자 채팅 여부 */
     @Getter
@@ -1062,16 +1064,26 @@ public final class User {
     @AllArgsConstructor
     public enum Place {
         /** 로비 */
-        LOBBY("로비", user -> user.teleport(GeneralConfig.getConfig().getLobbyLocation())),
+        LOBBY("로비", user -> user.teleport(GeneralConfig.getConfig().getLobbyLocation()), GeneralConfig.getConfig().getLobbyLocation()),
         /** 자유 전투 */
-        FREE_COMBAT("자유 전투", FreeCombat.getInstance()::onStart),
+        FREE_COMBAT("자유 전투", FreeCombat.getInstance()::onStart, FreeCombat.getInstance().getWaitLocation()),
         /** 훈련장 */
-        TRAINING_CENTER("훈련장", TrainingCenter.getInstance()::onStart);
+        TRAINING_CENTER("훈련장", TrainingCenter.getInstance()::onStart, TrainingCenter.getInstance().getSpawnLocation());
 
         /** 이름 */
         private final String name;
         /** 이동 시 실행할 작업 */
         private final Consumer<User> onWarp;
+        /** 시작 위치 */
+        private final Location startLocation;
+
+        /**
+         * @return 시작 위치
+         */
+        @NonNull
+        public Location getStartLocation() {
+            return startLocation.clone();
+        }
     }
 
     /**

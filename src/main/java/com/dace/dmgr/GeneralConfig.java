@@ -26,6 +26,9 @@ public final class GeneralConfig implements Initializable<Void> {
     /** 일반 설정 */
     @Nullable
     private Config config;
+    /** 훈련장 설정 */
+    @Nullable
+    private TrainingConfig trainingConfig;
     /** 전투 시스템 관련 설정 */
     @Nullable
     private CombatConfig combatConfig;
@@ -41,6 +44,16 @@ public final class GeneralConfig implements Initializable<Void> {
             instance.config = new Config();
 
         return instance.config;
+    }
+
+    @NonNull
+    public static TrainingConfig getTrainingConfig() {
+        instance.validate();
+
+        if (instance.trainingConfig == null)
+            instance.trainingConfig = new TrainingConfig();
+
+        return instance.trainingConfig;
     }
 
     @NonNull
@@ -132,6 +145,25 @@ public final class GeneralConfig implements Initializable<Void> {
         public Location getLobbyLocation() {
             return lobbyLocation.clone();
         }
+    }
+
+    /**
+     * 훈련장 관련 설정.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Getter
+    public static final class TrainingConfig {
+        /** Yaml 섹션 인스턴스 */
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("training");
+
+        /** 전투원 선택 지역 확인 Y 좌표 */
+        private final int spawnRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
+        /** 전투원 선택 지역 식별 블록 타입 */
+        @NonNull
+        private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());
+        /** 기본 더미 리스폰 시간 */
+        @NonNull
+        private final Timespan defaultDummyRespawnTime = Timespan.ofSeconds(section.getEntry("default_dummy_respawn_time_seconds", 3.0).get());
     }
 
     /**
