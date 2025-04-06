@@ -31,17 +31,24 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.function.IntConsumer;
 
-@Getter
 public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    /** 둔화 상태 효과 */
+    private static final Slow SLOW = new Slow(QuakerA2Info.SLOW);
+
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 기절 상태 효과 */
+    private final Stun stun;
 
     public QuakerA2(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA2Info.getInstance(), QuakerA2Info.COOLDOWN, Timespan.MAX, 1);
+
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerA2Info.ASSIST_SCORE);
+        this.stun = new Stun(combatUser);
     }
 
     @Override
@@ -140,17 +147,6 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
     }
 
-    /**
-     * 둔화 상태 효과 클래스.
-     */
-    private static final class QuakerA2Slow extends Slow {
-        private static final QuakerA2Slow instance = new QuakerA2Slow();
-
-        private QuakerA2Slow() {
-            super(QuakerA2Info.SLOW);
-        }
-    }
-
     private final class QuakerA2Effect extends Hitscan<CombatEntity> {
         private QuakerA2Effect() {
             super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(QuakerWeaponInfo.DISTANCE).build());
@@ -219,8 +215,8 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, QuakerA2Info.STUN_DURATION);
-                        target.getStatusEffectModule().apply(QuakerA2Slow.instance, combatUser, QuakerA2Info.SLOW_DURATION);
+                        target.getStatusEffectModule().apply(stun, QuakerA2Info.STUN_DURATION);
+                        target.getStatusEffectModule().apply(SLOW, QuakerA2Info.SLOW_DURATION);
 
                         if (target instanceof CombatUser) {
                             combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);

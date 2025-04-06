@@ -24,8 +24,12 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class MagrittaA1 extends ActiveSkill {
+    /** 화염 상태 효과 */
+    private final Burning burning;
+
     public MagrittaA1(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaA1Info.getInstance(), MagrittaA1Info.COOLDOWN, Timespan.MAX, 0);
+        this.burning = new Burning(combatUser, MagrittaA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 
     @Override
@@ -67,17 +71,6 @@ public final class MagrittaA1 extends ActiveSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-    }
-
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class MagrittaA1Burning extends Burning {
-        private static final MagrittaA1Burning instance = new MagrittaA1Burning();
-
-        private MagrittaA1Burning() {
-            super(MagrittaA1Info.FIRE_DAMAGE_PER_SECOND, true);
-        }
     }
 
     private final class MagrittaA1Projectile extends Projectile<Damageable> {
@@ -172,7 +165,7 @@ public final class MagrittaA1 extends ActiveSkill {
                         radius / 2.0));
 
                 if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null, false, true)) {
-                    target.getStatusEffectModule().apply(MagrittaA1Burning.instance, combatUser, burningDuration);
+                    target.getStatusEffectModule().apply(burning, burningDuration);
 
                     if (target instanceof Movable) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MagrittaA1Info.KNOCKBACK);

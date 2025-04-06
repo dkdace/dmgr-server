@@ -7,7 +7,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
@@ -21,17 +24,21 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-InfernoA2Info.HEAL_DECREMENT);
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 화염 상태 효과 */
+    private final InfernoA2Burning burning;
 
     public InfernoA2(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA2Info.getInstance(), InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION, 1);
+
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", InfernoA2Info.ASSIST_SCORE);
+        this.burning = new InfernoA2Burning();
     }
 
     @Override
@@ -115,21 +122,19 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /**
      * 화염 상태 효과 클래스.
      */
-    private static final class InfernoA2Burning extends Burning {
-        private static final InfernoA2Burning instance = new InfernoA2Burning();
-
+    private final class InfernoA2Burning extends Burning {
         private InfernoA2Burning() {
-            super(InfernoA2Info.FIRE_DAMAGE_PER_SECOND, true);
+            super(combatUser, InfernoA2Info.FIRE_DAMAGE_PER_SECOND, true);
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Healable)
                 ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER);
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Healable)
                 ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER);
         }
@@ -148,8 +153,8 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
-                target.getStatusEffectModule().apply(InfernoA2Burning.instance, combatUser, Timespan.ofTicks(10));
-                target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 고정", InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);

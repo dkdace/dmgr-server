@@ -4,7 +4,10 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.VectorUtil;
@@ -102,7 +105,7 @@ public final class NeaceA2 extends ActiveSkill {
      * @param target 적용 대상
      */
     void amplifyTarget(@NonNull Healable target) {
-        target.getStatusEffectModule().apply(NeaceA2Buff.instance, combatUser, Timespan.ofTicks(4));
+        target.getStatusEffectModule().apply(NeaceA2Buff.instance, Timespan.ofTicks(4));
 
         if (target instanceof CombatUser)
             ((CombatUser) target).addKillHelper(combatUser, this, NeaceA2Info.ASSIST_SCORE, Timespan.ofTicks(4));
@@ -119,19 +122,19 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(DAMAGE_MODIFIER);
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(DAMAGE_MODIFIER);

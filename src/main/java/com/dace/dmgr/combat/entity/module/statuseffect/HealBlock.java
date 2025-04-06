@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -30,21 +29,21 @@ public class HealBlock extends StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l회복 차단!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, long i) {
         if (combatEntity.isCreature() && combatEntity.getEntity() instanceof LivingEntity)
             ((LivingEntity) combatEntity.getEntity()).addPotionEffect(
                     new PotionEffect(PotionEffectType.WITHER, 4, 0, false, false), true);
     }
 
     @Override
-    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity) {
         // 미사용
     }
 

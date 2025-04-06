@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -24,17 +23,8 @@ public final class MagrittaT1 {
      * @param victim   피격자
      */
     static void addShreddingValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-        ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, attacker, MagrittaT1Info.DURATION);
-        shreddingValue.addValue();
-
-        if (shreddingValue.getValue() >= MagrittaT1Info.MAX) {
-            victim.getStatusEffectModule().apply(MagrittaT1Burning.instance, attacker, MagrittaT1Info.DURATION);
-
-            MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
-
-            if (victim instanceof CombatUser)
-                attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
-        }
+        ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, MagrittaT1Info.DURATION);
+        shreddingValue.addValue(attacker, victim);
 
         MagrittaT1Info.SOUND.USE.play(victim.getLocation());
     }
@@ -46,53 +36,62 @@ public final class MagrittaT1 {
         /** 파쇄 수치 홀로그램 */
         @Nullable
         private TextHologram shreddingHologram;
+        /** 화염 상태 효과 */
+        @Nullable
+        private Burning burning;
 
         public ShreddingValue() {
             super(StatusEffectType.NONE, false, MagrittaT1Info.MAX);
         }
 
-        private void addValue() {
+        private void addValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
             setValue(getValue() + 1);
 
-            if (shreddingHologram != null)
-                shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
-        }
-
-        @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
-            if (combatEntity.isCreature() && provider instanceof CombatUser)
-                shreddingHologram = new TextHologram(combatEntity.getEntity(), target -> {
-                    if (target == provider.getEntity())
-                        return LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
+            if (shreddingHologram == null)
+                shreddingHologram = new TextHologram(attacker.getEntity(), target -> {
+                    if (target == attacker.getEntity())
+                        return LocationUtil.canPass(target.getEyeLocation(), attacker.getCenterLocation());
 
                     return false;
                 }, 1);
+
+            shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
+
+            if (getValue() >= MagrittaT1Info.MAX)
+                onMaxValue(attacker, victim);
+        }
+
+        private void onMaxValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+            if (burning == null)
+                burning = new Burning(attacker, MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
+
+            victim.getStatusEffectModule().apply(burning, MagrittaT1Info.DURATION);
+
+            MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
+
+            if (victim instanceof CombatUser)
+                attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onStart(@NonNull Damageable combatEntity) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
+            // 미사용
+        }
+
+        @Override
+        public void onEnd(@NonNull Damageable combatEntity) {
             setValue(0);
+            burning = null;
 
             if (shreddingHologram != null) {
                 shreddingHologram.remove();
                 shreddingHologram = null;
             }
-        }
-    }
-
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class MagrittaT1Burning extends Burning {
-        private static final MagrittaT1Burning instance = new MagrittaT1Burning();
-
-        private MagrittaT1Burning() {
-            super(MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
         }
     }
 }

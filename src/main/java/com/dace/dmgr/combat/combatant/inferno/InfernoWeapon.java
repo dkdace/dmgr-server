@@ -24,20 +24,24 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-@Getter
 public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
     @NonNull
+    @Getter
     private final FullAutoModule fullAutoModule;
+    /** 화염 상태 효과 */
+    private final Burning burning;
 
     public InfernoWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoWeaponInfo.getInstance(), InfernoWeaponInfo.FIREBALL.COOLDOWN);
 
         this.reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
+        this.burning = new Burning(combatUser, InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND, true);
     }
 
     @Override
@@ -132,17 +136,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         // 미사용
     }
 
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class InfernoWeaponBurning extends Burning {
-        private static final InfernoWeaponBurning instance = new InfernoWeaponBurning();
-
-        private InfernoWeaponBurning() {
-            super(InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND, true);
-        }
-    }
-
     private final class InfernoWeaponRProjectile extends Projectile<Damageable> {
         private InfernoWeaponRProjectile() {
             super(InfernoWeapon.this, InfernoWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
@@ -177,7 +170,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             return (location, target) -> {
                 if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.DAMAGE_PER_SECOND / 20.0, DamageType.NORMAL, null,
                         false, true))
-                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, InfernoWeaponInfo.FIRE_DURATION);
+                    target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.FIRE_DURATION);
 
                 InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
                 return true;
@@ -242,7 +235,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                         radius / 2.0));
 
                 if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null, false, true)) {
-                    target.getStatusEffectModule().apply(InfernoWeaponBurning.instance, combatUser, burningDuration);
+                    target.getStatusEffectModule().apply(burning, burningDuration);
 
                     if (target instanceof Movable) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK);

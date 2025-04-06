@@ -45,7 +45,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);
-        target.getStatusEffectModule().apply(PalasUltBuff.instance, combatUser, PalasUltInfo.DURATION);
+        target.getStatusEffectModule().apply(PalasUltBuff.instance, PalasUltInfo.DURATION);
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
@@ -88,7 +88,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(DAMAGE_MODIFIER);
             if (combatEntity instanceof Movable)
@@ -96,12 +96,12 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             PalasUltInfo.PARTICLE.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Attacker)
                 ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(DAMAGE_MODIFIER);
             if (combatEntity instanceof Movable)

@@ -7,7 +7,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -87,7 +90,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 + PalasA3Info.HEALTH_INCREASE_RATIO));
             increasedHealth = newMaxHealth - maxHealth;
@@ -101,12 +104,12 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() - increasedHealth);
         }
     }
@@ -123,7 +126,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 - PalasA3Info.HEALTH_DECREASE_RATIO));
             decreasedHealth = maxHealth - newMaxHealth;
@@ -136,12 +139,12 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             // 미사용
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() + decreasedHealth);
         }
     }
@@ -215,7 +218,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
                 if (!target.getDamageModule().damage(PalasA3Projectile.this, 1, DamageType.NORMAL, null, false, true))
                     return;
 
-                target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), combatUser, PalasA3Info.DURATION);
+                target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), PalasA3Info.DURATION);
 
                 if (target instanceof CombatUser)
                     bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
@@ -227,7 +230,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
              * @param target 대상 엔티티
              */
             private void onHitTeamer(@NonNull Healable target) {
-                target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), combatUser, PalasA3Info.DURATION);
+                target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), PalasA3Info.DURATION);
 
                 if (target instanceof CombatUser && target != combatUser)
                     ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
