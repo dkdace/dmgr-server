@@ -40,12 +40,11 @@ public abstract class Controller extends Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
-            CombatUtil.getCombatEntities(combatUser.getGame(), combatUser.getLocation().getWorld(),
-                            CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
-                                    .and(combatEntity -> combatEntity instanceof CombatUser && combatEntity.getDamageModule().isLowHealth()))
+            CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                            .and(combatEntity -> combatEntity instanceof CombatUser && combatEntity.getDamageModule().isLowHealth()))
                     .forEach(target -> {
-                        Damageable targetCombatEntity = CombatUtil.getNearCombatEntity(combatUser.getGame(), target.getLocation(),
-                                RoleTrait1Info.DETECT_RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(CombatUser.class::isInstance));
+                        Damageable targetCombatEntity = CombatUtil.getNearCombatEntity(target.getLocation(), RoleTrait1Info.DETECT_RADIUS,
+                                CombatUtil.EntityCondition.enemy(combatUser).and(CombatUser.class::isInstance));
 
                         if (targetCombatEntity != null)
                             combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(10));

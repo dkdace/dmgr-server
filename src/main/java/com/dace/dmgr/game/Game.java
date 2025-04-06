@@ -2,7 +2,6 @@ package com.dace.dmgr.game;
 
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
@@ -49,8 +48,6 @@ public final class Game implements Initializable<Void> {
 
     /** 현재 게임 방 인스턴스 */
     private final GameRoom gameRoom;
-    /** 소속된 엔티티 목록 */
-    private final HashSet<CombatEntity> combatEntities = new HashSet<>();
     /** 소속된 게임 플레이어 목록 */
     private final HashSet<GameUser> gameUsers = new HashSet<>();
     /** 레드 팀 */
@@ -158,35 +155,6 @@ public final class Game implements Initializable<Void> {
             onSecondTask.stop();
         if (world != null)
             removeWorld();
-    }
-
-    /**
-     * 게임에 소속된 모든 엔티티 목록을 반환한다.
-     *
-     * @return 게임에 속한 모든 엔티티
-     */
-    @NonNull
-    @UnmodifiableView
-    public Set<@NonNull CombatEntity> getCombatEntities() {
-        return Collections.unmodifiableSet(combatEntities);
-    }
-
-    /**
-     * 게임에 지정한 엔티티를 추가한다.
-     *
-     * @param combatEntity 전투 시스템의 엔티티 인스턴스
-     */
-    public void addCombatEntity(@NonNull CombatEntity combatEntity) {
-        combatEntities.add(combatEntity);
-    }
-
-    /**
-     * 게임에 소속된 지정한 엔티티를 제거한다.
-     *
-     * @param combatEntity 전투 시스템의 엔티티 인스턴스
-     */
-    public void removeCombatEntity(@NonNull CombatEntity combatEntity) {
-        combatEntities.remove(combatEntity);
     }
 
     /**

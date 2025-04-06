@@ -30,8 +30,8 @@ import java.util.function.LongConsumer;
 public abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
     /** 전투 시스템 엔티티 목록 (엔티티 : 전투 시스템 엔티티) */
     private static final HashMap<Entity, CombatEntity> COMBAT_ENTITY_MAP = new HashMap<>();
-    /** 게임에 소속되지 않은 전투 시스템 엔티티 목록 (월드 : (엔티티 : 전투 시스템 엔티티)) */
-    private static final HashMap<World, HashMap<Entity, CombatEntity>> COMBAT_ENTITY_EXCLUDED_MAP = new HashMap<>();
+    /** 월드별 전투 시스템 엔티티 목록 (월드 : (엔티티 : 전투 시스템 엔티티)) */
+    private static final HashMap<World, HashMap<Entity, CombatEntity>> WORLD_COMBAT_ENTITY_MAP = new HashMap<>();
 
     /** 엔티티 인스턴스 */
     @NonNull
@@ -45,6 +45,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @Nullable
     @Getter
     protected final Game game;
+    /** 현재 월드 */
+    private final World world;
     /** 태스크 관리 인스턴스 */
     private final TaskManager taskManager = new TaskManager();
     /** 매 틱마다 실행할 작업 목록 */
@@ -54,8 +56,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
     /** 히트박스 목록 */
     protected Hitbox[] hitboxes;
-    /** 현재 월드 */
-    private World world;
     /** 히트박스 기준 위치 */
     private Location hitboxBaseLocation;
 
@@ -79,21 +79,11 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         this.hitboxBaseLocation = entity.getLocation();
 
         entity.setCustomName(ChatColor.WHITE + name);
-        if (game == null)
-            COMBAT_ENTITY_EXCLUDED_MAP.computeIfAbsent(world, k -> new HashMap<>()).put(entity, this);
-        else
-            game.addCombatEntity(this);
 
         COMBAT_ENTITY_MAP.put(entity, this);
+        WORLD_COMBAT_ENTITY_MAP.computeIfAbsent(world, k -> new HashMap<>()).put(entity, this);
 
         addTask(new IntervalTask(i -> {
-            if (world != entity.getWorld()) {
-                COMBAT_ENTITY_EXCLUDED_MAP.get(world).remove(entity);
-
-                world = entity.getWorld();
-                COMBAT_ENTITY_EXCLUDED_MAP.computeIfAbsent(world, k -> new HashMap<>()).put(entity, this);
-            }
-
             for (LongConsumer onTick : onTicks) {
                 onTick.accept(i);
 
@@ -118,15 +108,15 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     }
 
     /**
-     * 지정한 월드에서 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     * 지정한 월드에 있는 모든 전투 시스템 엔티티를 반환한다.
      *
-     * @param world 월드
-     * @return 게임에 소속되지 않은 모든 엔티티
+     * @param world 대상 월드
+     * @return 모든 전투 시스템 엔티티
      */
     @NonNull
     @UnmodifiableView
     static Collection<@NonNull CombatEntity> getAllExcluded(@NonNull World world) {
-        HashMap<Entity, CombatEntity> combatEntityMap = COMBAT_ENTITY_EXCLUDED_MAP.get(world);
+        HashMap<Entity, CombatEntity> combatEntityMap = WORLD_COMBAT_ENTITY_MAP.get(world);
         return Collections.unmodifiableCollection(combatEntityMap == null ? Collections.emptySet() : combatEntityMap.values());
     }
 
@@ -138,12 +128,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         onRemoves.clear();
         taskManager.stop();
 
-        if (game == null)
-            COMBAT_ENTITY_EXCLUDED_MAP.get(world).remove(entity);
-        else
-            game.removeCombatEntity(this);
-
         COMBAT_ENTITY_MAP.remove(entity);
+        WORLD_COMBAT_ENTITY_MAP.get(world).remove(entity);
     }
 
     @Override

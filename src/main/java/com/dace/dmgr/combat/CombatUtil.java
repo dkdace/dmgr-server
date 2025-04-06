@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -64,21 +63,19 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
      *
-     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
      * @param location        위치
      * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
      * @param entityCondition 엔티티 탐색 조건
      * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 가장 가까운 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntities(Game, Location, double, EntityCondition)
+     * @see CombatUtil#getNearCombatEntities(Location, double, EntityCondition)
      */
     @Nullable
-    public static <T extends CombatEntity> T getNearCombatEntity(@Nullable Game game, @NonNull Location location, double range,
-                                                                 @NonNull EntityCondition<T> entityCondition) {
+    public static <T extends CombatEntity> T getNearCombatEntity(@NonNull Location location, double range, @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
-        return (game == null ? CombatEntity.getAllExcluded(location.getWorld()) : game.getCombatEntities()).stream()
+        return CombatEntity.getAllExcluded(location.getWorld()).stream()
                 .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                         ? entityCondition.targetClass.cast(combatEntity)
                         : null)
@@ -93,23 +90,22 @@ public final class CombatUtil {
     /**
      * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
      * @param location        위치
      * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
      * @param entityCondition 엔티티 탐색 조건
      * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 모든 엔티티
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntity(Game, Location, double, EntityCondition)
+     * @see CombatUtil#getNearCombatEntity(Location, double, EntityCondition)
      */
     @NonNull
     @UnmodifiableView
-    public static <T extends CombatEntity> Set<@NonNull T> getNearCombatEntities(@Nullable Game game, @NonNull Location location, double range,
+    public static <T extends CombatEntity> Set<@NonNull T> getNearCombatEntities(@NonNull Location location, double range,
                                                                                  @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
         return Collections.unmodifiableSet(
-                (game == null ? CombatEntity.getAllExcluded(location.getWorld()) : game.getCombatEntities()).stream()
+                CombatEntity.getAllExcluded(location.getWorld()).stream()
                         .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                                 ? entityCondition.targetClass.cast(combatEntity)
                                 : null)
@@ -121,10 +117,9 @@ public final class CombatUtil {
     }
 
     /**
-     * 특정 조건을 만족하는 모든 엔티티를 반환한다.
+     * 지정한 월드에서 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded(World)})를 대상으로 함
-     * @param world           대상 월드. {@code game}이 {@code null}이면 해당 월드에서 탐색
+     * @param world           대상 월드
      * @param entityCondition 엔티티 탐색 조건
      * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 모든 엔티티
@@ -132,10 +127,9 @@ public final class CombatUtil {
      */
     @NonNull
     @UnmodifiableView
-    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@Nullable Game game, @NonNull World world,
-                                                                             @NonNull EntityCondition<T> entityCondition) {
+    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@NonNull World world, @NonNull EntityCondition<T> entityCondition) {
         return Collections.unmodifiableSet(
-                (game == null ? CombatEntity.getAllExcluded(world) : game.getCombatEntities()).stream()
+                CombatEntity.getAllExcluded(world).stream()
                         .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                                 ? entityCondition.targetClass.cast(combatEntity)
                                 : null)

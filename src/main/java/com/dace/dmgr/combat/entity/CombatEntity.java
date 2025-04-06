@@ -20,10 +20,10 @@ import java.util.function.LongConsumer;
  */
 public interface CombatEntity {
     /**
-     * 지정한 월드에서 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     * 지정한 월드에 있는 모든 전투 시스템 엔티티를 반환한다.
      *
-     * @param world 월드
-     * @return 게임에 소속되지 않은 모든 엔티티
+     * @param world 대상 월드
+     * @return 모든 전투 시스템 엔티티
      */
     @NonNull
     @UnmodifiableView

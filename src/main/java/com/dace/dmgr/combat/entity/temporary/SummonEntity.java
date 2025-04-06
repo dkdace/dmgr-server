@@ -81,7 +81,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        CombatUtil.getCombatEntities(game, entity.getWorld(), CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
+        CombatUtil.getCombatEntities(entity.getWorld(), CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
                 packet.sendPacket(target.getEntity()));
     }
 }

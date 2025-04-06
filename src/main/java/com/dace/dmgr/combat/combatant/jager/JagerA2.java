@@ -167,7 +167,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             if (!readyTimeModule.isReady())
                 return;
 
-            Damageable target = CombatUtil.getNearCombatEntity(game, getLocation().add(0, 0.5, 0), 0.8,
+            Damageable target = CombatUtil.getNearCombatEntity(getLocation().add(0, 0.5, 0), 0.8,
                     CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
 
             if (target != null)
