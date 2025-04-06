@@ -48,9 +48,9 @@ public final class MagrittaT1 {
             setValue(getValue() + 1);
 
             if (shreddingHologram == null)
-                shreddingHologram = new TextHologram(attacker.getEntity(), target -> {
+                shreddingHologram = new TextHologram(victim.getEntity(), target -> {
                     if (target == attacker.getEntity())
-                        return LocationUtil.canPass(target.getEyeLocation(), attacker.getCenterLocation());
+                        return LocationUtil.canPass(target.getEyeLocation(), victim.getCenterLocation());
 
                     return false;
                 }, 1);
