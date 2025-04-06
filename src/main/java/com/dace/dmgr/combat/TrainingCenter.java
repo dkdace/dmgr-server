@@ -2,29 +2,92 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
+import com.dace.dmgr.combat.entity.temporary.dummy.MovingBehavior;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
-import lombok.AccessLevel;
+import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.function.Supplier;
+
 /**
  * 훈련장 클래스.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TrainingCenter {
-    @Getter
-    private static final TrainingCenter instance = new TrainingCenter();
-
     /** 훈련장 월드 인스턴스 */
     private static final World WORLD = Bukkit.getWorld("Training");
     /** 스폰 위치 */
     private static final Location SPAWN_LOCATION = new Location(WORLD, 95.5, 220, 111.5, 270, 0);
+
+    /** 고정형 더미의 위치 목록 */
+    private static final Location[] FIXED_DUMMY_LOCATIONS = {
+            new Location(WORLD, 119.5, 220, 121.5, 90, 0),
+            new Location(WORLD, 119.5, 220, 128.5, 90, 0),
+            new Location(WORLD, 126.5, 220, 121.5, 90, 0),
+            new Location(WORLD, 126.5, 220, 128.5, 90, 0),
+            new Location(WORLD, 135.5, 223, 66.5, -45, 0),
+            new Location(WORLD, 140.5, 225, 73.5, -90, 0),
+
+            new Location(WORLD, 166.5, 219, 86.5, 180, 0),
+            new Location(WORLD, 164.5, 219, 96.5, 180, 0),
+            new Location(WORLD, 162.5, 219, 106.5, 180, 0),
+            new Location(WORLD, 160.5, 219, 116.5, 180, 0),
+            new Location(WORLD, 158.5, 219, 126.5, 180, 0),
+            new Location(WORLD, 156.5, 219, 136.5, 180, 0),
+            new Location(WORLD, 154.5, 219, 146.5, 180, 0),
+    };
+    /** 고정형 중량 더미의 위치 목록 */
+    private static final Location[] FIXED_HEAVY_DUMMY_LOCATIONS = {
+            new Location(WORLD, 110.5, 220, 133.5, 180, 0),
+            new Location(WORLD, 102.5, 220, 133.5, 180, 0),
+    };
+    /** 이동형 더미의 위치 목록 */
+    private static final Location[][] FIXED_MOVING_DUMMY_LOCATIONS = {
+            {new Location(WORLD, 96.5, 220, 122), new Location(WORLD, 79.5, 220, 117.5)},
+            {new Location(WORLD, 93.5, 220, 118.5), new Location(WORLD, 82.5, 220, 124.5)},
+            {new Location(WORLD, 91.5, 220, 113.5), new Location(WORLD, 86.5, 220, 128.5)},
+
+            {new Location(WORLD, 120.5, 220, 89.5), new Location(WORLD, 130.5, 220, 103.5)},
+            {new Location(WORLD, 117.5, 220, 92.5), new Location(WORLD, 125.5, 220, 104.5)},
+            {new Location(WORLD, 113.5, 220, 93.5), new Location(WORLD, 119.5, 220, 103.5)},
+    };
+
+    @Getter
+    private static final TrainingCenter instance = new TrainingCenter();
+
+    /**
+     * 훈련장을 생성하고 기본 더미를 소환한다.
+     */
+    private TrainingCenter() {
+        for (Location loc : FIXED_DUMMY_LOCATIONS)
+            spawnDummy(() -> new Dummy(loc, 1000, true));
+
+        for (Location loc : FIXED_HEAVY_DUMMY_LOCATIONS)
+            spawnDummy(() -> new Dummy(loc, 3000, true));
+
+        for (Location[] locs : FIXED_MOVING_DUMMY_LOCATIONS)
+            spawnDummy(() -> new Dummy(new MovingBehavior(locs), locs[0], 1000, true));
+    }
+
+    /**
+     * 기본 더미 생성을 시도한다.
+     *
+     * @param onSpawnDummy 더미 생성에 실행할 작업
+     */
+    private void spawnDummy(@NonNull Supplier<Dummy> onSpawnDummy) {
+        try {
+            Dummy dummy = onSpawnDummy.get();
+            dummy.addOnRemove(() -> new DelayTask(() -> spawnDummy(onSpawnDummy), GeneralConfig.getTrainingConfig().getDefaultDummyRespawnTime().toTicks()));
+        } catch (IllegalStateException ex) {
+            new DelayTask(() -> spawnDummy(onSpawnDummy), 20);
+        }
+    }
 
     /**
      * 스폰 위치를 반환한다.
