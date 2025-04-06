@@ -45,7 +45,7 @@ public final class MagrittaA2 extends ActiveSkill {
         setDuration();
 
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, MagrittaA2Info.DURATION);
+        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), MagrittaA2Info.DURATION);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION.toTicks(), 2, false, false), true);
 

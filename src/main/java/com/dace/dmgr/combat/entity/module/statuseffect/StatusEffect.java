@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
@@ -36,26 +35,23 @@ public abstract class StatusEffect {
      * 상태 효과 적용 시 실행할 작업.
      *
      * @param combatEntity 대상 엔티티
-     * @param provider     제공자
      */
-    public abstract void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
+    public abstract void onStart(@NonNull Damageable combatEntity);
 
     /**
      * 상태 효과 적용 중 매 틱마다 실행할 작업.
      *
      * @param combatEntity 대상 엔티티
-     * @param provider     제공자
      * @param i            인덱스
      */
-    public abstract void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i);
+    public abstract void onTick(@NonNull Damageable combatEntity, long i);
 
     /**
      * 상태 효과가 끝났을 때 실행할 작업.
      *
      * @param combatEntity 대상 엔티티
-     * @param provider     제공자
      */
-    public abstract void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider);
+    public abstract void onEnd(@NonNull Damageable combatEntity);
 
     /**
      * 상태 효과가 있을 때 제한할 행동들을 반환한다.

@@ -25,23 +25,27 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-@Getter
 public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA3Info.READY_SLOW);
 
     /** 위치 확인 모듈 */
     @NonNull
+    @Getter
     private final LocationConfirmModule confirmModule;
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 침묵 상태 효과 */
+    private final Silence silence;
 
     public VellionA3(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA3Info.getInstance(), VellionA3Info.COOLDOWN, Timespan.MAX, 2);
 
         this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);
+        this.silence = new Silence(combatUser);
     }
 
     @Override
@@ -209,8 +213,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
-                target.getStatusEffectModule().apply(HealBlock.getInstance(), combatUser, Timespan.ofTicks(10));
-                target.getStatusEffectModule().apply(Silence.getInstance(), combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(HealBlock.getInstance(), Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(silence, Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("적 침묵", VellionA3Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);

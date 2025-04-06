@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.SoundEffect;
@@ -17,6 +16,8 @@ public class Burning extends StatusEffect {
     private static final SoundEffect BURNING_DAMAGE_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build());
 
+    /** 공격자 */
+    private final Attacker attacker;
     /** 초당 피해량 */
     private final double damagePerSecond;
     /** 궁극기 제공 여부 */
@@ -25,33 +26,39 @@ public class Burning extends StatusEffect {
     /**
      * 화염 상태 효과 인스턴스를 생성한다.
      *
+     * @param attacker        공격자
      * @param damagePerSecond 초당 피해량
      * @param isUlt           궁극기 제공 여부
      */
-    protected Burning(double damagePerSecond, boolean isUlt) {
+    public Burning(@NonNull Attacker attacker, double damagePerSecond, boolean isUlt) {
         super(StatusEffectType.BURNING, false);
 
+        this.attacker = attacker;
         this.damagePerSecond = damagePerSecond;
         this.isUlt = isUlt;
     }
 
     @Override
-    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity) {
         // 미사용
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, long i) {
+        if (attacker.isRemoved()) {
+            combatEntity.getStatusEffectModule().remove(this);
+            return;
+        }
+
         combatEntity.getEntity().setFireTicks(4);
 
-        if (i % 10 == 0 && provider instanceof Attacker && combatEntity.getDamageModule().damage((Attacker) provider,
-                damagePerSecond * 10 / 20.0, DamageType.NORMAL, null, false, isUlt))
+        if (i % 10 == 0 && combatEntity.getDamageModule().damage(attacker, damagePerSecond * 10 / 20.0, DamageType.NORMAL, null, false, isUlt))
             BURNING_DAMAGE_SOUND.play(combatEntity.getLocation());
     }
 
     @Override
-    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity) {
         // 미사용
     }
 }

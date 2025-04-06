@@ -122,7 +122,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         isEnabled = true;
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
-        target.getStatusEffectModule().apply(VellionA2Mark.instance, combatUser, Timespan.MAX);
+        target.getStatusEffectModule().apply(VellionA2Mark.instance, Timespan.MAX);
 
         VellionA2Info.SOUND.USE_READY.play(combatUser.getLocation());
 
@@ -137,6 +137,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
                 blockResetTimestamp = Timestamp.now().plus(VellionA2Info.BLOCK_RESET_DELAY);
             if (blockResetTimestamp.isBefore(Timestamp.now()))
                 return false;
+
+            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(4));
 
             if (i % 10 == 0)
                 new VellionA2Area(target).emit(target.getCenterLocation());
@@ -226,22 +228,19 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             VellionA2Info.PARTICLE.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
-
-            if (provider instanceof CombatUser)
-                ((CombatUser) provider).getUser().setGlowing(combatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(4));
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§f저주가 풀림", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));

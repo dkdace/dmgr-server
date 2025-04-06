@@ -6,7 +6,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -26,17 +29,25 @@ import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 
-@Getter
 public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1.VellionA1Entity> {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA1Info.READY_SLOW);
+
     /** 소환 엔티티 모듈 */
     @NonNull
+    @Getter
     private final EntityModule<VellionA1Entity> entityModule;
+    /** 회복 상태 효과 */
+    private final VellionA1Heal heal;
+    /** 독 상태 효과 */
+    private final Poison poison;
 
     public VellionA1(@NonNull CombatUser combatUser) {
         super(combatUser, VellionA1Info.getInstance(), VellionA1Info.COOLDOWN, Timespan.MAX, 0);
+
         this.entityModule = new EntityModule<>(this);
+        this.heal = new VellionA1Heal();
+        this.poison = new Poison(combatUser, VellionA1Info.POISON_DAMAGE_PER_SECOND, true);
     }
 
     @Override
@@ -113,38 +124,30 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     /**
      * 회복 상태 효과 클래스.
      */
-    private static final class VellionA1Heal extends StatusEffect {
-        private static final VellionA1Heal instance = new VellionA1Heal();
-
+    private final class VellionA1Heal extends StatusEffect {
         private VellionA1Heal() {
             super(true);
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             // 미사용
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            if (combatEntity instanceof Healable && provider instanceof Healer)
-                ((Healable) combatEntity).getDamageModule().heal((Healer) provider, VellionA1Info.HEAL_PER_SECOND / 20.0, true);
+        public void onTick(@NonNull Damageable combatEntity, long i) {
+            if (combatUser.isRemoved()) {
+                combatEntity.getStatusEffectModule().remove(this);
+                return;
+            }
+
+            if (combatEntity instanceof Healable)
+                ((Healable) combatEntity).getDamageModule().heal(combatUser, VellionA1Info.HEAL_PER_SECOND / 20.0, true);
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             // 미사용
-        }
-    }
-
-    /**
-     * 독 상태 효과 클래스.
-     */
-    private static final class VellionA1Poison extends Poison {
-        private static final VellionA1Poison instance = new VellionA1Poison();
-
-        private VellionA1Poison() {
-            super(VellionA1Info.POISON_DAMAGE_PER_SECOND, true);
         }
     }
 
@@ -203,8 +206,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                     if (target.isEnemy(combatUser))
                         onHitEnemy(location, target);
                     else if (target instanceof Healable)
-                        target.getStatusEffectModule().apply(VellionA1Heal.instance, combatUser,
-                                target.getStatusEffectModule().getDuration(VellionA1Heal.instance).plus(VellionA1Info.EFFECT_DURATION));
+                        target.getStatusEffectModule().apply(heal, target.getStatusEffectModule().getDuration(heal).plus(VellionA1Info.EFFECT_DURATION));
 
                     if (target instanceof CombatUser)
                         combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);
@@ -220,12 +222,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
              * @param target   대상 엔티티
              */
             private void onHitEnemy(@NonNull Location location, @NonNull Damageable target) {
-                if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null,
-                        false, true)) {
-                    target.getStatusEffectModule().apply(VellionA1Poison.instance, combatUser,
-                            target.getStatusEffectModule().getDuration(VellionA1Poison.instance).plus(VellionA1Info.EFFECT_DURATION));
-
-                    target.getStatusEffectModule().apply(Snare.getInstance(), combatUser, VellionA1Info.SNARE_DURATION);
+                if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
+                    target.getStatusEffectModule().apply(poison, target.getStatusEffectModule().getDuration(poison).plus(VellionA1Info.EFFECT_DURATION));
+                    target.getStatusEffectModule().apply(Snare.getInstance(), VellionA1Info.SNARE_DURATION);
                 }
 
                 VellionA1Info.PARTICLE.HIT_ENTITY.play(location);

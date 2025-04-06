@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -26,18 +25,18 @@ public class Snare extends StatusEffect {
     }
 
     @Override
-    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity) {
         // 미사용
     }
 
     @Override
-    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, long i) {
         if (combatEntity instanceof CombatUser)
             ((CombatUser) combatEntity).getUser().sendTitle("§c§l속박당함!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
     }
 
     @Override
-    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity) {
         // 미사용
     }
 

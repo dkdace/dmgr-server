@@ -33,23 +33,27 @@ import org.bukkit.util.Vector;
 
 import java.util.function.LongConsumer;
 
-@Getter
 public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.ChedUltFireFloor>, HasBonusScore {
     /** 수정자 ID */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedUltInfo.READY_SLOW);
 
     /** 소환 엔티티 모듈 */
     @NonNull
+    @Getter
     private final EntityModule<ChedUltFireFloor> entityModule;
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 화염 상태 효과 */
+    private final Burning burning;
 
     public ChedUlt(@NonNull CombatUser combatUser) {
         super(combatUser, ChedUltInfo.getInstance(), Timespan.MAX, ChedUltInfo.COST);
 
         this.entityModule = new EntityModule<>(this);
         this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
+        this.burning = new Burning(combatUser, ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
     }
 
     @Override
@@ -96,17 +100,6 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class ChedUltBurning extends Burning {
-        private static final ChedUltBurning instance = new ChedUltBurning();
-
-        private ChedUltBurning() {
-            super(ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
-        }
     }
 
     /**
@@ -292,7 +285,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
-                    target.getStatusEffectModule().apply(ChedUltBurning.instance, combatUser, Timespan.ofTicks(10));
+                    target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
 
                     if (target instanceof CombatUser)
                         bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
