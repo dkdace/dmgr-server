@@ -30,17 +30,23 @@ import org.jetbrains.annotations.Nullable;
 public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    /** 둔화 상태 효과 */
+    private static final Slow SLOW = new Slow(VellionUltInfo.SLOW);
 
     /** 보너스 점수 모듈 */
     @NonNull
     @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 기절 상태 효과 */
+    private final Stun stun;
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
     public VellionUlt(@NonNull CombatUser combatUser) {
         super(combatUser, VellionUltInfo.getInstance(), VellionUltInfo.DURATION, VellionUltInfo.COST);
+
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionUltInfo.ASSIST_SCORE);
+        this.stun = new Stun(combatUser);
     }
 
     @Override
@@ -105,7 +111,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         isEnabled = true;
 
         setDuration();
-        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), combatUser, VellionUltInfo.DURATION);
+        combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
         VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
 
@@ -173,17 +179,6 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     }
 
     /**
-     * 둔화 상태 효과 클래스.
-     */
-    private static final class VellionUltSlow extends Slow {
-        private static final VellionUltSlow instance = new VellionUltSlow();
-
-        private VellionUltSlow() {
-            super(VellionUltInfo.SLOW);
-        }
-    }
-
-    /**
      * 효과를 재생하는 클래스.
      */
     @NoArgsConstructor
@@ -237,8 +232,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
-                target.getStatusEffectModule().apply(VellionUltSlow.instance, combatUser, Timespan.ofTicks(10));
-                target.getStatusEffectModule().apply(Grounding.getInstance(), combatUser, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(SLOW, Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
                 if (target instanceof CombatUser)
                     bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
@@ -262,7 +257,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, target.getDamageModule().getMaxHealth() * VellionUltInfo.DAMAGE_RATIO,
                     DamageType.FIXED, null, false, false)) {
-                target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, VellionUltInfo.STUN_DURATION);
+                target.getStatusEffectModule().apply(stun, VellionUltInfo.STUN_DURATION);
 
                 if (target instanceof CombatUser) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);

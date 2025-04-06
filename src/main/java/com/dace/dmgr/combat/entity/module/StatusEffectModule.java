@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -78,10 +77,9 @@ public final class StatusEffectModule {
      * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이 남은 시간보다 길 경우에만 적용한다.</p>
      *
      * @param statusEffect 적용할 상태 효과
-     * @param provider     제공자
      * @param duration     지속시간
      */
-    public void apply(@NonNull StatusEffect statusEffect, @NonNull CombatEntity provider, @NonNull Timespan duration) {
+    public void apply(@NonNull StatusEffect statusEffect, @NonNull Timespan duration) {
         if (!statusEffect.isPositive())
             duration = duration.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
         if (duration.isZero())
@@ -90,7 +88,7 @@ public final class StatusEffectModule {
         Timestamp expiration = Timestamp.now().plus(duration);
 
         StatusEffectInfo statusEffectInfo = statusEffectMap.computeIfAbsent(statusEffect, k ->
-                new StatusEffectInfo(statusEffect, provider, expiration));
+                new StatusEffectInfo(statusEffect, expiration));
         statusEffectInfo.expiration = expiration;
     }
 
@@ -100,16 +98,15 @@ public final class StatusEffectModule {
      * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이 남은 시간보다 길 경우에만 적용한다.</p>
      *
      * @param type     상태 변수 종류
-     * @param provider 제공자
      * @param duration 지속시간
      * @param <T>      {@link ValueStatusEffect}를 상속받는 상태 변수를 가진 상태 효과
      * @return 적용된 상태 효과
      * @see ValueStatusEffect.Type
      */
     @NonNull
-    public <T extends ValueStatusEffect> T apply(@NonNull ValueStatusEffect.Type<T> type, @NonNull CombatEntity provider, @NonNull Timespan duration) {
+    public <T extends ValueStatusEffect> T apply(@NonNull ValueStatusEffect.Type<T> type, @NonNull Timespan duration) {
         T valueStatusEffect = getValueStatusEffect(type);
-        apply(valueStatusEffect, provider, duration);
+        apply(valueStatusEffect, duration);
 
         return valueStatusEffect;
     }
@@ -241,26 +238,22 @@ public final class StatusEffectModule {
     private final class StatusEffectInfo {
         /** 상태 효과 */
         private final StatusEffect statusEffect;
-        /** 제공자 */
-        private final CombatEntity provider;
         /** 틱 작업을 처리하는 태스크 */
         private final IntervalTask onTickTask;
         /** 종료 시점 */
         private Timestamp expiration;
 
-        private StatusEffectInfo(@NonNull StatusEffect statusEffect, @NonNull CombatEntity provider, @NonNull Timestamp expiration) {
+        private StatusEffectInfo(@NonNull StatusEffect statusEffect, @NonNull Timestamp expiration) {
             this.statusEffect = statusEffect;
-            this.provider = provider;
             this.expiration = expiration;
 
-            statusEffect.onStart(combatEntity, provider);
+            statusEffect.onStart(combatEntity);
 
             this.onTickTask = new IntervalTask(i -> {
-                if (this.expiration.isBefore(Timestamp.now()) || provider.isRemoved() || combatEntity instanceof CombatUser
-                        && ((CombatUser) combatEntity).isDead())
+                if (this.expiration.isBefore(Timestamp.now()) || combatEntity instanceof CombatUser && ((CombatUser) combatEntity).isDead())
                     return false;
 
-                statusEffect.onTick(combatEntity, provider, i);
+                statusEffect.onTick(combatEntity, i);
                 return true;
             }, this::onFinish, 1);
 
@@ -269,7 +262,7 @@ public final class StatusEffectModule {
 
         private void onFinish() {
             statusEffectMap.remove(statusEffect);
-            statusEffect.onEnd(combatEntity, provider);
+            statusEffect.onEnd(combatEntity);
 
             onTickTask.stop();
         }

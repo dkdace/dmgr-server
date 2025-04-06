@@ -8,7 +8,10 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -147,7 +150,7 @@ public final class JagerA3 extends ActiveSkill {
         private static final Freeze instance = new Freeze();
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
@@ -231,7 +234,7 @@ public final class JagerA3 extends ActiveSkill {
                 JagerT1.addFreezeValue(target, freeze);
 
                 if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
-                    target.getStatusEffectModule().apply(Freeze.instance, combatUser, JagerA3Info.SNARE_DURATION);
+                    target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
                     combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
                     combatUser.useAction(ActionKey.PERIODIC_1);

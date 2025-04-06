@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.jager;
 
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
@@ -22,7 +21,7 @@ public final class JagerT1 {
      * @param amount 증가량
      */
     static void addFreezeValue(@NonNull Damageable victim, int amount) {
-        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, victim, JagerT1Info.DURATION);
+        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, JagerT1Info.DURATION);
         freezeValue.setValue(freezeValue.getValue() + amount);
     }
 
@@ -38,13 +37,13 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifier);
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             if (combatEntity instanceof Movable)
                 modifier.setIncrement(-getValue());
 
@@ -53,7 +52,7 @@ public final class JagerT1 {
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             setValue(0);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifier);

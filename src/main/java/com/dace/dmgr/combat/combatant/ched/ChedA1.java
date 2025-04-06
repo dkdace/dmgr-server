@@ -22,13 +22,16 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
-@Getter(AccessLevel.PACKAGE)
 public final class ChedA1 extends StackableSkill {
+    /** 화염 상태 효과 */
+    private final Burning burning;
     /** 활성화 완료 여부 */
+    @Getter(AccessLevel.PACKAGE)
     private boolean isEnabled = false;
 
     public ChedA1(@NonNull CombatUser combatUser) {
         super(combatUser, ChedA1Info.getInstance(), ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK, 0);
+        this.burning = new Burning(combatUser, ChedA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 
     @Override
@@ -106,17 +109,6 @@ public final class ChedA1 extends StackableSkill {
         ChedA1Info.SOUND.SHOOT.play(combatUser.getLocation());
     }
 
-    /**
-     * 화염 상태 효과 클래스.
-     */
-    private static final class ChedA1Burning extends Burning {
-        private static final ChedA1Burning instance = new ChedA1Burning();
-
-        private ChedA1Burning() {
-            super(ChedA1Info.FIRE_DAMAGE_PER_SECOND, true);
-        }
-    }
-
     private final class ChedA1Projectile extends Projectile<Damageable> {
         private ChedA1Projectile() {
             super(ChedA1.this, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
@@ -155,7 +147,7 @@ public final class ChedA1 extends StackableSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, location, isCrit, true)) {
-                    target.getStatusEffectModule().apply(ChedA1Burning.instance, shooter, ChedA1Info.FIRE_DURATION);
+                    target.getStatusEffectModule().apply(burning, ChedA1Info.FIRE_DURATION);
 
                     if (target instanceof CombatUser)
                         ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);

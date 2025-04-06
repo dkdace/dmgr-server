@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
@@ -26,27 +25,27 @@ public class Slow extends StatusEffect {
      *
      * @param decrement 이동 속도 감소량
      */
-    protected Slow(double decrement) {
+    public Slow(double decrement) {
         super(StatusEffectType.SLOW, false);
         this.modifier = new AbilityStatus.Modifier(-decrement);
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifier);
     }
 
     @Override
-    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, long i) {
         if (combatEntity.isCreature())
             TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof Movable)
             ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifier);
     }

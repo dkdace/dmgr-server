@@ -16,6 +16,9 @@ import org.jetbrains.annotations.Nullable;
  * 역할군이 '근접'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Scuffler extends Combatant {
+    /** 속도 증가 상태 효과 */
+    private static final Speed SPEED = new Speed(RoleTrait2Info.SPEED);
+
     /**
      * 근접 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -43,7 +46,7 @@ public abstract class Scuffler extends Combatant {
         if (isFinalHit)
             attacker.addUltGauge(RoleTrait1Info.ULTIMATE_CHARGE);
 
-        attacker.getStatusEffectModule().apply(RoleTrait2Speed.instance, attacker, RoleTrait2Info.DURATION);
+        attacker.getStatusEffectModule().apply(SPEED, RoleTrait2Info.DURATION);
     }
 
     @Override
@@ -88,17 +91,6 @@ public abstract class Scuffler extends Combatant {
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                             .build()));
-        }
-    }
-
-    /**
-     * 속도 증가 상태 효과 클래스.
-     */
-    private static final class RoleTrait2Speed extends Speed {
-        private static final RoleTrait2Speed instance = new RoleTrait2Speed();
-
-        private RoleTrait2Speed() {
-            super(RoleTrait2Info.SPEED);
         }
     }
 }
