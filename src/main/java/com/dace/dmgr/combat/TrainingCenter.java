@@ -65,6 +65,8 @@ public final class TrainingCenter {
      * 훈련장을 생성하고 기본 더미를 소환한다.
      */
     private TrainingCenter() {
+        WORLD.setFullTime(16000);
+
         for (Location loc : FIXED_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(loc, 1000, true));
 
