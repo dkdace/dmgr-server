@@ -12,6 +12,7 @@ import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.MemoryNPCDataStore;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
@@ -112,7 +113,7 @@ public class DMGR extends JavaPlugin {
     @NonNull
     public static NPCRegistry getNpcRegistry() {
         if (npcRegistry == null)
-            npcRegistry = CitizensAPI.createInMemoryNPCRegistry(TEMPORARY_ENTITY_CUSTOM_NAME);
+            npcRegistry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
         return npcRegistry;
     }
 
@@ -174,6 +175,8 @@ public class DMGR extends JavaPlugin {
         });
 
         getHolographicDisplaysAPI().deleteHolograms();
+        if (npcRegistry != null)
+            npcRegistry.deregisterAll();
     }
 
     /**
