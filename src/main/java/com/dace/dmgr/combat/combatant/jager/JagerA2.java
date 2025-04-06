@@ -194,7 +194,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         private void onCatchEnemy(@NonNull Damageable target) {
             if (target.getDamageModule().damage(this, JagerA2Info.DAMAGE, DamageType.NORMAL, target.getLocation().add(0, 0.2, 0),
                     false, true)) {
-                target.getStatusEffectModule().apply(Snare.getInstance(), this, JagerA2Info.SNARE_DURATION);
+                target.getStatusEffectModule().apply(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
 
                 if (target instanceof CombatUser)
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);

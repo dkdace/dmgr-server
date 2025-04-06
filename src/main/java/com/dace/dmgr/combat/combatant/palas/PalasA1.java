@@ -7,29 +7,30 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
-@Getter
 public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 기절 상태 효과 */
+    private final PalasA1Stun stun;
 
     public PalasA1(@NonNull CombatUser combatUser) {
         super(combatUser, PalasA1Info.getInstance(), PalasA1Info.COOLDOWN, Timespan.MAX, 0);
+
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA1Info.ASSIST_SCORE);
+        this.stun = new PalasA1Stun();
     }
 
     @Override
@@ -83,13 +84,14 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     /**
      * 기절 상태 효과 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class PalasA1Stun extends Stun {
-        private static final PalasA1Stun instance = new PalasA1Stun();
+    private final class PalasA1Stun extends Stun {
+        private PalasA1Stun() {
+            super(combatUser);
+        }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
-            super.onTick(combatEntity, provider, i);
+        public void onTick(@NonNull Damageable combatEntity, long i) {
+            super.onTick(combatEntity, i);
 
             if (combatEntity instanceof CombatUser)
                 CombatUtil.sendShake((CombatUser) combatEntity, 20, 20);
@@ -124,7 +126,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, PalasA1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
                     if (target.isCreature()) {
-                        target.getStatusEffectModule().apply(PalasA1Stun.instance, combatUser, PalasA1Info.STUN_DURATION);
+                        target.getStatusEffectModule().apply(stun, PalasA1Info.STUN_DURATION);
 
                         PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }

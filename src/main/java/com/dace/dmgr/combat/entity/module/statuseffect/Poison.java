@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.ParticleEffect;
@@ -23,6 +22,8 @@ public class Poison extends StatusEffect {
                     .verticalSpread(1, 0, 0.25)
                     .speed(0.3).build());
 
+    /** 공격자 */
+    private final Attacker attacker;
     /** 초당 피해량 */
     private final double damagePerSecond;
     /** 궁극기 제공 여부 */
@@ -31,26 +32,33 @@ public class Poison extends StatusEffect {
     /**
      * 독 상태 효과 인스턴스를 생성한다.
      *
+     * @param attacker        공격자
      * @param damagePerSecond 초당 피해량
      * @param isUlt           궁극기 제공 여부
      */
-    protected Poison(double damagePerSecond, boolean isUlt) {
+    public Poison(@NonNull Attacker attacker, double damagePerSecond, boolean isUlt) {
         super(StatusEffectType.POISON, false);
 
+        this.attacker = attacker;
         this.damagePerSecond = damagePerSecond;
         this.isUlt = isUlt;
     }
 
     @Override
-    public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onStart(@NonNull Damageable combatEntity) {
         // 미사용
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+    public void onTick(@NonNull Damageable combatEntity, long i) {
         if (!combatEntity.isCreature())
             return;
+
+        if (attacker.isRemoved()) {
+            combatEntity.getStatusEffectModule().remove(this);
+            return;
+        }
 
         if (combatEntity.getEntity() instanceof LivingEntity)
             ((LivingEntity) combatEntity.getEntity()).addPotionEffect(
@@ -59,13 +67,12 @@ public class Poison extends StatusEffect {
         if (i % 2 == 0)
             TICK_PARTICLE.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
 
-        if (i % 10 == 0 && provider instanceof Attacker)
-            combatEntity.getDamageModule().damage((Attacker) provider, damagePerSecond * 10 / 20.0, DamageType.IGNORE_DEFENSE, null,
-                    false, isUlt);
+        if (i % 10 == 0)
+            combatEntity.getDamageModule().damage(attacker, damagePerSecond * 10 / 20.0, DamageType.IGNORE_DEFENSE, null, false, isUlt);
     }
 
     @Override
-    public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+    public void onEnd(@NonNull Damageable combatEntity) {
         // 미사용
     }
 }

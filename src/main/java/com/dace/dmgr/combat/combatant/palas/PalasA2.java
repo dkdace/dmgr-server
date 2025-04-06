@@ -6,7 +6,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.LocationUtil;
@@ -50,7 +53,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);
         target.getStatusEffectModule().clear(false);
-        target.getStatusEffectModule().apply(PalasA2Immune.instance, combatUser, PalasA2Info.DURATION);
+        target.getStatusEffectModule().apply(PalasA2Immune.instance, PalasA2Info.DURATION);
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
@@ -92,19 +95,19 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         }
 
         @Override
-        public void onStart(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onStart(@NonNull Damageable combatEntity) {
             combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
 
         @Override
-        public void onTick(@NonNull Damageable combatEntity, @NonNull CombatEntity provider, long i) {
+        public void onTick(@NonNull Damageable combatEntity, long i) {
             PalasA2Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override
-        public void onEnd(@NonNull Damageable combatEntity, @NonNull CombatEntity provider) {
+        public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
                 ((Movable) combatEntity).getMoveModule().getResistanceStatus().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);

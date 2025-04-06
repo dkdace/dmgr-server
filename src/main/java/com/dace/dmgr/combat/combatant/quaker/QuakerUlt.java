@@ -25,17 +25,24 @@ import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 
-@Getter
 public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    /** 둔화 상태 효과 */
+    private static final Slow SLOW = new Slow(QuakerUltInfo.SLOW);
+
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
+    /** 기절 상태 효과 */
+    private final Stun stun;
 
     public QuakerUlt(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerUltInfo.getInstance(), Timespan.MAX, QuakerUltInfo.COST);
+
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerUltInfo.ASSIST_SCORE);
+        this.stun = new Stun(combatUser);
     }
 
     @Override
@@ -109,17 +116,6 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(6));
     }
 
-    /**
-     * 둔화 상태 효과 클래스.
-     */
-    private static final class QuakerUltSlow extends Slow {
-        private static final QuakerUltSlow instance = new QuakerUltSlow();
-
-        private QuakerUltSlow() {
-            super(QuakerUltInfo.SLOW);
-        }
-    }
-
     private final class QuakerUltProjectile extends Projectile<Damageable> {
         private final HashSet<Damageable> targets;
 
@@ -150,8 +146,8 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
-                        target.getStatusEffectModule().apply(Stun.getInstance(), combatUser, QuakerUltInfo.STUN_DURATION);
-                        target.getStatusEffectModule().apply(QuakerUltSlow.instance, combatUser, QuakerUltInfo.SLOW_DURATION);
+                        target.getStatusEffectModule().apply(stun, QuakerUltInfo.STUN_DURATION);
+                        target.getStatusEffectModule().apply(SLOW, QuakerUltInfo.SLOW_DURATION);
 
                         if (target instanceof Movable) {
                             Vector dir = LocationUtil.getDirection(combatUser.getLocation(), target.getLocation().add(0, 1, 0))
