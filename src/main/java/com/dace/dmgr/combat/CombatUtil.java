@@ -15,6 +15,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -77,7 +78,7 @@ public final class CombatUtil {
                                                                  @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
-        return (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+        return (game == null ? CombatEntity.getAllExcluded(location.getWorld()) : game.getCombatEntities()).stream()
                 .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                         ? entityCondition.targetClass.cast(combatEntity)
                         : null)
@@ -108,7 +109,7 @@ public final class CombatUtil {
         Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
 
         return Collections.unmodifiableSet(
-                (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+                (game == null ? CombatEntity.getAllExcluded(location.getWorld()) : game.getCombatEntities()).stream()
                         .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                                 ? entityCondition.targetClass.cast(combatEntity)
                                 : null)
@@ -122,7 +123,8 @@ public final class CombatUtil {
     /**
      * 특정 조건을 만족하는 모든 엔티티를 반환한다.
      *
-     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded()})를 대상으로 함
+     * @param game            대상 게임. {@code null}로 지정 시 게임에 소속되지 않은 엔티티 ({@link CombatEntity#getAllExcluded(World)})를 대상으로 함
+     * @param world           대상 월드. {@code game}이 {@code null}이면 해당 월드에서 탐색
      * @param entityCondition 엔티티 탐색 조건
      * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      * @return 범위 내 모든 엔티티
@@ -130,9 +132,10 @@ public final class CombatUtil {
      */
     @NonNull
     @UnmodifiableView
-    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@Nullable Game game, @NonNull EntityCondition<T> entityCondition) {
+    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@Nullable Game game, @NonNull World world,
+                                                                             @NonNull EntityCondition<T> entityCondition) {
         return Collections.unmodifiableSet(
-                (game == null ? CombatEntity.getAllExcluded() : game.getCombatEntities()).stream()
+                (game == null ? CombatEntity.getAllExcluded(world) : game.getCombatEntities()).stream()
                         .map(combatEntity -> entityCondition.targetClass.isInstance(combatEntity)
                                 ? entityCondition.targetClass.cast(combatEntity)
                                 : null)

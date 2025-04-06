@@ -189,7 +189,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
                     combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION);
 
-                    CombatUtil.getCombatEntities(combatUser.getGame(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    CombatUtil.getCombatEntities(combatUser.getGame(), location.getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
                                     .and(CombatUser.class::isInstance))
                             .forEach(teamTarget -> ((CombatUser) teamTarget).getUser().setGlowing(target.getEntity(), ChatColor.RED,
                                     ChedA3Info.DETECT_DURATION));

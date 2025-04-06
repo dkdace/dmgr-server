@@ -5,6 +5,7 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -19,14 +20,15 @@ import java.util.function.LongConsumer;
  */
 public interface CombatEntity {
     /**
-     * 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     * 지정한 월드에서 게임에 소속되지 않은 모든 엔티티를 반환한다.
      *
+     * @param world 월드
      * @return 게임에 소속되지 않은 모든 엔티티
      */
     @NonNull
     @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllExcluded() {
-        return AbstractCombatEntity.getAllExcluded();
+    static Collection<@NonNull CombatEntity> getAllExcluded(@NonNull World world) {
+        return AbstractCombatEntity.getAllExcluded(world);
     }
 
     /**
