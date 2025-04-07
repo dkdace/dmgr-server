@@ -4,6 +4,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.MoveModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
@@ -15,14 +16,18 @@ import com.dace.dmgr.game.Game;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public final class Dummy extends TemporaryPlayerEntity implements Healable, Movable, HasCritHitbox, CombatEntity {
-    /** 행동 양식 */
-    private final DummyBehavior dummyBehavior;
+public final class Dummy extends TemporaryPlayerEntity implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
+    /** 공격 모듈 */
+    @NonNull
+    @Getter
+    private final AttackModule attackModule;
     /** 피해 모듈 */
     @NonNull
     @Getter
@@ -35,7 +40,10 @@ public final class Dummy extends TemporaryPlayerEntity implements Healable, Mova
     @NonNull
     @Getter
     private final MoveModule moveModule;
+    /** 행동 양식 */
+    private final DummyBehavior dummyBehavior;
     /** 적 여부 */
+    @Getter
     private final boolean isEnemy;
 
     /**
@@ -56,6 +64,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Healable, Mova
                 Hitbox.builder(0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.4).build());
 
         this.dummyBehavior = dummyBehavior;
+        this.attackModule = new AttackModule();
         this.damageModule = new HealModule(this, maxHealth, true);
         this.statusEffectModule = new StatusEffectModule(this);
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
@@ -79,6 +88,9 @@ public final class Dummy extends TemporaryPlayerEntity implements Healable, Mova
         entity.setSilent(true);
         entity.setAI(true);
 
+        if (!isEnemy)
+            entity.getEquipment().setHelmet(new ItemStack(Material.STAINED_GLASS, 1, (short) 5));
+
         dummyBehavior.onInit(this);
     }
 
@@ -98,13 +110,23 @@ public final class Dummy extends TemporaryPlayerEntity implements Healable, Mova
         if (target instanceof CombatUser || target instanceof SummonEntity)
             return isEnemy;
 
-        return !(target instanceof Dummy);
+        return !(target instanceof Dummy) || isEnemy != ((Dummy) target).isEnemy;
     }
 
     @Override
     @Nullable
     public Hitbox getCritHitbox() {
         return hitboxes[3];
+    }
+
+    @Override
+    public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
+        // 미사용
+    }
+
+    @Override
+    public void onKill(@NonNull Damageable victim) {
+        // 미사용
     }
 
     @Override
@@ -121,5 +143,4 @@ public final class Dummy extends TemporaryPlayerEntity implements Healable, Mova
     public void onDeath(@Nullable Attacker attacker) {
         remove();
     }
-
 }

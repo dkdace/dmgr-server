@@ -4,6 +4,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.MovingBehavior;
+import com.dace.dmgr.combat.entity.temporary.dummy.ShootingBehavior;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -57,6 +58,16 @@ public final class TrainingCenter {
             {new Location(WORLD, 117.5, 220, 92.5), new Location(WORLD, 125.5, 220, 104.5)},
             {new Location(WORLD, 113.5, 220, 93.5), new Location(WORLD, 119.5, 220, 103.5)},
     };
+    /** 공격형 적 더미의 위치 목록 */
+    private static final Location[] SHOOTING_ENEMY_DUMMY_LOCATIONS = {
+            new Location(WORLD, 84.5, 220, 102.5, -135, 2),
+            new Location(WORLD, 89.5, 220, 107.5, -135, 2)
+    };
+    /** 공격형 아군 더미의 위치 목록 */
+    private static final Location[] SHOOTING_TEAM_DUMMY_LOCATIONS = {
+            new Location(WORLD, 93.5, 220, 93.5, 45, 2),
+            new Location(WORLD, 97.5, 220, 99.5, 45, 2)
+    };
 
     @Getter
     private static final TrainingCenter instance = new TrainingCenter();
@@ -69,12 +80,16 @@ public final class TrainingCenter {
 
         for (Location loc : FIXED_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(loc, 1000, true));
-
         for (Location loc : FIXED_HEAVY_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(loc, 3000, true));
 
         for (Location[] locs : FIXED_MOVING_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(new MovingBehavior(locs), locs[0], 1000, true));
+
+        for (Location loc : SHOOTING_ENEMY_DUMMY_LOCATIONS)
+            spawnDummy(() -> new Dummy(new ShootingBehavior(), loc, 1000, true));
+        for (Location loc : SHOOTING_TEAM_DUMMY_LOCATIONS)
+            spawnDummy(() -> new Dummy(new ShootingBehavior(), loc, 1000, false));
     }
 
     /**
