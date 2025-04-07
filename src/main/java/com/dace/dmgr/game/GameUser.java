@@ -106,7 +106,7 @@ public final class GameUser {
         this.game = game;
         this.team = team;
 
-        user.reset();
+        user.setCurrentPlace(User.Place.LOBBY);
 
         GAME_USER_MAP.put(user, this);
 

@@ -661,7 +661,7 @@ public final class User {
     /**
      * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
-    public void reset() {
+    private void reset() {
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.setExp(0);
@@ -1010,7 +1010,7 @@ public final class User {
     }
 
     /**
-     * 플레이어를 지정한 장소로 이동시킨다.
+     * 플레이어를 지정한 장소로 이동시키고 상태를 재설정한다.
      *
      * @param place 이동할 장소
      */

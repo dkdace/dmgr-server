@@ -467,7 +467,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (target == this)
             return false;
         if (target instanceof CombatUser)
-            return getTeam() == null || getTeam() != target.getTeam();
+            return (getTeam() == null || getTeam() != target.getTeam()) && user.getCurrentPlace() != User.Place.TRAINING_CENTER;
 
         return target.isEnemy(this);
     }

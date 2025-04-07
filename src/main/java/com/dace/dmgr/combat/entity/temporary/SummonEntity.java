@@ -68,10 +68,10 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
 
     @Override
     public final boolean isEnemy(@NonNull CombatEntity target) {
-        if (target instanceof SummonEntity)
-            return owner != ((SummonEntity<?>) target).getOwner();
+        if (target == this)
+            return false;
 
-        return owner != target;
+        return owner.isEnemy(target);
     }
 
     /**
