@@ -2,19 +2,23 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.module.statuseffect.*;
 import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.MovingBehavior;
 import com.dace.dmgr.combat.entity.temporary.dummy.ShootingBehavior;
+import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -78,6 +82,8 @@ public final class TrainingCenter {
     private TrainingCenter() {
         WORLD.setFullTime(16000);
 
+        new EffectTestBlock();
+
         for (Location loc : FIXED_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(loc, 1000, true));
         for (Location loc : FIXED_HEAVY_DUMMY_LOCATIONS)
@@ -136,5 +142,54 @@ public final class TrainingCenter {
         user.sendTitle("훈련장", "§b신호기 위치에서 전투원을 선택할 수 있습니다.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
                 Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
         user.teleport(SPAWN_LOCATION);
+    }
+
+    /**
+     * 디버프 실험 블록 클래스.
+     */
+    private static final class EffectTestBlock extends FunctionalBlock.CooldownBlock {
+        /** 블록 위치별 디버프 적용에 실행할 작업의 목록 (위치 : 디버프 적용에 실행할 작업) */
+        private static final HashMap<Location, Consumer<CombatUser>> USE_EFFECT_MAP = new HashMap<>();
+
+        /** 사용 입자 효과 */
+        private static final ParticleEffect USE_PARTICLE = new ParticleEffect(
+                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_ANGRY).build());
+        /** 사용 효과음 */
+        private static final SoundEffect USE_SOUND = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BREATH).volume(1).pitch(0.8).build(),
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_PICKUP).volume(1).pitch(0.7).build());
+
+        private EffectTestBlock() {
+            super(GeneralConfig.getTrainingConfig().getEffectTestBlock(), GeneralConfig.getTrainingConfig().getEffectTestCooldown());
+
+            USE_EFFECT_MAP.put(new Location(WORLD, 124, 233, 107), combatUser ->
+                    combatUser.getStatusEffectModule().apply(new Stun(null), Timespan.ofSeconds(1)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 126, 233, 107), combatUser ->
+                    combatUser.getStatusEffectModule().apply(Snare.getInstance(), Timespan.ofSeconds(1)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 128, 233, 109), combatUser ->
+                    combatUser.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofSeconds(1)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 128, 233, 111), combatUser ->
+                    combatUser.getStatusEffectModule().apply(new Burning(combatUser, 100, false), Timespan.ofSeconds(3)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 128, 233, 113), combatUser ->
+                    combatUser.getStatusEffectModule().apply(new Poison(combatUser, 100, false), Timespan.ofSeconds(3)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 126, 233, 115), combatUser ->
+                    combatUser.getStatusEffectModule().apply(HealBlock.getInstance(), Timespan.ofSeconds(3)));
+            USE_EFFECT_MAP.put(new Location(WORLD, 124, 233, 115), combatUser ->
+                    combatUser.getStatusEffectModule().apply(new Silence(null), Timespan.ofSeconds(3)));
+        }
+
+        @Override
+        protected boolean canUse(@NonNull CombatUser combatUser, @NonNull Location location) {
+            return super.canUse(combatUser, location) && USE_EFFECT_MAP.containsKey(location);
+        }
+
+        @Override
+        protected void onUse(@NonNull CombatUser combatUser, @NonNull Location location) {
+            super.onUse(combatUser, location);
+
+            USE_EFFECT_MAP.get(location).accept(combatUser);
+            USE_PARTICLE.play(location.clone().add(0.5, 0.5, 0.5));
+            USE_SOUND.play(location);
+        }
     }
 }
