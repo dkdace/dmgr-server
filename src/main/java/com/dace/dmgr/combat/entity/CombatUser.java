@@ -1094,12 +1094,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 히트박스를 기본 히트박스로 재설정한다.
      */
     public void resetHitboxes() {
-        double hitboxMultiplier = combatant.getHitboxMultiplier();
-
-        setHitboxes(Hitbox.builder(0.5 * hitboxMultiplier, 0.7, 0.3 * hitboxMultiplier).axisOffsetY(0.35).pitchFixed().build(),
-                Hitbox.builder(0.8 * hitboxMultiplier, 0.7, 0.45 * hitboxMultiplier).axisOffsetY(1.05).pitchFixed().build(),
-                Hitbox.builder(0.45 * hitboxMultiplier, 0.35, 0.45 * hitboxMultiplier).offsetY(0.225).axisOffsetY(1.4).build(),
-                Hitbox.builder(0.45 * hitboxMultiplier, 0.1, 0.45 * hitboxMultiplier).offsetY(0.4).axisOffsetY(1.4).build());
+        setHitboxes(Hitbox.createDefaultPlayerHitboxes(combatant.getHitboxMultiplier()));
         currentHitboxes = hitboxes;
     }
 

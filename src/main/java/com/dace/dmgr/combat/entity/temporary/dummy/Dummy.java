@@ -57,11 +57,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
      * @see DummyBehavior
      */
     public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, boolean isEnemy) {
-        super(PlayerSkin.fromPlayerName("Clemounours"), spawnLocation, "훈련용 봇", null,
-                Hitbox.builder(0.5, 0.7, 0.3).axisOffsetY(0.35).pitchFixed().build(),
-                Hitbox.builder(0.8, 0.7, 0.45).axisOffsetY(1.05).pitchFixed().build(),
-                Hitbox.builder(0.45, 0.35, 0.45).offsetY(0.225).axisOffsetY(1.4).build(),
-                Hitbox.builder(0.45, 0.1, 0.45).offsetY(0.4).axisOffsetY(1.4).build());
+        super(PlayerSkin.fromPlayerName("Clemounours"), spawnLocation, "훈련용 봇", null, Hitbox.createDefaultPlayerHitboxes(1));
 
         this.dummyBehavior = dummyBehavior;
         this.attackModule = new AttackModule();
