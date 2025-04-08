@@ -243,7 +243,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         }
 
         @Override
-        public double getScore() {
+        public int getScore() {
             return JagerA1Info.DEATH_SCORE;
         }
 
@@ -254,8 +254,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             combatUser.getSkill(JagerP1Info.getInstance()).setTarget(victim);
             combatUser.useAction(ActionKey.PERIODIC_1);
 
-            if (victim instanceof CombatUser)
-                bonusScoreModule.addTarget((CombatUser) victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
+            if (victim.isGoalTarget())
+                bonusScoreModule.addTarget(victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override

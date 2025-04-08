@@ -194,9 +194,9 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
                             .forEach(teamTarget -> ((CombatUser) teamTarget).getUser().setGlowing(target.getEntity(), ChatColor.RED,
                                     ChedA3Info.DETECT_DURATION));
 
-                    if (target instanceof CombatUser) {
+                    if (target.isGoalTarget()) {
                         combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
-                        bonusScoreModule.addTarget((CombatUser) target, ChedA3Info.KILL_SCORE_TIME_LIMIT);
+                        bonusScoreModule.addTarget(target, ChedA3Info.KILL_SCORE_TIME_LIMIT);
                     }
                 }
 

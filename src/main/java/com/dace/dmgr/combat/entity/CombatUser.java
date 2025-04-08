@@ -484,6 +484,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
+    public boolean isGoalTarget() {
+        return true;
+    }
+
+    @Override
     public boolean canJump() {
         return combatant.canJump(this);
     }
@@ -493,18 +498,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-        isUlt = isUlt && combatant.onAttack(this, victim, damage, isCrit);
+        boolean onAttackUlt = combatant.onAttack(this, victim, damage, isCrit);
+        isUlt = isUlt && onAttackUlt;
 
         playAttackEffect(isCrit);
 
-        if (victim instanceof Healable && isUlt)
-            addUltGauge(damage);
+        if (victim.isGoalTarget()) {
+            if (isUlt)
+                addUltGauge(damage);
 
-        if (victim instanceof CombatUser) {
             if (hasCore(Core.HEALTH_DRAIN))
                 damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValue() / 100.0, false);
 
-            if (gameUser != null)
+            if (gameUser != null && victim instanceof CombatUser)
                 gameUser.addDamage(damage);
         }
     }
@@ -559,7 +565,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
-        isUlt = isUlt && getSkill(combatant.getUltimateSkillInfo()).isDurationFinished() && combatant.onGiveHeal(this, target, amount);
+        boolean onGiveHealUlt = combatant.onGiveHeal(this, target, amount);
+        isUlt = isUlt && onGiveHealUlt;
 
         if (this != target)
             lastGiveHealTimestamp = Timestamp.now();
@@ -603,21 +610,27 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         playKillEffect();
 
+        int score = victim instanceof CombatUser ? ((CombatUser) victim).killContributorManager.getScore(this) : victim.getScore();
+        int contributeScore = victim instanceof CombatUser ? score : 100;
+
+        combatant.onKill(this, victim, contributeScore, true);
+        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), score);
+
+        if (!victim.isGoalTarget())
+            return;
+
+        addScore("결정타", FINAL_HIT_SCORE);
+
+        handleBonusScoreSkill(victim, contributeScore);
+
+        if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
+            killStreak = 0;
+        killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
+        if (killStreak++ > 0)
+            addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
+
         if (victim instanceof CombatUser) {
             CombatUser combatUserVictim = (CombatUser) victim;
-            int score = combatUserVictim.killContributorManager.getScore(this);
-
-            combatant.onKill(this, victim, score, true);
-            addScore("§e" + victim.getName() + "§f 처치", score);
-            addScore("결정타", FINAL_HIT_SCORE);
-
-            handleBonusScoreSkill(combatUserVictim, score);
-
-            if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
-                killStreak = 0;
-            killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
-            if (killStreak++ > 0)
-                addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
             if (!(combatUserVictim.getSkill(combatUserVictim.getCombatantType().getCombatant().getUltimateSkillInfo()).isDurationFinished()))
                 addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
@@ -627,12 +640,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (gameUser != null)
                 gameUser.onKill(true);
-
-            return;
         }
-
-        combatant.onKill(this, victim, -1, true);
-        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), victim.getScore());
     }
 
     /**
@@ -734,7 +742,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 int score = killContributorManager.getScore(target);
 
                 target.combatant.onKill(target, this, score, false);
-                target.addScore("§e" + name + "§f 처치 도움", score);
+                target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 target.handleBonusScoreSkill(this, score);
 
                 target.playKillEffect();
@@ -805,7 +813,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      * @param score  처치 기여 점수
      */
-    private void handleBonusScoreSkill(@NonNull CombatUser victim, int score) {
+    private void handleBonusScoreSkill(@NonNull Damageable victim, int score) {
         for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
             Skill skill = getSkill(skillInfo);
             if (skill instanceof HasBonusScore)

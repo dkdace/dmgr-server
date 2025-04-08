@@ -133,9 +133,9 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
 
                     PalasA1Info.SOUND.HIT_ENTITY.play(location);
 
-                    if (target instanceof CombatUser) {
+                    if (target.isGoalTarget()) {
                         combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
-                        bonusScoreModule.addTarget((CombatUser) target, PalasA1Info.STUN_DURATION);
+                        bonusScoreModule.addTarget(target, PalasA1Info.STUN_DURATION);
                     }
                 }
 

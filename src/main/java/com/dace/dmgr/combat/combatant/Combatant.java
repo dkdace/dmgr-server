@@ -281,7 +281,7 @@ public abstract class Combatant {
      *
      * @param attacker   공격자
      * @param victim     피격자
-     * @param score      점수 (처치 기여도). -1이면 플레이어가 아닌 적
+     * @param score      처치 기여 점수
      * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
      * @see Combatant#onDeath(CombatUser, Attacker)
      */

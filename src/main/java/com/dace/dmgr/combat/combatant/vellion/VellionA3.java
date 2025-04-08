@@ -216,9 +216,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 target.getStatusEffectModule().apply(HealBlock.getInstance(), Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(silence, Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser) {
+                if (target.isGoalTarget()) {
                     combatUser.addScore("적 침묵", VellionA3Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
                 }
             }
 

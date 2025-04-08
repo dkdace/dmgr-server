@@ -106,6 +106,16 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
     }
 
     @Override
+    public int getScore() {
+        return 100;
+    }
+
+    @Override
+    public boolean isGoalTarget() {
+        return true;
+    }
+
+    @Override
     public boolean isEnemy(@NonNull CombatEntity target) {
         if (target instanceof CombatUser || target instanceof SummonEntity)
             return isEnemy;

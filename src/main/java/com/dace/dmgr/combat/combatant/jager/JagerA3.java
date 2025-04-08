@@ -239,7 +239,7 @@ public final class JagerA3 extends ActiveSkill {
                     combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
                     combatUser.useAction(ActionKey.PERIODIC_1);
 
-                    if (target != combatUser && target instanceof CombatUser)
+                    if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
                 }
             }

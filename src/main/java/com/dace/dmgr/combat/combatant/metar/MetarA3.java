@@ -191,9 +191,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
                     if (targets.add(target)) {
                         target.getDamageModule().damage(MetarA3Projectile.this, 1, DamageType.NORMAL, null, false, true);
 
-                        if (target != combatUser && target instanceof CombatUser) {
+                        if (target != combatUser && target.isGoalTarget()) {
                             combatUser.addScore("적 끌어당김", MetarA3Info.EFFECT_SCORE);
-                            bonusScoreModule.addTarget((CombatUser) target, MetarA3Info.ASSIST_SCORE_TIME_LIMIT);
+                            bonusScoreModule.addTarget(target, MetarA3Info.ASSIST_SCORE_TIME_LIMIT);
                         }
                     }
                 }

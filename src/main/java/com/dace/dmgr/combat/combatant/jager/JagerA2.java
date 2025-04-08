@@ -196,7 +196,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
                     false, true)) {
                 target.getStatusEffectModule().apply(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
 
-                if (target instanceof CombatUser)
+                if (target.isGoalTarget())
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
             }
 
@@ -220,7 +220,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         }
 
         @Override
-        public double getScore() {
+        public int getScore() {
             return JagerA2Info.DEATH_SCORE;
         }
 

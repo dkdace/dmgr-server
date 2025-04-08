@@ -208,7 +208,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                     else if (target instanceof Healable)
                         target.getStatusEffectModule().apply(heal, target.getStatusEffectModule().getDuration(heal).plus(VellionA1Info.EFFECT_DURATION));
 
-                    if (target instanceof CombatUser)
+                    if (target.isGoalTarget())
                         combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);
                 }
 
