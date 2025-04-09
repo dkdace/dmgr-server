@@ -157,7 +157,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("training");
 
         /** 전투원 선택 지역 확인 Y 좌표 */
-        private final int spawnRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
+        private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
         /** 전투원 선택 지역 식별 블록 타입 */
         @NonNull
         private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());

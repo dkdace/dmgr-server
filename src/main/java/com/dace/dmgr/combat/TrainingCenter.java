@@ -130,7 +130,7 @@ public final class TrainingCenter {
      * @return 전투원 선택 지역 안에 있으면 {@code true} 반환
      */
     public boolean isInSelectCharZone(@NonNull Player player) {
-        return LocationUtil.isInSameBlockXZ(player.getLocation(), GeneralConfig.getTrainingConfig().getSpawnRegionCheckYCoordinate(),
+        return LocationUtil.isInSameBlockXZ(player.getLocation(), GeneralConfig.getTrainingConfig().getSelectCharRegionCheckYCoordinate(),
                 GeneralConfig.getTrainingConfig().getSelectCharZoneBlock());
     }
 
