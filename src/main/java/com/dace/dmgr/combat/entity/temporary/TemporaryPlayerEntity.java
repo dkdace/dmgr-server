@@ -5,6 +5,7 @@ import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import net.citizensnpcs.api.npc.NPC;
@@ -12,6 +13,7 @@ import net.citizensnpcs.trait.SkinTrait;
 import net.skinsrestorer.api.property.IProperty;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -21,11 +23,13 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>실제 플레이어가 아니므로 {@link User#fromPlayer(Player)}를 호출하면 안 된다.</p>
  */
-@Getter
 public abstract class TemporaryPlayerEntity extends TemporaryEntity<Player> {
     /** Citizens NPC 인스턴스 */
     @NonNull
+    @Getter
     protected final NPC npc;
+    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
+    private final ArmorStand nameTagHider;
 
     /**
      * 일시적 플레이어 엔티티 인스턴스를 생성한다.
@@ -42,7 +46,13 @@ public abstract class TemporaryPlayerEntity extends TemporaryEntity<Player> {
         super(spawnPlayerNPC(playerSkin, spawnLocation), name, game, hitboxes);
 
         this.npc = DMGR.getNpcRegistry().getNPC(entity);
-        addOnRemove(npc::destroy);
+        this.nameTagHider = EntityUtil.createTemporaryArmorStand(entity.getLocation());
+        entity.addPassenger(this.nameTagHider);
+
+        addOnRemove(() -> {
+            nameTagHider.remove();
+            npc.destroy();
+        });
     }
 
     /**
@@ -56,6 +66,8 @@ public abstract class TemporaryPlayerEntity extends TemporaryEntity<Player> {
     @NonNull
     private static Player spawnPlayerNPC(@NonNull PlayerSkin playerSkin, @NonNull Location spawnLocation) {
         NPC npc = DMGR.getNpcRegistry().createNPC(EntityType.PLAYER, RandomStringUtils.randomAlphanumeric(8));
+
+        npc.data().set(NPC.Metadata.NAMEPLATE_VISIBLE, false);
 
         IProperty property = playerSkin.getProperty();
         npc.getOrAddTrait(SkinTrait.class).setSkinPersistent(property.getName(), property.getSignature(), property.getValue());

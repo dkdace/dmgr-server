@@ -35,6 +35,7 @@ import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -772,7 +773,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void respawn() {
         Location deadLocation = (gameUser == null ? user.getCurrentPlace().getStartLocation() : gameUser.getSpawnLocation().add(0, 2, 0));
-        user.teleport(deadLocation);
+        EntityUtil.teleport(entity, deadLocation);
 
         Timespan duration = GeneralConfig.getCombatConfig().getRespawnTime();
         if (gameUser == null)
@@ -789,7 +790,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
                         String.format("%.1f", Timespan.ofTicks(durationTicks - i).toSeconds())), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-            user.teleport(deadLocation);
+
+            EntityUtil.teleport(entity, deadLocation);
             entity.setSpectatorTarget(null);
         }, () -> {
             isDead = false;

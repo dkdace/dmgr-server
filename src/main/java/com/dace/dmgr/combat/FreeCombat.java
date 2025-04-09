@@ -3,6 +3,7 @@ package com.dace.dmgr.combat;
 import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -97,15 +98,15 @@ public final class FreeCombat {
     public void onStart(@NonNull User user) {
         user.sendTitle("자유 전투", "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
                 Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
-        user.teleport(WAIT_LOCATION);
+        EntityUtil.teleport(user.getPlayer(), WAIT_LOCATION);
     }
 
     /**
      * 플레이어를 자유 전투 전장의 무작위 위치로 이동시킨다.
      *
-     * @param user 이동할 플레이어
+     * @param player 이동할 플레이어
      */
-    public void teleportRandom(@NonNull User user) {
-        user.teleport(SPAWN_LOCATIONS[RandomUtils.nextInt(0, SPAWN_LOCATIONS.length)].toLocation(WORLD));
+    public void teleportRandom(@NonNull Player player) {
+        EntityUtil.teleport(player, SPAWN_LOCATIONS[RandomUtils.nextInt(0, SPAWN_LOCATIONS.length)].toLocation(WORLD));
     }
 }

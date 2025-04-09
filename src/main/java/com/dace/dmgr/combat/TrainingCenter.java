@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.temporary.dummy.ShootingBehavior;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
@@ -141,7 +142,7 @@ public final class TrainingCenter {
     public void onStart(@NonNull User user) {
         user.sendTitle("훈련장", "§b신호기 위치에서 전투원을 선택할 수 있습니다.", Timespan.ofSeconds(0.5), Timespan.ofSeconds(2),
                 Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
-        user.teleport(SPAWN_LOCATION);
+        EntityUtil.teleport(user.getPlayer(), SPAWN_LOCATION);
     }
 
     /**

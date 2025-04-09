@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.temporary.dummy;
 
+import com.dace.dmgr.util.EntityUtil;
 import lombok.NonNull;
 import net.citizensnpcs.api.ai.Navigator;
 import net.citizensnpcs.api.ai.tree.BehaviorGoalAdapter;
@@ -30,7 +31,7 @@ public final class MovingBehavior implements DummyBehavior {
             @Override
             public void reset() {
                 dummy.getNpc().getNavigator().cancelNavigation();
-                dummy.getEntity().teleport(getCurrentTarget());
+                EntityUtil.teleport(dummy.getEntity(), getCurrentTarget());
             }
 
             @Override

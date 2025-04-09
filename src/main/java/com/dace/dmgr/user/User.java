@@ -118,6 +118,8 @@ public final class User {
     @NonNull
     @Getter
     private final Player player;
+    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
+    private final ArmorStand nameTagHider;
     /** 유저 데이터 정보 인스턴스 */
     @NonNull
     @Getter
@@ -150,9 +152,6 @@ public final class User {
     /** 액션바 덮어쓰기 타임스탬프 */
     private Timestamp actionBarOverrideTimestamp = Timestamp.now();
 
-    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
-    @Nullable
-    private ArmorStand nameTagHider;
     /** 이름표 홀로그램 */
     @Nullable
     private TextHologram nameTagHologram;
@@ -186,6 +185,7 @@ public final class User {
      */
     private User(@NonNull Player player) {
         this.player = player;
+        this.nameTagHider = EntityUtil.createTemporaryArmorStand(player.getLocation());
         this.userData = UserData.fromPlayer(player);
         this.tabListManager = new TabListManager(player);
         this.sidebarManager = new SidebarManager(player);
@@ -250,7 +250,6 @@ public final class User {
      */
     private void onInit() {
         disableCollision();
-        taskManager.add(new DelayTask(this::createNameTagHider, 1));
         taskManager.add(new DelayTask(this::sendResourcePack, 10));
         taskManager.add(resetSkin());
 
@@ -276,26 +275,6 @@ public final class User {
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         team.addEntry(player.getName());
-    }
-
-    /**
-     * 이름표 숨기기 갑옷 거치대 인스턴스를 생성한다.
-     */
-    private void createNameTagHider() {
-        if (nameTagHider != null)
-            return;
-
-        nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
-        nameTagHider.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
-        nameTagHider.setSilent(true);
-        nameTagHider.setInvulnerable(true);
-        nameTagHider.setGravity(false);
-        nameTagHider.setAI(false);
-        nameTagHider.setMarker(true);
-        nameTagHider.setVisible(false);
-
-        if (!player.getPassengers().contains(nameTagHider))
-            player.addPassenger(nameTagHider);
     }
 
     /**
@@ -338,6 +317,9 @@ public final class User {
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+        if (!player.getPassengers().contains(nameTagHider))
+            player.addPassenger(nameTagHider);
 
         if (CombatUser.fromUser(this) == null) {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
@@ -584,16 +566,13 @@ public final class User {
         if (gameRoom != null)
             quitGame();
 
+        nameTagHider.remove();
         taskManager.stop();
         tabListManager.delete();
         sidebarManager.delete();
         glowingInfoMap.values().iterator().forEachRemaining(GlowingInfo::removeGlowing);
 
         if (userData.isInitialized()) {
-            if (nameTagHider != null) {
-                nameTagHider.remove();
-                nameTagHider = null;
-            }
             if (nameTagHologram != null) {
                 nameTagHologram.remove();
                 nameTagHologram = null;
@@ -964,24 +943,6 @@ public final class User {
     }
 
     /**
-     * 플레이어를 지정한 위치로 순간이동 시킨다.
-     *
-     * <p>이름표 숨기기 기능으로 인해 기본 텔레포트가 되지 않기 때문에 사용한다.</p>
-     *
-     * @param location 이동할 위치
-     */
-    public void teleport(@NonNull Location location) {
-        if (nameTagHider == null)
-            player.teleport(location);
-        else {
-            player.removePassenger(nameTagHider);
-            player.teleport(location);
-            nameTagHider.teleport(location);
-            player.addPassenger(nameTagHider);
-        }
-    }
-
-    /**
      * 플레이어를 지정한 게임 방에 입장시킨다.
      *
      * @param gameRoom 대상 게임 방
@@ -1064,7 +1025,8 @@ public final class User {
     @AllArgsConstructor
     public enum Place {
         /** 로비 */
-        LOBBY("로비", user -> user.teleport(GeneralConfig.getConfig().getLobbyLocation()), GeneralConfig.getConfig().getLobbyLocation()),
+        LOBBY("로비", user -> EntityUtil.teleport(user.getPlayer(), GeneralConfig.getConfig().getLobbyLocation()),
+                GeneralConfig.getConfig().getLobbyLocation()),
         /** 자유 전투 */
         FREE_COMBAT("자유 전투", FreeCombat.getInstance()::onStart, FreeCombat.getInstance().getWaitLocation()),
         /** 훈련장 */

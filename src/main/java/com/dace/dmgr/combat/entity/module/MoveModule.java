@@ -5,14 +5,13 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -157,13 +156,7 @@ public final class MoveModule {
      * @param location 이동할 위치
      */
     public void teleport(@NonNull Location location) {
-        if (combatEntity instanceof Damageable && ((Damageable) combatEntity).getStatusEffectModule().hasRestriction(CombatRestriction.TELEPORT))
-            return;
-
-        if (combatEntity.getEntity() instanceof Player) {
-            User user = User.fromPlayer(combatEntity.getEntity());
-            user.teleport(location);
-        } else
-            combatEntity.getEntity().teleport(location);
+        if (!(combatEntity instanceof Damageable) || !((Damageable) combatEntity).getStatusEffectModule().hasRestriction(CombatRestriction.TELEPORT))
+            EntityUtil.teleport(combatEntity.getEntity(), location);
     }
 }
