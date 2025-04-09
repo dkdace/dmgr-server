@@ -26,7 +26,6 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.BossBarDisplay;
-import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
@@ -48,7 +47,10 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.MainHand;
@@ -587,21 +589,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Override
     public void onTakeHeal(@Nullable Healer provider, double amount) {
         combatant.onTakeHeal(this, provider, amount);
+
         selfHarmDamage -= amount;
         if (selfHarmDamage < 0)
             selfHarmDamage = 0;
-
-        playTakeHealEffect(amount);
-    }
-
-    /**
-     * 치유를 받았을 때 효과를 재생한다.
-     *
-     * @param amount 치유량
-     */
-    private void playTakeHealEffect(double amount) {
-        if (amount >= 100 || amount / 100.0 > Math.random())
-            PARTICLE.HEAL.play(getLocation().add(0, getHeight() + 0.3, 0), amount / 100.0);
     }
 
     @Override
@@ -1380,18 +1371,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private static final SoundEffect KILL = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(2).pitch(1.25).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1).pitch(1.25).build());
-    }
-
-    /**
-     * 입자 효과 목록.
-     */
-    @UtilityClass
-    private static final class PARTICLE {
-        /** 회복 */
-        private static final ParticleEffect HEAL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
-                        .count(0, 0, 1)
-                        .horizontalSpread(0.3).verticalSpread(0.1).build());
     }
 
     /**
