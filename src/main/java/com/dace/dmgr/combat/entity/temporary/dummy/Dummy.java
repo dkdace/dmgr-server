@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -49,21 +50,24 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
     /**
      * 더미의 행동 양식을 지정하여 더미 인스턴스를 생성한다.
      *
-     * @param dummyBehavior 행동 양식
-     * @param spawnLocation 생성 위치
-     * @param maxHealth     최대 체력
-     * @param isEnemy       적 여부. {@code true}로 지정 시 적 더미, {@code false}로 지정 시 아군 더미
-     * @throws IllegalStateException {@code spawnLocation}에 엔티티를 소환할 수 없으면 발생
+     * @param dummyBehavior   행동 양식
+     * @param spawnLocation   생성 위치
+     * @param maxHealth       최대 체력
+     * @param speedMultiplier 이동속도 배수. 0 이상의 값
+     * @param isEnemy         적 여부. {@code true}로 지정 시 적 더미, {@code false}로 지정 시 아군 더미
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IllegalStateException    {@code spawnLocation}에 엔티티를 소환할 수 없으면 발생
      * @see DummyBehavior
      */
-    public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, boolean isEnemy) {
+    public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
         super(PlayerSkin.fromPlayerName("Clemounours"), spawnLocation, "훈련용 봇", null, Hitbox.createDefaultPlayerHitboxes(1));
+        Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;
         this.attackModule = new AttackModule();
         this.damageModule = new HealModule(this, maxHealth, true);
         this.statusEffectModule = new StatusEffectModule(this);
-        this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+        this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed() * speedMultiplier);
         this.isEnemy = isEnemy;
 
         onInit();
@@ -72,12 +76,13 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
     /**
      * 더미 인스턴스를 생성한다.
      *
-     * @param spawnLocation 생성 위치
-     * @param maxHealth     최대 체력
+     * @param spawnLocation   생성 위치
+     * @param maxHealth       최대 체력
+     * @param speedMultiplier 이동속도 배수. 0 이상의 값
      */
-    public Dummy(@NonNull Location spawnLocation, int maxHealth, boolean isEnemy) {
+    public Dummy(@NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
         this(new DummyBehavior() {
-        }, spawnLocation, maxHealth, isEnemy);
+        }, spawnLocation, maxHealth, speedMultiplier, isEnemy);
     }
 
     private void onInit() {
@@ -123,6 +128,11 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
     @Nullable
     public Hitbox getCritHitbox() {
         return hitboxes[3];
+    }
+
+    @Override
+    public void onDefaultAttack(@NonNull Damageable victim) {
+        dummyBehavior.onDefaultAttack(this, victim);
     }
 
     @Override

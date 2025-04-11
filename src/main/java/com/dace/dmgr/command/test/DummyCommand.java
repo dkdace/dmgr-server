@@ -26,9 +26,9 @@ public class DummyCommand implements CommandExecutor {
         int health = Integer.parseInt(args[0]);
 
         if (args.length > 1)
-            new Dummy(player.getLocation(), health, Boolean.parseBoolean(args[1]));
+            new Dummy(player.getLocation(), health, 0, Boolean.parseBoolean(args[1]));
         else
-            new Dummy(player.getLocation(), health, true);
+            new Dummy(player.getLocation(), health, 0, true);
 
         return true;
     }
