@@ -21,6 +21,8 @@ import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
@@ -97,7 +99,16 @@ public final class TrainingCenter {
         for (Location loc : FIXED_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(loc, 1000, 0, true));
         for (Location loc : FIXED_HEAVY_DUMMY_LOCATIONS)
-            spawnDummy(() -> new Dummy(loc, 3000, 0, true));
+            spawnDummy(() -> {
+                Dummy dummy = new Dummy(loc, 3000, 0, true);
+
+                EntityEquipment equipment = dummy.getEntity().getEquipment();
+                equipment.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+                equipment.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+                equipment.setBoots(new ItemStack(Material.IRON_BOOTS));
+
+                return dummy;
+            });
 
         for (Location[] locs : FIXED_MOVING_DUMMY_LOCATIONS)
             spawnDummy(() -> new Dummy(new MovingBehavior(locs), locs[0], 1000, 1, true));
