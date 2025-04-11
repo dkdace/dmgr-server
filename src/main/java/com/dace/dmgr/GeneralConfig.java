@@ -26,6 +26,9 @@ public final class GeneralConfig implements Initializable<Void> {
     /** 일반 설정 */
     @Nullable
     private Config config;
+    /** 훈련장 설정 */
+    @Nullable
+    private TrainingConfig trainingConfig;
     /** 전투 시스템 관련 설정 */
     @Nullable
     private CombatConfig combatConfig;
@@ -41,6 +44,16 @@ public final class GeneralConfig implements Initializable<Void> {
             instance.config = new Config();
 
         return instance.config;
+    }
+
+    @NonNull
+    public static TrainingConfig getTrainingConfig() {
+        instance.validate();
+
+        if (instance.trainingConfig == null)
+            instance.trainingConfig = new TrainingConfig();
+
+        return instance.trainingConfig;
     }
 
     @NonNull
@@ -132,6 +145,41 @@ public final class GeneralConfig implements Initializable<Void> {
         public Location getLobbyLocation() {
             return lobbyLocation.clone();
         }
+    }
+
+    /**
+     * 훈련장 관련 설정.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Getter
+    public static final class TrainingConfig {
+        /** Yaml 섹션 인스턴스 */
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("training");
+
+        /** 전투원 선택 지역 확인 Y 좌표 */
+        private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
+        /** 전투원 선택 지역 식별 블록 타입 */
+        @NonNull
+        private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());
+        /** 아레나 확인 Y 좌표 */
+        private final int arenaRegionCheckYCoordinate = section.getEntry("arena_region_check_y_coordinate", 208).get();
+        /** 아레나 식별 블록 타입 */
+        @NonNull
+        private final Material arenaZoneBlock = Material.valueOf(section.getEntry("arena_block", Material.GOLD_ORE.toString()).get());
+        /** 아레나 설정 지역 확인 Y 좌표 */
+        private final int arenaOptionRegionCheckYCoordinate = section.getEntry("arena_option_region_check_y_coordinate", 209).get();
+        /** 아레나 설정 지역 식별 블록 타입 */
+        @NonNull
+        private final Material arenaOptionZoneBlock = Material.valueOf(section.getEntry("arena_option_zone_block", Material.ENCHANTMENT_TABLE.toString()).get());
+        /** 기본 더미 리스폰 시간 */
+        @NonNull
+        private final Timespan defaultDummyRespawnTime = Timespan.ofSeconds(section.getEntry("default_dummy_respawn_time_seconds", 3.0).get());
+        /** 디버프 실험 블록에 사용되는 블록의 타입 */
+        @NonNull
+        private final Material effectTestBlock = Material.valueOf(section.getEntry("effect_test_block", Material.STRUCTURE_BLOCK.toString()).get());
+        /** 디버프 실험 블록 쿨타임 */
+        @NonNull
+        private final Timespan effectTestCooldown = Timespan.ofSeconds(section.getEntry("effect_test_cooldown_seconds", 3.0).get());
     }
 
     /**

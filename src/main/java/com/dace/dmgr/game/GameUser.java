@@ -11,6 +11,7 @@ import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
@@ -106,7 +107,7 @@ public final class GameUser {
         this.game = game;
         this.team = team;
 
-        user.quitFreeCombat();
+        user.setCurrentPlace(User.Place.LOBBY);
 
         GAME_USER_MAP.put(user, this);
 
@@ -132,7 +133,7 @@ public final class GameUser {
         for (CommunicationItem communicationItem : CommunicationItem.values())
             user.getGui().set(communicationItem.slotIndex, communicationItem.definedItem);
 
-        user.teleport(getSpawnLocation());
+        EntityUtil.teleport(player, getSpawnLocation());
         user.clearChat();
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5),
@@ -153,7 +154,7 @@ public final class GameUser {
                 onTickOppositeSpawn();
         }
         if (!isInSpawn() && (!game.isPlaying() || CombatUser.fromUser(user) == null))
-            user.teleport(getSpawnLocation());
+            EntityUtil.teleport(player, getSpawnLocation());
 
         if (i % 5 == 0)
             team.getTeamUsers().forEach(target -> target.getUser().setGlowing(player, ChatColor.BLUE));
@@ -209,9 +210,9 @@ public final class GameUser {
         onTickTask.stop();
         game.onRemoveGameUser(this);
 
-        user.reset();
-
         GAME_USER_MAP.remove(user);
+
+        user.setCurrentPlace(User.Place.LOBBY);
     }
 
     /**

@@ -162,7 +162,7 @@ public final class SiliaA2 extends ActiveSkill {
             combatUser.getMoveModule().teleport(location);
             combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
-            if (target instanceof CombatUser)
+            if (target.isGoalTarget())
                 combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
         }
     }

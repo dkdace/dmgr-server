@@ -57,10 +57,10 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-
-            combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
             ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
         }
+        if (target.isGoalTarget())
+            combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
 
         PalasA2Info.SOUND.USE.play(combatUser.getLocation());
 

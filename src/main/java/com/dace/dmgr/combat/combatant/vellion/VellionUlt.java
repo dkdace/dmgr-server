@@ -235,8 +235,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(SLOW, Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                if (target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
             }
 
             return true;
@@ -259,9 +259,9 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                     DamageType.FIXED, null, false, false)) {
                 target.getStatusEffectModule().apply(stun, VellionUltInfo.STUN_DURATION);
 
-                if (target instanceof CombatUser) {
+                if (target.isGoalTarget()) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
-                    bonusScoreModule.addTarget((CombatUser) target, VellionUltInfo.STUN_DURATION);
+                    bonusScoreModule.addTarget(target, VellionUltInfo.STUN_DURATION);
                 }
             }
 

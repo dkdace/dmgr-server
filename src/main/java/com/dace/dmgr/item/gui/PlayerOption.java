@@ -1,8 +1,8 @@
 package com.dace.dmgr.item.gui;
 
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.user.UserData;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -71,7 +71,7 @@ public final class PlayerOption extends ChestGUI {
         private final DefinedItem definedItem;
 
         PlayerOptionItem(String skinUrl, String name, String lore, Consumer<Player> action) {
-            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl))
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkin.fromURL(skinUrl))
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),

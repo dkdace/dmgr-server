@@ -149,8 +149,8 @@ public final class ChedA1 extends StackableSkill {
                 if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, location, isCrit, true)) {
                     target.getStatusEffectModule().apply(burning, ChedA1Info.FIRE_DURATION);
 
-                    if (target instanceof CombatUser)
-                        ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);
+                    if (target.isGoalTarget())
+                        combatUser.addScore("불화살", ChedA1Info.DAMAGE_SCORE);
                 }
 
                 return false;

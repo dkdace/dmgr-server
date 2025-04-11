@@ -132,7 +132,7 @@ public final class Neace extends Support {
 
     @Override
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        if (provider != target && target instanceof CombatUser)
+        if (provider != target && target.isGoalTarget())
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 
         return true;

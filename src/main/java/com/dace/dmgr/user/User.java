@@ -5,6 +5,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.FreeCombat;
+import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
@@ -16,9 +17,9 @@ import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.GUI;
 import com.dace.dmgr.item.gui.SelectGame;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
@@ -30,6 +31,7 @@ import com.keenant.tabbed.tablist.TableTabList;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -116,6 +118,8 @@ public final class User {
     @NonNull
     @Getter
     private final Player player;
+    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
+    private final ArmorStand nameTagHider;
     /** 유저 데이터 정보 인스턴스 */
     @NonNull
     @Getter
@@ -148,9 +152,6 @@ public final class User {
     /** 액션바 덮어쓰기 타임스탬프 */
     private Timestamp actionBarOverrideTimestamp = Timestamp.now();
 
-    /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
-    @Nullable
-    private ArmorStand nameTagHider;
     /** 이름표 홀로그램 */
     @Nullable
     private TextHologram nameTagHologram;
@@ -168,13 +169,14 @@ public final class User {
     @Nullable
     @Getter
     private GameRoom gameRoom;
+    /** 현재 장소 */
+    @NonNull
+    @Getter
+    private Place currentPlace = Place.LOBBY;
     /** 관리자 채팅 여부 */
     @Getter
     @Setter
     private boolean isAdminChat = false;
-    /** 자유 전투 입장 여부 */
-    @Getter
-    private boolean isInFreeCombat = false;
 
     /**
      * 유저 인스턴스를 생성한다.
@@ -183,6 +185,7 @@ public final class User {
      */
     private User(@NonNull Player player) {
         this.player = player;
+        this.nameTagHider = EntityUtil.createTemporaryArmorStand(player.getLocation());
         this.userData = UserData.fromPlayer(player);
         this.tabListManager = new TabListManager(player);
         this.sidebarManager = new SidebarManager(player);
@@ -198,9 +201,12 @@ public final class User {
      *
      * @param player 대상 플레이어
      * @return 유저 인스턴스
+     * @throws IllegalStateException 해당 {@code player}가 Citizens NPC이면 발생
      */
     @NonNull
     public static User fromPlayer(@NonNull Player player) {
+        Validate.validState(!EntityUtil.isCitizensNPC(player), "Citizens NPC는 User 인스턴스를 생성할 수 없음");
+
         User user = USER_MAP.get(player);
         if (user == null)
             user = new User(player);
@@ -223,7 +229,7 @@ public final class User {
      * 유저 초기화 작업을 수행한다.
      */
     private void init() {
-        reset();
+        setCurrentPlace(Place.LOBBY);
         taskManager.add(new DelayTask(this::clearChat, 10));
 
         if (userData.isInitialized())
@@ -244,7 +250,6 @@ public final class User {
      */
     private void onInit() {
         disableCollision();
-        taskManager.add(new DelayTask(this::createNameTagHider, 1));
         taskManager.add(new DelayTask(this::sendResourcePack, 10));
         taskManager.add(resetSkin());
 
@@ -270,26 +275,6 @@ public final class User {
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         team.addEntry(player.getName());
-    }
-
-    /**
-     * 이름표 숨기기 갑옷 거치대 인스턴스를 생성한다.
-     */
-    private void createNameTagHider() {
-        if (nameTagHider != null)
-            return;
-
-        nameTagHider = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
-        nameTagHider.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
-        nameTagHider.setSilent(true);
-        nameTagHider.setInvulnerable(true);
-        nameTagHider.setGravity(false);
-        nameTagHider.setAI(false);
-        nameTagHider.setMarker(true);
-        nameTagHider.setVisible(false);
-
-        if (!player.getPassengers().contains(nameTagHider))
-            player.addPassenger(nameTagHider);
     }
 
     /**
@@ -332,6 +317,9 @@ public final class User {
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
         else
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+        if (!player.getPassengers().contains(nameTagHider))
+            player.addPassenger(nameTagHider);
 
         if (CombatUser.fromUser(this) == null) {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
@@ -500,8 +488,8 @@ public final class User {
 
         if (gameRoom != null)
             prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 {0}]" : "§a[일반 {0}]", gameRoom.getNumber());
-        else if (isInFreeCombat())
-            prefix = "§7[자유 전투]";
+        else if (currentPlace != Place.LOBBY)
+            prefix = MessageFormat.format("§7[{0}]", currentPlace.name);
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
@@ -573,21 +561,18 @@ public final class User {
      * @see OnPlayerQuit
      */
     public void onQuit() {
-        reset();
+        setCurrentPlace(Place.LOBBY);
 
         if (gameRoom != null)
             quitGame();
 
+        nameTagHider.remove();
         taskManager.stop();
         tabListManager.delete();
         sidebarManager.delete();
         glowingInfoMap.values().iterator().forEachRemaining(GlowingInfo::removeGlowing);
 
         if (userData.isInitialized()) {
-            if (nameTagHider != null) {
-                nameTagHider.remove();
-                nameTagHider = null;
-            }
             if (nameTagHologram != null) {
                 nameTagHologram.remove();
                 nameTagHologram = null;
@@ -653,9 +638,9 @@ public final class User {
     }
 
     /**
-     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정하고 스폰으로 이동시킨다.
+     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
      */
-    public void reset() {
+    private void reset() {
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
         player.setHealth(20);
         player.setExp(0);
@@ -665,9 +650,6 @@ public final class User {
 
         gui.clear();
         updateGUI();
-
-        teleport(GeneralConfig.getConfig().getLobbyLocation());
-        quitFreeCombat();
 
         getAllUsers().forEach(target -> {
             removeGlowing(target.getPlayer());
@@ -961,24 +943,6 @@ public final class User {
     }
 
     /**
-     * 플레이어를 지정한 위치로 순간이동 시킨다.
-     *
-     * <p>이름표 숨기기 기능으로 인해 기본 텔레포트가 되지 않기 때문에 사용한다.</p>
-     *
-     * @param location 이동할 위치
-     */
-    public void teleport(@NonNull Location location) {
-        if (nameTagHider == null)
-            player.teleport(location);
-        else {
-            player.removePassenger(nameTagHider);
-            player.teleport(location);
-            nameTagHider.teleport(location);
-            player.addPassenger(nameTagHider);
-        }
-    }
-
-    /**
      * 플레이어를 지정한 게임 방에 입장시킨다.
      *
      * @param gameRoom 대상 게임 방
@@ -1007,40 +971,30 @@ public final class User {
     }
 
     /**
-     * 플레이어를 자유 전투에 입장시킨다.
+     * 플레이어를 지정한 장소로 이동시키고 상태를 재설정한다.
+     *
+     * @param place 이동할 장소
      */
-    public void startFreeCombat() {
-        if (isInFreeCombat || GameUser.fromUser(this) != null)
+    public void setCurrentPlace(@NonNull Place place) {
+        if (currentPlace == place && place != Place.LOBBY || GameUser.fromUser(this) != null)
             return;
 
-        isInFreeCombat = true;
-        FreeCombat.getInstance().onStart(this);
-    }
+        currentPlace = place;
+        place.onWarp.accept(this);
 
-    /**
-     * 플레이어를 자유 전투에서 퇴장시킨다.
-     */
-    public void quitFreeCombat() {
-        if (!isInFreeCombat)
-            return;
-
-        isInFreeCombat = false;
-
-        CombatUser combatUser = CombatUser.fromUser(this);
-        if (combatUser != null)
-            combatUser.remove();
+        reset();
     }
 
     /**
      * 플레이어의 스킨을 변경한다.
      *
-     * @param skinName 적용할 스킨 이름
+     * @param playerSkin 적용할 스킨
      */
     @NonNull
-    public AsyncTask<Void> applySkin(@NonNull String skinName) {
+    public AsyncTask<Void> applySkin(@NonNull PlayerSkin playerSkin) {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), skinName);
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), playerSkin.getProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
@@ -1056,13 +1010,42 @@ public final class User {
     public AsyncTask<Void> resetSkin() {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), player.getName());
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), PlayerSkin.fromPlayerName(player.getName()).getProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
                 onError.accept(ex);
             }
         });
+    }
+
+    /**
+     * 이용 가능한 장소 목록.
+     */
+    @AllArgsConstructor
+    public enum Place {
+        /** 로비 */
+        LOBBY("로비", user -> EntityUtil.teleport(user.getPlayer(), GeneralConfig.getConfig().getLobbyLocation()),
+                GeneralConfig.getConfig().getLobbyLocation()),
+        /** 자유 전투 */
+        FREE_COMBAT("자유 전투", FreeCombat.getInstance()::onStart, FreeCombat.getInstance().getWaitLocation()),
+        /** 훈련장 */
+        TRAINING_CENTER("훈련장", TrainingCenter.getInstance()::onStart, TrainingCenter.getInstance().getSpawnLocation());
+
+        /** 이름 */
+        private final String name;
+        /** 이동 시 실행할 작업 */
+        private final Consumer<User> onWarp;
+        /** 시작 위치 */
+        private final Location startLocation;
+
+        /**
+         * @return 시작 위치
+         */
+        @NonNull
+        public Location getStartLocation() {
+            return startLocation.clone();
+        }
     }
 
     /**
@@ -1081,10 +1064,10 @@ public final class User {
                 }),
         FREE_GAME("NTBkZmM4YTM1NjNiZjk5NmY1YzFiNzRiMGIwMTViMmNjZWIyZDA0Zjk0YmJjZGFmYjIyOTlkOGE1OTc5ZmFjMSJ9fX0=",
                 "자유 전투", "전장에서 다른 플레이어들과 자유롭게 전투합니다.", 14,
-                target -> User.fromPlayer(target).startFreeCombat()),
+                target -> User.fromPlayer(target).setCurrentPlace(Place.FREE_COMBAT)),
         TRAINING("NzNjM2E5YmRjOGM0MGM0MmQ4NDFkYWViNzFlYTllN2QxYzU0YWIzMWEyM2EyZDkyNjU5MWQ1NTUxNDExN2U1ZCJ9fX0=",
-                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15, target -> {
-        }),
+                "훈련장", "훈련장에서 다양한 전투원을 체험하고 전투 기술을 훈련합니다.", 15,
+                target -> User.fromPlayer(target).setCurrentPlace(Place.TRAINING_CENTER)),
         LOBBY("OTNiZjJmYzY5M2IxNmNiOTFiOGM4N2E0YjA4OWZkOWUxODI1ZmNhMDFjZWZiMTY1YzYxODdmYzUzOWIxNTJjOSJ9fX0=",
                 "로비", "로비로 이동합니다.", 17,
                 target -> {
@@ -1099,7 +1082,7 @@ public final class User {
 
         MenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
             this.slotIndex = slotIndex;
-            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl))
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkin.fromURL(skinUrl))
                     .setName("§e§l" + name)
                     .setLore("§f" + lore)
                     .build(),

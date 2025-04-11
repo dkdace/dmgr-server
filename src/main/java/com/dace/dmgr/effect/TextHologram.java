@@ -1,6 +1,7 @@
 package com.dace.dmgr.effect;
 
 import com.dace.dmgr.DMGR;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
@@ -106,10 +107,12 @@ public final class TextHologram {
      * @param world 현재 월드
      */
     private void setVisibility(@NonNull World world) {
-        world.getPlayers().forEach(player ->
+        world.getPlayers().forEach(player -> {
+            if (!EntityUtil.isCitizensNPC(player))
                 hologram.getVisibilitySettings().setIndividualVisibility(player, condition.test(player)
                         ? VisibilitySettings.Visibility.VISIBLE
-                        : VisibilitySettings.Visibility.HIDDEN));
+                        : VisibilitySettings.Visibility.HIDDEN);
+        });
     }
 
     /**

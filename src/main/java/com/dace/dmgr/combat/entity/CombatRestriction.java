@@ -33,7 +33,7 @@ public enum CombatRestriction {
     /** 비행 */
     FLY,
     /** 무기 사용 */
-    USE_WEAPON(),
+    USE_WEAPON,
     /** 스킬 사용 */
     USE_SKILL,
     /** 기본 근접 공격 */

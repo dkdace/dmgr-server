@@ -122,8 +122,8 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(combatUser, MetarUltInfo.DAMAGE_PER_SECOND * 4 / 20.0, DamageType.NORMAL, null,
-                        false, false) && target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                        false, false) && target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
 
                 return true;
             };

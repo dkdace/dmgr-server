@@ -21,7 +21,7 @@ public final class OnEntityDamageByEntity extends EventListener<EntityDamageByEn
     protected void onEvent(@NonNull EntityDamageByEntityEvent event) {
         CombatEntity attacker = CombatEntity.fromEntity(event.getDamager());
         CombatEntity victim = CombatEntity.fromEntity(event.getEntity());
-        if (attacker == null || victim == null)
+        if (attacker == null && victim == null)
             return;
 
         event.setCancelled(true);
@@ -30,4 +30,3 @@ public final class OnEntityDamageByEntity extends EventListener<EntityDamageByEn
             ((Attacker) attacker).onDefaultAttack((Damageable) victim);
     }
 }
-

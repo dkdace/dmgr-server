@@ -202,7 +202,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
                     else if (target instanceof Healable)
                         onHitTeamer((Healable) target);
 
-                    if (target != combatUser && target instanceof CombatUser)
+                    if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
                 }
 
@@ -220,8 +220,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
                 target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), PalasA3Info.DURATION);
 
-                if (target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
+                if (target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, PalasA3Info.DURATION);
             }
 
             /**

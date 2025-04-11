@@ -30,12 +30,24 @@ public interface Damageable extends CombatEntity {
     boolean isCreature();
 
     /**
+     * 엔티티가 목표 처치 대상인지 확인한다.
+     *
+     * <p>목표 처치 대상이란 플레이어에게 점수와 궁극기를 지급할 수 있는 엔티티를 말한다.</p>
+     *
+     * @return 목표 처치 대상이면 {@code true} 반환
+     * @implSpec {@code false}
+     */
+    default boolean isGoalTarget() {
+        return false;
+    }
+
+    /**
      * 죽었을 때 공격자(플레이어)에게 주는 점수를 반환한다.
      *
      * @return 죽었을 때 공격자에게 주는 점수. 0 이상의 값
      * @implSpec 0
      */
-    default double getScore() {
+    default int getScore() {
         return 0;
     }
 

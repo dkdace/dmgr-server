@@ -237,7 +237,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         }
 
         @Override
-        public double getScore() {
+        public int getScore() {
             return JagerUltInfo.DEATH_SCORE;
         }
 
@@ -245,8 +245,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
-            if (victim instanceof CombatUser)
-                bonusScoreModule.addTarget((CombatUser) victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
+            if (victim.isGoalTarget())
+                bonusScoreModule.addTarget(victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override

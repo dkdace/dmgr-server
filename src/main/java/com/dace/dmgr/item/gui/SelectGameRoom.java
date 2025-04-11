@@ -1,10 +1,10 @@
 package com.dace.dmgr.item.gui;
 
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.user.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -103,7 +103,7 @@ public final class SelectGameRoom extends ChestGUI {
         private DefinedItem create(int number) {
             GameRoom gameRoom = GameRoom.fromNumber(isRanked, number);
 
-            ItemBuilder itemBuilder = new ItemBuilder(PlayerSkullUtil.fromURL(
+            ItemBuilder itemBuilder = new ItemBuilder(PlayerSkin.fromURL(
                     (gameRoom != null && gameRoom.getPhase() == GameRoom.Phase.PLAYING ? SKIN_URLS_PLAYING : SKIN_URLS)[number]))
                     .setName(MessageFormat.format(name, number))
                     .setLore("§e인원 수 : §f[{0}§f/{1} 명]",

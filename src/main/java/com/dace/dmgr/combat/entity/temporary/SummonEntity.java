@@ -39,7 +39,6 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
      * @param hasNameTag    아군에게 이름표 표시 여부
      * @param isHidden      엔티티 숨김 여부
      * @param hitboxes      히트박스 목록
-     * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected SummonEntity(@NonNull Class<T> entityClass, @NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner,
                            boolean hasNameTag, boolean isHidden, @NonNull Hitbox @NonNull ... hitboxes) {
@@ -69,10 +68,10 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
 
     @Override
     public final boolean isEnemy(@NonNull CombatEntity target) {
-        if (target instanceof SummonEntity)
-            return owner != ((SummonEntity<?>) target).getOwner();
+        if (target == this)
+            return false;
 
-        return owner != target;
+        return owner.isEnemy(target);
     }
 
     /**
@@ -82,7 +81,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        CombatUtil.getCombatEntities(game, CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
+        CombatUtil.getCombatEntities(entity.getWorld(), CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
                 packet.sendPacket(target.getEntity()));
     }
 }

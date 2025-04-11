@@ -40,7 +40,7 @@ public abstract class Scuffler extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        if (!(victim instanceof CombatUser))
+        if (!victim.isGoalTarget())
             return;
 
         if (isFinalHit)

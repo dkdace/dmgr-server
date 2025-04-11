@@ -129,7 +129,7 @@ public final class Arkace extends Marksman {
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
-        if (!(victim instanceof CombatUser))
+        if (!victim.isGoalTarget())
             return;
 
         ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());

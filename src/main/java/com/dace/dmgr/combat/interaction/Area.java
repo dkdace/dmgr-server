@@ -61,7 +61,7 @@ public abstract class Area<T extends CombatEntity> {
             return;
 
         isUsed = true;
-        Set<T> targets = CombatUtil.getNearCombatEntities(shooter.getGame(), center, radius, entityCondition);
+        Set<T> targets = CombatUtil.getNearCombatEntities(center, radius, entityCondition);
         for (T target : targets)
             penetrationMap.put(target, null);
 

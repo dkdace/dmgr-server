@@ -92,7 +92,7 @@ public final class ArkaceA1 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
-                        && target instanceof CombatUser)
+                        && target.isGoalTarget())
                     combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
 
                 return false;

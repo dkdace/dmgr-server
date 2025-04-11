@@ -45,6 +45,8 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
         this.weaponInfo = weaponInfo;
         this.itemStack = weaponInfo.getDefinedItem().getItemStack();
 
+        combatUser.getEntity().getInventory().setHeldItemSlot(ITEM_SLOT_INDEX);
+
         display();
         addOnRemove(() -> combatUser.getEntity().getInventory().clear(ITEM_SLOT_INDEX));
     }

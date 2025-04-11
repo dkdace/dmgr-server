@@ -2,10 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.DMGR;
-import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.FunctionalBlock;
@@ -29,16 +26,15 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.BossBarDisplay;
-import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.Menu;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -51,8 +47,10 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.MainHand;
@@ -94,7 +92,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     /** 메뉴 아이템 */
     private static final DefinedItem MENU_ITEM = new DefinedItem(new ItemBuilder(
-            PlayerSkullUtil.fromURL("ZDliMjk4M2MwMWI4ZGE3ZGMxYzBmMTJkMDJjNGFiMjBjZDhlNjg3NWU4ZGY2OWVhZTJhODY3YmFlZTYyMzZkNCJ9fX0="))
+            PlayerSkin.fromURL("ZDliMjk4M2MwMWI4ZGE3ZGMxYzBmMTJkMDJjNGFiMjBjZDhlNjg3NWU4ZGY2OWVhZTJhODY3YmFlZTYyMzZkNCJ9fX0="))
             .setName("§e§l메뉴")
             .setLore("§f메뉴 창을 엽니다.")
             .build(),
@@ -472,7 +470,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (target == this)
             return false;
         if (target instanceof CombatUser)
-            return getTeam() == null || getTeam() != target.getTeam();
+            return (getTeam() == null || getTeam() != target.getTeam()) && user.getCurrentPlace() != User.Place.TRAINING_CENTER;
 
         return target.isEnemy(this);
     }
@@ -489,6 +487,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
+    public boolean isGoalTarget() {
+        return true;
+    }
+
+    @Override
     public boolean canJump() {
         return combatant.canJump(this);
     }
@@ -498,18 +501,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == victim)
             return;
 
-        isUlt = isUlt && combatant.onAttack(this, victim, damage, isCrit);
+        boolean onAttackUlt = combatant.onAttack(this, victim, damage, isCrit);
+        isUlt = isUlt && onAttackUlt;
 
         playAttackEffect(isCrit);
 
-        if (victim instanceof Healable && isUlt)
-            addUltGauge(damage);
+        if (victim.isGoalTarget()) {
+            if (isUlt)
+                addUltGauge(damage);
 
-        if (victim instanceof CombatUser) {
             if (hasCore(Core.HEALTH_DRAIN))
                 damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValue() / 100.0, false);
 
-            if (gameUser != null)
+            if (gameUser != null && victim instanceof CombatUser)
                 gameUser.addDamage(damage);
         }
     }
@@ -564,7 +568,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
-        isUlt = isUlt && getSkill(combatant.getUltimateSkillInfo()).isDurationFinished() && combatant.onGiveHeal(this, target, amount);
+        boolean onGiveHealUlt = combatant.onGiveHeal(this, target, amount);
+        isUlt = isUlt && onGiveHealUlt;
 
         if (this != target)
             lastGiveHealTimestamp = Timestamp.now();
@@ -584,21 +589,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Override
     public void onTakeHeal(@Nullable Healer provider, double amount) {
         combatant.onTakeHeal(this, provider, amount);
+
         selfHarmDamage -= amount;
         if (selfHarmDamage < 0)
             selfHarmDamage = 0;
-
-        playTakeHealEffect(amount);
-    }
-
-    /**
-     * 치유를 받았을 때 효과를 재생한다.
-     *
-     * @param amount 치유량
-     */
-    private void playTakeHealEffect(double amount) {
-        if (amount >= 100 || amount / 100.0 > Math.random())
-            PARTICLE.HEAL.play(getLocation().add(0, getHeight() + 0.3, 0), amount / 100.0);
     }
 
     @Override
@@ -608,21 +602,27 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         playKillEffect();
 
+        int score = victim instanceof CombatUser ? ((CombatUser) victim).killContributorManager.getScore(this) : victim.getScore();
+        int contributeScore = victim instanceof CombatUser ? score : 100;
+
+        combatant.onKill(this, victim, contributeScore, true);
+        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), score);
+
+        if (!victim.isGoalTarget())
+            return;
+
+        addScore("결정타", FINAL_HIT_SCORE);
+
+        handleBonusScoreSkill(victim, contributeScore);
+
+        if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
+            killStreak = 0;
+        killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
+        if (killStreak++ > 0)
+            addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
+
         if (victim instanceof CombatUser) {
             CombatUser combatUserVictim = (CombatUser) victim;
-            int score = combatUserVictim.killContributorManager.getScore(this);
-
-            combatant.onKill(this, victim, score, true);
-            addScore("§e" + victim.getName() + "§f 처치", score);
-            addScore("결정타", FINAL_HIT_SCORE);
-
-            handleBonusScoreSkill(combatUserVictim, score);
-
-            if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
-                killStreak = 0;
-            killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
-            if (killStreak++ > 0)
-                addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
             if (!(combatUserVictim.getSkill(combatUserVictim.getCombatantType().getCombatant().getUltimateSkillInfo()).isDurationFinished()))
                 addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
@@ -632,12 +632,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (gameUser != null)
                 gameUser.onKill(true);
-
-            return;
         }
-
-        combatant.onKill(this, victim, -1, true);
-        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), victim.getScore());
     }
 
     /**
@@ -739,7 +734,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 int score = killContributorManager.getScore(target);
 
                 target.combatant.onKill(target, this, score, false);
-                target.addScore("§e" + name + "§f 처치 도움", score);
+                target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
                 target.handleBonusScoreSkill(this, score);
 
                 target.playKillEffect();
@@ -768,8 +763,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 사망 후 리스폰 작업을 수행한다.
      */
     private void respawn() {
-        Location deadLocation = (gameUser == null ? FreeCombat.getInstance().getWaitLocation() : gameUser.getSpawnLocation()).add(0, 2, 0);
-        user.teleport(deadLocation);
+        Location deadLocation = (gameUser == null ? user.getCurrentPlace().getStartLocation() : gameUser.getSpawnLocation().add(0, 2, 0));
+        EntityUtil.teleport(entity, deadLocation);
 
         Timespan duration = GeneralConfig.getCombatConfig().getRespawnTime();
         if (gameUser == null)
@@ -786,7 +781,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (!user.isTypewriterTitlePrinting())
                 user.sendTitle("§c§l죽었습니다!", MessageFormat.format("{0}초 후 부활합니다.",
                         String.format("%.1f", Timespan.ofTicks(durationTicks - i).toSeconds())), Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-            user.teleport(deadLocation);
+
+            EntityUtil.teleport(entity, deadLocation);
             entity.setSpectatorTarget(null);
         }, () -> {
             isDead = false;
@@ -810,7 +806,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      * @param score  처치 기여 점수
      */
-    private void handleBonusScoreSkill(@NonNull CombatUser victim, int score) {
+    private void handleBonusScoreSkill(@NonNull Damageable victim, int score) {
         for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
             Skill skill = getSkill(skillInfo);
             if (skill instanceof HasBonusScore)
@@ -1030,7 +1026,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         combatant.onSet(this);
 
-        addTask(user.applySkin(combatant.getSkinName()));
+        addTask(user.applySkin(PlayerSkin.fromName(combatant.getSkinName())));
         addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
                 1, 10));
@@ -1040,8 +1036,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 모든 상태를 재설정한다.
      */
     private void reset() {
-        entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        entity.getInventory().setHeldItemSlot(4);
         entity.getActivePotionEffects().forEach((potionEffect -> entity.removePotionEffect(potionEffect.getType())));
         entity.setAllowFlight(false);
         entity.setFlying(false);
@@ -1093,12 +1087,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 히트박스를 기본 히트박스로 재설정한다.
      */
     public void resetHitboxes() {
-        double hitboxMultiplier = combatant.getHitboxMultiplier();
-
-        setHitboxes(Hitbox.builder(0.5 * hitboxMultiplier, 0.7, 0.3 * hitboxMultiplier).axisOffsetY(0.35).pitchFixed().build(),
-                Hitbox.builder(0.8 * hitboxMultiplier, 0.7, 0.45 * hitboxMultiplier).axisOffsetY(1.05).pitchFixed().build(),
-                Hitbox.builder(0.45 * hitboxMultiplier, 0.35, 0.45 * hitboxMultiplier).offsetY(0.225).axisOffsetY(1.4).build(),
-                Hitbox.builder(0.45 * hitboxMultiplier, 0.1, 0.45 * hitboxMultiplier).offsetY(0.4).axisOffsetY(1.4).build());
+        setHitboxes(Hitbox.createDefaultPlayerHitboxes(combatant.getHitboxMultiplier()));
         currentHitboxes = hitboxes;
     }
 
@@ -1382,18 +1371,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private static final SoundEffect KILL = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(2).pitch(1.25).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1).pitch(1.25).build());
-    }
-
-    /**
-     * 입자 효과 목록.
-     */
-    @UtilityClass
-    private static final class PARTICLE {
-        /** 회복 */
-        private static final ParticleEffect HEAL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
-                        .count(0, 0, 1)
-                        .horizontalSpread(0.3).verticalSpread(0.1).build());
     }
 
     /**

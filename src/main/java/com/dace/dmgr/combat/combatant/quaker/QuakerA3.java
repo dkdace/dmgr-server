@@ -198,7 +198,7 @@ public final class QuakerA3 extends ActiveSkill {
                     false, true) && target instanceof Movable) {
                 target.getStatusEffectModule().apply(Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
-                if (target instanceof CombatUser)
+                if (target.isGoalTarget())
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 

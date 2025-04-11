@@ -145,7 +145,7 @@ public final class MetarA1 extends ActiveSkill {
                         ((Movable) target).getMoveModule().knockback(dir);
                     }
 
-                    if (target instanceof CombatUser)
+                    if (target.isGoalTarget())
                         combatUser.addScore("미사일 직격", MetarA1Info.DIRECT_HIT_SCORE);
                 }
 

@@ -233,7 +233,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                             ((Movable) target).getMoveModule().knockback(dir);
                         }
 
-                        if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target instanceof CombatUser)
+                        if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 

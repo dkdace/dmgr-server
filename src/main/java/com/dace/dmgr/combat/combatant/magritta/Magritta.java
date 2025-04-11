@@ -128,7 +128,7 @@ public final class Magritta extends Scuffler {
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
-        if (!(victim instanceof CombatUser))
+        if (!victim.isGoalTarget())
             return;
 
         MagrittaUlt skillUlt = attacker.getSkill(MagrittaUltInfo.getInstance());

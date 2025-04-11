@@ -1,11 +1,11 @@
 package com.dace.dmgr.item.gui;
 
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -84,7 +84,7 @@ public final class SelectCharInfo extends ChestGUI {
         private final DefinedItem definedItem;
 
         SelectCharInfoItem(String skinUrl, String name) {
-            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkullUtil.fromURL(skinUrl)).setName(name).build());
+            this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkin.fromURL(skinUrl)).setName(name).build());
         }
     }
 }

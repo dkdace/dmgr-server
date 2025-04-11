@@ -218,9 +218,9 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                         target.getStatusEffectModule().apply(stun, QuakerA2Info.STUN_DURATION);
                         target.getStatusEffectModule().apply(SLOW, QuakerA2Info.SLOW_DURATION);
 
-                        if (target instanceof CombatUser) {
+                        if (target.isGoalTarget()) {
                             combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
-                            bonusScoreModule.addTarget((CombatUser) target, QuakerA2Info.SLOW_DURATION);
+                            bonusScoreModule.addTarget(target, QuakerA2Info.SLOW_DURATION);
                         }
                     }
 
