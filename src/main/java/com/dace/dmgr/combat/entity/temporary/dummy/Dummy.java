@@ -12,12 +12,14 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.TemporaryPlayerEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.effect.FireworkEffect;
+import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.Game;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,23 @@ import org.jetbrains.annotations.Nullable;
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 public final class Dummy extends TemporaryPlayerEntity implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
+    /** 생성 입자 효과 */
+    private static final FireworkEffect SPAWN_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
+            Color.fromRGB(255, 255, 255)).fadeColor(Color.fromRGB(255, 255, 0)).build();
+    /** 사망 입자 효과 */
+    private static final ParticleEffect DEATH_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
+            ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(150)
+                    .horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build());
+    /** 피격 효과음 */
+    private static final SoundEffect DAMAGE_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.1).pitch(1.5).pitchVariance(0.2).build());
+    /** 사망 효과음 */
+    private static final SoundEffect DEATH_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
+            SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
+
     /** 공격 모듈 */
     @NonNull
     @Getter
@@ -92,6 +111,8 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
         if (!isEnemy)
             entity.getEquipment().setHelmet(new ItemStack(Material.STAINED_GLASS, 1, (short) 5));
 
+        SPAWN_PARTICLE.play(getCenterLocation());
+
         dummyBehavior.onInit(this);
     }
 
@@ -147,6 +168,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
 
     @Override
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
+        DAMAGE_SOUND.play(getLocation(), 1 + damage * 0.001);
         CombatEffectUtil.playBreakParticle(this, location, damage);
     }
 
@@ -158,5 +180,8 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
     @Override
     public void onDeath(@Nullable Attacker attacker) {
         remove();
+
+        DEATH_PARTICLE.play(getCenterLocation());
+        DEATH_SOUND.play(getLocation());
     }
 }
