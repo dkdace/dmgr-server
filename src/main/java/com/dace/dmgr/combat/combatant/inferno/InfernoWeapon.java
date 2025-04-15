@@ -212,7 +212,12 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true);
+                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
+                        && target instanceof Movable) {
+                    Vector dir = getVelocity().normalize().multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK);
+                    ((Movable) target).getMoveModule().knockback(dir);
+                }
+
                 return false;
             };
         }
@@ -237,7 +242,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null, false, true)) {
                     target.getStatusEffectModule().apply(burning, burningDuration);
 
-                    if (target instanceof Movable) {
+                    if (target instanceof Movable && isNotHit(target)) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK);
                         ((Movable) target).getMoveModule().knockback(dir);
                     }

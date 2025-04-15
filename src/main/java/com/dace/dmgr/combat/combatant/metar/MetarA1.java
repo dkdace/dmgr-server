@@ -22,8 +22,6 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-
 public final class MetarA1 extends ActiveSkill {
     /** 발사 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
@@ -92,7 +90,6 @@ public final class MetarA1 extends ActiveSkill {
     }
 
     private final class MetarA1Projectile extends Projectile<Damageable> {
-        private final HashSet<Damageable> targets = new HashSet<>();
         @Nullable
         private Damageable target;
 
@@ -138,8 +135,6 @@ public final class MetarA1 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, MetarA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
-                    targets.add(target);
-
                     if (target instanceof Movable) {
                         Vector dir = getVelocity().normalize().multiply(MetarA1Info.KNOCKBACK);
                         ((Movable) target).getMoveModule().knockback(dir);
@@ -187,7 +182,7 @@ public final class MetarA1 extends ActiveSkill {
                 double damage = CombatUtil.getDistantDamage(MetarA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
 
                 if (target.getDamageModule().damage(MetarA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable && !targets.contains(target)) {
+                        && target instanceof Movable && isNotHit(target)) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MetarA1Info.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }

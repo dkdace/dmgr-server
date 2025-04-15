@@ -91,9 +91,16 @@ public final class ArkaceA1 extends ActiveSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
-                        && target.isGoalTarget())
-                    combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+                if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
+                    if (target instanceof Movable) {
+                        Vector dir = getVelocity().normalize().multiply(ArkaceA1Info.KNOCKBACK);
+                        ((Movable) target).getMoveModule().knockback(dir);
+                    }
+
+                    if (target.isGoalTarget())
+                        combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+                }
+
 
                 return false;
             };
@@ -114,7 +121,7 @@ public final class ArkaceA1 extends ActiveSkill {
                 double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable) {
+                        && target instanceof Movable && isNotHit(target)) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }

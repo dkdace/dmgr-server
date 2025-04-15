@@ -119,6 +119,16 @@ public abstract class Bullet<T extends CombatEntity> {
     @NonNull
     protected abstract HitEntityHandler<T> getHitEntityHandler();
 
+    /**
+     * 지정한 엔티티가 총알에 맞은 적이 없는지 확인한다.
+     *
+     * @param target 확인할 엔티티
+     * @return {@code target}이 총알에 맞지 않았으면 {@code true} 반환
+     */
+    protected boolean isNotHit(@NonNull T target) {
+        return !targets.contains(target);
+    }
+
     private void validateIsShot() {
         Validate.validState(isShot, "총알이 발사되지 않음");
     }
