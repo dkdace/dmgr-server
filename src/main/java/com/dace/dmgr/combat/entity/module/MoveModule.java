@@ -12,6 +12,7 @@ import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -55,12 +56,13 @@ public final class MoveModule {
         this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
 
         combatEntity.addOnTick(i -> {
-            double movementSpeed = speedStatus.getValue();
-            if (!canMove() || !combatEntity.canMove())
-                movementSpeed = 0;
+            double finalSpeed = Math.max(0, getFinalSpeed());
 
             LivingEntity livingEntity = combatEntity.getEntity();
-            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(movementSpeed);
+            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(finalSpeed);
+
+            if (livingEntity instanceof Player)
+                ((Player) livingEntity).setFlySpeed((float) (finalSpeed * 0.35));
 
             if (canJump() && combatEntity.canJump()) {
                 if (livingEntity.hasPotionEffect(PotionEffectType.JUMP) && livingEntity.getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
@@ -69,6 +71,30 @@ public final class MoveModule {
                 livingEntity.addPotionEffect(
                         new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6, false, false), true);
         });
+    }
+
+    /**
+     * 최종 이동속도를 반환한다.
+     *
+     * @return 최종 이동속도
+     */
+    private double getFinalSpeed() {
+        if (!canMove() || !combatEntity.canMove())
+            return 0;
+
+        double speed = speedStatus.getValue();
+
+        LivingEntity livingEntity = combatEntity.getEntity();
+        if (!(livingEntity instanceof Player))
+            return speed;
+
+        if (((Player) livingEntity).isSprinting()) {
+            speed *= 0.88;
+            if (!livingEntity.isOnGround())
+                speed *= speed / speedStatus.getBaseValue();
+        }
+
+        return speed;
     }
 
     /**

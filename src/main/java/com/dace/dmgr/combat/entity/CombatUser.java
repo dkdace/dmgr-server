@@ -284,7 +284,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setLowHealthScreenEffect(damageModule.isLowHealth() || isDead);
         setCanSprint();
         setCanFly();
-        adjustWalkSpeed();
 
         if (!isDead)
             onTickLive(i);
@@ -396,22 +395,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             if (gameUser != null && !gameUser.isInSpawn())
                 user.getUserData().getCombatantRecord(combatantType).addPlayTime();
         }
-    }
-
-    /**
-     * 플레이어의 이동 속도를 조정한다.
-     */
-    private void adjustWalkSpeed() {
-        double speed = Math.max(0, GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
-
-        if (entity.isSprinting()) {
-            speed *= 0.88;
-            if (!entity.isOnGround())
-                speed *= speed / GeneralConfig.getCombatConfig().getDefaultSpeed();
-        }
-
-        moveModule.getSpeedStatus().setBaseValue(speed);
-        entity.setFlySpeed((float) (moveModule.getSpeedStatus().getValue() * 0.4));
     }
 
     /**
