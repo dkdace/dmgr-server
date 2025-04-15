@@ -25,8 +25,6 @@ public abstract class StackableSkill extends ActiveSkill {
     /** 틱 작업을 처리하는 태스크 */
     @Nullable
     private IntervalTask onTickTask;
-    /** 처음 설정된 스택 충전 쿨타임 */
-    private Timespan firstStackCooldown = Timespan.ZERO;
     /** 스택 충전 쿨타임 타임스탬프 */
     private Timestamp stackCooldownTimestamp = Timestamp.now();
     /** 스킬 스택 수 */
