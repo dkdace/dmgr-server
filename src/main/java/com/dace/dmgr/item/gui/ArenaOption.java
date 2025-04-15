@@ -120,7 +120,7 @@ public final class ArenaOption extends ChestGUI {
                 (gui, value) -> gui.spawnPeriodSeconds = value.doubleValue()),
         MAX_COUNT(Material.MOB_SPAWNER, "최대 더미 수", "", 1, 1, 5, gui -> gui.maxCount,
                 (gui, value) -> gui.maxCount = value.intValue()),
-        DURATION(Material.WATCH, "진행 시간", "초", 1, 10, 60, gui -> gui.durationSeconds,
+        DURATION(Material.WATCH, "진행 시간", "초", 1, 10, 120, gui -> gui.durationSeconds,
                 (gui, value) -> gui.durationSeconds = value.intValue());
 
         private final Material material;
