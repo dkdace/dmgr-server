@@ -43,6 +43,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
         setDuration();
 
+        combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
