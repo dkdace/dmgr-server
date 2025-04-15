@@ -47,15 +47,17 @@ public final class MagrittaT1 {
         private void addValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
             setValue(getValue() + 1);
 
-            if (shreddingHologram == null)
-                shreddingHologram = new TextHologram(victim.getEntity(), target -> {
-                    if (target == attacker.getEntity())
-                        return LocationUtil.canPass(target.getEyeLocation(), victim.getCenterLocation());
+            if (victim.isCreature()) {
+                if (shreddingHologram == null)
+                    shreddingHologram = new TextHologram(victim.getEntity(), target -> {
+                        if (target == attacker.getEntity())
+                            return LocationUtil.canPass(target.getEyeLocation(), victim.getCenterLocation());
 
-                    return false;
-                }, 1);
+                        return false;
+                    }, 1);
 
-            shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
+                shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
+            }
 
             if (getValue() >= MagrittaT1Info.MAX)
                 onMaxValue(attacker, victim);
