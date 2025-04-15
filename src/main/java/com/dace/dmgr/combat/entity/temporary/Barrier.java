@@ -28,7 +28,7 @@ public abstract class Barrier extends SummonEntity<ArmorStand> implements Damage
     @NonNull
     protected final StatusEffectModule statusEffectModule;
     /** 죽었을 때 공격자에게 주는 점수 */
-    private final double score;
+    private final int score;
 
     /**
      * 방벽 인스턴스를 생성한다.
@@ -39,7 +39,6 @@ public abstract class Barrier extends SummonEntity<ArmorStand> implements Damage
      * @param maxHealth     최대 체력
      * @param score         죽었을 때 공격자에게 주는 점수
      * @param hitbox        히트박스
-     * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected Barrier(@NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner, int maxHealth, int score, @NonNull Hitbox hitbox) {
         super(ArmorStand.class, spawnLocation, name, owner, false, false, hitbox);

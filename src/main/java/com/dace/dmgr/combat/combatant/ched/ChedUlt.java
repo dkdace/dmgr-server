@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -149,9 +148,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     private final class ChedUltProjectile extends Projectile<Damageable> {
         private ChedUltProjectile() {
-            super(ChedUlt.this, ChedUltInfo.VELOCITY,
-                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
-                            combatEntity instanceof CombatUser || combatEntity instanceof Dummy),
+            super(ChedUlt.this, ChedUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget),
                     Option.builder().size(ChedUltInfo.SIZE).build());
         }
 
@@ -235,8 +232,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null, false, false)
-                        && target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                        && target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, center.distance(location), radius / 2.0);
 
@@ -287,8 +284,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
                     target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
 
-                    if (target instanceof CombatUser)
-                        bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                    if (target.isGoalTarget())
+                        bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
                 return !(target instanceof Barrier);

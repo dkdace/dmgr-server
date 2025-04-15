@@ -1,6 +1,6 @@
 package com.dace.dmgr.command.test;
 
-import com.dace.dmgr.combat.entity.temporary.Dummy;
+import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,6 @@ import org.bukkit.entity.Player;
 
 /**
  * 훈련용 봇 소환 명령어 클래스.
- *
- * <p>Usage: /소환 체력</p>
  *
  * @see Dummy
  */
@@ -28,9 +26,9 @@ public class DummyCommand implements CommandExecutor {
         int health = Integer.parseInt(args[0]);
 
         if (args.length > 1)
-            new Dummy(player.getLocation(), health, Boolean.parseBoolean(args[1]));
+            new Dummy(player.getLocation(), health, 0, Boolean.parseBoolean(args[1]));
         else
-            new Dummy(player.getLocation(), health);
+            new Dummy(player.getLocation(), health, 0, true);
 
         return true;
     }

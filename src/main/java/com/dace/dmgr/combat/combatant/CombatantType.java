@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.combatant.arkace.Arkace;
 import com.dace.dmgr.combat.combatant.ched.Ched;
@@ -16,7 +17,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
 import com.dace.dmgr.item.gui.SelectCharInfo;
 import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
@@ -73,7 +73,7 @@ public enum CombatantType {
     CombatantType(Combatant combatant) {
         this.combatant = combatant;
 
-        this.profileItem = new ItemBuilder(PlayerSkullUtil.fromCombatant(this))
+        this.profileItem = new ItemBuilder(PlayerSkin.fromName(combatant.getSkinName()))
                 .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}",
                         combatant.getIcon(),
                         combatant.getRole().getColor(),

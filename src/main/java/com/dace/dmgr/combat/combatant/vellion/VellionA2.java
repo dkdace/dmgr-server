@@ -143,8 +143,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
             if (i % 10 == 0)
                 new VellionA2Area(target).emit(target.getCenterLocation());
 
-            if (target instanceof CombatUser)
-                bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+            if (target.isGoalTarget())
+                bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
 
             return true;
         }, VellionA2.this::forceCancel, 1));

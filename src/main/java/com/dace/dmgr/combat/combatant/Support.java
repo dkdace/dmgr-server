@@ -42,8 +42,8 @@ public abstract class Support extends Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
-            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getGame(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
-                    .and(combatEntity -> combatEntity instanceof CombatUser
+            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+                    .and(combatEntity -> combatEntity.isGoalTarget()
                             && combatEntity.getDamageModule().isHalfHealth()
                             && combatEntity.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS)).isEmpty();
 

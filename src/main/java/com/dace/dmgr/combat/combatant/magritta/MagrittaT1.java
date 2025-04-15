@@ -69,7 +69,7 @@ public final class MagrittaT1 {
 
             MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
 
-            if (victim instanceof CombatUser)
+            if (victim.isGoalTarget())
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 

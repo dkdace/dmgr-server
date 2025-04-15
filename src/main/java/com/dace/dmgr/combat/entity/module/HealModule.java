@@ -5,9 +5,11 @@ import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.effect.ParticleEffect;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,8 +22,14 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 public final class HealModule extends DamageModule {
+    /** 회복 입자 효과 */
+    private static final ParticleEffect HEAL_PARTICLE = new ParticleEffect(
+            ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
+                    .count(0, 0, 1)
+                    .horizontalSpread(0.3).verticalSpread(0.1).build());
     /** 회복량 배수 기본값 */
     private static final double DEFAULT_VALUE = 1;
+
     /** 회복량 배수 값 */
     @NonNull
     private final AbilityStatus healMultiplierStatus;
@@ -59,12 +67,15 @@ public final class HealModule extends DamageModule {
         if (getHealth() + finalAmount > getMaxHealth())
             finalAmount = getMaxHealth() - getHealth();
 
+        setHealth(getHealth() + finalAmount);
+
         if (provider != null)
             provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
 
         ((Healable) combatEntity).onTakeHeal(provider, finalAmount);
 
-        setHealth(getHealth() + finalAmount);
+        if (finalAmount >= 100 || finalAmount / 100.0 > Math.random())
+            HEAL_PARTICLE.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.3, 0), finalAmount / 100.0);
 
         return true;
     }

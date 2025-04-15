@@ -155,9 +155,9 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
                             ((Movable) target).getMoveModule().knockback(dir);
                         }
 
-                        if (target instanceof CombatUser) {
+                        if (target.isGoalTarget()) {
                             combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
-                            bonusScoreModule.addTarget((CombatUser) target, QuakerUltInfo.SLOW_DURATION);
+                            bonusScoreModule.addTarget(target, QuakerUltInfo.SLOW_DURATION);
                         }
                     }
 

@@ -11,6 +11,9 @@ import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.MemoryNPCDataStore;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
@@ -46,6 +49,9 @@ public class DMGR extends JavaPlugin {
     /** 스킨 관리 API 인스턴스 */
     @Nullable
     private static SkinsRestorerAPI skinsRestorerAPI;
+    /** Citizens NPC 저장소 인스턴스 */
+    @Nullable
+    private static NPCRegistry npcRegistry;
     /** 기본 월드 인스턴스 */
     @Nullable
     private World defaultWorld;
@@ -99,6 +105,16 @@ public class DMGR extends JavaPlugin {
         if (skinsRestorerAPI == null)
             skinsRestorerAPI = SkinsRestorerAPI.getApi();
         return skinsRestorerAPI;
+    }
+
+    /**
+     * @return Citizens NPC 저장소 인스턴스
+     */
+    @NonNull
+    public static NPCRegistry getNpcRegistry() {
+        if (npcRegistry == null)
+            npcRegistry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
+        return npcRegistry;
     }
 
     /**
@@ -159,6 +175,8 @@ public class DMGR extends JavaPlugin {
         });
 
         getHolographicDisplaysAPI().deleteHolograms();
+        if (npcRegistry != null)
+            npcRegistry.deregisterAll();
     }
 
     /**

@@ -118,7 +118,7 @@ public final class MagrittaA1 extends ActiveSkill {
             if (target != null) {
                 combatUser.getUser().sendTitle("§b§l부착", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser)
+                if (target.isGoalTarget())
                     combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);
             }
 

@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.action.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -14,8 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,16 +88,7 @@ public final class LocationConfirmModule extends ConfirmModule {
     protected void onCheckEnable() {
         Player player = skill.getCombatUser().getEntity();
 
-        pointer = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
-        pointer.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
-        pointer.setSilent(true);
-        pointer.setInvulnerable(true);
-        pointer.setGravity(false);
-        pointer.setAI(false);
-        pointer.setMarker(true);
-        pointer.setVisible(false);
-        pointer.addPotionEffect(
-                new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false), true);
+        pointer = EntityUtil.createTemporaryArmorStand(player.getLocation());
         pointer.setHelmet(new ItemStack(Material.HOPPER));
         currentLocation = skill.getCombatUser().getLocation();
 

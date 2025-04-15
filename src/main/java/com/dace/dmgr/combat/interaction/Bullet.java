@@ -321,7 +321,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @return 총알 소멸 여부
      */
     private boolean handleEntityCollision() {
-        T target = CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size, entityCondition);
+        T target = CombatUtil.getNearCombatEntity(getLocation(), size, entityCondition);
 
         if (target == null || !targets.add(target))
             return false;

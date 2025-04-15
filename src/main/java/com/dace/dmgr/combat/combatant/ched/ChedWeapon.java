@@ -124,7 +124,7 @@ public final class ChedWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location, isCrit, true)
-                        && target instanceof CombatUser && isCrit)
+                        && target.isGoalTarget() && isCrit)
                     combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
 
                 return false;

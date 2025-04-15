@@ -49,10 +49,10 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-
-            combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
             ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
         }
+        if (target.isGoalTarget())
+            combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
 
         PalasUltInfo.SOUND.USE.play(combatUser.getLocation());
 

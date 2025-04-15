@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -42,7 +43,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
             return true;
 
         Player target = (Player) location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5).stream()
-                .filter(targetPlayer -> targetPlayer instanceof Player && targetPlayer != player)
+                .filter(targetPlayer -> targetPlayer instanceof Player && targetPlayer != player && !EntityUtil.isCitizensNPC(targetPlayer))
                 .findFirst()
                 .orElse(null);
         if (target != null) {

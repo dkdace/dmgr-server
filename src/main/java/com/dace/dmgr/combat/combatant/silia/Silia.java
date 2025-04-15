@@ -121,7 +121,7 @@ public final class Silia extends Scuffler {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (victim instanceof CombatUser && isCrit)
+        if (victim.isGoalTarget() && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
 
         return true;
@@ -131,12 +131,14 @@ public final class Silia extends Scuffler {
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
-        if (!(victim instanceof CombatUser))
+        if (!victim.isGoalTarget())
             return;
 
-        Timespan timeLimit = GeneralConfig.getCombatConfig().getDamageSumTimeLimit().minus(FAST_KILL_SCORE_TIME_LIMIT);
-        if (((CombatUser) victim).getKillContributorRemainingTime(attacker).compareTo(timeLimit) > 0)
-            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
+        if (victim instanceof CombatUser) {
+            Timespan timeLimit = GeneralConfig.getCombatConfig().getDamageSumTimeLimit().minus(FAST_KILL_SCORE_TIME_LIMIT);
+            if (((CombatUser) victim).getKillContributorRemainingTime(attacker).compareTo(timeLimit) > 0)
+                attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
+        }
 
         SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
