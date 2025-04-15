@@ -511,7 +511,7 @@ public final class User {
                 if (gameUser == null)
                     getAllUsers().forEach(target -> sendChatMessage(target, message));
                 else
-                    gameUser.broadcastChatMessage(message, gameUser.isTeamChat());
+                    gameUser.broadcastChatMessage(message);
             }
         } else {
             sendChatMessage(this, ChatColor.GRAY + message);

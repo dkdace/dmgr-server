@@ -663,10 +663,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void sendPlayerKillMent(@NonNull CombatUser victim) {
         String[] ments = combatant.getKillMent(victim.getCombatantType());
         String ment = ments[RandomUtils.nextInt(0, ments.length)];
-        String message = getFormattedChatMessage("§l" + ment);
 
-        entity.sendMessage(message);
-        victim.getEntity().sendMessage(message);
+        sendMentMessage(this, ment);
+        sendMentMessage(victim, ment);
 
         addTask(new DelayTask(() ->
                 victim.getUser().sendTypewriterTitle(String.valueOf(combatant.getIcon()), MessageFormat.format("§f\"{0}\"", ment)), 10));
@@ -680,10 +679,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void sendPlayerDeathMent(@NonNull CombatUser attacker) {
         String[] ments = combatant.getDeathMent(attacker.getCombatantType());
         String ment = ments[RandomUtils.nextInt(0, ments.length)];
-        String message = getFormattedChatMessage("§l" + ment);
 
-        entity.sendMessage(message);
-        attacker.getEntity().sendMessage(message);
+        sendMentMessage(this, ment);
+        sendMentMessage(attacker, ment);
 
         Location hologramLoc = LocationUtil.getNearestAgainstEdge(getLocation(), new Vector(0, -1, 0)).add(0, 1.2, 0);
         deathMentHologram = new TextHologram(hologramLoc, player -> LocationUtil.canPass(player.getEyeLocation(), hologramLoc),
@@ -1312,13 +1310,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NonNull
     public String getFormattedChatMessage(@NonNull String message) {
-        ChatColor color = gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getType().getColor();
-
-        return MessageFormat.format("§f<{0}§l[{1}]§f{2}> §f{3}",
-                color,
-                "§f" + combatant.getIcon() + " " + color + "§l" + combatant.getName(),
+        return MessageFormat.format("§f<{0}§l[§f{1} {0}{2}]§f{3}> {4}",
+                (gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getType().getColor()),
+                combatant.getIcon(),
+                "§l" + combatant.getName(),
                 entity.getName(),
                 message);
+    }
+
+    /**
+     * 수신 플레이어에게 전투원 대사 메시지를 전송한다.
+     *
+     * @param receiver 수신 플레이어
+     * @param message  메시지
+     */
+    public void sendMentMessage(@NonNull CombatUser receiver, @NonNull String message) {
+        receiver.getEntity().sendMessage(getFormattedChatMessage("§e" + message));
     }
 
     /**

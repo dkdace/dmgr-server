@@ -385,7 +385,7 @@ public final class GameUser {
      */
     @NonNull
     private String getFormattedChatMessage(@NonNull String message) {
-        return MessageFormat.format("§f<{0}§l[미선택]§f{1}> §f{2}", team.getType().getColor(), player.getName(), message);
+        return MessageFormat.format("<{0}§l[미선택]§f{1}> {2}", team.getType().getColor(), player.getName(), message);
     }
 
     /**
@@ -394,7 +394,7 @@ public final class GameUser {
      * @param message 메시지
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
-    public void broadcastChatMessage(@NonNull String message, boolean isTeam) {
+    private void broadcastChatMessage(@NonNull String message, boolean isTeam) {
         CombatUser combatUser = CombatUser.fromUser(user);
         String fullMessage = MessageFormat.format("§7§l[{0}] {1}",
                 isTeam ? "팀" : "전체",
@@ -406,6 +406,15 @@ public final class GameUser {
             targetUser.getPlayer().sendMessage(fullMessage);
             targetUser.getUserData().getConfig().getChatSound().getSound().play(gameUser.getPlayer());
         }
+    }
+
+    /**
+     * 게임에 참여한 모든 플레이어에게 채팅 메시지를 전송한다.
+     *
+     * @param message 메시지
+     */
+    public void broadcastChatMessage(@NonNull String message) {
+        broadcastChatMessage(message, isTeamChat);
     }
 
     /**
@@ -429,7 +438,7 @@ public final class GameUser {
                 ment = combatant.getReqHealMentNormal();
             }
 
-            return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
+            return MessageFormat.format("§7[{0}] §e{1}", state, ment);
         }),
         /** 궁극기 상태 */
         SHOW_ULT("§a궁극기 상태", 10, targetCombatUser -> {
@@ -443,14 +452,14 @@ public final class GameUser {
             else
                 ment = combatant.getUltStateMentFull();
 
-            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
+            return MessageFormat.format("§7[궁극기 {0}%] §e{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
         }),
         /** 집결 요청 */
         REQ_RALLY("§a집결 요청", 11, targetCombatUser -> {
             String[] ments = targetCombatUser.getCombatantType().getCombatant().getReqRallyMents();
             String ment = ments[RandomUtils.nextInt(0, ments.length)];
 
-            return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
+            return MessageFormat.format("§7[집결 요청] §e{0}", ment);
         });
 
         /** 인벤토리 칸 번호 */
