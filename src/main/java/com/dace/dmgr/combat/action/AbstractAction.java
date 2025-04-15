@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,9 @@ public abstract class AbstractAction implements Action {
     /** 제거 시 실행할 작업 목록 */
     private final ArrayList<Runnable> onRemoves = new ArrayList<>();
 
+    /** 틱 작업을 처리하는 태스크 */
+    @Nullable
+    private IntervalTask onTickTask;
     /** 쿨타임 타임스탬프 */
     private Timestamp cooldownTimestamp = Timestamp.now();
     /** 제거 여부 */
@@ -94,8 +98,13 @@ public abstract class AbstractAction implements Action {
 
             if (!cooldown.isZero())
                 runCooldown();
-        } else
-            cooldownTimestamp = Timestamp.now().plus(cooldown);
+
+            return;
+        }
+
+        cooldownTimestamp = Timestamp.now().plus(cooldown);
+        if (cooldown.isZero())
+            stopCooldown();
     }
 
     @Override
@@ -109,17 +118,34 @@ public abstract class AbstractAction implements Action {
     }
 
     /**
-     * 동작의 쿨타임을 실행한다.
+     * 동작의 쿨타임 태스크를 실행한다.
      */
     private void runCooldown() {
-        addTask(new IntervalTask(i -> {
+        if (onTickTask != null)
+            return;
+
+        onTickTask = new IntervalTask(i -> {
             if (isCooldownFinished()) {
-                onCooldownFinished();
+                stopCooldown();
                 return false;
             }
 
             return true;
-        }, 1));
+        }, 1);
+
+        addTask(onTickTask);
+    }
+
+    /**
+     * 동작의 쿨타임 태스크를 종료한다.
+     */
+    private void stopCooldown() {
+        if (onTickTask == null)
+            return;
+
+        onTickTask.stop();
+        onTickTask = null;
+        onCooldownFinished();
     }
 
     /**

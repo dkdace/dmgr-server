@@ -60,10 +60,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (!isDurationFinished()) {
-            if (projectile != null && !projectile.isDestroyed())
-                projectile.destroy();
-
+            forceCancel();
             MetarA3Info.SOUND.DETONATE.play(combatUser.getLocation());
+
             return;
         }
 
@@ -94,6 +93,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     protected void onCancelled() {
         isEnabled = false;
         setDuration(Timespan.ZERO);
+
+        if (projectile != null && !projectile.isDestroyed())
+            projectile.destroy();
     }
 
     @Override
@@ -111,8 +113,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         protected void onDestroy(@NonNull Location location) {
-            forceCancel();
             projectile = null;
+            if (isEnabled)
+                forceCancel();
 
             Location[] locs = new Location[30];
             Vector[] vecs = new Vector[30];

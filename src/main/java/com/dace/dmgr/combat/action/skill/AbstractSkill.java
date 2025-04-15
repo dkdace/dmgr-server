@@ -11,6 +11,7 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
@@ -25,6 +26,9 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     @Getter
     protected final Timespan defaultDuration;
 
+    /** 틱 작업을 처리하는 태스크 */
+    @Nullable
+    private IntervalTask onTickTask;
     /** 지속시간 타임스탬프 */
     private Timestamp durationTimestamp = Timestamp.now();
 
@@ -73,8 +77,13 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
             if (!duration.isZero())
                 runDuration();
-        } else
-            durationTimestamp = Timestamp.now().plus(duration);
+
+            return;
+        }
+
+        durationTimestamp = Timestamp.now().plus(duration);
+        if (duration.isZero())
+            stopDuration();
     }
 
     @Override
@@ -88,17 +97,34 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
     }
 
     /**
-     * 스킬의 지속시간을 실행한다.
+     * 스킬의 지속시간 태스크를 실행한다.
      */
     private void runDuration() {
-        addTask(new IntervalTask(i -> {
+        if (onTickTask != null)
+            return;
+
+        onTickTask = new IntervalTask(i -> {
             if (isDurationFinished()) {
-                onDurationFinished();
+                stopDuration();
                 return false;
             }
 
             return true;
-        }, 1));
+        }, 1);
+
+        addTask(onTickTask);
+    }
+
+    /**
+     * 스킬의 지속시간 태스크를 종료한다.
+     */
+    private void stopDuration() {
+        if (onTickTask == null)
+            return;
+
+        onTickTask.stop();
+        onTickTask = null;
+        onDurationFinished();
     }
 
     /**

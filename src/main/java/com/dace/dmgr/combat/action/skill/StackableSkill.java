@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 여러 번 사용할 수 있는 스택형 스킬의 상태를 관리하는 클래스.
@@ -21,6 +22,9 @@ public abstract class StackableSkill extends ActiveSkill {
     /** 최대 스택 충전량 */
     private final int maxStack;
 
+    /** 틱 작업을 처리하는 태스크 */
+    @Nullable
+    private IntervalTask onTickTask;
     /** 스택 충전 쿨타임 타임스탬프 */
     private Timestamp stackCooldownTimestamp = Timestamp.now();
     /** 스킬 스택 수 */
@@ -94,30 +98,45 @@ public abstract class StackableSkill extends ActiveSkill {
             stackCooldownTimestamp = Timestamp.now().plus(cooldown);
 
             if (!cooldown.isZero())
-                runStackCooldown(cooldown);
-        } else
-            stackCooldownTimestamp = Timestamp.now().plus(cooldown);
+                runStackCooldown();
+
+            return;
+        }
+
+        stackCooldownTimestamp = Timestamp.now().plus(cooldown);
+        if (cooldown.isZero())
+            stopStackCooldown();
     }
 
     /**
-     * 스킬의 스택 충전 쿨타임을 실행한다.
-     *
-     * @param cooldown 스택 충전 쿨타임
+     * 스킬의 스택 충전 쿨타임 태스크를 실행한다.
      */
-    private void runStackCooldown(@NonNull Timespan cooldown) {
-        addTask(new IntervalTask(i -> {
+    private void runStackCooldown() {
+        if (onTickTask != null)
+            return;
+
+        onTickTask = new IntervalTask(i -> {
             if (isStackCooldownFinished()) {
-                onStackCooldownFinished();
-
-                addStack(1);
-                if (stack < maxStack)
-                    setStackCooldown(cooldown);
-
+                stopStackCooldown();
                 return false;
             }
 
             return true;
-        }, 1));
+        }, 1);
+
+        addTask(onTickTask);
+    }
+
+    /**
+     * 스킬의 스택 충전 쿨타임 태스크를 종료한다.
+     */
+    private void stopStackCooldown() {
+        if (onTickTask == null)
+            return;
+
+        onTickTask.stop();
+        onTickTask = null;
+        onStackCooldownFinished();
     }
 
     /**
@@ -125,6 +144,10 @@ public abstract class StackableSkill extends ActiveSkill {
      */
     @MustBeInvokedByOverriders
     protected void onStackCooldownFinished() {
+        addStack(1);
+        if (stack < maxStack)
+            setStackCooldown(getDefaultStackCooldown());
+
         READY_SOUND.play(combatUser.getEntity());
     }
 

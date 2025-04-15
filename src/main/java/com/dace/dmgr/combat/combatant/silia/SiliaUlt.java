@@ -38,7 +38,7 @@ public final class SiliaUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration();
+        setDuration(Timespan.MAX);
         combatUser.setGlobalCooldown(SiliaUltInfo.READY_DURATION);
 
         SiliaWeapon weapon = (SiliaWeapon) combatUser.getWeapon();
