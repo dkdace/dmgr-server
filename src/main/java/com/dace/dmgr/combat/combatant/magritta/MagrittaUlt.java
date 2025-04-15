@@ -42,7 +42,7 @@ public final class MagrittaUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration();
+        setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(MagrittaUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);

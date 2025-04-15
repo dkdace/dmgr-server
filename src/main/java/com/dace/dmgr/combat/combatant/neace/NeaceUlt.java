@@ -46,7 +46,7 @@ public final class NeaceUlt extends UltimateSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         super.onUse(actionKey);
 
-        setDuration();
+        setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
