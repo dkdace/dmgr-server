@@ -487,7 +487,7 @@ public final class User {
         String prefix = "§7[로비]";
 
         if (gameRoom != null)
-            prefix = MessageFormat.format(gameRoom.isRanked() ? "§6[랭크 {0}]" : "§a[일반 {0}]", gameRoom.getNumber());
+            prefix = gameRoom.getName();
         else if (currentPlace != Place.LOBBY)
             prefix = MessageFormat.format("§7[{0}]", currentPlace.name);
 
