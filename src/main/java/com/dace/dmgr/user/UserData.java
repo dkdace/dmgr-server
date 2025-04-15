@@ -3,12 +3,14 @@ package com.dace.dmgr.user;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.RankManager;
 import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.item.gui.ChatSoundOption;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.AsyncTask;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.Initializable;
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,6 +19,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +46,15 @@ public final class UserData implements Initializable<Void> {
             "§7문의 : {2}");
     /** Yaml 파일 경로의 디렉터리 이름 */
     private static final String DIRECTORY_NAME = "User";
+    /** 레벨 업 효과음 */
+    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
+    /** 티어 승급 효과음 */
+    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
+    /** 티어 강등 효과음 */
+    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
 
     /** 플레이어 UUID */
     @NonNull
@@ -218,6 +230,20 @@ public final class UserData implements Initializable<Void> {
     }
 
     /**
+     * 유저 데이터에 해당하는 유저 인스턴스를 반환한다.
+     *
+     * @return 유저 인스턴스. 플레이어가 접속 중이 아니면 {@code null} 반환
+     */
+    @Nullable
+    private User getOnlineUser() {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null)
+            return null;
+
+        return User.fromPlayer(player);
+    }
+
+    /**
      * @return 경험치
      */
     public int getXp() {
@@ -227,7 +253,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어의 경험치를 설정하고 필요 경험치를 충족했을 경우 레벨을 증가시킨다.
      *
-     * <p>레벨이 증가했을 경우 {@link User#playLevelUpEffect()}를 호출한다.</p>
+     * <p>레벨이 증가했을 경우 효과를 재생한다.</p>
      *
      * @param xp 경험치. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
@@ -247,13 +273,16 @@ public final class UserData implements Initializable<Void> {
 
         xpEntry.set(xp);
 
-        if (levelup) {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player == null)
-                return;
+        if (levelup)
+            new DelayTask(() -> {
+                User user = getOnlineUser();
+                if (user == null)
+                    return;
 
-            User.fromPlayer(player).playLevelUpEffect();
-        }
+                user.sendTitle(getLevelPrefix() + " §e§l달성!", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                        Timespan.ofSeconds(2));
+                LEVEL_UP_SOUND.play(user.getPlayer());
+            }, 100);
     }
 
     /**
@@ -329,7 +358,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어의 랭크 점수를 설정한다.
      *
-     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는 {@link User#playTierDownEffect()}를 호출한다.</p>
+     * <p>티어가 바뀌었을 경우 효과를 재생한다.</p>
      *
      * @param rankRate 랭크 점수 (RR)
      */
@@ -337,15 +366,27 @@ public final class UserData implements Initializable<Void> {
         Tier tier = getTier();
         rankRateEntry.set(rankRate);
 
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player == null)
-            return;
+        new DelayTask(() -> {
+            User user = getOnlineUser();
+            if (user == null)
+                return;
 
-        User user = User.fromPlayer(player);
-        if (getTier().getMinScore() > tier.getMinScore())
-            user.playTierUpEffect();
-        else if (getTier().getMinScore() < tier.getMinScore())
-            user.playTierDownEffect();
+            String title = null;
+            SoundEffect sound = null;
+            if (getTier().getMinScore() > tier.getMinScore()) {
+                title = "§b§l등급 상승";
+                sound = TIER_UP_SOUND;
+            } else if (getTier().getMinScore() < tier.getMinScore()) {
+                title = "§c§l등급 강등";
+                sound = TIER_DOWN_SOUND;
+            }
+
+            if (title == null)
+                return;
+
+            user.sendTitle(title, getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5), Timespan.ofSeconds(2));
+            sound.play(user.getPlayer());
+        }, 80);
     }
 
     /**
@@ -515,9 +556,9 @@ public final class UserData implements Initializable<Void> {
                 GeneralConfig.getConfig().getAdminContact());
         Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, expiration.toDate(), null);
 
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player != null)
-            player.kickPlayer(finalReason);
+        User user = getOnlineUser();
+        if (user != null)
+            user.getPlayer().kickPlayer(finalReason);
 
         return expiration;
     }

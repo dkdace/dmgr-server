@@ -43,7 +43,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -98,15 +97,6 @@ public final class User {
             "§7다운로드 오류 문의 : {1}");
     /** 채팅의 메시지 포맷 패턴 */
     private static final String CHAT_FORMAT_PATTERN = "<{0}> {1}";
-    /** 레벨 업 효과음 */
-    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
-    /** 티어 승급 효과음 */
-    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
-    /** 티어 강등 효과음 */
-    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
     /** 경고 액션바 효과음 */
     private static final SoundEffect ALERT_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build());
@@ -602,39 +592,6 @@ public final class User {
         commandCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getCommandCooldown());
 
         return true;
-    }
-
-    /**
-     * 레벨 상승 시 효과를 재생한다.
-     */
-    void playLevelUpEffect() {
-        taskManager.add(new DelayTask(() -> {
-            sendTitle(userData.getLevelPrefix() + " §e§l달성!", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
-                    Timespan.ofSeconds(2));
-            LEVEL_UP_SOUND.play(player);
-        }, 100));
-    }
-
-    /**
-     * 티어 상승 시 효과를 재생한다.
-     */
-    void playTierUpEffect() {
-        taskManager.add(new DelayTask(() -> {
-            sendTitle("§b§l등급 상승", userData.getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
-                    Timespan.ofSeconds(2));
-            TIER_UP_SOUND.play(player);
-        }, 80));
-    }
-
-    /**
-     * 티어 하락 시 효과를 재생한다.
-     */
-    void playTierDownEffect() {
-        taskManager.add(new DelayTask(() -> {
-            sendTitle("§c§l등급 강등", userData.getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
-                    Timespan.ofSeconds(2));
-            TIER_DOWN_SOUND.play(player);
-        }, 80));
     }
 
     /**
