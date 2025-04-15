@@ -543,11 +543,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-        if (this == attacker) {
-            selfHarmDamage += damage;
-            return;
-        }
-        if (attacker == null)
+        if (this == attacker || attacker == null)
             selfHarmDamage += damage;
 
         if (damageModule.getTotalShield() == 0)
@@ -561,7 +557,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (attacker instanceof CombatUser)
             killContributorManager.addDamage((CombatUser) attacker, damage);
 
-        if (gameUser != null)
+        if (gameUser != null && attacker != null)
             gameUser.addDefend(reducedDamage);
     }
 
