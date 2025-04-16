@@ -21,9 +21,9 @@ public final class PlayerSkin {
     /** 스킨을 불러올 때 사용하는 토큰의 접두사 */
     private static final String SKIN_TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
 
-    /** 프로퍼티 인스턴스 */
+    /** Tabbed Skin 인스턴스 */
     @NonNull
-    private final IProperty property;
+    private final Skin skin;
 
     /**
      * 지정한 스킨 이름으로 스킨 인스턴스를 생성하여 반환한다.
@@ -34,7 +34,7 @@ public final class PlayerSkin {
     @NonNull
     public static PlayerSkin fromName(@NonNull String skinName) {
         IProperty property = Validate.notNull(DMGR.getSkinsRestorerAPI().getSkinData(skinName), "스킨 %s이 존재하지 않음", skinName);
-        return new PlayerSkin(property);
+        return new PlayerSkin(new Skin(property.getValue(), property.getSignature()));
     }
 
     /**
@@ -43,9 +43,8 @@ public final class PlayerSkin {
      * @param skin Tabbed Skin 인스턴스
      */
     @NonNull
-    private static PlayerSkin fromSkin(@NonNull Skin skin) {
-        WrappedSignedProperty signedProperty = skin.getProperty();
-        return new PlayerSkin(DMGR.getSkinsRestorerAPI().createProperty(signedProperty.getName(), signedProperty.getValue(), signedProperty.getSignature()));
+    public static PlayerSkin fromSkin(@NonNull Skin skin) {
+        return new PlayerSkin(skin);
     }
 
     /**
@@ -59,22 +58,24 @@ public final class PlayerSkin {
     }
 
     /**
-     * 지정한 플레이어 이름으로 스킨 인스턴스를 생성하여 반환한다.
-     *
-     * @param playerName 플레이어 이름
-     */
-    @NonNull
-    public static PlayerSkin fromPlayerName(@NonNull String playerName) {
-        return fromSkin(Skins.getPlayer(playerName));
-    }
-
-    /**
      * 지정한 스킨 URL 값으로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param skinUrl 스킨 URL 값
+     * @apiNote 플레이어 머리 아이템에만 사용할 수 있음
      */
     @NonNull
     public static PlayerSkin fromURL(@NonNull String skinUrl) {
-        return new PlayerSkin(DMGR.getSkinsRestorerAPI().createProperty("", SKIN_TOKEN_PREFIX + skinUrl, ""));
+        return fromSkin(new Skin(SKIN_TOKEN_PREFIX + skinUrl, ""));
+    }
+
+    /**
+     * 플레이어 스킨을 SkinsRestorer API의 프로퍼티 인스턴스로 바꿔 반환한다.
+     *
+     * @return 프로퍼티 인스턴스
+     */
+    @NonNull
+    public IProperty toProperty() {
+        WrappedSignedProperty property = skin.getProperty();
+        return DMGR.getSkinsRestorerAPI().createProperty(property.getName(), property.getValue(), property.getSignature());
     }
 }

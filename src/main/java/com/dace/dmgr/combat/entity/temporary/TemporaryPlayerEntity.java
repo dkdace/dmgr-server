@@ -69,8 +69,8 @@ public abstract class TemporaryPlayerEntity extends TemporaryEntity<Player> {
 
         npc.data().set(NPC.Metadata.NAMEPLATE_VISIBLE, false);
 
-        IProperty property = playerSkin.getProperty();
-        npc.getOrAddTrait(SkinTrait.class).setSkinPersistent(property.getName(), property.getSignature(), property.getValue());
+        IProperty property = playerSkin.toProperty();
+        npc.getOrAddTrait(SkinTrait.class).setSkinPersistent(playerSkin.toString(), property.getSignature(), property.getValue());
 
         if (!npc.spawn(spawnLocation)) {
             npc.destroy();

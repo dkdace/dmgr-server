@@ -43,6 +43,8 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
             SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
+    /** 더미 플레이어 스킨 */
+    private static final PlayerSkin PLAYER_SKIN = PlayerSkin.fromName("DVDummy");
 
     /** 공격 모듈 */
     @NonNull
@@ -79,7 +81,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
      * @see DummyBehavior
      */
     public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
-        super(PlayerSkin.fromPlayerName("Clemounours"), spawnLocation, "훈련용 봇", null, Hitbox.createDefaultPlayerHitboxes(1));
+        super(PLAYER_SKIN, spawnLocation, "훈련용 봇", null, Hitbox.createDefaultPlayerHitboxes(1));
         Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;

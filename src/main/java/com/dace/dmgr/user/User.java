@@ -28,13 +28,13 @@ import com.dace.dmgr.util.task.TaskManager;
 import com.keenant.tabbed.item.TextTabItem;
 import com.keenant.tabbed.tablist.TabList;
 import com.keenant.tabbed.tablist.TableTabList;
-import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.skinsrestorer.api.PlayerWrapper;
@@ -405,27 +405,21 @@ public final class User {
         tabListManager.setHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
         tabListManager.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
 
-        tabListManager.setItem(0, 0, "§f§l§n 서버 상태 ", Skins.getPlayer("TimmyTimothy"));
-        tabListManager.setItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping),
-                Skins.getPlayer("FranciRoma"));
+        tabListManager.setItem(0, 0, "§f§l§n 서버 상태 ", SKIN.SERVER_STATUS);
+        tabListManager.setItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping), SKIN.PING);
         tabListManager.setItem(0, 3, MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
-                Skins.getPlayer("AddelBurgh"));
-        tabListManager.setItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps),
-                Skins.getPlayer("CommandBlock"));
-        tabListManager.setItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
-                Skins.getPlayer("MHF_Steve"));
+                SKIN.MEMORY);
+        tabListManager.setItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), SKIN.TPS);
+        tabListManager.setItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()), SKIN.ONLINE);
         tabListManager.setItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
-                Skins.getPlayer(player));
+                PlayerSkin.fromUUID(player.getUniqueId()));
         tabListManager.setItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
-                        userData.getWinCount(),
-                        userData.getLoseCount(),
-                        (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100),
-                Skins.getPlayer("goldblock"));
-        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()),
-                Skins.getPlayer("MHF_TNT2"));
+                userData.getWinCount(),
+                userData.getLoseCount(),
+                (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100), SKIN.WIN_RATE);
+        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()), SKIN.QUIT);
         tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
-                        DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")),
-                Skins.getPlayer("Olaf_C"));
+                DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")), SKIN.PLAY_TIME);
 
         updateLobbyTabListUsers();
     }
@@ -440,7 +434,7 @@ public final class User {
                 .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
                 .forEach(target -> (target.getPlayer().isOp() ? adminUsers : lobbyUsers).add(target));
 
-        tabListManager.setItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.size()), Skins.getDot(ChatColor.GREEN));
+        tabListManager.setItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.size()), SKIN.LOBBY_USERS);
         for (int i = 0; i < 38; i++) {
             int column = 1 + i % 2;
             int row = i / 2 + 1;
@@ -453,7 +447,7 @@ public final class User {
             }
         }
 
-        tabListManager.setItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.size()), Skins.getDot(ChatColor.AQUA));
+        tabListManager.setItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.size()), SKIN.ADMIN_USERS);
         for (int i = 0; i < 19; i++) {
             int column = 3;
             int row = i + 1;
@@ -590,7 +584,6 @@ public final class User {
         }
 
         commandCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getCommandCooldown());
-
         return true;
     }
 
@@ -951,7 +944,7 @@ public final class User {
     public AsyncTask<Void> applySkin(@NonNull PlayerSkin playerSkin) {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), playerSkin.getProperty());
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), playerSkin.toProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
@@ -967,7 +960,7 @@ public final class User {
     public AsyncTask<Void> resetSkin() {
         return new AsyncTask<>((onFinish, onError) -> {
             try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), PlayerSkin.fromPlayerName(player.getName()).getProperty());
+                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), PlayerSkin.fromUUID(player.getUniqueId()).toProperty());
                 onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 초기화 실패", ex, player.getName());
@@ -1209,18 +1202,15 @@ public final class User {
         /**
          * 지정한 번호의 항목을 설정한다.
          *
-         * @param column  열 번호. 0~3 사이의 값
-         * @param row     행 번호. 0~19 사이의 값
-         * @param content 내용
-         * @param skin    머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
+         * @param column     열 번호. 0~3 사이의 값
+         * @param row        행 번호. 0~19 사이의 값
+         * @param content    내용
+         * @param playerSkin 머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
-        public void setItem(int column, int row, @NonNull String content, @Nullable Skin skin) {
+        public void setItem(int column, int row, @NonNull String content, @Nullable PlayerSkin playerSkin) {
             validateColumnRow(column, row);
-
-            tabList.set(column, row, skin == null
-                    ? new TextTabItem(content, -1)
-                    : new TextTabItem(content, -1, skin));
+            tabList.set(column, row, new TextTabItem(content, -1, playerSkin == null ? Skins.DEFAULT_SKIN : playerSkin.getSkin()));
         }
 
         /**
@@ -1348,5 +1338,32 @@ public final class User {
         private void delete() {
             sidebar.delete();
         }
+    }
+
+    /**
+     * 로비 탭리스트에 사용되는 머리 스킨 목록.
+     */
+    @UtilityClass
+    private static final class SKIN {
+        /** 서버 상태 */
+        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
+        /** 핑 */
+        private static final PlayerSkin PING = PlayerSkin.fromName("DTabPing");
+        /** 메모리 */
+        private static final PlayerSkin MEMORY = PlayerSkin.fromName("DTabMemory");
+        /** TPS */
+        private static final PlayerSkin TPS = PlayerSkin.fromName("DTabTPS");
+        /** 접속자 수 */
+        private static final PlayerSkin ONLINE = PlayerSkin.fromName("DTabOnline");
+        /** 승률 */
+        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("DTabWinRate");
+        /** 탈주 */
+        private static final PlayerSkin QUIT = PlayerSkin.fromName("DTabQuit");
+        /** 플레이 시간 */
+        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
+        /** 접속 인원 */
+        private static final PlayerSkin LOBBY_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
+        /** 관리자 */
+        private static final PlayerSkin ADMIN_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.AQUA));
     }
 }

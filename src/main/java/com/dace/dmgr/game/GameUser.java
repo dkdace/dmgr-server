@@ -1,6 +1,7 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.TextIcon;
@@ -13,7 +14,6 @@ import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,6 +39,8 @@ import java.util.function.Function;
 public final class GameUser {
     /** 게임 유저 목록 (유저 정보 : 게임 유저 정보) */
     private static final HashMap<User, GameUser> GAME_USER_MAP = new HashMap<>();
+    /** 미공개 상태의 플레이어 머리 스킨 */
+    private static final PlayerSkin UNKNOWN_PLAYER_SKIN = PlayerSkin.fromName("DTabUnknown");
 
     /** 플레이어 인스턴스 */
     @NonNull
@@ -221,21 +223,20 @@ public final class GameUser {
     private void updateGameTabList() {
         User.TabListManager tabListManager = user.getTabListManager();
 
-        String title = (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName();
-        String teamScore = MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
-                game.getRedTeam().getScore(),
-                game.getBlueTeam().getScore());
-        tabListManager.setHeader("\n" + title + "\n" + teamScore);
+        tabListManager.setHeader(MessageFormat.format("\n{0} §f{1}\n",
+                (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ]" : "§a§l[ 일반 ]"),
+                game.getGamePlayMode().getName()));
 
-        boolean isHeadReveal = game.isPlaying()
-                && game.getElapsedTime().compareTo(GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart()) > 0;
+        boolean isHeadReveal = game.isPlaying() && game.getElapsedTime().compareTo(GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart()) > 0;
 
         int column = 0;
         for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
+            ChatColor targetTeamColor = targetTeam.getType().getColor();
+
             tabListManager.setItem(++column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
-                    targetTeam.getType().getColor(),
+                    targetTeamColor,
                     targetTeam.getType().getName(),
-                    targetTeam.getTeamUsers().size()), Skins.getDot(targetTeam.getType().getColor()));
+                    targetTeam.getTeamUsers().size()), PlayerSkin.fromSkin(Skins.getDot(targetTeamColor)));
 
             Iterator<GameUser> iterator = targetTeam.getTeamUsers().stream()
                     .sorted(Comparator.comparing(GameUser::getScore).reversed())
@@ -249,14 +250,14 @@ public final class GameUser {
                     tabListManager.removeItem(column, row + 1);
                 } else {
                     GameUser target = iterator.next();
-                    User targetUser = target.getUser();
+                    String name = MessageFormat.format("{0} {1}", targetTeamColor, target.getPlayer().getName());
 
                     if (team == targetTeam || isHeadReveal)
-                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), targetUser);
+                        tabListManager.setItem(column, row, name, target.getUser());
                     else
-                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), Skins.getPlayer("crashdummie99"));
+                        tabListManager.setItem(column, row, name, UNKNOWN_PLAYER_SKIN);
 
-                    tabListManager.setItem(column, row + 1, MessageFormat.format("§7{0} §f{1}   §7{2} §f{3}   §7{4} §f{5}   §7{6} §f{7}",
+                    tabListManager.setItem(column, row + 1, MessageFormat.format("§7{0} §f{1}   §7{2} §f{3}   §7{4} §f{5}   §7{6} §f{7}  ",
                             "✪",
                             (int) target.getScore(),
                             TextIcon.DAMAGE,
@@ -264,7 +265,7 @@ public final class GameUser {
                             TextIcon.POISON,
                             target.getDeath(),
                             "✔",
-                            target.getAssist()), (Skin) null);
+                            target.getAssist()), (PlayerSkin) null);
                 }
             }
         }
@@ -474,8 +475,8 @@ public final class GameUser {
                             .setDamage((short) 5)
                             .setName(name)
                             .build(),
-                    new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
-                        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+                    new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
+                        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(target));
                         if (combatUser == null)
                             return false;
 
@@ -483,7 +484,7 @@ public final class GameUser {
                         if (gameUser == null)
                             return false;
 
-                        if (!player.isOp()) {
+                        if (!target.isOp()) {
                             if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
                                 return false;
 
@@ -491,7 +492,7 @@ public final class GameUser {
                         }
 
                         gameUser.broadcastChatMessage(action.apply(combatUser), true);
-                        player.closeInventory();
+                        target.closeInventory();
 
                         return true;
                     }));
