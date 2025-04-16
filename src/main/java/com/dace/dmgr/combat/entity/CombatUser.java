@@ -498,10 +498,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
+        isUlt = combatant.onAttack(this, victim, damage, isCrit) && isUlt;
         if (this == victim)
             return;
-
-        isUlt = isUlt && combatant.onAttack(this, victim, damage, isCrit);
 
         playAttackEffect(isCrit);
 
@@ -554,16 +553,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
-        if (attacker instanceof CombatUser)
-            killContributorManager.addDamage((CombatUser) attacker, damage);
 
-        if (gameUser != null && attacker != null)
-            gameUser.addDefend(reducedDamage);
+        if (attacker != null && this != attacker) {
+            if (attacker instanceof CombatUser)
+                killContributorManager.addDamage((CombatUser) attacker, damage);
+
+            if (gameUser != null)
+                gameUser.addDefend(reducedDamage);
+        }
     }
 
     @Override
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
-        isUlt = isUlt && getSkill(combatant.getUltimateSkillInfo()).isDurationFinished() && combatant.onGiveHeal(this, target, amount);
+        isUlt = combatant.onGiveHeal(this, target, amount) && getSkill(combatant.getUltimateSkillInfo()).isDurationFinished() && isUlt;
 
         if (this != target)
             lastGiveHealTimestamp = Timestamp.now();

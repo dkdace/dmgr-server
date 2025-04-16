@@ -123,7 +123,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (victim.isCreature()) {
+        if (attacker != victim && victim.isCreature()) {
             attacker.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
             attacker.useAction(ActionKey.PERIODIC_1);
         }

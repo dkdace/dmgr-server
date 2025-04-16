@@ -121,7 +121,7 @@ public final class Silia extends Scuffler {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (victim instanceof CombatUser && isCrit)
+        if (attacker != victim && victim instanceof CombatUser && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
 
         return true;
