@@ -8,10 +8,13 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 실리아 클래스.
@@ -124,6 +127,19 @@ public final class Silia extends Scuffler {
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
 
         return true;
+    }
+
+    @Override
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
+        SiliaA3 skill3 = victim.getSkill(SiliaA3Info.getInstance());
+        if (skill3.isDurationFinished())
+            return;
+
+        skill3.setDamage(skill3.getDamage() + damage);
+        if (skill3.getDamage() >= victim.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO) {
+            skill3.cancel();
+            skill3.setCooldown(SiliaA3Info.COOLDOWN_FORCE);
+        }
     }
 
     @Override

@@ -8,11 +8,18 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
+@Getter(AccessLevel.PACKAGE)
+@Setter(AccessLevel.PACKAGE)
 public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaA3Info.SPEED);
+    /** 누적 피해 */
+    private double damage = 0;
 
     public SiliaA3(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA3Info.getInstance(), SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
@@ -61,21 +68,13 @@ public final class SiliaA3 extends ChargeableSkill {
 
         SiliaA3Info.SOUND.USE.play(combatUser.getLocation());
 
-        double health = combatUser.getDamageModule().getHealth();
-
         addActionTask(new IntervalTask(i -> {
-            boolean isDamaged = health - combatUser.getDamageModule().getHealth() >= combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO;
-            if (getStateValue() <= 0 || isDamaged)
+            if (getStateValue() <= 0)
                 return false;
 
             combatUser.getEntity().setFallDistance(0);
             return true;
-        }, () -> {
-            cancel();
-
-            if (getStateValue() > 0)
-                setCooldown(SiliaA3Info.COOLDOWN_FORCE);
-        }, 1));
+        }, this::cancel, 1));
 
         addActionTask(new DelayTask(() -> {
             ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
@@ -91,7 +90,9 @@ public final class SiliaA3 extends ChargeableSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        damage = 0;
 
         ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
 
