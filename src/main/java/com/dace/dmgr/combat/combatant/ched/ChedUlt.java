@@ -271,7 +271,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
         private final class ChedUltFireFloorArea extends Area<Damageable> {
             private ChedUltFireFloorArea() {
-                super(combatUser, ChedUltInfo.SIZE, CombatUtil.EntityCondition.enemy(combatUser));
+                super(combatUser, ChedUltInfo.SIZE, CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
+                        Math.abs(combatEntity.getLocation().getY() - ChedUltFireFloor.this.getLocation().getY()) < ChedUltInfo.FIRE_FLOOR_HEIGHT));
             }
 
             @Override

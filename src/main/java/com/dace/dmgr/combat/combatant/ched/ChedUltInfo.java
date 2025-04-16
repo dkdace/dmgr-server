@@ -34,6 +34,8 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     public static final Timespan FIRE_FLOOR_DURATION = Timespan.ofSeconds(8);
     /** 화염 지대 범위 (단위: 블록) */
     public static final double FIRE_FLOOR_RADIUS = 7;
+    /** 화염 지대 높이 (단위: 블록) */
+    public static final double FIRE_FLOOR_HEIGHT = 1.5;
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
