@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.silia;
 
-import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
@@ -134,11 +133,8 @@ public final class Silia extends Scuffler {
         if (!victim.isGoalTarget())
             return;
 
-        if (victim instanceof CombatUser) {
-            Timespan timeLimit = GeneralConfig.getCombatConfig().getDamageSumTimeLimit().minus(FAST_KILL_SCORE_TIME_LIMIT);
-            if (((CombatUser) victim).getKillContributorRemainingTime(attacker).compareTo(timeLimit) > 0)
-                attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
-        }
+        if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributorElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
+            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
 
         SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())

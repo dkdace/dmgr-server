@@ -78,6 +78,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private static final int KILLSTREAK_SCORE = 25;
     /** 코어 장착 인벤토리 슬롯 목록 */
     private static final int[] CORE_INVENTORY_SLOT = {27, 28, 29};
+    /** 연속 처치 제한시간 */
+    private static final Timespan KILL_STREAK_TIME_LIMIT = Timespan.ofSeconds(8);
+    /** 획득 점수 표시 유지시간 */
+    private static final Timespan SCORE_DISPLAY_DURATION = Timespan.ofSeconds(5);
+    /** 킬 로그 표시 유지시간 */
+    private static final Timespan KILL_LOG_DISPLAY_DURATION = Timespan.ofSeconds(4);
 
     /** 힘의 코어 수정자 */
     private static final AbilityStatus.Modifier CORE_STRENGTH_MODIFIER = new AbilityStatus.Modifier(Core.STRENGTH.getValue());
@@ -596,7 +602,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
             killStreak = 0;
-        killStreakTimeLimitTimestamp = Timestamp.now().plus(GeneralConfig.getCombatConfig().getKillStreakTimeLimit());
+        killStreakTimeLimitTimestamp = Timestamp.now().plus(KILL_STREAK_TIME_LIMIT);
         if (killStreak++ > 0)
             addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
 
@@ -640,7 +646,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         new DelayTask(() -> {
             if (!game.isFinished())
                 game.removeBossBar(killBossBar);
-        }, GeneralConfig.getCombatConfig().getKillLogDisplayDuration().toTicks());
+        }, KILL_LOG_DISPLAY_DURATION.toTicks());
     }
 
     /**
@@ -792,14 +798,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 공격자의 남은 적 처치 기여 제한시간을 반환한다.
+     * 공격자의 첫 공격 후 경과한 시간을 반환한다.
      *
      * @param attacker 공격자
-     * @return 남은 적 처치 기여 제한시간
+     * @return 첫 공격 후 경과한 시간
      */
     @NonNull
-    public Timespan getKillContributorRemainingTime(@NonNull CombatUser attacker) {
-        return killContributorManager.getRemainingTime(attacker);
+    public Timespan getKillContributorElapsedTime(@NonNull CombatUser attacker) {
+        return killContributorManager.getElapsedTime(attacker);
     }
 
     /**
@@ -894,7 +900,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (gameUser != null)
             gameUser.addScore(score);
 
-        Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getScoreDisplayDuration());
+        Timestamp expiration = Timestamp.now().plus(SCORE_DISPLAY_DURATION);
         if (scoreDisplayTimestamp.isBefore(Timestamp.now())) {
             scoreDisplayTimestamp = expiration;
 
@@ -1392,15 +1398,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         /**
-         * 지정한 공격자의 남은 처치 기여 제한시간을 반환한다.
+         * 지정한 공격자의 첫 공격 후 경과한 시간을 반환한다.
          *
          * @param attacker 공격자
-         * @return 남은 처치 기여 제한시간
+         * @return 첫 공격 후 경과한 시간
          */
         @NonNull
-        private Timespan getRemainingTime(@NonNull CombatUser attacker) {
+        private Timespan getElapsedTime(@NonNull CombatUser attacker) {
             DamageInfo damageInfo = getDamageMap().get(attacker);
-            return damageInfo == null ? Timespan.ZERO : Timestamp.now().until(damageInfo.expiration);
+            return damageInfo == null ? Timespan.ZERO : damageInfo.startTime.until(Timestamp.now());
         }
 
         /**
@@ -1428,8 +1434,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          */
         @NoArgsConstructor
         private static final class DamageInfo {
+            /** 시작 시점 */
+            private final Timestamp startTime = Timestamp.now();
             /** 종료 시점 */
-            private final Timestamp expiration = Timestamp.now().plus(GeneralConfig.getCombatConfig().getDamageSumTimeLimit());
+            private final Timestamp expiration = startTime.plus(Timespan.ofSeconds(10));
             /** 누적 피해량 */
             private double damage = 0;
 

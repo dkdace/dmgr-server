@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
@@ -36,51 +37,54 @@ public final class GeneralConfig implements Initializable<Void> {
     @Nullable
     private GameConfig gameConfig;
 
+    /**
+     * @return 일반 설정
+     */
     @NonNull
     public static Config getConfig() {
         instance.validate();
-
-        if (instance.config == null)
-            instance.config = new Config();
-
-        return instance.config;
+        return Validate.notNull(instance.config);
     }
 
+    /**
+     * @return 훈련장 설정
+     */
     @NonNull
     public static TrainingConfig getTrainingConfig() {
         instance.validate();
-
-        if (instance.trainingConfig == null)
-            instance.trainingConfig = new TrainingConfig();
-
-        return instance.trainingConfig;
+        return Validate.notNull(instance.trainingConfig);
     }
 
+    /**
+     * @return 전투 시스템 관련 설정
+     */
     @NonNull
     public static CombatConfig getCombatConfig() {
         instance.validate();
-
-        if (instance.combatConfig == null)
-            instance.combatConfig = new CombatConfig();
-
-        return instance.combatConfig;
+        return Validate.notNull(instance.combatConfig);
     }
 
+    /**
+     * @return 게임 관련 설정
+     */
     @NonNull
     public static GameConfig getGameConfig() {
         instance.validate();
-
-        if (instance.gameConfig == null)
-            instance.gameConfig = new GameConfig();
-
-        return instance.gameConfig;
+        return Validate.notNull(instance.gameConfig);
     }
 
     @Override
     @NonNull
     public AsyncTask<Void> init() {
         return yamlFile.init()
-                .onFinish(() -> ConsoleLogger.info("전역 설정 불러오기 완료"))
+                .onFinish(() -> {
+                    config = new Config();
+                    trainingConfig = new TrainingConfig();
+                    combatConfig = new CombatConfig();
+                    gameConfig = new GameConfig();
+
+                    ConsoleLogger.info("전역 설정 불러오기 완료");
+                })
                 .onError(ex -> ConsoleLogger.severe("전역 설정 불러오기 실패", ex));
     }
 
@@ -222,18 +226,6 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 낙사 구역에 사용되는 블록의 타입 */
         @NonNull
         private final Material fallZoneBlock = Material.valueOf(section.getEntry("fall_zone_block", Material.BEDROCK.toString()).get());
-        /** 적 처치 기여 (데미지 누적) 제한시간 */
-        @NonNull
-        private final Timespan damageSumTimeLimit = Timespan.ofSeconds(section.getEntry("damage_sum_time_limit_seconds", 10.0).get());
-        /** 연속 처치 제한시간 */
-        @NonNull
-        private final Timespan killStreakTimeLimit = Timespan.ofSeconds(section.getEntry("kill_streak_time_limit_seconds", 8.0).get());
-        /** 획득 점수 표시 유지시간 */
-        @NonNull
-        private final Timespan scoreDisplayDuration = Timespan.ofSeconds(section.getEntry("score_display_duration_seconds", 5.0).get());
-        /** 킬 로그 표시 유지시간 */
-        @NonNull
-        private final Timespan killLogDisplayDuration = Timespan.ofSeconds(section.getEntry("kill_log_display_duration_seconds", 4.0).get());
     }
 
     /**
