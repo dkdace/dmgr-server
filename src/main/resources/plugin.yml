@@ -94,7 +94,3 @@ commands:
       - 더미
   게임:
     permission: admin
-  랭크설정:
-    permission: admin
-  경험치설정:
-    permission: admin
