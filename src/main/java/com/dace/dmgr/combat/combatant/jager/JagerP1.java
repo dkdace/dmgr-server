@@ -8,7 +8,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Setter;
-import org.bukkit.ChatColor;
 
 @Setter(AccessLevel.PACKAGE)
 public final class JagerP1 extends AbstractSkill {
@@ -32,7 +31,7 @@ public final class JagerP1 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, JagerP1Info.DURATION);
+        combatUser.setGlowing(target, JagerP1Info.DURATION);
     }
 
     @Override

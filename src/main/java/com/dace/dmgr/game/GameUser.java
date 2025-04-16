@@ -159,7 +159,7 @@ public final class GameUser {
             EntityUtil.teleport(player, getSpawnLocation());
 
         if (i % 5 == 0)
-            team.getTeamUsers().forEach(target -> target.getUser().setGlowing(player, ChatColor.BLUE));
+            team.getTeamUsers().forEach(target -> target.getUser().setGlowing(player, team.getType().getColor()));
 
         if (i % 20 == 0)
             updateGameTabList();

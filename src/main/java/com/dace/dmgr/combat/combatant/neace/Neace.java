@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
@@ -186,7 +185,7 @@ public final class Neace extends Support {
 
         @Override
         protected void onFindEntity(@NonNull Healable target) {
-            ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, Timespan.ofTicks(3));
+            ((CombatUser) shooter).setGlowing(target, Timespan.ofTicks(3));
         }
     }
 }

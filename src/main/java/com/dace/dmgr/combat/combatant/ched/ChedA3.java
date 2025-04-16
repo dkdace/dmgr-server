@@ -17,7 +17,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
@@ -187,12 +186,8 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
-                    combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, ChedA3Info.DETECT_DURATION);
-
-                    CombatUtil.getCombatEntities(location.getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
-                                    .and(CombatUser.class::isInstance))
-                            .forEach(teamTarget -> ((CombatUser) teamTarget).getUser().setGlowing(target.getEntity(), ChatColor.RED,
-                                    ChedA3Info.DETECT_DURATION));
+                    CombatUtil.getCombatEntities(location.getWorld(), CombatUtil.EntityCondition.team(combatUser).and(CombatUser.class::isInstance))
+                            .forEach(teamTarget -> ((CombatUser) teamTarget).setGlowing(target, ChedA3Info.DETECT_DURATION));
 
                     if (target.isGoalTarget()) {
                         combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);

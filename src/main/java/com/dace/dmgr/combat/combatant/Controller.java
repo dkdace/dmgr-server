@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +46,7 @@ public abstract class Controller extends Combatant {
                                 CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
 
                         if (targetCombatEntity != null)
-                            combatUser.getUser().setGlowing(targetCombatEntity.getEntity(), ChatColor.RED, Timespan.ofTicks(10));
+                            combatUser.setGlowing(targetCombatEntity, Timespan.ofTicks(10));
                     });
 
         if (combatUser.getLastDamageTimestamp().plus(RoleTrait2Info.ACTIVATE_DURATION).isBefore(Timestamp.now()))

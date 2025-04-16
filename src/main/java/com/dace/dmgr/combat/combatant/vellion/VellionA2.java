@@ -24,7 +24,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
@@ -138,7 +137,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
             if (blockResetTimestamp.isBefore(Timestamp.now()))
                 return false;
 
-            combatUser.getUser().setGlowing(target.getEntity(), ChatColor.RED, Timespan.ofTicks(4));
+            combatUser.setGlowing(target, Timespan.ofTicks(4));
 
             if (i % 10 == 0)
                 new VellionA2Area(target).emit(target.getCenterLocation());

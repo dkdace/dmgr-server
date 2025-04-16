@@ -51,6 +51,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.MainHand;
@@ -656,7 +657,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NonNull
     private String getPlayerKillBossBarName() {
-        ChatColor color = gameUser == null ? ChatColor.WHITE : gameUser.getTeam().getType().getColor();
+        ChatColor color = team == null ? ChatColor.WHITE : team.getType().getColor();
 
         return MessageFormat.format("§f{0}{1}§l {2}", combatant.getIcon(), color, name);
     }
@@ -1307,6 +1308,25 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
+     * 플레이어에게 지정한 엔티티를 지속시간동안 발광 상태로 표시한다.
+     *
+     * <p>색상은 적용 대상이 아군이면 연두색, 적이면 게임에 참여중이지 않을 때 노란색, 게임에 참여 중이면 팀 색상으로 표시한다.</p>
+     *
+     * @param target   발광 효과를 적용할 엔티티
+     * @param duration 지속시간
+     * @see User#setGlowing(Entity, ChatColor, Timespan)
+     */
+    public void setGlowing(@NonNull CombatEntity target, @NonNull Timespan duration) {
+        ChatColor color;
+        if (isEnemy(target))
+            color = target.getTeam() == null ? ChatColor.YELLOW : target.getTeam().getType().getColor();
+        else
+            color = ChatColor.GREEN;
+
+        user.setGlowing(target.getEntity(), color, duration);
+    }
+
+    /**
      * 전투 시스템의 메시지 포맷이 적용된 채팅 메시지를 반환한다.
      *
      * <p>인게임 채팅 및 전투원 대사에 사용한다.</p>
@@ -1317,7 +1337,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     public String getFormattedChatMessage(@NonNull String message) {
         return MessageFormat.format("§f<{0}§l[§f{1} {0}{2}]§f{3}> {4}",
-                (gameUser == null ? ChatColor.YELLOW : gameUser.getTeam().getType().getColor()),
+                (team == null ? ChatColor.YELLOW : team.getType().getColor()),
                 combatant.getIcon(),
                 "§l" + combatant.getName(),
                 entity.getName(),
