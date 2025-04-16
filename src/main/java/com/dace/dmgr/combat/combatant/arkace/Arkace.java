@@ -8,7 +8,6 @@ import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -123,18 +122,6 @@ public final class Arkace extends Marksman {
 
         if (combatUser.getEntity().isSprinting())
             combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!victim.isGoalTarget())
-            return;
-
-        ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
-            attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override

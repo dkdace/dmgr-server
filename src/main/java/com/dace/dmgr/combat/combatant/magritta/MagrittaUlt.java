@@ -5,26 +5,35 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-public final class MagrittaUlt extends UltimateSkill {
+public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MagrittaUltInfo.USE_SLOW);
+
+    /** 보너스 점수 모듈 */
+    @NonNull
+    @Getter
+    private final BonusScoreModule bonusScoreModule;
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
     public MagrittaUlt(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaUltInfo.getInstance(), MagrittaUltInfo.DURATION, MagrittaUltInfo.COST);
+        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", MagrittaUltInfo.KILL_SCORE);
     }
 
     @Override

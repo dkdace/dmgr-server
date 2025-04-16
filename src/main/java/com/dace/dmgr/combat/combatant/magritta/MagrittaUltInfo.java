@@ -29,6 +29,8 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
+    /** 궁극기 처치 점수 제한시간 */
+    public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(1);
 
     @Getter
     private static final MagrittaUltInfo instance = new MagrittaUltInfo();

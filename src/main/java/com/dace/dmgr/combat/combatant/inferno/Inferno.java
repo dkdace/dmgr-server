@@ -145,11 +145,7 @@ public final class Inferno extends Vanguard {
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
-        if (!victim.isGoalTarget())
-            return;
-
-        InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
+        if (victim.isGoalTarget() && !attacker.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }
 

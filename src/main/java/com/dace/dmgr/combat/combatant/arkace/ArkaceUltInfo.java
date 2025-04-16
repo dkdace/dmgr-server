@@ -20,6 +20,8 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 40;
+    /** 궁극기 처치 점수 제한시간 */
+    public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
 
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();

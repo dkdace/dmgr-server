@@ -191,8 +191,12 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 if (shredding > 0)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
 
-                if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true))
+                if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true)) {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);
+
+                    if (isUlt && target.isGoalTarget())
+                        combatUser.getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule().addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
+                }
 
                 MagrittaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
                 return false;

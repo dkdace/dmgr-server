@@ -167,7 +167,9 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 double damage = ArkaceWeaponInfo.DAMAGE;
-                if (!isUlt)
+                if (isUlt)
+                    combatUser.getSkill(ArkaceUltInfo.getInstance()).getBonusScoreModule().addTarget(target, ArkaceUltInfo.KILL_SCORE_TIME_LIMIT);
+                else
                     damage = CombatUtil.getDistantDamage(damage, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
 
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, !isUlt);

@@ -8,7 +8,6 @@ import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -122,18 +121,6 @@ public final class Magritta extends Scuffler {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
             combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!victim.isGoalTarget())
-            return;
-
-        MagrittaUlt skillUlt = attacker.getSkill(MagrittaUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
-            attacker.addScore("궁극기 보너스", MagrittaUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override
