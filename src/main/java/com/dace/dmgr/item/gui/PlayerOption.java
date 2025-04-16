@@ -27,14 +27,11 @@ public final class PlayerOption extends ChestGUI {
         UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
 
         fillRow(1, GUIItem.EMPTY);
-        set(0, 0, PlayerOptionItem.KOREAN_CHAT.definedItem, itemBuilder ->
-                itemBuilder.addLore(userConfig.isKoreanChat() ? "§a§l켜짐" : "§c§l꺼짐"));
-        set(1, 0, userConfig.isKoreanChat() ? GUIItem.ENABLED : GUIItem.DISABLED);
-        set(0, 1, PlayerOptionItem.NIGHT_VISION.definedItem, itemBuilder ->
+        set(0, 0, PlayerOptionItem.NIGHT_VISION.definedItem, itemBuilder ->
                 itemBuilder.addLore(userConfig.isNightVision() ? "§a§l켜짐" : "§c§l꺼짐"));
-        set(1, 1, userConfig.isNightVision() ? GUIItem.ENABLED : GUIItem.DISABLED);
-        set(0, 2, PlayerOptionItem.CROSSHAIR.definedItem);
-        set(0, 3, PlayerOptionItem.CHAT_SOUND.definedItem);
+        set(1, 0, userConfig.isNightVision() ? GUIItem.ENABLED : GUIItem.DISABLED);
+        set(0, 1, PlayerOptionItem.CROSSHAIR.definedItem);
+        set(0, 2, PlayerOptionItem.CHAT_SOUND.definedItem);
         set(1, 7, new GUIItem.Previous(Menu::new));
         set(1, 8, GUIItem.EXIT);
     }
@@ -43,16 +40,6 @@ public final class PlayerOption extends ChestGUI {
      * 설정의 아이템 목록.
      */
     private enum PlayerOptionItem {
-        KOREAN_CHAT("YjAyYWYzY2EyZDVhMTYwY2ExMTE0MDQ4Yjc5NDc1OTQyNjlhZmUyYjFiNWVjMjU1ZWU3MmI2ODNiNjBiOTliOSJ9fX0=\\",
-                "한글 자동 변환", "채팅 자동 한글 변환을 활성화합니다.",
-                player -> {
-                    UserData.Config userConfig = UserData.fromPlayer(player).getConfig();
-
-                    userConfig.setKoreanChat(!userConfig.isKoreanChat());
-                    player.performCommand("kakc chmod " + (userConfig.isKoreanChat() ? "2" : "0"));
-
-                    new PlayerOption(player);
-                }),
         NIGHT_VISION("N2VmNGU1NzM1NDkwZmI5MDMyZDUxOTMwMWMzMGU1NTkxNjY2ZTg4YjZmY2I2MmM1M2Q5ZmM3Nzk2YTZmMDZhNyJ9fX0=",
                 "야간 투시", "야간 투시를 활성화합니다.",
                 player -> {

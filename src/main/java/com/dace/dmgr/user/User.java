@@ -246,9 +246,6 @@ public final class User {
         nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
                 0, userData.getDisplayName());
 
-        if (!userData.getConfig().isKoreanChat())
-            player.performCommand("kakc chmod 0");
-
         sendTitle("§bWelcome!", "§f메뉴를 사용하려면 §nF키§f를 누르십시오.", Timespan.ZERO, Timespan.ofSeconds(5), Timespan.ofSeconds(3));
 
         taskManager.add(new IntervalTask((LongConsumer) i -> onSecond(), 20));

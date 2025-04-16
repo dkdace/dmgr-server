@@ -660,15 +660,12 @@ public final class UserData implements Initializable<Void> {
     public final class Config {
         /** 채팅 효과음 */
         private final YamlFile.Section.Entry<String> chatSoundEntry;
-        /** 한글 채팅 여부 */
-        private final YamlFile.Section.Entry<Boolean> koreanChatEntry;
         /** 야간 투시 여부 */
         private final YamlFile.Section.Entry<Boolean> nightVisionEntry;
 
         private Config() {
             YamlFile.Section section = yamlFile.getDefaultSection();
             this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING.toString());
-            this.koreanChatEntry = section.getEntry("koreanChat", false);
             this.nightVisionEntry = section.getEntry("nightVision", false);
         }
 
@@ -685,20 +682,6 @@ public final class UserData implements Initializable<Void> {
          */
         public void setChatSound(@NonNull ChatSoundOption.ChatSound chatSound) {
             chatSoundEntry.set(chatSound.toString());
-        }
-
-        /**
-         * @return 한글 채팅 여부
-         */
-        public boolean isKoreanChat() {
-            return koreanChatEntry.get();
-        }
-
-        /**
-         * @param isKoreanChat 한글 채팅 여부
-         */
-        public void setKoreanChat(boolean isKoreanChat) {
-            koreanChatEntry.set(isKoreanChat);
         }
 
         /**
