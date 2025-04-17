@@ -68,7 +68,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case SLOT_3: {
-                combatUser.getWeapon().cancel();
                 confirmModule.toggleCheck();
 
                 break;
@@ -129,8 +128,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         confirmModule.toggleCheck();
         combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
-
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(1));
 
         Location location = confirmModule.getCurrentLocation();
 
