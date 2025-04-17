@@ -8,11 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * 전역 설정 클래스.
@@ -27,6 +30,9 @@ public final class GeneralConfig implements Initializable<Void> {
     /** 일반 설정 */
     @Nullable
     private Config config;
+    /** 자유 전투 설정 */
+    @Nullable
+    private FreeCombatConfig freeCombatConfig;
     /** 훈련장 설정 */
     @Nullable
     private TrainingConfig trainingConfig;
@@ -44,6 +50,15 @@ public final class GeneralConfig implements Initializable<Void> {
     public static Config getConfig() {
         instance.validate();
         return Validate.notNull(instance.config);
+    }
+
+    /**
+     * @return 자유 전투 설정
+     */
+    @NonNull
+    public static FreeCombatConfig getFreeCombatConfig() {
+        instance.validate();
+        return Validate.notNull(instance.freeCombatConfig);
     }
 
     /**
@@ -73,12 +88,18 @@ public final class GeneralConfig implements Initializable<Void> {
         return Validate.notNull(instance.gameConfig);
     }
 
+    @NonNull
+    private static Location @NonNull [] getLocationsFromGlobalLocationList(@NonNull World world, @NonNull List<GlobalLocation> globalLocations) {
+        return globalLocations.stream().map(globalLocation -> globalLocation.toLocation(world)).toArray(Location[]::new);
+    }
+
     @Override
     @NonNull
     public AsyncTask<Void> init() {
         return yamlFile.init()
                 .onFinish(() -> {
                     config = new Config();
+                    freeCombatConfig = new FreeCombatConfig();
                     trainingConfig = new TrainingConfig();
                     combatConfig = new CombatConfig();
                     gameConfig = new GameConfig();
@@ -98,8 +119,6 @@ public final class GeneralConfig implements Initializable<Void> {
     public static final class Config {
         /** Yaml 섹션 인스턴스 */
         private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("default");
-        /** Yaml 로비 위치 섹션 인스턴스 */
-        private static final YamlFile.Section lobbySection = section.getSection("lobby_location");
 
         /** 리소스팩 URL */
         @NonNull
@@ -132,22 +151,58 @@ public final class GeneralConfig implements Initializable<Void> {
         private final String minelist = section.getEntry("minelist", "").get();
         /** 코어 가격 */
         private final int corePrice = section.getEntry("core_price", 0).get();
+        /** 월드 */
+        @NonNull
+        private final World world = Bukkit.getWorld(section.getEntry("world", "DMGR").get());
         /** 로비 위치 */
-        private final Location lobbyLocation = new Location(
-                DMGR.getDefaultWorld(),
-                lobbySection.getEntry("x", 0.0).get(),
-                lobbySection.getEntry("y", 0.0).get(),
-                lobbySection.getEntry("z", 0.0).get(),
-                lobbySection.getEntry("yaw", 0F).get(),
-                lobbySection.getEntry("pitch", 0F).get()
-        );
+        private final GlobalLocation lobbyLocation = section.getEntry("lobby_location", GlobalLocation.ZERO).get();
 
         /**
          * @return 로비 위치
          */
         @NonNull
         public Location getLobbyLocation() {
-            return lobbyLocation.clone();
+            return lobbyLocation.toLocation(world);
+        }
+    }
+
+    /**
+     * 자유 전투 관련 설정.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Getter
+    public static final class FreeCombatConfig {
+        /** Yaml 섹션 인스턴스 */
+        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("free_combat");
+
+        /** 월드 */
+        @NonNull
+        private final World world = Bukkit.getWorld(section.getEntry("world", "FreeCombat").get());
+        /** 대기실 지역 이름 */
+        @NonNull
+        private final String waitRegionName = section.getEntry("wait_region_name", "BattlePVP").get();
+        /** 이동 지역 이름 */
+        @NonNull
+        private final String warpRegionName = section.getEntry("warp_region_name", "BattlePVPWarp").get();
+        /** 대기실 위치 */
+        private final GlobalLocation waitLocation = section.getEntry("wait_location", GlobalLocation.ZERO).get();
+        /** 스폰 위치 목록 */
+        private final List<GlobalLocation> spawnLocations = section.<GlobalLocation>getListEntry("spawn_locations").get();
+
+        /**
+         * @return 대기실 위치
+         */
+        @NonNull
+        public Location getWaitLocation() {
+            return waitLocation.toLocation(world);
+        }
+
+        /**
+         * @return 스폰 위치 목록
+         */
+        @NonNull
+        public Location @NonNull [] getSpawnLocations() {
+            return getLocationsFromGlobalLocationList(world, spawnLocations);
         }
     }
 
@@ -160,30 +215,218 @@ public final class GeneralConfig implements Initializable<Void> {
         /** Yaml 섹션 인스턴스 */
         private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("training");
 
+        /** 월드 */
+        @NonNull
+        private final World world = Bukkit.getWorld(section.getEntry("world", "Training").get());
         /** 전투원 선택 지역 확인 Y 좌표 */
         private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
         /** 전투원 선택 지역 식별 블록 타입 */
         @NonNull
         private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());
-        /** 아레나 확인 Y 좌표 */
-        private final int arenaRegionCheckYCoordinate = section.getEntry("arena_region_check_y_coordinate", 208).get();
-        /** 아레나 식별 블록 타입 */
+        /** 스폰 위치 맵 */
+        private final GlobalLocation spawnLocation = section.getEntry("spawn_location", GlobalLocation.ZERO).get();
+
+        /** 기본 더미의 위치 설정 */
         @NonNull
-        private final Material arenaZoneBlock = Material.valueOf(section.getEntry("arena_block", Material.GOLD_ORE.toString()).get());
-        /** 아레나 설정 지역 확인 Y 좌표 */
-        private final int arenaOptionRegionCheckYCoordinate = section.getEntry("arena_option_region_check_y_coordinate", 209).get();
-        /** 아레나 설정 지역 식별 블록 타입 */
+        private final DefaultDummyConfig defaultDummyConfig = new DefaultDummyConfig();
+        /** 아레나 설정 */
         @NonNull
-        private final Material arenaOptionZoneBlock = Material.valueOf(section.getEntry("arena_option_zone_block", Material.ENCHANTMENT_TABLE.toString()).get());
-        /** 기본 더미 리스폰 시간 */
+        private final ArenaConfig arenaConfig = new ArenaConfig();
+        /** 디버프 실험 블록 설정 */
         @NonNull
-        private final Timespan defaultDummyRespawnTime = Timespan.ofSeconds(section.getEntry("default_dummy_respawn_time_seconds", 3.0).get());
-        /** 디버프 실험 블록에 사용되는 블록의 타입 */
+        private final EffectTestBlockConfig effectTestBlockConfig = new EffectTestBlockConfig();
+
+        /**
+         * @return 스폰 위치
+         */
         @NonNull
-        private final Material effectTestBlock = Material.valueOf(section.getEntry("effect_test_block", Material.STRUCTURE_BLOCK.toString()).get());
-        /** 디버프 실험 블록 쿨타임 */
-        @NonNull
-        private final Timespan effectTestCooldown = Timespan.ofSeconds(section.getEntry("effect_test_cooldown_seconds", 3.0).get());
+        public Location getSpawnLocation() {
+            return spawnLocation.toLocation(world);
+        }
+
+        /**
+         * 기본 더미의 위치 설정.
+         */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @Getter
+        public static final class DefaultDummyConfig {
+            /** Yaml 섹션 인스턴스 */
+            private static final YamlFile.Section section = TrainingConfig.section.getSection("default_dummy");
+
+            /** 리스폰 시간 */
+            @NonNull
+            private final Timespan respawnTime = Timespan.ofSeconds(section.getEntry("respawn_time_seconds", 3.0).get());
+            /** 고정형 더미의 위치 목록 */
+            private final List<GlobalLocation> fixedLocations = section.<GlobalLocation>getListEntry("fixed_locations").get();
+            /** 고정형 중량 더미의 위치 목록 */
+            private final List<GlobalLocation> fixedHeavyLocations = section.<GlobalLocation>getListEntry("fixed_heavy_locations").get();
+            /** 이동형 더미의 위치 목록 */
+            private final List<List<GlobalLocation>> movingLocations = section.<List<GlobalLocation>>getListEntry("moving_locations").get();
+            /** 공격형 적 더미의 위치 목록 */
+            private final List<GlobalLocation> shootingEnemyLocations = section.<GlobalLocation>getListEntry("shooting_enemy_locations").get();
+            /** 공격형 아군 더미의 위치 목록 */
+            private final List<GlobalLocation> shootingTeamLocations = section.<GlobalLocation>getListEntry("shooting_team_locations").get();
+
+            /**
+             * @return 고정형 더미의 위치 목록
+             */
+            @NonNull
+            public Location @NonNull [] getFixedLocations() {
+                return getLocationsFromGlobalLocationList(getTrainingConfig().getWorld(), fixedLocations);
+            }
+
+            /**
+             * @return 고정형 중량 더미의 위치 목록
+             */
+            @NonNull
+            public Location @NonNull [] getFixedHeavyLocations() {
+                return getLocationsFromGlobalLocationList(getTrainingConfig().getWorld(), fixedHeavyLocations);
+            }
+
+            /**
+             * @return 이동형 더미의 위치 목록
+             */
+            @NonNull
+            public Location @NonNull [] @NonNull [] getMovingLocations() {
+                return movingLocations.stream().map(map -> getLocationsFromGlobalLocationList(getTrainingConfig().getWorld(), map))
+                        .toArray(Location[][]::new);
+            }
+
+            /**
+             * @return 공격형 적 더미의 위치 목록
+             */
+            @NonNull
+            public Location @NonNull [] getShootingEnemyLocations() {
+                return getLocationsFromGlobalLocationList(getTrainingConfig().getWorld(), shootingEnemyLocations);
+            }
+
+            /**
+             * @return 공격형 아군 더미의 위치 목록
+             */
+            @NonNull
+            public Location @NonNull [] getShootingTeamLocations() {
+                return getLocationsFromGlobalLocationList(getTrainingConfig().getWorld(), shootingTeamLocations);
+            }
+        }
+
+        /**
+         * 아레나 설정.
+         */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @Getter
+        public static final class ArenaConfig {
+            /** Yaml 섹션 인스턴스 */
+            private static final YamlFile.Section section = TrainingConfig.section.getSection("arena");
+
+            /** 지역 확인 Y 좌표 */
+            private final int regionCheckYCoordinate = section.getEntry("region_check_y_coordinate", 208).get();
+            /** 지역 식별 블록 타입 */
+            @NonNull
+            private final Material zoneBlock = Material.valueOf(section.getEntry("zone_block", Material.GOLD_ORE.toString()).get());
+            /** 설정 지역 확인 Y 좌표 */
+            private final int optionRegionCheckYCoordinate = section.getEntry("option_region_check_y_coordinate", 209).get();
+            /** 설정 지역 식별 블록 타입 */
+            @NonNull
+            private final Material optionZoneBlock = Material.valueOf(section.getEntry("option_zone_block", Material.ENCHANTMENT_TABLE.toString()).get());
+            /** 더미 생성 위치 */
+            private final GlobalLocation dummyLocation = section.getEntry("dummy_location", GlobalLocation.ZERO).get();
+
+            /**
+             * @return 더미 생성 위치
+             */
+            @NonNull
+            public Location getDummyLocation() {
+                return dummyLocation.toLocation(getTrainingConfig().getWorld());
+            }
+        }
+
+        /**
+         * 디버프 실험 블록 설정.
+         */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @Getter
+        public static final class EffectTestBlockConfig {
+            /** Yaml 섹션 인스턴스 */
+            private static final YamlFile.Section section = TrainingConfig.section.getSection("effect_test_block");
+
+            /** 블록의 타입 */
+            @NonNull
+            private final Material block = Material.valueOf(section.getEntry("block", Material.STRUCTURE_BLOCK.toString()).get());
+            /** 쿨타임 */
+            @NonNull
+            private final Timespan cooldown = Timespan.ofSeconds(section.getEntry("cooldown_seconds", 3.0).get());
+
+            /** 기절 위치 */
+            private final GlobalLocation stunLocation = section.getEntry("stun_location", GlobalLocation.ZERO).get();
+            /** 속박 위치 */
+            private final GlobalLocation snareLocation = section.getEntry("snare_location", GlobalLocation.ZERO).get();
+            /** 고정 위치 */
+            private final GlobalLocation groundingLocation = section.getEntry("grounding_location", GlobalLocation.ZERO).get();
+            /** 화염 위치 */
+            private final GlobalLocation burningLocation = section.getEntry("burning_location", GlobalLocation.ZERO).get();
+            /** 독 위치 */
+            private final GlobalLocation poisonLocation = section.getEntry("poison_location", GlobalLocation.ZERO).get();
+            /** 회복 차단 위치 */
+            private final GlobalLocation healBlockLocation = section.getEntry("heal_block_location", GlobalLocation.ZERO).get();
+            /** 침묵 위치 */
+            private final GlobalLocation silenceLocation = section.getEntry("silence_location", GlobalLocation.ZERO).get();
+
+            /**
+             * @return 기절 위치
+             */
+            @NonNull
+            public Location getStunLocation() {
+                return stunLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 속박 위치
+             */
+            @NonNull
+            public Location getSnareLocation() {
+                return snareLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 고정 위치
+             */
+            @NonNull
+            public Location getGroundingLocation() {
+                return groundingLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 화염 위치
+             */
+            @NonNull
+            public Location getBurningLocation() {
+                return burningLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 독 위치
+             */
+            @NonNull
+            public Location getPoisonLocation() {
+                return poisonLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 회복 차단 위치
+             */
+            @NonNull
+            public Location getHealBlockLocation() {
+                return healBlockLocation.toLocation(getTrainingConfig().getWorld());
+            }
+
+            /**
+             * @return 침묵 위치
+             */
+            @NonNull
+            public Location getSilenceLocation() {
+                return silenceLocation.toLocation(getTrainingConfig().getWorld());
+            }
+        }
     }
 
     /**
