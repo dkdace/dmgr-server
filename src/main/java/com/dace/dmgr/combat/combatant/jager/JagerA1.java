@@ -86,11 +86,10 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case SLOT_1: {
-                combatUser.getWeapon().cancel();
-
-                if (isDurationFinished())
+                if (isDurationFinished()) {
+                    combatUser.getWeapon().cancel();
                     confirmModule.toggleCheck();
-                else {
+                } else {
                     setDuration(Timespan.ZERO);
                     entityModule.disposeEntity();
                 }
@@ -141,7 +140,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         setDuration();
 
         confirmModule.toggleCheck();
-        combatUser.setGlobalCooldown(Timespan.ofTicks(1));
+        combatUser.getWeapon().setCooldown(Timespan.ofTicks(2));
 
         entityModule.set(new JagerA1Entity(confirmModule.getCurrentLocation()));
     }
