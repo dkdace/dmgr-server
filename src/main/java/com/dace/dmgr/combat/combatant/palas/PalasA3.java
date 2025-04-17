@@ -81,9 +81,9 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     /**
      * 체력 증가 상태 효과 클래스.
      */
-    private static final class PalasA3HealthIncrease extends StatusEffect {
+    private final class PalasA3HealthIncrease extends StatusEffect {
         /** 증가한 최대 체력 */
-        private int increasedHealth;
+        private int increasedMaxHealth;
 
         private PalasA3HealthIncrease() {
             super(true);
@@ -91,12 +91,15 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
+            if (!(combatEntity instanceof Healable))
+                return;
+
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 + PalasA3Info.HEALTH_INCREASE_RATIO));
-            increasedHealth = newMaxHealth - maxHealth;
+            increasedMaxHealth = newMaxHealth - maxHealth;
 
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
-            combatEntity.getDamageModule().setHealth(combatEntity.getDamageModule().getHealth() + increasedHealth);
+            ((Healable) combatEntity).getDamageModule().heal(combatUser, increasedMaxHealth, true);
 
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", Timespan.ZERO, Timespan.ofTicks(5),
@@ -110,16 +113,17 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() - increasedHealth);
+            if (combatEntity instanceof Healable)
+                combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() - increasedMaxHealth);
         }
     }
 
     /**
      * 체력 감소 상태 효과 클래스.
      */
-    private static final class PalasA3HealthDecrease extends StatusEffect {
+    private final class PalasA3HealthDecrease extends StatusEffect {
         /** 감소한 최대 체력 */
-        private int decreasedHealth;
+        private int decreasedMaxHealth;
 
         private PalasA3HealthDecrease() {
             super(false);
@@ -127,10 +131,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
+            double health = combatEntity.getDamageModule().getHealth();
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 - PalasA3Info.HEALTH_DECREASE_RATIO));
-            decreasedHealth = maxHealth - newMaxHealth;
+            double damage = Math.max(0, health - newMaxHealth);
+            decreasedMaxHealth = maxHealth - newMaxHealth;
 
+            combatEntity.getDamageModule().damage(combatUser, damage, DamageType.FIXED, null, false, true);
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
 
             if (combatEntity instanceof CombatUser)
@@ -145,7 +152,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() + decreasedHealth);
+            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() + decreasedMaxHealth);
         }
     }
 
