@@ -17,7 +17,7 @@ import org.bukkit.Sound;
 
 public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     /** 궁극기 필요 충전량 */
-    public static final int COST = 8000;
+    public static final int COST = 9500;
     /** 최대 거리 (단위: 블록) */
     public static final int MAX_DISTANCE = 40;
     /** 공격력 증가량 */
