@@ -55,6 +55,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
         this.targetModule = new TargetModule<>(this, VellionA2Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);
+
+        addOnReset(this::forceCancel);
     }
 
     @Override
