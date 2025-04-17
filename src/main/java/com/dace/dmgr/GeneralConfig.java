@@ -125,16 +125,16 @@ public final class GeneralConfig implements Initializable<Void> {
         private final String resourcePackUrl = section.getEntry("resource_pack_url", "").get();
         /** 리소스팩 적용 시간 제한 */
         @NonNull
-        private final Timespan resourcePackTimeout = Timespan.ofSeconds(section.getEntry("resource_pack_timeout_seconds", 8.0).get());
+        private final Timespan resourcePackTimeout = section.getEntry("resource_pack_timeout", Timespan.ofSeconds(8)).get();
         /** 채팅 쿨타임 */
         @NonNull
-        private final Timespan chatCooldown = Timespan.ofSeconds(section.getEntry("chat_cooldown_seconds", 0.0).get());
+        private final Timespan chatCooldown = section.getEntry("chat_cooldown", Timespan.ofSeconds(0)).get();
         /** 명령어 쿨타임 */
         @NonNull
-        private final Timespan commandCooldown = Timespan.ofSeconds(section.getEntry("command_cooldown_seconds", 0.0).get());
+        private final Timespan commandCooldown = section.getEntry("command_cooldown", Timespan.ofSeconds(0)).get();
         /** 랭킹 업데이트 주기 */
         @NonNull
-        private final Timespan rankingUpdatePeriod = Timespan.ofMinutes(section.getEntry("ranking_update_period_minutes", 5.0).get());
+        private final Timespan rankingUpdatePeriod = section.getEntry("ranking_update_period", Timespan.ofMinutes(5)).get();
         /** 네더라이트({@link Tier#NETHERITE}) 티어가 되기 위한 최소 순위 */
         private final int netheriteTierMinRank = section.getEntry("netherite_tier_min_rank", 5).get();
         /** 메시지의 접두사 */
@@ -178,14 +178,14 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 월드 */
         @NonNull
         private final World world = Bukkit.getWorld(section.getEntry("world", "FreeCombat").get());
+        /** 대기실 위치 */
+        private final GlobalLocation waitLocation = section.getEntry("wait_location", GlobalLocation.ZERO).get();
         /** 대기실 지역 이름 */
         @NonNull
         private final String waitRegionName = section.getEntry("wait_region_name", "BattlePVP").get();
         /** 이동 지역 이름 */
         @NonNull
         private final String warpRegionName = section.getEntry("warp_region_name", "BattlePVPWarp").get();
-        /** 대기실 위치 */
-        private final GlobalLocation waitLocation = section.getEntry("wait_location", GlobalLocation.ZERO).get();
         /** 스폰 위치 목록 */
         private final List<GlobalLocation> spawnLocations = section.<GlobalLocation>getListEntry("spawn_locations").get();
 
@@ -218,13 +218,13 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 월드 */
         @NonNull
         private final World world = Bukkit.getWorld(section.getEntry("world", "Training").get());
+        /** 스폰 위치 */
+        private final GlobalLocation spawnLocation = section.getEntry("spawn_location", GlobalLocation.ZERO).get();
         /** 전투원 선택 지역 확인 Y 좌표 */
         private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
         /** 전투원 선택 지역 식별 블록 타입 */
         @NonNull
         private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());
-        /** 스폰 위치 맵 */
-        private final GlobalLocation spawnLocation = section.getEntry("spawn_location", GlobalLocation.ZERO).get();
 
         /** 기본 더미의 위치 설정 */
         @NonNull
@@ -255,7 +255,7 @@ public final class GeneralConfig implements Initializable<Void> {
 
             /** 리스폰 시간 */
             @NonNull
-            private final Timespan respawnTime = Timespan.ofSeconds(section.getEntry("respawn_time_seconds", 3.0).get());
+            private final Timespan respawnTime = section.getEntry("respawn_time", Timespan.ofSeconds(3)).get();
             /** 고정형 더미의 위치 목록 */
             private final List<GlobalLocation> fixedLocations = section.<GlobalLocation>getListEntry("fixed_locations").get();
             /** 고정형 중량 더미의 위치 목록 */
@@ -354,7 +354,7 @@ public final class GeneralConfig implements Initializable<Void> {
             private final Material block = Material.valueOf(section.getEntry("block", Material.STRUCTURE_BLOCK.toString()).get());
             /** 쿨타임 */
             @NonNull
-            private final Timespan cooldown = Timespan.ofSeconds(section.getEntry("cooldown_seconds", 3.0).get());
+            private final Timespan cooldown = section.getEntry("cooldown", Timespan.ofSeconds(3)).get();
 
             /** 기절 위치 */
             private final GlobalLocation stunLocation = section.getEntry("stun_location", GlobalLocation.ZERO).get();
@@ -444,13 +444,13 @@ public final class GeneralConfig implements Initializable<Void> {
         private final double defaultSpeed = section.getEntry("default_speed", 0.12).get();
         /** 리스폰 시간 */
         @NonNull
-        private final Timespan respawnTime = Timespan.ofSeconds(section.getEntry("respawn_time_seconds", 10.0).get());
+        private final Timespan respawnTime = section.getEntry("respawn_time", Timespan.ofSeconds(10)).get();
         /** 힐 팩에 사용되는 블록의 타입 */
         @NonNull
         private final Material healPackBlock = Material.valueOf(section.getEntry("heal_pack_block", Material.NETHERRACK.toString()).get());
         /** 힐 팩 쿨타임 */
         @NonNull
-        private final Timespan healPackCooldown = Timespan.ofSeconds(section.getEntry("heal_pack_cooldown_seconds", 15.0).get());
+        private final Timespan healPackCooldown = section.getEntry("heal_pack_cooldown", Timespan.ofSeconds(15)).get();
         /** 힐 팩 회복량 */
         private final int healPackHeal = section.getEntry("heal_pack_heal", 350).get();
         /** 궁극기 팩에 사용되는 블록의 타입 */
@@ -458,7 +458,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private final Material ultPackBlock = Material.valueOf(section.getEntry("ult_pack_block", Material.QUARTZ_ORE.toString()).get());
         /** 궁극기 팩 쿨타임 */
         @NonNull
-        private final Timespan ultPackCooldown = Timespan.ofSeconds(section.getEntry("ult_pack_cooldown_seconds", 120.0).get());
+        private final Timespan ultPackCooldown = section.getEntry("ult_pack_cooldown", Timespan.ofSeconds(120)).get();
         /** 궁극기 팩 충전량 */
         private final int ultPackCharge = section.getEntry("ult_pack_charge", 1000).get();
         /** 점프대에 사용되는 블록의 타입 */
@@ -494,10 +494,10 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int rankPlacementPlayCount = section.getEntry("rank_placement_play_count", 5).get();
         /** 게임 시작까지 필요한 대기 시간 */
         @NonNull
-        private final Timespan waitingTime = Timespan.ofSeconds(section.getEntry("waiting_time_seconds", 30.0).get());
+        private final Timespan waitingTime = section.getEntry("waiting_time", Timespan.ofSeconds(30)).get();
         /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 */
         @NonNull
-        private final Timespan headRevealTimeAfterStart = Timespan.ofSeconds(section.getEntry("head_reveal_time_after_start_seconds", 20.0).get());
+        private final Timespan headRevealTimeAfterStart = section.getEntry("head_reveal_time_after_start", Timespan.ofSeconds(20)).get();
         /** 스폰 지역 확인 Y 좌표 */
         private final int spawnRegionCheckYCoordinate = section.getEntry("spawn_region_check_y_coordinate", 41).get();
         /** 팀 스폰 입장 시 초당 회복량 */
@@ -512,7 +512,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private final Material blueTeamSpawnBlock = Material.valueOf(section.getEntry("blue_team_spawn_block", Material.LAPIS_ORE.toString()).get());
         /** 궁극기 팩 활성화 대기 시간 */
         @NonNull
-        private final Timespan ultPackActivationTime = Timespan.ofSeconds(section.getEntry("ult_pack_activation_time_seconds", 60.0).get());
+        private final Timespan ultPackActivationTime = section.getEntry("ult_pack_activation_time", Timespan.ofSeconds(60)).get();
         /** 예상하는 플레이어의 평균 랭크 점수 */
         private final int expectedAverageRankRate = section.getEntry("expected_average_rank_rate", 400).get();
         /** 예상하는 K/DA 평균 */

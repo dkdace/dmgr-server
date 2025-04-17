@@ -130,6 +130,7 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         ConfigurationSerialization.registerClass(GlobalLocation.class);
+        ConfigurationSerialization.registerClass(Timespan.class);
 
         GeneralConfig.getInstance().init()
                 .onFinish(this::loadUserDatas)
