@@ -187,7 +187,8 @@ public final class GeneralConfig implements Initializable<Void> {
         @NonNull
         private final String warpRegionName = section.getEntry("warp_region_name", "BattlePVPWarp").get();
         /** 스폰 위치 목록 */
-        private final List<GlobalLocation> spawnLocations = section.<GlobalLocation>getListEntry("spawn_locations").get();
+        private final List<GlobalLocation> spawnLocations = section.getListEntry("spawn_locations",
+                new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
 
         /**
          * @return 대기실 위치
@@ -224,7 +225,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
         /** 전투원 선택 지역 식별 블록 타입 */
         @NonNull
-        private final Material selectCharZoneBlock = Material.valueOf(section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME.toString()).get());
+        private final Material selectCharZoneBlock = section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME).get();
 
         /** 기본 더미의 위치 설정 */
         @NonNull
@@ -257,15 +258,20 @@ public final class GeneralConfig implements Initializable<Void> {
             @NonNull
             private final Timespan respawnTime = section.getEntry("respawn_time", Timespan.ofSeconds(3)).get();
             /** 고정형 더미의 위치 목록 */
-            private final List<GlobalLocation> fixedLocations = section.<GlobalLocation>getListEntry("fixed_locations").get();
+            private final List<GlobalLocation> fixedLocations = section.getListEntry("fixed_locations",
+                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
             /** 고정형 중량 더미의 위치 목록 */
-            private final List<GlobalLocation> fixedHeavyLocations = section.<GlobalLocation>getListEntry("fixed_heavy_locations").get();
+            private final List<GlobalLocation> fixedHeavyLocations = section.getListEntry("fixed_heavy_locations",
+                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
             /** 이동형 더미의 위치 목록 */
-            private final List<List<GlobalLocation>> movingLocations = section.<List<GlobalLocation>>getListEntry("moving_locations").get();
+            private final List<List<GlobalLocation>> movingLocations = section.getListEntry("moving_locations",
+                    new YamlFile.ListSerializer<>(new YamlFile.ListSerializer<>(GlobalLocation.class))).get();
             /** 공격형 적 더미의 위치 목록 */
-            private final List<GlobalLocation> shootingEnemyLocations = section.<GlobalLocation>getListEntry("shooting_enemy_locations").get();
+            private final List<GlobalLocation> shootingEnemyLocations = section.getListEntry("shooting_enemy_locations",
+                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
             /** 공격형 아군 더미의 위치 목록 */
-            private final List<GlobalLocation> shootingTeamLocations = section.<GlobalLocation>getListEntry("shooting_team_locations").get();
+            private final List<GlobalLocation> shootingTeamLocations = section.getListEntry("shooting_team_locations",
+                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
 
             /**
              * @return 고정형 더미의 위치 목록
@@ -322,12 +328,12 @@ public final class GeneralConfig implements Initializable<Void> {
             private final int regionCheckYCoordinate = section.getEntry("region_check_y_coordinate", 208).get();
             /** 지역 식별 블록 타입 */
             @NonNull
-            private final Material zoneBlock = Material.valueOf(section.getEntry("zone_block", Material.GOLD_ORE.toString()).get());
+            private final Material zoneBlock = section.getEntry("zone_block", Material.GOLD_ORE).get();
             /** 설정 지역 확인 Y 좌표 */
             private final int optionRegionCheckYCoordinate = section.getEntry("option_region_check_y_coordinate", 209).get();
             /** 설정 지역 식별 블록 타입 */
             @NonNull
-            private final Material optionZoneBlock = Material.valueOf(section.getEntry("option_zone_block", Material.ENCHANTMENT_TABLE.toString()).get());
+            private final Material optionZoneBlock = section.getEntry("option_zone_block", Material.ENCHANTMENT_TABLE).get();
             /** 더미 생성 위치 */
             private final GlobalLocation dummyLocation = section.getEntry("dummy_location", GlobalLocation.ZERO).get();
 
@@ -351,7 +357,7 @@ public final class GeneralConfig implements Initializable<Void> {
 
             /** 블록의 타입 */
             @NonNull
-            private final Material block = Material.valueOf(section.getEntry("block", Material.STRUCTURE_BLOCK.toString()).get());
+            private final Material block = section.getEntry("block", Material.STRUCTURE_BLOCK).get();
             /** 쿨타임 */
             @NonNull
             private final Timespan cooldown = section.getEntry("cooldown", Timespan.ofSeconds(3)).get();
@@ -447,7 +453,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private final Timespan respawnTime = section.getEntry("respawn_time", Timespan.ofSeconds(10)).get();
         /** 힐 팩에 사용되는 블록의 타입 */
         @NonNull
-        private final Material healPackBlock = Material.valueOf(section.getEntry("heal_pack_block", Material.NETHERRACK.toString()).get());
+        private final Material healPackBlock = section.getEntry("heal_pack_block", Material.NETHERRACK).get();
         /** 힐 팩 쿨타임 */
         @NonNull
         private final Timespan healPackCooldown = section.getEntry("heal_pack_cooldown", Timespan.ofSeconds(15)).get();
@@ -455,7 +461,7 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int healPackHeal = section.getEntry("heal_pack_heal", 350).get();
         /** 궁극기 팩에 사용되는 블록의 타입 */
         @NonNull
-        private final Material ultPackBlock = Material.valueOf(section.getEntry("ult_pack_block", Material.QUARTZ_ORE.toString()).get());
+        private final Material ultPackBlock = section.getEntry("ult_pack_block", Material.QUARTZ_ORE).get();
         /** 궁극기 팩 쿨타임 */
         @NonNull
         private final Timespan ultPackCooldown = section.getEntry("ult_pack_cooldown", Timespan.ofSeconds(120)).get();
@@ -463,12 +469,12 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int ultPackCharge = section.getEntry("ult_pack_charge", 1000).get();
         /** 점프대에 사용되는 블록의 타입 */
         @NonNull
-        private final Material jumpPadBlock = Material.valueOf(section.getEntry("jump_pad_block", Material.SPONGE.toString()).get());
+        private final Material jumpPadBlock = section.getEntry("jump_pad_block", Material.SPONGE).get();
         /** 점프대 사용 시 속력 */
         private final double jumpPadVelocity = section.getEntry("jump_pad_velocity", 1.4).get();
         /** 낙사 구역에 사용되는 블록의 타입 */
         @NonNull
-        private final Material fallZoneBlock = Material.valueOf(section.getEntry("fall_zone_block", Material.BEDROCK.toString()).get());
+        private final Material fallZoneBlock = section.getEntry("fall_zone_block", Material.BEDROCK).get();
     }
 
     /**
@@ -506,10 +512,10 @@ public final class GeneralConfig implements Initializable<Void> {
         private final int oppositeSpawnDamagePerSecond = section.getEntry("opposite_spawn_damage_per_second", 250).get();
         /** 레드 팀 스폰 식별 블록 타입 */
         @NonNull
-        private final Material redTeamSpawnBlock = Material.valueOf(section.getEntry("red_team_spawn_block", Material.REDSTONE_ORE.toString()).get());
+        private final Material redTeamSpawnBlock = section.getEntry("red_team_spawn_block", Material.REDSTONE_ORE).get();
         /** 블루 팀 스폰 식별 블록 타입 */
         @NonNull
-        private final Material blueTeamSpawnBlock = Material.valueOf(section.getEntry("blue_team_spawn_block", Material.LAPIS_ORE.toString()).get());
+        private final Material blueTeamSpawnBlock = section.getEntry("blue_team_spawn_block", Material.LAPIS_ORE).get();
         /** 궁극기 팩 활성화 대기 시간 */
         @NonNull
         private final Timespan ultPackActivationTime = section.getEntry("ult_pack_activation_time", Timespan.ofSeconds(60)).get();

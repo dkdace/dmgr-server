@@ -1,13 +1,8 @@
 package com.dace.dmgr;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.NumberConversions;
 
 import java.util.HashMap;
@@ -17,21 +12,10 @@ import java.util.Map;
  * 밀리초 단위의 기간을 나타내는 클래스.
  *
  * <p>음수 값을 가질 수 없으며, 틱 단위와의 호환을 위해 사용한다.</p>
- *
- * <p>직렬화 형식:</p>
- *
- * <table>
- * <tr><th>키</th><th>값</th><th>예시</th></tr>
- * <tr><td>hours</td><td>{@link Timespan#ofHours(double)}</td><td>1.0</td>
- * <tr><td>minutes</td><td>{@link Timespan#ofMinutes(double)}</td><td>1.0</td>
- * <tr><td>seconds</td><td>{@link Timespan#ofSeconds(double)}</td><td>1.0</td>
- * <tr><td>ticks</td><td>{@link Timespan#ofTicks(long)}</td><td>10</td>
- * </table>
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
-@SerializableAs("Timespan")
-public final class Timespan implements Comparable<Timespan>, ConfigurationSerializable {
+public final class Timespan implements Comparable<Timespan> {
     /** 0의 값을 가진 기간 */
     public static final Timespan ZERO = new Timespan(0);
     /** 사용 가능한 최댓값의 기간 */
@@ -50,15 +34,6 @@ public final class Timespan implements Comparable<Timespan>, ConfigurationSerial
 
     /** 시간 (ms) */
     private final long milliseconds;
-
-    @NonNull
-    @SuppressWarnings("unused")
-    public static Timespan deserialize(@NonNull Map<String, Object> map) {
-        return ofHours(NumberConversions.toDouble(map.get("hours")))
-                .plus(ofMinutes(NumberConversions.toDouble(map.get("minutes"))))
-                .plus(ofSeconds(NumberConversions.toDouble(map.get("seconds"))))
-                .plus(ofTicks(NumberConversions.toLong(map.get("ticks"))));
-    }
 
     /**
      * 기간을 반환한다.
@@ -150,15 +125,6 @@ public final class Timespan implements Comparable<Timespan>, ConfigurationSerial
     @NonNull
     public static Timespan between(@NonNull Timestamp start, @NonNull Timestamp end) {
         return start.until(end);
-    }
-
-    @Override
-    @NonNull
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("ticks", toTicks());
-
-        return map;
     }
 
     /**
@@ -286,5 +252,40 @@ public final class Timespan implements Comparable<Timespan>, ConfigurationSerial
     @Override
     public String toString() {
         return DurationFormatUtils.formatDurationISO(milliseconds);
+    }
+
+    /**
+     * <p>직렬화 형식:</p>
+     *
+     * <table>
+     * <tr><th>키</th><th>값</th><th>예시</th></tr>
+     * <tr><td>hours</td><td>{@link Timespan#ofHours(double)}</td><td>1.0</td></tr>
+     * <tr><td>minutes</td><td>{@link Timespan#ofMinutes(double)}</td><td>1.0</td></tr>
+     * <tr><td>seconds</td><td>{@link Timespan#ofSeconds(double)}</td><td>1.0</td></tr>
+     * <tr><td>ticks</td><td>{@link Timespan#ofTicks(long)}</td><td>10</td></tr>
+     * </table>
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Serializer implements YamlFile.Serializer<Timespan, Map<String, Number>> {
+        @Getter
+        private static final Serializer instance = new Serializer();
+
+        @Override
+        @NonNull
+        public Map<String, Number> serialize(@NonNull Timespan value) {
+            Map<String, Number> map = new HashMap<>();
+            map.put("ticks", value.toTicks());
+
+            return map;
+        }
+
+        @Override
+        @NonNull
+        public Timespan deserialize(@NonNull Map<String, Number> value) {
+            return ofHours(NumberConversions.toDouble(value.get("hours")))
+                    .plus(ofMinutes(NumberConversions.toDouble(value.get("minutes"))))
+                    .plus(ofSeconds(NumberConversions.toDouble(value.get("seconds"))))
+                    .plus(ofTicks(NumberConversions.toLong(value.get("ticks"))));
+        }
     }
 }

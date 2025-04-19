@@ -1,12 +1,8 @@
 package com.dace.dmgr;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.NumberConversions;
 
 import java.util.HashMap;
@@ -16,22 +12,10 @@ import java.util.Map;
  * 월드가 지정되지 않은 전역 위치를 나타내는 클래스.
  *
  * <p>월드 복제 시 동일한 위치를 나타내기 위해 사용한다.</p>
- *
- * <p>직렬화 형식:</p>
- *
- * <table>
- * <tr><th>키</th><th>값</th><th>예시</th></tr>
- * <tr><td>x</td><td>{@link GlobalLocation#x}</td><td>1.0</td>
- * <tr><td>y</td><td>{@link GlobalLocation#y}</td><td>1.0</td>
- * <tr><td>z</td><td>{@link GlobalLocation#z}</td><td>1.0</td>
- * <tr><td>yaw</td><td>{@link GlobalLocation#yaw}</td><td>90.0</td>
- * <tr><td>pitch</td><td>{@link GlobalLocation#pitch}</td><td>0.0</td>
- * </table>
  */
 @AllArgsConstructor
 @EqualsAndHashCode
-@SerializableAs("GlobalLocation")
-public final class GlobalLocation implements ConfigurationSerializable {
+public final class GlobalLocation {
     /** 모든 값이 0인 전역 위치 */
     public static final GlobalLocation ZERO = new GlobalLocation(0, 0, 0, 0, 0);
 
@@ -57,30 +41,6 @@ public final class GlobalLocation implements ConfigurationSerializable {
         this(x, y, z, 0, 0);
     }
 
-    @NonNull
-    @SuppressWarnings("unused")
-    public static GlobalLocation deserialize(@NonNull Map<String, Object> map) {
-        return new GlobalLocation(
-                NumberConversions.toDouble(map.get("x")),
-                NumberConversions.toDouble(map.get("y")),
-                NumberConversions.toDouble(map.get("z")),
-                NumberConversions.toFloat(map.get("yaw")),
-                NumberConversions.toFloat(map.get("pitch")));
-    }
-
-    @Override
-    @NonNull
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("x", x);
-        map.put("y", y);
-        map.put("z", z);
-        map.put("yaw", yaw);
-        map.put("pitch", pitch);
-
-        return map;
-    }
-
     /**
      * 현재 좌표를 바탕으로 지정한 월드의 위치를 반환한다.
      *
@@ -90,5 +50,47 @@ public final class GlobalLocation implements ConfigurationSerializable {
     @NonNull
     public Location toLocation(@NonNull World world) {
         return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    /**
+     * <p>직렬화 형식:</p>
+     *
+     * <table>
+     * <tr><th>키</th><th>값</th><th>예시</th></tr>
+     * <tr><td>x</td><td>{@link GlobalLocation#x}</td><td>1.0</td>
+     * <tr><td>y</td><td>{@link GlobalLocation#y}</td><td>1.0</td>
+     * <tr><td>z</td><td>{@link GlobalLocation#z}</td><td>1.0</td>
+     * <tr><td>yaw</td><td>{@link GlobalLocation#yaw}</td><td>90.0</td>
+     * <tr><td>pitch</td><td>{@link GlobalLocation#pitch}</td><td>0.0</td>
+     * </table>
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Serializer implements YamlFile.Serializer<GlobalLocation, Map<String, Number>> {
+        @Getter
+        private static final Serializer instance = new Serializer();
+
+        @Override
+        @NonNull
+        public Map<String, Number> serialize(@NonNull GlobalLocation value) {
+            Map<String, Number> map = new HashMap<>();
+            map.put("x", value.x);
+            map.put("y", value.y);
+            map.put("z", value.z);
+            map.put("yaw", value.yaw);
+            map.put("pitch", value.pitch);
+
+            return map;
+        }
+
+        @Override
+        @NonNull
+        public GlobalLocation deserialize(@NonNull Map<String, Number> value) {
+            return new GlobalLocation(
+                    NumberConversions.toDouble(value.get("x")),
+                    NumberConversions.toDouble(value.get("y")),
+                    NumberConversions.toDouble(value.get("z")),
+                    NumberConversions.toFloat(value.get("yaw")),
+                    NumberConversions.toFloat(value.get("pitch")));
+        }
     }
 }

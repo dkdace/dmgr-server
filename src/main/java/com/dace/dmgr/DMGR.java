@@ -19,7 +19,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
@@ -129,9 +128,6 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        ConfigurationSerialization.registerClass(GlobalLocation.class);
-        ConfigurationSerialization.registerClass(Timespan.class);
-
         GeneralConfig.getInstance().init()
                 .onFinish(this::loadUserDatas)
                 .onFinish(() -> {
