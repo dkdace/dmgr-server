@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FreeCombat {
-    /** 자유 전투 설 */
+    /** 자유 전투 설정 */
     private static final GeneralConfig.FreeCombatConfig CONFIG = GeneralConfig.getFreeCombatConfig();
     @Getter
     private static final FreeCombat instance = new FreeCombat();

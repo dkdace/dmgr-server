@@ -114,6 +114,9 @@ public final class GeneralConfig implements Initializable<Void> {
         return yamlFile.isInitialized();
     }
 
+    /**
+     * 일반 설정.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     public static final class Config {
