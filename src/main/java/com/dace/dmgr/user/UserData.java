@@ -114,7 +114,8 @@ public final class UserData implements Initializable<Void> {
         this.xpEntry = section.getEntry("xp", 0);
         this.levelEntry = section.getEntry("level", 1);
         this.moneyEntry = section.getEntry("money", 0);
-        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new YamlFile.ListSerializer<>(UserData.class));
+        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new YamlFile.TypeToken<List<UserData>>() {
+        });
         this.warningEntry = section.getEntry("warning", 0);
         this.rankRateEntry = section.getEntry("rankRate", 100);
         this.isRankedEntry = section.getEntry("isRanked", false);
@@ -659,7 +660,7 @@ public final class UserData implements Initializable<Void> {
     }
 
     /**
-     * 직렬화 형식: {@link UserData#playerUUID}.{@link UUID#toString()}
+     * {@link UserData}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Serializer implements YamlFile.Serializer<UserData, String> {
@@ -742,7 +743,8 @@ public final class UserData implements Initializable<Void> {
             this.killEntry = section.getEntry("kill", 0);
             this.deathEntry = section.getEntry("death", 0);
             this.playTimeEntry = section.getEntry("playTime", 0);
-            this.coresEntry = section.getListEntry("cores", new YamlFile.ListSerializer<>(Core.class));
+            this.coresEntry = section.getListEntry("cores", new YamlFile.TypeToken<List<Core>>() {
+            });
         }
 
         /**

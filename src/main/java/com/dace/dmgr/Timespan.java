@@ -284,15 +284,7 @@ public final class Timespan implements Comparable<Timespan> {
     }
 
     /**
-     * <p>직렬화 형식:</p>
-     *
-     * <table>
-     * <tr><th>키</th><th>값</th><th>예시</th></tr>
-     * <tr><td>hours</td><td>{@link Timespan#ofHours(double)}</td><td>1.0</td></tr>
-     * <tr><td>minutes</td><td>{@link Timespan#ofMinutes(double)}</td><td>1.0</td></tr>
-     * <tr><td>seconds</td><td>{@link Timespan#ofSeconds(double)}</td><td>1.0</td></tr>
-     * <tr><td>ticks</td><td>{@link Timespan#ofTicks(long)}</td><td>10</td></tr>
-     * </table>
+     * {@link Timespan}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Serializer implements YamlFile.Serializer<Timespan, Map<String, Number>> {

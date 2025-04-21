@@ -53,16 +53,7 @@ public final class GlobalLocation {
     }
 
     /**
-     * <p>직렬화 형식:</p>
-     *
-     * <table>
-     * <tr><th>키</th><th>값</th><th>예시</th></tr>
-     * <tr><td>x</td><td>{@link GlobalLocation#x}</td><td>1.0</td>
-     * <tr><td>y</td><td>{@link GlobalLocation#y}</td><td>1.0</td>
-     * <tr><td>z</td><td>{@link GlobalLocation#z}</td><td>1.0</td>
-     * <tr><td>yaw</td><td>{@link GlobalLocation#yaw}</td><td>90.0</td>
-     * <tr><td>pitch</td><td>{@link GlobalLocation#pitch}</td><td>0.0</td>
-     * </table>
+     * {@link GlobalLocation}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Serializer implements YamlFile.Serializer<GlobalLocation, Map<String, Number>> {

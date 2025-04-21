@@ -188,7 +188,8 @@ public final class GeneralConfig implements Initializable<Void> {
         private final String warpRegionName = section.getEntry("warp_region_name", "BattlePVPWarp").get();
         /** 스폰 위치 목록 */
         private final List<GlobalLocation> spawnLocations = section.getListEntry("spawn_locations",
-                new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
+                new YamlFile.TypeToken<List<GlobalLocation>>() {
+                }).get();
 
         /**
          * @return 대기실 위치
@@ -259,19 +260,24 @@ public final class GeneralConfig implements Initializable<Void> {
             private final Timespan respawnTime = section.getEntry("respawn_time", Timespan.ofSeconds(3)).get();
             /** 고정형 더미의 위치 목록 */
             private final List<GlobalLocation> fixedLocations = section.getListEntry("fixed_locations",
-                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
+                    new YamlFile.TypeToken<List<GlobalLocation>>() {
+                    }).get();
             /** 고정형 중량 더미의 위치 목록 */
             private final List<GlobalLocation> fixedHeavyLocations = section.getListEntry("fixed_heavy_locations",
-                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
+                    new YamlFile.TypeToken<List<GlobalLocation>>() {
+                    }).get();
             /** 이동형 더미의 위치 목록 */
             private final List<List<GlobalLocation>> movingLocations = section.getListEntry("moving_locations",
-                    new YamlFile.ListSerializer<>(new YamlFile.ListSerializer<>(GlobalLocation.class))).get();
+                    new YamlFile.TypeToken<List<List<GlobalLocation>>>() {
+                    }).get();
             /** 공격형 적 더미의 위치 목록 */
             private final List<GlobalLocation> shootingEnemyLocations = section.getListEntry("shooting_enemy_locations",
-                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
+                    new YamlFile.TypeToken<List<GlobalLocation>>() {
+                    }).get();
             /** 공격형 아군 더미의 위치 목록 */
             private final List<GlobalLocation> shootingTeamLocations = section.getListEntry("shooting_team_locations",
-                    new YamlFile.ListSerializer<>(GlobalLocation.class)).get();
+                    new YamlFile.TypeToken<List<GlobalLocation>>() {
+                    }).get();
 
             /**
              * @return 고정형 더미의 위치 목록
