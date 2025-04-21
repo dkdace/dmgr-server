@@ -514,12 +514,12 @@ public final class UserData implements Initializable<Void> {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
-        if (!isBlockedPlayer(userData)) {
-            List<UserData> list = blockedPlayersEntry.get();
-            list.add(userData);
+        List<UserData> list = blockedPlayersEntry.get();
+        if (list.contains(userData))
+            return;
 
-            blockedPlayersEntry.set(list);
-        }
+        list.add(userData);
+        blockedPlayersEntry.set(list);
     }
 
     /**

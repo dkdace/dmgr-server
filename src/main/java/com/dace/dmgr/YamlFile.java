@@ -464,7 +464,7 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 this.value = value;
-                getConfigurationSection().set(key, value == null || value == defaultValue ? null : serializer.serialize(value));
+                getConfigurationSection().set(key, value == null ? null : serializer.serialize(value));
             }
         }
     }
