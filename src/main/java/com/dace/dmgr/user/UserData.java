@@ -12,7 +12,9 @@ import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.Initializable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -28,7 +30,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 public final class UserData implements Initializable<Void> {
     /** 유저 데이터 목록 (UUID : 유저 데이터 정보) */
     private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
-
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
             "{0}§c관리자에 의해 서버에서 차단되었습니다.",
@@ -64,7 +64,6 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     @Getter
     private final String playerName;
-
     /** Yaml 파일 관리 인스턴스 */
     private final YamlFile yamlFile;
     /** 경험치 */
@@ -74,7 +73,7 @@ public final class UserData implements Initializable<Void> {
     /** 돈 */
     private final YamlFile.Section.Entry<Integer> moneyEntry;
     /** 차단한 플레이어의 UUID 목록 */
-    private final YamlFile.Section.ListEntry<String> blockedPlayersEntry;
+    private final YamlFile.Section.Entry<List<UserData>> blockedPlayersEntry;
     /** 경고 횟수 */
     private final YamlFile.Section.Entry<Integer> warningEntry;
     /** 랭크 점수 (RR) */
@@ -115,7 +114,8 @@ public final class UserData implements Initializable<Void> {
         this.xpEntry = section.getEntry("xp", 0);
         this.levelEntry = section.getEntry("level", 1);
         this.moneyEntry = section.getEntry("money", 0);
-        this.blockedPlayersEntry = section.getListEntry("blockedPlayers");
+        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new YamlFile.TypeToken<List<UserData>>() {
+        });
         this.warningEntry = section.getEntry("warning", 0);
         this.rankRateEntry = section.getEntry("rankRate", 100);
         this.isRankedEntry = section.getEntry("isRanked", false);
@@ -495,9 +495,7 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     @UnmodifiableView
     public Set<@NonNull UserData> getBlockedPlayers() {
-        return Collections.unmodifiableSet(blockedPlayersEntry.get().stream()
-                .map(uuid -> UserData.fromUUID(UUID.fromString(uuid)))
-                .collect(Collectors.toSet()));
+        return Collections.unmodifiableSet(new HashSet<>(blockedPlayersEntry.get()));
     }
 
     /**
@@ -507,7 +505,7 @@ public final class UserData implements Initializable<Void> {
      * @return 차단 여부
      */
     public boolean isBlockedPlayer(@NonNull UserData userData) {
-        return blockedPlayersEntry.get().contains(userData.getPlayerUUID().toString());
+        return blockedPlayersEntry.get().contains(userData);
     }
 
     /**
@@ -516,8 +514,12 @@ public final class UserData implements Initializable<Void> {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
-        if (!isBlockedPlayer(userData))
-            blockedPlayersEntry.add(userData.getPlayerUUID().toString());
+        List<UserData> list = blockedPlayersEntry.get();
+        if (list.contains(userData))
+            return;
+
+        list.add(userData);
+        blockedPlayersEntry.set(list);
     }
 
     /**
@@ -526,7 +528,10 @@ public final class UserData implements Initializable<Void> {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void removeBlockedPlayer(@NonNull UserData userData) {
-        blockedPlayersEntry.remove(userData.getPlayerUUID().toString());
+        List<UserData> list = blockedPlayersEntry.get();
+        list.remove(userData);
+
+        blockedPlayersEntry.set(list);
     }
 
     /**
@@ -655,17 +660,38 @@ public final class UserData implements Initializable<Void> {
     }
 
     /**
+     * {@link UserData}의 직렬화 처리기 클래스.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Serializer implements YamlFile.Serializer<UserData, String> {
+        @Getter
+        private static final Serializer instance = new Serializer();
+
+        @Override
+        @NonNull
+        public String serialize(@NonNull UserData value) {
+            return value.getPlayerUUID().toString();
+        }
+
+        @Override
+        @NonNull
+        public UserData deserialize(@NonNull String value) {
+            return UserData.fromUUID(UUID.fromString(value));
+        }
+    }
+
+    /**
      * 유저 개인 설정.
      */
     public final class Config {
         /** 채팅 효과음 */
-        private final YamlFile.Section.Entry<String> chatSoundEntry;
+        private final YamlFile.Section.Entry<ChatSoundOption.ChatSound> chatSoundEntry;
         /** 야간 투시 여부 */
         private final YamlFile.Section.Entry<Boolean> nightVisionEntry;
 
         private Config() {
             YamlFile.Section section = yamlFile.getDefaultSection();
-            this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING.toString());
+            this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING);
             this.nightVisionEntry = section.getEntry("nightVision", false);
         }
 
@@ -674,14 +700,14 @@ public final class UserData implements Initializable<Void> {
          */
         @NonNull
         public ChatSoundOption.ChatSound getChatSound() {
-            return ChatSoundOption.ChatSound.valueOf(chatSoundEntry.get());
+            return chatSoundEntry.get();
         }
 
         /**
          * @param chatSound 채팅 효과음
          */
         public void setChatSound(@NonNull ChatSoundOption.ChatSound chatSound) {
-            chatSoundEntry.set(chatSound.toString());
+            chatSoundEntry.set(chatSound);
         }
 
         /**
@@ -710,14 +736,15 @@ public final class UserData implements Initializable<Void> {
         /** 플레이 시간 (초) */
         private final YamlFile.Section.Entry<Integer> playTimeEntry;
         /** 적용된 코어의 이름 목록 */
-        private final YamlFile.Section.ListEntry<String> coresEntry;
+        private final YamlFile.Section.Entry<List<Core>> coresEntry;
 
         private CombatantRecord(@NonNull CombatantType combatantType) {
             YamlFile.Section section = yamlFile.getDefaultSection().getSection("record").getSection(combatantType.toString());
             this.killEntry = section.getEntry("kill", 0);
             this.deathEntry = section.getEntry("death", 0);
             this.playTimeEntry = section.getEntry("playTime", 0);
-            this.coresEntry = section.getListEntry("cores");
+            this.coresEntry = section.getListEntry("cores", new YamlFile.TypeToken<List<Core>>() {
+            });
         }
 
         /**
@@ -771,9 +798,10 @@ public final class UserData implements Initializable<Void> {
         @NonNull
         @UnmodifiableView
         public Set<@NonNull Core> getCores() {
-            return Collections.unmodifiableSet(coresEntry.get().stream()
-                    .map(Core::valueOf)
-                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class))));
+            EnumSet<Core> cores = EnumSet.noneOf(Core.class);
+            cores.addAll(coresEntry.get());
+
+            return cores;
         }
 
         /**
@@ -782,8 +810,12 @@ public final class UserData implements Initializable<Void> {
          * @param core 추가할 코어
          */
         public void addCore(@NonNull Core core) {
-            if (!coresEntry.get().contains(core.toString()))
-                coresEntry.add(core.toString());
+            List<Core> cores = coresEntry.get();
+            if (cores.contains(core))
+                return;
+
+            cores.add(core);
+            coresEntry.set(cores);
         }
 
         /**
@@ -792,7 +824,10 @@ public final class UserData implements Initializable<Void> {
          * @param core 제거할 코어
          */
         public void removeCore(@NonNull Core core) {
-            coresEntry.remove(core.toString());
+            List<Core> cores = coresEntry.get();
+            cores.remove(core);
+
+            coresEntry.set(cores);
         }
     }
 }

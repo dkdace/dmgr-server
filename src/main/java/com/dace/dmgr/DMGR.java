@@ -52,9 +52,6 @@ public class DMGR extends JavaPlugin {
     /** Citizens NPC 저장소 인스턴스 */
     @Nullable
     private static NPCRegistry npcRegistry;
-    /** 기본 월드 인스턴스 */
-    @Nullable
-    private World defaultWorld;
 
     /**
      * 플러그인 인스턴스를 반환한다.
@@ -64,17 +61,6 @@ public class DMGR extends JavaPlugin {
     @NonNull
     public static DMGR getPlugin() {
         return JavaPlugin.getPlugin(DMGR.class);
-    }
-
-    /**
-     * @return 기본 월드 인스턴스
-     */
-    @NonNull
-    public static World getDefaultWorld() {
-        if (getPlugin().defaultWorld == null)
-            throw new IllegalStateException("아직 기본 월드에 접근할 수 없음");
-
-        return getPlugin().defaultWorld;
     }
 
     /**
@@ -142,8 +128,6 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        defaultWorld = Bukkit.getWorld("DMGR");
-
         GeneralConfig.getInstance().init()
                 .onFinish(this::loadUserDatas)
                 .onFinish(() -> {

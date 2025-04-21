@@ -1,10 +1,12 @@
 package com.dace.dmgr;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.NumberConversions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 월드가 지정되지 않은 전역 위치를 나타내는 클래스.
@@ -14,6 +16,9 @@ import org.bukkit.World;
 @AllArgsConstructor
 @EqualsAndHashCode
 public final class GlobalLocation {
+    /** 모든 값이 0인 전역 위치 */
+    public static final GlobalLocation ZERO = new GlobalLocation(0, 0, 0, 0, 0);
+
     /** X 좌표 */
     private final double x;
     /** Y 좌표 */
@@ -48,12 +53,35 @@ public final class GlobalLocation {
     }
 
     /**
-     * 지정한 위치와 X, Y, Z 좌표가 같은지 확인한다.
-     *
-     * @param location 확인할 위치
-     * @return 좌표가 같으면 {@code true} 반환
+     * {@link GlobalLocation}의 직렬화 처리기 클래스.
      */
-    public boolean isSameLocation(@NonNull Location location) {
-        return x == location.getX() && y == location.getY() && z == location.getZ();
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Serializer implements YamlFile.Serializer<GlobalLocation, Map<String, Number>> {
+        @Getter
+        private static final Serializer instance = new Serializer();
+
+        @Override
+        @NonNull
+        public Map<String, Number> serialize(@NonNull GlobalLocation value) {
+            Map<String, Number> map = new HashMap<>();
+            map.put("x", value.x);
+            map.put("y", value.y);
+            map.put("z", value.z);
+            map.put("yaw", value.yaw);
+            map.put("pitch", value.pitch);
+
+            return map;
+        }
+
+        @Override
+        @NonNull
+        public GlobalLocation deserialize(@NonNull Map<String, Number> value) {
+            return new GlobalLocation(
+                    NumberConversions.toDouble(value.get("x")),
+                    NumberConversions.toDouble(value.get("y")),
+                    NumberConversions.toDouble(value.get("z")),
+                    NumberConversions.toFloat(value.get("yaw")),
+                    NumberConversions.toFloat(value.get("pitch")));
+        }
     }
 }
