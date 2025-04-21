@@ -12,6 +12,7 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,9 +44,10 @@ public abstract class FunctionalBlock {
      * 기능 블록 인스턴스를 생성하고 등록한다.
      *
      * @param material 블록 타입
+     * @throws IllegalStateException 해당 블록 타입의 FunctionalBlock이 이미 등록되었으면 발생
      */
     protected FunctionalBlock(@NonNull Material material) {
-        FUNCTIONAL_BLOCK_MAP.put(material, this);
+        Validate.validState(FUNCTIONAL_BLOCK_MAP.put(material, this) == null, "FunctionalBlock이 이미 등록됨");
     }
 
     /**
@@ -143,6 +145,7 @@ public abstract class FunctionalBlock {
          *
          * @param material 블록 타입
          * @param cooldown 쿨타임
+         * @throws IllegalStateException 해당 블록 타입의 CooldownBlock이 이미 등록되었으면 발생
          */
         protected CooldownBlock(@NonNull Material material, @NonNull Timespan cooldown) {
             super(material);
