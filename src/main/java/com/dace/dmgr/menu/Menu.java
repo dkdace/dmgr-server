@@ -1,7 +1,9 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.menu;
 
 import com.dace.dmgr.command.MenuCommand;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;

@@ -4,14 +4,15 @@ import com.dace.dmgr.*;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.game.RankManager;
-import com.dace.dmgr.game.Tier;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.ChatSoundOption;
+import com.dace.dmgr.menu.ChatSoundOption;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.Initializable;
+import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.TypeToken;
+import com.dace.dmgr.yaml.YamlFile;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -114,7 +115,7 @@ public final class UserData implements Initializable<Void> {
         this.xpEntry = section.getEntry("xp", 0);
         this.levelEntry = section.getEntry("level", 1);
         this.moneyEntry = section.getEntry("money", 0);
-        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new YamlFile.TypeToken<List<UserData>>() {
+        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new TypeToken<List<UserData>>() {
         });
         this.warningEntry = section.getEntry("warning", 0);
         this.rankRateEntry = section.getEntry("rankRate", 100);
@@ -663,9 +664,9 @@ public final class UserData implements Initializable<Void> {
      * {@link UserData}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Serializer implements YamlFile.Serializer<UserData, String> {
+    public static final class UserDataSerializer implements Serializer<UserData, String> {
         @Getter
-        private static final Serializer instance = new Serializer();
+        private static final UserDataSerializer instance = new UserDataSerializer();
 
         @Override
         @NonNull
@@ -743,7 +744,7 @@ public final class UserData implements Initializable<Void> {
             this.killEntry = section.getEntry("kill", 0);
             this.deathEntry = section.getEntry("death", 0);
             this.playTimeEntry = section.getEntry("playTime", 0);
-            this.coresEntry = section.getListEntry("cores", new YamlFile.TypeToken<List<Core>>() {
+            this.coresEntry = section.getListEntry("cores", new TypeToken<List<Core>>() {
             });
         }
 

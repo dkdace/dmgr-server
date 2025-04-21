@@ -1,9 +1,9 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.combat.combatant;
 
-import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.IntervalTask;

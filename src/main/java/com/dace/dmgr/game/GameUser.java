@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.user.TabListManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -221,7 +222,7 @@ public final class GameUser {
      * 게임 탭리스트를 업데이트한다.
      */
     private void updateGameTabList() {
-        User.TabListManager tabListManager = user.getTabListManager();
+        TabListManager tabListManager = user.getTabListManager();
 
         tabListManager.setHeader(MessageFormat.format("\n{0} §f{1}\n",
                 (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ]" : "§a§l[ 일반 ]"),

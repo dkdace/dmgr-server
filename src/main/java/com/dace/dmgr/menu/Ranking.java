@@ -1,7 +1,9 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.menu;
 
 import com.dace.dmgr.command.RankingCommand;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -19,7 +21,7 @@ public final class Ranking extends ChestGUI {
      *
      * @param player GUI 표시 대상 플레이어
      */
-    public Ranking(@NonNull Player player) {
+    Ranking(@NonNull Player player) {
         super(1, "§8랭킹", player);
 
         set(0, 0, RankingItem.RANK_RATE.definedItem);

@@ -32,7 +32,7 @@ import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.Menu;
+import com.dace.dmgr.menu.Menu;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;

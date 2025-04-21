@@ -1,7 +1,5 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.item;
 
-import com.dace.dmgr.item.DefinedItem;
-import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;

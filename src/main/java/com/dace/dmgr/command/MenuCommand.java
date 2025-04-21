@@ -1,6 +1,6 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.item.gui.Menu;
+import com.dace.dmgr.menu.Menu;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.entity.Player;

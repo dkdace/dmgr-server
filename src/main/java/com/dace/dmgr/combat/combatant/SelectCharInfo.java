@@ -1,10 +1,10 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.action.info.ActionInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
-import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ public final class SelectCharInfo extends ChestGUI {
      * @param player        GUI 표시 대상 플레이어
      * @param combatantType 전투원 종류
      */
-    public SelectCharInfo(@NonNull Player player, @NonNull CombatantType combatantType) {
+    SelectCharInfo(@NonNull Player player, @NonNull CombatantType combatantType) {
         super(6, "§c§l전투원 정보", player);
 
         Combatant combatant = combatantType.getCombatant();

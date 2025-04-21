@@ -1,8 +1,6 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.item;
 
 import com.dace.dmgr.event.listener.OnInventoryClose;
-import com.dace.dmgr.item.DefinedItem;
-import com.dace.dmgr.item.ItemBuilder;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;

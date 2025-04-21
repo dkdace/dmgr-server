@@ -5,8 +5,8 @@ import com.comphenix.packetwrapper.WrapperPlayServerScoreboardTeam;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.FreeCombat;
-import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.trainingcenter.TrainingCenter;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.listener.OnAsyncPlayerChat;
@@ -15,21 +15,17 @@ import com.dace.dmgr.event.listener.OnPlayerQuit;
 import com.dace.dmgr.event.listener.OnPlayerResourcePackStatus;
 import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.SelectGame;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUI;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.GUI;
-import com.dace.dmgr.item.gui.SelectGame;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskManager;
-import com.keenant.tabbed.item.TextTabItem;
-import com.keenant.tabbed.tablist.TabList;
-import com.keenant.tabbed.tablist.TableTabList;
 import com.keenant.tabbed.util.Skins;
-import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -146,6 +142,7 @@ public final class User {
     @Nullable
     private TextHologram nameTagHologram;
     /** 현재 핑 (ms) */
+    @Getter
     @Setter
     private int ping = 0;
     /** 리소스팩 적용 수락 여부 */
@@ -177,8 +174,8 @@ public final class User {
         this.player = player;
         this.nameTagHider = EntityUtil.createTemporaryArmorStand(player.getLocation());
         this.userData = UserData.fromPlayer(player);
-        this.tabListManager = new TabListManager(player);
-        this.sidebarManager = new SidebarManager(player);
+        this.tabListManager = new TabListManager(this);
+        this.sidebarManager = new SidebarManager(this);
         this.gui = new GUI(player.getInventory());
 
         USER_MAP.put(player, this);
@@ -470,7 +467,7 @@ public final class User {
         if (gameRoom != null)
             prefix = gameRoom.getName();
         else if (currentPlace != Place.LOBBY)
-            prefix = MessageFormat.format("§7[{0}]", currentPlace.name);
+            prefix = MessageFormat.format("§7[{0}]", currentPlace);
 
         return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
     }
@@ -993,6 +990,11 @@ public final class User {
         public Location getStartLocation() {
             return startLocation.clone();
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     /**
@@ -1153,187 +1155,6 @@ public final class User {
             packet.setPlayers(Collections.singletonList(target instanceof Player ? target.getName() : target.getUniqueId().toString()));
 
             packet.sendPacket(player);
-        }
-    }
-
-    /**
-     * 플레이어의 탭리스트 상태를 관리하는 클래스.
-     */
-    public static final class TabListManager {
-        /** 탭리스트의 공백 항목 */
-        private static final TextTabItem BLANK_TAB_ITEM = new TextTabItem("", -1);
-        /** 탭리스트 인스턴스 */
-        private final TableTabList tabList;
-
-        private TabListManager(Player player) {
-            TabList tableTabList = DMGR.getTabbed().getTabList(player);
-            this.tabList = tableTabList == null ? DMGR.getTabbed().newTableTabList(player) : (TableTabList) tableTabList;
-
-            this.tabList.setBatchEnabled(true);
-            clearItems();
-        }
-
-        private static void validateColumnRow(int column, int row) {
-            Validate.inclusiveBetween(0, 3, column, "3 >= column >= 0 (%d)", column);
-            Validate.inclusiveBetween(0, 19, row, "19 >= row >= 0 (%d)", row);
-        }
-
-        /**
-         * 탭리스트 헤더(상단부)의 내용을 지정한다.
-         *
-         * @param content 내용
-         */
-        public void setHeader(@NonNull String content) {
-            tabList.setHeader(content);
-        }
-
-        /**
-         * 탭리스트 푸터(하단부)의 내용을 지정한다.
-         *
-         * @param content 내용
-         */
-        public void setFooter(@NonNull String content) {
-            tabList.setFooter(content);
-        }
-
-        /**
-         * 지정한 번호의 항목을 설정한다.
-         *
-         * @param column     열 번호. 0~3 사이의 값
-         * @param row        행 번호. 0~19 사이의 값
-         * @param content    내용
-         * @param playerSkin 머리 스킨. {@code null}로 지정 시 머리 스킨 표시 안 함
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-         */
-        public void setItem(int column, int row, @NonNull String content, @Nullable PlayerSkin playerSkin) {
-            validateColumnRow(column, row);
-            tabList.set(column, row, new TextTabItem(content, -1, playerSkin == null ? Skins.DEFAULT_SKIN : playerSkin.getSkin()));
-        }
-
-        /**
-         * 지정한 번호의 항목을 설정한다.
-         *
-         * @param column  열 번호. 0~3 사이의 값
-         * @param row     행 번호. 0~19 사이의 값
-         * @param content 내용
-         * @param user    표시할 플레이어
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-         */
-        public void setItem(int column, int row, @NonNull String content, @NonNull User user) {
-            validateColumnRow(column, row);
-
-            int realPing;
-            if (user.ping < 50)
-                realPing = 0;
-            else if (user.ping < 70)
-                realPing = 150;
-            else if (user.ping < 100)
-                realPing = 300;
-            else if (user.ping < 130)
-                realPing = 600;
-            else
-                realPing = 1000;
-
-            tabList.set(column, row, new TextTabItem(content, realPing, Skins.getPlayer(user.getPlayer())));
-        }
-
-        /**
-         * 지정한 번호의 항목을 제거한다.
-         *
-         * @param column 열 번호. 0~3 사이의 값
-         * @param row    행 번호. 0~19 사이의 값
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-         */
-        public void removeItem(int column, int row) {
-            validateColumnRow(column, row);
-            tabList.set(column, row, BLANK_TAB_ITEM);
-        }
-
-        /**
-         * 탭리스트의 모든 항목을 제거한다.
-         */
-        public void clearItems() {
-            for (int i = 0; i < 80; i++)
-                tabList.set(i, BLANK_TAB_ITEM);
-        }
-
-        /**
-         * 탭리스트 변경 사항을 업데이트한다.
-         *
-         * <p>탭리스트 내용 변경 후 호출해야 한다.</p>
-         */
-        private void update() {
-            tabList.batchUpdate();
-        }
-
-        /**
-         * 탭리스트를 제거한다.
-         */
-        private void delete() {
-            tabList.disable();
-        }
-    }
-
-    /**
-     * 플레이어의 사이드바 상태를 관리하는 클래스.
-     */
-    public static final class SidebarManager {
-        /** 사이드바 인스턴스 */
-        private final BPlayerBoard sidebar;
-
-        private SidebarManager(Player player) {
-            this.sidebar = new BPlayerBoard(player, "");
-            clear();
-        }
-
-        /**
-         * 사이드바의 이름을 지정한다.
-         *
-         * @param name 사이드바 이름
-         */
-        public void setName(@NonNull String name) {
-            sidebar.setName(name);
-        }
-
-        /**
-         * 사이드바의 내용을 설정한다.
-         *
-         * @param line    줄 번호. 0~14 사이의 값
-         * @param content 내용
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-         */
-        public void set(int line, @NonNull String content) {
-            Validate.inclusiveBetween(0, 14, line, "14 >= line >= 0 (%d)", line);
-
-            ChatColor[] chatColors = ChatColor.values();
-            sidebar.set(chatColors[line] + content, 14 - line);
-        }
-
-        /**
-         * 사이드바의 전체 내용을 설정한다.
-         *
-         * @param contents 내용 목록
-         * @throws IllegalArgumentException {@code contents}의 길이가 15를 초과하면 발생
-         */
-        public void setAll(@NonNull String @NonNull ... contents) {
-            Validate.inclusiveBetween(0, 15, contents.length, "contents.length <= 15 (%d)", contents.length);
-
-            for (int i = 0; i < contents.length; i++)
-                set(i, contents[i]);
-        }
-
-        /**
-         * 사이드바의 내용을 초기화한다.
-         */
-        public void clear() {
-            sidebar.clear();
-        }
-
-        /**
-         * 사이드바를 제거한다.
-         */
-        private void delete() {
-            sidebar.delete();
         }
     }
 

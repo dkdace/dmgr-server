@@ -1,25 +1,22 @@
-package com.dace.dmgr;
+package com.dace.dmgr.yaml;
 
-import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.DMGR;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
-import lombok.*;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Yaml 파일을 관리하는 클래스.
@@ -42,23 +39,6 @@ import java.util.stream.Collectors;
  * </code></pre>
  */
 public final class YamlFile implements Initializable<Void> {
-    /** 클래스별 직렬화 처리기 목록 (클래스 : 직렬화 처리기) */
-    private static final HashMap<Class<?>, Serializer<?, ?>> SERIALIZER_MAP = new HashMap<>();
-
-    static {
-        SERIALIZER_MAP.put(Boolean.class, new DefaultSerializer<>());
-        SERIALIZER_MAP.put(Byte.class, new NumberSerializer<>(Number::byteValue));
-        SERIALIZER_MAP.put(Short.class, new NumberSerializer<>(Number::shortValue));
-        SERIALIZER_MAP.put(Integer.class, new NumberSerializer<>(Number::intValue));
-        SERIALIZER_MAP.put(Long.class, new NumberSerializer<>(Number::longValue));
-        SERIALIZER_MAP.put(Float.class, new NumberSerializer<>(Number::floatValue));
-        SERIALIZER_MAP.put(Double.class, new NumberSerializer<>(Number::doubleValue));
-        SERIALIZER_MAP.put(String.class, new DefaultSerializer<>());
-        SERIALIZER_MAP.put(Timespan.class, Timespan.Serializer.getInstance());
-        SERIALIZER_MAP.put(GlobalLocation.class, GlobalLocation.Serializer.getInstance());
-        SERIALIZER_MAP.put(UserData.class, UserData.Serializer.getInstance());
-    }
-
     /** Yaml 설정 인스턴스 */
     private final YamlConfiguration config;
     /** 파일 저장 인스턴스 */
@@ -81,66 +61,6 @@ public final class YamlFile implements Initializable<Void> {
         this.file = DMGR.getPlugin().getDataFolder().toPath().resolve(path).toFile();
         this.config = YamlConfiguration.loadConfiguration(file);
         this.defaultSection = new Section();
-    }
-
-    @NonNull
-    private static <T, R> Serializer<List<T>, List<R>> getListSerializer(@NonNull TypeToken<List<T>> typeToken) {
-        return new Serializer<List<T>, List<R>>() {
-            @SuppressWarnings("unchecked")
-            private Serializer<T, R> getNestedSerializer() {
-                TypeToken<T> nestedType = (TypeToken<T>) Validate.notNull(typeToken.getNestedTypeTokens())[0];
-                return getDefaultSerializer(nestedType.getRawType(), nestedType);
-            }
-
-            @Override
-            @NonNull
-            public List<R> serialize(@NonNull List<T> value) {
-                return value.stream().map(v -> getNestedSerializer().serialize(v)).collect(Collectors.toList());
-            }
-
-            @Override
-            @NonNull
-            public List<T> deserialize(@NonNull List<R> value) {
-                return value.stream().map(v -> getNestedSerializer().deserialize(v)).collect(Collectors.toList());
-            }
-        };
-    }
-
-    @NonNull
-    private static <E extends Enum<E>> Serializer<E, String> getEnumSerializer(@NonNull TypeToken<E> typeToken) {
-        return new Serializer<E, String>() {
-            @Override
-            @NonNull
-            public String serialize(@NonNull E value) {
-                return value.name();
-            }
-
-            @Override
-            @NonNull
-            public E deserialize(@NonNull String value) {
-                return Enum.valueOf(typeToken.getRawType(), value);
-            }
-        };
-    }
-
-    /**
-     * 지정한 타입에 대한 기본 직렬화 처리기를 반환한다.
-     *
-     * @param rawType   원시 타입 (클래스)
-     * @param typeToken 타입
-     * @param <T>       역직렬화된 데이터 타입
-     * @param <R>       Yaml 파일에 저장할 직렬화된 데이터 타입
-     * @return 직렬화 처리기
-     * @throws NullPointerException 해당하는 Serializer가 존재하지 않으면 발생
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static <T, R> Serializer<T, R> getDefaultSerializer(@NonNull Class<T> rawType, @NonNull TypeToken<T> typeToken) {
-        if (List.class.isAssignableFrom(rawType))
-            return getListSerializer((TypeToken) typeToken);
-        else if (Enum.class.isAssignableFrom(rawType))
-            return getEnumSerializer((TypeToken) typeToken);
-
-        return (Serializer<T, R>) Validate.notNull(SERIALIZER_MAP.get(rawType), "%s에 대한 Serializer가 존재하지 않음", rawType.getName());
     }
 
     /**
@@ -204,108 +124,6 @@ public final class YamlFile implements Initializable<Void> {
     }
 
     /**
-     * 섹션 항목의 직렬화 및 역직렬화를 관리하는 인터페이스.
-     *
-     * @param <T> 역직렬화된 데이터 타입
-     * @param <R> Yaml 파일에 저장할 직렬화된 데이터 타입
-     */
-    public interface Serializer<T, R> {
-        /**
-         * 지정한 값을 직렬화한다.
-         *
-         * @param value 값
-         * @return 직렬화된 값
-         */
-        @NonNull
-        R serialize(@NonNull T value);
-
-        /**
-         * 지정한 값을 역직렬화한다.
-         *
-         * @param value 값
-         * @return 역직렬화된 값
-         */
-        @NonNull
-        T deserialize(@NonNull R value);
-    }
-
-    @NoArgsConstructor
-    @Getter
-    private static final class DefaultSerializer<T> implements Serializer<T, T> {
-        @Override
-        @NonNull
-        public T serialize(@NonNull T value) {
-            return value;
-        }
-
-        @Override
-        @NonNull
-        public T deserialize(@NonNull T value) {
-            return value;
-        }
-    }
-
-    @AllArgsConstructor
-    private static final class NumberSerializer<T extends Number> implements Serializer<T, Number> {
-        private final Function<Number, T> onDeserialize;
-
-        @Override
-        @NonNull
-        public Number serialize(@NonNull T value) {
-            return value;
-        }
-
-        @Override
-        @NonNull
-        public T deserialize(@NonNull Number value) {
-            return onDeserialize.apply(value);
-        }
-    }
-
-    /**
-     * 섹션 항목의 타입 추론을 위한 타입 토큰 클래스.
-     *
-     * @param <T> 역직렬화된 데이터 타입
-     */
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public abstract static class TypeToken<T> {
-        private final Type type;
-
-        /**
-         * 타입 토큰 인스턴스를 생성한다.
-         */
-        protected TypeToken() {
-            Type genericType = getClass().getGenericSuperclass();
-            Validate.validState(genericType instanceof ParameterizedType, "제네릭 타입이 유효하지 않음");
-
-            this.type = ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        }
-
-        /**
-         * 원시 타입 (클래스)을 반환한다.
-         *
-         * @return 원시 타입
-         */
-        @SuppressWarnings("unchecked")
-        private Class<T> getRawType() {
-            return (Class<T>) TypeUtils.getRawType(type, null);
-        }
-
-        /**
-         * 중첩된 제네릭 타입의 타입 토큰 목록을 반환한다.
-         *
-         * @return 타입 토큰 목록. 존재하지 않으면 {@code null} 반환
-         */
-        private TypeToken<?> @Nullable [] getNestedTypeTokens() {
-            if (!(type instanceof ParameterizedType))
-                return null;
-
-            return Arrays.stream(((ParameterizedType) type).getActualTypeArguments()).map(t -> new TypeToken<T>(t) {
-            }).toArray(TypeToken[]::new);
-        }
-    }
-
-    /**
      * Yaml 파일의 섹션을 나타내는 클래스.
      */
     public final class Section {
@@ -350,7 +168,7 @@ public final class YamlFile implements Initializable<Void> {
             return (Entry<T>) entries.computeIfAbsent(key, k -> {
                 Class<T> type = (Class<T>) defaultValue.getClass();
 
-                return new Entry<>(k, defaultValue, getDefaultSerializer(type, new TypeToken<T>(type) {
+                return new Entry<>(k, defaultValue, SerializerUtil.getDefaultSerializer(type, new TypeToken<T>(type) {
                 }));
             });
         }
@@ -372,7 +190,7 @@ public final class YamlFile implements Initializable<Void> {
         @NonNull
         @SuppressWarnings("unchecked")
         public <T> Entry<List<T>> getListEntry(@NonNull String key, @NonNull TypeToken<List<T>> typeToken) {
-            return (Entry<List<T>>) entries.computeIfAbsent(key, k -> new Entry<>(k, new ArrayList<>(), getListSerializer(typeToken)));
+            return (Entry<List<T>>) entries.computeIfAbsent(key, k -> new Entry<>(k, new ArrayList<>(), SerializerUtil.getListSerializer(typeToken)));
         }
 
         /**

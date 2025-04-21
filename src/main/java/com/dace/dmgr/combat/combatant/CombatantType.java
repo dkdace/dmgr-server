@@ -17,8 +17,6 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.gui.SelectCharInfo;
-import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;

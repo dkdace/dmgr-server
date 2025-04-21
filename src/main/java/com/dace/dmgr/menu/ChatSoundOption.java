@@ -1,7 +1,9 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.menu;
 
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
 import lombok.Getter;
@@ -19,7 +21,7 @@ public final class ChatSoundOption extends ChestGUI {
      *
      * @param player GUI 표시 대상 플레이어
      */
-    public ChatSoundOption(@NonNull Player player) {
+    ChatSoundOption(@NonNull Player player) {
         super(2, "§8채팅 효과음 설정", player);
 
         fillRow(1, GUIItem.EMPTY);

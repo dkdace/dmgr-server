@@ -1,6 +1,7 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.menu;
 
 import com.dace.dmgr.command.BlockCommand;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;

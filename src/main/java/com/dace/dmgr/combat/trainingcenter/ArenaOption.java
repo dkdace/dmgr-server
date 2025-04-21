@@ -1,9 +1,10 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.combat.trainingcenter;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import lombok.AllArgsConstructor;
@@ -33,7 +34,7 @@ public final class ArenaOption extends ChestGUI {
     /** 진행 시간 (초) */
     private int durationSeconds = 30;
     /** 공격 방식 */
-    private TrainingCenter.Arena.AttackMethod attackMethod = TrainingCenter.Arena.AttackMethod.MELEE;
+    private Arena.AttackMethod attackMethod = Arena.AttackMethod.MELEE;
 
     /**
      * 아레나 설정 GUI 인스턴스를 생성한다.
@@ -46,7 +47,7 @@ public final class ArenaOption extends ChestGUI {
         fillAll(GUIItem.EMPTY);
 
         CombatUser combatUser = Validate.notNull(CombatUser.fromUser(User.fromPlayer(player)));
-        boolean isUsing = TrainingCenter.Arena.getInstance().isUsing(combatUser);
+        boolean isUsing = Arena.getInstance().isUsing(combatUser);
 
         if (isUsing)
             set(0, 8, new DefinedItem(new ItemBuilder(Material.BARRIER)
@@ -54,7 +55,7 @@ public final class ArenaOption extends ChestGUI {
                     .setLore("§f아레나 훈련을 종료합니다.")
                     .build(),
                     new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
-                        TrainingCenter.Arena.getInstance().finish();
+                        Arena.getInstance().finish();
                         target.closeInventory();
 
                         return true;
@@ -65,9 +66,9 @@ public final class ArenaOption extends ChestGUI {
                     .setLore("§f아레나 훈련을 시작합니다.")
                     .build(),
                     new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
-                        TrainingCenter.Arena.Option option = new TrainingCenter.Arena.Option(health, damage, speedMultiplier,
+                        Arena.Option option = new Arena.Option(health, damage, speedMultiplier,
                                 Timespan.ofSeconds(spawnPeriodSeconds), maxCount, Timespan.ofSeconds(durationSeconds), attackMethod);
-                        if (!TrainingCenter.Arena.getInstance().start(combatUser, option))
+                        if (!Arena.getInstance().start(combatUser, option))
                             return false;
 
                         target.closeInventory();
@@ -97,7 +98,7 @@ public final class ArenaOption extends ChestGUI {
                         "§7§n클릭§f하여 공격 방식을 변경합니다.")
                 .build(),
                 new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
-                    TrainingCenter.Arena.AttackMethod[] values = TrainingCenter.Arena.AttackMethod.values();
+                    Arena.AttackMethod[] values = Arena.AttackMethod.values();
                     attackMethod = values[(attackMethod.ordinal() + 1) % values.length];
 
                     update();

@@ -1,14 +1,15 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.FreeCombat;
-import com.dace.dmgr.combat.TrainingCenter;
 import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.combatant.SelectChar;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.trainingcenter.Arena;
+import com.dace.dmgr.combat.trainingcenter.ArenaOption;
+import com.dace.dmgr.combat.trainingcenter.TrainingCenter;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.item.gui.ArenaOption;
-import com.dace.dmgr.item.gui.Menu;
-import com.dace.dmgr.item.gui.SelectChar;
+import com.dace.dmgr.menu.Menu;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
 
         CombatUser combatUser = CombatUser.fromUser(user);
         if (combatUser != null) {
-            if (TrainingCenter.Arena.getInstance().isInOptionZone(player)) {
+            if (Arena.getInstance().isInOptionZone(player)) {
                 new ArenaOption(player);
                 return;
             }

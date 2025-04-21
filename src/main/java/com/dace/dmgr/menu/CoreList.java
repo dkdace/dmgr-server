@@ -1,10 +1,12 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.menu;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -31,7 +33,7 @@ public final class CoreList extends ChestGUI {
      *
      * @param player GUI 표시 대상 플레이어
      */
-    public CoreList(@NonNull Player player) {
+    CoreList(@NonNull Player player) {
         super(6, "§8코어 목록", player);
 
         set(5, 8, new GUIItem.Previous(Menu::new));

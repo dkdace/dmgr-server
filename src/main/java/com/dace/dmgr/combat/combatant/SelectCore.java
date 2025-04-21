@@ -1,7 +1,8 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
 import org.bukkit.entity.Player;

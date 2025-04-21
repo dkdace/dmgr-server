@@ -1,6 +1,6 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.game.RankManager;
+import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.StringFormUtil;

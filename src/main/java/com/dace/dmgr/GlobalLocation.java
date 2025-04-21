@@ -1,5 +1,6 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.yaml.Serializer;
 import lombok.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -56,9 +57,9 @@ public final class GlobalLocation {
      * {@link GlobalLocation}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Serializer implements YamlFile.Serializer<GlobalLocation, Map<String, Number>> {
+    public static final class GlobalLocationSerializer implements Serializer<GlobalLocation, Map<String, Number>> {
         @Getter
-        private static final Serializer instance = new Serializer();
+        private static final GlobalLocationSerializer instance = new GlobalLocationSerializer();
 
         @Override
         @NonNull

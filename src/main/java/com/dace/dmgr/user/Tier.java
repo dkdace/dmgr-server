@@ -1,4 +1,4 @@
-package com.dace.dmgr.game;
+package com.dace.dmgr.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

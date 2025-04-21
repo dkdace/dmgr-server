@@ -1,10 +1,11 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
-import com.dace.dmgr.game.GameRoom;
 import com.dace.dmgr.game.mode.GamePlayMode;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;

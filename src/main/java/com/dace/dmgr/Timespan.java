@@ -1,5 +1,6 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.yaml.Serializer;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -287,9 +288,9 @@ public final class Timespan implements Comparable<Timespan> {
      * {@link Timespan}의 직렬화 처리기 클래스.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Serializer implements YamlFile.Serializer<Timespan, Map<String, Number>> {
+    public static final class TimespanSerializer implements Serializer<Timespan, Map<String, Number>> {
         @Getter
-        private static final Serializer instance = new Serializer();
+        private static final TimespanSerializer instance = new TimespanSerializer();
 
         @Override
         @NonNull

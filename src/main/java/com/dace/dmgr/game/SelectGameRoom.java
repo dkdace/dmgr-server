@@ -1,9 +1,10 @@
-package com.dace.dmgr.item.gui;
+package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
-import com.dace.dmgr.game.GameRoom;
+import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
+import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public final class SelectGameRoom extends ChestGUI {
      * @param player   GUI 표시 대상 플레이어
      * @param isRanked 랭크 여부
      */
-    public SelectGameRoom(@NonNull Player player, boolean isRanked) {
+    SelectGameRoom(@NonNull Player player, boolean isRanked) {
         super(1, "§8게임 시작", player);
 
         fillAll(GUIItem.EMPTY);

@@ -1,8 +1,7 @@
-package com.dace.dmgr.game;
+package com.dace.dmgr.user;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AllArgsConstructor;
