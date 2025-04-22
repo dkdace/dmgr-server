@@ -146,7 +146,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         private void onInit() {
             entity.teleport(getLocation().add(0, 0.05, 0));
 
-            owner.getUser().setGlowing(entity, ChatColor.WHITE);
+            owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             JagerA2Info.SOUND.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);

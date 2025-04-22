@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.TabListManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
@@ -110,7 +111,7 @@ public final class GameUser {
         this.game = game;
         this.team = team;
 
-        user.setCurrentPlace(User.Place.LOBBY);
+        user.setCurrentPlace(Place.LOBBY);
 
         GAME_USER_MAP.put(user, this);
 
@@ -160,7 +161,7 @@ public final class GameUser {
             EntityUtil.teleport(player, getSpawnLocation());
 
         if (i % 5 == 0)
-            team.getTeamUsers().forEach(target -> target.getUser().setGlowing(player, team.getType().getColor()));
+            team.getTeamUsers().forEach(target -> target.getUser().getGlowingManager().setGlowing(player, team.getType().getColor()));
 
         if (i % 20 == 0)
             updateGameTabList();
@@ -215,7 +216,7 @@ public final class GameUser {
 
         GAME_USER_MAP.remove(user);
 
-        user.setCurrentPlace(User.Place.LOBBY);
+        user.setCurrentPlace(Place.LOBBY);
     }
 
     /**

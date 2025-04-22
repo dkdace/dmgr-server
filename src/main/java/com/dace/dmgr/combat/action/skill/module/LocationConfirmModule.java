@@ -125,7 +125,7 @@ public final class LocationConfirmModule extends ConfirmModule {
                 cancelKey);
 
         skill.getCombatUser().getUser().sendTitle("", message, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
-        skill.getCombatUser().getUser().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));
+        skill.getCombatUser().getUser().getGlowingManager().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));
     }
 
     @Override

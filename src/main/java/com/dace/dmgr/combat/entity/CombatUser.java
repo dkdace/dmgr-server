@@ -33,6 +33,8 @@ import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.menu.Menu;
+import com.dace.dmgr.user.GlowingManager;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
@@ -460,7 +462,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (target == this)
             return false;
         if (target instanceof CombatUser)
-            return (getTeam() == null || getTeam() != target.getTeam()) && user.getCurrentPlace() != User.Place.TRAINING_CENTER;
+            return (getTeam() == null || getTeam() != target.getTeam()) && user.getCurrentPlace() != Place.TRAINING_CENTER;
 
         return target.isEnemy(this);
     }
@@ -1314,7 +1316,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * @param target   발광 효과를 적용할 엔티티
      * @param duration 지속시간
-     * @see User#setGlowing(Entity, ChatColor, Timespan)
+     * @see GlowingManager#setGlowing(Entity, ChatColor, Timespan)
      */
     public void setGlowing(@NonNull CombatEntity target, @NonNull Timespan duration) {
         ChatColor color;
@@ -1323,7 +1325,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         else
             color = ChatColor.GREEN;
 
-        user.setGlowing(target.getEntity(), color, duration);
+        user.getGlowingManager().setGlowing(target.getEntity(), color, duration);
     }
 
     /**

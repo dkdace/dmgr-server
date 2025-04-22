@@ -188,7 +188,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
             damageModule.setHealth(getStateValue());
 
-            owner.getUser().setGlowing(entity, ChatColor.WHITE);
+            owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             CombatEffectUtil.ENTITY_SUMMON_SOUND.play(getLocation());
 
             addOnTick(this::onTick);

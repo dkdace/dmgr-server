@@ -40,11 +40,11 @@ public final class UserData implements Initializable<Void> {
     private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
-            "{0}§c관리자에 의해 서버에서 차단되었습니다.",
+            "§c관리자에 의해 서버에서 차단되었습니다.",
             "",
-            "§f해제 일시 : §e{1}",
+            "§f해제 일시 : §e{0}",
             "",
-            "§7문의 : {2}");
+            "§7문의 : {1}");
     /** Yaml 파일 경로의 디렉터리 이름 */
     private static final String DIRECTORY_NAME = "User";
     /** 레벨 업 효과음 */
@@ -557,14 +557,13 @@ public final class UserData implements Initializable<Void> {
 
         Timestamp expiration = Timestamp.now().plus(duration);
         String finalReason = MessageFormat.format(MESSAGE_BANNED,
-                GeneralConfig.getConfig().getMessagePrefix(),
                 DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"),
                 GeneralConfig.getConfig().getAdminContact());
         Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, expiration.toDate(), null);
 
         User user = getOnlineUser();
         if (user != null)
-            user.getPlayer().kickPlayer(finalReason);
+            user.kick(finalReason);
 
         return expiration;
     }

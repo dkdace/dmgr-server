@@ -1,6 +1,7 @@
 package com.dace.dmgr.command;
 
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,6 +28,6 @@ public final class LobbyCommand extends CommandHandler {
             return;
         }
 
-        user.setCurrentPlace(User.Place.LOBBY);
+        user.setCurrentPlace(Place.LOBBY);
     }
 }

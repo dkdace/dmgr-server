@@ -2,6 +2,7 @@ package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.event.EventListener;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import lombok.AccessLevel;
@@ -27,7 +28,7 @@ public final class OnEntityDamage extends EventListener<EntityDamageEvent> {
         if (CombatEntity.fromEntity(entity) == null) {
             if (entity instanceof Player && !EntityUtil.isCitizensNPC(entity)) {
                 User user = User.fromPlayer((Player) entity);
-                if (user.getCurrentPlace() != User.Place.LOBBY || user.getGameRoom() != null)
+                if (user.getCurrentPlace() != Place.LOBBY || user.getGameRoom() != null)
                     event.setCancelled(true);
             }
 

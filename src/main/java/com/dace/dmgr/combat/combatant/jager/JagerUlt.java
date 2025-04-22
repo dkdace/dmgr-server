@@ -153,7 +153,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private void onInit() {
             entity.setGravity(false);
 
-            owner.getUser().setGlowing(entity, ChatColor.WHITE);
+            owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             JagerUltInfo.SOUND.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
