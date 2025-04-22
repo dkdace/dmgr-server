@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.BanList;
@@ -28,9 +29,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
@@ -177,6 +182,28 @@ public final class UserData implements Initializable<Void> {
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(playerName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
+     *
+     * <p>플러그인 활성화 시 호출해야 한다.</p>
+     */
+    @NonNull
+    public static AsyncTask<Void> initAllUserDatas() {
+        List<AsyncTask<?>> userDataInitTasks = Collections.emptyList();
+
+        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
+            userDataInitTasks = userDataPaths
+                    .map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
+                    .filter(userData -> !userData.isInitialized())
+                    .map(UserData::init)
+                    .collect(Collectors.toList());
+        } catch (Exception ex) {
+            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
+        }
+
+        return AsyncTask.all(userDataInitTasks);
     }
 
     /**

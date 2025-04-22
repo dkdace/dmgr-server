@@ -6,7 +6,6 @@ import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.ReflectionUtil;
-import com.dace.dmgr.util.task.AsyncTask;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
@@ -15,7 +14,6 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.MemoryNPCDataStore;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.skinsrestorer.api.SkinsRestorerAPI;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -27,9 +25,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 플러그인 메인 클래스.
@@ -129,7 +124,7 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         GeneralConfig.getInstance().init()
-                .onFinish(this::loadUserDatas)
+                .onFinish(UserData::initAllUserDatas)
                 .onFinish(() -> {
                     Validate.notNull(RankManager.getInstance());
                     EventListenerManager.register();
@@ -161,25 +156,6 @@ public class DMGR extends JavaPlugin {
         getHolographicDisplaysAPI().deleteHolograms();
         if (npcRegistry != null)
             npcRegistry.deregisterAll();
-    }
-
-    /**
-     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
-     */
-    @NonNull
-    private AsyncTask<Void> loadUserDatas() {
-        File dir = new File(DMGR.getPlugin().getDataFolder(), "User");
-        File[] userDataFiles = dir.listFiles();
-        if (userDataFiles == null)
-            return new AsyncTask<>((onFinish, onError) -> onFinish.accept(null));
-
-        List<AsyncTask<?>> userDataInitTasks = Arrays.stream(userDataFiles)
-                .map(userDataFile -> UserData.fromUUID(UUID.fromString(FilenameUtils.removeExtension(userDataFile.getName()))))
-                .filter(userData -> !userData.isInitialized())
-                .map(UserData::init)
-                .collect(Collectors.toList());
-
-        return AsyncTask.all(userDataInitTasks);
     }
 
     /**
