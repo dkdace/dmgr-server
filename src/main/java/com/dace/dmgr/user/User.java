@@ -20,17 +20,14 @@ import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskManager;
-import com.keenant.tabbed.util.Skins;
+import com.keenant.tabbed.tablist.TableTabList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.skinsrestorer.api.PlayerWrapper;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
@@ -45,7 +42,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
@@ -98,16 +97,16 @@ public final class User {
     private final Player player;
     /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
     private final ArmorStand nameTagHider;
+    /** 탭리스트 인스턴스 */
+    private final TableTabList tabList;
+    /** 로비 탭리스트 프로필 */
+    private final LobbyTabListProfile lobbyTabListProfile;
     /** 유저 데이터 정보 인스턴스 */
     @NonNull
     @Getter
     private final UserData userData;
     /** 태스크 관리 인스턴스 */
     private final TaskManager taskManager = new TaskManager();
-    /** 플레이어 탭리스트 관리 인스턴스 */
-    @NonNull
-    @Getter
-    private final TabListManager tabListManager;
     /** 플레이어 사이드바 관리 인스턴스 */
     @NonNull
     @Getter
@@ -132,6 +131,9 @@ public final class User {
     /** 액션바 덮어쓰기 타임스탬프 */
     private Timestamp actionBarOverrideTimestamp = Timestamp.now();
 
+    /** 탭리스트 프로필 */
+    @Setter
+    private TabListProfile tabListProfile;
     /** 이름표 홀로그램 */
     @Nullable
     private TextHologram nameTagHologram;
@@ -167,8 +169,11 @@ public final class User {
     private User(@NonNull Player player) {
         this.player = player;
         this.nameTagHider = EntityUtil.createTemporaryArmorStand(player.getLocation());
+        this.tabList = DMGR.getTabbed().newTableTabList(player);
+        this.tabList.setBatchEnabled(true);
         this.userData = UserData.fromPlayer(player);
-        this.tabListManager = new TabListManager(this);
+        this.lobbyTabListProfile = new LobbyTabListProfile(this);
+        this.tabListProfile = lobbyTabListProfile;
         this.sidebarManager = new SidebarManager(this);
         this.glowingManager = new GlowingManager(this);
         this.gui = new GUI(player.getInventory());
@@ -247,6 +252,7 @@ public final class User {
         Team team = scoreBoard.getTeam("Default");
         if (team == null)
             team = scoreBoard.registerNewTeam("Default");
+
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         team.addEntry(player.getName());
@@ -290,16 +296,15 @@ public final class User {
         if (!player.getPassengers().contains(nameTagHider))
             player.addPassenger(nameTagHider);
 
+        nameTagHider.setVisible(true);
+        nameTagHider.setVisible(false);
+
         if (CombatUser.fromUser(this) == null) {
             sendActionBar("§1메뉴를 사용하려면 §nF키§1를 누르십시오.");
             updateLobbySidebar();
         }
 
-        GameUser gameUser = GameUser.fromUser(this);
-        if (gameUser == null)
-            updateLobbyTabList();
-
-        tabListManager.update();
+        updateTabList();
     }
 
     /**
@@ -348,114 +353,22 @@ public final class User {
     }
 
     /**
-     * 로비 탭리스트를 업데이트한다.
+     * 탭리스트 변경 사항을 업데이트한다.
      */
-    private void updateLobbyTabList() {
-        long freeMemory = Runtime.getRuntime().freeMemory() / 1024 / 1024;
-        long totalMemory = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-        long memory = totalMemory - freeMemory;
-        double memoryPercent = (double) memory / totalMemory;
-        double tps = DMGR.getTps();
+    private void updateTabList() {
+        tabList.setHeader(tabListProfile.getHeader());
+        tabList.setFooter(tabListProfile.getFooter());
 
-        ChatColor memoryColor = ChatColor.RED;
-        if (memoryPercent < 0.5)
-            memoryColor = ChatColor.GREEN;
-        else if (memoryPercent < 0.75)
-            memoryColor = ChatColor.YELLOW;
-        else if (memoryPercent < 0.9)
-            memoryColor = ChatColor.GOLD;
+        TabListProfile.Item[][] items = new TabListProfile.Item[4][20];
+        tabListProfile.updateItems(items);
 
-        ChatColor pingColor = ChatColor.RED;
-        if (ping < 70)
-            pingColor = ChatColor.GREEN;
-        else if (ping < 100)
-            pingColor = ChatColor.YELLOW;
-        else if (ping < 130)
-            pingColor = ChatColor.GOLD;
-
-        ChatColor tpsColor = ChatColor.GREEN;
-        if (tps < 19)
-            tpsColor = ChatColor.RED;
-        else if (tps < 19.4)
-            tpsColor = ChatColor.GOLD;
-        else if (tps < 19.7)
-            tpsColor = ChatColor.YELLOW;
-
-        tabListManager.setHeader("\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n");
-        tabListManager.setFooter("\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n");
-
-        tabListManager.setItem(0, 0, "§f§l§n 서버 상태 ", LobbyTabListSkin.SERVER_STATUS);
-        tabListManager.setItem(0, 2, MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, ping), LobbyTabListSkin.PING);
-        tabListManager.setItem(0, 3, MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory),
-                LobbyTabListSkin.MEMORY);
-        tabListManager.setItem(0, 4, MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), LobbyTabListSkin.TPS);
-        tabListManager.setItem(0, 5, MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()),
-                LobbyTabListSkin.ONLINE);
-        tabListManager.setItem(0, 7, MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", player.getName()),
-                PlayerSkin.fromUUID(player.getUniqueId()));
-        tabListManager.setItem(0, 9, MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
-                userData.getWinCount(),
-                userData.getLoseCount(),
-                (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100), LobbyTabListSkin.WIN_RATE);
-        tabListManager.setItem(0, 10, MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()), LobbyTabListSkin.QUIT);
-        tabListManager.setItem(0, 11, MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
-                DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")), LobbyTabListSkin.PLAY_TIME);
-
-        updateLobbyTabListUsers();
-    }
-
-    /**
-     * 로비 탭리스트의 접속자 목록을 업데이트한다.
-     */
-    private void updateLobbyTabListUsers() {
-        List<User> lobbyUsers = new ArrayList<>();
-        List<User> adminUsers = new ArrayList<>();
-        getAllUsers().stream()
-                .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
-                .forEach(target -> (target.getPlayer().isOp() ? adminUsers : lobbyUsers).add(target));
-
-        tabListManager.setItem(1, 0, MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", lobbyUsers.size()), LobbyTabListSkin.LOBBY_USERS);
-        for (int i = 0; i < 38; i++) {
-            int column = 1 + i % 2;
-            int row = i / 2 + 1;
-
-            if (i > lobbyUsers.size() - 1)
-                tabListManager.removeItem(column, row);
-            else {
-                User lobbyUser = lobbyUsers.get(i);
-                tabListManager.setItem(column, row, lobbyUser.getTabListPlayerName(), lobbyUser);
+        for (int i = 0; i < items.length; i++)
+            for (int j = 0; j < items[i].length; j++) {
+                TabListProfile.Item item = items[i][j];
+                tabList.set(i, j, (item == null ? TabListProfile.Item.BLANK_ITEM : item).getTextTabItem());
             }
-        }
 
-        tabListManager.setItem(3, 0, MessageFormat.format("§b§l§n 관리자 §f({0}명)", adminUsers.size()), LobbyTabListSkin.ADMIN_USERS);
-        for (int i = 0; i < 19; i++) {
-            int column = 3;
-            int row = i + 1;
-
-            if (i > adminUsers.size() - 1)
-                tabListManager.removeItem(column, row);
-            else {
-                User adminUser = adminUsers.get(i);
-                tabListManager.setItem(column, row, adminUser.getTabListPlayerName(), adminUser);
-            }
-        }
-    }
-
-    /**
-     * 탭리스트에 사용되는 플레이어의 이름을 반환한다.
-     *
-     * @return 이름
-     */
-    @NonNull
-    private String getTabListPlayerName() {
-        String prefix = "§7[로비]";
-
-        if (gameRoom != null)
-            prefix = gameRoom.getName();
-        else if (currentPlace != Place.LOBBY)
-            prefix = MessageFormat.format("§7[{0}]", currentPlace);
-
-        return MessageFormat.format(" {0} §f{1}", prefix, player.getName());
+        tabList.batchUpdate();
     }
 
     /**
@@ -532,7 +445,6 @@ public final class User {
 
         nameTagHider.remove();
         taskManager.stop();
-        tabListManager.delete();
         sidebarManager.delete();
         glowingManager.clearGlowing();
 
@@ -565,46 +477,6 @@ public final class User {
 
         commandCooldownTimestamp = Timestamp.now().plus(GeneralConfig.getConfig().getCommandCooldown());
         return true;
-    }
-
-    /**
-     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
-     */
-    private void reset() {
-        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
-        player.setHealth(20);
-        player.setExp(0);
-        player.setLevel(0);
-        player.setWalkSpeed(0.2F);
-        player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
-
-        gui.clear();
-        updateMenuGUI();
-
-        getAllUsers().forEach(target -> {
-            glowingManager.removeGlowing(target.getPlayer());
-            target.getGlowingManager().removeGlowing(player);
-        });
-
-        if (userData.isInitialized()) {
-            sidebarManager.clear();
-            tabListManager.clearItems();
-        }
-
-        CombatUser combatUser = CombatUser.fromUser(this);
-        if (combatUser != null)
-            combatUser.remove();
-    }
-
-    /**
-     * 인벤토리 메뉴 GUI를 업데이트한다.
-     */
-    private void updateMenuGUI() {
-        for (MenuItem menuItem : MenuItem.values())
-            if (menuItem != MenuItem.TEAM_GAME && gameRoom != null || menuItem != MenuItem.TEAM_GAME_EXIT && gameRoom == null)
-                gui.set(menuItem.slotIndex, menuItem.definedItem);
-
-        player.updateInventory();
     }
 
     /**
@@ -845,7 +717,7 @@ public final class User {
         this.gameRoom = gameRoom;
         gameRoom.onJoin(this);
 
-        updateMenuGUI();
+        InventoryMenuItem.updateGUI(this);
     }
 
     /**
@@ -858,7 +730,35 @@ public final class User {
         gameRoom.onQuit(this);
         gameRoom = null;
 
-        updateMenuGUI();
+        InventoryMenuItem.updateGUI(this);
+    }
+
+    /**
+     * 플레이어의 체력, 이동속도 등의 모든 상태를 재설정한다.
+     */
+    private void reset() {
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+        player.setHealth(20);
+        player.setExp(0);
+        player.setLevel(0);
+        player.setWalkSpeed(0.2F);
+        player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
+
+        gui.clear();
+        InventoryMenuItem.updateGUI(this);
+        tabListProfile = lobbyTabListProfile;
+
+        getAllUsers().forEach(target -> {
+            glowingManager.removeGlowing(target.getPlayer());
+            target.getGlowingManager().removeGlowing(player);
+        });
+
+        if (userData.isInitialized())
+            sidebarManager.clear();
+
+        CombatUser combatUser = CombatUser.fromUser(this);
+        if (combatUser != null)
+            combatUser.remove();
     }
 
     /**
@@ -905,7 +805,7 @@ public final class User {
     /**
      * 인벤토리 메뉴 아이템 목록.
      */
-    private enum MenuItem {
+    private enum InventoryMenuItem {
         TEAM_GAME("NzYxODQ2MTBjNTBjMmVmYjcyODViYzJkMjBmMzk0MzY0ZTgzNjdiYjMxNDg0MWMyMzhhNmE1MjFhMWVlMTJiZiJ9fX0=",
                 "팀전 (일반/랭크)", "전장에서 다른 플레이어들과 팀을 맺어 전투하고 보상을 획득합니다.", 13, SelectGame::new),
         TEAM_GAME_EXIT("YzEwNTkxZTY5MDllNmEyODFiMzcxODM2ZTQ2MmQ2N2EyYzc4ZmEwOTUyZTkxMGYzMmI0MWEyNmM0OGMxNzU3YyJ9fX0=",
@@ -934,7 +834,7 @@ public final class User {
         /** GUI 아이템 */
         private final DefinedItem definedItem;
 
-        MenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
+        InventoryMenuItem(String skinUrl, String name, String lore, int slotIndex, Consumer<Player> action) {
             this.slotIndex = slotIndex;
             this.definedItem = new DefinedItem(new ItemBuilder(PlayerSkin.fromURL(skinUrl))
                     .setName("§e§l" + name)
@@ -945,32 +845,19 @@ public final class User {
                         return true;
                     }));
         }
-    }
 
-    /**
-     * 로비 탭리스트에 사용되는 머리 스킨 목록.
-     */
-    @UtilityClass
-    private static final class LobbyTabListSkin {
-        /** 서버 상태 */
-        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
-        /** 핑 */
-        private static final PlayerSkin PING = PlayerSkin.fromName("DTabPing");
-        /** 메모리 */
-        private static final PlayerSkin MEMORY = PlayerSkin.fromName("DTabMemory");
-        /** TPS */
-        private static final PlayerSkin TPS = PlayerSkin.fromName("DTabTPS");
-        /** 접속자 수 */
-        private static final PlayerSkin ONLINE = PlayerSkin.fromName("DTabOnline");
-        /** 승률 */
-        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("DTabWinRate");
-        /** 탈주 */
-        private static final PlayerSkin QUIT = PlayerSkin.fromName("DTabQuit");
-        /** 플레이 시간 */
-        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
-        /** 접속 인원 */
-        private static final PlayerSkin LOBBY_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
-        /** 관리자 */
-        private static final PlayerSkin ADMIN_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.AQUA));
+        /**
+         * 인벤토리 메뉴 GUI를 업데이트한다.
+         *
+         * @param user 대상 유저
+         */
+        private static void updateGUI(@NonNull User user) {
+            for (InventoryMenuItem inventoryMenuItem : values())
+                if (inventoryMenuItem != InventoryMenuItem.TEAM_GAME && user.getGameRoom() != null
+                        || inventoryMenuItem != InventoryMenuItem.TEAM_GAME_EXIT && user.getGameRoom() == null)
+                    user.getGui().set(inventoryMenuItem.slotIndex, inventoryMenuItem.definedItem);
+
+            user.getPlayer().updateInventory();
+        }
     }
 }

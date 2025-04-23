@@ -5,7 +5,6 @@ import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.ReflectionUtil;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
@@ -22,7 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -96,26 +94,6 @@ public class DMGR extends JavaPlugin {
         if (npcRegistry == null)
             npcRegistry = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
         return npcRegistry;
-    }
-
-    /**
-     * 서버의 최근 TPS (Ticks Per Second)를 반환한다.
-     *
-     * @return 최근 TPS
-     */
-    public static double getTps() {
-        try {
-            Class<?> minecraftServerClass = ReflectionUtil.getClass("net.minecraft.server.v1_12_R1.MinecraftServer");
-            Object minecraftServer = ReflectionUtil.getMethod(minecraftServerClass, "getServer").invoke(null);
-            Field recentTpsField = ReflectionUtil.getField(minecraftServerClass, "recentTps");
-
-            double[] recent = (double[]) recentTpsField.get(minecraftServer);
-            return recent[0];
-        } catch (Exception ex) {
-            ConsoleLogger.severe("서버 TPS를 구할 수 없음", ex);
-        }
-
-        return -1;
     }
 
     /**

@@ -1,10 +1,8 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.*;
@@ -12,17 +10,14 @@ import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.Place;
-import com.dace.dmgr.user.TabListManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.keenant.tabbed.util.Skins;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,9 +25,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.function.Function;
 
 /**
@@ -41,8 +34,6 @@ import java.util.function.Function;
 public final class GameUser {
     /** 게임 유저 목록 (유저 정보 : 게임 유저 정보) */
     private static final HashMap<User, GameUser> GAME_USER_MAP = new HashMap<>();
-    /** 미공개 상태의 플레이어 머리 스킨 */
-    private static final PlayerSkin UNKNOWN_PLAYER_SKIN = PlayerSkin.fromName("DTabUnknown");
 
     /** 플레이어 인스턴스 */
     @NonNull
@@ -60,6 +51,8 @@ public final class GameUser {
     @NonNull
     @Getter
     private final Game.Team team;
+    /** 게임 탭리스트 프로필 */
+    private final GameTabListProfile gameTabListProfile;
     /** 게임 시작 시점 */
     @Getter
     private final Timestamp startTime = Timestamp.now();
@@ -110,6 +103,7 @@ public final class GameUser {
         this.player = user.getPlayer();
         this.game = game;
         this.team = team;
+        this.gameTabListProfile = new GameTabListProfile(this);
 
         user.setCurrentPlace(Place.LOBBY);
 
@@ -142,7 +136,7 @@ public final class GameUser {
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5),
                 game.isPlaying() ? Timespan.ofSeconds(2) : game.getGamePlayMode().getReadyDuration(), Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
-        user.getTabListManager().clearItems();
+        user.setTabListProfile(gameTabListProfile);
     }
 
     /**
@@ -162,9 +156,6 @@ public final class GameUser {
 
         if (i % 5 == 0)
             team.getTeamUsers().forEach(target -> target.getUser().getGlowingManager().setGlowing(player, team.getType().getColor()));
-
-        if (i % 20 == 0)
-            updateGameTabList();
     }
 
     /**
@@ -217,60 +208,6 @@ public final class GameUser {
         GAME_USER_MAP.remove(user);
 
         user.setCurrentPlace(Place.LOBBY);
-    }
-
-    /**
-     * 게임 탭리스트를 업데이트한다.
-     */
-    private void updateGameTabList() {
-        TabListManager tabListManager = user.getTabListManager();
-
-        tabListManager.setHeader(MessageFormat.format("\n{0} §f{1}\n",
-                (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ]" : "§a§l[ 일반 ]"),
-                game.getGamePlayMode().getName()));
-
-        boolean isHeadReveal = game.isPlaying() && game.getElapsedTime().compareTo(GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart()) > 0;
-
-        int column = 0;
-        for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
-            ChatColor targetTeamColor = targetTeam.getType().getColor();
-
-            tabListManager.setItem(++column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
-                    targetTeamColor,
-                    targetTeam.getType().getName(),
-                    targetTeam.getTeamUsers().size()), PlayerSkin.fromSkin(Skins.getDot(targetTeamColor)));
-
-            Iterator<GameUser> iterator = targetTeam.getTeamUsers().stream()
-                    .sorted(Comparator.comparing(GameUser::getScore).reversed())
-                    .iterator();
-
-            for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
-                int row = i * 3 + 1;
-
-                if (i > targetTeam.getTeamUsers().size() - 1) {
-                    tabListManager.removeItem(column, row);
-                    tabListManager.removeItem(column, row + 1);
-                } else {
-                    GameUser target = iterator.next();
-                    String name = MessageFormat.format("{0} {1}", targetTeamColor, target.getPlayer().getName());
-
-                    if (team == targetTeam || isHeadReveal)
-                        tabListManager.setItem(column, row, name, target.getUser());
-                    else
-                        tabListManager.setItem(column, row, name, UNKNOWN_PLAYER_SKIN);
-
-                    tabListManager.setItem(column, row + 1, MessageFormat.format("§7{0} §f{1}   §7{2} §f{3}   §7{4} §f{5}   §7{6} §f{7}  ",
-                            "✪",
-                            (int) target.getScore(),
-                            TextIcon.DAMAGE,
-                            target.getKill(),
-                            TextIcon.POISON,
-                            target.getDeath(),
-                            "✔",
-                            target.getAssist()), (PlayerSkin) null);
-                }
-            }
-        }
     }
 
     /**
