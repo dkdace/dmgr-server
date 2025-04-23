@@ -1,8 +1,8 @@
 package com.dace.dmgr.util;
 
-import com.dace.dmgr.DMGR;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -14,6 +14,9 @@ import java.util.List;
  */
 @UtilityClass
 public final class EntityUtil {
+    /** 일시적인 엔티티의 사용자 지정 이름 */
+    private static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
+
     /**
      * 지정한 엔티티가 Citizens NPC인지 확인한다.
      *
@@ -33,7 +36,7 @@ public final class EntityUtil {
     @NonNull
     public static ArmorStand createTemporaryArmorStand(@NonNull Location spawnLocation) {
         ArmorStand armorStand = spawnLocation.getWorld().spawn(spawnLocation, ArmorStand.class);
-        armorStand.setCustomName(DMGR.TEMPORARY_ENTITY_CUSTOM_NAME);
+        armorStand.setCustomName(TEMPORARY_ENTITY_CUSTOM_NAME);
         armorStand.setSilent(true);
         armorStand.setInvulnerable(true);
         armorStand.setGravity(false);
@@ -42,6 +45,18 @@ public final class EntityUtil {
         armorStand.setVisible(false);
 
         return armorStand;
+    }
+
+    /**
+     * 사용되지 않는 모든 엔티티를 제거한다.
+     *
+     * <p>플러그인 활성화 시 호출해야 한다.</p>
+     */
+    public static void clearUnusedEntities() {
+        Bukkit.getWorlds().stream()
+                .flatMap(world -> world.getEntities().stream())
+                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
+                .forEach(Entity::remove);
     }
 
     /**

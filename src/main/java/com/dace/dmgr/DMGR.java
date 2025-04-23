@@ -5,6 +5,7 @@ import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.EntityUtil;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
@@ -16,7 +17,6 @@ import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,8 +28,6 @@ import java.util.Arrays;
  * 플러그인 메인 클래스.
  */
 public class DMGR extends JavaPlugin {
-    /** 일시적인 엔티티의 사용자 지정 이름 */
-    public static final String TEMPORARY_ENTITY_CUSTOM_NAME = "temporary";
     /** 임시 복제 월드 이름의 접두사 */
     public static final String TEMPORARY_WORLD_NAME_PREFIX = "_";
 
@@ -108,7 +106,7 @@ public class DMGR extends JavaPlugin {
                     EventListenerManager.register();
                     CommandHandlerManager.register();
                     CommandHandlerManager.registerTestCommands();
-                    clearUnusedEntities();
+                    EntityUtil.clearUnusedEntities();
                     clearDuplicatedWorlds();
 
                     ConsoleLogger.info("플러그인 활성화 완료");
@@ -134,16 +132,6 @@ public class DMGR extends JavaPlugin {
         getHolographicDisplaysAPI().deleteHolograms();
         if (npcRegistry != null)
             npcRegistry.deregisterAll();
-    }
-
-    /**
-     * 사용되지 않는 모든 엔티티를 제거한다.
-     */
-    private void clearUnusedEntities() {
-        Bukkit.getWorlds().stream()
-                .flatMap(world -> world.getEntities().stream())
-                .filter(entity -> entity.getCustomName() != null && entity.getCustomName().equals(TEMPORARY_ENTITY_CUSTOM_NAME))
-                .forEach(Entity::remove);
     }
 
     /**
