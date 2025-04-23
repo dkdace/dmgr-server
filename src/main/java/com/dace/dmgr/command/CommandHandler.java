@@ -186,7 +186,7 @@ public abstract class CommandHandler implements TabExecutor {
      * 명령어의 매개변수 타입.
      */
     @AllArgsConstructor
-    protected enum ParameterType {
+    protected enum ParameterType implements ParameterHandler {
         PLAYER_NAME(() -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList())),
         INTEGER(() -> Collections.singletonList("0")),
         STRING();
@@ -197,6 +197,26 @@ public abstract class CommandHandler implements TabExecutor {
         ParameterType() {
             this.onGetKeywords = Collections::emptyList;
         }
+
+        @Override
+        @NonNull
+        public List<@NonNull String> getKeywords() {
+            return onGetKeywords.get();
+        }
+    }
+
+    /**
+     * 명령어의 매개변수를 처리하는 인터페이스.
+     */
+    @FunctionalInterface
+    protected interface ParameterHandler {
+        /**
+         * 매개변수 키워드 목록을 반환한다.
+         *
+         * @return 매개변수 키워드 목록
+         */
+        @NonNull
+        List<@NonNull String> getKeywords();
     }
 
     /**
@@ -205,27 +225,27 @@ public abstract class CommandHandler implements TabExecutor {
     protected static final class ParameterList {
         /** 가변 인수 포함 여부 */
         private final boolean hasVarArgs;
-        /** 매개변수 타입 목록 */
-        private final ParameterType[] parameterTypes;
+        /** 매개변수 처리기 목록 */
+        private final ParameterHandler[] parameterHandlers;
 
         /**
          * 명령어의 매개변수 목록 인스턴스를 생성한다.
          *
-         * @param hasVarArgs     가변 인수 포함 여부. {@code true}로 지정하면 명령어 입력 시 마지막 인수를 가변적으로 지정할 수 있음
-         * @param parameterTypes 매개변수 타입 목록
+         * @param hasVarArgs        가변 인수 포함 여부. {@code true}로 지정하면 명령어 입력 시 마지막 인수를 가변적으로 지정할 수 있음
+         * @param parameterHandlers 매개변수 처리기 목록
          */
-        ParameterList(boolean hasVarArgs, @NonNull ParameterType @NonNull ... parameterTypes) {
+        public ParameterList(boolean hasVarArgs, @NonNull ParameterHandler @NonNull ... parameterHandlers) {
             this.hasVarArgs = hasVarArgs;
-            this.parameterTypes = parameterTypes;
+            this.parameterHandlers = parameterHandlers;
         }
 
         /**
          * 명령어의 매개변수 목록 인스턴스를 생성한다.
          *
-         * @param parameterTypes 매개변수 타입 목록
+         * @param parameterHandlers 매개변수 처리기 목록
          */
-        ParameterList(@NonNull ParameterType @NonNull ... parameterTypes) {
-            this(false, parameterTypes);
+        public ParameterList(@NonNull ParameterHandler @NonNull ... parameterHandlers) {
+            this(false, parameterHandlers);
         }
 
         /**
@@ -236,9 +256,9 @@ public abstract class CommandHandler implements TabExecutor {
          */
         @NonNull
         private List<@NonNull String> getKeywords(int index) {
-            int arg = Math.min(index, parameterTypes.length - 1);
-            if (index < parameterTypes.length || hasVarArgs)
-                return parameterTypes[arg].onGetKeywords.get();
+            int arg = Math.min(index, parameterHandlers.length - 1);
+            if (index < parameterHandlers.length || hasVarArgs)
+                return parameterHandlers[arg].getKeywords();
 
             return Collections.emptyList();
         }
