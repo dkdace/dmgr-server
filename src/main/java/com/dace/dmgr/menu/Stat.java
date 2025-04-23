@@ -1,6 +1,7 @@
 package com.dace.dmgr.menu;
 
 import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.command.StatCommand;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;
@@ -13,6 +14,8 @@ import org.bukkit.entity.Player;
 
 /**
  * 전적 GUI 클래스.
+ *
+ * @see StatCommand
  */
 public final class Stat extends ChestGUI {
     /**

@@ -40,10 +40,10 @@ public final class Ranking extends ChestGUI {
         /** GUI 아이템 */
         private final DefinedItem definedItem;
 
-        RankingItem(Material material, String name, String indicator) {
+        RankingItem(Material material, String name, String rankType) {
             this.definedItem = new DefinedItem(new ItemBuilder(material).setName("§e§l" + name).build(),
                     new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
-                        player.performCommand("랭킹 " + indicator);
+                        player.performCommand("랭킹 " + rankType);
                         player.closeInventory();
 
                         return true;
