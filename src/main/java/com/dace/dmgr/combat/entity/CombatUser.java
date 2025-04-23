@@ -28,8 +28,8 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.menu.Menu;
@@ -141,7 +141,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 팀. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
     @Nullable
     @Getter
-    private final Game.Team team;
+    private final Team team;
     /** 처치 기여자별 누적 피해량 관리 인스턴스 */
     private final KillContributorManager killContributorManager = new KillContributorManager();
     /** 처치 지원자 관리 인스턴스 */

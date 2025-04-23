@@ -220,7 +220,7 @@ public final class GameRoom {
         onUserCountChange();
 
         if (game.isInitialized() && !game.isFinished()) {
-            Game.Team team = game.getRedTeam().getTeamUsers().size() < game.getBlueTeam().getTeamUsers().size()
+            Team team = game.getRedTeam().getTeamUsers().size() < game.getBlueTeam().getTeamUsers().size()
                     ? game.getRedTeam()
                     : game.getBlueTeam();
 
@@ -259,7 +259,7 @@ public final class GameRoom {
 
         if (canStart()) {
             if (onSecondTask == null)
-                onSecondTask = new IntervalTask(i -> onSecondWaiting((int) (waitingSeconds - i)), () -> {
+                onSecondTask = new IntervalTask(i -> onSecondWaiting((int) (waitingSeconds - i), waitingSeconds), () -> {
                     for (BossBarDisplay gameWaitBossBar : gameWaitBossBars)
                         removeBossBar(gameWaitBossBar);
 
@@ -274,7 +274,7 @@ public final class GameRoom {
             return;
         }
 
-        onSecondWaiting(0);
+        onSecondWaiting(waitingSeconds, waitingSeconds);
 
         if (onSecondTask != null) {
             onSecondTask.stop();
@@ -286,14 +286,15 @@ public final class GameRoom {
      * 인원 대기 중 매 초마다 실행할 작업.
      *
      * @param remainingSeconds 남은 시간 (초)
+     * @param waitingSeconds   대기 시간 (초)
      */
-    private void onSecondWaiting(int remainingSeconds) {
+    private void onSecondWaiting(int remainingSeconds, int waitingSeconds) {
         gameWaitBossBars[1].setTitle(MessageFormat.format("§c게임을 시작하려면 최소 {0}명이 필요합니다.", minPlayerCount));
         gameWaitBossBars[2].setTitle(MessageFormat.format("§a§l{0} §f[{1}§f/{2} 명]",
                 (isRanked() ? "§6§l랭크" : "§a§l일반"),
                 (canStart() ? "§f" : "§c") + users.size(),
                 maxPlayerCount));
-        gameWaitBossBars[2].setProgress(canStart() ? remainingSeconds / GeneralConfig.getGameConfig().getWaitingTime().toSeconds() : 1);
+        gameWaitBossBars[2].setProgress((double) remainingSeconds / waitingSeconds);
 
         if (remainingSeconds > 0 && (remainingSeconds <= 5 || remainingSeconds == 10))
             announceGameMessage(MessageFormat.format("게임이 {0}초 뒤에 시작합니다.", remainingSeconds));

@@ -2,11 +2,11 @@ package com.dace.dmgr;
 
 import com.dace.dmgr.command.CommandHandlerManager;
 import com.dace.dmgr.event.EventListenerManager;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.EntityUtil;
-import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.keenant.tabbed.Tabbed;
 import lombok.NonNull;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
@@ -16,21 +16,13 @@ import net.citizensnpcs.api.npc.NPCRegistry;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Arrays;
 
 /**
  * 플러그인 메인 클래스.
  */
 public class DMGR extends JavaPlugin {
-    /** 임시 복제 월드 이름의 접두사 */
-    public static final String TEMPORARY_WORLD_NAME_PREFIX = "_";
-
     /** 탭리스트 관리 인스턴스 */
     @Nullable
     private static Tabbed tabbed;
@@ -107,7 +99,7 @@ public class DMGR extends JavaPlugin {
                     CommandHandlerManager.register();
                     CommandHandlerManager.registerTestCommands();
                     EntityUtil.clearUnusedEntities();
-                    clearDuplicatedWorlds();
+                    Game.clearDuplicatedWorlds();
 
                     ConsoleLogger.info("플러그인 활성화 완료");
 
@@ -132,29 +124,5 @@ public class DMGR extends JavaPlugin {
         getHolographicDisplaysAPI().deleteHolograms();
         if (npcRegistry != null)
             npcRegistry.deregisterAll();
-    }
-
-    /**
-     * 모든 복제 월드를 삭제한다.
-     */
-    private void clearDuplicatedWorlds() {
-        File worldDir = new File(Bukkit.getWorldContainer(), ConfigManager.getDatasourcesConfig().getFileConfig().getPath());
-        File[] worldFiles = worldDir.listFiles();
-        if (worldFiles == null)
-            return;
-
-        Arrays.stream(worldFiles)
-                .filter(file -> file.getName().startsWith(TEMPORARY_WORLD_NAME_PREFIX))
-                .forEach(file -> {
-                    try {
-                        World world = Bukkit.getWorld(file.getName().replace(".slime", ""));
-                        if (world != null)
-                            Bukkit.unloadWorld(world, false);
-
-                        Files.delete(file.toPath());
-                    } catch (Exception ex) {
-                        ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
-                    }
-                });
     }
 }

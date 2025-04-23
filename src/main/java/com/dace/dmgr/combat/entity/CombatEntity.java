@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -65,7 +66,7 @@ public interface CombatEntity {
      * @return 팀. {@code null}이면 게임에 참여중이지 않음을 나타냄
      */
     @Nullable
-    Game.Team getTeam();
+    Team getTeam();
 
     /**
      * 엔티티를 제거한다.

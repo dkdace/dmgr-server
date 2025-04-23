@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.TextHologram;
-import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
@@ -62,7 +62,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
 
     @Override
     @Nullable
-    public final Game.Team getTeam() {
+    public final Team getTeam() {
         return owner.getTeam();
     }
 

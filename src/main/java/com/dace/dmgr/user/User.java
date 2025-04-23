@@ -439,9 +439,7 @@ public final class User {
      */
     public void onQuit() {
         setCurrentPlace(Place.LOBBY);
-
-        if (gameRoom != null)
-            quitGame();
+        quitGame();
 
         nameTagHider.remove();
         taskManager.stop();

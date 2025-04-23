@@ -49,7 +49,7 @@ public final class GameTabListProfile implements TabListProfile {
         boolean isHeadReveal = game.isPlaying() && game.getElapsedTime().compareTo(GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart()) > 0;
 
         int column = 0;
-        for (Game.Team team : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
+        for (Team team : new Team[]{game.getRedTeam(), game.getBlueTeam()}) {
             ChatColor targetTeamColor = team.getType().getColor();
 
             items[++column][0] = new Item(MessageFormat.format("{0}§l§n {1} §f({2}명)",

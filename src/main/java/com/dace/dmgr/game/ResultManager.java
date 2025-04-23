@@ -36,7 +36,7 @@ public final class ResultManager {
     private final Game game;
     /** 승리한 팀. {@code null}이면 무승부 */
     @Nullable
-    private final Game.Team winnerTeam;
+    private final Team winnerTeam;
     /** 랭킹 항목별 플레이어 순위 목록 (랭킹 항목 : (플레이어 : 순위)) */
     private final EnumMap<RankType, HashMap<GameUser, Integer>> rankingMap = new EnumMap<>(RankType.class);
 
@@ -48,16 +48,16 @@ public final class ResultManager {
     ResultManager(@NonNull Game game) {
         this.game = game;
 
-        Game.Team redTeam = game.getRedTeam();
-        Game.Team blueTeam = game.getBlueTeam();
+        Team redTeam = game.getRedTeam();
+        Team blueTeam = game.getBlueTeam();
 
-        Game.Team winner = redTeam.getScore() > blueTeam.getScore() ? redTeam : blueTeam;
+        Team winner = redTeam.getScore() > blueTeam.getScore() ? redTeam : blueTeam;
         if (redTeam.getScore() == blueTeam.getScore())
             winner = null;
 
         this.winnerTeam = winner;
 
-        for (Game.Team team : new Game.Team[]{redTeam, blueTeam})
+        for (Team team : new Team[]{redTeam, blueTeam})
             for (RankType rankType : RankType.values()) {
                 Iterator<GameUser> iterator = team.getTeamUsers().stream()
                         .sorted(Comparator.comparing(rankType.valueFunction::applyAsInt).reversed())

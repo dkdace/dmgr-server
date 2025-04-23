@@ -15,7 +15,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.Team;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -120,7 +120,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
 
     @Override
     @Nullable
-    public Game.Team getTeam() {
+    public Team getTeam() {
         return null;
     }
 

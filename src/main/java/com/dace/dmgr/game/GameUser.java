@@ -50,7 +50,7 @@ public final class GameUser {
     /** 팀 */
     @NonNull
     @Getter
-    private final Game.Team team;
+    private final Team team;
     /** 게임 탭리스트 프로필 */
     private final GameTabListProfile gameTabListProfile;
     /** 게임 시작 시점 */
@@ -95,7 +95,7 @@ public final class GameUser {
      * @param team 설정할 팀
      * @throws IllegalStateException 해당 {@code user}가 지정한 {@code game}의 방에 입장하지 않았거나 GameUser가 이미 존재하면 발생
      */
-    GameUser(@NonNull User user, @NonNull Game game, @NonNull Game.Team team) {
+    GameUser(@NonNull User user, @NonNull Game game, @NonNull Team team) {
         Validate.validState(!GAME_USER_MAP.containsKey(user), "GameUser가 이미 존재함");
         Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game, "user.getGameRoom().getGame() == game (false)");
 
@@ -110,6 +110,7 @@ public final class GameUser {
         GAME_USER_MAP.put(user, this);
 
         game.onAddGameUser(this);
+        team.onAddGameUser(this);
 
         this.onTickTask = new IntervalTask(this::onTick, 1);
 
@@ -128,8 +129,7 @@ public final class GameUser {
     }
 
     private void onInit() {
-        for (CommunicationItem communicationItem : CommunicationItem.values())
-            user.getGui().set(communicationItem.slotIndex, communicationItem.definedItem);
+        CommunicationItem.updateGUI(this);
 
         EntityUtil.teleport(player, getSpawnLocation());
         user.clearChat();
@@ -204,6 +204,7 @@ public final class GameUser {
 
         onTickTask.stop();
         game.onRemoveGameUser(this);
+        team.onRemoveGameUser(this);
 
         GAME_USER_MAP.remove(user);
 
@@ -289,18 +290,18 @@ public final class GameUser {
      * 스폰 위치를 반환한다.
      *
      * @return 스폰 위치
-     * @see Game.Team#getSpawn()
+     * @see Game#getTeamSpawn(Team)
      */
     @NonNull
     public Location getSpawnLocation() {
-        return team.getSpawn();
+        return game.getTeamSpawn(team);
     }
 
     /**
      * 플레이어가 스폰 지역 안에 있는지 확인한다.
      *
      * @return 플레이어가 스폰 안에 있으면 {@code true} 반환
-     * @see Game.Team#isInSpawn(GameUser)
+     * @see Team#isInSpawn(GameUser)
      */
     public boolean isInSpawn() {
         return team.isInSpawn(this);
@@ -435,6 +436,16 @@ public final class GameUser {
 
                         return true;
                     }));
+        }
+
+        /**
+         * 의사소통 아이템 인벤토리 GUI를 업데이트한다.
+         *
+         * @param gameUser 대상 플레이어
+         */
+        private static void updateGUI(@NonNull GameUser gameUser) {
+            for (CommunicationItem communicationItem : CommunicationItem.values())
+                gameUser.getUser().getGui().set(communicationItem.slotIndex, communicationItem.definedItem);
         }
     }
 }
