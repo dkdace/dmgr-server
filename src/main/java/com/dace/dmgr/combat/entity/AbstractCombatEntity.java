@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.Task;
@@ -13,7 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.ArrayList;
@@ -41,10 +39,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     @Getter
     protected final String name;
-    /** 소속된 게임 */
-    @Nullable
-    @Getter
-    protected final Game game;
     /** 현재 월드 */
     private final World world;
     /** 태스크 관리 인스턴스 */
@@ -64,16 +58,14 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
      *
      * @param entity   대상 엔티티
      * @param name     이름
-     * @param game     소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
      * @param hitboxes 히트박스 목록
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @Nullable Game game, @NonNull Hitbox @NonNull ... hitboxes) {
+    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @NonNull Hitbox @NonNull ... hitboxes) {
         Validate.validState(COMBAT_ENTITY_MAP.get(entity) == null, "CombatEntity가 이미 존재함");
 
         this.entity = entity;
         this.name = name;
-        this.game = game;
         this.world = entity.getWorld();
         this.hitboxes = hitboxes;
         this.hitboxBaseLocation = entity.getLocation();

@@ -28,6 +28,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.item.DefinedItem;
@@ -138,6 +139,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final GameUser gameUser;
+    /** 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
+    @Nullable
+    @Getter
+    private final Game game;
     /** 팀. {@code null}이면 게임에 참여중이지 않음을 나타냄 */
     @Nullable
     @Getter
@@ -231,10 +236,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalStateException 해당 {@code user}의 CombatUser가 이미 존재하면 발생
      */
     private CombatUser(@NonNull CombatantType combatantType, @NonNull User user, @Nullable GameUser gameUser) {
-        super(user.getPlayer(), user.getPlayer().getName(), gameUser == null ? null : gameUser.getGame());
+        super(user.getPlayer(), user.getPlayer().getName());
 
         this.user = user;
         this.gameUser = gameUser;
+        this.game = gameUser == null ? null : gameUser.getGame();
         this.team = gameUser == null ? null : gameUser.getTeam();
         this.combatantType = combatantType;
         this.combatant = combatantType.getCombatant();

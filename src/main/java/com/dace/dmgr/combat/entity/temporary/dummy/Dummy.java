@@ -15,6 +15,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
 import lombok.Getter;
 import lombok.NonNull;
@@ -81,7 +82,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
      * @see DummyBehavior
      */
     public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
-        super(PLAYER_SKIN, spawnLocation, "훈련용 봇", null, Hitbox.createDefaultPlayerHitboxes(1));
+        super(PLAYER_SKIN, spawnLocation, "훈련용 봇", Hitbox.createDefaultPlayerHitboxes(1));
         Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;
@@ -116,6 +117,12 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
         SPAWN_PARTICLE.play(getCenterLocation());
 
         dummyBehavior.onInit(this);
+    }
+
+    @Override
+    @Nullable
+    public Game getGame() {
+        return null;
     }
 
     @Override

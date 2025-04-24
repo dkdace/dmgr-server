@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity.temporary;
 import com.dace.dmgr.DMGR;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.game.Game;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
@@ -16,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어 형태의 엔티티 클래스.
@@ -37,13 +35,12 @@ public abstract class TemporaryPlayerEntity extends TemporaryEntity<Player> {
      * @param playerSkin    플레이어 스킨
      * @param spawnLocation 생성 위치
      * @param name          이름
-     * @param game          소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄
      * @param hitboxes      히트박스 목록
      * @throws IllegalStateException {@code spawnLocation}에 엔티티를 소환할 수 없으면 발생
      */
-    protected TemporaryPlayerEntity(@NonNull PlayerSkin playerSkin, @NonNull Location spawnLocation, @NonNull String name, @Nullable Game game,
+    protected TemporaryPlayerEntity(@NonNull PlayerSkin playerSkin, @NonNull Location spawnLocation, @NonNull String name,
                                     @NonNull Hitbox @NonNull ... hitboxes) {
-        super(spawnPlayerNPC(playerSkin, spawnLocation), name, game, hitboxes);
+        super(spawnPlayerNPC(playerSkin, spawnLocation), name, hitboxes);
 
         this.npc = DMGR.getNpcRegistry().getNPC(entity);
         this.nameTagHider = EntityUtil.createTemporaryArmorStand(entity.getLocation());

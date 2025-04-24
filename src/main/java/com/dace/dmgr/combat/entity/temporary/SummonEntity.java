@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.TextHologram;
+import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.task.DelayTask;
@@ -43,7 +44,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
      */
     protected SummonEntity(@NonNull Class<T> entityClass, @NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner,
                            boolean hasNameTag, boolean isHidden, @NonNull Hitbox @NonNull ... hitboxes) {
-        super(entityClass, spawnLocation, name, owner.getGame(), hitboxes);
+        super(entityClass, spawnLocation, name, hitboxes);
         this.owner = owner;
 
         if (hasNameTag) {
@@ -59,6 +60,12 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         }
         if (isHidden)
             hide();
+    }
+
+    @Override
+    @Nullable
+    public final Game getGame() {
+        return owner.getGame();
     }
 
     @Override
