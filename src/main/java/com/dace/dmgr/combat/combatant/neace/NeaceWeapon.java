@@ -2,16 +2,12 @@ package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.Target;
@@ -122,7 +118,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     private final class NeaceWeaponRTarget extends Target<Healable> {
         private NeaceWeaponRTarget() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
@@ -133,7 +129,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     private final class NeaceWeaponLProjectile extends Projectile<Damageable> {
         private NeaceWeaponLProjectile() {
-            super(NeaceWeapon.this, NeaceWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(NeaceWeapon.this, NeaceWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(NeaceWeaponInfo.SIZE).maxDistance(NeaceWeaponInfo.DISTANCE).build());
         }
 

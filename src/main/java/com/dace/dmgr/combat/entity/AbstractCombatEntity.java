@@ -115,7 +115,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
      */
     @NonNull
     @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllExcluded(@NonNull World world) {
+    static Collection<@NonNull CombatEntity> getAllCombatEntities(@NonNull World world) {
         HashMap<Entity, CombatEntity> combatEntityMap = WORLD_COMBAT_ENTITY_MAP.get(world);
         return Collections.unmodifiableCollection(combatEntityMap == null ? Collections.emptySet() : combatEntityMap.values());
     }

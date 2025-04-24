@@ -1,16 +1,12 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
@@ -142,7 +138,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
     private final class InfernoA2Area extends Area<Damageable> {
         private InfernoA2Area() {
-            super(combatUser, InfernoA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, InfernoA2Info.RADIUS, EntityCondition.enemy(combatUser));
         }
 
         @Override

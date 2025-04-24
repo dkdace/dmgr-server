@@ -9,10 +9,7 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
@@ -192,7 +189,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     private final class PalasWeaponHitscan extends Hitscan<Damageable> {
         private PalasWeaponHitscan(boolean isAiming) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+            super(combatUser, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser).exclude(combatUser)),
                     (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).build());
         }
 
@@ -231,7 +228,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     private final class PalasWeaponHealHitscan extends Hitscan<Damageable> {
         private PalasWeaponHealHitscan(boolean isAiming) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+            super(combatUser, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser).exclude(combatUser)),
                     (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).size(PalasWeaponInfo.HEAL_SIZE).build());
         }
 

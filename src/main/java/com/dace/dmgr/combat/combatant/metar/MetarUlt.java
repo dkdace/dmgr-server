@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
@@ -9,6 +8,7 @@ import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
@@ -91,7 +91,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
     private final class MetarUltHitscan extends Hitscan<Damageable> {
         private MetarUltHitscan() {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(MetarUltInfo.SIZE).build());
+            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(MetarUltInfo.SIZE).build());
         }
 
         @Override

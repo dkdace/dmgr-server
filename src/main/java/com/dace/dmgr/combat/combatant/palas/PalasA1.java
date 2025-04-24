@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
@@ -105,7 +106,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
 
     private final class PalasA1Projectile extends Projectile<Damageable> {
         private PalasA1Projectile() {
-            super(PalasA1.this, PalasA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(PalasA1.this, PalasA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override

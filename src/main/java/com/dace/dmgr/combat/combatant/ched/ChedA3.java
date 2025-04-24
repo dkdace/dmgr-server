@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -134,7 +135,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
-            super(ChedA3.this, ChedA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature),
+            super(ChedA3.this, ChedA3Info.VELOCITY, EntityCondition.enemy(combatUser).and(Damageable::isCreature),
                     Option.builder().size(ChedA3Info.SIZE).build());
         }
 
@@ -186,7 +187,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
-                    CombatUtil.getCombatEntities(location.getWorld(), CombatUtil.EntityCondition.team(combatUser).and(CombatUser.class::isInstance))
+                    CombatUtil.getCombatEntities(location.getWorld(), EntityCondition.team(combatUser).and(CombatUser.class::isInstance))
                             .forEach(teamTarget -> ((CombatUser) teamTarget).setGlowing(target, ChedA3Info.DETECT_DURATION));
 
                     if (target.isGoalTarget()) {

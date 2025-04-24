@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Summonable;
@@ -89,7 +88,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
-            super(JagerUlt.this, JagerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerUlt.this, JagerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }
@@ -270,7 +269,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         private final class JagerUltArea extends Area<Damageable> {
             private JagerUltArea(double radius) {
-                super(JagerUltEntity.this, radius, CombatUtil.EntityCondition.enemy(JagerUltEntity.this).and(combatEntity ->
+                super(JagerUltEntity.this, radius, EntityCondition.enemy(JagerUltEntity.this).and(combatEntity ->
                         combatEntity.getLocation().add(0, combatEntity.getHeight(), 0).getY() < JagerUltEntity.this.getLocation().getY()));
             }
 

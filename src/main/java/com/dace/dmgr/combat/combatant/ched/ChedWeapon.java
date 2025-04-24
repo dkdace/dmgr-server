@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
@@ -88,7 +88,7 @@ public final class ChedWeapon extends AbstractWeapon {
         private final double power;
 
         private ChedWeaponProjectile(double power) {
-            super(ChedWeapon.this, (int) (power * ChedWeaponInfo.MAX_VELOCITY), CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedWeapon.this, (int) (power * ChedWeaponInfo.MAX_VELOCITY), EntityCondition.enemy(combatUser));
             this.power = power;
         }
 

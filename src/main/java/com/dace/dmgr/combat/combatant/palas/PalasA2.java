@@ -1,15 +1,11 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.LocationUtil;
@@ -79,8 +75,8 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
-        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+    public EntityCondition<Healable> getEntityCondition() {
+        return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasA2Immune.instance));
     }
 

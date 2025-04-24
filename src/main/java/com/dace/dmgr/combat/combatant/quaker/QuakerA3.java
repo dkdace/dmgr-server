@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
@@ -90,7 +89,7 @@ public final class QuakerA3 extends ActiveSkill {
 
     private final class QuakerA3Effect extends Hitscan<CombatEntity> {
         private QuakerA3Effect() {
-            super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(0.6).build());
+            super(combatUser, EntityCondition.all(), Option.builder().maxDistance(0.6).build());
         }
 
         @Override
@@ -132,7 +131,7 @@ public final class QuakerA3 extends ActiveSkill {
         private final HashSet<Damageable> targets = new HashSet<>();
 
         private QuakerA3Projectile() {
-            super(QuakerA3.this, QuakerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerA3.this, QuakerA3Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerA3Info.SIZE).maxDistance(QuakerA3Info.DISTANCE).build());
         }
 

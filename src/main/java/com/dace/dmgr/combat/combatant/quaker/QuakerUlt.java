@@ -6,10 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
@@ -120,7 +117,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerUltProjectile(@NonNull HashSet<Damageable> targets) {
-            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerUltInfo.SIZE).maxDistance(QuakerUltInfo.DISTANCE).build());
             this.targets = targets;
         }

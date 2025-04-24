@@ -5,10 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Bullet;
@@ -94,7 +91,7 @@ public final class MetarA1 extends ActiveSkill {
         private Damageable target;
 
         private MetarA1Projectile() {
-            super(MetarA1.this, MetarA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(MetarA1.this, MetarA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override

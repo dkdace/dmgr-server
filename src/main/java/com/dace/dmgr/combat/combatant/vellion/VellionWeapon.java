@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;
@@ -42,7 +42,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
     private final class VellionWeaponProjectile extends Projectile<Damageable> {
         private VellionWeaponProjectile() {
-            super(VellionWeapon.this, VellionWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(VellionWeapon.this, VellionWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(VellionWeaponInfo.SIZE).maxDistance(VellionWeaponInfo.DISTANCE).build());
         }
 

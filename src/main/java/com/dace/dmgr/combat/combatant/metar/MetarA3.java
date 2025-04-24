@@ -1,16 +1,12 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -107,7 +103,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         private final HashSet<Damageable> targets = new HashSet<>();
 
         private MetarA3Projectile() {
-            super(MetarA3.this, MetarA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(MetarA3.this, MetarA3Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(MetarA3Info.SIZE).duration(MetarA3Info.EXPLODE_DURATION).build());
         }
 
@@ -175,7 +171,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         private final class MetarA3Area extends Area<Damageable> {
             private MetarA3Area() {
-                super(combatUser, MetarA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
+                super(combatUser, MetarA3Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
             }
 
             @Override

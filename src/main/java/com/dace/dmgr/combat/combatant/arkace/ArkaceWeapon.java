@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -140,7 +141,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         private final boolean isUlt;
 
         private ArkaceWeaponHitscan(boolean isUlt) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, EntityCondition.enemy(combatUser));
             this.isUlt = isUlt;
         }
 

@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -11,6 +10,7 @@ import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
@@ -180,7 +180,7 @@ public final class Neace extends Support {
 
     private static final class NeaceTarget extends Target<Healable> {
         private NeaceTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, NeaceA1Info.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override

@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -135,7 +136,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         private final boolean isOpposite;
 
         private MetarWeaponProjectile(boolean isOpposite) {
-            super(MetarWeapon.this, MetarWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(MetarWeapon.this, MetarWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().maxDistance(MetarWeaponInfo.DISTANCE).build());
             this.isOpposite = isOpposite;
         }

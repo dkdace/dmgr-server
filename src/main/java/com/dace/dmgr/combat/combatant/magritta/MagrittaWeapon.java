@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
@@ -144,7 +145,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         private final boolean isUlt;
 
         private MagrittaWeaponHitscan(@NonNull HashMap<Damageable, Integer> targets, boolean isUlt) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
+            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
 
             this.targets = targets;
             this.isUlt = isUlt;

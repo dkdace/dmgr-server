@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -10,10 +9,7 @@ import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -169,8 +165,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Damageable> getEntityCondition() {
-        return CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
+    public EntityCondition<Damageable> getEntityCondition() {
+        return EntityCondition.enemy(combatUser).and(combatEntity ->
                 combatEntity.isCreature() && !combatEntity.getStatusEffectModule().has(VellionA2Mark.instance));
     }
 
@@ -253,7 +249,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         private boolean isActivated = false;
 
         private VellionA2Area(@NonNull Damageable target) {
-            super(combatUser, VellionA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).exclude(target));
+            super(combatUser, VellionA2Info.RADIUS, EntityCondition.enemy(combatUser).exclude(target));
             this.effectLoc = target.getLocation().add(0, target.getHeight() + 0.5, 0);
         }
 

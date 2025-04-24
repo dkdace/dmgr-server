@@ -2,13 +2,9 @@ package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.LocationUtil;
@@ -115,7 +111,7 @@ public final class InfernoA1 extends ActiveSkill {
 
     private final class InfernoA1Area extends Area<Damageable> {
         private InfernoA1Area() {
-            super(combatUser, InfernoA1Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, InfernoA1Info.RADIUS, EntityCondition.enemy(combatUser));
         }
 
         @Override

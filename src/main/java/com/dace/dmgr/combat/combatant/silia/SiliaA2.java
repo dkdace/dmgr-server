@@ -2,13 +2,9 @@ package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -78,7 +74,7 @@ public final class SiliaA2 extends ActiveSkill {
 
     private final class SiliaA2Projectile extends Projectile<Damageable> {
         private SiliaA2Projectile() {
-            super(SiliaA2.this, SiliaA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(SiliaA2.this, SiliaA2Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(SiliaA2Info.SIZE).maxDistance(SiliaA2Info.DISTANCE).build());
         }
 

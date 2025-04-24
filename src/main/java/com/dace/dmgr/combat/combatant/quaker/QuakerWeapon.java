@@ -2,13 +2,9 @@ package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -101,7 +97,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         private final boolean isUlt;
 
         private QuakerWeaponAttack(@NonNull HashSet<Damageable> targets, boolean isUlt) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(QuakerWeaponInfo.SIZE)
+            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(QuakerWeaponInfo.SIZE)
                     .maxDistance(QuakerWeaponInfo.DISTANCE).build());
 
             this.targets = targets;

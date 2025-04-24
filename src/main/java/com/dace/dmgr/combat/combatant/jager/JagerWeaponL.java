@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.action.weapon.module.SwapModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -170,7 +171,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     private final class JagerWeaponLProjectile extends Projectile<Damageable> {
         private JagerWeaponLProjectile() {
-            super(JagerWeaponL.this, JagerWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerWeaponL.this, JagerWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().maxDistance(JagerWeaponInfo.DISTANCE).build());
         }
 

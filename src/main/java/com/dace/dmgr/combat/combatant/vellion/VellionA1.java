@@ -1,15 +1,11 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -192,7 +188,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
         private final class VellionA1Area extends Area<Damageable> {
             private VellionA1Area() {
-                super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
+                super(combatUser, VellionA1Info.RADIUS, EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
             }
 
             @Override

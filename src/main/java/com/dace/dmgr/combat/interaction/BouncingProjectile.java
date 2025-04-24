@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import lombok.Builder;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -40,7 +40,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @see Projectile.Option
      * @see Option
      */
-    BouncingProjectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    BouncingProjectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull EntityCondition<T> entityCondition,
                        @NonNull Projectile.Option projectileOption, @NonNull Option option) {
         super(shooter, action, speed, entityCondition, projectileOption);
 
@@ -67,7 +67,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @see Projectile.Option
      * @see Option
      */
-    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull EntityCondition<T> entityCondition,
                                  @NonNull Projectile.Option projectileOption, @NonNull Option option) {
         this(shooter, null, speed, entityCondition, projectileOption, option);
     }
@@ -88,7 +88,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @see Projectile.Option
      * @see Option
      */
-    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull EntityCondition<T> entityCondition,
                                  @NonNull Projectile.Option projectileOption, @NonNull Option option) {
         this(action.getCombatUser(), action, speed, entityCondition, projectileOption, option);
     }
@@ -105,7 +105,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Projectile.Option
      */
-    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull EntityCondition<T> entityCondition,
                                  @NonNull Projectile.Option projectileOption) {
         this(shooter, null, speed, entityCondition, projectileOption, Option.builder().build());
     }
@@ -122,7 +122,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Projectile.Option
      */
-    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull EntityCondition<T> entityCondition,
                                  @NonNull Projectile.Option projectileOption) {
         this(action.getCombatUser(), action, speed, entityCondition, projectileOption, Option.builder().build());
     }
@@ -135,7 +135,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected BouncingProjectile(@NonNull CombatEntity shooter, int speed, @NonNull EntityCondition<T> entityCondition) {
         this(shooter, null, speed, entityCondition, Projectile.Option.builder().build(), Option.builder().build());
     }
 
@@ -147,7 +147,7 @@ public abstract class BouncingProjectile<T extends CombatEntity> extends Project
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected BouncingProjectile(@NonNull Action action, int speed, @NonNull EntityCondition<T> entityCondition) {
         this(action.getCombatUser(), action, speed, entityCondition, Projectile.Option.builder().build(), Option.builder().build());
     }
 

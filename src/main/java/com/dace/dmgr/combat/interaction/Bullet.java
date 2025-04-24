@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,7 +40,7 @@ public abstract class Bullet<T extends CombatEntity> {
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     protected final double size;
     /** 대상 엔티티를 찾는 조건 */
-    protected final CombatUtil.EntityCondition<T> entityCondition;
+    protected final EntityCondition<T> entityCondition;
     /** 피격자 목록 */
     private final HashSet<T> targets = new HashSet<>();
 
@@ -83,7 +84,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(startDistance >= 0, "startDistance >= 0 (%f)", startDistance);
         Validate.isTrue(maxDistance >= 0, "maxDistance >= %f (%f)", startDistance, maxDistance);
         Validate.isTrue(size >= 0, "size >= 0 (%f)", size);

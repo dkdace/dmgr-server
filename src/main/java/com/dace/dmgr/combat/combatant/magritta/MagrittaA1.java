@@ -5,10 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -75,7 +72,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
     private final class MagrittaA1Projectile extends Projectile<Damageable> {
         private MagrittaA1Projectile() {
-            super(MagrittaA1.this, MagrittaA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(MagrittaA1.this, MagrittaA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -149,7 +146,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
         private final class MagrittaA1Area extends Area<Damageable> {
             private MagrittaA1Area() {
-                super(combatUser, MagrittaA1Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
+                super(combatUser, MagrittaA1Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
             }
 
             @Override

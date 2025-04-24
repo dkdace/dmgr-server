@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.temporary.dummy;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -36,7 +36,7 @@ final class DummyProjectile extends Projectile<Damageable> {
      * @param damage  피해량
      */
     DummyProjectile(@NonNull Dummy shooter, int damage) {
-        super(shooter, 30, CombatUtil.EntityCondition.enemy(shooter));
+        super(shooter, 30, EntityCondition.enemy(shooter));
 
         this.damage = damage;
         SHOOT_SOUND.play(shooter.getLocation());

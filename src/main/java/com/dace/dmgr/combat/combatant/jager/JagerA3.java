@@ -8,10 +8,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -161,7 +158,7 @@ public final class JagerA3 extends ActiveSkill {
 
     private final class JagerA3Projectile extends BouncingProjectile<Damageable> {
         private JagerA3Projectile() {
-            super(JagerA3.this, JagerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerA3.this, JagerA3Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timestamp.now().until(explodeTimestamp)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }
@@ -207,7 +204,7 @@ public final class JagerA3 extends ActiveSkill {
         private final JagerA3Projectile projectile;
 
         private JagerA3Area(@Nullable JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
+            super(combatUser, JagerA3Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
             this.projectile = projectile;
         }
 

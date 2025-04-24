@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import lombok.NonNull;
 
 /**
@@ -22,7 +22,7 @@ public abstract class Target<T extends CombatEntity> extends Hitscan<T> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Target(@NonNull CombatUser shooter, double maxDistance, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Target(@NonNull CombatUser shooter, double maxDistance, @NonNull EntityCondition<T> entityCondition) {
         super(shooter, entityCondition, Option.builder().size(SIZE).maxDistance(maxDistance).build());
     }
 

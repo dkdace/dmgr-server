@@ -215,7 +215,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
                 entity.setTamed(true);
 
                 Damageable target = CombatUtil.getNearCombatEntity(getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
-                        CombatUtil.EntityCondition.enemy(this).and(Damageable::isCreature));
+                        EntityCondition.enemy(this).and(Damageable::isCreature));
 
                 if (target != null) {
                     entity.setTarget(target.getEntity());

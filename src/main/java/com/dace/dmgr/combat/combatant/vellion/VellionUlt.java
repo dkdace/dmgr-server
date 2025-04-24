@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -10,6 +9,7 @@ import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
@@ -221,7 +221,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     private final class VellionUltArea extends Area<Damageable> {
         private VellionUltArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
+            super(combatUser, VellionUltInfo.RADIUS, EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override
@@ -245,7 +245,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     private final class VellionUltExplodeArea extends Area<Damageable> {
         private VellionUltExplodeArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
+            super(combatUser, VellionUltInfo.RADIUS, EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override

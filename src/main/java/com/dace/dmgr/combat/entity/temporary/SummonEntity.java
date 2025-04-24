@@ -4,6 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Team;
@@ -81,7 +82,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
         WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
         packet.setEntityIds(new int[]{getEntity().getEntityId()});
 
-        CombatUtil.getCombatEntities(entity.getWorld(), CombatUtil.EntityCondition.of(CombatUser.class)).forEach(target ->
+        CombatUtil.getCombatEntities(entity.getWorld(), EntityCondition.of(CombatUser.class)).forEach(target ->
                 packet.sendPacket(target.getEntity()));
     }
 }

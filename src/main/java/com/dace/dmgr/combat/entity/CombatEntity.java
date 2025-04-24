@@ -28,8 +28,8 @@ public interface CombatEntity {
      */
     @NonNull
     @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllExcluded(@NonNull World world) {
-        return AbstractCombatEntity.getAllExcluded(world);
+    static Collection<@NonNull CombatEntity> getAllCombatEntities(@NonNull World world) {
+        return AbstractCombatEntity.getAllCombatEntities(world);
     }
 
     /**

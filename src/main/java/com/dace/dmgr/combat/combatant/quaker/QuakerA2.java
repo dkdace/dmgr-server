@@ -8,10 +8,7 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
@@ -149,7 +146,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
 
     private final class QuakerA2Effect extends Hitscan<CombatEntity> {
         private QuakerA2Effect() {
-            super(combatUser, CombatUtil.EntityCondition.all(), Option.builder().maxDistance(QuakerWeaponInfo.DISTANCE).build());
+            super(combatUser, EntityCondition.all(), Option.builder().maxDistance(QuakerWeaponInfo.DISTANCE).build());
         }
 
         @Override
@@ -187,7 +184,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerA2Projectile(@NonNull HashSet<Damageable> targets) {
-            super(QuakerA2.this, QuakerA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerA2.this, QuakerA2Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerA2Info.SIZE).maxDistance(QuakerA2Info.DISTANCE).build());
             this.targets = targets;
         }

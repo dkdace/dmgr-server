@@ -4,10 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -63,7 +60,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
     private final class ArkaceA1Projectile extends Projectile<Damageable> {
         private ArkaceA1Projectile() {
-            super(ArkaceA1.this, ArkaceA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ArkaceA1.this, ArkaceA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override

@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -42,7 +43,7 @@ public abstract class Support extends Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0) {
-            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
                     .and(combatEntity -> combatEntity.isGoalTarget()
                             && combatEntity.getDamageModule().isHalfHealth()
                             && combatEntity.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS)).isEmpty();

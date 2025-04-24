@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -125,7 +126,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     private final class JagerWeaponRHitscan extends Hitscan<Damageable> {
         private JagerWeaponRHitscan() {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, EntityCondition.enemy(combatUser));
         }
 
         @Override

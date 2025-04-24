@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
@@ -11,6 +10,7 @@ import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -111,7 +111,7 @@ public final class ChedA1 extends StackableSkill {
 
     private final class ChedA1Projectile extends Projectile<Damageable> {
         private ChedA1Projectile() {
-            super(ChedA1.this, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedA1.this, ChedA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override

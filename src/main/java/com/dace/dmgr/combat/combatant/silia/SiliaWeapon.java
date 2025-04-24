@@ -2,14 +2,10 @@ package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -127,7 +123,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     private final class SiliaWeaponProjectile extends Projectile<Damageable> {
         private SiliaWeaponProjectile() {
-            super(SiliaWeapon.this, SiliaWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(SiliaWeapon.this, SiliaWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(SiliaWeaponInfo.SIZE).maxDistance(SiliaWeaponInfo.DISTANCE).build());
         }
 
@@ -182,7 +178,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         private final HashSet<Damageable> targets;
 
         private SiliaWeaponStrikeAttack(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE).build());
+            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE).build());
             this.targets = targets;
         }
 

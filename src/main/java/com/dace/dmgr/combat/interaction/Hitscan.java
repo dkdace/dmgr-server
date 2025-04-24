@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -22,7 +22,7 @@ public abstract class Hitscan<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Option
      */
-    protected Hitscan(@NonNull CombatEntity shooter, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
+    protected Hitscan(@NonNull CombatEntity shooter, @NonNull EntityCondition<T> entityCondition, @NonNull Option option) {
         super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
     }
 
@@ -34,7 +34,7 @@ public abstract class Hitscan<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Option
      */
-    protected Hitscan(@NonNull CombatEntity shooter, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Hitscan(@NonNull CombatEntity shooter, @NonNull EntityCondition<T> entityCondition) {
         this(shooter, entityCondition, Option.builder().build());
     }
 

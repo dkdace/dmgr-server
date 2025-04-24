@@ -8,10 +8,7 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -138,7 +135,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     private final class InfernoWeaponRProjectile extends Projectile<Damageable> {
         private InfernoWeaponRProjectile() {
-            super(InfernoWeapon.this, InfernoWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(InfernoWeapon.this, InfernoWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).build());
         }
 
@@ -180,7 +177,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     private final class InfernoWeaponLProjectile extends Projectile<Damageable> {
         private InfernoWeaponLProjectile() {
-            super(InfernoWeapon.this, InfernoWeaponInfo.FIREBALL.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(InfernoWeapon.this, InfernoWeaponInfo.FIREBALL.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(InfernoWeaponInfo.FIREBALL.SIZE).maxDistance(InfernoWeaponInfo.FIREBALL.DISTANCE).build());
         }
 

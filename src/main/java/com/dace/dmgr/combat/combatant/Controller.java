@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -39,11 +40,11 @@ public abstract class Controller extends Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
-            CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+            CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
                             .and(combatEntity -> combatEntity.isGoalTarget() && combatEntity.getDamageModule().isLowHealth()))
                     .forEach(target -> {
                         Damageable targetCombatEntity = CombatUtil.getNearCombatEntity(target.getLocation(), RoleTrait1Info.DETECT_RADIUS,
-                                CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
+                                EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
 
                         if (targetCombatEntity != null)
                             combatUser.setGlowing(targetCombatEntity, Timespan.ofTicks(10));

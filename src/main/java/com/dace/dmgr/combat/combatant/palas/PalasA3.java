@@ -2,15 +2,11 @@ package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.DamageType;
-import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -158,7 +154,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
     private final class PalasA3Projectile extends Projectile<Damageable> {
         private PalasA3Projectile() {
-            super(PalasA3.this, PalasA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser)
+            super(PalasA3.this, PalasA3Info.VELOCITY, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser)
                     .exclude(combatUser)));
         }
 
@@ -193,7 +189,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         private final class PalasA3Area extends Area<Damageable> {
             private PalasA3Area() {
-                super(combatUser, PalasA3Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class));
+                super(combatUser, PalasA3Info.RADIUS, EntityCondition.of(Damageable.class));
             }
 
             @Override
