@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -92,7 +93,7 @@ public abstract class ArenaDummyBehavior implements DummyBehavior {
      * @param dummy 대상 더미
      */
     private void navigate(@NonNull Dummy dummy) {
-        Navigator navigator = dummy.getNpc().getNavigator();
+        Navigator navigator = PlayerNPCSpawnHandler.getNPC(dummy).getNavigator();
 
         navigator.setTarget(target.getEntity(), false);
         navigator.getLocalParameters().entityTargetLocationMapper(new Function<Entity, Location>() {
@@ -100,7 +101,7 @@ public abstract class ArenaDummyBehavior implements DummyBehavior {
 
             @Override
             public Location apply(Entity entity) {
-                if (dummy.getNpc().getNavigator().isNavigating() && navigateTimestamp.isAfter(Timestamp.now()))
+                if (PlayerNPCSpawnHandler.getNPC(dummy).getNavigator().isNavigating() && navigateTimestamp.isAfter(Timestamp.now()))
                     return targetLocation;
 
                 navigateTimestamp = Timestamp.now().plus(Timespan.ofSeconds(RandomUtils.nextDouble(0.5, 1)));

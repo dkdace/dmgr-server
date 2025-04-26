@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.temporary.dummy;
 
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import lombok.NonNull;
 import net.citizensnpcs.api.ai.Navigator;
 import org.bukkit.Location;
@@ -29,7 +30,7 @@ public final class MovingBehavior implements DummyBehavior {
 
             @Override
             public void accept(long i) {
-                Navigator navigator = dummy.getNpc().getNavigator();
+                Navigator navigator = PlayerNPCSpawnHandler.getNPC(dummy).getNavigator();
                 if (!navigator.isNavigating())
                     navigator.setStraightLineTarget(points[index++ % points.length]);
             }

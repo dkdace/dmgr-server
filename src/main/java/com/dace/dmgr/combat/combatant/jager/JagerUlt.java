@@ -14,6 +14,7 @@ import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -138,7 +139,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private final ReadyTimeModule readyTimeModule;
 
         private JagerUltEntity(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true, true,
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true,
                     Hitbox.builder(0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build());
 
             this.attackModule = new AttackModule();

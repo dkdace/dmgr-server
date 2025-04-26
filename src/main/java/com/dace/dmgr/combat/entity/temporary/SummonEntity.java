@@ -1,10 +1,8 @@
 package com.dace.dmgr.combat.entity.temporary;
 
-import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
@@ -34,17 +32,17 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
     /**
      * 소환 가능한 엔티티 인스턴스를 생성한다.
      *
-     * @param entityClass   대상 엔티티 클래스
-     * @param spawnLocation 생성 위치
-     * @param name          이름
-     * @param owner         엔티티를 소환한 플레이어
-     * @param hasNameTag    아군에게 이름표 표시 여부
-     * @param isHidden      엔티티 숨김 여부
-     * @param hitboxes      히트박스 목록
+     * @param entitySpawnHandler 엔티티 생성 처리기
+     * @param spawnLocation      생성 위치
+     * @param name               이름
+     * @param owner              엔티티를 소환한 플레이어
+     * @param hasNameTag         아군에게 이름표 표시 여부
+     * @param hitboxes           히트박스 목록
+     * @throws IllegalStateException {@code spawnLocation}에 엔티티를 소환할 수 없으면 발생
      */
-    protected SummonEntity(@NonNull Class<T> entityClass, @NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner,
-                           boolean hasNameTag, boolean isHidden, @NonNull Hitbox @NonNull ... hitboxes) {
-        super(entityClass, spawnLocation, name, hitboxes);
+    protected SummonEntity(@NonNull EntitySpawnHandler<T> entitySpawnHandler, @NonNull Location spawnLocation, @NonNull String name,
+                           @NonNull CombatUser owner, boolean hasNameTag, @NonNull Hitbox @NonNull ... hitboxes) {
+        super(entitySpawnHandler, spawnLocation, name, hitboxes);
         this.owner = owner;
 
         if (hasNameTag) {
@@ -58,8 +56,6 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
                     nameTagHologram.remove();
             });
         }
-        if (isHidden)
-            hide();
     }
 
     @Override
@@ -80,16 +76,5 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
             return false;
 
         return owner.isEnemy(target);
-    }
-
-    /**
-     * 엔티티를 보이지 않게 한다.
-     */
-    private void hide() {
-        WrapperPlayServerEntityDestroy packet = new WrapperPlayServerEntityDestroy();
-        packet.setEntityIds(new int[]{getEntity().getEntityId()});
-
-        CombatUtil.getCombatEntities(entity.getWorld(), EntityCondition.of(CombatUser.class)).forEach(target ->
-                packet.sendPacket(target.getEntity()));
     }
 }

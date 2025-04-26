@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -157,7 +158,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         private long returnTime = VellionA1Info.RETURN_DURATION.toTicks();
 
         private VellionA1Entity(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false, true);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false);
 
             entity.setGravity(false);
             addOnTick(this::onTick);

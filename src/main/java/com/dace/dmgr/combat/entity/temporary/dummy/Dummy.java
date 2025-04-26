@@ -9,7 +9,8 @@ import com.dace.dmgr.combat.entity.module.HealModule;
 import com.dace.dmgr.combat.entity.module.MoveModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
-import com.dace.dmgr.combat.entity.temporary.TemporaryPlayerEntity;
+import com.dace.dmgr.combat.entity.temporary.TemporaryEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
@@ -21,13 +22,14 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public final class Dummy extends TemporaryPlayerEntity implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
+public final class Dummy extends TemporaryEntity<Player> implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
     /** 생성 입자 효과 */
     private static final FireworkEffect SPAWN_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
             Color.fromRGB(255, 255, 255)).fadeColor(Color.fromRGB(255, 255, 0)).build();
@@ -82,7 +84,7 @@ public final class Dummy extends TemporaryPlayerEntity implements Attacker, Heal
      * @see DummyBehavior
      */
     public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
-        super(PLAYER_SKIN, spawnLocation, "훈련용 봇", Hitbox.createDefaultPlayerHitboxes(1));
+        super(new PlayerNPCSpawnHandler(PLAYER_SKIN), spawnLocation, "훈련용 봇", Hitbox.createDefaultPlayerHitboxes(1));
         Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;

@@ -16,6 +16,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import lombok.Getter;
 import lombok.NonNull;
@@ -167,8 +168,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA1Entity(@NonNull Location spawnLocation) {
-            super(Wolf.class, spawnLocation, combatUser.getName() + "의 설랑", combatUser, true, false,
-                    Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
+            super(EntitySpawnHandler.getDefaultSpawnHandler(Wolf.class), spawnLocation, combatUser.getName() + "의 설랑", combatUser,
+                    true, Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
 
             this.attackModule = new AttackModule();
             this.damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);

@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -250,7 +251,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
      */
     public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false, true);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false);
             addOnTick(this::onTick);
         }
 

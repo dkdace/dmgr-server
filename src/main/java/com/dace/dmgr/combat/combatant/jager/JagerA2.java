@@ -14,6 +14,7 @@ import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -132,7 +133,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         private final ReadyTimeModule readyTimeModule;
 
         private JagerA2Entity(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 곰덫", combatUser, true, true,
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 곰덫", combatUser, true,
                     Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build());
 
             this.attackModule = new AttackModule();

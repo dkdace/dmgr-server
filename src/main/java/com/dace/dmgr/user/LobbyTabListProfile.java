@@ -130,9 +130,9 @@ public final class LobbyTabListProfile implements TabListProfile {
         items[1][0] = new Item(MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", i), Skin.LOBBY_USERS);
 
         int j = 0;
-        for (; adminUsersIterator.hasNext(); i++) {
+        for (; adminUsersIterator.hasNext(); j++) {
             User adminUser = adminUsersIterator.next();
-            items[3][i + 1] = new Item(getTabListPlayerName(adminUser), adminUser);
+            items[3][j + 1] = new Item(getTabListPlayerName(adminUser), adminUser);
         }
         items[3][0] = new Item(MessageFormat.format("§b§l§n 관리자 §f({0}명)", j), Skin.ADMIN_USERS);
     }

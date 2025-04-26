@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.GameUser;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public abstract class Barrier extends SummonEntity<ArmorStand> implements Damage
      * @param hitbox        히트박스
      */
     protected Barrier(@NonNull Location spawnLocation, @NonNull String name, @NonNull CombatUser owner, int maxHealth, int score, @NonNull Hitbox hitbox) {
-        super(ArmorStand.class, spawnLocation, name, owner, false, false, hitbox);
+        super(ArmorStandSpawnHandler.getInstance(), spawnLocation, name, owner, false, hitbox);
 
         this.damageModule = new DamageModule(this, maxHealth, false);
         this.statusEffectModule = new StatusEffectModule(this);
