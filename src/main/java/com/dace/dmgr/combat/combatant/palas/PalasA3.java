@@ -47,7 +47,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
-        PalasA3Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -163,8 +163,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
             Location loc = location.add(0, 0.1, 0);
             new PalasA3Area().emit(loc);
 
-            PalasA3Info.SOUND.EXPLODE.play(loc);
-            PalasA3Info.PARTICLE.EXPLODE.play(loc);
+            PalasA3Info.Sounds.EXPLODE.play(loc);
+            PalasA3Info.Particles.EXPLODE.play(loc);
         }
 
         @Override
@@ -172,7 +172,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, PalasA3Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, PalasA3Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override

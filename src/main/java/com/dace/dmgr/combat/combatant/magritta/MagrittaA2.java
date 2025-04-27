@@ -53,13 +53,13 @@ public final class MagrittaA2 extends ActiveSkill {
         weapon.cancel();
         weapon.setVisible(false);
 
-        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
+        MagrittaA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation().add(0, 0.1, 0);
 
-            MagrittaA2Info.PARTICLE.TICK_CORE.play(loc);
-            MagrittaA2Info.PARTICLE.TICK_DECO.play(combatUser.getCenterLocation());
+            MagrittaA2Info.Particles.TICK_CORE.play(loc);
+            MagrittaA2Info.Particles.TICK_DECO.play(combatUser.getCenterLocation());
         }, 1, MagrittaA2Info.DURATION.toTicks()));
     }
 
@@ -73,7 +73,7 @@ public final class MagrittaA2 extends ActiveSkill {
         weapon.setVisible(true);
         weapon.getReloadModule().resetRemainingAmmo();
 
-        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
+        MagrittaA2Info.Sounds.USE.play(combatUser.getLocation());
     }
 
     @Override

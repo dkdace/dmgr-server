@@ -64,7 +64,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
@@ -84,7 +84,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 - 1 */
         public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

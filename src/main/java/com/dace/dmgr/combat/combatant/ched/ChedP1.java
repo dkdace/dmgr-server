@@ -116,7 +116,7 @@ public final class ChedP1 extends AbstractSkill {
 
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
-            ChedP1Info.SOUND.USE.play(combatUser.getLocation());
+            ChedP1Info.Sounds.USE.play(combatUser.getLocation());
 
             return true;
         }, () -> {
@@ -149,8 +149,8 @@ public final class ChedP1 extends AbstractSkill {
         if (isHanging) {
             setHanging(false);
 
-            ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getLocation());
-            ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
+            ChedP1Info.Sounds.DISABLE_HANG.play(combatUser.getLocation());
+            ChedP1Info.Particles.USE_HANG.play(combatUser.getLocation());
         } else
             combatUser.getWeapon().setVisible(true);
     }
@@ -168,8 +168,8 @@ public final class ChedP1 extends AbstractSkill {
             if (!isHanging) {
                 setHanging(true);
 
-                ChedP1Info.SOUND.USE_HANG.play(combatUser.getLocation());
-                ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
+                ChedP1Info.Sounds.USE_HANG.play(combatUser.getLocation());
+                ChedP1Info.Particles.USE_HANG.play(combatUser.getLocation());
             }
 
             hangTick--;
@@ -196,7 +196,7 @@ public final class ChedP1 extends AbstractSkill {
             int angle = 360 / 7 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ChedP1Info.PARTICLE.TICK_HANG.play(loc.clone().add(vec));
+            ChedP1Info.Particles.TICK_HANG.play(loc.clone().add(vec));
         }
     }
 

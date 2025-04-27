@@ -26,7 +26,7 @@ public final class MagrittaT1 {
         ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, MagrittaT1Info.DURATION);
         shreddingValue.addValue(attacker, victim);
 
-        MagrittaT1Info.SOUND.USE.play(victim.getLocation());
+        MagrittaT1Info.Sounds.USE.play(victim.getLocation());
     }
 
     /**
@@ -69,7 +69,7 @@ public final class MagrittaT1 {
 
             victim.getStatusEffectModule().apply(burning, MagrittaT1Info.DURATION);
 
-            MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
+            MagrittaT1Info.Sounds.MAX.play(victim.getLocation());
 
             if (victim.isGoalTarget())
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);

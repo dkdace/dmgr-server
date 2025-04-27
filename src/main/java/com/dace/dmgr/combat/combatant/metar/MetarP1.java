@@ -45,7 +45,7 @@ public final class MetarP1 extends AbstractSkill {
         setDuration();
         combatUser.getMoveModule().getResistanceStatus().addModifier(MODIFIER);
 
-        MetarP1Info.SOUND.USE.play(combatUser.getLocation());
+        MetarP1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> combatUser.getEntity().isSneaking(), this::forceCancel, 1));
     }
@@ -60,6 +60,6 @@ public final class MetarP1 extends AbstractSkill {
         setCooldown();
         combatUser.getMoveModule().getResistanceStatus().removeModifier(MODIFIER);
 
-        MetarP1Info.SOUND.DISABLE.play(combatUser.getLocation());
+        MetarP1Info.Sounds.DISABLE.play(combatUser.getLocation());
     }
 }

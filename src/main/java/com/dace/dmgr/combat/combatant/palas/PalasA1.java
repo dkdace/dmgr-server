@@ -54,7 +54,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
         weapon.cancel();
         weapon.setVisible(false);
 
-        PalasA1Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -62,7 +62,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA1Projectile().shot(loc);
 
-            PalasA1Info.SOUND.USE_READY.play(loc);
+            PalasA1Info.Sounds.USE_READY.play(loc);
         }, PalasA1Info.READY_DURATION.toTicks()));
     }
 
@@ -98,8 +98,8 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
                 CombatUtil.sendShake((CombatUser) combatEntity, 20, 20);
 
             if (i % 2 == 0) {
-                PalasA1Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
-                PalasA1Info.SOUND.TICK.play(combatEntity.getLocation());
+                PalasA1Info.Particles.TICK.play(combatEntity.getCenterLocation());
+                PalasA1Info.Sounds.TICK.play(combatEntity.getLocation());
             }
         }
     }
@@ -112,7 +112,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(8, PalasA1Info.PARTICLE.BULLET_TRAIL::play);
+            return createPeriodIntervalHandler(8, PalasA1Info.Particles.BULLET_TRAIL::play);
         }
 
         @Override
@@ -129,10 +129,10 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
                     if (target.isCreature()) {
                         target.getStatusEffectModule().apply(stun, PalasA1Info.STUN_DURATION);
 
-                        PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
+                        PalasA1Info.Particles.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }
 
-                    PalasA1Info.SOUND.HIT_ENTITY.play(location);
+                    PalasA1Info.Sounds.HIT_ENTITY.play(location);
 
                     if (target.isGoalTarget()) {
                         combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);

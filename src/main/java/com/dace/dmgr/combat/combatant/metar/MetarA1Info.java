@@ -54,7 +54,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.6).build(),
@@ -75,7 +75,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(40, 160, 200);
 

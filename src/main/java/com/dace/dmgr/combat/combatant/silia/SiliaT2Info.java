@@ -44,7 +44,7 @@ public final class SiliaT2Info extends TraitInfo {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(1.5).pitch(1, 1.2).build(),
@@ -56,10 +56,10 @@ public final class SiliaT2Info extends TraitInfo {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 (중심) */
         public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.PARTICLE.COLOR)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.Particles.COLOR)
                         .count(8).horizontalSpread(0.15).verticalSpread(0.15).build());
         /** 총알 궤적 (장식) */
         public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(

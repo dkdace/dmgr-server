@@ -81,7 +81,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             new QuakerA2Effect().shot(loc, vec);
 
             if (i % 2 == 0)
-                QuakerA2Info.SOUND.USE.play(loc.add(vec));
+                QuakerA2Info.Sounds.USE.play(loc.add(vec));
             if (i == 11)
                 addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), this::onReady, 1));
         };
@@ -140,7 +140,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             new QuakerA2Projectile(targets).shot(loc, vec);
         }
 
-        QuakerA2Info.SOUND.USE_READY.play(loc);
+        QuakerA2Info.Sounds.USE_READY.play(loc);
         CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
     }
 
@@ -152,7 +152,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         @Override
         protected void onDestroy(@NonNull Location location) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+            QuakerWeaponInfo.Particles.BULLET_TRAIL_DECO.play(loc);
         }
 
         @Override
@@ -163,7 +163,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-                QuakerWeaponInfo.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+                QuakerWeaponInfo.Particles.BULLET_TRAIL_CORE.play(loc);
             });
         }
 
@@ -196,7 +196,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                     .chain(createGroundIntervalHandler())
                     .next(createPeriodIntervalHandler(10, location -> {
                         CombatEffectUtil.playHitBlockParticle(location, location.clone().subtract(0, 0.5, 0).getBlock(), 3);
-                        QuakerA2Info.PARTICLE.BULLET_TRAIL.play(location);
+                        QuakerA2Info.Particles.BULLET_TRAIL.play(location);
                     }));
         }
 
@@ -221,7 +221,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                         }
                     }
 
-                    QuakerA2Info.PARTICLE.HIT_ENTITY.play(location);
+                    QuakerA2Info.Particles.HIT_ENTITY.play(location);
                 }
 
                 return !(target instanceof Barrier);

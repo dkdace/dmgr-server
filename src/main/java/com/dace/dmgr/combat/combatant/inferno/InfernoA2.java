@@ -58,13 +58,13 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        InfernoA2Info.SOUND.USE.play(combatUser.getLocation());
+        InfernoA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
-            InfernoA2Info.SOUND.TICK.play(combatUser.getLocation());
+            InfernoA2Info.Sounds.TICK.play(combatUser.getLocation());
             playTickEffect(i);
         }, 1, InfernoA2Info.DURATION.toTicks()));
     }
@@ -94,7 +94,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         loc.setYaw(0);
         loc.setPitch(0);
 
-        InfernoA2Info.PARTICLE.TICK_CORE.play(loc);
+        InfernoA2Info.Particles.TICK_CORE.play(loc);
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -110,7 +110,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
                 Location loc2 = loc.clone().add(vec.clone().multiply(1.8));
 
-                InfernoA2Info.PARTICLE.TICK_DECO.play(loc2, vec);
+                InfernoA2Info.Particles.TICK_DECO.play(loc2, vec);
             }
         }
     }

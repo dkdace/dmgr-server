@@ -35,7 +35,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     private static final MagrittaWeaponInfo instance = new MagrittaWeaponInfo();
 
     private MagrittaWeaponInfo() {
-        super(MagrittaWeapon.class, RESOURCE.DEFAULT, "데스페라도",
+        super(MagrittaWeapon.class, Resource.DEFAULT, "데스페라도",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("근거리에 강력한 피해를 입히는 산탄총입니다. " +
                                 "사격하여 <:DAMAGE:피해>를 입힙니다. " +
@@ -52,7 +52,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
      * 반동 정보.
      */
     @UtilityClass
-    public static final class RECOIL {
+    public static final class Recoil {
         /** 수직 반동 */
         public static final double UP = 9.0;
         /** 수평 반동 */
@@ -67,7 +67,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 13;
     }
@@ -76,7 +76,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(1).build(),
@@ -100,7 +100,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).build());

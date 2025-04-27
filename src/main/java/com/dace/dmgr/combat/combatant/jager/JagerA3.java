@@ -78,17 +78,17 @@ public final class JagerA3 extends ActiveSkill {
         weapon.cancel();
         weapon.setVisible(false);
 
-        JagerA3Info.SOUND.USE.play(combatUser.getLocation());
+        JagerA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
             explodeTimestamp = Timestamp.now().plus(JagerA3Info.EXPLODE_DURATION);
 
-            JagerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
+            JagerA3Info.Sounds.USE_READY.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
-                JagerA3Info.PARTICLE.BULLET_TRAIL.play(loc);
+                JagerA3Info.Particles.BULLET_TRAIL.play(loc);
             }, () -> {
                 forceCancel();
 
@@ -135,8 +135,8 @@ public final class JagerA3 extends ActiveSkill {
         Location loc = location.clone().add(0, 0.1, 0);
         new JagerA3Area(projectile).emit(loc);
 
-        JagerA3Info.SOUND.EXPLODE.play(loc);
-        JagerA3Info.PARTICLE.EXPLODE.play(loc);
+        JagerA3Info.Sounds.EXPLODE.play(loc);
+        JagerA3Info.Particles.EXPLODE.play(loc);
     }
 
     /**
@@ -152,7 +152,7 @@ public final class JagerA3 extends ActiveSkill {
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
             if (combatEntity.isCreature())
-                JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
+                JagerA3Info.Particles.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
         }
     }
 
@@ -173,7 +173,7 @@ public final class JagerA3 extends ActiveSkill {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerA3Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerA3Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override

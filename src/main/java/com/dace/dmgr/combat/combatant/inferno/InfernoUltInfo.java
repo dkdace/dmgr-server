@@ -45,7 +45,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.block.respawn_anchor.ambient").volume(3).pitch(1.2, 1.7).build());
@@ -66,7 +66,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 (중심) */
         public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).horizontalSpread(1).verticalSpread(1.5).speed(0.2).build());

@@ -30,7 +30,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     private static final SiliaWeaponInfo instance = new SiliaWeaponInfo();
 
     private SiliaWeaponInfo() {
-        super(SiliaWeapon.class, RESOURCE.DEFAULT, "접이식 마체테",
+        super(SiliaWeapon.class, Resource.DEFAULT, "접이식 마체테",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("휴대성이 뛰어난 접이식 마체테입니다. " +
                                 "검기를 날려 <:DAMAGE:피해>를 입힙니다.")
@@ -45,7 +45,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 4;
         /** 확장 */
@@ -56,7 +56,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.knife_leftclick").volume(0.8).pitch(1).build(),
@@ -74,7 +74,7 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 255, 255);
 

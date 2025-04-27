@@ -60,7 +60,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
@@ -79,7 +79,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 색상 */
         public static final Color USE_TICK_COLOR = Color.fromRGB(200, 130, 230);
         /** 표식 색상 */

@@ -34,7 +34,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     private final Burning burning;
 
     public InfernoWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoWeaponInfo.getInstance(), InfernoWeaponInfo.FIREBALL.COOLDOWN);
+        super(combatUser, InfernoWeaponInfo.getInstance(), InfernoWeaponInfo.Fireball.COOLDOWN);
 
         this.reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
@@ -72,12 +72,12 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
-                InfernoWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+                InfernoWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 break;
             }
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() < InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME) {
+                if (reloadModule.getRemainingAmmo() < InfernoWeaponInfo.Fireball.CAPACITY_CONSUME) {
                     onAmmoEmpty();
                     return;
                 }
@@ -87,11 +87,11 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 new InfernoWeaponLProjectile().shot();
 
                 if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
-                    reloadModule.consume(InfernoWeaponInfo.FIREBALL.CAPACITY_CONSUME);
+                    reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
-                CombatUtil.sendRecoil(combatUser, InfernoWeaponInfo.FIREBALL.RECOIL.UP, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE,
-                        InfernoWeaponInfo.FIREBALL.RECOIL.UP_SPREAD, InfernoWeaponInfo.FIREBALL.RECOIL.SIDE_SPREAD, 3, 1);
-                InfernoWeaponInfo.SOUND.USE_FIREBALL.play(combatUser.getLocation());
+                CombatUtil.sendRecoil(combatUser, InfernoWeaponInfo.Fireball.Recoil.UP, InfernoWeaponInfo.Fireball.Recoil.SIDE,
+                        InfernoWeaponInfo.Fireball.Recoil.UP_SPREAD, InfernoWeaponInfo.Fireball.Recoil.SIDE_SPREAD, 3, 1);
+                InfernoWeaponInfo.Sounds.USE_FIREBALL.play(combatUser.getLocation());
 
                 break;
             }
@@ -125,7 +125,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     public void onReloadTick(long i) {
-        InfernoWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
+        InfernoWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -148,7 +148,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                InfernoWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
+                InfernoWeaponInfo.Particles.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
             });
         }
 
@@ -156,7 +156,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                InfernoWeaponInfo.PARTICLE.HIT_BLOCK.play(location);
+                InfernoWeaponInfo.Particles.HIT_BLOCK.play(location);
                 return false;
             };
         }
@@ -169,7 +169,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                         false, true))
                     target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.FIRE_DURATION);
 
-                InfernoWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                InfernoWeaponInfo.Particles.HIT_ENTITY.play(location);
                 return true;
             };
         }
@@ -177,8 +177,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     private final class InfernoWeaponLProjectile extends Projectile<Damageable> {
         private InfernoWeaponLProjectile() {
-            super(InfernoWeapon.this, InfernoWeaponInfo.FIREBALL.VELOCITY, EntityCondition.enemy(combatUser),
-                    Option.builder().size(InfernoWeaponInfo.FIREBALL.SIZE).maxDistance(InfernoWeaponInfo.FIREBALL.DISTANCE).build());
+            super(InfernoWeapon.this, InfernoWeaponInfo.Fireball.VELOCITY, EntityCondition.enemy(combatUser),
+                    Option.builder().size(InfernoWeaponInfo.Fireball.SIZE).maxDistance(InfernoWeaponInfo.Fireball.DISTANCE).build());
         }
 
         @Override
@@ -186,8 +186,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             Location loc = location.add(0, 0.1, 0);
             new InfernoWeaponLArea().emit(loc);
 
-            InfernoWeaponInfo.SOUND.FIREBALL_EXPLODE.play(loc);
-            InfernoWeaponInfo.PARTICLE.FIREBALL_EXPLODE.play(loc);
+            InfernoWeaponInfo.Sounds.FIREBALL_EXPLODE.play(loc);
+            InfernoWeaponInfo.Particles.FIREBALL_EXPLODE.play(loc);
         }
 
         @Override
@@ -195,7 +195,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(13, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                InfernoWeaponInfo.PARTICLE.BULLET_TRAIL_FIREBALL.play(loc);
+                InfernoWeaponInfo.Particles.BULLET_TRAIL_FIREBALL.play(loc);
             });
         }
 
@@ -209,9 +209,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.FIREBALL.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
+                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
                         && target instanceof Movable) {
-                    Vector dir = getVelocity().normalize().multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK);
+                    Vector dir = getVelocity().normalize().multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }
 
@@ -221,7 +221,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
         private final class InfernoWeaponLArea extends Area<Damageable> {
             private InfernoWeaponLArea() {
-                super(combatUser, InfernoWeaponInfo.FIREBALL.RADIUS, InfernoWeaponLProjectile.this.entityCondition.include(combatUser));
+                super(combatUser, InfernoWeaponInfo.Fireball.RADIUS, InfernoWeaponLProjectile.this.entityCondition.include(combatUser));
             }
 
             @Override
@@ -232,7 +232,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.FIREBALL.DAMAGE_EXPLODE, distance, radius / 2.0);
+                double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.Fireball.DAMAGE_EXPLODE, distance, radius / 2.0);
                 Timespan burningDuration = Timespan.ofTicks((long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION.toTicks(), distance,
                         radius / 2.0));
 
@@ -240,7 +240,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     target.getStatusEffectModule().apply(burning, burningDuration);
 
                     if (target instanceof Movable && isNotHit(target)) {
-                        Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.FIREBALL.KNOCKBACK);
+                        Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
                         ((Movable) target).getMoveModule().knockback(dir);
                     }
                 }

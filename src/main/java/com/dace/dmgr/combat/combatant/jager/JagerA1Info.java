@@ -73,7 +73,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 소환 준비 */
         public static final SoundEffect SUMMON_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_GROWL).volume(1).pitch(1).build());
@@ -92,7 +92,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 소환 준비 대기 틱 입자 효과 */
         public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,

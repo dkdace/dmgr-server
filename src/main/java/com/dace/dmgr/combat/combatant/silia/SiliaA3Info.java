@@ -50,7 +50,7 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1).build(),

@@ -52,7 +52,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         Location location = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
 
-        SiliaA1Info.SOUND.USE.play(location);
+        SiliaA1Info.Sounds.USE.play(location);
 
         HashSet<Damageable> targets = new HashSet<>();
 
@@ -68,7 +68,7 @@ public final class SiliaA1 extends ActiveSkill {
             addTask(new DelayTask(() -> {
                 Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
                 for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3))
-                    SiliaA1Info.PARTICLE.TICK.play(loc3);
+                    SiliaA1Info.Particles.TICK.play(loc3);
             }, 1));
         }, () -> {
             forceCancel();
@@ -112,11 +112,11 @@ public final class SiliaA1 extends ActiveSkill {
 
                     for (int j = 0; j < 3; j++) {
                         Location loc2 = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
-                        SiliaA1Info.PARTICLE.BULLET_TRAIL_CORE.play(loc2);
+                        SiliaA1Info.Particles.BULLET_TRAIL_CORE.play(loc2);
 
                         if ((i == 0 || i == 11) && j == 1) {
                             Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().normalize(), 10);
-                            SiliaA1Info.PARTICLE.BULLET_TRAIL_DECO.play(loc2, vec2);
+                            SiliaA1Info.Particles.BULLET_TRAIL_DECO.play(loc2, vec2);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ public final class SiliaA1 extends ActiveSkill {
                     target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
                             SiliaT1.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
 
-                    SiliaA1Info.PARTICLE.HIT_ENTITY.play(location);
+                    SiliaA1Info.Particles.HIT_ENTITY.play(location);
                 }
 
                 return !(target instanceof Barrier);

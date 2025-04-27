@@ -39,7 +39,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
 
-        SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
+        SiliaA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -51,14 +51,14 @@ public final class SiliaA2 extends ActiveSkill {
                 angle += 360 / 6;
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(1.6 - i * 0.2);
 
-                SiliaA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec), vec);
+                SiliaA2Info.Particles.USE_TICK.play(loc.clone().add(vec), vec);
             }
         }, () -> {
             cancel();
 
             new SiliaA2Projectile().shot();
 
-            SiliaA2Info.SOUND.USE_READY.play(combatUser.getLocation());
+            SiliaA2Info.Sounds.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaA2Info.READY_DURATION.toTicks()));
     }
 
@@ -82,7 +82,7 @@ public final class SiliaA2 extends ActiveSkill {
         protected void onHit(@NonNull Location location) {
             for (int i = 0; i < 40; i++) {
                 Vector vec = VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60);
-                SiliaA2Info.PARTICLE.HIT.play(location, vec, Math.random());
+                SiliaA2Info.Particles.HIT.play(location, vec, Math.random());
             }
         }
 
@@ -103,7 +103,7 @@ public final class SiliaA2 extends ActiveSkill {
                         Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
                         Location loc = location.clone().add(vec);
 
-                        SiliaA2Info.PARTICLE.BULLET_TRAIL.play(loc, vec);
+                        SiliaA2Info.Particles.BULLET_TRAIL.play(loc, vec);
                     }
 
                     i++;
@@ -134,9 +134,9 @@ public final class SiliaA2 extends ActiveSkill {
                     loc.setPitch(0);
                     loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
 
-                    SiliaA2Info.SOUND.HIT_ENTITY.play(location);
+                    SiliaA2Info.Sounds.HIT_ENTITY.play(location);
                     for (Location loc2 : LocationUtil.getLine(combatUser.getLocation(), loc, 0.5))
-                        SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
+                        SiliaA2Info.Particles.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
 
                     knockback(loc, target);
                 }

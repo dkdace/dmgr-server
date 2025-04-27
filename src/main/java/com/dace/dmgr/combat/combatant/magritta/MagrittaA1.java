@@ -48,7 +48,7 @@ public final class MagrittaA1 extends ActiveSkill {
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MagrittaA1Info.READY_DURATION);
 
-        MagrittaA1Info.SOUND.USE.play(combatUser.getLocation());
+        MagrittaA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -80,7 +80,7 @@ public final class MagrittaA1 extends ActiveSkill {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(7, MagrittaA1Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(7, MagrittaA1Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -110,7 +110,7 @@ public final class MagrittaA1 extends ActiveSkill {
          * @param target   부착 대상
          */
         private void onStuck(@NonNull Location location, @Nullable Damageable target) {
-            MagrittaA1Info.SOUND.STUCK.play(location);
+            MagrittaA1Info.Sounds.STUCK.play(location);
 
             if (target != null) {
                 combatUser.getUser().sendTitle("§b§l부착", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
@@ -123,7 +123,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 Location loc = location.clone();
 
                 if (target == null)
-                    MagrittaA1Info.PARTICLE.TICK.play(loc);
+                    MagrittaA1Info.Particles.TICK.play(loc);
                 else {
                     if (target.isRemoved() || target instanceof CombatUser && ((CombatUser) target).isDead())
                         return false;
@@ -132,15 +132,15 @@ public final class MagrittaA1 extends ActiveSkill {
                 }
 
                 if (i % 2 == 0)
-                    MagrittaA1Info.SOUND.TICK.play(loc);
+                    MagrittaA1Info.Sounds.TICK.play(loc);
 
                 return true;
             }, isCancelled -> {
                 Location loc = (target == null ? location.clone() : target.getHitboxCenter()).add(0, 0.1, 0);
                 new MagrittaA1Area().emit(loc);
 
-                MagrittaA1Info.SOUND.EXPLODE.play(loc);
-                MagrittaA1Info.PARTICLE.EXPLODE.play(loc);
+                MagrittaA1Info.Sounds.EXPLODE.play(loc);
+                MagrittaA1Info.Particles.EXPLODE.play(loc);
             }, 1, MagrittaA1Info.EXPLODE_DURATION.toTicks()));
         }
 

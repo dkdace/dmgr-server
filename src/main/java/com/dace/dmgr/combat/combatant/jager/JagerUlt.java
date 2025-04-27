@@ -65,7 +65,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         entityModule.disposeEntity();
 
-        JagerUltInfo.SOUND.USE.play(combatUser.getLocation());
+        JagerUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -104,7 +104,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerUltInfo.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerUltInfo.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -154,7 +154,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             entity.setGravity(false);
 
             owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
-            JagerUltInfo.SOUND.SUMMON.play(getLocation());
+            JagerUltInfo.Sounds.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
         }
@@ -165,8 +165,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
                 entity.teleport(getLocation().add(0, 0.2, 0));
 
             Location loc = getLocation();
-            JagerUltInfo.PARTICLE.SUMMON_BEFORE_READY_TICK.play(loc);
-            JagerUltInfo.SOUND.SUMMON_BEFORE_READY.play(loc);
+            JagerUltInfo.Particles.SUMMON_BEFORE_READY_TICK.play(loc);
+            JagerUltInfo.Sounds.SUMMON_BEFORE_READY.play(loc);
         }
 
         @Override
@@ -175,7 +175,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         }
 
         private void onTick(long i) {
-            JagerUltInfo.PARTICLE.DISPLAY.play(getLocation());
+            JagerUltInfo.Particles.DISPLAY.play(getLocation());
             if (!readyTimeModule.isReady())
                 return;
 
@@ -200,7 +200,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private void playTickEffect(long i, double range) {
             Location loc = getLocation();
             if (i <= JagerUltInfo.DURATION.toTicks() - 100 && i % 30 == 0)
-                JagerUltInfo.SOUND.TICK.play(loc);
+                JagerUltInfo.Sounds.TICK.play(loc);
 
             loc.setYaw(0);
             loc.setPitch(0);
@@ -214,10 +214,10 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
                 Location loc1 = loc.clone().add(vec.clone().multiply(range / 6 * j));
                 Location loc2 = loc.clone().subtract(vec.clone().multiply(range / 6 * j));
 
-                JagerUltInfo.PARTICLE.TICK_CORE.play(loc1, vec.setY(-0.6), j / 6.0);
-                JagerUltInfo.PARTICLE.TICK_CORE.play(loc2, vec.multiply(-1).setY(-0.6), j / 6.0);
-                JagerUltInfo.PARTICLE.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
-                JagerUltInfo.PARTICLE.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
+                JagerUltInfo.Particles.TICK_CORE.play(loc1, vec.setY(-0.6), j / 6.0);
+                JagerUltInfo.Particles.TICK_CORE.play(loc2, vec.multiply(-1).setY(-0.6), j / 6.0);
+                JagerUltInfo.Particles.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
+                JagerUltInfo.Particles.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
             }
         }
 
@@ -256,7 +256,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-            JagerUltInfo.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            JagerUltInfo.Sounds.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakParticle(this, location, damage);
         }
 
@@ -264,8 +264,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         public void onDeath(@Nullable Attacker attacker) {
             remove();
 
-            JagerUltInfo.PARTICLE.DEATH.play(getLocation());
-            JagerUltInfo.SOUND.DEATH.play(getLocation());
+            JagerUltInfo.Particles.DEATH.play(getLocation());
+            JagerUltInfo.Sounds.DEATH.play(getLocation());
         }
 
         private final class JagerUltArea extends Area<Damageable> {

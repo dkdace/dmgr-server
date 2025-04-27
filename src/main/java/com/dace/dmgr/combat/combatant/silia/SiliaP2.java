@@ -73,9 +73,9 @@ public final class SiliaP2 extends AbstractSkill {
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
             if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 1, 0);
+                SiliaP2Info.Sounds.USE.play(combatUser.getLocation(), 1, 0);
             else
-                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 0, 1);
+                SiliaP2Info.Sounds.USE.play(combatUser.getLocation(), 0, 1);
 
             return true;
         }, isCancelled -> {

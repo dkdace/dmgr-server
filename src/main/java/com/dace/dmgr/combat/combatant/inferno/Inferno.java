@@ -136,9 +136,9 @@ public final class Inferno extends Vanguard {
         if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 
-        InfernoUltInfo.SOUND.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
+        InfernoUltInfo.Sounds.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
         if (location != null)
-            InfernoUltInfo.PARTICLE.DAMAGE.play(location, damage * 0.04);
+            InfernoUltInfo.Particles.DAMAGE.play(location, damage * 0.04);
     }
 
     @Override

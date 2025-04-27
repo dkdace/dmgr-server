@@ -45,20 +45,20 @@ public final class MetarA1 extends ActiveSkill {
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA1Info.READY_DURATION);
 
-        MetarA1Info.SOUND.USE.play(combatUser.getLocation());
+        MetarA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             for (int j = 0; j < 2; j++) {
                 for (int k = 0; k < Math.min(6, i); k++) {
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().add(0, -0.3 + k * 0.15, 0),
                             -0.5 + j, 0, -0.5);
-                    MetarA1Info.PARTICLE.USE_TICK_CORE.play(loc);
+                    MetarA1Info.Particles.USE_TICK_CORE.play(loc);
                 }
 
                 if (i > 5) {
                     Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().add(0, 0.6, 0),
                             -0.5 + j, 0, -0.25);
-                    MetarA1Info.PARTICLE.USE_TICK_SHAPE.play(loc);
+                    MetarA1Info.Particles.USE_TICK_SHAPE.play(loc);
                 }
             }
         }, 1));
@@ -72,7 +72,7 @@ public final class MetarA1 extends ActiveSkill {
                     isOpposite ? 0.4 : -0.4, 0, 0);
             new MetarA1Projectile().shot(loc);
 
-            MetarA1Info.SOUND.SHOOT.play(loc);
+            MetarA1Info.Sounds.SHOOT.play(loc);
         }, this::cancel, 3, 6)), MetarA1Info.READY_DURATION.toTicks()));
     }
 
@@ -99,8 +99,8 @@ public final class MetarA1 extends ActiveSkill {
             Location loc = location.add(0, 0.1, 0);
             new MetarA1ExplodeArea().emit(loc);
 
-            MetarA1Info.SOUND.EXPLODE.play(loc);
-            MetarA1Info.PARTICLE.EXPLODE.play(loc);
+            MetarA1Info.Sounds.EXPLODE.play(loc);
+            MetarA1Info.Particles.EXPLODE.play(loc);
         }
 
         @Override
@@ -114,7 +114,7 @@ public final class MetarA1 extends ActiveSkill {
                 else
                     target = null;
 
-                MetarA1Info.PARTICLE.BULLET_TRAIL.play(location, getVelocity().normalize());
+                MetarA1Info.Particles.BULLET_TRAIL.play(location, getVelocity().normalize());
             });
         }
 

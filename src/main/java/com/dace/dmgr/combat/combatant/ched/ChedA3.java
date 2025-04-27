@@ -60,7 +60,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         weapon.cancel();
         weapon.setCanShoot(false);
 
-        ChedA3Info.SOUND.USE.play(combatUser.getLocation());
+        ChedA3Info.Sounds.USE.play(combatUser.getLocation());
 
         long durationTicks = ChedA3Info.READY_DURATION.toTicks();
         EffectManager effectManager = new EffectManager();
@@ -71,7 +71,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedA3Projectile().shot(location);
 
-            ChedA3Info.SOUND.USE_READY.play(location);
+            ChedA3Info.Sounds.USE_READY.play(location);
 
             addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, durationTicks));
         }, 1, durationTicks));
@@ -125,7 +125,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
                     Location loc2 = loc.clone().add(vec3).add(loc.getDirection().multiply(forward));
                     Vector dir = LocationUtil.getDirection(loc.clone().add(vec), loc.clone().add(vec2));
 
-                    ChedA3Info.PARTICLE.USE_TICK.play(loc2, dir);
+                    ChedA3Info.Particles.USE_TICK.play(loc2, dir);
                 }
             }
 
@@ -145,31 +145,31 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
             return createPeriodIntervalHandler(18, location -> {
                 location.setPitch(0);
 
-                ChedA3Info.SOUND.TICK.play(location);
+                ChedA3Info.Sounds.TICK.play(location);
 
-                ChedA3Info.PARTICLE.BULLET_TRAIL_CORE.play(location);
+                ChedA3Info.Particles.BULLET_TRAIL_CORE.play(location);
 
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
                         0.2, 0.12);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
                         0.16, 0.08);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
                         0.12, 0.04);
 
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
                         0.1, 0.16);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
                         0.1, 0.16);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
                         0.18, 0.16);
-                ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
+                ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
                         0.24, 0.16);
 
                 for (int i = 0; i < 6; i++) {
-                    ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                    ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(
                             LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
                             0.1, 0.1 + i * 0.04);
-                    ChedA3Info.PARTICLE.BULLET_TRAIL_SHAPE.play(
+                    ChedA3Info.Particles.BULLET_TRAIL_SHAPE.play(
                             LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0),
                             0.1, 0.1 + i * 0.04);
                 }

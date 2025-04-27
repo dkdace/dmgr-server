@@ -28,7 +28,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     private static final ChedWeaponInfo instance = new ChedWeaponInfo();
 
     private ChedWeaponInfo() {
-        super(ChedWeapon.class, Material.BOW, RESOURCE.DEFAULT, "아폴론",
+        super(ChedWeapon.class, Material.BOW, Resource.DEFAULT, "아폴론",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("불의 힘이 깃든 체드의 주력 활입니다. 화살을 걸고 발사하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE, MAX_DAMAGE / 10, MAX_DAMAGE)
@@ -41,7 +41,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 1;
         /** 불화살 */
@@ -52,7 +52,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 충전 */
         public static final SoundEffect CHARGE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.crossbow.loading_middle").volume(0.6).pitch(1).build());

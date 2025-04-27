@@ -48,7 +48,7 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.4).build(),
@@ -64,7 +64,7 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(150, 110, 170);
 

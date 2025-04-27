@@ -45,7 +45,7 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(1).pitch(0.525).pitchVariance(0.05).build());
@@ -63,7 +63,7 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(186, 55, 30);
 

@@ -57,7 +57,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         if (!isDurationFinished()) {
             forceCancel();
-            MetarA3Info.SOUND.DETONATE.play(combatUser.getLocation());
+            MetarA3Info.Sounds.DETONATE.play(combatUser.getLocation());
 
             return;
         }
@@ -67,12 +67,12 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         combatUser.getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA3Info.READY_DURATION);
 
-        MetarA3Info.SOUND.USE.play(combatUser.getLocation());
+        MetarA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
 
-            MetarA3Info.SOUND.USE_READY.play(combatUser.getLocation());
+            MetarA3Info.Sounds.USE_READY.play(combatUser.getLocation());
 
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
             projectile = new MetarA3Projectile();
@@ -129,11 +129,11 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
                 for (int j = 0; j < locs.length; j++) {
                     Vector vec = vecs[j];
-                    MetarA3Info.PARTICLE.DETONATE_TICK_DECO.play(locs[j].add(vec), i / 13.0, vec);
+                    MetarA3Info.Particles.DETONATE_TICK_DECO.play(locs[j].add(vec), i / 13.0, vec);
                 }
 
-                MetarA3Info.PARTICLE.DETONATE_TICK_CORE.play(loc);
-                MetarA3Info.SOUND.DETONATE_TICK.play(loc, 1, i / 13.0);
+                MetarA3Info.Particles.DETONATE_TICK_CORE.play(loc);
+                MetarA3Info.Sounds.DETONATE_TICK.play(loc, 1, i / 13.0);
             }, 1, MetarA3Info.DURATION.toTicks()));
         }
 
@@ -145,9 +145,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
                 @Override
                 public void accept(Location location) {
-                    MetarA3Info.PARTICLE.BULLET_TRAIL.play(location);
+                    MetarA3Info.Particles.BULLET_TRAIL.play(location);
                     if (i % 4 == 0)
-                        MetarA3Info.SOUND.TICK.play(location);
+                        MetarA3Info.Sounds.TICK.play(location);
 
                     i++;
                 }

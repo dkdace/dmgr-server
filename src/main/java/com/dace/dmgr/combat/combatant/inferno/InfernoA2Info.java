@@ -50,7 +50,7 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.5).build(),
@@ -65,7 +65,7 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(2).horizontalSpread(0.1).verticalSpread(0.1).speed(0.2).build());

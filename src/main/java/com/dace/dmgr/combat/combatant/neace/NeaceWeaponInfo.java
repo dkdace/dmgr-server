@@ -29,7 +29,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     private static final NeaceWeaponInfo instance = new NeaceWeaponInfo();
 
     private NeaceWeaponInfo() {
-        super(NeaceWeapon.class, RESOURCE.DEFAULT, "이중성",
+        super(NeaceWeapon.class, Resource.DEFAULT, "이중성",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("적을 공격하거나 아군을 치유할 수 있는 완드입니다.")
                         .addActionKeyInfo("마법 구체", ActionKey.LEFT_CLICK)
@@ -44,8 +44,8 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                         new ActionInfoLore.NamedSection("치유 광선", ActionInfoLore.Section
                                 .builder("바라보는 아군에게 치유 광선을 고정하여 지속적으로 <:HEAL:치유>합니다. " +
                                         "<d::구원의 표식>이 있는 아군은 치유할 수 없습니다.")
-                                .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL.HEAL_PER_SECOND)
-                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, HEAL.MAX_DISTANCE)
+                                .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, Heal.HEAL_PER_SECOND)
+                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, Heal.MAX_DISTANCE)
                                 .build())));
     }
 
@@ -53,7 +53,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      * 치유 광선의 정보.
      */
     @UtilityClass
-    public static final class HEAL {
+    public static final class Heal {
         /** 초당 치유량 */
         public static final int HEAL_PER_SECOND = 250;
         /** 최대 거리 (단위: 블록) */
@@ -66,7 +66,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 5;
     }
@@ -75,7 +75,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(0.8).pitch(1.8).build(),
@@ -89,7 +89,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 255, 200);
 

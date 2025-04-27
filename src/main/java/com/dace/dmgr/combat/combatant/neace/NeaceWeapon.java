@@ -59,14 +59,14 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 new NeaceWeaponLProjectile().shot();
 
-                NeaceWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+                NeaceWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 break;
             }
             case RIGHT_CLICK: {
                 if (target != null && (!target.canBeTargeted() || target.isRemoved() || targetResetTimestamp.isBefore(Timestamp.now())
                         || blockResetTimestamp.isBefore(Timestamp.now())
-                        || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.HEAL.MAX_DISTANCE)) {
+                        || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.Heal.MAX_DISTANCE)) {
                     target = null;
                 }
 
@@ -77,7 +77,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 targetResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
                 if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
-                    blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.HEAL.BLOCK_RESET_DELAY);
+                    blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.Heal.BLOCK_RESET_DELAY);
 
                 String title = MessageFormat.format("{0} : {1}§e{2}",
                         (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished()
@@ -87,7 +87,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         target.getName());
                 combatUser.getUser().sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
 
-                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
+                NeaceWeaponInfo.Sounds.USE_HEAL.play(combatUser.getLocation());
 
                 healTarget(target);
 
@@ -110,15 +110,15 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         if (isAmplifying)
             skill2.amplifyTarget(target);
         else if (!target.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK))
-            target.getDamageModule().heal(combatUser, NeaceWeaponInfo.HEAL.HEAL_PER_SECOND / 20.0, true);
+            target.getDamageModule().heal(combatUser, NeaceWeaponInfo.Heal.HEAL_PER_SECOND / 20.0, true);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.8))
-            (isAmplifying ? NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.PARTICLE.HIT_ENTITY_HEAL).play(loc);
+            (isAmplifying ? NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL).play(loc);
     }
 
     private final class NeaceWeaponRTarget extends Target<Healable> {
         private NeaceWeaponRTarget() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, NeaceWeaponInfo.Heal.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
@@ -135,7 +135,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            NeaceWeaponInfo.PARTICLE.HIT.play(location);
+            NeaceWeaponInfo.Particles.HIT.play(location);
         }
 
         @Override
@@ -143,7 +143,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(10, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                NeaceWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+                NeaceWeaponInfo.Particles.BULLET_TRAIL.play(loc);
             });
         }
 

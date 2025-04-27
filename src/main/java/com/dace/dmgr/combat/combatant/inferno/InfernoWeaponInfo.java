@@ -38,7 +38,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
     private static final InfernoWeaponInfo instance = new InfernoWeaponInfo();
 
     private InfernoWeaponInfo() {
-        super(InfernoWeapon.class, RESOURCE.DEFAULT, "파이어스톰",
+        super(InfernoWeapon.class, Resource.DEFAULT, "파이어스톰",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("근거리에 화염을 흩뿌리거나 화염탄을 발사할 수 있는 화염방사기입니다.")
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
@@ -53,14 +53,14 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                                 .build()),
                         new ActionInfoLore.NamedSection("화염탄", ActionInfoLore.Section
                                 .builder("폭발하는 화염 구체를 발사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
-                                .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", FIREBALL.DAMAGE_EXPLODE, FIREBALL.DAMAGE_EXPLODE / 2)
-                                .addValueInfo(TextIcon.DAMAGE, FIREBALL.DAMAGE_DIRECT + " (직격)")
+                                .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", Fireball.DAMAGE_EXPLODE, Fireball.DAMAGE_EXPLODE / 2)
+                                .addValueInfo(TextIcon.DAMAGE, Fireball.DAMAGE_DIRECT + " (직격)")
                                 .addValueInfo(TextIcon.FIRE, Format.VARIABLE_TIME_WITH_PER_SECOND,
                                         FIRE_DURATION.toSeconds(), FIRE_DURATION.toSeconds() / 2, FIRE_DAMAGE_PER_SECOND)
-                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, FIREBALL.COOLDOWN.toSeconds())
-                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, FIREBALL.DISTANCE)
-                                .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, FIREBALL.RADIUS)
-                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, -FIREBALL.CAPACITY_CONSUME)
+                                .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, Fireball.COOLDOWN.toSeconds())
+                                .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, Fireball.DISTANCE)
+                                .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, Fireball.RADIUS)
+                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, -Fireball.CAPACITY_CONSUME)
                                 .build())));
     }
 
@@ -68,7 +68,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      * 화염탄의 정보.
      */
     @UtilityClass
-    public static final class FIREBALL {
+    public static final class Fireball {
         /** 쿨타임 */
         public static final Timespan COOLDOWN = Timespan.ofSeconds(1);
         /** 피해량 (폭발) */
@@ -92,7 +92,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
          * 반동 정보.
          */
         @UtilityClass
-        public static final class RECOIL {
+        public static final class Recoil {
             /** 수직 반동 */
             public static final double UP = 5.0;
             /** 수평 반동 */
@@ -108,7 +108,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 12;
     }
@@ -117,7 +117,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_HORSE_BREATHE).volume(1.5).pitch(0.7).build(),
@@ -149,7 +149,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)

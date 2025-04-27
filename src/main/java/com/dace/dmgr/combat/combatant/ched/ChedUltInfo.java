@@ -67,7 +67,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.4).build(),
@@ -98,7 +98,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 - 1 */
         public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build(),

@@ -43,7 +43,7 @@ public final class MagrittaT1Info extends TraitInfo {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.item.trident.hit").volume(2).pitch(0.8).pitchVariance(0.1).build());

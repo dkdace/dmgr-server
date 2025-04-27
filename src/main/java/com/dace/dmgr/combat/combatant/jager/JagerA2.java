@@ -59,7 +59,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
         entityModule.disposeEntity();
 
-        JagerA2Info.SOUND.USE.play(combatUser.getLocation());
+        JagerA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -98,7 +98,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerA2Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerA2Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -148,19 +148,19 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             entity.teleport(getLocation().add(0, 0.05, 0));
 
             owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
-            JagerA2Info.SOUND.SUMMON.play(getLocation());
+            JagerA2Info.Sounds.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
         }
 
         @Override
         public void onTickBeforeReady(long i) {
-            JagerA2Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(getLocation());
+            JagerA2Info.Particles.SUMMON_BEFORE_READY_TICK.play(getLocation());
         }
 
         @Override
         public void onReady() {
-            JagerA2Info.SOUND.SUMMON_READY.play(getLocation());
+            JagerA2Info.Sounds.SUMMON_READY.play(getLocation());
         }
 
         private void onTick(long i) {
@@ -180,11 +180,11 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
          */
         private void playTickEffect() {
             for (int i = 0; i < 7; i++) {
-                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
-                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
+                JagerA2Info.Particles.DISPLAY.play(getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
+                JagerA2Info.Particles.DISPLAY.play(getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
             }
             for (int i = 0; i < 5; i++)
-                JagerA2Info.PARTICLE.DISPLAY.play(getLocation().add(0, 0, 0.4 - i * 0.2));
+                JagerA2Info.Particles.DISPLAY.play(getLocation().add(0, 0, 0.4 - i * 0.2));
         }
 
         /**
@@ -201,7 +201,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
                     combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
             }
 
-            JagerA2Info.SOUND.TRIGGER.play(getLocation());
+            JagerA2Info.Sounds.TRIGGER.play(getLocation());
             remove();
         }
 
@@ -240,7 +240,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-            JagerA2Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            JagerA2Info.Sounds.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakParticle(this, location, damage);
         }
 
@@ -248,8 +248,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         public void onDeath(@Nullable Attacker attacker) {
             remove();
 
-            JagerA2Info.PARTICLE.DEATH.play(getLocation());
-            JagerA2Info.SOUND.DEATH.play(getLocation());
+            JagerA2Info.Particles.DEATH.play(getLocation());
+            JagerA2Info.Sounds.DEATH.play(getLocation());
         }
     }
 }

@@ -29,7 +29,7 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.1, 0.8).pitch(1.2, 1.4).build(),

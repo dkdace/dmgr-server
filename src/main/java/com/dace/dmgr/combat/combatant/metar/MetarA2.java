@@ -43,7 +43,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
         setCooldown();
         addStack(-1);
 
-        MetarA2Info.SOUND.USE.play(combatUser.getLocation());
+        MetarA2Info.Sounds.USE.play(combatUser.getLocation());
 
         Location loc = combatUser.getLocation().add(0, 0.75, 0);
         multiEntityModule.add(new MetarA2Entity(loc));
@@ -94,9 +94,9 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
 
             combatUser.addScore("피해 막음", damage * MetarA2Info.BLOCK_SCORE / MetarA2Info.HEALTH);
 
-            MetarA2Info.SOUND.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
+            MetarA2Info.Sounds.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
             if (location != null)
-                MetarA2Info.PARTICLE.DAMAGE.play(location, damage * 0.04);
+                MetarA2Info.Particles.DAMAGE.play(location, damage * 0.04);
         }
 
         @Override
@@ -104,11 +104,11 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
             remove();
             cancel();
 
-            MetarA2Info.SOUND.DEATH.play(getCenterLocation());
+            MetarA2Info.Sounds.DEATH.play(getCenterLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -2.2 + i * 2.2, -0.9 + j * 1.8, 0);
-                    MetarA2Info.PARTICLE.DEATH.play(loc);
+                    MetarA2Info.Particles.DEATH.play(loc);
                 }
             }
         }

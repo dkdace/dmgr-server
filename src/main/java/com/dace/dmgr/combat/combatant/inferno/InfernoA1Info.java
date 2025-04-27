@@ -48,7 +48,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SHOOT).volume(3).pitch(0.8).build(),
@@ -66,7 +66,7 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 */
         public static final ParticleEffect USE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(80).horizontalSpread(0.5).verticalSpread(0.2).speed(0.2).build());

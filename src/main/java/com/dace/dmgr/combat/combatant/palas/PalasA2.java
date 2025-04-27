@@ -58,14 +58,14 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         if (target.isGoalTarget())
             combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
 
-        PalasA2Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA2Info.Sounds.USE.play(combatUser.getLocation());
 
         Location location = target.getCenterLocation();
-        PalasA2Info.SOUND.HIT_ENTITY.play(location);
-        PalasA2Info.PARTICLE.HIT_ENTITY_CORE.play(location);
+        PalasA2Info.Sounds.HIT_ENTITY.play(location);
+        PalasA2Info.Particles.HIT_ENTITY_CORE.play(location);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.LEFT), location, 0.4))
-            PalasA2Info.PARTICLE.HIT_ENTITY_DECO.play(loc);
+            PalasA2Info.Particles.HIT_ENTITY_DECO.play(loc);
     }
 
     @Override
@@ -99,7 +99,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            PalasA2Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
+            PalasA2Info.Particles.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override

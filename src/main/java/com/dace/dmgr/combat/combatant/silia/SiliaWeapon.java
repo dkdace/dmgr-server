@@ -52,7 +52,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             new SiliaWeaponProjectile().shot();
 
-            SiliaWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+            SiliaWeaponInfo.Sounds.USE.play(combatUser.getLocation());
         }
 
         combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
@@ -90,7 +90,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             combatUser.addYawAndPitch(isOpposite ? 0.5 : -0.5, 0.15);
             if (i < 3)
-                SiliaT2Info.SOUND.USE.play(loc.add(vec), 1, i / 2.0);
+                SiliaT2Info.Sounds.USE.play(loc.add(vec), 1, i / 2.0);
             if (i == 7) {
                 combatUser.addYawAndPitch(isOpposite ? -0.7 : 0.7, -0.85);
                 cancel();
@@ -118,7 +118,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         Weapon weapon = combatUser.getWeapon();
         weapon.setGlowing(isStrike);
-        weapon.setDurability(isStrike ? SiliaWeaponInfo.RESOURCE.EXTENDED : SiliaWeaponInfo.RESOURCE.DEFAULT);
+        weapon.setDurability(isStrike ? SiliaWeaponInfo.Resource.EXTENDED : SiliaWeaponInfo.Resource.DEFAULT);
     }
 
     private final class SiliaWeaponProjectile extends Projectile<Damageable> {
@@ -129,7 +129,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            SiliaWeaponInfo.PARTICLE.HIT.play(location);
+            SiliaWeaponInfo.Particles.HIT.play(location);
         }
 
         @Override
@@ -142,7 +142,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
                     vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(location), isOpposite ? -30 : 30);
-                    SiliaWeaponInfo.PARTICLE.BULLET_TRAIL.play(location.clone().add(vec));
+                    SiliaWeaponInfo.Particles.BULLET_TRAIL.play(location.clone().add(vec));
                 }
             });
         }
@@ -151,7 +151,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                SiliaWeaponInfo.SOUND.HIT_BLOCK.play(location);
+                SiliaWeaponInfo.Sounds.HIT_BLOCK.play(location);
                 CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
                 CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1.5);
 
@@ -166,8 +166,8 @@ public final class SiliaWeapon extends AbstractWeapon {
                 target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
                         SiliaT1.getCritMultiplier(getVelocity(), target), true);
 
-                SiliaWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
-                SiliaWeaponInfo.SOUND.HIT_ENTITY.play(location);
+                SiliaWeaponInfo.Particles.HIT_ENTITY.play(location);
+                SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
 
                 return false;
             };
@@ -184,13 +184,13 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            SiliaT2Info.PARTICLE.HIT.play(location);
+            SiliaT2Info.Particles.HIT.play(location);
         }
 
         @Override
         protected void onDestroy(@NonNull Location location) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            SiliaT2Info.PARTICLE.BULLET_TRAIL_DECO.play(loc);
+            SiliaT2Info.Particles.BULLET_TRAIL_DECO.play(loc);
         }
 
         @Override
@@ -201,7 +201,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-                SiliaT2Info.PARTICLE.BULLET_TRAIL_CORE.play(loc);
+                SiliaT2Info.Particles.BULLET_TRAIL_CORE.play(loc);
             });
         }
 
@@ -233,8 +233,8 @@ public final class SiliaWeapon extends AbstractWeapon {
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 
-                    SiliaT2Info.PARTICLE.HIT_ENTITY.play(location);
-                    SiliaWeaponInfo.SOUND.HIT_ENTITY.play(location);
+                    SiliaT2Info.Particles.HIT_ENTITY.play(location);
+                    SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
                 }
 
                 return true;

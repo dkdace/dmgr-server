@@ -58,9 +58,9 @@ public final class InfernoUlt extends UltimateSkill {
             playTickEffect(i);
             Location loc = combatUser.getLocation();
             if (i < 24)
-                InfernoUltInfo.SOUND.USE.play(loc, 1, i / 23.0);
+                InfernoUltInfo.Sounds.USE.play(loc, 1, i / 23.0);
             if (i % 12 == 0)
-                InfernoUltInfo.SOUND.TICK.play(loc);
+                InfernoUltInfo.Sounds.TICK.play(loc);
 
             return true;
         }, isCancelled -> {
@@ -70,8 +70,8 @@ public final class InfernoUlt extends UltimateSkill {
             setDuration(Timespan.ZERO);
 
             Location loc = combatUser.getLocation();
-            InfernoUltInfo.SOUND.DEATH.play(loc);
-            InfernoUltInfo.PARTICLE.DEATH.play(loc);
+            InfernoUltInfo.Sounds.DEATH.play(loc);
+            InfernoUltInfo.Particles.DEATH.play(loc);
         }, 1, InfernoUltInfo.DURATION.toTicks()));
     }
 
@@ -125,8 +125,8 @@ public final class InfernoUlt extends UltimateSkill {
                 Location loc2 = loc.clone().add(vec1);
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
 
-                InfernoUltInfo.PARTICLE.TICK_CORE.play(loc2);
-                InfernoUltInfo.PARTICLE.TICK_DECO.play(loc2.clone().add(0, up, 0), dir);
+                InfernoUltInfo.Particles.TICK_CORE.play(loc2);
+                InfernoUltInfo.Particles.TICK_DECO.play(loc2.clone().add(0, up, 0), dir);
             }
         }
     }
@@ -141,7 +141,7 @@ public final class InfernoUlt extends UltimateSkill {
         loc.setYaw(0);
         loc.setPitch(0);
 
-        InfernoUltInfo.PARTICLE.USE_TICK_CORE.play(loc);
+        InfernoUltInfo.Particles.USE_TICK_CORE.play(loc);
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -159,7 +159,7 @@ public final class InfernoUlt extends UltimateSkill {
                 Location loc2 = loc.clone().add(vec1.clone().multiply(2.5));
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
 
-                InfernoUltInfo.PARTICLE.USE_TICK_DECO.play(loc2, dir);
+                InfernoUltInfo.Particles.USE_TICK_DECO.play(loc2, dir);
             }
         }
     }

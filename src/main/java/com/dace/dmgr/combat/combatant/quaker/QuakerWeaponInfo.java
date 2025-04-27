@@ -32,7 +32,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     private static final QuakerWeaponInfo instance = new QuakerWeaponInfo();
 
     private QuakerWeaponInfo() {
-        super(QuakerWeapon.class, RESOURCE.DEFAULT, "타바르진",
+        super(QuakerWeapon.class, Resource.DEFAULT, "타바르진",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("거대한 도끼를 휘둘러 근거리에 <:DAMAGE:광역 피해>를 입히고 옆으로 <:KNOCKBACK:밀쳐냅니다>.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
@@ -46,7 +46,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 3;
     }
@@ -55,7 +55,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
@@ -74,7 +74,7 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(200, 200, 200);
 

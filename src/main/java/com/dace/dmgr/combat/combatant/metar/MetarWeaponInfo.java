@@ -42,7 +42,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     private static final MetarWeaponInfo instance = new MetarWeaponInfo();
 
     private MetarWeaponInfo() {
-        super(MetarWeapon.class, RESOURCE.DEFAULT, "펄스 쌍기관포",
+        super(MetarWeapon.class, Resource.DEFAULT, "펄스 쌍기관포",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("대용량 탄창이 장착된 에너지 기관포입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
@@ -60,7 +60,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 1561;
     }
@@ -69,7 +69,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BREATH).volume(2.5).pitch(1.6).build(),
@@ -97,7 +97,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

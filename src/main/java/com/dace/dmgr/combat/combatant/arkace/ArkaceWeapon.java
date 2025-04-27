@@ -34,8 +34,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         super(combatUser, ArkaceWeaponInfo.getInstance(), Timespan.ZERO);
 
         this.reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        this.fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.SPREAD.INCREMENT,
-                ArkaceWeaponInfo.SPREAD.START, ArkaceWeaponInfo.SPREAD.MAX);
+        this.fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.Spread.INCREMENT,
+                ArkaceWeaponInfo.Spread.START, ArkaceWeaponInfo.Spread.MAX);
     }
 
     @Override
@@ -69,14 +69,14 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                     reloadModule.consume(1);
 
-                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.RECOIL.UP, ArkaceWeaponInfo.RECOIL.SIDE, ArkaceWeaponInfo.RECOIL.UP_SPREAD,
-                            ArkaceWeaponInfo.RECOIL.SIDE_SPREAD, 2, 2);
-                    ArkaceWeaponInfo.SOUND.USE.play(loc);
+                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.Recoil.UP, ArkaceWeaponInfo.Recoil.SIDE, ArkaceWeaponInfo.Recoil.UP_SPREAD,
+                            ArkaceWeaponInfo.Recoil.SIDE_SPREAD, 2, 2);
+                    ArkaceWeaponInfo.Sounds.USE.play(loc);
 
                     addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shot();
-                    ArkaceUltInfo.SOUND.SHOOT.play(loc);
+                    ArkaceUltInfo.Sounds.SHOOT.play(loc);
                 }
 
                 break;
@@ -129,7 +129,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public void onReloadTick(long i) {
-        ArkaceWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
+        ArkaceWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -150,7 +150,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(14, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                (isUlt ? ArkaceUltInfo.PARTICLE.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+                (isUlt ? ArkaceUltInfo.Particles.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
             });
         }
 

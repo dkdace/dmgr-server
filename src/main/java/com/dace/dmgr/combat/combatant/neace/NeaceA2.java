@@ -52,10 +52,10 @@ public final class NeaceA2 extends ActiveSkill {
         setDuration();
         combatUser.getWeapon().setGlowing(true);
 
-        NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
+        NeaceA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            NeaceA2Info.PARTICLE.TICK.play(combatUser.getCenterLocation());
+            NeaceA2Info.Particles.TICK.play(combatUser.getCenterLocation());
             if (i < 12)
                 playUseTickEffect(i);
         }, 1, NeaceA2Info.DURATION.toTicks()));
@@ -95,7 +95,7 @@ public final class NeaceA2 extends ActiveSkill {
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            NeaceA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
+            NeaceA2Info.Particles.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
         }
     }
 

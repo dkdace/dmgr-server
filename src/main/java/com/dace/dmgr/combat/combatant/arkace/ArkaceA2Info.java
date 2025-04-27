@@ -42,7 +42,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(0.9).build(),
@@ -54,7 +54,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

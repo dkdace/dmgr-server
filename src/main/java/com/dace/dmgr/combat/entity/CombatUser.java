@@ -440,11 +440,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 volume = 1.2 + fallDistance * 0.05;
                 SoundEffect fallSound;
                 if (fallDistance > 6)
-                    fallSound = SOUND.FALL_HIGH;
+                    fallSound = Sounds.FALL_HIGH;
                 else if (fallDistance > 3)
-                    fallSound = SOUND.FALL_MID;
+                    fallSound = Sounds.FALL_MID;
                 else
-                    fallSound = SOUND.FALL_LOW;
+                    fallSound = Sounds.FALL_LOW;
 
                 fallSound.play(loc, volume);
             }
@@ -528,10 +528,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         SoundEffect sound;
         if (isCrit) {
             title = "§c§l×";
-            sound = SOUND.ATTACK_CRIT;
+            sound = Sounds.ATTACK_CRIT;
         } else {
             title = "§f×";
-            sound = SOUND.ATTACK;
+            sound = Sounds.ATTACK;
         }
 
         user.sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
@@ -634,7 +634,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void playKillEffect() {
         user.sendTitle("", "§c" + TextIcon.POISON, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
-        addTask(new DelayTask(() -> SOUND.KILL.play(entity), 2));
+        addTask(new DelayTask(() -> Sounds.KILL.play(entity), 2));
     }
 
     /**
@@ -1366,7 +1366,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 효과음 목록.
      */
     @UtilityClass
-    private static final class SOUND {
+    private static final class Sounds {
         /** 추락 (낮음) */
         private static final SoundEffect FALL_LOW = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.3).pitch(0.9).pitchVariance(0.1).build());

@@ -54,8 +54,8 @@ public final class VellionP1 extends AbstractSkill {
 
         Location location = combatUser.getLocation();
 
-        VellionP1Info.SOUND.USE.play(location);
-        VellionP1Info.PARTICLE.USE.play(location);
+        VellionP1Info.Sounds.USE.play(location);
+        VellionP1Info.Particles.USE.play(location);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
@@ -100,8 +100,8 @@ public final class VellionP1 extends AbstractSkill {
             return !combatUser.getEntity().isOnGround();
         }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
-        VellionP1Info.SOUND.DISABLE.play(combatUser.getLocation());
-        VellionP1Info.PARTICLE.USE.play(combatUser.getLocation());
+        VellionP1Info.Sounds.DISABLE.play(combatUser.getLocation());
+        VellionP1Info.Particles.USE.play(combatUser.getLocation());
     }
 
     @Override
@@ -128,7 +128,7 @@ public final class VellionP1 extends AbstractSkill {
             int angle = 360 / 8 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            VellionP1Info.PARTICLE.TICK.play(loc.clone().add(vec));
+            VellionP1Info.Particles.TICK.play(loc.clone().add(vec));
         }
     }
 }

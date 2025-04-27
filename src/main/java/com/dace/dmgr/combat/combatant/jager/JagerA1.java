@@ -197,13 +197,13 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
         @Override
         public void onTickBeforeReady(long i) {
-            JagerA1Info.PARTICLE.SUMMON_BEFORE_READY_TICK.play(getLocation());
+            JagerA1Info.Particles.SUMMON_BEFORE_READY_TICK.play(getLocation());
         }
 
         @Override
         public void onReady() {
             entity.setAI(true);
-            JagerA1Info.SOUND.SUMMON_READY.play(getLocation());
+            JagerA1Info.Sounds.SUMMON_READY.play(getLocation());
         }
 
         private void onTick(long i) {
@@ -220,7 +220,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
                 if (target != null) {
                     entity.setTarget(target.getEntity());
-                    JagerA1Info.SOUND.ENEMY_DETECT.play(getLocation());
+                    JagerA1Info.Sounds.ENEMY_DETECT.play(getLocation());
                 }
             } else {
                 entity.setAngry(true);
@@ -273,7 +273,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
             setStateValue(damageModule.getHealth());
 
-            JagerA1Info.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            JagerA1Info.Sounds.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBleedingParticle(this, location, damage);
         }
 
@@ -284,7 +284,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             setStateValue(0);
             setCooldown(JagerA1Info.COOLDOWN_DEATH);
 
-            JagerA1Info.SOUND.DEATH.play(getLocation());
+            JagerA1Info.Sounds.DEATH.play(getLocation());
         }
     }
 }

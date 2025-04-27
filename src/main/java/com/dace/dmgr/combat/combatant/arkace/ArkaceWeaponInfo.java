@@ -31,7 +31,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
 
     private ArkaceWeaponInfo() {
-        super(ArkaceWeapon.class, RESOURCE.DEFAULT, "HLN-12",
+        super(ArkaceWeapon.class, Resource.DEFAULT, "HLN-12",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("뛰어난 안정성을 가진 전자동 돌격소총입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
@@ -48,7 +48,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 반동 정보.
      */
     @UtilityClass
-    public static final class RECOIL {
+    public static final class Recoil {
         /** 수직 반동 */
         public static final double UP = 0.6;
         /** 수평 반동 */
@@ -63,7 +63,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 탄퍼짐 정보.
      */
     @UtilityClass
-    public static final class SPREAD {
+    public static final class Spread {
         /** 탄퍼짐 증가량 */
         public static final double INCREMENT = 0.3;
         /** 탄퍼짐 시작 시점 */
@@ -76,7 +76,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 1;
         /** 달리기 */
@@ -87,7 +87,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.scarlight_1").volume(3).pitch(1).build(),

@@ -131,18 +131,18 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
         Location location = confirmModule.getCurrentLocation();
 
-        VellionA3Info.SOUND.USE.play(combatUser.getLocation());
+        VellionA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);
+            VellionA3Info.Particles.USE_TICK_CORE.play(location);
             for (Location loc2 : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), location, 0.7))
-                VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
+                VellionA3Info.Particles.USE_TICK_DECO.play(loc2);
         }, () -> {
             cancel();
 
             Location loc = location.clone().add(0, 0.1, 0);
 
-            VellionA3Info.SOUND.USE_READY.play(loc);
+            VellionA3Info.Sounds.USE_READY.play(loc);
 
             addTask(new IntervalTask(i -> {
                 if (i % 4 == 0)
@@ -164,7 +164,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         loc.setYaw(0);
         loc.setPitch(0);
 
-        VellionA3Info.PARTICLE.TICK_CORE.play(loc);
+        VellionA3Info.Particles.TICK_CORE.play(loc);
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -179,7 +179,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
                 Location loc2 = loc.clone().add(vec.clone().multiply(distance));
 
-                VellionA3Info.PARTICLE.TICK_DECO_1.play(loc2, vec.setY(0.4));
+                VellionA3Info.Particles.TICK_DECO_1.play(loc2, vec.setY(0.4));
             }
 
             long angle2 = index * 44;
@@ -191,7 +191,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
 
-                VellionA3Info.PARTICLE.TICK_DECO_2.play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
+                VellionA3Info.Particles.TICK_DECO_2.play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
                         dir.setY(distance2 * 0.1));
             }
         }

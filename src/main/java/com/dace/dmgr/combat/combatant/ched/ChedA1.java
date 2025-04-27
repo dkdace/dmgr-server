@@ -68,14 +68,14 @@ public final class ChedA1 extends StackableSkill {
         Weapon weapon = combatUser.getWeapon();
         weapon.cancel();
 
-        ChedA1Info.SOUND.USE.play(combatUser.getLocation());
+        ChedA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
 
             weapon.setGlowing(true);
             weapon.setMaterial(WeaponInfo.MATERIAL);
-            weapon.setDurability(ChedWeaponInfo.RESOURCE.FIRE);
+            weapon.setDurability(ChedWeaponInfo.Resource.FIRE);
         }, ChedA1Info.READY_DURATION.toTicks()));
     }
 
@@ -93,7 +93,7 @@ public final class ChedA1 extends StackableSkill {
         Weapon weapon = combatUser.getWeapon();
         weapon.setGlowing(false);
         weapon.setMaterial(Material.BOW);
-        weapon.setDurability(ChedWeaponInfo.RESOURCE.DEFAULT);
+        weapon.setDurability(ChedWeaponInfo.Resource.DEFAULT);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class ChedA1 extends StackableSkill {
 
         new ChedA1Projectile().shot();
 
-        ChedA1Info.SOUND.SHOOT.play(combatUser.getLocation());
+        ChedA1Info.Sounds.SHOOT.play(combatUser.getLocation());
     }
 
     private final class ChedA1Projectile extends Projectile<Damageable> {
@@ -116,7 +116,7 @@ public final class ChedA1 extends StackableSkill {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            ChedWeaponInfo.SOUND.HIT.play(location);
+            ChedWeaponInfo.Sounds.HIT.play(location);
         }
 
         @Override
@@ -126,7 +126,7 @@ public final class ChedA1 extends StackableSkill {
                     .chain(createGravityIntervalHandler())
                     .next(createPeriodIntervalHandler(9, location -> {
                         Location loc = LocationUtil.getLocationFromOffset(location, 0.2, 0, 0);
-                        ChedA1Info.PARTICLE.BULLET_TRAIL.play(loc);
+                        ChedA1Info.Particles.BULLET_TRAIL.play(loc);
                     }));
         }
 
@@ -136,7 +136,7 @@ public final class ChedA1 extends StackableSkill {
             return (location, hitBlock) -> {
                 CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
                 CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1.5);
-                ChedA1Info.PARTICLE.HIT_BLOCK.play(location);
+                ChedA1Info.Particles.HIT_BLOCK.play(location);
 
                 return false;
             };

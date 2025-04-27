@@ -39,7 +39,7 @@ public final class JagerT1Info extends TraitInfo {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 3)

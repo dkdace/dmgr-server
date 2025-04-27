@@ -35,8 +35,8 @@ public final class ChedA2 extends ActiveSkill {
         Location location = combatUser.getLocation();
         location.setPitch(0);
 
-        ChedA2Info.SOUND.USE.play(location);
-        ChedA2Info.PARTICLE.USE.play(location.clone().add(0, 0.5, 0));
+        ChedA2Info.Sounds.USE.play(location);
+        ChedA2Info.Particles.USE.play(location.clone().add(0, 0.5, 0));
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
@@ -64,7 +64,7 @@ public final class ChedA2 extends ActiveSkill {
             combatUser.getMoveModule().push(vec, true);
         }, 1, 2));
 
-        addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getLocation()), 1, 10));
+        addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.Particles.USE_TICK.play(combatUser.getLocation()), 1, 10));
     }
 
     @Override

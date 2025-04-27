@@ -60,7 +60,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 
-        MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
+        MagrittaUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
@@ -69,11 +69,11 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
             addActionTask(new IntervalTask(i -> {
                 weapon.shot(true);
 
-                CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.RECOIL.UP / 2, MagrittaWeaponInfo.RECOIL.SIDE / 2,
-                        MagrittaWeaponInfo.RECOIL.UP_SPREAD / 2, MagrittaWeaponInfo.RECOIL.SIDE_SPREAD / 2, 2, 1);
+                CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.Recoil.UP / 2, MagrittaWeaponInfo.Recoil.SIDE / 2,
+                        MagrittaWeaponInfo.Recoil.UP_SPREAD / 2, MagrittaWeaponInfo.Recoil.SIDE_SPREAD / 2, 2, 1);
 
                 Location loc = combatUser.getLocation();
-                MagrittaUltInfo.SOUND.SHOOT.play(loc);
+                MagrittaUltInfo.Sounds.SHOOT.play(loc);
 
                 addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
             }, this::onEnd, MagrittaUltInfo.ATTACK_COOLDOWN.toTicks(), MagrittaUltInfo.DURATION.divide(2).toTicks()));
@@ -110,14 +110,14 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.5);
 
-        MagrittaUltInfo.SOUND.END.play(loc);
-        MagrittaUltInfo.PARTICLE.END.play(loc);
+        MagrittaUltInfo.Sounds.END.play(loc);
+        MagrittaUltInfo.Particles.END.play(loc);
         CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(7));
 
         addTask(new DelayTask(() -> {
             weapon.setVisible(true);
 
-            MagrittaUltInfo.SOUND.USE.play(combatUser.getLocation());
+            MagrittaUltInfo.Sounds.USE.play(combatUser.getLocation());
         }, weaponCooldown.toTicks()));
     }
 }

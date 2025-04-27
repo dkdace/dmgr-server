@@ -45,7 +45,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     private static final PalasWeaponInfo instance = new PalasWeaponInfo();
 
     private PalasWeaponInfo() {
-        super(PalasWeapon.class, RESOURCE.DEFAULT, "RQ-07",
+        super(PalasWeapon.class, Resource.DEFAULT, "RQ-07",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("생체탄을 발사하는 볼트액션 소총입니다. " +
                                 "사격하여 아군을 <:HEAL:치유>하거나 적에게 <:DAMAGE:피해>를 입힙니다. " +
@@ -65,7 +65,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
      * 반동 정보.
      */
     @UtilityClass
-    public static final class RECOIL {
+    public static final class Recoil {
         /** 수직 반동 */
         public static final double UP = 2.5;
         /** 수평 반동 */
@@ -80,7 +80,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 15;
     }
@@ -89,7 +89,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun.vssvintorez").volume(2.5).pitch(1.3).build(),
@@ -126,7 +126,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

@@ -30,7 +30,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
 
         this.mainWeapon = mainWeapon;
-        this.reloadModule = new ReloadModule(this, JagerWeaponInfo.SCOPE.CAPACITY, Timespan.ZERO);
+        this.reloadModule = new ReloadModule(this, JagerWeaponInfo.Scope.CAPACITY, Timespan.ZERO);
     }
 
     @Override
@@ -69,11 +69,11 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
                 reloadModule.consume(1);
 
-                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.SCOPE.RECOIL.UP, JagerWeaponInfo.SCOPE.RECOIL.SIDE,
-                        JagerWeaponInfo.SCOPE.RECOIL.UP_SPREAD, JagerWeaponInfo.SCOPE.RECOIL.SIDE_SPREAD, 2, 1);
+                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.Scope.Recoil.UP, JagerWeaponInfo.Scope.Recoil.SIDE,
+                        JagerWeaponInfo.Scope.Recoil.UP_SPREAD, JagerWeaponInfo.Scope.Recoil.SIDE_SPREAD, 2, 1);
 
                 Location loc = combatUser.getLocation();
-                JagerWeaponInfo.SOUND.USE_SCOPE.play(loc);
+                JagerWeaponInfo.Sounds.USE_SCOPE.play(loc);
 
                 addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
 
@@ -151,7 +151,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
-                double damage = CombatUtil.getDistantDamage(JagerWeaponInfo.SCOPE.DAMAGE, getTravelDistance(), JagerWeaponInfo.SCOPE.DAMAGE_WEAKENING_DISTANCE);
+                double damage = CombatUtil.getDistantDamage(JagerWeaponInfo.Scope.DAMAGE, getTravelDistance(), JagerWeaponInfo.Scope.DAMAGE_WEAKENING_DISTANCE);
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, true);
 
                 return false;

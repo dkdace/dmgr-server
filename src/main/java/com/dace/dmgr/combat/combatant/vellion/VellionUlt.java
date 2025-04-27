@@ -71,7 +71,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
         combatUser.getSkill(VellionP1Info.getInstance()).cancel();
 
-        VellionUltInfo.SOUND.USE.play(combatUser.getLocation());
+        VellionUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         EffectManager effectManager = new EffectManager();
 
@@ -113,7 +113,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         setDuration();
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
-        VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
+        VellionUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             if (i % 4 == 0)
@@ -127,8 +127,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
             new VellionUltExplodeArea().emit(loc);
 
             Location loc2 = loc.add(0, 1, 0);
-            VellionUltInfo.SOUND.EXPLODE.play(loc2);
-            VellionUltInfo.PARTICLE.EXPLODE.play(loc2);
+            VellionUltInfo.Sounds.EXPLODE.play(loc2);
+            VellionUltInfo.Particles.EXPLODE.play(loc2);
         }, 1, VellionUltInfo.DURATION.toTicks()));
     }
 
@@ -142,9 +142,9 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         loc.setYaw(0);
         loc.setPitch(0);
 
-        VellionUltInfo.PARTICLE.TICK_CORE_1.play(loc.clone().add(0, 1, 0));
+        VellionUltInfo.Particles.TICK_CORE_1.play(loc.clone().add(0, 1, 0));
         if (i < 8)
-            VellionUltInfo.PARTICLE.TICK_CORE_2.play(loc.clone().add(0, 1, 0));
+            VellionUltInfo.Particles.TICK_CORE_2.play(loc.clone().add(0, 1, 0));
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -159,11 +159,11 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 Location loc2 = loc.clone().add(vec);
 
                 if (j > 0 && j % 10 == 0)
-                    VellionUltInfo.PARTICLE.TICK_DECO_1.play(loc2.clone().add(0, 2.5, 0));
+                    VellionUltInfo.Particles.TICK_DECO_1.play(loc2.clone().add(0, 2.5, 0));
                 else if (i > 20)
-                    VellionUltInfo.PARTICLE.TICK_DECO_3.play(loc2);
+                    VellionUltInfo.Particles.TICK_DECO_3.play(loc2);
                 else
-                    VellionUltInfo.PARTICLE.TICK_DECO_2.play(loc2, j / 49.0);
+                    VellionUltInfo.Particles.TICK_DECO_2.play(loc2, j / 49.0);
             }
         }
 
@@ -173,8 +173,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
             Location loc2 = loc.clone().add(vec);
 
-            VellionUltInfo.PARTICLE.TICK_DECO_4.play(loc2);
-            VellionUltInfo.PARTICLE.TICK_DECO_5.play(loc2.clone().add(0, 2, 0));
+            VellionUltInfo.Particles.TICK_DECO_4.play(loc2);
+            VellionUltInfo.Particles.TICK_DECO_5.play(loc2.clone().add(0, 2, 0));
         }
     }
 
@@ -211,7 +211,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
                     Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                    VellionUltInfo.PARTICLE.USE_TICK.play(loc2);
+                    VellionUltInfo.Particles.USE_TICK.play(loc2);
                 }
             }
 
@@ -265,11 +265,11 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 }
             }
 
-            VellionUltInfo.PARTICLE.HIT_ENTITY_CORE.play(location);
+            VellionUltInfo.Particles.HIT_ENTITY_CORE.play(location);
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
             for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                VellionUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc2);
+                VellionUltInfo.Particles.HIT_ENTITY_DECO.play(loc2);
 
             return true;
         }

@@ -53,15 +53,15 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         if (target.isGoalTarget())
             combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
 
-        PalasUltInfo.SOUND.USE.play(combatUser.getLocation());
+        PalasUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         Location location = target.getCenterLocation();
-        PalasUltInfo.SOUND.HIT_ENTITY.play(location);
-        PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_1.play(location);
-        PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_2.play(location);
+        PalasUltInfo.Sounds.HIT_ENTITY.play(location);
+        PalasUltInfo.Particles.HIT_ENTITY_CORE_1.play(location);
+        PalasUltInfo.Particles.HIT_ENTITY_CORE_2.play(location);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.LEFT), location, 0.4))
-            PalasUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc);
+            PalasUltInfo.Particles.HIT_ENTITY_DECO.play(loc);
     }
 
     @Override
@@ -96,7 +96,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            PalasUltInfo.PARTICLE.TICK.play(combatEntity.getCenterLocation());
+            PalasUltInfo.Particles.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override
